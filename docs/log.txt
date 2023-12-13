@@ -21,3 +21,66 @@ ng build ng-common
 ng build ng-altea-common
 ng build altea-velzon-admin
 
+
+tsconfig.json
+=============
+
+There are 2 ways to use external projects (when you work with local sources)
+
+1/ Use the build output files (default) located in your dist directory
+
+Disadvantage: you can not debug the source files of the other library
+
+    "paths": {
+        "other-lib": [
+            "dist/other-lib"
+        ]
+    }
+
+2/ Use the source files:
+    Then you have to change the paths to
+
+    "paths": {
+        "other-lib": [
+            "projects/other-lib/src/public-api.ts"
+        ]
+    }
+
+
+
+
+    // "paths": {
+    //   "ng-altea-common": [
+    //     "dist/ng-altea-common"
+    //   ],
+    //   "ng-common": [
+    //     "dist/ng-common"
+    //   ],
+    //   "ts-altea-logic": [
+    //     "dist/ts-altea-logic"
+    //   ],
+    //   "ts-altea-model": [
+    //     "dist/ts-altea-model"
+    //   ],
+    //   "ts-common": [
+    //     "dist/ts-common"
+    //   ]
+    // },
+    "paths": {
+      "ng-altea-common": [
+        "projects/ng-altea-common/src/public-api.ts"
+      ],
+      "ng-common": [
+        "projects/ng-common/src/public-api.ts"
+      ],
+      "ts-altea-logic": [
+        "projects/ts-altea-logic/src/public-api.ts"
+      ],
+      "ts-altea-model": [
+        "projects/ts-altea-model/src/public-api.ts"
+      ],
+      "ts-common": [
+        "projects/ts-common/src/public-api.ts"
+      ]
+    },
+
