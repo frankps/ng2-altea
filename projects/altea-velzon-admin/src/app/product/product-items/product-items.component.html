@@ -1,0 +1,164 @@
+<ngx-altea-search-product #searchProductModal (select)="addNewProductItem($event)"></ngx-altea-search-product>
+
+
+<!-- 
+<button type="button" class="btn btn-primary btn-sm" (click)="searchProduct()">Zoek product</button> -->
+
+
+
+<ngx-altea-form-card-section
+    *ngIf="product && (product.type === ProductType.bundle || product.type === ProductType.subscription)"
+    sectionName="ui.product.edit.sections.items.title" sectionId="items" [editSectionId]="parent.editSectionId"
+    [showBody]="!product.hasItems()" icon="fa-duotone fa-credit-card" (save)="save()" (cancel)="cancel()"
+    (editModeChanged)="editModeChanged($event)">
+
+    <ng-container readonly>
+
+        <div *ngIf="!product.hasItems()" [innerHTML]="'ui.product.edit.sections.items.none' | translate">
+
+        </div>
+    </ng-container>
+
+
+
+    <ng-container outside-body>
+
+
+        <ul class="list-group list-group-flush">
+
+            <ng-container *ngIf="product.hasItems()">
+
+
+                <li class="list-group-item" *ngFor="let item of product.items; let idx = index">
+
+                    <div class="row">
+
+                        <ng-container *ngIf="item !== itemInEdit; else editItem">
+                            <div class="col">{{item.qty}} x {{item.name}}</div>
+
+                            <div class="col">
+                                <ul>
+                                    <!-- item.optionsWithValues -->
+                                    <li *ngFor="let option of item.options; let idx2 = index">
+                                        {{option.name}}:
+
+                                        <ng-container *ngIf="option.values">
+                                            <ng-container *ngIf="Array.isArray(option.values)">
+                                                <span
+                                                    *ngFor="let val of option.values; let idx3 = index">{{val.name}}</span>
+                                            </ng-container>
+
+                                            <ng-container *ngIf="!Array.isArray(option.values)">
+                                                {{<option value="" class="values"></option>.name}}
+                                            </ng-container>
+                                        </ng-container>
+
+
+                                    </li>
+                                </ul>
+
+                            </div>
+                        </ng-container>
+
+                        <ng-template #editItem>
+
+                            <div class="col-4 d-flex align-items-start pt-2">
+
+                                <!-- <input type="number" id="qty" name="qty"
+                                    required class="form-control" style="width: 60px;"
+                                    [(ngModel)]="item.qty" />
+                                     -->
+                                <div class="d-flex align-items-center">
+
+
+                                    <ng-select id="qty" name="qty" style="width: 60px;" [items]="qtyArray"
+                                        [clearable]="false" [multiple]="false" [(ngModel)]="item.qty">
+                                    </ng-select>
+
+                                    &nbsp;&nbsp;x&nbsp;<div>{{item.name}}</div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <!-- 
+                                class="list-group list-group-flush"
+                                class="list-group-item"
+                            <li class="list-group-item"
+
+                            bindValue="id"
+                         -->
+
+                                <ul *ngIf="dependingProduct">
+                                    <li class="mt-2" *ngFor="let option of dependingProduct.options; let idx2 = index">
+
+                                        <div class="row">
+                                            <div class="col">{{option.name}}:</div>
+                                            <div class="col-6">
+                                                <ng-select id="optionValues" name="optionValues" [items]="itemOptionValues.get(option.id)"
+                                                    bindLabel="name" [clearable]="true" [multiple]="false"
+                                                    [(ngModel)]="item.getOption(option).values[0]">
+                                                </ng-select>
+                                            </div>
+                                        </div>
+
+
+
+
+
+
+
+                                        <!--
+                                            option.values[0]
+
+
+
+                                            class="d-flex align-items-center"
+
+                                             [(ngModel)]="object.gender"
+                                            <ng-container *ngIf="option.value">
+                                            <ng-container *ngIf="Array.isArray(option.value)">
+                                                <span
+                                                    *ngFor="let val of option.value; let idx3 = index">{{val.value}}</span>
+                                            </ng-container>
+
+                                            <ng-container *ngIf="!Array.isArray(option.value)">
+                                                {{option.value.value}}
+                                            </ng-container>
+                                        </ng-container> -->
+
+
+                                    </li>
+                                </ul>
+
+
+                            </div>
+                        </ng-template>
+
+
+                        <div class="col-1" *ngIf="sectionInEdit(ListSectionMode.readOnly)">
+
+                            <ng-container>
+                                <i class="fas fa-trash float-end" (click)="deleteItem(item)"></i>
+                                <i class="fas fa-pen float-end me-3" (click)="toggleEditItem($event, item, idx)"></i>
+                            </ng-container>
+
+                        </div>
+
+                    </div>
+
+                </li>
+            </ng-container>
+
+            <li *ngIf="sectionInEdit(ListSectionMode.readOnly)" class="list-group-item"
+                style="text-align: center; cursor: pointer;" (click)="startAdd()">
+                <i class="fa-duotone fa-circle-plus fa-xl"></i> &nbsp; {{ 'ui.product.edit.sections.options.add-btn' |
+                translate
+                }}
+            </li>
+
+
+        </ul>
+    </ng-container>
+
+
+
+</ngx-altea-form-card-section>

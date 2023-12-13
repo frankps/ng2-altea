@@ -1,0 +1,283 @@
+<ng-container *ngIf="object">
+
+    <ngx-altea-delete-modal #deleteModal objectType="subscription" [object]="object" [objectSvc]="subscriptionSvc"
+        [config]="deleteConfig"></ngx-altea-delete-modal>
+
+    <div class="row">
+        <div class="col-9">
+            <h4>{{'objects.subscription._single' | translate}} {{object.name}}</h4>
+        </div>
+        <div class="col-3">
+
+            <div class="d-inline-block float-end" ngbDropdown #myDrop="ngbDropdown">
+                <button type="button" class="btn btn-outline-primary me-2" id="dropdownManual" ngbDropdownAnchor
+                    (focus)="myDrop.open()">
+                    Acties
+                </button>
+                <div ngbDropdownMenu aria-labelledby="dropdownManual">
+                    <button ngbDropdownItem (click)="delete()"><i class="fa-duotone fa-trash me-1"></i>
+                        Verwijderen</button>
+                </div>
+            </div>
+
+
+        </div>
+
+    </div>
+    <!-- 
+    [icon]="ResourceTypeIcons[object.type]" -->
+
+    <ngx-altea-form-card-section sectionName="{{object.name}} - {{object.contact.name}}" sectionId="general"
+        [editSectionId]="editSectionId" (save)="save()" (cancel)="cancel()" (editModeChanged)="editModeChanged($event)"
+        [enableSave]="!generalForm?.form.pristine && generalForm?.form.valid">
+        <ng-container readonly>
+            <!-- <div>{{ object.descr }}</div> -->
+
+            <div class="row">
+                <div class="col-4"> <ngx-altea-label-value label="objects.subscription.totalQty"
+                        [value]="object.totalQty"></ngx-altea-label-value> </div>
+                <div class="col-4"> <ngx-altea-label-value label="objects.subscription.usedQty"
+                        [value]="object.usedQty"></ngx-altea-label-value> </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12"> <ngx-altea-label-value label="objects.subscription.contact"
+                        [value]="object.contact.name"></ngx-altea-label-value> </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12"> <ngx-altea-label-value label="objects.subscription.name"
+                        [value]="object.name"></ngx-altea-label-value> </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12"> <ngx-altea-label-value label="objects.subscription.remark"
+                        [value]="object.remark"></ngx-altea-label-value> </div>
+            </div>
+
+
+
+            <!-- 
+
+            <div class="row">
+                <div class="col-6"> <ngx-altea-label-value label="objects.contact.gender"
+                        value="{{ 'enums.gender.' + object.gender | translate }}"></ngx-altea-label-value> </div>
+
+                <div class="col-6"> <ngx-altea-label-value label="objects.contact.language"
+                        value="{{ 'enums.language.' + object.language | translate }}"></ngx-altea-label-value> </div>
+                <div class="col-6"> </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-6"><ngx-altea-label-value label="objects.contact.email"
+                        [value]="object.email"></ngx-altea-label-value></div>
+                <div class="col-6">
+                    <ngx-altea-label-value label="objects.contact.emailRemind" valueFormat="yesNo"
+                        [value]="object.emailRemind"></ngx-altea-label-value>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-6"><ngx-altea-label-value label="objects.contact.mobile"
+                        [value]="object.mobile"></ngx-altea-label-value></div>
+                <div class="col-6">
+                    <ngx-altea-label-value label="objects.contact.smsRemind" valueFormat="yesNo"
+                        [value]="object.smsRemind"></ngx-altea-label-value>
+                </div>
+            </div> -->
+
+
+
+        </ng-container>
+        <ng-container edit>
+
+            <form #generalForm="ngForm">
+
+
+
+                <div class="row">
+                    <div class="col-4">
+                        <ngx-altea-label-control label="objects.subscription.totalQty" for="totalQty">
+                            <input type="number" id="totalQty" name="totalQty" required class="form-control"
+                                [(ngModel)]="object.totalQty" />
+                        </ngx-altea-label-control>
+                    </div>
+                    <div class="col-4">
+                        <ngx-altea-label-control label="objects.subscription.usedQty" for="usedQty">
+                            <input type="number" id="usedQty" name="usedQty" required class="form-control"
+                                [(ngModel)]="object.usedQty" />
+                        </ngx-altea-label-control>
+                    </div>
+                    <!-- <div class="col-4"> <ngx-altea-label-value label="objects.gift.isConsumed" valueFormat="yesNo"
+                            [value]="object.isConsumed"></ngx-altea-label-value> </div> -->
+                </div>
+
+
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <ngx-altea-label-control label="objects.subscription.name" for="name">
+                            <input type="text" id="name" name="name" class="form-control" [(ngModel)]="object.name" />
+                        </ngx-altea-label-control>
+
+                    </div>
+                </div>
+
+
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <ngx-altea-label-control label="objects.subscription.remark" for="remark">
+                            <textarea rows="2" class="form-control" id="remark" name="remark" style="height: 80px"
+                                [(ngModel)]="object.remark"></textarea>
+                        </ngx-altea-label-control>
+                    </div>
+                </div>
+
+
+
+<!-- 
+                <div class="row mt-2">
+                    <div class="col-6">
+                        {{'objects.gift.from' | translate}}
+                    </div>
+                </div>
+
+                <div class="row mt-2">
+                    <div class="col-6">
+                        <ngx-altea-label-control label="objects.gift.fromName" for="fromName">
+                            <input type="text" id="fromName" name="fromName" class="form-control"
+                                [(ngModel)]="object.fromName" />
+                        </ngx-altea-label-control>
+
+                    </div>
+                    <div class="col-6">
+
+                        <ngx-altea-label-control label="objects.gift.fromEmail" for="fromEmail">
+                            <input type="text" id="fromEmail" name="fromEmail" class="form-control"
+                                [(ngModel)]="object.fromEmail" />
+                        </ngx-altea-label-control>
+
+                    </div>
+                </div>
+
+                <div class="row mt-2">
+                    <div class="col-6">
+                        {{'objects.gift.to' | translate}}
+                    </div>
+                </div>
+
+                <div class="row mt-2">
+                    <div class="col-6">
+                        <ngx-altea-label-control label="objects.gift.toName" for="toName">
+                            <input type="text" id="toName" name="toName" class="form-control"
+                                [(ngModel)]="object.toName" />
+                        </ngx-altea-label-control>
+
+                    </div>
+                    <div class="col-6">
+
+                        <ngx-altea-label-control label="objects.gift.toEmail" for="toEmail">
+                            <input type="text" id="toEmail" name="toEmail" class="form-control"
+                                [(ngModel)]="object.toEmail" />
+                        </ngx-altea-label-control>
+
+                    </div>
+                </div>
+
+                <div class="row mt-2">
+                    <div class="col-6">
+                        <ngx-altea-label-control label="objects.gift.toAddress" for="toAddress">
+                            <textarea rows="2" class="form-control" id="toAddress" name="toAddress" style="height: 80px"
+                                [(ngModel)]="object.toAddress"></textarea>
+                        </ngx-altea-label-control>
+
+                    </div>
+                    <div class="col-6"></div>
+                </div>
+
+ -->
+
+
+
+
+
+
+
+                <!-- 
+                <div class="row mt-3">
+                    <div class="col-6">
+                        <ngx-altea-label-control label="objects.contact.gender" [trans]="true" for="gender">
+                            <ng-select id="gender" name="gender" [items]="gender" bindLabel="trans" bindValue="key"
+                                [clearable]="false" [multiple]="false" [(ngModel)]="object.gender">
+                            </ng-select>
+                        </ngx-altea-label-control>
+
+                    </div>
+
+                    <div class="col-6">
+
+                        <ngx-altea-label-control label="objects.contact.language" [trans]="true" for="language">
+                            <ng-select id="language" name="language" [items]="language" bindLabel="trans"
+                                bindValue="key" [clearable]="false" [multiple]="false" [(ngModel)]="object.language">
+                            </ng-select>
+                        </ngx-altea-label-control>
+
+
+                    </div>
+                </div>
+
+
+                <div class="row mt-3">
+                    <div class="col-6">
+                        <ngx-altea-label-control label="objects.contact.email" for="email">
+                            <input type="text" id="email" name="email" required class="form-control"
+                                [(ngModel)]="object.email" />
+                        </ngx-altea-label-control>
+                    </div>
+                    <div class="col-6 d-flex align-items-center">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="emailRemind" name="emailRemind"
+                                [(ngModel)]="object.emailRemind" />
+                            <label class="form-check-label" for="emailRemind"
+                                translate="objects.contact.emailRemind"></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-6">
+                        <ngx-altea-label-control label="objects.contact.mobile" for="mobile">
+                            <input type="text" id="mobile" name="mobile" required class="form-control"
+                                [(ngModel)]="object.mobile" />
+                        </ngx-altea-label-control>
+                    </div>
+                    <div class="col-6 d-flex align-items-center">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="smsRemind" name="smsRemind"
+                                [(ngModel)]="object.smsRemind" />
+                            <label class="form-check-label" for="smsRemind"
+                                translate="objects.contact.smsRemind"></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+
+                    <div class="col-6"></div>
+                </div> -->
+
+
+
+            </form>
+
+
+
+
+        </ng-container>
+
+    </ngx-altea-form-card-section>
+
+
+
+
+</ng-container>

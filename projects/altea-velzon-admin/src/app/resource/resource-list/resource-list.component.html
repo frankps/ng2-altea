@@ -1,0 +1,25 @@
+<ngx-altea-new-resource #newModal></ngx-altea-new-resource>
+
+
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h3>{{ 'menu.resources.sub.' + resourceType | translate }}</h3>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-12 d-flex justify-content-center">
+        <ul class="list-group" style="width: 100%;" *ngIf="objects">
+            <li class="list-group-item" *ngFor="let resource of objects" (click)="select(resource)">
+
+                <i class="{{getIcon(resource)}}"></i> &nbsp; {{ resource.name }}
+
+                <i class="fa-solid fa-circle float-end" [style.color]="resource.color"></i>
+
+            </li>
+        </ul>
+    </div>
+
+</div>

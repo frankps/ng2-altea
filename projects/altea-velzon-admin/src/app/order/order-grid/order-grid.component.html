@@ -1,0 +1,31 @@
+
+<!-- 
+(bsValueChange)="rangePickerChanged($event)" -->
+
+<div class="row mb-4">  
+    <div class="col-4">
+        <input class="form-control" #drp="bsDaterangepicker" bsDaterangepicker [(ngModel)]="dateRange" [bsConfig]="{useUtc: true}" onkeydown="return false">
+
+    </div>
+    <div class="col-3">
+        <ng-select *ngIf="searchTypeSelect && searchTypeSelect.length > 0" id="searchTypeSelect" name="searchTypeSelect" [items]="searchTypeSelect" bindLabel="trans" bindValue="key"
+        [clearable]="false" [multiple]="false" [(ngModel)]="orderSearch.typeSelect">
+    </ng-select>
+    </div>
+
+
+    <div class="col-2">
+        <button type="button" class="btn btn-primary btn-sm" (click)="startSearch()" translate>dic.search</button>
+    </div>
+</div>
+
+
+
+
+<div class="row row-cols-1 row-cols-md-2 g-4" *ngIf="objects">
+    <div class="col" *ngFor="let uiOrder of uiOrders">
+
+        <app-order-card [uiOrder]="uiOrder"></app-order-card>
+    </div>
+
+</div>

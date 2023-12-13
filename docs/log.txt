@@ -1,0 +1,23 @@
+
+
+
+
+https://angular.io/guide/file-structure#setting-up-for-a-multi-project-workspace
+
+
+ng new ng2-altea --no-create-application
+ng generate library ts-common
+ng generate library ts-altea-model
+ng generate library ts-altea-logic
+ng generate library ng-common
+ng generate library ng-altea-common
+ng generate application altea-velzon-admin
+
+
+ng build ts-common
+ng build ts-altea-model
+ng build ts-altea-logic
+ng build ng-common
+ng build ng-altea-common
+ng build altea-velzon-admin
+

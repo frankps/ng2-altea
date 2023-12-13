@@ -1,0 +1,107 @@
+<ng-container [ngSwitch]="layout">
+
+  <ng-container *ngSwitchCase="'ng-select'">
+
+    <div class="form-floating {{ class }}" *ngIf="trans">
+
+      <ng-select id="vatPct" name="vatPct" [items]="vatPcts" [clearable]="false" [multiple]="false"
+      [(ngModel)]="vatPct">
+    </ng-select>
+      <label [for]="for"> {{ label | translate }}</label>
+      <!-- <small *ngIf="help"><i>{{ help | translate }}</i></small> -->
+    </div>
+
+
+  </ng-container>
+
+
+  <ng-container *ngSwitchCase="'floating'">
+
+    <!-- <div class="form-floating {{ class }}">
+      <ng-container *ngTemplateOutlet="contentTpl"></ng-container>
+      <label [for]="for">{{ label }}</label>
+    </div> -->
+
+
+    <div class="form-floating {{ class }}" *ngIf="!trans">
+      <ng-container *ngTemplateOutlet="contentTpl"></ng-container>
+      <label [for]="for">{{ label }} </label>
+    </div>
+
+
+    <div class="form-floating {{ class }}" *ngIf="trans">
+
+      <ng-container *ngTemplateOutlet="contentTpl"></ng-container>
+      <label [for]="for"> {{ label | translate }}</label>
+      <small *ngIf="help"><i>{{ help | translate }}</i></small>
+    </div>
+    <!-- 
+    {{ labelTranslate | translate }} -->
+
+  </ng-container>
+
+
+  <ng-container *ngSwitchCase="'basic'">
+
+    <div class="{{ class }}" *ngIf="trans">
+      <label [for]="for" class="form-label">{{ label | translate }}</label>
+      <ng-container *ngTemplateOutlet="contentTpl"></ng-container>
+      <small *ngIf="help"><i>{{ help | translate }}</i></small>
+    </div>
+
+    <div class="{{ class }}" *ngIf="!trans">
+      <label [for]="for" class="form-label">{{ label }}</label>
+      <ng-container *ngTemplateOutlet="contentTpl"></ng-container>
+      <small *ngIf="help"><i>{{ help }}</i></small>
+    </div>
+
+
+  </ng-container>
+
+
+  <ng-container *ngSwitchCase="'list'">
+
+    <div class="{{ class }}" *ngIf="trans">
+      <div class="mb-1" style="line-height:100%">
+        <label [for]="for" class="form-label pb-0 mb-0">{{ label | translate }}</label><br>
+        <small><small *ngIf="help"><i>{{ help | translate }}</i></small></small>
+      </div>
+      <ng-container *ngTemplateOutlet="contentTpl"></ng-container>
+    </div>
+  </ng-container>
+
+</ng-container>
+
+<ng-template #contentTpl>
+  <ng-content></ng-content>
+</ng-template>
+
+<!-- 
+<ng-container [ngSwitch]="layout">
+    <ng-container *ngSwitchCase="'row'">
+
+        <div class="form-group row {{class}}">
+            <label [for]="for" class="{{labelCol}} {{extraCss}}">{{label}}</label>
+            <div class="{{controlCol}}">
+                <ng-container *ngTemplateOutlet="contentTpl"></ng-container>
+
+               <small *ngIf="showHelp && help" id="{{for}}-help" class="form-text text-muted">{{help}} &nbsp; <a
+                        *ngIf="extraHelp" href="javascript:void(0)" (click)="toggleExtraHelp()">Extra help</a></small>
+
+                <div *ngIf="showExtraHelp" class="mt-2" [ngTemplateOutlet]="extraHelp"></div>
+
+            </div>
+        </div>
+
+    </ng-container>
+
+
+    <ng-container *ngSwitchDefault>
+        Non-supported layout
+    </ng-container>
+</ng-container>
+
+
+<ng-template #contentTpl>
+    <ng-content></ng-content>
+</ng-template> -->

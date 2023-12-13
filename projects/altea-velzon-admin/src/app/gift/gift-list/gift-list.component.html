@@ -1,0 +1,33 @@
+<div class="row mb-4">
+    <div class="col-12">
+        <h3>{{ 'menu.gifts.label' | translate }}</h3>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-12 d-flex justify-content-center">
+        <ul class="list-group" style="width: 100%;" *ngIf="objects">
+            <li class="list-group-item" *ngFor="let gift of objects" (click)="select(gift)">
+
+                <div class="row">
+                    <div class="col-4"><b>{{ gift.code }}</b></div>
+                    <div class="col-4">{{ gift.used }}/{{ gift.value }}</div>
+                    <div class="col-4 d-flex justify-content-end">{{ gift.createdAt | date: sessionSvc.formats.date }}</div>
+                </div>
+
+                <!-- <i class="{{ResourceTypeIcons[contact.type]}}"></i> &nbsp;  -->
+
+                <div class="row">
+                    <div class="col">{{gift.fromName}} {{gift.fromEmail}}</div>
+                </div>
+
+
+
+                <!-- <i class="fa-solid fa-circle float-end" [style.color]="contact.color"></i> -->
+
+            </li>
+        </ul>
+    </div>
+
+</div>

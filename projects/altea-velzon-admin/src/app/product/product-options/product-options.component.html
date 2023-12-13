@@ -1,0 +1,376 @@
+<ngx-altea-form-card-section *ngIf="product" sectionName="ui.product.edit.sections.options.title" sectionId="options"
+  [editSectionId]="parent.editSectionId" [showBody]="!product.hasOptions()" icon="fa-duotone fa-credit-card"
+  (save)="save()" (cancel)="cancel()" (editModeChanged)="parent.editModeChanged($event)">
+
+  <ng-container readonly>
+
+    <div *ngIf="!product.hasOptions()" [innerHTML]="'ui.product.edit.sections.options.none' | translate">
+
+    </div>
+  </ng-container>
+
+
+
+  <ng-container outside-body>
+
+
+    <ul class="list-group list-group-flush">
+      <ng-container *ngIf="product.hasOptions()">
+        <!-- 
+      (click)="showOptionDetails(option, optionIdx)" -->
+        <li class="list-group-item" *ngFor="let option of product.options; let optionIdx = index">
+
+          <div class="row">
+            <div class="col-6">
+
+              <h6 *ngIf="option !== optionInEdit; else editOptionName">{{option.name}}</h6>
+
+              <ng-template #editOptionName>
+                <input type="text" id="name_{{option.id}}" name="name_{{option.id}}" required
+                  class="form-control form-control-sm" [(ngModel)]="option.name" />
+
+              </ng-template>
+
+            </div>
+            <div class="col-6">
+
+              <ng-container *ngIf="sectionInEdit(ListSectionMode.readOnly)">
+                <i class="fas fa-trash float-end" (click)="deleteOption(option)"></i>
+                <i class="fas fa-pen float-end me-3" (click)="toggleEditOption($event, option, optionIdx)"></i>
+              </ng-container>
+
+
+              <i class="fa-duotone fa-list-check float-end me-3" placement="left"
+                [ngbTooltip]="'objects.productOption.multiSelect' | translate" *ngIf="option.multiSelect"></i>
+              <i class="fa-duotone fa-triangle-exclamation float-end me-3" placement="left"
+                [ngbTooltip]="'objects.productOption.required' | translate" *ngIf="option.required"></i>
+              <i class="fa-solid fa-people-group float-end me-3" placement="left"
+                [ngbTooltip]="'objects.productOption.public' | translate" *ngIf="option.public"></i>
+
+
+            </div>
+          </div>
+
+
+
+
+
+          <!-- 
+        showOptionDetails
+        editOption
+ -->
+
+
+
+          <!-- 
+        <ngx-altea-label-control layout="list" label="objects.product.multiSelect" for="multiSelect"
+          help="objects.product.help.multiSelect">
+        </ngx-altea-label-control> -->
+
+          <ng-container *ngIf="option === optionInEdit">
+
+            <div class="ms-4">
+              <i>Instellingen</i>
+
+
+
+
+
+
+
+              <div class="ms-4 mt-2">
+
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="required" [(ngModel)]="option.required" />
+                  <label class="form-check-label" for="required" translate="objects.productOption.required"></label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="pvt" [(ngModel)]="option.pvt" />
+                  <label class="form-check-label" for="pvt" translate="objects.productOption.pvt"></label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="multiSelect" [(ngModel)]="option.multiSelect"
+                    (change)="multiSelectChanged(option, $event.target['checked'])" />
+                  <label class="form-check-label" for="multiSelect"
+                    translate="objects.productOption.multiSelect"></label>
+                </div>
+
+                <!-- (change)="defaultChanged(option, value, $event.target.checked)"
+               -->
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="hasDuration" [(ngModel)]="option.hasDuration" />
+                  <label class="form-check-label" for="hasDuration"
+                    translate="objects.productOption.hasDuration"></label>
+                </div>
+
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="hasValue" [(ngModel)]="option.hasValue" />
+                  <label class="form-check-label" for="hasValue" translate="objects.productOption.hasValue"></label>
+                </div>
+
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="hasPrice" [(ngModel)]="option.hasPrice" />
+                  <label class="form-check-label" for="hasPrice" translate="objects.productOption.hasPrice"></label>
+                </div>
+
+
+
+                <div class="ms-4 mt-2" *ngIf="option.hasPrice">
+                  <!-- <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="hasFactor" [(ngModel)]="option.hasFactor" />
+                    <label class="form-check-label" for="hasFactor" translate="objects.productOption.hasFactor"></label>
+                  </div> -->
+
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="hasFormula" [(ngModel)]="option.hasFormula" />
+                    <label class="form-check-label" for="hasFormula"
+                      translate="objects.productOption.hasFormula"></label>
+                  </div>
+
+
+                  <!-- <ng-container *ngIf="option.hasFactor">
+                    <ng-select id="factorOptionId" name="factorOptionId" [items]="product.options" bindLabel="name"
+                      bindValue="id" [clearable]="true" [multiple]="false" [(ngModel)]="option.factorOptionId">
+                    </ng-select>
+                  </ng-container> -->
+
+                  <ng-container *ngIf="option.hasFormula">
+
+                    <div class="row">
+                      <div class="col-9">
+                        Formule = <ng-container *ngFor="let term of option.formula; let idx = index"><span
+                            *ngIf="idx > 0"> + </span>(<span>{{term.factor}}</span>
+                          <span *ngIf="term.value">&nbsp;x&nbsp;{{'objects.formulaTerm.value' | translate}}</span>
+                          <span *ngIf="term.optionId"> x {{getOptionName(term.optionId)}}</span>) <i
+                            class="fa-solid fa-trash" (click)="removeTerm(option, idx)"></i> &nbsp;
+
+                        </ng-container>
+
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-3"><input type="number" id="factor" name="factor" class="form-control"
+                          [(ngModel)]="formulaTerm.factor" /></div>
+
+                      <div class="col-3">
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" id="value" [(ngModel)]="formulaTerm.value" />
+                          <label class="form-check-label" for="value" translate="objects.formulaTerm.value"></label>
+                        </div>
+
+                      </div>
+
+                      <div class="col-3"><ng-select id="optionId" name="optionId" [items]="product.options"
+                          bindLabel="name" bindValue="id" [clearable]="true" [multiple]="false"
+                          [(ngModel)]="formulaTerm.optionId">
+                        </ng-select></div>
+                      <div class="col-3">
+
+                        <button type="button" class="btn btn-primary btn-sm" (click)="addFormulaTerm(option)"
+                          translate>dic.add</button>
+
+
+                      </div>
+                    </div>
+
+
+
+
+                  </ng-container>
+
+
+                </div>
+
+
+
+              </div>
+
+
+
+
+
+              <!-- 
+              <ngx-altea-label-control label="objects.contact.gender" [trans]="true" for="factorOptionId">
+                
+              </ngx-altea-label-control> -->
+
+
+
+            </div>
+          </ng-container>
+
+
+          <!-- <div class="row" >
+          <div class="col-6">
+            
+          </div>
+          <div class="col-6">
+            <ng-container>
+
+            </ng-container>
+
+          </div>
+        </div> -->
+
+
+
+          <div class="ms-4 mt-3">
+            <i>Mogelijke keuzes:</i>
+          </div>
+
+
+
+          <ul class="list-group  ms-5">
+            <div class="row">
+              <div class="col-3">
+
+              </div>
+              <div class="col-2 d-flex justify-content-center" *ngIf="option.hasDuration" translate>
+                objects.productOptionValue.duration</div>
+
+              <div class="col-2 d-flex justify-content-center" *ngIf="option.hasValue" translate>
+                objects.productOptionValue.value</div>
+
+              <ng-container *ngIf="option.hasPrice && !option.hasFormula">
+                <div class="col-2 d-flex justify-content-center" translate>
+                  objects.productOptionValue.price</div>
+                <!-- <div class="col-2 d-flex justify-content-center" *ngIf="option.hasFactor" translate>
+                  objects.productOptionValue.factor</div> -->
+              </ng-container>
+              <div class="col d-flex justify-content-center">
+                {{'objects.productOptionValue.default' | translate}} / {{'objects.productOptionValue.pvt' | translate}}</div>
+            </div>
+
+            <li class="list-group-item" *ngFor="let value of option.values; let valueIdx = index">
+
+              <div class="row">
+
+                <ng-container *ngIf="!isValueInEdit(value.id); else editOptionValue">
+
+                  <div class="col-3">
+                    {{value.name}}
+                  </div>
+                  <div class="col-2 d-flex justify-content-center" *ngIf="option.hasDuration">
+                    {{value.duration}}
+                  </div>
+                  <div class="col-2 d-flex justify-content-center" *ngIf="option.hasValue">
+                    {{value.value}}
+                  </div>
+                  <ng-container *ngIf="option.hasPrice && !option.hasFormula">
+                    <div class="col-2 d-flex justify-content-center">
+                      {{value.price}}{{sessionSvc.currencySymbol}}
+                    </div>
+                    <!-- <div class="col-2 d-flex justify-content-center" *ngIf="option.hasFactor">
+                      {{value.factor}}
+                    </div> -->
+                  </ng-container>
+
+                  <div class="col-2 d-flex justify-content-center">
+                    <i *ngIf="value.default" style="color: green;" class="fa-sharp fa-regular fa-circle-check"></i>
+                    &nbsp;
+                    <i *ngIf="value.pvt" style="color: red;" class="fa-duotone fa-lock"></i>
+                  </div>
+
+
+                </ng-container>
+
+                <ng-template #editOptionValue>
+
+
+
+                  <div class="col-3">
+                    <input type="text" id="valueName" name="valueName" required class="form-control form-control-sm"
+                      [(ngModel)]="value.name" />
+                  </div>
+                  <div class="col-2 d-flex justify-content-center" *ngIf="option.hasDuration">
+                    <input type="number" id="duration" name="duration" required class="form-control form-control-sm"
+                      [(ngModel)]="value.duration" />
+                  </div>
+                  <div class="col-2 d-flex justify-content-center" *ngIf="option.hasValue">
+                    <input type="number" id="value" name="value" required class="form-control form-control-sm"
+                      [(ngModel)]="value.value" />
+                  </div>
+                  <ng-container *ngIf="option.hasPrice && !option.hasFormula">
+                    <div class="col-2 d-flex justify-content-center">
+                      <input type="number" id="price" name="price" required class="form-control form-control-sm"
+                        [(ngModel)]="value.price" /><span class="ms-2">{{sessionSvc.currencySymbol}}</span>
+                    </div>
+                    <!-- <div class="col-2 d-flex justify-content-center" *ngIf="option.hasFactor">
+                      <input type="number" id="factor" name="factor" required class="form-control form-control-sm"
+                        [(ngModel)]="value.factor" />
+                    </div> -->
+                  </ng-container>
+                  <div class="col-2 d-flex justify-content-center">
+                    <input class="form-check-input" type="checkbox" id="default" name="default"
+                      (change)="defaultChanged(option, value, $event.target['checked'])" [(ngModel)]="value.default" />
+
+                      <input class="form-check-input ms-2" type="checkbox" id="pvt" name="pvt" [(ngModel)]="value.pvt" />
+                  </div>
+
+
+
+                </ng-template>
+
+                <div class="col">
+                  <div style="color: gray" *ngIf="sectionInEdit(ListSectionMode.readOnly)">
+                    <i class="fas fa-trash fa-sm float-end" (click)="deleteOptionValue(option, value)"></i>
+                    <i class="fas fa-pen fa-sm float-end me-2"
+                      (click)="toggleEditOptionValue($event, option, optionIdx, value, valueIdx)"></i>
+                  </div>
+                </div>
+              </div>
+
+
+            </li>
+            <li *ngIf="sectionInEdit(ListSectionMode.readOnly)" class="list-group-item" style="cursor: pointer;"
+              (click)="startAddValue(option)">
+              <i class="fa-duotone fa-circle-plus fa-xl"></i> &nbsp; {{ 'ui.product.edit.sections.options.add-value-btn'
+              |
+              translate
+              }}
+            </li>
+          </ul>
+
+
+        </li>
+      </ng-container>
+
+      <!-- (click)="startAdd()"    -->
+      <li *ngIf="sectionInEdit(ListSectionMode.readOnly)" class="list-group-item"
+        style="text-align: center; cursor: pointer;" (click)="startAdd()">
+        <i class="fa-duotone fa-circle-plus fa-xl"></i> &nbsp; {{ 'ui.product.edit.sections.options.add-btn' | translate
+        }}
+      </li>
+
+      <li class="list-group-item" *ngIf="sectionInEdit(ListSectionMode.createNew)">
+
+        <!-- help="objects.template.help.subject"
+         -->
+
+
+        <div class="row">
+          <div class="col-8">
+
+            <ngx-altea-label-control label="dic.name" for="name">
+              <input type="text" id="name" name="name" required class="form-control" [(ngModel)]="objNew.name" />
+            </ngx-altea-label-control>
+
+          </div>
+          <div class="col-4">
+            <button type="button" class="btn btn-outline-primary btn-sm  me-2" (click)="cancelAdd()"
+              translate>dic.cancel</button>
+            <button type="button" class="btn btn-primary btn-sm" (click)="add()" translate>dic.add</button>
+          </div>
+        </div>
+
+
+      </li>
+
+
+    </ul>
+  </ng-container>
+
+
+
+</ngx-altea-form-card-section>

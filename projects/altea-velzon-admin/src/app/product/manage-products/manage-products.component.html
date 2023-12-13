@@ -1,0 +1,29 @@
+<div class="row ">
+    <div class="col-12">
+
+        <nav class="mb-0" aria-label="breadcrumb" *ngIf="manageProductSvc.path && manageProductSvc.path.length > 0">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item" *ngFor="let item of manageProductSvc.path" (click)="selectProduct(item)"><a href="javascript:void(0)"
+                        >{{item.name}}</a></li>
+
+                        <!-- (click)="selectPathItem(item)" -->
+            </ol>
+        </nav>
+
+
+    </div>
+
+</div>
+
+<div class="row">
+    <div class="col-4">
+
+        <ngx-altea-product-list #productList></ngx-altea-product-list>
+    </div>
+    <div class="col-8">
+
+        <router-outlet></router-outlet>
+
+        <!-- <ngx-altea-edit-product></ngx-altea-edit-product> -->
+    </div>
+</div>

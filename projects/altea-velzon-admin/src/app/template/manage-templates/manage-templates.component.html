@@ -1,0 +1,130 @@
+<ngx-altea-form-card-section sectionName="ui.template.edit.sections.config.title" sectionId="config"
+    [editSectionId]="editSectionId" icon="fa-duotone fa-mail" (editModeChanged)="editModeChanged($event)"
+    (cancel)="cancel()" (save)="save()">
+
+    <!-- 
+    (save)="save()" 
+    
+    <ng-container readonly>
+
+  </ng-container>
+  <ng-container edit>
+
+  </ng-container> -->
+
+    <ng-container always>
+
+        <div class="row mb-3  d-flex justify-content-center">
+            <div class="col-2">
+
+            </div>
+            <div class="col-2" style="text-align: center" translate>
+                ui.template.email-to-provider
+            </div>
+            <div class="col-2" style="text-align: center" translate>
+                ui.template.sms-to-provider
+            </div>
+            <div class="col-2" style="text-align: center" translate>
+                ui.template.email-to-client
+            </div>
+            <div class="col-2" style="text-align: center" translate>
+                ui.template.sms-to-client
+            </div>
+        </div>
+
+        <ng-container *ngIf="selectionsAvailable">
+            <div class="row mb-1  d-flex justify-content-center" *ngFor="let type of templateTypes">
+
+                <div class="col-2">{{'enums.template-type.' + type | translate}}</div>
+
+                <ng-container *ngIf="selections[type]">
+
+                    <div class="col-2 d-flex justify-content-center" *ngFor="let variant of variants">
+                        <!-- [(ngModel)]="object.showPrice" -->
+
+                        <ng-container *ngIf="sectionInEditIs('config')">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox"
+                                    id="{{type}}-{{variant.channel}}-{{variant.recipient}}"
+                                    [(ngModel)]="selections[type][variant.channel + '_' + variant.recipient]"
+                                    (change)="selectionChanged($event.target['checked'], type, variant)" />
+
+                            </div>
+
+                            <i class="fas fa-pen ms-2"
+                                *ngIf="selections[type][variant.channel + '_' + variant.recipient]"
+                                (click)="editTemplate(type, variant)"></i>
+
+                        </ng-container>
+
+                        <i class="fas fa-eye"
+                            *ngIf="sectionIsReadOnly('config') && selections[type][variant.channel + '_' + variant.recipient]"></i>
+                    </div>
+
+
+
+                </ng-container>
+            </div>
+        </ng-container>
+
+        <!-- <button type="button" class="btn btn-primary btn-sm" (click)="test()" translate>dic.add</button> -->
+
+
+
+        <ng-container *ngIf="sectionInEditIs('config') && template">
+
+            <div class="row mt-4  d-flex justify-content-center">
+                <div class="col-10">
+                    {{'objects.template._name' | translate}}
+                </div>
+                <div class="col-10 mt-2" *ngIf="template.isEmail()">
+                    <ngx-altea-label-control label="objects.template.subject" for="subject">
+                        <input type="text" id="subject" name="subject" required class="form-control"
+                            [(ngModel)]="template.name" />
+                    </ngx-altea-label-control>
+                </div>
+                <div class="col-10 mt-2">
+                    <ngx-altea-label-control [label]="'objects.template.body.' + template.channels[0]" for="body">
+                        <textarea rows="4" class="form-control" id="body" name="body" style="height: 120px"
+                            [(ngModel)]="template.body"></textarea>
+                    </ngx-altea-label-control>
+
+                </div>
+            </div>
+        </ng-container>
+
+
+
+
+        <!-- <div class="row mt-4  d-flex justify-content-center">
+            <div class="col-10">
+                SMS
+            </div>
+            <div class="col-10 mt-2">
+                <ngx-altea-label-control label="objects.template.short" for="short">
+                    <textarea rows="4" class="form-control" id="short" name="short" style="height: 120px"
+                        [(ngModel)]="template.short"></textarea>
+                </ngx-altea-label-control>
+            </div>
+        </div> -->
+
+
+
+        <!-- <div class="col-6">
+
+
+            </div> -->
+
+
+
+
+
+
+    </ng-container>
+
+</ngx-altea-form-card-section>
+
+
+
+
+<!-- help="objects.template.help.subject" -->

@@ -1,0 +1,91 @@
+<div class="row my-1 {{class}}">
+    <div [class]="nameColClass()">
+
+
+        <ng-container *ngIf="valueFormat == 'yesNo'">
+            <i *ngIf="value" style="color: green;" class="fa-sharp fa-regular fa-circle-check me-2"></i>
+            <i *ngIf="!value" style="color: red;" class="fa-sharp fa-regular fa-circle-xmark me-2"></i>
+        </ng-container>
+
+
+        <ng-container *ngIf="!trans">
+            {{label}}:
+        </ng-container>
+
+        <ng-container *ngIf="trans">
+            {{ label | translate }}:
+        </ng-container>
+
+
+        <span *ngIf="empty && !value">
+            {{ empty | translate }}
+        </span>
+
+        <!--         
+    </div>
+    <div [class]="valueCol"> -->
+
+
+        <ng-container [ngSwitch]="valueFormat">
+            <ng-container *ngSwitchCase="'pre'">
+                <pre>{{value}}</pre>
+            </ng-container>
+
+            <ng-container *ngSwitchCase="'url'">
+                <a href="{{url}}" target="_blank">{{value}}</a>
+            </ng-container>
+
+            <ng-container *ngSwitchCase="'html'">
+                <div>
+                    <div class="htmlDiv" [outerHTML]="value"></div>
+                </div>
+            </ng-container>
+            <!-- 
+            <ng-container *ngSwitchCase="'rating'">
+                <ngb-rating [(rate)]="value" [max]="max" readonly="true"></ngb-rating>
+            </ng-container> -->
+
+            <ng-container *ngSwitchCase="'date'">
+                {{value | date:'dd/MM/yy'}}
+            </ng-container>
+
+            <ng-container *ngSwitchCase="'currency'">
+                {{value}}
+
+                <ng-container [ngSwitch]="currency">
+                    <ng-container *ngSwitchCase="'EUR'">€</ng-container>
+                    <ng-container *ngSwitchDefault>{{currency}}</ng-container>
+                </ng-container>
+
+            </ng-container>
+
+            <ng-container *ngSwitchCase="'yesNo'">
+                <!-- {{getYesNo()}} >> we show icons, see above !!  -->
+            </ng-container>
+
+            <ng-container *ngSwitchCase="'color'">
+                <div class="row" style="padding-left: 15px;">
+                    <div class="col-min" [style]="colorStyle()">{{value}}</div>
+                    <div class="col">{{bgColor}}</div>
+                </div>
+
+            </ng-container>
+
+            <ng-container *ngSwitchCase="'translate'">
+                {{prefix + value | translate}}
+            </ng-container>
+
+
+            <ng-container *ngSwitchDefault>
+                {{getValue()}} <sup *ngIf="icon"><i [class]="icon"></i> </sup>
+            </ng-container>
+        </ng-container>
+
+        <!-- 
+        <cmn-label-control label="Importance" for="importance">
+            
+        </cmn-label-control> -->
+
+
+    </div>
+</div>

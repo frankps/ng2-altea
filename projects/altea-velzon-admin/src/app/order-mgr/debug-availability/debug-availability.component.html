@@ -1,0 +1,329 @@
+<h4>Availability Request</h4>
+<ng-container *ngIf="request">
+
+    {{request.from}} - {{request.to}}
+</ng-container>
+
+
+<h4>Order lines</h4>
+
+<small>
+
+</small>
+
+<ng-container *ngIf="order">
+
+    <ng-container *ngFor="let line of order.lines">
+
+        <div class="row">
+            <div class="col-3">{{line.qty}} x {{line.product.name}}</div>
+            <div class="col-3">
+                <span *ngIf="line.hasPersons()" class="badge bg-danger text-white">persons: {{line.persons}}</span>
+            </div>
+        </div>
+
+        <ng-container *ngIf="line.product">
+
+            <div class="row">
+                <div class="col-1"></div>
+                <div class="col-10">
+                    <div class="row">
+                        <div class="col-2" style="text-align: center; font-weight: bolder;"><i>Plan mode:</i></div>
+                        <div class="col-2"><i>{{line.product.planMode}}</i></div>
+                    </div>
+
+
+                </div>
+            </div>
+
+            <div class="row" *ngIf="line.product.plan">
+                <div class="col-1"></div>
+                <div class="col-10">
+                    <div class="row" style="text-align: center; font-weight: bolder;">
+                        <div class="col-2"><i>Start</i></div>
+                        <div class="col-2"><i>Duration</i></div>
+                        <div class="col-2"><i>Post</i></div>
+                        <div class="col-2"><i>Count</i></div>
+                        <div class="col-2"><i>Schedule</i></div>
+
+                    </div>
+
+                    <div class="row" style="text-align: center;" *ngFor="let blockSeries of line.product.plan">
+                        <div class="col-2"><i>{{blockSeries.start}}</i></div>
+                        <div class="col-2"><i>{{blockSeries.dur}}m (min: {{blockSeries.min}}m)</i></div>
+                        <div class="col-2"><i>{{blockSeries.post}}</i></div>
+                        <div class="col-2"><i>{{blockSeries.count}}</i></div>
+
+                        <div class="col" style="text-align: left">
+                            deviate={{blockSeries.dev}}
+                            <ng-container *ngIf="blockSeries.scheduleIds">
+                                <span class="badge bg-warning text-dark"
+                                    *ngFor="let id of blockSeries.scheduleIds">{{getScheduleName(id)}}</span>
+                            </ng-container>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+        </ng-container>
+
+        <div class="row">
+            <div class="col-1"></div>
+            <div class="col-10" *ngIf="line.product.hasResources()">
+                <div class="row" style="text-align: center; font-weight: bolder;">
+                    <div class="col-3"><i>Resource</i></div>
+                    <div class="col-2"><i>DurationMode</i></div>
+                    <div class="col-2"><i>Duration</i></div>
+                    <div class="col-2"><i>Schedules</i></div>
+                    <!-- <div class="col-2">Offset</div>
+                    <div class="col-2">Duration</div> -->
+                </div>
+                <div class="row" *ngFor="let prodRes of line.product.resources">
+                    <div class="col-3">
+                        
+                        <!-- <span
+                            *ngIf="prodRes.resource.type == 'group' && prodRes.groupQty != 1">{{prodRes.groupQty}} x
+                        </span> 
+                         -->
+                        {{prodRes.resource.name}}</div>
+                    <div class="col-2">{{prodRes.durationMode}}</div>
+
+                    <ng-container [ngSwitch]="prodRes.durationMode">
+                        <ng-container *ngSwitchCase="'product'">
+                            <div class="col-2">{{line.totalDuration()}} min</div>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'custom'">
+                            <div class="col-2">{{prodRes.reference}}: {{prodRes.duration}} min
+                                <span *ngIf="prodRes.offset != 0">(offset: {{prodRes.offset}} min)</span>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngSwitchDefault>
+                        </ng-container>
+                    </ng-container>
+
+
+
+                    <div class="col" *ngIf="prodRes.scheduleIds">
+                        <span class="badge bg-warning text-dark"
+                            *ngFor="let id of prodRes.scheduleIds">{{getScheduleName(id)}}</span>
+                    </div>
+
+
+                    <div class="col">
+                        <span style="color: purple;" *ngIf="prodRes.groupAlloc">{{ 'objects.prodRes.groupAlloc' |
+                            translate }}</span>
+                    </div>
+                    <!-- <div class="row" ></div> -->
+
+
+
+
+                    <!-- <div class="col-2">{{prodRes.reference}}</div>
+                    <div class="col-1">{{prodRes.offset}}</div>
+                    <div class="col-1">{{prodRes.duration}}</div> -->
+                </div>
+            </div>
+
+        </div>
+
+    </ng-container>
+
+
+</ng-container>
+
+<h4>Resource Request</h4>
+<ng-container *ngFor="let resourceRequest of resourceRequests">
+    <order-mgr-debug-resource-request [request]="resourceRequest"></order-mgr-debug-resource-request>
+</ng-container>
+
+<!-- <h4>Optimized Request</h4>
+<ng-container *ngIf="resourceRequest">
+    <order-mgr-debug-resource-request [request]="optimizedRequest"></order-mgr-debug-resource-request>
+</ng-container> -->
+
+
+<h4>Resources</h4>
+
+
+<ng-container *ngIf="ctx?.allResources">
+
+
+    <ng-container *ngFor="let resource of ctx.allResources">
+        <div class="row">
+            <div class="col-2">{{resource.name}}</div>
+            <div class="col-2">{{resource.type}}</div>
+
+            <div class="col-3">
+                <div class="row" *ngFor="let resourceLink of resource.children">
+                    <div class="col">{{resourceLink.child.name}}</div>
+
+                </div>
+            </div>
+        </div>
+
+        <ng-container *ngIf="availability">
+
+            <div class="row" *ngFor="let day of availability.getAvailabilitiesForResource(resource).fromDays()">
+                <div class="col-1"></div>
+                <div class="col-1">Availability:</div>
+                <div class="col-1">{{day | date:'dd/MM'}}: </div>
+
+                <div class="col"><span
+                        *ngFor="let range of availability.getAvailabilitiesForResource(resource).getRangesForDay(day)">{{range.from
+                        |
+                        date:'HH:mm'}} - {{range.to | date:'HH:mm'}}</span></div>
+            </div>
+
+        </ng-container>
+
+
+        <ng-container *ngIf="resourceHasplannings(resource.id)">
+
+            <div class="row">
+                <div class="col-1"></div>
+                <div class="col-1">Plannings:</div>
+                <div class="col">
+                    <div class="row">
+                        <div class="col" *ngFor="let planning of planningsForResource(resource.id)">
+                            {{'enums.planning-type.' + planning.type | translate}}: {{planning.startDate | date:"dd/MM
+                            HH:mm" }} - {{planning.endDate |
+                            date:"dd/MM HH:mm" }} </div>
+                    </div>
+
+
+                </div>
+            </div>
+
+
+
+        </ng-container>
+
+
+    </ng-container>
+
+</ng-container>
+
+<h4>Schedules</h4>
+
+<ng-container *ngIf="ctx?.schedules">
+    <ng-container *ngFor="let schedule of ctx.schedules">
+        <div class="row">
+
+            <div class="col-2"><span
+                    *ngIf="schedule.resource; else noScheduleResource">{{schedule.resource.name}}</span>
+
+                <ng-template #noScheduleResource>
+                    <small><i>no resource</i></small>
+                </ng-template>
+
+
+            </div>
+            <div class="col">{{schedule.name}}
+
+                <span class="badge rounded-pill text-bg-danger" style="font-size: 0.5em;"
+                    *ngIf="schedule.default">default</span>
+            </div>
+
+        </div>
+
+        <ng-container *ngIf="schedule.weeks">
+            <div class="row" *ngFor="let week of schedule.weeks">
+
+                <div class="col-1"></div>
+
+                <div class="col" *ngFor="let day of week.days">
+                    {{day.day}}
+                    <span *ngFor="let block of day.blocks">{{block.from}}-{{block.to}}</span>
+
+                </div>
+            </div>
+        </ng-container>
+
+    </ng-container>
+
+</ng-container>
+
+
+<ng-container *ngIf="solutionSet">
+
+    <h4>Solutions</h4>
+
+    <ng-container *ngFor="let solution of solutionSet.solutions">
+
+        <div class="row">
+            <div class="col-1">
+                <ng-container *ngIf="solution.valid; else invalidSolution">
+                    Solution:
+                </ng-container>
+
+                <ng-template #invalidSolution>
+                    <s style="color: red;">Invalid:</s>
+                </ng-template>
+
+            </div>
+            <div class="col">
+
+                <ng-container *ngFor="let solutionItem of solution.items">
+
+                    <div class="row">
+                        <!-- <div class="col-1"></div> -->
+                        <div class="col-2">
+                            <span class="badge bg-secondary">{{solutionItem.dateRange.from | date:"dd/MM HH:mm"}}</span>
+                            - <span class="badge bg-secondary">{{solutionItem.dateRange.to | date:"HH:mm"}}</span>
+
+                        </div>
+                        <div class="col-2">
+
+                            <ng-container *ngFor="let resource of solutionItem.resources">
+                                <span class="badge bg-danger" style="font-size: 0.6em;">{{resource.name}}</span> &nbsp;
+                            </ng-container>
+                        </div>
+                    </div>
+
+                </ng-container>
+
+            </div>
+        </div>
+
+
+
+    </ng-container>
+
+
+
+    <!--     
+    <div class="row" *ngFor="let day of options.startDays()">
+
+    </div>
+
+
+    <div class="row" *ngFor="let day of options.startDays()">
+        <div class="col-2">{{day | date:'dd/MM'}}</div>
+        <div class="col">
+
+
+            <div class="row">
+                <div class="col-1" *ngFor="let slot of options.getSlotsForDay(day)">{{slot.startDate | date:"HH:mm"}}
+                </div>
+            </div>
+        </div>
+    </div> -->
+
+
+
+
+</ng-container>
+
+<ng-container *ngIf="optionSet">
+
+    <h4>Options</h4>
+
+    <ng-container *ngFor="let option of optionSet.options">
+        <span class="badge bg-danger">{{option.date | date:"HH:mm"}}</span> &nbsp;
+    </ng-container>
+
+
+</ng-container>

@@ -1,0 +1,42 @@
+<ng-template #searchProductModal let-modal>
+
+    <div class="modal-header">
+        <h4>Product zoeken</h4>
+        <!-- <h4>{{ 'ui.delete-modal.title' | translate:deleteTransParams }}</h4> -->
+    </div>
+    <div class="modal-body">
+
+
+        <div class="row">
+            <div class="col-8">
+                <input type="text" id="searchFor" name="searchFor" required class="form-control"
+                    [(ngModel)]="searchFor" />
+            </div>
+            <div class="col-4">
+                <button type="button" class="btn btn-primary" (click)="search()" translate>dic.search</button>
+            </div>
+        </div>
+
+
+        <div class="row mt-3" *ngIf="products">
+            <div class="col-12 d-flex justify-content-center">
+                <ul class="list-group" style="width: 100%;">
+                    <li class="list-group-item" *ngFor="let product of products"
+                        (click)="selectProduct(product, modal)">
+
+
+                        <i class="{{ProductTypeIcons[product.type]}}"></i> &nbsp; {{ product.name }}
+
+
+
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+
+
+    </div>
+
+</ng-template>

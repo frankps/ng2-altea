@@ -1,0 +1,97 @@
+<ngx-altea-form-card-section *ngIf="product" sectionName="ui.product.edit.sections.rules.title"
+    [sectionId]="thisSection" [editSectionId]="parent.editSectionId" [showBody]="false"
+    [enableSave]="dirty && enableSave" icon="fa-duotone fa-credit-card" (save)="parent.save()"
+    (cancel)="parent.cancel()" (editModeChanged)="parent.editModeChanged($event)">
+
+    <ng-container outside-body>
+
+
+        <ul class="list-group list-group-flush">
+
+            <li class="list-group-item" *ngIf="!product.hasRules() && !sectionInEdit()">
+                <div [innerHTML]="'ui.product.edit.sections.rules.none' | translate">
+                </div>
+            </li>
+
+
+            <ng-container *ngIf="product.hasRules()">
+                <li class="list-group-item" *ngFor="let rule of product.rules; let idx = index">
+
+                    <ng-container *ngIf="sectionInEdit(ListSectionMode.edit); else readOnlyItem">
+
+                        <!-- && mode ===  && idx === idxEdit -->
+
+                        Edit:
+                        {{rule.type}}
+
+                    </ng-container>
+
+
+
+                    <ng-template #readOnlyItem>
+
+                        <!-- Read only:
+                        {{rule.type}} -->
+
+                        <ngx-altea-product-rule [rule]="rule" [schedules]="schedules"></ngx-altea-product-rule>
+
+                    </ng-template>
+
+
+
+                </li>
+            </ng-container>
+
+
+
+            <li class="list-group-item" style="text-align: center; cursor: pointer;" (click)="startAdd()"
+                *ngIf="parent.editSectionId === thisSection && mode === ListSectionMode.readOnly">
+                <i class="fa-duotone fa-circle-plus fa-xl"></i> &nbsp; Voeg regel toe
+            </li>
+
+            <li class="list-group-item" *ngIf="mode === ListSectionMode.createNew">
+
+                <div class="row">
+                    <div class="col-6">
+
+
+                        <!-- 
+                        <ngx-altea-label-control label="objects.productRule.type" [trans]="true" for="ruleType">
+                        </ngx-altea-label-control> -->
+                        <ng-select *ngIf="ruleTypes" id="ruleType" name="ruleType" [items]="ruleTypes" bindLabel="trans"
+                            bindValue="key" [clearable]="false" [multiple]="false" [(ngModel)]="newRule.type">
+                        </ng-select>
+
+
+
+                    </div>
+                    <div class="col-6">
+                        <button type="button" class="btn btn-primary btn-sm" (click)="addRule()"
+                            translate>dic.add</button>
+
+                    </div>
+                </div>
+
+
+
+                <!-- 
+                <ngx-altea-edit-product-resource [isNew]="true" [object]="objNew" [resources]="resources"
+                    [durationMode]="durationMode" [durationReference]="durationReference" (cancel)="cancelAdd()"
+                    (save)="addToList()"></ngx-altea-edit-product-resource> -->
+
+            </li>
+
+
+        </ul>
+
+
+
+
+
+
+
+
+    </ng-container>
+
+
+</ngx-altea-form-card-section>

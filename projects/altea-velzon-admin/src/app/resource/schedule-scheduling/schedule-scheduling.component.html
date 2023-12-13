@@ -1,0 +1,96 @@
+
+<h6>Actieve periodes</h6>
+
+<!-- <button type="button" class="btn btn-primary btn-sm" (click)="createDemoScheduling()">Demo scheduling</button>    :"+0000" -->
+<ng-container *ngIf="_schedule?.planning">
+
+    <ng-container *ngFor="let scheduling of _schedule?.planning; let idx = index">
+        <div class="row mb-1">
+            <div class="col"> Van {{scheduling.startDate | date:"dd/MM/yyyy HH:mm"}} tot {{scheduling.endDate | date:"dd/MM/yyyy HH:mm"}}</div>
+           
+            <ng-container *ngIf="mode !== 'readonly'">
+                <div class="col-2"> &nbsp;<i class="fa-duotone fa-trash"
+                        (click)="deleteScheduling(scheduling, idx)"></i>
+                </div>
+            </ng-container>
+
+           
+        </div>
+        <!-- <div class="row">
+
+            <div class="col-4"> <input type="time" id="from" name="from" class="form-control form-control-sm" [(ngModel)]="scheduling.startUtc" /> </div>
+            <div class="col-4"> {{scheduling.startUtc}} </div>
+            <div class="col-4"> <button type="button" class="btn btn-primary btn-sm" (click)="update(scheduling)" translate>dic.update</button> </div>
+        </div> -->
+    </ng-container>
+
+
+</ng-container>
+
+<div class="row mt-2" *ngIf="mode === 'editall'">
+    <div class="col-10" style="text-align: center; cursor: pointer;" (click)="startAdd()"><i
+            class="fa-duotone fa-circle-plus fa-xl"></i> &nbsp; Voeg periode toe
+    </div>
+</div>
+
+<ng-container *ngIf="mode === 'add'">
+    <div class="row">
+        <!-- <div class="col-4">
+    
+            <ngx-altea-label-control label="objects.scheduling.start" for="start">
+                <input type="date" id="start" name="start" class="form-control" [(ngModel)]="new.start" />
+            </ngx-altea-label-control>
+    
+    
+        </div>
+        <div class="col-4">
+    
+            <ngx-altea-label-control label="objects.scheduling.end" for="end">
+                <input type="date" id="end" name="end" class="form-control" [(ngModel)]="new.end" />
+            </ngx-altea-label-control>
+    
+        </div> -->
+        <div class="col-xs-12 col-12 col-md-8 form-group mb-3">
+
+
+            <!-- <bs-daterangepicker-inline [bsValue]="rangeSelection" [bsConfig]="{useUtc: true}"></bs-daterangepicker-inline> -->
+
+
+            <input class="form-control" #drp="bsDaterangepicker" bsDaterangepicker [(ngModel)]="rangeSelection"
+                [bsConfig]="{useUtc: true}" onkeydown="return false" (bsValueChange)="rangePickerChanged($event)">
+
+
+        </div>
+
+        <div class="col-4">
+            <button type="button" class="btn btn-primary btn-sm" (click)="addScheduling()" translate>dic.add</button>
+
+
+            <button type="button" class="btn btn-primary btn-sm" (click)="cancelAddScheduling()"
+                translate>dic.cancel</button>
+        </div>
+
+
+
+        <!-- <div class="col-xs-12 col-12 col-md-3 form-group mb-3">
+            <button class="btn btn-success" (click)="drp.toggle()" [attr.aria-expanded]="drp.isOpen" type="button">Date
+                Range Picker</button>
+        </div> -->
+
+
+    </div>
+
+
+
+    <div class="row">
+
+        <div class="col-4">
+
+
+
+            <button type="button" class="btn btn-primary btn-sm" (click)="save()" translate>dic.save</button>
+
+        </div>
+
+    </div>
+</ng-container>

@@ -1,0 +1,160 @@
+<form #productResourceForm="ngForm">
+
+
+    <div class="row mb-3">
+        <div class="col-6">
+            <ngx-altea-label-control layout="basic" label="ui.product.edit.sections.resources.select-resource"
+                for="resources" help="De naam van product of dienst">
+                <ng-select required id="resources" name="resources" [items]="resources" [clearable]="false"
+                    bindLabel="name" bindValue="id" [multiple]="false" [(ngModel)]="object.resourceId"
+                    (change)="resourceChanged($event)">
+                </ng-select>
+            </ngx-altea-label-control>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-12">
+
+
+            <ngx-altea-label-control layout="basic" label="ui.product.edit.sections.resources.select-mode"
+                for="resources" help="De naam van product of dienst">
+
+                <div class="form-check" *ngFor="let mode of durationMode">
+                    <input class="form-check-input" type="radio" name="select-mode" [id]="mode.key" [value]="mode.key"
+                        [(ngModel)]="object.durationMode">
+                    <label class="form-check-label" [for]="mode.key">{{mode.trans}}<br>
+                        <small>{{mode.help}}</small>
+                    </label>
+                </div>
+
+            </ngx-altea-label-control>
+
+
+
+        </div>
+    </div>
+
+    <ng-container *ngIf="object.durationMode === 'custom'">
+
+        <div class="row mb-4">
+            <div class="col-12">
+
+
+                <ngx-altea-label-control layout="basic" label="ui.product.edit.sections.resources.select-reference"
+                    for="resources" help="De naam van product of dienst">
+
+                    <div class="form-check" *ngFor="let ref of durationReference">
+                        <input class="form-check-input" type="radio" name="select-reference" [id]="ref.key"
+                            [value]="ref.key" [(ngModel)]="object.reference">
+                        <label class="form-check-label" [for]="ref.key">{{ref.trans}}<br>
+                            <!-- <small>{{ref.help}}</small> -->
+                        </label>
+                    </div>
+
+                </ngx-altea-label-control>
+
+
+
+            </div>
+        </div>
+
+        <div class="row mb-3">
+
+            <div class="col-6">
+
+                <ngx-altea-label-control label="objects.prodRes.duration" for="duration"
+                    help="objects.prodRes.help.duration">
+                    <input type="number" id="duration" name="duration" required class="form-control"
+                        [(ngModel)]="object.duration" />
+                </ngx-altea-label-control>
+
+
+            </div>
+
+            <div class="col-6">
+
+                <ngx-altea-label-control label="objects.prodRes.offset" for="offset" help="objects.prodRes.help.offset">
+                    <input type="number" id="offset" name="offset" required class="form-control"
+                        [(ngModel)]="object.offset" />
+                </ngx-altea-label-control>
+
+            </div>
+
+        </div>
+
+    </ng-container>
+
+
+
+    <!-- <div class="row mb-3" *ngIf="object?.resource?.type == 'group'">
+
+        <div class="col-6">
+
+            <ngx-altea-label-control label="objects.prodRes.groupQty" for="groupQty"
+                help="objects.prodRes.help.groupQty">
+                <input type="number" id="groupQty" name="groupQty" required class="form-control"
+                    [(ngModel)]="object.groupQty" />
+            </ngx-altea-label-control>
+
+
+        </div>
+
+        <div class="col-6">
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="groupAlloc" name="groupAlloc" [(ngModel)]="object.groupAlloc" />
+                <label class="form-check-label" for="groupAlloc" translate="objects.prodRes.groupAlloc"></label>
+            </div>
+
+        </div>
+
+    </div> -->
+
+
+
+
+    <div class="row mb-3">
+
+        <div class="col-12">
+
+
+            <ngx-altea-label-control label="objects.prodRes.scheduleIds" for="scheduleIds"
+                help="objects.prodRes.help.scheduleIds">
+
+                <ng-select id="branchSchedules" name="branchSchedules" [items]="branchSchedules" bindLabel="name"
+                    bindValue="id" [clearable]="false" [multiple]="true" [(ngModel)]="object.scheduleIds">
+                </ng-select>
+
+            </ngx-altea-label-control>
+
+
+        </div>
+
+    </div>
+
+
+    <div class="row mb-3">
+        <div class="col-12 ">
+            <button type="button" class="btn btn-sm btn-primary float-end" (click)="_save()"
+                [disabled]="productResourceForm.form.pristine || !productResourceForm.form.valid"
+                translate>dic.{{isNew?'add':'ok'}}</button>
+            <button type="button" class="btn btn-sm btn-outline-primary float-end me-2"
+                (click)="_cancel()">Cancel</button>
+
+        </div>
+    </div>
+
+
+    <!-- 
+    <div class="row mb-3">
+        <div class="col-12 ">
+            <button type="button" class="btn btn-sm btn-primary float-end"
+                (click)="addToList()" [disabled]="productResourceForm.form.pristine || !productResourceForm.form.valid">Toevoegen</button>
+            <button type="button" class="btn btn-sm btn-outline-primary float-end me-2"
+                (click)="cancelAdd()">Cancel</button>
+
+        </div>
+    </div> -->
+
+
+</form>

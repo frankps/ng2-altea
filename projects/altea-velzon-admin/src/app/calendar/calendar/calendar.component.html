@@ -1,0 +1,23 @@
+<!-- <full-calendar [options]="calendarOptions"></full-calendar> -->
+
+<!-- https://github.com/fullcalendar/fullcalendar-angular/issues/204  -->
+
+<div class='demo-app-main'>
+  <full-calendar *ngIf='calendarVisible' [options]='calendarOptions'>
+    <ng-template #eventContent let-arg>
+
+      <div style="background-color: white; text-align: left;">
+        <b>{{ arg.timeText }}</b><br>
+        <i>{{ arg.event.title }}</i>
+      </div>
+
+    </ng-template>
+  </full-calendar>
+</div>
+
+<div class='demo-app'>
+
+
+
+
+</div>

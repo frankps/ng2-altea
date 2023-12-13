@@ -1,0 +1,73 @@
+<div class="card mt-4">
+  <div class="card-header {{editMode?'text-bg-primary':''}}">
+    <b>
+      <ng-container *ngIf="icon"><i [class]="icon"></i> &nbsp; </ng-container>
+
+
+      <ng-container *ngIf="!trans">
+        {{ sectionName }}
+      </ng-container>
+
+      <ng-container *ngIf="trans">
+        {{ sectionName | translate }}
+      </ng-container>
+
+
+    </b>
+    <!-- {{showButtons}} {{editMode}} {{editSection}} -->
+    <ng-container *ngIf="showButtons">
+
+      <ng-container *ngIf="editMode">
+        <button class="btn btn-light btn-sm float-end" [disabled]="!enableSave" (click)="triggerSave()">
+          <i class="fas fa-save"></i> {{ 'dic.save' | translate }}
+        </button>
+
+        <button class="btn btn-outline-light btn-sm float-end me-2" (click)="triggerCancel()">
+          <i class="far fa-times"></i> {{ 'dic.cancel' | translate }}
+        </button>
+
+      </ng-container>
+
+      <ng-container *ngIf="!editMode && editSectionId === ''">
+
+        <button class="btn btn-outline-primary btn-sm float-end" (click)="startEdit()">
+          <i class="fas fa-pen"></i> {{ 'dic.edit' | translate }}
+        </button>
+
+      </ng-container>
+
+      <ng-container *ngIf="!editMode && editSectionId !== '' && editSectionId !== sectionName">
+
+        <button class="btn btn-outline-primary btn-sm float-end"
+          ngbPopover="U bent reeds een ander blok op deze pagina aan het aanpassen. Gelieve deze eerst op te slaan of te sluiten!"
+          popoverTitle="Ander blok nog open">
+          <i class="fas fa-pen me-1"></i> <i>{{ 'dic.edit' | translate }}</i>
+          <!-- {{ 'dic.edit' | translate }} -->
+        </button>
+
+      </ng-container>
+
+
+
+
+      <ng-template #sectionReadOnlyButtons>
+        <button class="btn btn-outline-primary btn-sm float-end" (click)="startEdit()">
+          <i class="fas fa-pen"></i> {{ 'dic.edit' | translate }}
+        </button>
+      </ng-template>
+    </ng-container>
+  </div>
+
+
+  <ng-content select="[outside-body]">
+  </ng-content>
+
+  <div class="card-body" *ngIf="showBody">
+
+    <ng-content select="[always]"></ng-content>
+
+    <ng-content *ngIf="!editMode" select="[readonly]"></ng-content>
+
+    <ng-content *ngIf="editMode" select="[edit]"></ng-content>
+  </div>
+</div>

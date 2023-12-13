@@ -1,0 +1,107 @@
+<div class="card" *ngIf="product && orderLine">
+
+    <ng-container>
+
+        <div class="card-header">
+
+            <div class="row">
+                <div class="col-10 d-flex justify-content-start align-items-center">
+
+                    <ng-select id="qty" name="qty" style="width: 60px;" [items]="qtyArray" [clearable]="false"
+                        [multiple]="false" [(ngModel)]="orderLine.qty" (change)="qtyChanged()">
+                    </ng-select>
+
+                    &nbsp;&nbsp;x&nbsp;
+
+                    {{product.name}}
+
+                </div>
+                <div class="col">
+
+
+                    <button *ngIf="orderMgrSvc.orderLineIsNew" type="button" class="btn btn-primary btn-sm float-end"
+                        (click)="orderMgrSvc.addOrderLine(orderLine)" translate><i
+                            class="fa-solid fa-plus fa-lg"></i></button>
+
+                    <button *ngIf="!orderMgrSvc.orderLineIsNew" type="button" class="btn btn-primary btn-sm float-end"
+                        (click)="orderMgrSvc.deleteCurrentOrderLine()" translate><i
+                            class="fa-solid fa-minus fa-lg"></i></button>
+
+                </div>
+            </div>
+
+            <!-- <div class="col-6 d-flex justify-content-end"></div> -->
+
+        </div>
+        <div class="card-body">
+
+            Prijs: {{orderLine.incl}} € <br>
+
+
+            {{product.descr}}
+
+
+
+            <ng-container *ngIf="orderLineOptions">
+                <div class="mt-4">
+                    <ng-container *ngFor="let option of orderLineOptions; let idx = index">
+
+                        <ng-container *ngIf="product.options[idx].multiSelect; else optionValueSingleSelect">
+
+                            <div class="row mt-1">
+                                <div class="col">{{option.name}}</div>
+                            </div>
+
+                            <div class="row mt-1" *ngFor="let value of option.values">
+                                <div class="col-1"></div>
+                                <div class="col">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="value_{{value.id}}"
+                                            [checked]="orderLine.optionValueSelected(option, value.id)"
+                                            (change)="multiOptionValueChanged(option, value, $event.target['checked'])" />
+                                        <label class="form-check-label" for="value_{{value.id}}">{{value.name}}</label>
+
+                                        <span class="float-end">{{value.prc}} {{sessionSvc.currencySymbol}}</span>
+                                    </div>
+
+                                    <!-- checked="true" -->
+
+                                </div>
+                            </div>
+
+
+
+
+                            <!-- Multi -->
+
+                        </ng-container>
+
+                        <ng-template #optionValueSingleSelect>
+                            <div class="row mt-1">
+                                <div class="col-6">{{option.name}}</div>
+                                <div class="col-6">
+                                    <ng-select id="option_{{option.id}}" name="option_{{option.id}}"
+                                        [items]="option.values" bindLabel="name" [clearable]="false" [multiple]="false"
+                                        [(ngModel)]="orderLine.getOption(option).values[0]"
+                                        (change)="optionChanged(option)">
+                                    </ng-select>
+                                </div>
+                            </div>
+                        </ng-template>
+
+
+
+
+
+
+                    </ng-container>
+                </div>
+
+
+            </ng-container>
+
+
+        </div>
+    </ng-container>
+
+</div>

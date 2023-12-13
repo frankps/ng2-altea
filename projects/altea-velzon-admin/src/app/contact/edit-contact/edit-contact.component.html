@@ -1,0 +1,217 @@
+<ng-container *ngIf="object">
+
+    <ngx-altea-delete-modal #deleteModal objectType="resource" [object]="object" [objectSvc]="contactSvc"
+        [config]="deleteConfig"></ngx-altea-delete-modal>
+
+    <div class="row">
+        <div class="col-9">
+            <h4>{{object.name}} &nbsp; <i class="fa-solid fa-circle"></i></h4>
+            <!-- [style.color]="object.color" -->
+        </div>
+        <div class="col-3">
+
+            <div class="d-inline-block float-end" ngbDropdown #myDrop="ngbDropdown">
+                <button type="button" class="btn btn-outline-primary me-2" id="dropdownManual" ngbDropdownAnchor
+                    (focus)="myDrop.open()">
+                    Acties
+                </button>
+                <div ngbDropdownMenu aria-labelledby="dropdownManual">
+                    <button ngbDropdownItem (click)="delete()"><i class="fa-duotone fa-trash me-1"></i>
+                        Verwijderen</button>
+                </div>
+            </div>
+
+
+        </div>
+
+    </div>
+    <!-- 
+    [icon]="ResourceTypeIcons[object.type]" -->
+
+    <ngx-altea-form-card-section sectionName="ui.contact.edit.sections.general.title" sectionId="general"
+        [editSectionId]="editSectionId" (save)="save()" (cancel)="cancel()" (editModeChanged)="editModeChanged($event)"
+        [enableSave]="!generalForm?.form.pristine && generalForm?.form.valid">
+        <ng-container readonly>
+            <!-- <div>{{ object.descr }}</div> -->
+
+            <div class="row">
+                <div class="col-6"> <ngx-altea-label-value label="objects.contact.first"
+                        [value]="object.first"></ngx-altea-label-value> </div>
+                <div class="col-6"> <ngx-altea-label-value label="objects.contact.last"
+                        [value]="object.last"></ngx-altea-label-value> </div>
+            </div>
+
+            <div class="row">
+                <div class="col-6"> <ngx-altea-label-value label="objects.contact.gender"
+                        value="{{ 'enums.gender.' + object.gender | translate }}"></ngx-altea-label-value> </div>
+
+                <div class="col-6"> <ngx-altea-label-value label="objects.contact.language"
+                        value="{{ 'enums.language.' + object.language | translate }}"></ngx-altea-label-value> </div>
+                <div class="col-6"> </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-6"><ngx-altea-label-value label="objects.contact.email"
+                        [value]="object.email"></ngx-altea-label-value></div>
+                <div class="col-6">
+                    <ngx-altea-label-value label="objects.contact.emailRemind" valueFormat="yesNo"
+                        [value]="object.emailRemind"></ngx-altea-label-value>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-6"><ngx-altea-label-value label="objects.contact.mobile"
+                        [value]="object.mobile"></ngx-altea-label-value></div>
+                <div class="col-6">
+                    <ngx-altea-label-value label="objects.contact.smsRemind" valueFormat="yesNo"
+                        [value]="object.smsRemind"></ngx-altea-label-value>
+                </div>
+            </div>
+
+
+            <!-- 
+        <ngx-altea-label-value label="objects.product.salesPrice" [value]="object.salesPrice"></ngx-altea-label-value>
+  
+        <ngx-altea-label-value label="objects.product.vatPct" [value]="object.vatPct"></ngx-altea-label-value> -->
+
+
+        </ng-container>
+        <ng-container edit>
+
+            <form #generalForm="ngForm">
+
+                <!-- help="objects.resource.help.{{object.type}}-name" -->
+
+
+                <div class="row">
+                    <div class="col-6">
+                        <ngx-altea-label-control label="objects.contact.first" for="first">
+                            <input type="text" id="first" name="first" required class="form-control"
+                                [(ngModel)]="object.first" />
+                        </ngx-altea-label-control>
+                    </div>
+                    <div class="col-6">
+                        <ngx-altea-label-control label="objects.contact.last" for="last">
+                            <input type="text" id="last" name="last" required class="form-control"
+                                [(ngModel)]="object.last" />
+                        </ngx-altea-label-control>
+                    </div>
+                </div>
+
+
+                <div class="row mt-3">
+                    <div class="col-6">
+                        <ngx-altea-label-control label="objects.contact.gender" [trans]="true" for="gender">
+                            <ng-select id="gender" name="gender" [items]="gender" bindLabel="trans" bindValue="key"
+                                [clearable]="false" [multiple]="false" [(ngModel)]="object.gender">
+                            </ng-select>
+                        </ngx-altea-label-control>
+
+                    </div>
+
+                    <div class="col-6">
+
+                        <ngx-altea-label-control label="objects.contact.language" [trans]="true" for="language">
+                            <ng-select id="language" name="language" [items]="language" bindLabel="trans"
+                                bindValue="key" [clearable]="false" [multiple]="false" [(ngModel)]="object.language">
+                            </ng-select>
+                        </ngx-altea-label-control>
+
+
+                    </div>
+                </div>
+
+
+                <div class="row mt-3">
+                    <div class="col-6">
+                        <ngx-altea-label-control label="objects.contact.email" for="email">
+                            <input type="text" id="email" name="email" required class="form-control"
+                                [(ngModel)]="object.email" />
+                        </ngx-altea-label-control>
+                    </div>
+                    <div class="col-6 d-flex align-items-center">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="emailRemind" name="emailRemind"
+                                [(ngModel)]="object.emailRemind" />
+                            <label class="form-check-label" for="emailRemind"
+                                translate="objects.contact.emailRemind"></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-6">
+                        <ngx-altea-label-control label="objects.contact.mobile" for="mobile">
+                            <input type="text" id="mobile" name="mobile" required class="form-control"
+                                [(ngModel)]="object.mobile" />
+                        </ngx-altea-label-control>
+                    </div>
+                    <div class="col-6 d-flex align-items-center">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="smsRemind" name="smsRemind"
+                                [(ngModel)]="object.smsRemind" />
+                            <label class="form-check-label" for="smsRemind"
+                                translate="objects.contact.smsRemind"></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+
+                    <div class="col-6"></div>
+                </div>
+
+
+
+            </form>
+
+
+
+
+        </ng-container>
+
+    </ngx-altea-form-card-section>
+
+
+    <ngx-altea-form-card-section sectionName="ui.contact.edit.sections.subscriptions.title" sectionId="subscriptions"
+        [editSectionId]="editSectionId" [showButtons]="false">
+
+        <!-- 
+             [icon]="ResourceTypeIcons[object.type]"
+            (save)="save()" (cancel)="cancel()"
+            <ng-container readonly>
+
+                 (editModeChanged)="editModeChanged($event)"
+        [enableSave]="!resourceGeneralForm.form.pristine && resourceGeneralForm.form.valid"
+
+        </ng-container>
+        <ng-container edit>
+            <form #resourceGeneralForm="ngForm">
+            </form>
+        </ng-container> -->
+
+        <ng-container always>
+
+            <div class="row">
+                <div class="col-6 d-flex justify-content-center">Abonnement</div>
+                <div class="col-2 d-flex justify-content-center">Beurten</div>
+                <div class="col-2 d-flex justify-content-center">Gemaakt op</div>
+                <div class="col-2 d-flex justify-content-center">Eerste gebruik</div>                
+            </div>
+
+
+            <!-- <div class="row" *ngFor="let sub of object.subscriptions">
+                <div class="col-6">{{sub.name}}</div>
+                <div class="col-2 d-flex justify-content-center">{{sub.usedQty}}/{{sub.totalQty}}</div>
+                <div class="col-2 d-flex justify-content-center">{{sub.createdAt | date: sessionSvc.formats.Date}}</div>
+                <div class="col-2 d-flex justify-content-center">{{sub.firstUsedOn | date: sessionSvc.formats.Date}}</div>
+                
+            </div> -->
+
+        </ng-container>
+
+    </ngx-altea-form-card-section>
+
+
+</ng-container>

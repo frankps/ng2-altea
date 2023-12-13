@@ -1,0 +1,412 @@
+<!-- <ngb-timepicker [(ngModel)]="time"></ngb-timepicker>
+<hr />
+<pre>Selected time: {{time | json}}</pre>
+
+<i class="{{ProductTypeIcons[product.type]}}"></i> &nbsp;
+-->
+
+<ng-container *ngIf="object">
+
+  <div class="row">
+    <div class="col-9">
+      <h4>{{object.name}}</h4>
+    </div>
+    <div class="col-3">
+
+      <div class="d-inline-block float-end" ngbDropdown #myDrop="ngbDropdown">
+        <button type="button" class="btn btn-outline-primary me-2" id="dropdownManual" ngbDropdownAnchor
+          (focus)="myDrop.open()" translate>dic.actions
+        </button>
+        <div ngbDropdownMenu aria-labelledby="dropdownManual">
+          <button ngbDropdownItem (click)="delete()"><i class="fa-duotone fa-trash me-1"></i> {{ 'dic.delete' |
+            translate }} </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+
+
+
+
+
+
+
+  <ngx-altea-form-card-section sectionName="ui.product.edit.sections.general.title" sectionId="general"
+    [editSectionId]="editSectionId" [icon]="ProductTypeIcons[object.type]" (save)="save()" (cancel)="cancel()"
+    (editModeChanged)="editModeChanged($event)">
+    <ng-container readonly>
+      <!-- <div>{{ object.descr }}</div> -->
+
+
+      <ngx-altea-label-value label="objects.product.descr" [value]="object.descr"
+        empty="objects.product.no-descr"></ngx-altea-label-value>
+
+      <ngx-altea-label-value label="objects.product.salesPrice" [value]="object.salesPrice"></ngx-altea-label-value>
+
+      <ngx-altea-label-value label="objects.product.vatPct" [value]="object.vatPct"></ngx-altea-label-value>
+
+
+    </ng-container>
+    <ng-container edit>
+      <ngx-altea-label-control label="dic.name" for="name" help="objects.product.help.{{object.type}}-name">
+        <input type="text" id="projectName" name="name" required class="form-control" [(ngModel)]="object.name" />
+      </ngx-altea-label-control>
+
+      <br />
+      <ngx-altea-label-control label="dic.description" for="descr">
+        <textarea rows="4" class="form-control" id="descr" name="descr" style="height: 120px"
+          [(ngModel)]="object.descr"></textarea>
+      </ngx-altea-label-control>
+
+      <div class="row mt-3">
+
+        <div class="col-4">
+
+          <ngx-altea-label-control label="objects.product.salesPrice" for="salesPrice"
+            help="objects.product.help.salesPrice">
+            <input type="number" id="salesPrice" name="salesPrice" required class="form-control"
+              [(ngModel)]="object.salesPrice" />
+          </ngx-altea-label-control>
+
+
+        </div>
+
+        <div class="col-4">
+
+          <ngx-altea-label-control layout="floating" label="objects.product.vatPct" [trans]="true" for="vatPct">
+            <ng-select id="vatPct" name="vatPct" [items]="vatPcts" [clearable]="false" [multiple]="false"
+              [(ngModel)]="object.vatPct">
+            </ng-select>
+          </ngx-altea-label-control>
+        </div>
+
+
+        <div class="col-4">
+
+          <ngx-altea-label-control label="dic.color" for="color">
+            <input type="color" id="color" name="color" required class="form-control" [(ngModel)]="object.color" />
+          </ngx-altea-label-control>
+
+
+        </div>
+
+
+      </div>
+      <div class="row mt-3">
+        <div class="col-12">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="personSelect" [(ngModel)]="object.personSelect" />
+            <label class="form-check-label" for="personSelect" translate="objects.product.personSelect"></label>
+          </div>
+
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="staffSelect" [(ngModel)]="object.staffSelect" />
+            <label class="form-check-label" for="staffSelect" translate="objects.product.staffSelect"></label>
+          </div>
+
+        </div>
+
+      </div>
+
+    </ng-container>
+
+  </ngx-altea-form-card-section>
+
+
+  <ngx-altea-product-planning [parent]="this" [product]="object"></ngx-altea-product-planning>
+
+
+
+
+  <ngx-altea-product-resources *ngIf="object.type === ProductType.service" [parent]="this" [product]="object"
+    [collection]="object.resources"></ngx-altea-product-resources>
+
+  <ngx-altea-product-rules [parent]="this" [product]="object" [collection]="object.rules"></ngx-altea-product-rules>
+
+  <!-- <ngx-altea-product-resources [parent]="this" [product]="object"
+  [collection]="object.rules"></ngx-altea-product-resources> -->
+
+
+  <ngx-altea-product-items [product]="object" [parent]="this"></ngx-altea-product-items>
+
+  <ngx-altea-product-options [product]="object" [parent]="this"></ngx-altea-product-options>
+
+
+
+
+
+  <ngx-altea-form-card-section *ngIf="object" sectionName="ui.product.edit.sections.visibility.title"
+    sectionId="visibility" [editSectionId]="editSectionId" icon="fa-duotone fa-eye" (save)="save()" (cancel)="cancel()"
+    (editModeChanged)="editModeChanged($event)">
+
+    <ng-container readonly>
+
+      <div class="row">
+        <div class="col-12">
+          <ngx-altea-label-value label="objects.product.online" [value]="object.online" valueFormat="translate"
+            prefix="enums.online-mode."></ngx-altea-label-value>
+        </div>
+      </div>
+
+
+      <div class="row mt-3">
+        <div class="col-12">
+
+          <ngx-altea-label-control layout="list" label="objects.product.visibility" for="visibility"
+            help="objects.product.help.visibility">
+
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="showPrice" [(ngModel)]="object.showPrice"
+                onclick="return false;" />
+              <label class="form-check-label" for="showPrice" translate="objects.product.showPrice"></label>
+            </div>
+
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="showDuration" [(ngModel)]="object.showDuration"
+                onclick="return false;" />
+              <label class="form-check-label" for="showDuration" translate="objects.product.showDuration"></label>
+            </div>
+
+
+          </ngx-altea-label-control>
+
+        </div>
+      </div>
+
+      <div class="row mt-3">
+        <div class="col-12">
+
+
+          <ngx-altea-label-control layout="list" label="objects.product.pos" for="pos">
+
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="showPos" [(ngModel)]="object.showPos"
+                onclick="return false;" />
+              <label class="form-check-label" for="showPos" translate="objects.product.showPos"></label>
+            </div>
+
+          </ngx-altea-label-control>
+
+        </div>
+      </div>
+
+    </ng-container>
+
+    <ng-container edit>
+
+      <div class="row">
+        <div class="col-12">
+
+          <ngx-altea-radio-list label="objects.product.online" help="objects.product.help.online" [enum]="OnlineMode"
+            [bindObject]="object" bindProp="online" transPath="enums.online-mode."></ngx-altea-radio-list>
+
+        </div>
+      </div>
+
+
+      <div class="row mt-3">
+        <div class="col-12">
+
+
+          <ngx-altea-label-control layout="list" label="objects.product.visibility" for="visibility"
+            help="objects.product.help.visibility">
+
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="showPrice" [(ngModel)]="object.showPrice" />
+              <label class="form-check-label" for="showPrice" translate="objects.product.showPrice"></label>
+            </div>
+
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="showDuration" [(ngModel)]="object.showDuration" />
+              <label class="form-check-label" for="showDuration" translate="objects.product.showDuration"></label>
+            </div>
+
+          </ngx-altea-label-control>
+
+        </div>
+      </div>
+
+
+      <div class="row mt-3">
+        <div class="col-12">
+
+
+          <ngx-altea-label-control layout="list" label="objects.product.pos" for="pos">
+
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="showPos" [(ngModel)]="object.showPos" />
+              <label class="form-check-label" for="showPos" translate="objects.product.showPos"></label>
+            </div>
+
+          </ngx-altea-label-control>
+
+        </div>
+      </div>
+
+
+    </ng-container>
+  </ngx-altea-form-card-section>
+
+
+  <ngx-altea-form-card-section *ngIf="object.type === ProductType.service"
+    sectionName="ui.product.edit.sections.serviceDetails.title" sectionId="serviceDetails"
+    [editSectionId]="editSectionId" icon="fa-duotone fa-user-hair-long" (save)="save()" (cancel)="cancel()"
+    (editModeChanged)="editModeChanged($event)">
+    <ng-container readonly>
+      <div class="row">
+        <div class="col-4">
+          <ngx-altea-label-value label="{{ 'objects.product.customers' | translate }}"
+            [value]="object.customers"></ngx-altea-label-value>
+        </div>
+        <div class="col-4">
+          <ngx-altea-label-value label="{{ 'dic.gender' | translate }}"
+            value="{{ 'enums.gender.' + object.gender | translate }}"></ngx-altea-label-value>
+        </div>
+
+      </div>
+
+
+
+
+    </ng-container>
+    <ng-container edit>
+      <div class="row mb-3">
+        <div class="col-4">
+          <ngx-altea-label-control layout="basic" label="objects.product.customers" [trans]="true" for="customers"
+            help="De naam van product of dienst">
+            <ng-select id="customers" name="customers" [items]="nrOfPeople" [clearable]="false" [multiple]="false"
+              [(ngModel)]="object.customers">
+            </ng-select>
+          </ngx-altea-label-control>
+        </div>
+        <div class="col-4">
+          <ngx-altea-label-control layout="basic" label="dic.gender" [trans]="true" for="gender"
+            help="De naam van product of dienst">
+            <ng-select id="gender" name="gender" [items]="gender" bindLabel="trans" bindValue="key" [clearable]="false"
+              [multiple]="false" [(ngModel)]="object.gender">
+            </ng-select>
+          </ngx-altea-label-control>
+        </div>
+
+
+      </div>
+    </ng-container>
+  </ngx-altea-form-card-section>
+
+
+
+
+
+
+
+
+
+  <ngx-altea-form-card-section *ngIf="object" sectionName="ui.product.edit.sections.pricing.title" sectionId="pricing"
+    [editSectionId]="editSectionId" icon="fa-duotone fa-credit-card" (save)="save()" (cancel)="cancel()"
+    (editModeChanged)="editModeChanged($event)">
+    <ng-container always>
+
+
+      <ul class="list-group">
+        <li class="list-group-item" (click)="addPrice()" *ngIf="editSectionId === 'pricing'">
+          Voeg prijs toe
+        </li>
+        <li class="list-group-item" *ngFor="let price of object.prices">
+
+          <div class="row">
+            <div class="col-2">
+              €{{ price.value }}
+              <!-- idx={{price.idx}} -->
+            </div>
+            <div class="col-3">
+              <ng-container *ngIf="price.start">
+                vanaf {{ price.start | date : 'dd/MM/yyyy' }}
+              </ng-container>
+
+            </div>
+            <div class="col" *ngIf="editSectionId === 'pricing'">
+              <i class="fas fa-trash float-end" (click)="deletePrice(price)"></i>
+              <i class="fas fa-pen float-end me-3" (click)="editPrice(price)"></i>
+            </div>
+          </div>
+
+          <div class="row" *ngIf="price.isQty">
+            <div class="col-6">
+
+              Kwantumkorting: {{price.qty}}
+
+            </div>
+          </div>
+
+
+          <div class="row" *ngIf="price.isDay">
+            <div class="col-6">
+
+              Enkel op dagen: {{getDaysOfWeek(price)}}
+
+            </div>
+          </div>
+
+          <div class="row" *ngIf="price.isTime">
+            <div class="col-6">
+
+              Tijdsinterval: van {{price.from}} tot {{price.to}}
+
+            </div>
+          </div>
+
+        </li>
+      </ul>
+
+
+
+
+
+    </ng-container>
+  </ngx-altea-form-card-section>
+
+
+
+
+
+
+
+
+  <ngx-altea-ngx-modal #priceModal title="{{ 'ui.price-modal.title' | translate }}" icon="fa-duotone fa-credit-card"
+    size="lg">
+    <ngx-altea-product-price *ngIf="price" [object]="price"></ngx-altea-product-price>
+  </ngx-altea-ngx-modal>
+
+
+</ng-container>
+
+
+
+<ngx-altea-delete-modal #deleteModal objectType="product" [object]="object"
+  [objectSvc]="productSvc"></ngx-altea-delete-modal>
+
+
+<!-- <ng-template #deleteModal let-modal>
+
+  <div class="modal-header">
+    <h4>{{ 'ui.delete-modal.title' | translate:deleteTransParams }}</h4>
+  </div>
+  <div class="modal-body">
+    
+    {{ 'ui.delete-modal.msg' | translate:deleteTransParams }}
+
+    <div class="row mt-3">
+      <div class="col-12">
+
+        <button type="button" class="btn btn-primary float-end" (click)="confirmDelete(modal)">{{ 'ui.delete-modal.confirm' | translate }} </button>
+        <button type="button" class="btn btn-outline-primary float-end me-2" (click)="cancelDelete(modal)">{{ 'ui.delete-modal.cancel' | translate }} </button>
+      </div>
+    </div>
+
+
+  </div>
+
+</ng-template> -->

@@ -1,0 +1,65 @@
+<ng-template #productTypeModal let-modal>
+
+    <div class="modal-header">
+      <h4>Toevoegen: {{ 'enums.product-type.' + newProduct.type |
+        translate }}</h4>
+  
+    </div>
+    <div class="modal-body">
+  
+  
+      <ng-container [ngSwitch]="step">
+        <ng-container *ngSwitchCase="-1">
+          {{ 'msg.api-problem' | translate }}
+  
+          <!-- <div *ngIf="message">{{message}}</div> -->
+  
+        </ng-container>
+        <ng-container *ngSwitchCase="1">
+          <ul class="list-group">
+            <li *ngFor="let productType of productTypes" class="list-group-item"
+              (click)="selectProductType(productType.key)">
+  
+              <div class="row">
+                <div class="col-1">
+                  <i class="{{ProductTypeIcons[productType.key]}}"></i>
+                </div>
+                <div class="col">
+                  {{ 'enums.product-type.' + productType.key | translate }}
+                </div>
+              </div>
+            </li>
+          </ul>
+        </ng-container>
+        <ng-container *ngSwitchCase="2">
+          <div class="row">
+            <div class="col-12">
+              <ngx-altea-label-control layout="basic" label="{{ 'dic.name' | translate }}" for="name"
+                help="De naam van product of dienst">
+                <input type="text" id="name" name="name" required class="form-control" [(ngModel)]="newProduct.name" />
+              </ngx-altea-label-control>
+            </div>
+          </div>
+  
+        </ng-container>
+        <ng-container *ngSwitchDefault>
+        </ng-container>
+      </ng-container>
+  
+  
+      <div class="row mt-3">
+        <div class="col-12">
+  
+          <button type="button" *ngIf="step === nrOfSteps" class="btn btn-primary float-end"
+            (click)="createProduct(modal)">{{ 'dic.create' | translate }} {{ 'enums.product-type.' + newProduct.type |
+            translate }}</button>
+  
+        </div>
+      </div>
+  
+  
+    </div>
+  
+  </ng-template>
+  
+  

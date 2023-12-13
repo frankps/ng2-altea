@@ -1,0 +1,265 @@
+<ng-container *ngIf="object">
+
+  <ngx-altea-delete-modal #deleteModal objectType="resource" [object]="object" [objectSvc]="resourceSvc"
+    [config]="deleteConfig"></ngx-altea-delete-modal>
+
+  <div class="row">
+    <div class="col-9">
+      <h4>{{object.name}} &nbsp; <i class="fa-solid fa-circle" [style.color]="object.color"></i></h4>
+    </div>
+    <div class="col-3">
+
+      <div class="d-inline-block float-end" ngbDropdown #myDrop="ngbDropdown">
+        <button type="button" class="btn btn-outline-primary me-2" id="dropdownManual" ngbDropdownAnchor
+          (focus)="myDrop.open()">
+          Acties
+        </button>
+        <div ngbDropdownMenu aria-labelledby="dropdownManual">
+          <button ngbDropdownItem (click)="delete()"><i class="fa-duotone fa-trash me-1"></i>
+            Verwijderen</button>
+        </div>
+      </div>
+
+
+    </div>
+
+  </div>
+
+
+
+  <ngx-altea-form-card-section sectionName="ui.resource.edit.sections.general.title" sectionId="general"
+    [editSectionId]="editSectionId" [icon]="ResourceTypeIcons[object.type]" (save)="save()" (cancel)="cancel()"
+    (editModeChanged)="editModeChanged($event)"
+    [enableSave]="!resourceGeneralForm.form.pristine && resourceGeneralForm.form.valid">
+    <ng-container readonly>
+      <!-- <div>{{ object.descr }}</div> -->
+
+      <ngx-altea-label-value label="objects.product.descr" [value]="object.descr"
+        empty="objects.product.no-descr"></ngx-altea-label-value>
+
+
+      <ngx-altea-label-value label="objects.resource.qty" *ngIf="object.canChangeQty()"
+        [value]="object.qty"></ngx-altea-label-value>
+
+      <ngx-altea-label-value label="objects.resource.start" valueFormat="date" *ngIf="object.start"
+        [value]="object.startDate"></ngx-altea-label-value>
+
+      <ngx-altea-label-value label="objects.resource.end" valueFormat="date" *ngIf="object.end"
+        [value]="object.endDate"></ngx-altea-label-value>
+
+
+      <!-- 
+      <ngx-altea-label-value label="objects.product.salesPrice" [value]="object.salesPrice"></ngx-altea-label-value>
+
+      <ngx-altea-label-value label="objects.product.vatPct" [value]="object.vatPct"></ngx-altea-label-value> -->
+
+
+    </ng-container>
+    <ng-container edit>
+
+      <form #resourceGeneralForm="ngForm">
+       
+        <!-- help="objects.resource.help.{{object.type}}-name" -->
+        <ngx-altea-label-control label="dic.name" for="name">
+          <input type="text" id="projectName" name="name" required class="form-control" [(ngModel)]="object.name" />
+        </ngx-altea-label-control>
+
+        <br />
+        <ngx-altea-label-control label="dic.description" for="descr">
+          <textarea rows="4" class="form-control" id="descr" name="descr" style="height: 120px"
+            [(ngModel)]="object.descr"></textarea>
+        </ngx-altea-label-control>
+
+
+        <div class="row mt-3">
+
+          <div class="col-4">
+
+            <ngx-altea-label-control label="dic.color" for="color">
+              <input type="color" id="color" name="color" required class="form-control" [(ngModel)]="object.color" />
+            </ngx-altea-label-control>
+
+          </div>
+
+
+          <div class="col-4" *ngIf="object.canChangeQty()">
+
+            <ngx-altea-label-control label="objects.resource.qty" for="qty"
+              help="objects.resource.help.{{object.type}}-qty">
+              <input type="number" id="qty" name="qty" required class="form-control" [(ngModel)]="object.qty" />
+            </ngx-altea-label-control>
+
+
+          </div>
+
+        </div>
+
+        <div class="row mt-3">
+
+          <div class="col-6">
+
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="hasStart" name="hasStart"
+                [(ngModel)]="object.hasStart" />
+              <label class="form-check-label" for="hasStart" translate="objects.resource.hasStart"></label>
+            </div>
+
+          </div>
+          <div class="col-6" *ngIf="object.hasStart">
+
+            <ngx-altea-label-control label="objects.resource.start" for="start" help="objects.resource.help.start">
+
+              <input type="text" id="start" name="start" placeholder="Datepicker" class="form-control" bsDatepicker
+                [(ngModel)]="object.startDate" [maxDate]="object.endDate">
+
+
+              <!--  [bsConfig]="{useUtc: true}"
+              [maxDate]="end"
+              
+              (bsValueChange)="rangePickerChanged($event)" 
+              <input type="date" id="start" name="start" class="form-control" [(ngModel)]="object.start" /> -->
+            </ngx-altea-label-control>
+
+            <!-- pattern="\d\d" -->
+
+          </div>
+          <!-- <div class="col-6">
+          {{object.hasStart}} - {{object.start}} - {{object.startDate}}
+        </div> -->
+        </div>
+
+        <div class="row mt-3">
+
+          <div class="col-6">
+
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="hasEnd" name="hasEnd" [(ngModel)]="object.hasEnd" />
+              <label class="form-check-label" for="hasEnd" translate="objects.resource.hasEnd"></label>
+            </div>
+
+          </div>
+
+          <div class="col-6" *ngIf="object.hasEnd">
+
+            <ngx-altea-label-control label="objects.resource.end" for="end" help="objects.resource.help.end">
+
+              <input type="text" id="end" name="end" placeholder="Datepicker" class="form-control" bsDatepicker
+                [(ngModel)]="object.endDate" [minDate]="object.startDate">
+
+              <!-- [bsConfig]="{useUtc: true}" -->
+
+            </ngx-altea-label-control>
+
+          </div>
+        </div>
+
+        <div class="row mt-3">
+
+          <div class="col-6">
+
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="isGroup" name="isGroup"
+                [(ngModel)]="object.isGroup" />
+              <label class="form-check-label" for="isGroup" translate="objects.resource.isGroup"></label>
+            </div>
+
+          </div>
+
+          <div class="col-6">
+
+            <ng-select id="type" name="type" [items]="resourceTypes" bindLabel="trans" bindValue="key"
+              [clearable]="false" [multiple]="false" [(ngModel)]="object.type"></ng-select>
+          </div>
+        </div>
+
+
+        
+        <div class="row mt-3">
+
+          <div class="col-6">
+
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="customSchedule" name="customSchedule"
+                [(ngModel)]="object.customSchedule" />
+              <label class="form-check-label" for="customSchedule" translate="objects.resource.customSchedule"></label>
+            </div>
+
+          </div>
+
+        </div>
+
+
+      </form>
+
+      <!-- <div class="col-6">
+          {{object.hasEnd}} - {{object.end | date:'short':'UTC'}}
+        </div> -->
+
+      <!-- <div class="col-6">
+          {{object.hasStart}} - {{object.start}}
+        </div> -->
+
+
+    </ng-container>
+
+  </ngx-altea-form-card-section>
+
+
+  <ngx-altea-resource-planning [parent]="this" [resource]="object"></ngx-altea-resource-planning>
+
+  <ngx-altea-resource-groups #resourceGroups *ngIf="!object.isGroup"
+    [groupMode]="ResourceGroupMode.showGroups" [parent]="this" [resource]="object"
+    [collection]="object.groups"></ngx-altea-resource-groups>
+
+  <ngx-altea-resource-groups #resourceGroups *ngIf="object.isGroup"
+    [groupMode]="ResourceGroupMode.showChildren" [parent]="this" [resource]="object"
+    [collection]="object.children"></ngx-altea-resource-groups>
+
+
+
+  <ng-container *ngIf="object.schedules?.length > 0">
+
+
+    <ngx-altea-form-card-section
+      sectionName="{{'ui.resource.edit.sections.schedule.title' | translate}}  {{schedule.name}}"
+      *ngFor="let schedule of object.schedules; let idx = index" sectionId="schedule" [sectionParam]="schedule.id"
+      [editSectionId]="editSectionId" [editSectionParam]="editSectionParam" icon="fa-duotone fa-clock" (save)="save()"
+      (cancel)="cancel()" (editModeChanged)="editModeChanged($event)">
+
+      <ng-container readonly>
+
+        <!-- {{schedule.id}} -->
+        <ngx-altea-schedule [readonly]="true" [schedule]="schedule"></ngx-altea-schedule>
+
+      </ng-container>
+
+      <ng-container edit>
+
+
+
+        <ngx-altea-schedule [parent]="this" [readonly]="false" [schedule]="schedule"></ngx-altea-schedule>
+
+
+      </ng-container>
+
+      <!-- <ng-container always>
+
+    </ng-container> -->
+
+    </ngx-altea-form-card-section>
+
+
+
+  </ng-container>
+
+</ng-container>
+
+
+<!-- && (!object.schedules || object.schedules.length === 0) -->
+
+<div *ngIf="object" class="mt-4">
+  Deze resource heeft nog geen planning!
+
+  <button type="button" class="btn btn-primary" (click)="createSchedule()">Maak nieuwe planning</button>
+
+</div>

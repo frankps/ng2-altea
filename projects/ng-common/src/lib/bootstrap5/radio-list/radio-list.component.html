@@ -1,0 +1,11 @@
+<ngx-altea-label-control layout="list" [label]="label" for="online" [help]="help">
+
+    <div class="form-check" *ngFor="let item of items">
+        <input class="form-check-input" type="radio" name="select-item" [id]="item.key" [value]="item.key"
+            [(ngModel)]="bindObject[bindProp]">
+        <label class="form-check-label" [for]="item.key">{{item.trans}}<br>
+            <small>{{item.help}}</small>
+        </label>
+    </div>
+
+</ngx-altea-label-control>

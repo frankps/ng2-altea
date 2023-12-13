@@ -1,0 +1,63 @@
+<div class="card" *ngIf="order">   
+    <!-- <img src="..." class="card-img-top" alt="..."> -->
+    <div class="card-header p-2" (click)="openOrder(order.id)">
+        <div class="row">
+            <div class="col-4">{{order.contact?.name}}</div>
+            <div class="col-4"> {{order.start | intdate}}</div>
+            <div class="col-4 d-flex justify-content-end align-items-center">
+
+
+                <ng-container *ngIf="resources">
+                    <ng-container *ngFor="let resource of resources">
+
+                        <!-- <i class=" fa-solid fa-circle fa-lg me-1" *ngIf="resource.color"
+                            [style.color]="resource.color"></i> -->
+
+                        <!-- <i class="{{ResourceTypeIcons[resource.type]}} fa-lg me-1" *ngIf="resource.color" [style.color]="resource.color"></i>
+                    
+                    data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Tooltip on top"
+                    
+                        -->
+
+                        <span class="fa-stack fa-sm" placement="top" [ngbTooltip]="resource.short">
+                            <i class="fa fa-circle fa-stack-2x icon-background" [style.color]="resource.color"></i>
+                            <i class="{{ResourceTypeIcons[resource.type]}} fa-stack-1x fa-lg" style="color: white;"></i>
+                        </span>
+
+                    </ng-container>
+
+
+
+                    <!-- fa-solid fa-circle -->
+
+                </ng-container>
+
+
+
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+
+        <!--               
+        <h5 class="card-title">{{order.contact.name}}</h5> -->
+
+
+
+        <div class="row" *ngFor="let line of order.lines">
+            <div class="col-8">{{line.qty}} x {{line.descr}}</div>
+            <div class="col-4 d-flex justify-content-end ">€ {{line.incl}}</div>
+        </div>
+
+
+
+
+    </div>
+    <div class="card-footer p-2">
+        <div class="row text-muted" style="font-size: 80%;">
+            <div class="col-6">Gemaakt op {{order.createdAt | date: sessionSvc.formats.dateShort}}</div>
+            <!-- <div class="col-4"> </div> -->
+            <div class="col-6 d-flex justify-content-end">€{{order.advance}} / €{{order.paid}} / €{{order.incl}}</div>
+        </div>
+    </div>
+</div>

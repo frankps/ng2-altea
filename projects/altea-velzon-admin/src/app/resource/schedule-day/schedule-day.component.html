@@ -1,0 +1,30 @@
+<div class="card" *ngIf="day" (click)="select()" style="height: 100%;" [ngClass]="{'highlight':selected}">
+    <div class="card-body p-2">
+
+        <div class="row" *ngIf="!readonly">
+            <div class="col d-flex justify-content-center">
+
+                <div class="form-check form-switch d-flex justify-content-center">
+                    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" [(ngModel)]="day.on">
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row mb-2">
+            <div class="col d-flex justify-content-center" style="font-weight:600;">{{'enums.days-of-week.' + day.day | translate}}</div> 
+        </div>
+
+        <ng-container *ngIf="day.on">
+            <div class="row" *ngFor="let block of day.blocks">
+                <div class="col d-flex justify-content-center">
+                    <small>{{block.from}}-{{block.to}}</small>
+                </div>
+            </div>
+        </ng-container>
+
+
+
+    </div>
+</div>

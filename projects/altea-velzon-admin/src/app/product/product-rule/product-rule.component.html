@@ -1,0 +1,49 @@
+<!-- 
+<div class="row">
+    <div class="col-6">
+
+        <ngx-altea-label-control label="objects.contact.gender" [trans]="true" for="ruleType">
+            <ng-select id="ruleType" name="ruleType" [items]="ruleTypes" bindLabel="trans" bindValue="key"
+                [clearable]="false" [multiple]="false" [(ngModel)]="rule.type">
+            </ng-select>
+        </ngx-altea-label-control>
+
+
+    </div>
+    <div class="col-6"></div>
+</div> -->
+
+{{rule.type}}
+
+
+
+
+
+
+<ng-select id="ruleType" name="ruleType" [items]="schedules" bindLabel="name" bindValue="id" [clearable]="false"
+    [multiple]="true" [(ngModel)]="rule.scheduleIds">
+</ng-select>
+
+
+<ng-container>
+
+
+    <span *ngFor="let time of rule.startAt">{{time}}&nbsp;<i class="fas fa-trash" (click)="deleteTime(time)"></i>&nbsp;&nbsp;</span>
+
+    <time-picker [(time)]="time"></time-picker>
+
+    <button type="button" class="btn btn-primary btn-sm" (click)="addTime()" translate>dic.add</button>
+
+</ng-container>
+
+
+
+
+<!-- <div class="row" style="width: 200px;">
+    <div class="col d-flex justify-content-center align-items-center">
+        <ng-select id="hour" name="hour" style="width: 60px;" [items]="hours" [clearable]="false" [multiple]="false"
+            [(ngModel)]="hour"></ng-select> &nbsp; : &nbsp; <ng-select id="minute" name="minute" style="width: 60px;"
+            [items]="minutes" [clearable]="false" [multiple]="false" [(ngModel)]="minute">
+        </ng-select>
+    </div>
+</div> -->

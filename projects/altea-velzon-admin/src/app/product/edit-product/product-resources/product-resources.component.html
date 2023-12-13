@@ -1,0 +1,112 @@
+<ngx-altea-form-card-section *ngIf="product" sectionName="ui.product.edit.sections.resources.title"
+    [sectionId]="thisSection" [editSectionId]="parent.editSectionId" [showBody]="false"
+    [enableSave]="dirty && enableSave" icon="fa-duotone fa-credit-card" (save)="parent.save()"
+    (cancel)="parent.cancel()" (editModeChanged)="editModeChanged($event)">
+
+    <ng-container outside-body>
+
+
+        <ul class="list-group list-group-flush">
+
+            <li class="list-group-item" *ngIf="!product.hasResources() && !sectionInEdit()">
+                <div [innerHTML]="'ui.product.edit.sections.resources.none' | translate">
+                </div>
+            </li>
+
+
+            <ng-container *ngIf="product.hasResources()">
+                <li class="list-group-item" *ngFor="let obj of collection; let idx = index">
+
+                    <ng-container
+                        *ngIf="sectionInEdit() && mode === ListSectionMode.edit && idx === idxEdit; else readOnlyItem">
+
+
+                        <ngx-altea-edit-product-resource [object]="objEdit" [resources]="resources"
+                            [durationMode]="durationMode" [durationReference]="durationReference"
+                            [branchSchedules]="branchSchedules" (cancel)="cancelItemEdit()"
+                            (save)="acceptItemEdit(objEdit, idx)"></ngx-altea-edit-product-resource>
+
+
+                    </ng-container>
+
+
+
+                    <ng-template #readOnlyItem>
+                        <div class="row">
+                            <div class="col"><span *ngIf="obj.resource.type == 'group' && obj.groupQty != 1">{{obj.groupQty}} x </span> {{obj.resource.name}}</div>
+
+                            <div class="col"
+                                *ngIf="parent.editSectionId === thisSection && mode === ListSectionMode.readOnly">
+
+                                <i class="fas fa-trash float-end" (click)="delete(obj)"></i>
+                                <i class="fas fa-pen float-end me-3" (click)="startEdit(obj, idx)"></i>
+
+                            </div>
+                        </div>
+
+                        <div class="row" *ngIf="obj.durationMode === 'product'">
+                            <div class="col"></div>
+                        </div>
+
+                        <ng-container *ngIf="obj.durationMode === 'custom'">
+                            <div class="row">
+                                <div class="col">
+                                    <i>Opgelet: Aangepaste bezetting! Aanvang bij het <b>{{ 'dic.' + obj.reference |
+                                            translate}}</b> van de dienst <span *ngIf="obj.offset !== 0">plus
+                                            <b>{{obj.offset}} minuten</b></span>, gedurende <b>{{obj.duration}}</b>
+                                        minuten.</i>
+                                </div>
+
+                            </div>
+                        </ng-container>
+
+                        <div class="row" *ngIf="obj.resource.type == 'group' && obj.groupAlloc">
+                            <div class="col">
+                                <span style="color: purple;">{{ 'objects.prodRes.help.groupAlloc' | translate }}</span>
+                            </div>
+                        </div>
+
+
+                        <div class="row" *ngIf="obj.scheduleIds">
+                            <div class="col">
+                                <span class="badge bg-warning text-dark" *ngFor="let id of obj.scheduleIds">{{getScheduleName(id)}}</span>
+                            </div>
+                        </div>
+
+                    </ng-template>
+
+
+
+                </li>
+            </ng-container>
+
+
+
+            <li class="list-group-item" style="text-align: center; cursor: pointer;" (click)="startAdd()"
+                *ngIf="parent.editSectionId === thisSection && mode === ListSectionMode.readOnly">
+                <i class="fa-duotone fa-circle-plus fa-xl"></i> &nbsp; Voeg resource toe
+            </li>
+
+            <li class="list-group-item" *ngIf="mode === ListSectionMode.createNew">
+
+                <ngx-altea-edit-product-resource [isNew]="true" [object]="objNew" [resources]="resources"
+                    [durationMode]="durationMode" [durationReference]="durationReference"
+                    [branchSchedules]="branchSchedules" (cancel)="cancelAdd()"
+                    (save)="addToList()"></ngx-altea-edit-product-resource>
+
+            </li>
+
+
+        </ul>
+
+
+
+
+
+
+
+
+    </ng-container>
+
+
+</ngx-altea-form-card-section>

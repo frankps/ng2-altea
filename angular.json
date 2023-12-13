@@ -3,5 +3,276 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
+    "ts-common": {
+      "projectType": "library",
+      "root": "projects/ts-common",
+      "sourceRoot": "projects/ts-common/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/ts-common/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/ts-common/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/ts-common/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/ts-common/tsconfig.spec.json",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ]
+          }
+        }
+      }
+    },
+    "ts-altea-model": {
+      "projectType": "library",
+      "root": "projects/ts-altea-model",
+      "sourceRoot": "projects/ts-altea-model/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/ts-altea-model/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/ts-altea-model/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/ts-altea-model/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/ts-altea-model/tsconfig.spec.json",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ]
+          }
+        }
+      }
+    },
+    "ts-altea-logic": {
+      "projectType": "library",
+      "root": "projects/ts-altea-logic",
+      "sourceRoot": "projects/ts-altea-logic/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/ts-altea-logic/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/ts-altea-logic/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/ts-altea-logic/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/ts-altea-logic/tsconfig.spec.json",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ]
+          }
+        }
+      }
+    },
+    "ng-common": {
+      "projectType": "library",
+      "root": "projects/ng-common",
+      "sourceRoot": "projects/ng-common/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/ng-common/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/ng-common/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/ng-common/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/ng-common/tsconfig.spec.json",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ]
+          }
+        }
+      }
+    },
+    "altea-velzon-admin": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "root": "projects/altea-velzon-admin",
+      "sourceRoot": "projects/altea-velzon-admin/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/altea-velzon-admin",
+            "index": "projects/altea-velzon-admin/src/index.html",
+            "main": "projects/altea-velzon-admin/src/main.ts",
+            "polyfills": [
+              "zone.js", "projects/altea-velzon-admin/src/polyfills.ts"
+            ],
+            "tsConfig": "projects/altea-velzon-admin/tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              "projects/altea-velzon-admin/src/favicon.ico",
+              "projects/altea-velzon-admin/src/assets"
+            ],
+            "styles": ["projects/altea-velzon-admin/src/styles.scss",
+            "node_modules/shepherd.js/dist/css/shepherd.css",
+              "node_modules/flatpickr/dist/flatpickr.css",          
+              "node_modules/@ctrl/ngx-emoji-mart/picker.css",
+              "node_modules/swiper/swiper-bundle.css",
+              "projects/altea-velzon-admin/src/assets/scss/config/minimal/bootstrap.scss",
+              "projects/altea-velzon-admin/src/assets/scss/config/minimal/app.scss",
+              "projects/altea-velzon-admin/src/assets/scss/icons.scss",
+              "node_modules/ngx-bootstrap/datepicker/bs-datepicker.css", 
+              "node_modules/ngx-spinner/animations/ball-scale-multiple.css",
+              "node_modules/@ng-select/ng-select/themes/default.theme.css"   
+            ],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kb",
+                  "maximumError": "3mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kb",
+                  "maximumError": "4kb"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "configurations": {
+            "production": {
+              "browserTarget": "altea-velzon-admin:build:production"
+            },
+            "development": {
+              "browserTarget": "altea-velzon-admin:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "altea-velzon-admin:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ],
+            "tsConfig": "projects/altea-velzon-admin/tsconfig.spec.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              "projects/altea-velzon-admin/src/favicon.ico",
+              "projects/altea-velzon-admin/src/assets"
+            ],
+            "styles": [
+              "projects/altea-velzon-admin/src/styles.scss"
+            ],
+            "scripts": []
+          }
+        }
+      }
+    },
+    "ng-altea-common": {
+      "projectType": "library",
+      "root": "projects/ng-altea-common",
+      "sourceRoot": "projects/ng-altea-common/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/ng-altea-common/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/ng-altea-common/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/ng-altea-common/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/ng-altea-common/tsconfig.spec.json",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ]
+          }
+        }
+      }
+    }
   }
 }

@@ -1,0 +1,117 @@
+<ngx-altea-new-product #newModal></ngx-altea-new-product>
+
+
+<!-- <div class="row my-3  align-items-center">
+  <div class="col-9 pe-0">
+
+
+    <input type="text" id="search" name="search" placeholder="Zoeken" required class="form-control"
+      [(ngModel)]="searchFor" />
+
+
+  </div>
+  <div class="col-3 d-flex justify-content-around">
+    <i class="fa-duotone fa-magnifying-glass fa-xl" (click)="search(searchFor)"></i>
+    <i class="fa-duotone fa-circle-plus fa-xl" (click)="createNew()"></i>
+
+  </div>
+
+
+</div> 
+
+  <div class="row">
+    <div class="col-9">
+      <h4>{{object.name}}</h4>
+    </div>
+    <div class="col-3">
+
+      <div class="d-inline-block float-end" ngbDropdown #myDrop="ngbDropdown">
+        <button type="button" class="btn btn-outline-primary me-2" id="dropdownManual" ngbDropdownAnchor
+          (focus)="myDrop.open()" translate>dic.actions  
+        </button>
+        <div ngbDropdownMenu aria-labelledby="dropdownManual">
+          <button ngbDropdownItem (click)="delete()"><i class="fa-duotone fa-trash me-1"></i> {{ 'dic.delete' | translate }} </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+-->
+
+<div class="row mb-4">
+  <div class="col-9 d-flex justify-content-start">
+    <h3>{{ 'menu.catalog.sub.' + productType | translate }}&nbsp;</h3> <i *ngIf="objects?.length > 0"
+      class="fas fa-pen float-end" style="color: gray;" (click)="toggleEditMode()"></i>
+
+  </div>
+
+  <div class="col-3">
+
+    <div class="d-inline-block float-end" ngbDropdown #myDrop="ngbDropdown" *ngIf="editMode && selectedIds?.length > 0">
+      <button type="button" class="btn btn-sm btn-outline-primary me-2" id="dropdownManual" ngbDropdownAnchor
+        (focus)="myDrop.open()" translate>dic.actions
+      </button>
+      <div ngbDropdownMenu aria-labelledby="dropdownManual">
+        <button ngbDropdownItem (click)="startMoveSelected()"><i
+            class="fa-duotone fa-arrow-up-right-from-square me-1"></i> {{ 'dic.move' | translate }} </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- <div class="col-2">
+    <i class="fa-duotone fa-arrow-up-right-from-square"></i>
+  </div> -->
+</div>
+
+<div class="row">
+  <div class="col-12 d-flex justify-content-center">
+    <ul class="list-group" style="width: 100%;" *ngIf="objects$ | async as products">
+      <li class="list-group-item" *ngFor="let product of products.data" (click)="selectProduct(product)">
+
+        <input *ngIf="editMode" class="form-check-input me-2" type="checkbox" id="editMode" id="editMode"
+          (change)="checkboxChanged(product, $event)" />
+        <!-- 
+        [(ngModel)]="object.showPrice" -->
+
+        <i class="{{product.getIcon()}}"></i> &nbsp; {{ product.name }}
+
+
+
+      </li>
+    </ul>
+  </div>
+
+</div>
+
+
+<ng-template #moveModal let-modal>
+
+  <div class="modal-header">
+    <h4>{{ 'ui.product.move-modal.title' | translate }}</h4>
+  </div>
+  <div class="modal-body">
+
+
+    <ng-select id="gender" name="gender" [items]="categories" bindLabel="name" bindValue="id" [clearable]="true"
+      [multiple]="false" [(ngModel)]="newCategoryId">
+    </ng-select>
+
+
+    <div class="row mt-3">
+
+      <div class="col-12 d-flex justify-content-end">
+
+        <button type="button" class="btn btn-primary" (click)="moveSelected(moveModal)"
+          translate>ui.product.move-modal.confirm</button>
+
+      </div>
+    </div>
+
+
+
+
+
+  </div>
+
+</ng-template>

@@ -1,0 +1,13 @@
+
+<div class="row" style="width: 200px;">
+    <div class="col d-flex justify-content-center align-items-center">
+        <ng-select id="hour" name="hour" style="width: 60px;" [items]="hours" [clearable]="false" [multiple]="false" (change)="timeChanged()"
+            [(ngModel)]="hour"></ng-select> &nbsp; : &nbsp;
+        <ng-select id="minute" name="minute" style="width: 60px;" [items]="minutes" [clearable]="false"
+            [multiple]="false" (change)="timeChanged()" [(ngModel)]="minute">
+        </ng-select>
+    </div>
+    <!-- <div class="col-6">
+
+    </div> -->
+</div>

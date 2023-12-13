@@ -1,0 +1,69 @@
+<ngx-altea-form-card-section *ngIf="parent" [sectionName]="'ui.resource.edit.sections.groups.' + groupMode + '.title'"
+    sectionId="groups" [editSectionId]="parent.editSectionId" icon="fa-duotone fa-user-group" [showBody]="false"
+    (save)="parent.save()" (cancel)="cancel()" (editModeChanged)="parent.editModeChanged($event)">
+
+
+    <ng-container outside-body>
+
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item" *ngIf="!collection || collection.length === 0">
+
+                {{ 'ui.resource.edit.sections.groups.' + groupMode + '.empty-list' | translate }}
+            </li>
+            <li class="list-group-item" *ngFor="let obj of collection; let idx = index">
+                <a [routerLink]="['/aqua/resources/any/',obj[linkProperty].id]">{{obj[linkProperty].name}} </a>
+
+                <i *ngIf="parent.editSectionId === thisSection && mode === ListSectionMode.readOnly"
+                    class="fas fa-trash float-end" (click)="delete(obj)"></i>
+            </li>
+
+
+            <li *ngIf="parent.editSectionId === thisSection && mode === ListSectionMode.readOnly"
+                class="list-group-item" style="text-align: center; cursor: pointer;" (click)="startAdd()">
+                <i class="fa-duotone fa-circle-plus fa-xl"></i> &nbsp; {{ 'ui.resource.edit.sections.groups.' +
+                groupMode + '.add-btn' | translate }}
+            </li>
+
+            <li class="list-group-item" *ngIf="mode === 'createNew'">
+
+
+                <ngx-altea-label-control layout="basic" label="ui.product.edit.sections.resources.select-resource"
+                    for="resources" help="De naam van product of dienst">
+                    <ng-select required id="resources" name="resources" [items]="resources" [clearable]="false"
+                        bindLabel="name" [multiple]="false" [(ngModel)]="selectedResource">
+
+
+                        <!-- bindValue="id"  (change)="resourceChanged($event)" -->
+
+                    </ng-select>
+                </ngx-altea-label-control>
+                <!-- 
+                [disabled]="productResourceForm.form.pristine || !productResourceForm.form.valid" -->
+
+                <div class="row mb-3">
+                    <div class="col-12 ">
+                        <button type="button" class="btn btn-sm btn-primary float-end" (click)="addResource()"
+                            translate>dic.add</button>
+                        <button type="button" class="btn btn-sm btn-outline-primary float-end me-2"
+                            (click)="cancelAdd()">Cancel</button>
+
+                    </div>
+                </div>
+
+
+
+            </li>
+
+
+
+        </ul>
+
+
+
+
+
+
+    </ng-container>
+
+
+</ngx-altea-form-card-section>

@@ -1,0 +1,208 @@
+<ngx-altea-form-card-section *ngIf="product && product.type === 'service'"
+    sectionName="ui.product.edit.sections.planning.title" [sectionId]="thisSection"
+    [editSectionId]="parent.editSectionId" icon="fa-duotone fa-clock" (save)="parent.save()" (cancel)="parent.cancel()"
+    (editModeChanged)="parent.editModeChanged($event)">
+
+    <ng-container readonly>
+
+
+        <ngx-altea-label-value label="objects.product.planMode" value="{{ 'enums.plan-mode.' + product.planMode | translate }}" ></ngx-altea-label-value>
+
+        <!-- [value]="product.planMode" -->
+
+        <ngx-altea-label-value label="dic.duration" [value]="product.duration"></ngx-altea-label-value>
+
+        <ngx-altea-label-value *ngIf="product.hasPre" label="objects.product.preTime"
+            [value]="product.preTime"></ngx-altea-label-value>
+
+        <ngx-altea-label-value *ngIf="product.hasPost" label="objects.product.postTime"
+            [value]="product.postTime"></ngx-altea-label-value>
+
+
+    </ng-container>
+    <ng-container edit>
+
+        <div class="row mt-3">
+            <div class="col">
+
+                <!-- <ngx-altea-label-control layout="list" label="objects.product.planMode" for="planMode"
+            help="objects.product.help.planMode">
+          
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="showPrice" [(ngModel)]="object.showPrice" />
+              <label class="form-check-label" for="showPrice" translate="objects.product.showPrice"></label>
+            </div>
+          
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="showDuration" [(ngModel)]="object.showDuration" />
+              <label class="form-check-label" for="showDuration" translate="objects.product.showDuration"></label>
+            </div>
+          
+          </ngx-altea-label-control> -->
+
+
+                <ngx-altea-radio-list label="objects.product.planMode" help="objects.product.help.planMode"
+                    [enum]="PlanningMode" [bindObject]="product" bindProp="planMode"
+                    transPath="enums.plan-mode."></ngx-altea-radio-list>
+
+
+
+
+            </div>
+        </div>
+
+
+        <ng-container *ngIf="product.planMode == 'block'">
+
+
+            <div class="row mt-3">
+                <div class="col-2">Aanvang</div>
+                <div class="col-2">Duurtijd</div>
+                <div class="col-2">Tussentijd</div>
+                <div class="col-2">Aantal</div>
+            </div>
+
+            <ng-container *ngIf="product.plan">
+
+                <div class="row" *ngFor="let blockSeries of product.plan; let idx = index">
+                    <div class="col-2">{{blockSeries.start}}</div>
+                    <div class="col-2">{{blockSeries.dur}}</div>
+                    <div class="col-2">{{blockSeries.post}}</div>
+                    <div class="col-2">{{blockSeries.count}}</div>
+
+                    <div class="col-3">
+
+                        <ng-container *ngIf="blockSeries.scheduleIds">
+                            <span class="badge rounded-pill text-bg-danger" style="font-size: 0.5em;"
+                                *ngFor="let scheduleId of blockSeries.scheduleIds">{{getScheduleName(scheduleId)}}</span>
+                        </ng-container>
+
+                    </div>
+                    <div class="col-1">
+                        <i class="fas fa-trash" (click)="deleteBlockSeries(idx)"></i>
+                    </div>
+                </div>
+
+            </ng-container>
+
+
+            <div class="row">
+                <div class="col-2">
+                    <input type="time" id="from" name="from" required class="form-control form-control-sm"
+                        [(ngModel)]="newBlock.start" />
+                </div>
+                <div class="col-2">
+                    <input type="number" id="dur" name="dur" required class="form-control form-control-sm"
+                        [(ngModel)]="newBlock.dur" />
+                </div>
+                <div class="col-2">
+                    <input type="number" id="post" name="post" required class="form-control form-control-sm"
+                        [(ngModel)]="newBlock.post" />
+                </div>
+                <div class="col-2">
+                    <input type="number" id="count" name="count" required class="form-control form-control-sm"
+                        [(ngModel)]="newBlock.count" />
+                </div>
+                <div class="col-2">
+                    <button type="button" class="btn btn-primary btn-sm" (click)="addBlockSeries(newBlock)"
+                        translate>dic.add</button>
+                </div>
+                <div class="col-2">
+
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-1">
+
+                </div>
+                <div class="col-7">
+                    <ng-select class="custom" *ngIf="schedules" id="schedules" name="schedules" [items]="schedules"
+                        bindLabel="name" bindValue="id" [clearable]="false" [multiple]="true"
+                        [(ngModel)]="newBlock.scheduleIds">
+                    </ng-select>
+                </div>
+
+            </div>
+
+
+
+
+
+        </ng-container>
+
+
+
+
+        <div class="row mt-3">
+            <div class="col-4">
+                <ngx-altea-label-control label="dic.duration" for="duration" help="objects.product.help.duration">
+                    <input type="number" id="duration" name="duration" required class="form-control"
+                        [(ngModel)]="product.duration" />
+                </ngx-altea-label-control>
+
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-12 col-xl-6">
+
+                <div class="row">
+                    <div class="col-12 mt-3">
+
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="hasPre" [(ngModel)]="product.hasPre" />
+                            <label class="form-check-label" for="hasPre" translate="objects.product.hasPre"></label>
+                        </div>
+
+                    </div>
+
+                    <div class="col-12 mt-3" *ngIf="product.hasPre">
+
+                        <ngx-altea-label-control label="objects.product.preTime" for="preTime">
+                            <input type="number" id="preTime" name="preTime" required class="form-control"
+                                [(ngModel)]="product.preTime" />
+                        </ngx-altea-label-control>
+
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-12 col-xl-6">
+
+                <div class="row">
+                    <div class="col-12 mt-3">
+
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="hasPost"
+                                [(ngModel)]="product.hasPost" />
+                            <label class="form-check-label" for="hasPost" translate="objects.product.hasPost"></label>
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-12 mt-3" *ngIf="product.hasPost">
+
+                        <ngx-altea-label-control label="objects.product.postTime" for="postTime">
+                            <input type="number" id="postTime" name="postTime" required class="form-control"
+                                [(ngModel)]="product.postTime" />
+                        </ngx-altea-label-control>
+
+                    </div>
+
+                </div>
+
+
+
+
+            </div>
+        </div>
+
+
+
+
+
+    </ng-container>
+
+</ngx-altea-form-card-section>

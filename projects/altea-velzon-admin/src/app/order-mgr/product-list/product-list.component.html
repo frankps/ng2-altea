@@ -1,0 +1,7 @@
+<ng-container *ngIf="orderMgrSvc.products">
+
+    <ul class="list-group">
+        <li class="list-group-item" *ngFor="let product of orderMgrSvc.products" (click)="productSelected(product)">{{product.name}}</li>
+    </ul>
+
+</ng-container>

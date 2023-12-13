@@ -1,0 +1,156 @@
+<div *ngIf="object">
+
+  <div class="row">
+    <div class="col-6 mb-3">
+      <ngx-altea-label-control label="{{ 'dic.price' | translate }}" for="name" help="De naam van product of dienst">
+        <input type="number" id="price" name="price" required class="form-control" [(ngModel)]="object.value" />
+      </ngx-altea-label-control>
+    </div>
+    <div class="col-6">
+
+
+      <ngx-altea-label-control label="{{ 'objects.price.start' | translate }}" for="qty"
+        help="De naam van product of dienst">
+
+        <input type="text" id="dateSelect" placeholder="Datepicker" class="form-control" bsDatepicker
+          [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY' }" [(ngModel)]="object.start">
+
+      </ngx-altea-label-control>
+
+      <!-- <ngx-altea-label-control label="{{ 'dic.qty' | translate }}" for="qty" help="De naam van product of dienst">
+        <input type="number" id="qty" name="qty" required class="form-control" [(ngModel)]="object.qty" />
+      </ngx-altea-label-control> -->
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" id="isQty" [(ngModel)]="object.isQty" />
+        <label class="form-check-label" for="isQty" translate="objects.price.isQty"></label>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="row mt-2" *ngIf="object.isQty">
+    <div class="col-2"></div>
+    <div class="col-3">
+
+      <ngx-altea-label-control label="{{ 'objects.price.qty' | translate }}" for="qty"
+        help="De naam van product of dienst">
+        <input type="number" id="qty" name="qty" required class="form-control" [(ngModel)]="object.qty" />
+      </ngx-altea-label-control>
+
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" id="isDay" [(ngModel)]="object.isDay" />
+        <label class="form-check-label" for="isDay" translate="objects.price.isDay"></label>
+      </div>
+
+    </div>
+  </div>
+
+
+  <div class="row mt-2" *ngIf="object.isDay">
+
+    <div class="col-2"></div>
+
+    <div class="col-1" *ngFor="let dow of daysOfWeekShort; let index = index; ">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="" [id]="dow.key" [(ngModel)]="object.days[dow.value]">
+        <label class="form-check-label" [for]="dow.key">
+          {{ dow.trans }}
+          <!-- {{ 'enums.days-of-week-short.' + dow | translate }} -->
+        </label>
+      </div>
+    </div>
+
+    <!-- <div class="col-1">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="" id="tu">
+        <label class="form-check-label" for="tu">
+          Di
+        </label>
+      </div>
+    </div> -->
+  </div>
+
+
+
+
+  <div class="row">
+    <div class="col-12">
+
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" id="isTime" [(ngModel)]="object.isTime" />
+        <label class="form-check-label" for="isTime" translate="objects.price.isTime"></label>
+      </div>
+
+    </div>
+  </div>
+
+
+
+
+
+
+  <!-- *ngIf="object.isDay" -->
+  <div class="row mt-2" *ngIf="object.isTime">
+
+    <div class="col-2"></div>
+
+    <div class="col-3">
+      <ngx-altea-label-control label="{{ 'objects.price.from' | translate }}" for="from" help="De naam van product of dienst">
+        <input type="time" id="from" name="from" class="form-control"  [(ngModel)]="object.from" pattern="\d\d" />
+      </ngx-altea-label-control>
+    </div>
+
+    <div class="col-3">
+      <ngx-altea-label-control label="{{ 'objects.price.to' | translate }}" for="to" help="De naam van product of dienst">
+        <input type="time" id="to" name="to" class="form-control"  [(ngModel)]="object.to" pattern="\d\d" />
+      </ngx-altea-label-control>
+    </div>
+
+
+  </div>
+
+
+  
+
+  <!-- 
+  <div class="row">
+    <div class="col-6">
+
+
+
+    </div>
+    <div class="col-6">
+
+      <ngx-altea-label-control label="{{ 'objects.price.end' | translate }}" for="qty"
+        help="De naam van product of dienst">
+
+        <input type="text" id="dateSelect" placeholder="Datepicker" class="form-control" bsDatepicker
+          [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY' }" [(ngModel)]="object.end">
+
+      </ngx-altea-label-control>
+
+    </div>
+  </div> -->
+
+
+
+
+
+
+
+
+
+
+</div>
