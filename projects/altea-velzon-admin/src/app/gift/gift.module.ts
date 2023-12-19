@@ -18,6 +18,7 @@ import { ManageGiftsComponent } from './manage-gifts/manage-gifts.component';
 import { EditGiftComponent } from './edit-gift/edit-gift.component';
 import { GiftListComponent } from './gift-list/gift-list.component';
 import { NewGiftComponent } from './new-gift/new-gift.component';
+import { ContactModule } from '../contact/contact.module';
 
 
 
@@ -38,6 +39,7 @@ import { NewGiftComponent } from './new-gift/new-gift.component';
     ModalModule,
     BsDatepickerModule,
     TimepickerModule,
-    NgxSpinnerModule],
+    NgxSpinnerModule,
+  ContactModule],
 })
 export class GiftModule { }

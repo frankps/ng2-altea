@@ -118,7 +118,7 @@ export abstract class NgEditBaseComponent<T extends ObjectWithId> extends NgSect
 
     getObject(id: string) {
 
-
+        
         this.spinner.show()
 
 

@@ -239,6 +239,8 @@ export class Contact extends ObjectWithId {
   active = true
   deleted = false
   deletedAt?: Date;
+
+  subscriptions?: Subscription[]
 }
 
 // export class ScheduleLine extends ObjectWithId {
@@ -856,7 +858,7 @@ export class Branch extends ObjectWithId {
 }
 
 
-export enum   ResourceType {
+export enum ResourceType {
   human = 'human',
   room = 'room',
   device = 'device',
@@ -1778,7 +1780,7 @@ export class OrderLineOptionValue extends ObjectWithId {
     olOptionValue.prc = prodOptionValue.price
     //olOptionValue.factor = prodOptionValue.factor
     return olOptionValue
-  } 
+  }
 
   getPrice(formula?: FormulaTerm[], options?: OrderLineOption[]): number {
 
@@ -2474,7 +2476,21 @@ export enum GiftCertificate {
 export class Gift extends ObjectWithId {
   orgId?: string;
   branchId?: string;
-  contactId?: string;
+
+  /*
+  fromId String? @db.Uuid
+  from   Contact? @relation(name: "giftsGiven", fields: [fromId], references: [id])
+
+  toId String? @db.Uuid
+  to   Contact? @relation(name: "giftsReceived", fields: [toId], references: [id])
+*/
+
+  fromId?: string;
+  from?: Contact
+
+  toId?: string;
+  to?: Contact
+
   orderId?: string;
   type = GiftType.value
   code?: string;

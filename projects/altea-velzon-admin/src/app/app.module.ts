@@ -18,6 +18,8 @@ import { allIcons } from 'angular-feather/icons';
 import { NgxSpinnerModule } from "ngx-spinner"
 import { Bootstrap5Module } from  'ng-common'  // 'ng-common' 
 import { FullCalendarModule } from '@fullcalendar/angular';
+import { DemoComponent } from './demo/demo/demo.component';
+import { ContactModule } from './contact/contact.module';
 
 defineLocale('nl-be', nlBeLocale);
 
@@ -26,7 +28,7 @@ export function createTranslateLoader(http: HttpClient): any {
 }
 
 @NgModule({
-  declarations: [AppComponent, NxWelcomeComponent],
+  declarations: [AppComponent, NxWelcomeComponent, DemoComponent],
   imports: [
     BrowserModule,
     RouterModule.forRoot(appRoutes, { initialNavigation: 'enabledBlocking' }),
@@ -44,6 +46,7 @@ export function createTranslateLoader(http: HttpClient): any {
         deps: [HttpClient],
       },
     }),
+    ContactModule
     
   ],
   providers: [],

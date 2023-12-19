@@ -24,6 +24,14 @@
         </div>
 
     </div>
+
+
+<!--     <altea-search-contact #searchContactModal></altea-search-contact>
+
+    
+ -->
+
+
     <!-- 
     [icon]="ResourceTypeIcons[object.type]" -->
 
@@ -54,6 +62,9 @@
 
                 </div>
             </div>
+
+
+
 
             <div class="row mt-3" *ngIf="object.fromName || object.fromEmail">
                 <div class="col-2">
@@ -148,6 +159,19 @@
                         {{'objects.gift.from' | translate}}
                     </div>
                 </div>
+
+
+
+                
+                <altea-search-contact #searchContactModal [modal]="true" (contactSelected)="setContact($event)"></altea-search-contact>
+        
+
+                <div class="row">
+                    <div class="col-6"><button type="button" class="btn btn-primary btn-sm" (click)="searchContact()">Contact zoeken</button></div>
+                    <div class="col-6">{{object.fromId}}  <span *ngIf="object.from">{{object.from.name}}</span></div>      
+                  </div>
+
+                  
 
                 <div class="row mt-2">
                     <div class="col-6">

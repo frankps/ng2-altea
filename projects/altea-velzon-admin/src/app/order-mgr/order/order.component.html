@@ -28,7 +28,19 @@
 
         <!--               
         <h5 class="card-title">{{order.contact.name}}</h5> -->
+        <ng-container *ngIf="order.contact">
 
+            <div class="row mt-2">
+                <div class="col-6">{{order.contact.name}}</div>
+                <div class="col-6">{{order.contact.email}}</div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-6"></div>
+                <div class="col-6">{{order.contact.mobile}}</div>
+            </div>
+
+        </ng-container>
+        
 
         <div *ngFor="let line of order.lines" (click)="orderMgrSvc.selectExistingOrderLine(line)">
             <div class="row mt-2">

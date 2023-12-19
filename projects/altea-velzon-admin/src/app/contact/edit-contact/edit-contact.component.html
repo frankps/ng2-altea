@@ -193,21 +193,30 @@
 
         <ng-container always>
 
-            <div class="row">
-                <div class="col-6 d-flex justify-content-center">Abonnement</div>
-                <div class="col-2 d-flex justify-content-center">Beurten</div>
-                <div class="col-2 d-flex justify-content-center">Gemaakt op</div>
-                <div class="col-2 d-flex justify-content-center">Eerste gebruik</div>                
-            </div>
+            <ng-container *ngIf="object.subscriptions">
+
+                <div class="row">
+                    <div class="col-6 d-flex justify-content-center">Abonnement</div>
+                    <div class="col-2 d-flex justify-content-center">Beurten</div>
+                    <div class="col-2 d-flex justify-content-center">Gemaakt op</div>
+                    <div class="col-2 d-flex justify-content-center">Eerste gebruik</div>                
+                </div>
+    
+    
+                <div class="row" *ngFor="let sub of object.subscriptions">
+                    <div class="col-6">
+                        <a [routerLink]="['/', sessionSvc.branch,'subscriptions',sub.id]">{{sub.name}} </a>
+                        </div>
+                    <div class="col-2 d-flex justify-content-center">{{sub.usedQty}}/{{sub.totalQty}}</div>
+                    <div class="col-2 d-flex justify-content-center">{{sub.createdAt | date: sessionSvc.formats.date}}</div>
+                    <div class="col-2 d-flex justify-content-center">{{sub.firstUsedOn | date: sessionSvc.formats.date}}</div>
+                    
+                </div>
 
 
-            <!-- <div class="row" *ngFor="let sub of object.subscriptions">
-                <div class="col-6">{{sub.name}}</div>
-                <div class="col-2 d-flex justify-content-center">{{sub.usedQty}}/{{sub.totalQty}}</div>
-                <div class="col-2 d-flex justify-content-center">{{sub.createdAt | date: sessionSvc.formats.Date}}</div>
-                <div class="col-2 d-flex justify-content-center">{{sub.firstUsedOn | date: sessionSvc.formats.Date}}</div>
-                
-            </div> -->
+            </ng-container>
+
+
 
         </ng-container>
 

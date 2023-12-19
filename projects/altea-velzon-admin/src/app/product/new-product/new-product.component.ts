@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Product, ProductType, ProductTypeIcons } from 'ts-altea-model'
 import { ApiListResult, DbQuery, QueryOperator, Translation, ApiResult, ApiStatus, ConnectTo } from 'ts-common'
-import { ProductService } from 'ng-altea-common'
+import { ProductService, SessionService } from 'ng-altea-common'
 import { Observable } from 'rxjs';
 import { TranslationService } from 'ng-common'
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -33,7 +33,7 @@ export class NewProductComponent implements OnInit {
   newProduct: Product = new Product()
 
 
-  constructor(private productSvc: ProductService, public manageProductSvc: ManageProductService, private translationSvc: TranslationService, private modalService: NgbModal, protected route: ActivatedRoute, private router: Router, protected spinner: NgxSpinnerService) {
+  constructor(private productSvc: ProductService, private sessionSvc: SessionService, public manageProductSvc: ManageProductService, private translationSvc: TranslationService, private modalService: NgbModal, protected route: ActivatedRoute, private router: Router, protected spinner: NgxSpinnerService) {
 
   }
 
@@ -58,10 +58,11 @@ export class NewProductComponent implements OnInit {
 
     this.spinner.show()
 
-    this.newProduct.organisation = new ConnectTo("66e77bdb-a5f5-4d3d-99e0-4391bded4c6c")
+    //this.newProduct.organisation = new ConnectTo("66e77bdb-a5f5-4d3d-99e0-4391bded4c6c")
     // this.newProduct.branch = new ConnectTo("66e77bdb-a5f5-4d3d-99e0-4391bded4c6c")
 
-    this.newProduct.branchId = "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c"
+    this.newProduct.orgId = this.sessionSvc.orgId
+    this.newProduct.branchId = this.sessionSvc.branchId
 
     this.productSvc.create(this.newProduct).subscribe((res: ApiResult<Product>) => {
 
@@ -79,7 +80,7 @@ export class NewProductComponent implements OnInit {
 
         console.error(this.router.getCurrentNavigation())
 
-        const url = '/aqua/products/' + res.object.id
+        const url = `/aqua/catalog/${this.newProduct.type}/` + res.object.id
 
         console.error(url)
 

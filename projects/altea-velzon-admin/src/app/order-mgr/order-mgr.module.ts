@@ -25,6 +25,7 @@ import { DebugAvailabilityComponent } from './debug-availability/debug-availabil
 import { DebugResourceRequestComponent } from './debug-availability/debug-resource-request/debug-resource-request.component';
 import { SelectTimeSlotComponent } from './select-time-slot/select-time-slot.component';
 import { DemoOrdersComponent } from './demo-orders/demo-orders.component';
+import { ContactSelectComponent } from './contact-select/contact-select.component';
 
 @NgModule({
   declarations: [
@@ -39,6 +40,7 @@ import { DemoOrdersComponent } from './demo-orders/demo-orders.component';
     DebugResourceRequestComponent,
     SelectTimeSlotComponent,
     DemoOrdersComponent,
+    ContactSelectComponent,
   ],
   imports: [
     CommonModule,

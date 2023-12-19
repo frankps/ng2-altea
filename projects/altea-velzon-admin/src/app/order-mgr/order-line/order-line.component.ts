@@ -20,7 +20,7 @@ export class OrderLineComponent {
   }
 
   get product() {
-    return this.orderMgrSvc.product
+    return this.orderMgrSvc.product 
   }
 
   get orderLineOptions() {

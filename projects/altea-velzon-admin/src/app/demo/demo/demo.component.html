@@ -1,0 +1,19 @@
+
+
+
+<div class="row">
+    <div class="col-4">
+        
+        <button type="button" class="btn btn-primary btn-sm" (click)="searchWithModal()">Contact zoeken</button>
+
+
+        <br>
+        <span *ngIf="selectedContact">{{selectedContact.name}}</span>
+        
+
+        <altea-search-contact #searchContactModal [modal]="true" (contactSelected)="setContact($event)"></altea-search-contact>
+
+    </div>
+    <div class="col-8"></div>      
+  </div>
+

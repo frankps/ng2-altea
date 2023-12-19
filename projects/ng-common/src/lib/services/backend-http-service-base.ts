@@ -43,6 +43,23 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
     return this.http.get<ApiListResult<T>>(`${this.host}/${this.urlDifferentiator}?query=name~${searchFor}`)
   }
 
+  search$(searchFor: string): Promise<T[]> {
+
+    const me = this
+
+    return new Promise<any>(function (resolve, reject) {
+
+      me.search(searchFor).pipe(take(1)).subscribe(res => {
+
+        resolve(res.data)
+
+      })
+
+
+    })
+
+  }
+
   update(object: any): Observable<ApiResult<T>> {
     console.log(object)
     const observ = this.http.put<any>(`${this.host}/${this.urlDifferentiator}/${object.id}`, object).pipe(map(res => {

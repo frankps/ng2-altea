@@ -1,4 +1,5 @@
 {
+  "extends": "../../tsconfig.json",
   "name": "ts-altea-logic",
   "version": "0.0.1",
   "peerDependencies": {

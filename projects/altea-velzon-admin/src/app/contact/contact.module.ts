@@ -18,15 +18,20 @@ import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { TimepickerModule } from 'ngx-bootstrap/timepicker';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerModule } from 'ngx-spinner';
+import { SearchContactComponent } from './search-contact/search-contact.component';
 
 
 
 @NgModule({
+  exports: [
+    SearchContactComponent
+  ],
   declarations: [
     ManageContactsComponent,
     EditContactComponent,
     ContactListComponent,
     NewContactComponent,
+    SearchContactComponent,
   ],
   imports: [CommonModule, 
     ContactRoutingModule,

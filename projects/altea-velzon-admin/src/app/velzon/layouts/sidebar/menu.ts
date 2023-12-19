@@ -107,10 +107,16 @@ export const MENU: MenuItem[] = [
     link: '/aqua/subscriptions',
   },
   {
-    id: 9,
+    id: 10,
     label: 'menu.order.label',
     icon: 'home',
     link: '/aqua/order',
+  },
+  {
+    id: 11,
+    label: 'menu.demo.label',
+    icon: 'home',
+    link: '/aqua/demo',
   }
   /*
   {

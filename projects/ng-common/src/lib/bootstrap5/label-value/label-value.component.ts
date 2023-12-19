@@ -17,6 +17,7 @@ export class LabelValueComponent {
 
   @Input() transform = ''
 
+
   _value = ''
 
   @Input() set value(val: any) {

@@ -13,7 +13,7 @@ export class SessionService {
   }
 
   public currency = 'EUR'
-  public currencySymbol = ' €'
+  public currencySymbol = ' €'  
   public idxStep = 100
 
   public orgId?: string = "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c"
@@ -23,10 +23,7 @@ export class SessionService {
   //public backend = "http://192.168.5.202:8080"
   //public backend = "https://altea-1.ew.r.appspot.com"
 
-  public backend = "https://dvit-477c9.uc.r.appspot.com"
-   //public backend = "http://localhost:8080"
-
-
-
+  // public backend = "https://dvit-477c9.uc.r.appspot.com"
+   public backend = "http://localhost:8080"
 
 }

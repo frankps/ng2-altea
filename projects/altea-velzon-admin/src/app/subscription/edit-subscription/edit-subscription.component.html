@@ -41,9 +41,12 @@
             </div>
 
             <div class="row">
-                <div class="col-12"> <ngx-altea-label-value label="objects.subscription.contact"
-                        [value]="object.contact.name"></ngx-altea-label-value> </div>
+                <div class="col-12"> <ngx-altea-label-value label="objects.subscription.contact" valueFormat="url"
+                        [value]="object.contact.name" [url]="'/' + sessionSvc.branch + '/contacts/' + object.contact.id"></ngx-altea-label-value> </div>
             </div>
+
+            <!-- <a [routerLink]="['/', sessionSvc.branch,'subscriptions',sub.id]">{{sub.name}} </a> -->
+
 
             <div class="row">
                 <div class="col-12"> <ngx-altea-label-value label="objects.subscription.name"

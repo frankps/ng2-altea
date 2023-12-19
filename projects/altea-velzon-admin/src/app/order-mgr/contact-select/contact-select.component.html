@@ -1,0 +1,32 @@
+<div class="card">
+    <div class="card-header" translate>
+      ui.order-mgr.persons.title
+    </div>
+    <div class="card-body">
+
+
+        <div class="row">
+            <div class="col-10">
+                <input type="search" class="form-control" id="searchFor" placeholder="search" [(ngModel)]="search">
+    
+            </div>
+            <div class="col-2">
+                <button type="button" class="btn btn-primary" (click)="searchContact()">
+                    <i class="fas fa-magnifying-glass"></i>
+                </button>
+            </div>
+        </div>
+    
+    
+        <ng-container *ngIf="contacts">
+    
+            <ul class="list-group mt-3">
+                <li class="list-group-item" (click)="selectContact(contact)" *ngFor="let contact of contacts">
+                    {{contact.name}}</li>
+            </ul>
+    
+        </ng-container>
+
+
+    </div>
+</div>

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import { Injectable } from '@angular/core';
-import { AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, DateBorder, Order, OrderLine, OrderLineOption, Product, ProductType, ProductTypeIcons, ReservationOption, Resource } from 'ts-altea-model'
+import { AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Contact, DateBorder, Order, OrderLine, OrderLineOption, Product, ProductType, ProductTypeIcons, ReservationOption, Resource } from 'ts-altea-model'
 import { ApiListResult, ApiStatus, DateHelper, DbQuery, QueryOperator, Translation } from 'ts-common'
 import { AlteaService, ObjectService, OrderMgrService, OrderService, ProductService, SessionService } from 'ng-altea-common'
 import * as _ from "lodash";
@@ -322,6 +322,14 @@ export class OrderMgrUiService {
     this.order.deleteLine(this.orderLine)
     this.orderLine = null
   }
+
+  setContact(contact: Contact) {
+
+    this.order.contactId = contact.id
+    this.order.contact = contact
+  
+  }
+  
 
 
 }

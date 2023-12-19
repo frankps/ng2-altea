@@ -14,6 +14,7 @@ import * as sc from 'stringcase'
 import { scheduled } from 'rxjs';
 import * as Rx from "rxjs";
 import { NgForm } from '@angular/forms';
+import { SearchContactComponent } from '../../contact/search-contact/search-contact.component';
 
 
 @Component({
@@ -22,6 +23,9 @@ import { NgForm } from '@angular/forms';
   styleUrls: ['./edit-gift.component.scss'],
 })
 export class EditGiftComponent extends NgEditBaseComponent<Gift> {
+
+
+  @ViewChild('searchContactModal') public searchContactModal: SearchContactComponent;
 
   @ViewChild('deleteModal') public deleteModal: DeleteModalComponent;
 
@@ -44,11 +48,11 @@ export class EditGiftComponent extends NgEditBaseComponent<Gift> {
   constructor(protected giftSvc: GiftService, protected translationSvc: TranslationService, route: ActivatedRoute, protected router: Router,
     spinner: NgxSpinnerService, private modalService: NgbModal, dashboardSvc: DashboardService,
     protected sessionSvc: SessionService) {
-    super('gift', Gift, ''
+    super('gift', Gift, 'from'
       , giftSvc
       , route, spinner, dashboardSvc)
 
-    this.sectionProps.set('general', ['value', 'used', 'isConsumed', 'fromName', 'fromEmail', 'toName', 'toEmail', 'toAddress', 'toMessage', 'toSendEmail'])
+    this.sectionProps.set('general', ['value', 'used', 'isConsumed', 'fromName', 'fromEmail', 'toName', 'toEmail', 'toAddress', 'toMessage', 'toSendEmail', 'fromId'])
     // this.translationSvc.translateEnum(Gender, 'enums.gender.', this.gender)
     // this.translationSvc.translateEnum(Language, 'enums.language.', this.language)
 
@@ -94,6 +98,21 @@ export class EditGiftComponent extends NgEditBaseComponent<Gift> {
     }
 
   }
+
+
+
+  searchContact() {
+    this.searchContactModal.show()    
+  }
+
+
+  setContact(contact: Contact) {
+
+    this.object.from = contact
+    this.object.fromId = contact.id
+
+  }
+
 
 
 

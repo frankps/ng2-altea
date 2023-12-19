@@ -18,6 +18,8 @@ import { CartModel } from './topbar.model';
 import { cartData } from './data';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
+import { DashboardService } from 'ng-common';
+
 @Component({
   selector: 'app-topbar',
   templateUrl: './topbar.component.html',
@@ -44,9 +46,12 @@ export class TopbarComponent implements OnInit {
   @ViewChild('removenotification') removenotification !: TemplateRef<any>;
   notifyId: any;
 
+  // ALTEA SPECIFIC
+  searchString = ''
+
   constructor(@Inject(DOCUMENT) private document: any, private eventService: EventService, public languageService: LanguageService, private modalService: NgbModal,
     public _cookiesService: CookieService, public translate: TranslateService, private authService: AuthenticationService, private authFackservice: AuthfakeauthenticationService,
-    private router: Router, private TokenStorageService: TokenStorageService) { }
+    private router: Router, private TokenStorageService: TokenStorageService, public dashboardSvc: DashboardService) { }
 
   ngOnInit(): void {
     this.userData = this.TokenStorageService.getUser();
@@ -316,4 +321,20 @@ export class TopbarComponent implements OnInit {
       document.querySelector('.empty-notification-elem')?.classList.remove('d-none')
     }
   }
+
+
+  // ALTEA SPECIFIC
+
+  searchNow(input: any) {
+
+    // console.error()
+
+    this.dashboardSvc.searchFor(this.searchString)
+
+  }
+
+  createNew() {
+    this.dashboardSvc.createNew()
+  }
+
 }
