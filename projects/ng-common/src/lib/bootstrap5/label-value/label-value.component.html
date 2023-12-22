@@ -79,7 +79,7 @@
 
             <ng-container *ngSwitchDefault>
                 
-                {{getValue()}} <sup *ngIf="icon"><i [class]="icon"></i> </sup>
+                {{getValue()}} <sup *ngIf="icon"><i [class]="icon"></i> </sup> <span *ngIf="unit" translate>{{unit}}</span>
 
 
                 

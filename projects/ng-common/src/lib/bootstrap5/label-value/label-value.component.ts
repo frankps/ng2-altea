@@ -43,6 +43,9 @@ export class LabelValueComponent {
     return this._value
   }
 
+  /** unit will be placed as suffix to the value */
+  @Input() unit?: string
+
   @Input() class = ''
 
   /** Background color: default white */

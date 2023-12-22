@@ -50,7 +50,7 @@ export class EditBranchComponent extends NgEditBaseComponent<Branch> {
     spinner: NgxSpinnerService, private modalService: NgbModal, dashboardSvc: DashboardService,
     protected scheduleSvc: ScheduleService, protected sessionSvc: SessionService) {
     super('branch', Branch, ''
-      , contactSvc
+      , contactSvc  
       , route, spinner, dashboardSvc)
 
     this.sectionProps.set('deposit', ['depositPct', 'depositTerms', 'reminders'])

@@ -19,6 +19,7 @@
     "gender": "Geslacht",
     "duration": "Duurtijd",
     "durationMin": "Duurtijd in minuten",
+    "hour": "uur",
     "msgType": "Berichttype",
     "ok": "OK",
     "price": "Prijs",
@@ -186,15 +187,19 @@
       "error": "Oepss... er was een probleem bij het verwijderen."
     },
     "deposit": {
+      "none": "Geen voorschot ingesteld",
       "request": "Gevraagde voorschot",
       "default": "Standaard voorschot",
       "custom": "Aangepaste voorschot",
       "terms": {
-        "info": "Betalings termijnen voor voorschotten:",
-        "same-day": "Zelfde dag",
-        "next-day": "Volgende dag",
-        "next-week": "Volgende week",
-        "next-month": "Volgende maand"
+        "info": "Betalingstermijnen (in aantal uren) voor voorschotten:",
+        "same-day": "Reservatie zelfde dag",
+        "next-day": "Reservatie volgende dag",
+        "next-week": "Reservatie volgende week",
+        "next-month": "Reservatie volgende maand",
+        "help": {
+          "info": "Stel hierboven in hoeveel uur uw klanten de tijd hebben om hun voorschot te betalen in functie van wanneer de reservatie gemaakt is."
+        }
       }
 
     },
@@ -202,7 +207,8 @@
       "edit": {
         "sections": {
           "deposit": {
-            "title": "Voorschotten"
+            "title": "Voorschotten",
+            "help": "Hier kan u een standaard voorschot percentage instellen. Dit percentage zal toegepast worden op alle orders. U kan dit percentage nog aanpassen per product of per klant. Op deze manier kan u bijvoorbeeld instellen dat sommige klanten geen voorschot hoeven te betalen ofwel alles moeten betalen."
           }
         }
       }

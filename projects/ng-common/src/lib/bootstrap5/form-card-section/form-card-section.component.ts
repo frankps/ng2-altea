@@ -43,6 +43,9 @@ export class FormCardSectionComponent {  //  implements OnInit
 
   @Input() enableSave = true
 
+  @Input() help: string | undefined
+  
+    //= 'ui.branch.edit.sections.deposit.help'
   // editMode = false
 
   //constructor() { }
