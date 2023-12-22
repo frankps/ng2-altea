@@ -4,6 +4,7 @@
 
 export * from './lib/ng-altea-common.module';
 export * from './lib/altea.service'
+export * from './lib/branch.service'
 export * from './lib/contact.service'
 export * from './lib/gift.service'
 export * from './lib/object.service'

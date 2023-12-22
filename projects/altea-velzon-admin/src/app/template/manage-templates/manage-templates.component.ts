@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Template, TemplateChannel, TemplateRecipient, TemplateType } from 'ts-altea-model' //'../../../../../../libs/ts-altea-common/src';
+import { Template, TemplateChannel, TemplateRecipient, TemplateType, orderTemplates } from 'ts-altea-model' //'../../../../../../libs/ts-altea-common/src';
 import { DashboardService, NgSectionsComponent, ToastType } from 'ng-common';
 import { ApiStatus, CollectionChangeTracker, DbQuery, QueryOperator } from 'ts-common'
 import { SessionService, TemplateService } from 'ng-altea-common'
@@ -38,7 +38,10 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
 
   selections: { [index: string]: TemplateTypeSelections } = {};
 
-  templateTypes = [TemplateType.confirmation, TemplateType.cancel, TemplateType.change, TemplateType.reminder]
+  //templateTypes = [TemplateType.confirmation, TemplateType.cancel, TemplateType.change, TemplateType.reminder]
+
+
+  templateCodes = orderTemplates
 
   /** Template can be for an email or for SMS  */
   //isEmail = false
@@ -79,8 +82,8 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
 
   initSelections() {
 
-    for (let type of this.templateTypes) {
-      this.selections[type] = new TemplateTypeSelections()
+    for (let templateCode of this.templateCodes) {
+      this.selections[templateCode] = new TemplateTypeSelections()
     }
 
     // console.error(this.selections)
@@ -94,7 +97,7 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
 
     for (let template of templates.filter(t => t.active)) {
 
-      if (!_.includes(this.templateTypes, template.type))
+      if (!_.includes(this.templateCodes, template.code))
         continue
 
       let channel = _.find(template.channels, channel => channel == TemplateChannel.email || channel == TemplateChannel.sms)
@@ -105,7 +108,7 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
 
       var prop = channel + '_' + recipient
 
-      this.selections[template.type][prop] = true
+      this.selections[template.code][prop] = true
 
     }
 
@@ -148,15 +151,15 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
     console.warn(this.selections)
   }
 
-  editTemplate(type: TemplateType, variant: TemplateVariant) {
+  editTemplate(templateCode: string, variant: TemplateVariant) {
     // this.template = new Template()
 
-    console.warn('Edit template', type, variant)
+    console.warn('Edit template', templateCode, variant)
 
     // _.constant
     // this.isEmail = (selectionProp && selectionProp.startsWith('email'))
 
-    var template = this.templates.find(t => t.type == type && t.channels && t.to
+    var template = this.templates.find(t => t.code == templateCode && t.channels && t.to
       && _.includes(t.channels, variant.channel) && _.includes(t.to, variant.recipient))
 
 
@@ -168,10 +171,10 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
   }
 
 
-  selectionChanged(selected: boolean, type: TemplateType, variant: TemplateVariant) {
+  selectionChanged(selected: boolean, templateCode: string, variant: TemplateVariant) {
     //    console.warn($event)
 
-    var template = this.templates.find(t => t.type == type && t.channels && t.to
+    var template = this.templates.find(t => t.code == templateCode && t.channels && t.to
       && _.includes(t.channels, variant.channel) && _.includes(t.to, variant.recipient))
 
     if (!selected) {
@@ -196,7 +199,8 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
 
       if (!template) {
         template = new Template()
-        template.type = type
+        template.cat = 'order'
+        template.code = templateCode
         template.orgId = this.sessionSvc.orgId
         template.branchId = this.sessionSvc.branchId
         template.to.push(variant.recipient)

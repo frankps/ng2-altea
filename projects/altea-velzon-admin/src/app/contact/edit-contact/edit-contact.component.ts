@@ -33,12 +33,15 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> {
   }
 
   Array = Array
+  Math = Math
 
   gender: Translation[] = []
   language: Translation[] = []
 
   // scheduleChanges?: CollectionChangeTracker<Schedule>
 
+  depositPctgs = [...Array(21).keys()].map(i => { return { pct: (i * 5) / 100, label: `${i * 5} %` }})
+  depositMode = "default"   // default or custom
 
 
   public saveScheduling$: Rx.Subject<any> = new Rx.Subject<any>()
@@ -50,7 +53,7 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> {
       , contactSvc
       , route, spinner, dashboardSvc)
 
-    this.sectionProps.set('general', ['first', 'last', 'gender', 'birth', 'email', 'emailRemind', 'mobile', 'smsRemind', 'language'])
+    this.sectionProps.set('general', ['first', 'last', 'gender', 'birth', 'email', 'emailRemind', 'mobile', 'smsRemind', 'language', 'depositPct'])
     this.translationSvc.translateEnum(Gender, 'enums.gender.', this.gender)
     this.translationSvc.translateEnum(Language, 'enums.language.', this.language)
 
@@ -70,7 +73,9 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> {
     console.error('objectRetrieved')
     console.error(object)
 
-   // this.editSectionId = 'general'
+    if (object?.depositPct)
+    this.depositMode = "custom"
+
 
 
   }
@@ -96,6 +101,27 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> {
       default:
         this.saveSection(this.sectionProps, this.editSectionId)
     }
+
+  }
+
+
+  depositModeChanged(custom: boolean) {
+
+    console.warn(custom)
+
+    if (custom) {
+
+      this.object.depositPct = 0.5
+
+    } else {
+
+      this.object.depositPct = null
+
+    }
+
+    this.generalForm.form.markAsDirty()
+
+    console.warn(this.object)
 
   }
 

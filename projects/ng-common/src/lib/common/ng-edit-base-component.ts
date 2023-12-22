@@ -90,7 +90,7 @@ export abstract class NgEditBaseComponent<T extends ObjectWithId> extends NgSect
         //this.object = object
 
         this.route.params.subscribe(params => {
-
+            
             console.error('edit-product')
 
             console.error(params)
@@ -118,7 +118,7 @@ export abstract class NgEditBaseComponent<T extends ObjectWithId> extends NgSect
 
     getObject(id: string) {
 
-        
+
         this.spinner.show()
 
 

@@ -10,7 +10,7 @@
 
         <!-- [value]="product.planMode" -->
 
-        <ngx-altea-label-value label="dic.duration" [value]="product.duration"></ngx-altea-label-value>
+        <ngx-altea-label-value label="dic.durationMin" [value]="product.duration"></ngx-altea-label-value>
 
         <ngx-altea-label-value *ngIf="product.hasPre" label="objects.product.preTime"
             [value]="product.preTime"></ngx-altea-label-value>
@@ -135,7 +135,7 @@
 
         <div class="row mt-3">
             <div class="col-4">
-                <ngx-altea-label-control label="dic.duration" for="duration" help="objects.product.help.duration">
+                <ngx-altea-label-control label="dic.durationMin" for="duration" help="objects.product.help.duration">
                     <input type="number" id="duration" name="duration" required class="form-control"
                         [(ngModel)]="product.duration" />
                 </ngx-altea-label-control>

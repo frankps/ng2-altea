@@ -33,11 +33,15 @@ export class RightsidebarComponent implements OnInit {
   constructor(private eventService: EventService, private offcanvasService: NgbOffcanvas) { }
 
   ngOnInit(): void {
-    setTimeout(() => {
+/* Disable the auto opening of the right side bar  
+
+  setTimeout(() => {
       if (this.offcanvasService.hasOpenOffcanvas() == false) {
         this.openEnd(this.filtetcontent);
       };
-    }, 1000);
+    }, 1000); 
+    
+    */
     this.layout = LAYOUT;
     this.mode = LAYOUT_MODE;
     this.width = LAYOUT_WIDTH;

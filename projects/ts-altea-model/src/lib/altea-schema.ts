@@ -46,6 +46,15 @@ export enum DaysOfWeekShort {
   su = 'su'
 }
 
+export enum TimeUnit {
+  seconds = 's',
+  minutes = 'm',
+  hours = 'h',
+  days = 'd',
+  weeks = 'w',
+  months = 'M'
+}
+
 export enum Gender {
   female = 'female',
   male = 'male',
@@ -236,6 +245,10 @@ export class Contact extends ObjectWithId {
   company?: string;
   vatNum?: string;
   branches?: string[];
+
+  depositPct?: number
+
+
   active = true
   deleted = false
   deletedAt?: Date;
@@ -552,9 +565,11 @@ export class Product extends ObjectWithId {
 
   stock = 0
   minStock = 0
-  advance = 0
+  //advance = 0
   vatPct = 0
   branches?: string[];
+
+  deposit = 0
 
   personSelect = true  // if order is for multiple persons, then customer can specify for each orderLine the person
   staffSelect = true  // customer can specify which staffmember 
@@ -826,6 +841,38 @@ export class Organisation extends ObjectWithId {
   }
 }
 
+
+/** DepositTerms define how much time a customer has to pay for a reservation (pt=payment term) 
+ * based on how long the booking was made upfront (bt=before time)   */
+export class DepositTerm {
+
+  /** before time: time between reservation made and effective date of reservation */
+  bt: number = 0
+
+  /** before time unit: (d)ays, (h)ours, (m)inutes */
+  btu: string = 'd'
+
+  /** payment term: the time a customer has to pay for his reservation */
+  pt: number = 0
+
+  /** payment term unit: (d)ays, (h)ours, (m)inutes */
+  ptu: string = 'h'
+}
+
+export enum MsgType {
+  sms = 'sms',
+  email = 'email'
+}
+
+export class Reminder {
+
+  type: MsgType = MsgType.email 
+
+  dur: number = 1
+
+  unit: TimeUnit = TimeUnit.days
+}
+
 export class Branch extends ObjectWithId {
 
   orders?: Order[];
@@ -850,11 +897,89 @@ export class Branch extends ObjectWithId {
   vatPct = 0
   vatPcts?: number[];
 
+  /** default deposit percentage, can be overruled on product & contact level */
+  depositPct?: number
+
+  depositTerms?: DepositTerm[]
+
+  reminders?: Reminder[]
+
   active = true;
   deleted = false;
   createdAt = new Date()
   updatedAt?: Date
   deletedAt?: Date
+
+  get sameDayTerm(): number { return this.getDepositTerm(0) }
+  set sameDayTerm(value: number) { this.setDepositTerm(0, value) }
+
+  get nextDayTerm(): number { return this.getDepositTerm(1) }
+  set nextDayTerm(value: number) { this.setDepositTerm(1, value) }  
+
+  get nextWeekTerm(): number { return this.getDepositTerm(7) }
+  set nextWeekTerm(value: number) { this.setDepositTerm(7, value) }  
+
+  get nextMonthTerm(): number { return this.getDepositTerm(30) }
+  set nextMonthTerm(value: number) { this.setDepositTerm(30, value) }  
+
+
+  // 
+  //nextDayTerm: number = 5
+
+  hasReminders() {
+    return (Array.isArray(this.reminders) && this.reminders.length > 0)
+  }
+
+  getDepositTerm(beforeTime: number, beforeUnit: string = 'd') {
+    if (!Array.isArray(this?.depositTerms))
+      return null
+
+    const term = this?.depositTerms.find(dt => dt.bt == beforeTime && dt.btu == beforeUnit)
+
+    if (!term)
+      return null
+    else
+      return term.pt
+  }
+
+  setDepositTerm(beforeTime: number, depositTerm: number, beforeUnit: string = 'd') {
+
+    if (!Array.isArray(this?.depositTerms))
+      this.depositTerms = []
+
+    if (!depositTerm) {
+      _.remove(this?.depositTerms, t => t.bt == beforeTime && t.btu == beforeUnit)
+      console.warn(this?.depositTerms)
+      return
+
+    }
+
+    let term = this?.depositTerms.find(dt => dt.bt == beforeTime && dt.btu == beforeUnit)
+
+    if (term) {
+      term.pt = depositTerm
+    }
+    else {
+
+
+      term = new DepositTerm()
+
+      term.bt = beforeTime
+      term.btu = beforeUnit
+      term.pt = depositTerm
+
+      this.depositTerms.push(term)
+    }
+
+    console.error(term)
+    console.warn(this?.depositTerms)
+
+
+  }
+
+
+
+
 }
 
 
@@ -2418,6 +2543,9 @@ export enum TemplateType {
   reminder = 'reminder'
 }
 
+
+export const orderTemplates = ['wait-deposit', 'confirmation', 'no-deposit-cancel', 'in-time-cancel', 'late-cancel', 'reminder', 'no-show', 'satisfaction']
+
 /*
 cancel
 cancelClient
@@ -2442,6 +2570,10 @@ export class Template extends ObjectWithId {
   type = TemplateType.general
   to: string[] = []
   channels: string[] = []
+
+  /** category (example: order) */
+  cat?: string
+
   code?: string | null
   name?: string | null
   language?: string | null

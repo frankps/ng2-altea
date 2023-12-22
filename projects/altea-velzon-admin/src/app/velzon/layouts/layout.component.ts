@@ -25,8 +25,11 @@ export class LayoutComponent implements OnInit {
     // listen to event and change the layout, theme, etc
     this.eventService.subscribe('changeLayout', (layout) => {
       this.layoutType = layout;
+
+     // console.error('layoutType', this.layoutType)
     });
 
+    //console.error('layoutType', this.layoutType)
   }
 
   /**

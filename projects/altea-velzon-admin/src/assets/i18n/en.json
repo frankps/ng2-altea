@@ -17,11 +17,13 @@
     "move": "Verplaatsen",
     "name": "Naam",
     "gender": "Geslacht",
-    "duration": "Duurtijd in minuten",
+    "duration": "Duurtijd",
+    "durationMin": "Duurtijd in minuten",
+    "msgType": "Berichttype",
     "ok": "OK",
     "price": "Prijs",
     "qty": "Aantal",
-
+    "timeUnit": "Tijdseenheid",
     "save": "Opslaan",
     "search": "Zoeken",
     "spacingAfter": "Kuistijd in minuten",
@@ -29,6 +31,26 @@
     "end": "einde"
   },
   "enums": {
+    "msg-type": {
+      "sms": "SMS",
+      "email": "E-mail"
+    },
+    "time-units-plur": {
+      "s": "Seconden",
+      "m": "Minuten",
+      "h": "Uren",
+      "d": "Dagen",
+      "w": "Weken",
+      "M": "Maanden"
+    },
+    "time-units-sing": {
+      "s": "Second",
+      "m": "Minuut",
+      "h": "Uur",
+      "d": "Dag",
+      "w": "Week",
+      "M": "Maand"
+    },
     "toast-type": {
       "saveSuccess": "Aanpassing zijn succesvol bewaard!",
       "saveError": "Er was een probleem bij het opslaan!",
@@ -139,6 +161,19 @@
       "reminder": "Herinnering"
     }
   },
+  "templates": {
+    "order": {
+      "wait-deposit": "Wachten op voorschot", 
+      "confirmation": "Confirmatie",
+      "no-deposit-cancel": "Annulatie - geen voorschot",
+      "in-time-cancel": "Annulatie - op tijd",
+      "late-cancel": "Late annulatie",
+      "reminder": "Herinnering",
+      "no-show": "No show",
+      "satisfaction": "Tevredenheid"
+    }
+
+  },
   "ui": {
     "price-modal": {
       "title": "Prijs"
@@ -149,6 +184,28 @@
       "confirm": "Ja, verwijder",
       "cancel": "Sluit",
       "error": "Oepss... er was een probleem bij het verwijderen."
+    },
+    "deposit": {
+      "request": "Gevraagde voorschot",
+      "default": "Standaard voorschot",
+      "custom": "Aangepaste voorschot",
+      "terms": {
+        "info": "Betalings termijnen voor voorschotten:",
+        "same-day": "Zelfde dag",
+        "next-day": "Volgende dag",
+        "next-week": "Volgende week",
+        "next-month": "Volgende maand"
+      }
+
+    },
+    "branch": {
+      "edit": {
+        "sections": {
+          "deposit": {
+            "title": "Voorschotten"
+          }
+        }
+      }
     },
     "contact": {
       "edit": {
@@ -300,7 +357,8 @@
       "phone": "Telefoon",
       "language": "Taal",
       "company": "Bedrijf",
-      "vatNum": "BTW nummer"
+      "vatNum": "BTW nummer",
+      "deposit": "Voorschot"
     },
 
     "template": {
@@ -511,6 +569,9 @@
     },
     "order": {
       "label": "Reservatie maken"
+    },
+    "branch": {
+      "label": "Instellingen"
     }
   },
   "MENUITEMS": {

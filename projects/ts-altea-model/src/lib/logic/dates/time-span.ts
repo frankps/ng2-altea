@@ -1,11 +1,12 @@
 import * as dateFns from 'date-fns'
 import { Timestamp } from 'rxjs'
+import { TimeUnit } from '../../altea-schema'
 
-export enum TimeUnit {
+/* export enum TimeUnit {
     hours,
     minutes,
     seconds
-}
+} */
 
 /** A TimeSpan is internally represented in seconds */
 export class TimeSpan {

@@ -33,11 +33,11 @@
         </div>
 
         <ng-container *ngIf="selectionsAvailable">
-            <div class="row mb-1  d-flex justify-content-center" *ngFor="let type of templateTypes">
+            <div class="row mb-1  d-flex justify-content-center" *ngFor="let templateCode of templateCodes">
 
-                <div class="col-2">{{'enums.template-type.' + type | translate}}</div>
+                <div class="col-2">{{'templates.order.' + templateCode | translate}}</div>
 
-                <ng-container *ngIf="selections[type]">
+                <ng-container *ngIf="selections[templateCode]">
 
                     <div class="col-2 d-flex justify-content-center" *ngFor="let variant of variants">
                         <!-- [(ngModel)]="object.showPrice" -->
@@ -45,20 +45,20 @@
                         <ng-container *ngIf="sectionInEditIs('config')">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox"
-                                    id="{{type}}-{{variant.channel}}-{{variant.recipient}}"
-                                    [(ngModel)]="selections[type][variant.channel + '_' + variant.recipient]"
-                                    (change)="selectionChanged($event.target['checked'], type, variant)" />
+                                    id="{{templateCode}}-{{variant.channel}}-{{variant.recipient}}"
+                                    [(ngModel)]="selections[templateCode][variant.channel + '_' + variant.recipient]"
+                                    (change)="selectionChanged($event.target['checked'], templateCode, variant)" />
 
                             </div>
 
                             <i class="fas fa-pen ms-2"
-                                *ngIf="selections[type][variant.channel + '_' + variant.recipient]"
-                                (click)="editTemplate(type, variant)"></i>
+                                *ngIf="selections[templateCode][variant.channel + '_' + variant.recipient]"
+                                (click)="editTemplate(templateCode, variant)"></i>
 
                         </ng-container>
 
                         <i class="fas fa-eye"
-                            *ngIf="sectionIsReadOnly('config') && selections[type][variant.channel + '_' + variant.recipient]"></i>
+                            *ngIf="sectionIsReadOnly('config') && selections[templateCode][variant.channel + '_' + variant.recipient]"></i>
                     </div>
 
 

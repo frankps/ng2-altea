@@ -1,12 +1,11 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { ContactRoutingModule } from './contact-routing.module';
-import { ManageContactsComponent } from './manage-contacts/manage-contacts.component';
-import { EditContactComponent } from './edit-contact/edit-contact.component';
-import { ContactListComponent } from './contact-list/contact-list.component';
-import { NewContactComponent } from './new-contact/new-contact.component';
-import { SearchContactComponent } from './search-contact/search-contact.component';
+import { BranchRoutingModule } from './branch-routing.module';
+import { EditBranchComponent } from './edit-branch/edit-branch.component';
+
+
+
 
 import { Bootstrap5Module } from 'ng-common';
 import { FormsModule } from '@angular/forms';
@@ -21,20 +20,13 @@ import { NgxSpinnerModule } from 'ngx-spinner';
 
 
 
-
 @NgModule({
-  exports: [
-    SearchContactComponent
-  ],
   declarations: [
-    ManageContactsComponent,
-    EditContactComponent,
-    ContactListComponent,
-    NewContactComponent,
-    SearchContactComponent,
+    EditBranchComponent
   ],
-  imports: [CommonModule, 
-    ContactRoutingModule,
+  imports: [
+    CommonModule,
+    BranchRoutingModule,
     NgbModule,
     Bootstrap5Module,
     FormsModule,
@@ -46,4 +38,4 @@ import { NgxSpinnerModule } from 'ngx-spinner';
     NgxSpinnerModule
   ]
 })
-export class ContactModule {}
+export class BranchModule { }

@@ -16,6 +16,8 @@ export class VerticalComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+
     if (document.documentElement.getAttribute('data-layout') == 'vertical') {
       document.documentElement.setAttribute('data-layout', 'vertical');
     } else {
@@ -110,6 +112,8 @@ export class VerticalComponent implements OnInit {
    * on settings button clicked from topbar
    */
   onSettingsButtonClicked() {
+
+
     document.body.classList.toggle('right-bar-enabled');
     const rightBar = document.getElementById('theme-settings-offcanvas');
     if (rightBar != null) {
