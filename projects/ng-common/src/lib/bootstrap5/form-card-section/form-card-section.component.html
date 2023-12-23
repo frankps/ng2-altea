@@ -71,9 +71,13 @@
     <ng-content *ngIf="editMode" select="[edit]"></ng-content>
   </div>
 
-<!--   style="background-color: #25A0E2; color: white;" -->
-  <div class="card-footer" style="color: gray;" *ngIf="help">
+  <!--   style="background-color: #25A0E2; color: white;" -->
+  <!--   <div class="card-footer" style="color: gray;" *ngIf="help">
     <span style="font-size: small;" ><i translate>{{help}}</i></span>
+  </div> -->
+
+  <div class="card-footer" *ngIf="help">
+    <span class="help" translate>{{help}}</span>
   </div>
 
 </div>

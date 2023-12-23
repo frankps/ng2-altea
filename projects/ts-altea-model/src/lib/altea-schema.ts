@@ -860,13 +860,46 @@ export class DepositTerm {
 }
 
 export enum MsgType {
+  unknown = 'unknown',
   sms = 'sms',
   email = 'email'
 }
 
+/*
+model Message {
+  id String @id(map: "newtable_pk") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  type String?  // email, sms
+
+  from String?
+  to String[]
+  cc String[]
+  bcc String[]
+
+  subject String?
+  body String?
+}
+*/
+
+export class Message extends ObjectWithId {
+
+  branchId?: string
+  orderId?: string
+
+  type: MsgType = MsgType.email
+
+  from?: string
+  to: string[] = []
+  cc: string[] = []
+  bcc: string[] = []
+
+  subject?: string
+  body?: string
+}
+
 export class Reminder {
 
-  type: MsgType = MsgType.email 
+  type: MsgType = MsgType.email
 
   dur: number = 1
 
@@ -914,13 +947,13 @@ export class Branch extends ObjectWithId {
   set sameDayTerm(value: number) { this.setDepositTerm(0, value) }
 
   get nextDayTerm(): number { return this.getDepositTerm(1) }
-  set nextDayTerm(value: number) { this.setDepositTerm(1, value) }  
+  set nextDayTerm(value: number) { this.setDepositTerm(1, value) }
 
   get nextWeekTerm(): number { return this.getDepositTerm(7) }
-  set nextWeekTerm(value: number) { this.setDepositTerm(7, value) }  
+  set nextWeekTerm(value: number) { this.setDepositTerm(7, value) }
 
   get nextMonthTerm(): number { return this.getDepositTerm(30) }
-  set nextMonthTerm(value: number) { this.setDepositTerm(30, value) }  
+  set nextMonthTerm(value: number) { this.setDepositTerm(30, value) }
 
 
   // 
@@ -1455,11 +1488,49 @@ export class OrderPerson extends ObjectWithId {
   // }
 }
 
+/*
+enum OrderState {
+
+  creation
+  waitDeposit
+  confirmed
+  
+  canceled
+  noDepositCancel
+  inTimeCancel
+  lateCancel
+
+  arrived
+  noShow
+  finished
+
+  inProgress
+  timedOut
+}
+*/
+
+
+// export const orderTemplates = ['wait-deposit', 'confirmation', 'no-deposit-cancel', 'in-time-cancel', 'late-cancel', 'reminder', 'no-show', 'satisfaction']
+
 
 export enum OrderState {
-  inProgress = 'inProgress',
+
+  creation = 'creation',
+  waitDeposit = 'waitDeposit',
   confirmed = 'confirmed',
+
   canceled = 'canceled',
+  noDepositCancel = 'noDepositCancel',
+  inTimeCancel = 'inTimeCancel',
+  lateCancel = 'lateCancel',
+
+  arrived = 'arrived',
+  noShow = 'noShow',
+  finished = 'finished',
+
+  inProgress = 'inProgress',
+  //  confirmed = 'confirmed',
+  //  canceled = 'canceled',
   timedOut = 'timedOut'
 }
 
@@ -1503,7 +1574,7 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
   incl = 0;
 
   @Type(() => Number)
-  advance = 0;
+  deposit = 0;
 
   @Type(() => Number)
   paid = 0;
@@ -2544,7 +2615,7 @@ export enum TemplateType {
 }
 
 
-export const orderTemplates = ['wait-deposit', 'confirmation', 'no-deposit-cancel', 'in-time-cancel', 'late-cancel', 'reminder', 'no-show', 'satisfaction']
+export const orderTemplates = ['waitDeposit', 'confirmed', 'noDepositCancel', 'inTimeCancel', 'lateCancel', 'reminder', 'noShow', 'satisfaction']
 
 /*
 cancel
@@ -2567,7 +2638,7 @@ export class Template extends ObjectWithId {
   orgId?: string
   branchId?: string
   idx = 0
-  type = TemplateType.general
+
   to: string[] = []
   channels: string[] = []
 
@@ -2588,10 +2659,21 @@ export class Template extends ObjectWithId {
   //fruit = 'pomme'
 
   isEmail(): boolean {
-
-    return (this.channels && _.includes(this.channels, 'email'))
-
+    return (Array.isArray(this.channels) && _.includes(this.channels, 'email'))
   }
+
+  isSms(): boolean {
+    return (Array.isArray(this.channels) && _.includes(this.channels, 'sms'))
+  }
+
+  msgType(): MsgType {
+
+    if (!Array.isArray(this.channels) || this.channels.length == 0)
+      return MsgType.email
+
+    return this.channels[0] as MsgType
+  }
+
 }
 
 export enum GiftType {

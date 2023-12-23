@@ -164,13 +164,13 @@
   },
   "templates": {
     "order": {
-      "wait-deposit": "Wachten op voorschot", 
-      "confirmation": "Confirmatie",
-      "no-deposit-cancel": "Annulatie - geen voorschot",
-      "in-time-cancel": "Annulatie - op tijd",
-      "late-cancel": "Late annulatie",
+      "waitDeposit": "Wachten op voorschot", 
+      "confirmed": "Confirmatie",
+      "noDepositCancel": "Annulatie - geen voorschot",
+      "inTimeCancel": "Annulatie - op tijd",
+      "lateCancel": "Late annulatie",
       "reminder": "Herinnering",
-      "no-show": "No show",
+      "noShow": "No show",
       "satisfaction": "Tevredenheid"
     }
 
@@ -192,7 +192,7 @@
       "default": "Standaard voorschot",
       "custom": "Aangepaste voorschot",
       "terms": {
-        "info": "Betalingstermijnen (in aantal uren) voor voorschotten:",
+        "info": "Betalingstermijn:",
         "same-day": "Reservatie zelfde dag",
         "next-day": "Reservatie volgende dag",
         "next-week": "Reservatie volgende week",
@@ -209,6 +209,10 @@
           "deposit": {
             "title": "Voorschotten",
             "help": "Hier kan u een standaard voorschot percentage instellen. Dit percentage zal toegepast worden op alle orders. U kan dit percentage nog aanpassen per product of per klant. Op deze manier kan u bijvoorbeeld instellen dat sommige klanten geen voorschot hoeven te betalen ofwel alles moeten betalen."
+          },
+          "reminders": {
+            "title": "Herinneringen",
+            "help": "Hier kan u instellen hoe (email,sms) en hoeveel tijd voorafgaand de reservatie herinneringen verstuurd worden."
           }
         }
       }
@@ -334,6 +338,9 @@
     "gift": {}
   },
   "objects": {
+    "reminder": {
+      "dur": "Versturen voor aanvang"
+    },
     "order": {
       "start": "Start",
       "end": "Einde",

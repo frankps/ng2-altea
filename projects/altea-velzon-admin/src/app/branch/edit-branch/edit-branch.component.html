@@ -9,18 +9,23 @@
 
         <div *ngIf="object.hasReminders()" class="mt-3"> 
 
-            <div class="row">
-                <div class="col-3" translate>dic.msgType</div>
-                <div class="col-3" translate>dic.duration</div>
+            <div class="row mb-2">
+                <div class="col-2" translate>dic.msgType</div>
+                <div class="col-2" translate>objects.reminder.dur</div>
             </div>
 
             <div class="row" *ngFor="let reminder of object.reminders; let idx = index">
-                <div class="col-3">{{reminder.type}}</div>
-                <div class="col-3">{{reminder.dur}} {{reminder.unit}}</div>
+                <div class="col-2">{{'enums.msg-type.' + reminder.type | translate}}</div>
+                <div class="col-2">{{reminder.dur}} {{reminder.unit}}
+                    <i *ngIf="sectionInEditIs('reminders')" class="fas fa-trash float-end" (click)="deleteReminder(idx)"></i>
+                </div>
 
                 <div class="col-3">
+                    
+                    
+<!-- 
                     <button type="button" class="btn btn-primary btn-sm" (click)="deleteReminder(idx)"
-                        translate>dic.delete</button>
+                        translate>dic.delete</button> -->
                 </div>
             </div>
 
@@ -32,39 +37,25 @@
 
 
 
-    <ngx-altea-form-card-section sectionName="ui.contact.edit.sections.general.title" sectionId="general"
+    <ngx-altea-form-card-section sectionName="ui.branch.edit.sections.reminders.title" sectionId="reminders"
         [editSectionId]="editSectionId" (save)="save()" (cancel)="cancel()" (editModeChanged)="editModeChanged($event)"
-        [enableSave]="!generalForm?.form.pristine && generalForm?.form.valid">
+        [enableSave]="!remindersForm?.form.pristine && remindersForm?.form.valid"
+        help="ui.branch.edit.sections.reminders.help">
 
         <ng-container readonly>
 
-
-
             <ng-container *ngTemplateOutlet="reminders"></ng-container>
          
-
-
-
-
-
-
-
-
-
-
         </ng-container>
 
         <ng-container edit>
 
-            <form #generalForm="ngForm">
-
-
+            <form #remindersForm="ngForm">
 
                 <ng-container *ngTemplateOutlet="reminders"></ng-container>
 
-
                 <div class="row mt-3">
-                    <div class="col-3">
+                    <div class="col-2">
     
                         <ngx-altea-label-control label="dic.msgType" [trans]="true" for="msgType">
                             <ng-select id="msgType" name="msgType" [items]="msgTypes" bindLabel="trans" bindValue="key"
@@ -74,14 +65,14 @@
     
     
                     </div>
-                    <div class="col-3">
+                    <div class="col-1">
                         <ngx-altea-label-control label="dic.duration" for="next-day">
                             <input type="number" id="next-day" name="next-day" class="form-control"
                                 [(ngModel)]="newReminder.dur" />
                         </ngx-altea-label-control>
     
                     </div>
-                    <div class="col-3">
+                    <div class="col-2">
     
                         <ngx-altea-label-control label="dic.timeUnit" [trans]="true" for="timeUnit">
                             <ng-select id="timeUnit" name="timeUnit" [items]="timeUnits" bindLabel="trans" bindValue="key"
@@ -91,6 +82,9 @@
     
                     </div>
                     <div class="col-3">
+
+                        
+
                         <button type="button" class="btn btn-primary" (click)="addReminder()"
                             translate>dic.add</button>
                     </div>
@@ -131,34 +125,12 @@
                 </div>
             </div>
     
-            <div class="row mt-1">
-                <div class="col-3" *ngIf="object.sameDayTerm">
-    
-                    <ngx-altea-label-value label="ui.deposit.terms.same-day" [value]="object.sameDayTerm" unit="dic.hour">
-                    </ngx-altea-label-value>
-    
-                </div>
-                <div class="col-3" *ngIf="object.nextDayTerm">
-    
-                    <ngx-altea-label-value label="ui.deposit.terms.next-day" [value]="object.nextDayTerm" unit="dic.hour">
-                    </ngx-altea-label-value>
-    
-                </div>
-                <div class="col-3" *ngIf="object.nextWeekTerm">
-    
-                    <ngx-altea-label-value label="ui.deposit.terms.next-week" [value]="object.nextWeekTerm" unit="dic.hour">
-                    </ngx-altea-label-value>
-    
-                </div>
-                <div class="col-3" *ngIf="object.nextMonthTerm">
-    
-                    <ngx-altea-label-value label="ui.deposit.terms.next-month" [value]="object.nextMonthTerm" unit="dic.hour">
-                    </ngx-altea-label-value>
-    
-                </div>
-            </div>
-
-
+            <ul>
+                <li *ngIf="object.sameDayTerm">{{'ui.deposit.terms.same-day' | translate}}: {{object.sameDayTerm}} {{'dic.hour' | translate}}</li>
+                <li *ngIf="object.nextDayTerm">{{'ui.deposit.terms.next-day' | translate}}: {{object.nextDayTerm}} {{'dic.hour' | translate}}</li>
+                <li *ngIf="object.nextWeekTerm">{{'ui.deposit.terms.next-week' | translate}}: {{object.nextWeekTerm}} {{'dic.hour' | translate}}</li>
+                <li *ngIf="object.nextMonthTerm">{{'ui.deposit.terms.next-month' | translate}}: {{object.nextMonthTerm}} {{'dic.hour' | translate}}</li>
+            </ul>
 
         </ng-container>
 

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ApiListResult, ApiResult, ApiStatus, DateHelper, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
-import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState } from 'ts-altea-model'
+import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { AlteaDb } from '../general/altea-db'
 import { IDb } from '../interfaces/i-db'
@@ -11,6 +11,7 @@ import { ResourceRequestOptimizer, ResourceSet } from './resource-request-optimi
 import { SolutionPicker } from './solution-picker'
 import { DetermineReservationOptions } from './determine-reservation-options'
 import * as dateFns from 'date-fns'
+import * as Handlebars from "handlebars"
 
 
 export class OrderMgmtService {
@@ -26,19 +27,72 @@ export class OrderMgmtService {
     }
 
 
-    async changeState(orderId: string, newState: OrderState) {
+    /*     async changeState(orderId: string, newState: OrderState) {
+    
+            
+    
+        } */
 
-        
 
-    }
-
-
-    async saveOrder(order: Order) : Promise<ApiResult<Order>> {
+    async saveOrder(order: Order): Promise<ApiResult<Order>> {
 
         const orderApiResult = await this.alteaDb.saveOrder(order)
 
         return orderApiResult
     }
+
+
+    async changeState(order: Order, newState: OrderState) {  //  : Promise<ApiResult<Order>>
+
+        order.state = newState
+
+        // await this.alteaDb.saveOrder(order)
+
+        const templates = await this.alteaDb.getTemplates(order.branchId, newState)
+
+        console.warn(templates)
+
+        for (let template of templates) {
+
+            const msg = this.mergeTemplate(template, order)
+
+            console.error(msg)
+
+            this.alteaDb
+
+
+        }
+    }
+
+
+    mergeTemplate(template: Template, order: Order): Message {
+
+        const message = new Message()
+
+        message.branchId = order.branchId
+        message.orderId = order.id
+
+        const replacements = { name: "Nils", info: "baby giraffe" }
+
+        if (template.body) {
+            const hbTemplate = Handlebars.compile(template.body)
+            message.body = hbTemplate(replacements)
+        }
+
+        if (template.subject) {
+            const hbTemplate = Handlebars.compile(template.subject)
+            message.subject = hbTemplate(replacements)
+        }
+
+        message.type = template.msgType()
+
+        return message
+
+    }
+
+
+
+
 
     /**
      * Saves the order, calculates & saves the resource plannings based on previously determined calculated solution
@@ -47,7 +101,7 @@ export class OrderMgmtService {
      * @param solution 
      * @returns 
      */
-    async confirmOrder(order: Order, reservationOption: ReservationOption, solution: Solution) : Promise<Order | undefined> {
+    async confirmOrder(order: Order, reservationOption: ReservationOption, solution: Solution): Promise<Order | undefined> {
 
         order.start = reservationOption.dateNum
 

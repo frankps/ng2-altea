@@ -1,5 +1,5 @@
 import { ApiListResult, ApiResult, DbObjectMulti, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
-import { Order, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType } from 'ts-altea-model'
+import { Order, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Template } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { IDb } from '../interfaces/i-db'
 
@@ -60,6 +60,17 @@ export class AlteaDb {
 
         return res
     }
+
+    async getTemplates(branchId: string, code: string) {
+
+        const qry = new DbQueryTyped<Template>('template', Template)
+        qry.and('branchId', QueryOperator.equals, branchId)
+        qry.and('code', QueryOperator.equals, code)
+
+        const templates = await this.db.query$<Template>(qry)
+
+        return templates
+    }  
 
 
 

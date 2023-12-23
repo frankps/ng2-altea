@@ -1,5 +1,5 @@
 import { ApiListResult, ApiResult, DbObject, DbObjectMulti, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
-import { Order, Schedule, SchedulingType } from 'ts-altea-model'
+import { Message, Order, Schedule, SchedulingType } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 
 export interface IDb {
@@ -11,8 +11,8 @@ export interface IDb {
     query$<T>(query: DbQueryTyped<T>): Promise<T[]>
     queryFirst$<T>(query: DbQueryTyped<T>): Promise<T | null>
 
-
     // Specialized methods
     saveOrder$(order: Order): Promise<ApiResult<Order>>
-
+    sendMessage$(message: Message): Promise<ApiResult<Message>>
+    
 }

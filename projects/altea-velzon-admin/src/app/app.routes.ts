@@ -18,14 +18,15 @@ export const appRoutes: Route[] = [{
     { path: "subscriptions", loadChildren: () => import(`./subscription/subscription.module`).then(m => m.SubscriptionModule) },
     { path: "order", loadChildren: () => import(`./order-mgr/order-mgr.module`).then(m => m.OrderMgrModule) },
     { path: "demo", component: DemoComponent },
+    { path: "", component: DemoComponent },  
   ]
-
+  
   //, loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule)
 
   //, component: AppComponent  //LayoutComponent 
 
   //, loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule)
-}];
+}]; 
 
 
 /*

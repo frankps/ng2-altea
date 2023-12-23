@@ -28,7 +28,7 @@ export class EditBranchComponent extends NgEditBaseComponent<Branch> {
   depositPctgs = [...Array(21).keys()].map(i => { return { pct: (i * 5) / 100, label: `${i * 5} %` } })
 
   @ViewChild('depositForm') depositForm: NgForm;
-  @ViewChild('generalForm') generalForm: NgForm;
+  @ViewChild('remindersForm') remindersForm: NgForm;
 
   timeUnitsPlural: Translation[] = []
   timeUnitsSingular: Translation[] = []
@@ -50,9 +50,10 @@ export class EditBranchComponent extends NgEditBaseComponent<Branch> {
     spinner: NgxSpinnerService, private modalService: NgbModal, dashboardSvc: DashboardService,
     protected scheduleSvc: ScheduleService, protected sessionSvc: SessionService) {
     super('branch', Branch, ''
-      , contactSvc  
+      , contactSvc
       , route, spinner, dashboardSvc)
 
+    this.sectionProps.set('reminders', ['reminders'])
     this.sectionProps.set('deposit', ['depositPct', 'depositTerms', 'reminders'])
 
     const branchId = this.sessionSvc.branchId
@@ -111,7 +112,7 @@ export class EditBranchComponent extends NgEditBaseComponent<Branch> {
 
     this.object.reminders.push(this.newReminder)
 
-    this.depositForm.form.markAsDirty()
+    this.remindersForm.form.markAsDirty()
 
 
     this.newReminder = new Reminder()
@@ -124,7 +125,7 @@ export class EditBranchComponent extends NgEditBaseComponent<Branch> {
   deleteReminder(idx: number) {
 
     this.object.reminders.splice(idx, 1)
-    this.depositForm.form.markAsDirty()
+    this.remindersForm.form.markAsDirty()
 
   }
 
