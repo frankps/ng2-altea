@@ -1,37 +1,38 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ApiListResult, ApiResult, ApiStatus, DateHelper, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
-import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType } from 'ts-altea-model'
+import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, Reminder } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { AlteaDb } from '../general/altea-db'
 import { IDb } from '../interfaces/i-db'
-import { CreateResourceRequest } from './create-resource-request'
-import { CreateAvailabilityContext } from './create-availability-context'
-import { SlotFinder } from './slot-finder'
-import { ResourceRequestOptimizer, ResourceSet } from './resource-request-optimizer'
-import { SolutionPicker } from './solution-picker'
-import { DetermineReservationOptions } from './determine-reservation-options'
+import { CreateResourceRequest } from './reservation/create-resource-request'
+import { CreateAvailabilityContext } from './reservation/create-availability-context'
+import { SlotFinder } from './reservation/slot-finder'
+import { ResourceRequestOptimizer, ResourceSet } from './reservation/resource-request-optimizer'
+import { SolutionPicker } from './reservation/solution-picker'
+import { DetermineReservationOptions } from './reservation/determine-reservation-options'
 import * as dateFns from 'date-fns'
 import * as Handlebars from "handlebars"
+import * as _ from "lodash"
 
 
 export class OrderMgmtService {
 
-    alteaDb: AlteaDb
 
+   // taskHub: TaskHub
+   // this.taskHub = new TaskHub(this.alteaDb)
+
+
+    alteaDb: AlteaDb
+    
     constructor(db: IDb | AlteaDb) {
 
         if (db instanceof AlteaDb)
             this.alteaDb = db
         else
-            this.alteaDb = new AlteaDb(db)
+            this.alteaDb = new AlteaDb(db)   
     }
 
 
-    /*     async changeState(orderId: string, newState: OrderState) {
-    
-            
-    
-        } */
 
 
     async saveOrder(order: Order): Promise<ApiResult<Order>> {
@@ -42,53 +43,44 @@ export class OrderMgmtService {
     }
 
 
-    async changeState(order: Order, newState: OrderState) {  //  : Promise<ApiResult<Order>>
+
+
+    async changeState(order: Order, newState: OrderState): Promise<ApiResult<Order>> {  //  : Promise<ApiResult<Order>>
 
         order.state = newState
+        order.m.setDirty('state')
 
-        // await this.alteaDb.saveOrder(order)
+        switch (newState) {
+            case OrderState.waitDeposit:
+                order.depositBy = DateHelper.yyyyMMddhhmmss()
+                order.m.setDirty('depositBy')
+        }
 
+        console.warn(order)
+
+        const result = await this.alteaDb.saveOrder(order)
+
+        return result
+        /*
         const templates = await this.alteaDb.getTemplates(order.branchId, newState)
 
         console.warn(templates)
 
         for (let template of templates) {
 
-            const msg = this.mergeTemplate(template, order)
+            const msg = template.mergeWithOrder(order)
+            msg.from = 'info@aquasense.be'
+            msg.to = ['frank@dvit.eu']
 
             console.error(msg)
 
-            this.alteaDb
+            const sendRes = await this.alteaDb.db.sendMessage$(msg)
+            console.warn(sendRes)
 
-
-        }
-    }
-
-
-    mergeTemplate(template: Template, order: Order): Message {
-
-        const message = new Message()
-
-        message.branchId = order.branchId
-        message.orderId = order.id
-
-        const replacements = { name: "Nils", info: "baby giraffe" }
-
-        if (template.body) {
-            const hbTemplate = Handlebars.compile(template.body)
-            message.body = hbTemplate(replacements)
-        }
-
-        if (template.subject) {
-            const hbTemplate = Handlebars.compile(template.subject)
-            message.subject = hbTemplate(replacements)
-        }
-
-        message.type = template.msgType()
-
-        return message
+        }*/
 
     }
+
 
 
 

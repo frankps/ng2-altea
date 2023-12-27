@@ -14,6 +14,22 @@ export class ObjectMgmt {
 
   /** updated fields=properties */
   f?: string[]
+
+  setDirty(...fields: string[]) {
+
+    if (!Array.isArray(fields) || fields.length == 0)
+      return
+
+    this.u = true
+
+    if (!Array.isArray(this.f))
+      this.f = []
+
+    this.f.push(...fields)
+
+  }
+
+
 }
 
 
@@ -25,6 +41,7 @@ export class ObjectMgmt {
 export abstract class ManagedObject {
 
   /** management property to manage object in back-end, not saved in db!  */
+  @Type(() => ObjectMgmt)
   m = new ObjectMgmt()
 
 

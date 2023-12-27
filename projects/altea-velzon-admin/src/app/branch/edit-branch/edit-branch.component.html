@@ -1,13 +1,8 @@
-
-
-
-
-
 <ng-container *ngIf="object">
 
     <ng-template #reminders>
 
-        <div *ngIf="object.hasReminders()" class="mt-3"> 
+        <div *ngIf="object.hasReminders()" class="mt-3">
 
             <div class="row mb-2">
                 <div class="col-2" translate>dic.msgType</div>
@@ -17,23 +12,297 @@
             <div class="row" *ngFor="let reminder of object.reminders; let idx = index">
                 <div class="col-2">{{'enums.msg-type.' + reminder.type | translate}}</div>
                 <div class="col-2">{{reminder.dur}} {{reminder.unit}}
-                    <i *ngIf="sectionInEditIs('reminders')" class="fas fa-trash float-end" (click)="deleteReminder(idx)"></i>
+                    <i *ngIf="sectionInEditIs('reminders')" class="fas fa-trash float-end"
+                        (click)="deleteReminder(idx)"></i>
                 </div>
 
                 <div class="col-3">
-                    
-                    
-<!-- 
+
+
+                    <!-- 
                     <button type="button" class="btn btn-primary btn-sm" (click)="deleteReminder(idx)"
                         translate>dic.delete</button> -->
                 </div>
             </div>
 
-
-
         </div>
 
     </ng-template>
+
+    <ngx-altea-form-card-section sectionName="ui.branch.edit.sections.general.title" sectionId="general"
+        [editSectionId]="editSectionId" (save)="save()" (cancel)="cancel()" (editModeChanged)="editModeChanged($event)"
+        [enableSave]="!generalForm?.form.pristine && generalForm?.form.valid">
+
+        <ng-container readonly>
+
+            <!--             <div class="row">
+                <div class="col-4">
+                    <ngx-altea-label-value label="objects.branch.name" [value]="object.name"></ngx-altea-label-value>
+                </div>
+            </div> -->
+
+            <div class="row">
+                <div class="col-6">
+                    <div class="subSection" translate>dic.name</div>
+                    {{object.name}}
+                </div>
+                <div class="col-6">
+                    <div class="subSection" translate>dic.language</div>
+
+                    <ngx-altea-label-value label="objects.branch.language"
+                        [value]="object.language"></ngx-altea-label-value>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-6">
+                    <div class="subSection" translate>dic.address</div>
+                    {{object.street}}, {{object.streetNr}}<br>
+                    {{object.postal}} {{object.city}} - {{object.country}}
+
+
+                </div>
+                <div class="col-6">
+
+
+                    <div class="subSection" translate>ui.branch.edit.sections.general.vat</div>
+
+                    <ngx-altea-label-value label="objects.branch.vatPcts" [value]="object.vatPcts"
+                        unit="%"></ngx-altea-label-value>
+                    <ngx-altea-label-value label="objects.branch.vatPct" [value]="object.vatPct"
+                        unit="%"></ngx-altea-label-value>
+                    <ngx-altea-label-value label="objects.branch.vatNr" [value]="object.vatNr"></ngx-altea-label-value>
+                    <ngx-altea-label-value label="objects.branch.vatIncl" valueFormat="yesNo"
+                        [value]="object.vatIncl"></ngx-altea-label-value>
+                </div>
+            </div>
+
+
+
+            <!--             <div class="row">
+                <div class="col-4">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-4">
+
+                </div>
+            </div> -->
+
+
+
+
+            <!--             <div class="row">
+                <div class="col-4">
+                    <ngx-altea-label-value label="objects.branch.vatPcts"
+                        [value]="object.vatPcts"></ngx-altea-label-value>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-4">
+                    <ngx-altea-label-value label="objects.branch.vatPct" [value]="object.vatPct"></ngx-altea-label-value>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-4">
+                    <ngx-altea-label-value label="objects.branch.vatNr" [value]="object.vatNr"></ngx-altea-label-value>
+                </div>
+            </div> -->
+
+        </ng-container>
+
+
+        <ng-container edit>
+
+            <form #generalForm="ngForm">
+
+                <div class="subSectionEdit" translate>dic.name</div>
+
+                <div class="row mt-3">
+                    <div class="col-3">
+                        <ngx-altea-label-control label="objects.branch.name" for="name">
+                            <input required type="text" id="name" name="name" class="form-control"
+                                [(ngModel)]="object.name" />
+                        </ngx-altea-label-control>
+                    </div>
+                </div>
+
+
+                <div class="subSectionEdit" translate>dic.language</div>
+
+                <div class="row mt-3">
+                    <div class="col-3">
+                        <ngx-altea-label-control label="dic.language" [trans]="true" for="language">
+                            <ng-select id="language" name="language" [items]="languages" bindLabel="trans"
+                                bindValue="key" [clearable]="false" [multiple]="false" [(ngModel)]="object.language">
+                            </ng-select>
+                        </ngx-altea-label-control>
+                    </div>
+                </div>
+
+
+                <div class="subSectionEdit" translate>dic.address</div>
+
+                <div class="row mt-3">
+                    <div class="col-3">
+                        <ngx-altea-label-control label="objects.address.street" for="street">
+                            <input type="text" id="street" name="street" class="form-control"
+                                [(ngModel)]="object.street" />
+                        </ngx-altea-label-control>
+                    </div>
+                    <div class="col-2">
+                        <ngx-altea-label-control label="objects.address.streetNr" for="streetNr">
+                            <input type="text" id="streetNr" name="streetNr" class="form-control"
+                                [(ngModel)]="object.streetNr" />
+                        </ngx-altea-label-control>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-2">
+                        <ngx-altea-label-control label="objects.address.postal" for="postal">
+                            <input type="text" id="postal" name="postal" class="form-control"
+                                [(ngModel)]="object.postal" />
+                        </ngx-altea-label-control>
+                    </div>
+                    <div class="col-3">
+                        <ngx-altea-label-control label="objects.address.city" for="city">
+                            <input type="text" id="city" name="city" class="form-control" [(ngModel)]="object.city" />
+                        </ngx-altea-label-control>
+                    </div>
+                </div>
+
+
+                <div class="row mt-3">
+                    <div class="col-3">
+                        <ngx-altea-label-control label="objects.address.country" [trans]="true" for="country">
+                            <ng-select id="country" name="country" [items]="countries" bindLabel="trans" bindValue="key"
+                                [clearable]="false" [multiple]="false" [(ngModel)]="object.country">
+                            </ng-select>
+                        </ngx-altea-label-control>
+                    </div>
+
+
+                </div>
+
+
+
+                <div class="subSectionEdit" translate="">ui.branch.edit.sections.general.vat</div>
+
+                <div class="row mt-3">
+                    <div class="col-3">
+
+                        <ngx-altea-label-control label="objects.branch.vatPcts" for="vatPcts">
+                            <ng-select id="vatPcts" name="vatPcts" [items]="vatPctgs" bindLabel="label" bindValue="pct"
+                                [clearable]="false" [multiple]="true" [(ngModel)]="object.vatPcts">
+                            </ng-select>
+                        </ngx-altea-label-control>
+
+
+                    </div>
+                    <div class="col-3">
+                        <ngx-altea-label-control label="objects.branch.vatPct" for="vatPct">
+                            <ng-select id="vatPct" name="vatPct" [items]="object.vatPcts" [clearable]="false"
+                                [multiple]="false" [(ngModel)]="object.vatPct">
+                            </ng-select>
+                        </ngx-altea-label-control>
+
+                    </div>
+                    <div class="col-3"></div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-3">
+                        <ngx-altea-label-control label="objects.branch.vatNr" for="vatNr">
+                            <input type="text" id="vatNr" name="vatNr" class="form-control"
+                                [(ngModel)]="object.vatNr" />
+                        </ngx-altea-label-control>
+                    </div>
+
+                    <div class="col-4">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="vatIncl" name="vatIncl"
+                                [(ngModel)]="object.vatIncl" />
+                            <label class="form-check-label" for="vatIncl" translate="objects.branch.vatIncl"></label>
+                        </div>
+                    </div>
+
+                </div>
+
+
+            </form>
+        </ng-container>
+
+    </ngx-altea-form-card-section>
+
+
+    <ngx-altea-form-card-section sectionName="ui.branch.edit.sections.communication.title" sectionId="communication"
+        [editSectionId]="editSectionId" (save)="save()" (cancel)="cancel()" (editModeChanged)="editModeChanged($event)"
+        [enableSave]="!communicationForm?.form.pristine && communicationForm?.form.valid">
+
+        <ng-container readonly>
+
+
+            <div class="row">
+                <div class="col-4">
+                    <ngx-altea-label-value label="objects.branch.emailFrom"
+                        [value]="object.emailFrom"></ngx-altea-label-value>
+                </div>
+                <div class="col-4">
+                    <ngx-altea-label-value label="objects.branch.emailBcc"
+                        [value]="object.emailBcc"></ngx-altea-label-value>
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="col-4">
+                    <ngx-altea-label-value label="objects.branch.smsOn" valueFormat="yesNo"
+                        [value]="object.smsOn"></ngx-altea-label-value>
+                </div>
+
+            </div>
+
+        </ng-container>
+
+
+        <ng-container edit>
+
+            <form #communicationForm="ngForm">
+
+                <div class="row mt-3">
+                    <div class="col-4">
+                        <ngx-altea-label-control label="objects.branch.emailFrom" for="emailFrom">
+                            <input type="email" id="emailFrom" name="emailFrom" class="form-control"
+                                [(ngModel)]="object.emailFrom" />
+                        </ngx-altea-label-control>
+                    </div>
+                    <div class="col-4">
+                        <ngx-altea-label-control label="objects.branch.emailBcc" for="emailBcc">
+                            <input type="email" id="emailBcc" name="emailBcc" class="form-control"
+                                [(ngModel)]="object.emailBcc" />
+                        </ngx-altea-label-control>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-4">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="smsOn" name="smsOn"
+                                [(ngModel)]="object.smsOn" />
+                            <label class="form-check-label" for="smsOn" translate="objects.branch.smsOn"></label>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+        </ng-container>
+
+    </ngx-altea-form-card-section>
+
+
 
 
 
@@ -45,7 +314,7 @@
         <ng-container readonly>
 
             <ng-container *ngTemplateOutlet="reminders"></ng-container>
-         
+
         </ng-container>
 
         <ng-container edit>
@@ -56,37 +325,36 @@
 
                 <div class="row mt-3">
                     <div class="col-2">
-    
+
                         <ngx-altea-label-control label="dic.msgType" [trans]="true" for="msgType">
                             <ng-select id="msgType" name="msgType" [items]="msgTypes" bindLabel="trans" bindValue="key"
                                 [clearable]="false" [multiple]="false" [(ngModel)]="newReminder.type">
                             </ng-select>
                         </ngx-altea-label-control>
-    
-    
+
+
                     </div>
                     <div class="col-1">
                         <ngx-altea-label-control label="dic.duration" for="next-day">
                             <input type="number" id="next-day" name="next-day" class="form-control"
                                 [(ngModel)]="newReminder.dur" />
                         </ngx-altea-label-control>
-    
+
                     </div>
                     <div class="col-2">
-    
+
                         <ngx-altea-label-control label="dic.timeUnit" [trans]="true" for="timeUnit">
-                            <ng-select id="timeUnit" name="timeUnit" [items]="timeUnits" bindLabel="trans" bindValue="key"
-                                [clearable]="false" [multiple]="false" [(ngModel)]="newReminder.unit">
+                            <ng-select id="timeUnit" name="timeUnit" [items]="timeUnits" bindLabel="trans"
+                                bindValue="key" [clearable]="false" [multiple]="false" [(ngModel)]="newReminder.unit">
                             </ng-select>
                         </ngx-altea-label-control>
-    
+
                     </div>
                     <div class="col-3">
 
-                        
 
-                        <button type="button" class="btn btn-primary" (click)="addReminder()"
-                            translate>dic.add</button>
+
+                        <button type="button" class="btn btn-primary" (click)="addReminder()" translate>dic.add</button>
                     </div>
                 </div>
 
@@ -103,138 +371,143 @@
 
 
     <ngx-altea-form-card-section sectionName="ui.branch.edit.sections.deposit.title" sectionId="deposit"
-    [editSectionId]="editSectionId" (save)="save()" (cancel)="cancel()" (editModeChanged)="editModeChanged($event)"
-    help="ui.branch.edit.sections.deposit.help"
-    [enableSave]="!depositForm?.form.pristine && depositForm?.form.valid">
+        [editSectionId]="editSectionId" (save)="save()" (cancel)="cancel()" (editModeChanged)="editModeChanged($event)"
+        help="ui.branch.edit.sections.deposit.help"
+        [enableSave]="!depositForm?.form.pristine && depositForm?.form.valid">
 
-    <ng-container readonly>
-
-        
-
-        <ng-container *ngIf="object.depositPct; else noDepositReadonly">
-
-            <div class="row">
-                <div class="col-6"><ngx-altea-label-value label="ui.deposit.request"
-                        [value]="'' + Math.round(object.depositPct * 100)" unit="%"></ngx-altea-label-value></div>
-    
-            </div>
-    
-            <div class="row mt-3">
-                <div class="col">
-                    {{ 'ui.deposit.terms.info' | translate }}
-                </div>
-            </div>
-    
-            <ul>
-                <li *ngIf="object.sameDayTerm">{{'ui.deposit.terms.same-day' | translate}}: {{object.sameDayTerm}} {{'dic.hour' | translate}}</li>
-                <li *ngIf="object.nextDayTerm">{{'ui.deposit.terms.next-day' | translate}}: {{object.nextDayTerm}} {{'dic.hour' | translate}}</li>
-                <li *ngIf="object.nextWeekTerm">{{'ui.deposit.terms.next-week' | translate}}: {{object.nextWeekTerm}} {{'dic.hour' | translate}}</li>
-                <li *ngIf="object.nextMonthTerm">{{'ui.deposit.terms.next-month' | translate}}: {{object.nextMonthTerm}} {{'dic.hour' | translate}}</li>
-            </ul>
-
-        </ng-container>
-
-
-        <ng-template #noDepositReadonly>
-
-            <span translate>ui.deposit.none</span>
-            
-
-
-        </ng-template>
-    
-    
+        <ng-container readonly>
 
 
 
+            <ng-container *ngIf="object.depositPct; else noDepositReadonly">
 
-    </ng-container>
-
-    <ng-container edit>
-
-        
-
-        <form #depositForm="ngForm">
-
-
-            <div class="row">
-                <div class="col-3">
-
-                    <ngx-altea-label-control label="ui.deposit.request" for="depositPct">
-                        <ng-select id="depositPct" name="depositPct" [items]="depositPctgs" bindLabel="label"
-                            bindValue="pct" [clearable]="false" [multiple]="false" [(ngModel)]="object.depositPct">
-                        </ng-select>
-                    </ngx-altea-label-control>
-
+                <div class="row">
+                    <div class="col-6"><ngx-altea-label-value label="ui.deposit.request"
+                            [value]="'' + Math.round(object.depositPct * 100)" unit="%"></ngx-altea-label-value></div>
 
                 </div>
-                <div class="col-3"></div>
-                <div class="col-3"></div>
-            </div>
-
-
-            <ng-container *ngIf="object.depositPct">
 
                 <div class="row mt-3">
                     <div class="col">
                         {{ 'ui.deposit.terms.info' | translate }}
                     </div>
                 </div>
-    
-                <div class="row mt-1">
-                    <div class="col-3">
-    
-                        <ngx-altea-label-control label="ui.deposit.terms.same-day" for="same-day">
-                            <input type="number" id="same-day" name="same-day" class="form-control"
-                                [(ngModel)]="object.sameDayTerm" (change)="markAsDirty()" />
-                        </ngx-altea-label-control>
-    
-                    </div>
-                    <div class="col-3">
-    
-                        <ngx-altea-label-control label="ui.deposit.terms.next-day" for="next-day">
-                            <input type="number" id="next-day" name="next-day" class="form-control"
-                                [(ngModel)]="object.nextDayTerm" />
-                        </ngx-altea-label-control>
-    
-                    </div>
-                    <div class="col-3">
-    
-                        <ngx-altea-label-control label="ui.deposit.terms.next-week" for="next-week">
-                            <input type="number" id="next-week" name="next-week" class="form-control"
-                                [(ngModel)]="object.nextWeekTerm" />
-                        </ngx-altea-label-control>
-    
-                    </div>
-                    <div class="col-3">
-    
-                        <ngx-altea-label-control label="ui.deposit.terms.next-month" for="next-month">
-                            <input type="number" id="next-month" name="next-month" class="form-control"
-                                [(ngModel)]="object.nextMonthTerm" />
-                        </ngx-altea-label-control>
-    
-                    </div>
-                </div>
 
-                <div class="row">
-                    <div class="col help">
-                        Stel hierboven in hoeveel uur uw klanten de tijd hebben om hun voorschot te betalen afhankelijk van het tijdstip van reserveren.
-                    </div>
-                </div>
+                <ul>
+                    <li *ngIf="object.sameDayTerm">{{'ui.deposit.terms.same-day' | translate}}: {{object.sameDayTerm}}
+                        {{'dic.hour' | translate}}</li>
+                    <li *ngIf="object.nextDayTerm">{{'ui.deposit.terms.next-day' | translate}}: {{object.nextDayTerm}}
+                        {{'dic.hour' | translate}}</li>
+                    <li *ngIf="object.nextWeekTerm">{{'ui.deposit.terms.next-week' | translate}}:
+                        {{object.nextWeekTerm}} {{'dic.hour' | translate}}</li>
+                    <li *ngIf="object.nextMonthTerm">{{'ui.deposit.terms.next-month' | translate}}:
+                        {{object.nextMonthTerm}} {{'dic.hour' | translate}}</li>
+                </ul>
 
             </ng-container>
 
 
+            <ng-template #noDepositReadonly>
+
+                <span translate>ui.deposit.none</span>
+
+
+
+            </ng-template>
 
 
 
 
-        </form>
-
-    </ng-container>
 
 
-</ngx-altea-form-card-section>
+        </ng-container>
+
+        <ng-container edit>
+
+
+
+            <form #depositForm="ngForm">
+
+
+                <div class="row">
+                    <div class="col-3">
+
+                        <ngx-altea-label-control label="ui.deposit.request" for="depositPct">
+                            <ng-select id="depositPct" name="depositPct" [items]="depositPctgs" bindLabel="label"
+                                bindValue="pct" [clearable]="false" [multiple]="false" [(ngModel)]="object.depositPct">
+                            </ng-select>
+                        </ngx-altea-label-control>
+
+
+                    </div>
+                    <div class="col-3"></div>
+                    <div class="col-3"></div>
+                </div>
+
+
+                <ng-container *ngIf="object.depositPct">
+
+                    <div class="row mt-3">
+                        <div class="col">
+                            {{ 'ui.deposit.terms.info' | translate }}
+                        </div>
+                    </div>
+
+                    <div class="row mt-1">
+                        <div class="col-3">
+
+                            <ngx-altea-label-control label="ui.deposit.terms.same-day" for="same-day">
+                                <input type="number" id="same-day" name="same-day" class="form-control"
+                                    [(ngModel)]="object.sameDayTerm" (change)="markAsDirty()" />
+                            </ngx-altea-label-control>
+
+                        </div>
+                        <div class="col-3">
+
+                            <ngx-altea-label-control label="ui.deposit.terms.next-day" for="next-day">
+                                <input type="number" id="next-day" name="next-day" class="form-control"
+                                    [(ngModel)]="object.nextDayTerm" />
+                            </ngx-altea-label-control>
+
+                        </div>
+                        <div class="col-3">
+
+                            <ngx-altea-label-control label="ui.deposit.terms.next-week" for="next-week">
+                                <input type="number" id="next-week" name="next-week" class="form-control"
+                                    [(ngModel)]="object.nextWeekTerm" />
+                            </ngx-altea-label-control>
+
+                        </div>
+                        <div class="col-3">
+
+                            <ngx-altea-label-control label="ui.deposit.terms.next-month" for="next-month">
+                                <input type="number" id="next-month" name="next-month" class="form-control"
+                                    [(ngModel)]="object.nextMonthTerm" />
+                            </ngx-altea-label-control>
+
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col help">
+                            Stel hierboven in hoeveel uur uw klanten de tijd hebben om hun voorschot te betalen
+                            afhankelijk van het tijdstip van reserveren.
+                        </div>
+                    </div>
+
+                </ng-container>
+
+
+
+
+
+
+            </form>
+
+        </ng-container>
+
+
+    </ngx-altea-form-card-section>
 
 
 

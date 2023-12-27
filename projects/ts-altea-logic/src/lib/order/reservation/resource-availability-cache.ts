@@ -1,6 +1,6 @@
 import { AvailabilityRequest, ResourcePlanning, ResourceRequest } from 'ts-altea-model'
-import { AlteaDb } from '../general/altea-db'
-import { IDb } from '../interfaces/i-db'
+import { AlteaDb } from '../../general/altea-db'
+import { IDb } from '../../interfaces/i-db'
 import * as _ from "lodash";
 
 export class ResourceAvailabilityCacheToRemove {
@@ -17,6 +17,7 @@ export class ResourceAvailabilityCacheToRemove {
             this.alteaDb = new AlteaDb(db)
     }
 
+    
 
     // constructor(resourceRequest: ResourceRequest) {
 

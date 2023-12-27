@@ -9,13 +9,14 @@
 
 
         <ng-container *ngIf="!trans">
-            {{label}}:
+            {{label}}<ng-container *ngIf="valueFormat != 'yesNo'">:</ng-container>
         </ng-container>
 
         <ng-container *ngIf="trans">
-            {{ label | translate }}:
+            {{ label | translate }}<ng-container *ngIf="valueFormat != 'yesNo'">:</ng-container>
         </ng-container>
 
+        
 
         <span *ngIf="empty && !value">
             {{ empty | translate }}
@@ -79,7 +80,7 @@
 
             <ng-container *ngSwitchDefault>
                 
-                {{getValue()}} <sup *ngIf="icon"><i [class]="icon"></i> </sup> <span *ngIf="unit" translate>{{unit}}</span>
+                {{getValue()}}<sup *ngIf="icon"><i [class]="icon"></i></sup><span *ngIf="unit" translate>{{unit}}</span>
 
 
                 

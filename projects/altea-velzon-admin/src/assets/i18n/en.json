@@ -5,8 +5,8 @@
     "api-problem": "Er was een probleem!!"
   },
   "dic": {
+    "address": "Adres",
     "actions": "Acties",
-
     "add": "Toevoegen",
     "cancel": "Annuleren",
     "color": "Kleur",
@@ -14,6 +14,7 @@
     "delete": "Verwijderen",
     "description": "Omschrijving",
     "edit": "Aanpassen",
+    "language": "Taal",
     "move": "Verplaatsen",
     "name": "Naam",
     "gender": "Geslacht",
@@ -86,6 +87,12 @@
         "continuous": "Doorlopende planning",
         "block": "De planning gebeurt op basis van vaste blokken"
       }
+    },
+    "country": {
+      "BEL": "België",
+      "GBR": "Groot Britanië",
+      "NLD": "Nederland",
+      "USA": "Verenigde Staten"
     },
     "language": {
       "nl": "Nederlands",
@@ -164,7 +171,7 @@
   },
   "templates": {
     "order": {
-      "waitDeposit": "Wachten op voorschot", 
+      "waitDeposit": "Wachten op voorschot",
       "confirmed": "Confirmatie",
       "noDepositCancel": "Annulatie - geen voorschot",
       "inTimeCancel": "Annulatie - op tijd",
@@ -173,7 +180,6 @@
       "noShow": "No show",
       "satisfaction": "Tevredenheid"
     }
-
   },
   "ui": {
     "price-modal": {
@@ -201,11 +207,17 @@
           "info": "Stel hierboven in hoeveel uur uw klanten de tijd hebben om hun voorschot te betalen in functie van wanneer de reservatie gemaakt is."
         }
       }
-
     },
     "branch": {
       "edit": {
         "sections": {
+          "general": {
+            "title": "Algemeen",
+            "vat": "BTW Instellingen"
+          },
+          "communication": {
+            "title": "Communicatie"
+          },
           "deposit": {
             "title": "Voorschotten",
             "help": "Hier kan u een standaard voorschot percentage instellen. Dit percentage zal toegepast worden op alle orders. U kan dit percentage nog aanpassen per product of per klant. Op deze manier kan u bijvoorbeeld instellen dat sommige klanten geen voorschot hoeven te betalen ofwel alles moeten betalen."
@@ -338,6 +350,24 @@
     "gift": {}
   },
   "objects": {
+    "address": {
+      "street": "Straat",
+      "streetNr": "Straat Nr",
+      "postal": "Postcode",
+      "city": "Gemeente",
+      "country": "Land"
+    },
+    "branch": {
+      "name": "Naam",
+      "emailFrom": "Email versturen vanaf",
+      "emailBcc": "Email Bcc",
+      "vatPcts": "Mogelijke BTW percentages",
+      "vatPct": "Standaard BTW percentage",
+      "language": "Primaire taal",
+      "vatIncl": "Prijzen zijn BTW inclusief",
+      "vatNr": "BTW nummer",
+      "smsOn": "Verstuur SMS berichten naar klanten"
+    },
     "reminder": {
       "dur": "Versturen voor aanvang"
     },
@@ -373,7 +403,6 @@
       "vatNum": "BTW nummer",
       "deposit": "Voorschot"
     },
-
     "template": {
       "_name": "Template",
       "subject": "Onderwerp",
@@ -383,19 +412,15 @@
       },
       "short": "SMS"
     },
-
     "resource": {
       "article": "de",
       "qty": "Aantal",
-
       "hasStart": "Stel startdatum in",
       "start": "Vanaf",
-
       "hasEnd": "Stel einddatum in",
       "end": "Tot en met",
       "isGroup": "Groep",
       "customSchedule": "Aangepast uurrooster",
-
       "help": {
         "device-name": "De naam van het toestel",
         "group-name": "De naam van de groep",
@@ -404,7 +429,6 @@
         "end": "Deze resource is actief tot en met"
       }
     },
-
     "product": {
       "article": "het",
       "pronoun": "dit",
@@ -412,25 +436,20 @@
       "no-descr": "Er is geen omschrijving",
       "customers": "Aantal klanten",
       "online": "Online zichtbaarheid",
-
       "visibility": "Online zichtbare informatie",
       "showDuration": "Toon duurtijd",
       "showPrice": "Toon prijs",
       "vatPct": "BTW Percentage",
-
       "hasPre": "Deze dienst heeft een voorbereidingstijd",
       "preTime": "Voorbereidingstijd",
       "hasPost": "Deze dienst heeft een opruimtijd",
       "postTime": "Opruimtijd",
-
       "pos": "Instellingen voor de kassa",
       "showPos": "Zichtbaar in kassa",
       "salesPrice": "Verkoopprijs",
       "personSelect": "Selecteer personen",
       "staffSelect": "Selecteer specialistes",
-
       "planMode": "Planning mode",
-
       "help": {
         "customers": "Aantal klanten dat gelijktijdig wordt bediend",
         "product-name": "De naam van het product",
@@ -518,7 +537,6 @@
       "toSendEmail": "Verstuur mail naar ontvanger",
       "certificate": "Certificaat"
     },
-
     "subscription": {
       "_single": "Abonnement",
       "name": "Naam",
@@ -528,7 +546,6 @@
       "contact": "Klant"
     }
   },
-
   "HEADER": {
     "MORE": {
       "TEXT": "More"

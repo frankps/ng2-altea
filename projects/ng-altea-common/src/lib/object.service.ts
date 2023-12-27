@@ -6,7 +6,7 @@ import { plainToInstance } from "class-transformer";
 import { Observable, map, Subject, take } from "rxjs";
 import { SessionService } from './session.service';
 import { IDb } from 'ts-altea-logic';
-import { Order } from 'ts-altea-model';
+import { Message, Order } from 'ts-altea-model';
 
 
 @Injectable({
@@ -136,6 +136,41 @@ export class ObjectService implements IDb {
         resolve(res)
       })
 
+    })
+
+  }
+
+  sendMessage(message: Message): Observable<ApiResult<Message>> {
+
+    return this.http.post<ApiResult<Message>>(`${this.sessionSvc.backend}/${this.sessionSvc.branch}/objects/sendMessage`, message).pipe(map(res => {
+
+      console.error(res)
+
+      let typedRes = res
+
+      if (res && res.object) {
+
+        const object = res.object
+
+        typedRes = plainToInstance(ApiResult<Message>, res)
+        typedRes.object = plainToInstance(Message, object)
+      }
+
+      return typedRes
+
+    }
+    ))
+  }
+
+
+  sendMessage$(message: Message): Promise<ApiResult<Message>> {
+
+    const me = this
+
+    return new Promise<ApiResult<Message>>(function (resolve, reject) {
+      me.sendMessage(message).pipe(take(1)).subscribe(res => {
+        resolve(res)
+      })
     })
 
   }

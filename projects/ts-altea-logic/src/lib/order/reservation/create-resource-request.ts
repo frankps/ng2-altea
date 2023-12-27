@@ -3,8 +3,8 @@
 import { ApiListResult, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
 import { DurationMode, Order, AvailabilityContext, OrderLine, OrderPerson, Product, ProductResource, ResourceRequest, ResourceRequestItem, Schedule, SchedulingType, TimeSpan, TimeUnit, OffsetDuration, DurationReference, Resource, ResourceType } from 'ts-altea-model'
 import { Observable } from 'rxjs'
-import { AlteaDb } from '../general/altea-db'
-import { IDb } from '../interfaces/i-db'
+import { AlteaDb } from '../../general/altea-db'
+import { IDb } from '../../interfaces/i-db'
 import * as _ from "lodash";
 
 

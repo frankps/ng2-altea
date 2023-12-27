@@ -219,7 +219,23 @@ export class OrderMgrUiService {
 
   async changeState() {
 
-    const res = await this.alteaSvc.orderMgmtService.changeState(this.order, OrderState.waitDeposit)
+    try {
+
+      const res = await this.alteaSvc.orderMgmtService.changeState(this.order, OrderState.waitDeposit)
+
+      if (res.isOk)
+        this.dashboardSvc.showToastType(ToastType.saveSuccess)
+      else
+        this.dashboardSvc.showToastType(ToastType.saveError)
+
+
+    } catch (ex) {
+
+      this.dashboardSvc.showToastType(ToastType.saveError)
+
+    }
+
+
 
   }
 
@@ -333,9 +349,9 @@ export class OrderMgrUiService {
 
     this.order.contactId = contact.id
     this.order.contact = contact
-  
+
   }
-  
+
 
 
 }

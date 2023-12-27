@@ -6,6 +6,7 @@ import * as _ from "lodash";
 import { PersonLine } from "./person-line";
 import { DateRange, DateRangeSet, TimeBlock, TimeBlockSet, TimeSpan } from "./logic";
 import * as dateFns from 'date-fns'
+import * as Handlebars from "handlebars"
 
 function TransformToNumber() {
 
@@ -53,6 +54,40 @@ export enum TimeUnit {
   days = 'd',
   weeks = 'w',
   months = 'M'
+}
+/*
+"country": {
+  "BEL": "België",
+  "GBR": "Groot Britanië",
+  "NLD": "Nederland",
+  "USA": "Verenigde Staten"
+},
+*/
+
+export enum Country {
+  BEL = 'BEL',
+  NLD = 'NLD',
+  USA = 'USA'
+
+}
+
+export class TimeUnitHelper {
+
+  static numberOfSeconds(unit: TimeUnit): number {
+
+    switch (unit) {
+      case TimeUnit.seconds: return 1
+      case TimeUnit.minutes: return 60
+      case TimeUnit.hours: return 3600
+      case TimeUnit.days: return 86400
+      case TimeUnit.weeks: return 604800
+      case TimeUnit.months: return 18144000
+      default: throw `Can not convert ${unit} to seconds`
+    }
+
+  }
+
+
 }
 
 export enum Gender {
@@ -881,7 +916,15 @@ model Message {
 }
 */
 
-export class Message extends ObjectWithId {
+export class IEmail {
+  from?: string
+  to: string[]
+  cc: string[]
+  subject?: string
+  body?: string
+}
+
+export class Message extends ObjectWithId implements IEmail {
 
   branchId?: string
   orderId?: string
@@ -895,15 +938,45 @@ export class Message extends ObjectWithId {
 
   subject?: string
   body?: string
+
 }
 
-export class Reminder {
-
+export class ReminderConfig {
   type: MsgType = MsgType.email
 
   dur: number = 1
 
   unit: TimeUnit = TimeUnit.days
+
+  seconds(): number {
+    return TimeUnitHelper.numberOfSeconds(this.unit) * this.dur
+  }
+
+  toReminder(appointmentDate: Date) : Reminder {
+    const seconds = this.seconds()
+    const remindeOn = dateFns.addSeconds(appointmentDate, -seconds)
+
+    const reminder = new Reminder(remindeOn, this.type)
+    return reminder
+  }
+}
+
+export class Reminder {
+
+  @Exclude()
+  date: Date
+
+  on: number
+
+  type: MsgType
+
+  constructor(date: Date, type: MsgType = MsgType.email) {
+
+    this.date = date
+    this.on = DateHelper.yyyyMMddhhmmss(date)
+    this.type = type
+
+  }
 }
 
 export class Branch extends ObjectWithId {
@@ -926,16 +999,20 @@ export class Branch extends ObjectWithId {
   language?: string;
   emailFrom?: string;
   emailBcc?: string;
+
   vatIncl = true
   vatPct = 0
   vatPcts?: number[];
+  vatNr?: string
+
+  smsOn = false
 
   /** default deposit percentage, can be overruled on product & contact level */
   depositPct?: number
 
   depositTerms?: DepositTerm[]
 
-  reminders?: Reminder[]
+  reminders?: ReminderConfig[]
 
   active = true;
   deleted = false;
@@ -1559,8 +1636,10 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
   // satisfaction?: Satisfaction;
   appointment = false;
 
-  start?: number;
-  end?: number;
+  start?: number; // format: yyyyMMddHHmmss
+
+
+  end?: number; // format: yyyyMMddHHmmss
   descr?: string;
   type = OrderType.sales
 
@@ -1576,6 +1655,9 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
   @Type(() => Number)
   deposit = 0;
 
+
+  depositBy?: number  // format: yyyyMMddHHmmss
+
   @Type(() => Number)
   paid = 0;
 
@@ -1588,7 +1670,7 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
   invoiced = false;
   invoiceNum?: string;
 
-  state: OrderState = OrderState.inProgress
+  state: OrderState = OrderState.creation
 
   /** extra info about order: to reduce joins */
   info?: string = ''
@@ -1605,6 +1687,14 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
   gift = false;
   giftCode?: string;
 
+  /** messaging (email,sms) to customer enabled */
+  msg = true
+
+  remindOn?: number  // format: yyyyMMddHHmmss
+
+  remindLog?: Reminder[]
+
+
   active = true;
   deleted = false;
   createdAt = new Date();
@@ -1618,6 +1708,14 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
       this.m.n = true
     //delete this.id //= undefined
   }
+
+  get startDate(): Date | undefined {
+    if (!this.start)
+      return undefined
+
+    return DateHelper.parse(this.start)
+  }
+
 
   asDbObject(): DbObject<Order> {
     return new DbObject<Order>('order', Order, this)
@@ -2614,6 +2712,9 @@ export enum TemplateType {
   reminder = 'reminder'
 }
 
+export enum OrderTemplate {
+  noDepositCancel = 'noDepositCancel'
+}
 
 export const orderTemplates = ['waitDeposit', 'confirmed', 'noDepositCancel', 'inTimeCancel', 'lateCancel', 'reminder', 'noShow', 'satisfaction']
 
@@ -2672,6 +2773,33 @@ export class Template extends ObjectWithId {
       return MsgType.email
 
     return this.channels[0] as MsgType
+  }
+
+
+
+  mergeWithOrder(order: Order): Message {
+
+    const message = new Message()
+
+    message.branchId = order.branchId
+    message.orderId = order.id
+
+    const replacements = { name: "Nils", info: "baby giraffe" }
+
+    if (this.body) {
+      const hbTemplate = Handlebars.compile(this.body)
+      message.body = hbTemplate(replacements)
+    }
+
+    if (this.subject) {
+      const hbTemplate = Handlebars.compile(this.subject)
+      message.subject = hbTemplate(replacements)
+    }
+
+    message.type = this.msgType()
+
+    return message
+
   }
 
 }

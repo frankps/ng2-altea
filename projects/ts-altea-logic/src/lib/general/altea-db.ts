@@ -1,12 +1,12 @@
-import { ApiListResult, ApiResult, DbObjectMulti, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
-import { Order, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Template } from 'ts-altea-model'
+import { ApiListResult, ApiResult, DateHelper, DbObjectMulti, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
+import { Branch, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Template } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { IDb } from '../interfaces/i-db'
 
 
 export class AlteaDb {
 
-    constructor(protected db: IDb, protected branchId?: string) {
+    constructor(public db: IDb, protected branchId?: string) {
 
     }
 
@@ -61,7 +61,58 @@ export class AlteaDb {
         return res
     }
 
-    async getTemplates(branchId: string, code: string) {
+    async getBranches(branchIds: string[]): Promise<Branch[]> {
+
+        if (!Array.isArray(branchIds) || branchIds.length == 0)
+            return []
+
+        const qry = new DbQueryTyped<Branch>('branch', Branch)
+
+        qry.and('id', QueryOperator.in, branchIds)
+
+        const branches = await this.db.query$<Branch>(qry)
+
+        return branches
+    }
+
+    async getExpiredDepositOrders(): Promise<Order[]> {
+
+        const now = DateHelper.yyyyMMddhhmmss()
+
+        const qry = new DbQueryTyped<Order>('order', Order)
+        qry.and('state', QueryOperator.equals, OrderState.waitDeposit)
+        qry.and('depositBy', QueryOperator.lessThan, now)
+        qry.include('contact', 'lines')
+
+        const templates = await this.db.query$<Order>(qry)
+
+        return templates
+    }
+
+    async getOrders(state: OrderState): Promise<Order[]> {
+
+        const qry = new DbQueryTyped<Order>('order', Order)
+        // qry.and('branchId', QueryOperator.equals, branchId)
+        qry.and('state', QueryOperator.equals, state)
+
+        const templates = await this.db.query$<Order>(qry)
+
+        return templates
+    }
+
+
+    async getTemplatesForBranches(branchIds: string[], code: string) {
+
+        const qry = new DbQueryTyped<Template>('template', Template)
+        qry.and('branchId', QueryOperator.in, branchIds)
+        qry.and('code', QueryOperator.equals, code)
+
+        const templates = await this.db.query$<Template>(qry)
+
+        return templates
+    }
+
+    async getTemplates(branchId: string, code: string): Promise<Template[]> {
 
         const qry = new DbQueryTyped<Template>('template', Template)
         qry.and('branchId', QueryOperator.equals, branchId)
@@ -70,7 +121,7 @@ export class AlteaDb {
         const templates = await this.db.query$<Template>(qry)
 
         return templates
-    }  
+    }
 
 
 

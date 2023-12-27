@@ -86,7 +86,7 @@ export class ObjectHelper {
      * @param propToRemove 
      * @returns 
      */
-    static removeProperty(obj: any, propToRemove: string): any {
+    static removeProperty(obj: any, propToRemove: string, recursive: boolean = true): any {
 
         if (!obj)
             return obj
@@ -100,12 +100,15 @@ export class ObjectHelper {
             if (!value)
                 return
 
-            if (value instanceof Object)
-                this.removeProperty(value, propToRemove)
+            if (recursive) {
 
-            if (Array.isArray(value)) {
+                if (value instanceof Object)
+                    this.removeProperty(value, propToRemove)
 
-                value.forEach(sub => this.removeProperty(sub, propToRemove))
+                if (Array.isArray(value))
+                    value.forEach(sub => this.removeProperty(sub, propToRemove))
+
+
             }
 
 

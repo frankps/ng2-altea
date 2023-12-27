@@ -3,8 +3,8 @@
 import { ApiListResult, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
 import { AvailabilityRequest, Order, AvailabilityContext, Resource, ResourcePlanning, ResourceType, Schedule, SchedulingType, DateRangeSet, ResourcePlannings } from 'ts-altea-model'
 import { Observable } from 'rxjs'
-import { AlteaDb } from '../general/altea-db'
-import { IDb } from '../interfaces/i-db'
+import { AlteaDb } from '../../general/altea-db'
+import { IDb } from '../../interfaces/i-db'
 import * as _ from "lodash";
 
 export class CreateAvailabilityContext {
