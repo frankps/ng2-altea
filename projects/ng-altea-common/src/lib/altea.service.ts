@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { AlteaDb, AvailabilityService, OrderMgmtService } from 'ts-altea-logic';
 import { ObjectService } from './object.service';
 import { SessionService } from './session.service';
+import { SubscriptionMgmtService } from 'projects/ts-altea-logic/src/lib/subscription/subscription-mgmt-service';
 
 @Injectable({
   providedIn: 'root'
@@ -39,6 +40,15 @@ export class AlteaService {
   }
 
 
+  _subscriptionMgmtService?: SubscriptionMgmtService
+
+  get subscriptionMgmtService(): SubscriptionMgmtService {
+
+    if (!this._subscriptionMgmtService)
+      this._subscriptionMgmtService = new SubscriptionMgmtService(this.objSvc)
+
+    return this._subscriptionMgmtService
+  }
 
 
 }

@@ -34,13 +34,13 @@ export class AlteaDb {
             delete l['product']
             delete l['orderId']
 
-            //l.product = undefined
+            //l.product = undefinedf
         })
 
         orderClone.info = undefined
         orderClone.persons = undefined
 
-        // console.log(orderClone)
+        console.log(orderClone)
 
         // const orderDb = orderClone.asDbObject()
 

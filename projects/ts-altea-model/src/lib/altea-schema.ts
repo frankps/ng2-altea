@@ -661,6 +661,10 @@ export class Product extends ObjectWithId {
     return this.plan?.filter(blockSeries => Array.isArray(blockSeries.scheduleIds) && blockSeries.scheduleIds.indexOf(scheduleId) >= 0)
   }
 
+  isSubscription() {
+    return this.type == ProductType.subscription
+  }
+
 }
 
 export class ProductItemOptionValue {

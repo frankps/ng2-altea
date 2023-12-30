@@ -244,6 +244,8 @@ export class OrderMgrUiService {
 
     this.spinner.show()
 
+    console.warn(this.order)
+
     const res = await this.alteaSvc.orderMgmtService.saveOrder(this.order)
 
     if (res.isOk) {
@@ -348,8 +350,22 @@ export class OrderMgrUiService {
   setContact(contact: Contact) {
 
     this.order.contactId = contact.id
+    this.order.m.setDirty('contactId')
+
     this.order.contact = contact
 
+  }
+
+
+  /** to be moved to external logic */
+  createSubscriptions(orderLine: OrderLine) {
+
+    if (!orderLine.product.isSubscription())
+      throw `Can't create subscription!`
+
+    const subscriptions = this.alteaSvc.subscriptionMgmtService.createSubscriptions(this.order, orderLine)
+
+    console.error(subscriptions)
   }
 
 
