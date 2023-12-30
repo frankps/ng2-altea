@@ -8,7 +8,7 @@ export class ApiResultBase {
 
 
   get isOk(): boolean {
-    return this.status === ApiStatus.ok
+    return this.status == ApiStatus.ok
   }
 }
 

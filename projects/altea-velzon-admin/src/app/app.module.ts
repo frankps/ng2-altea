@@ -20,11 +20,21 @@ import { Bootstrap5Module } from  'ng-common'  // 'ng-common'
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { DemoComponent } from './demo/demo/demo.component';
 import { ContactModule } from './contact/contact.module';
+import { environment } from '../environments/environment';
+
+import { FakeBackendInterceptor } from './velzon/core/helpers/fake-backend';
+import { initFirebaseBackend } from './velzon/authUtils';
 
 defineLocale('nl-be', nlBeLocale);
 
 export function createTranslateLoader(http: HttpClient): any {
   return new TranslateHttpLoader(http, 'assets/i18n/', '.json');
+}
+
+if (environment.defaultauth === 'firebase') {
+  initFirebaseBackend(environment.firebaseConfig);
+} else {
+  FakeBackendInterceptor;
 }
 
 @NgModule({

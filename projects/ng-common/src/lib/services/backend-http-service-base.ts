@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { ObjectWithId, BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, ApiBatchResult, DbQuery, ObjectHelper, ApiStatus, ConnectTo } from 'ts-common'
-import { plainToInstance } from "class-transformer";
+import { instanceToPlain, plainToInstance } from "class-transformer";
 import { Observable, map, Subject, take } from "rxjs";
 
 
@@ -80,6 +80,24 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
   }
 
 
+  update$(object: any): Promise<ApiResult<T>> {
+
+    const me = this
+
+    return new Promise<any>(function (resolve, reject) {
+
+      me.update(object).pipe(take(1)).subscribe(res => {
+        resolve(res)
+      })
+
+
+    })
+
+  }
+
+
+
+
   replaceIdWithConnectTo(object: any) {
 
     Object.keys(object).forEach(key => {
@@ -105,26 +123,25 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
 
   batchProcess(batch: ApiBatchProcess<T>): Observable<ApiBatchResult<T>> {
 
-    if (batch.create) {
-
-      for (let i = 0; i < batch.create.length; i++) {
-
-        const obj: any = batch.create[i]
-
-        const clone = ObjectHelper.clone(obj, this.type)
-
-        // this.replaceIdWithConnectTo(clone)
-
-        batch.create[i] = clone
-
-      }
-
-      console.warn(batch.create)
-
-    }
-
     return this.http.put<any>(`${this.host}/${this.urlDifferentiator}/batch`, batch)
   }
+
+
+  batchProcess$(batch: ApiBatchProcess<T>): Promise<ApiBatchResult<T>> {
+
+    const me = this
+
+    return new Promise<any>(function (resolve, reject) {
+
+      me.batchProcess(batch).pipe(take(1)).subscribe(res => {
+        resolve(res)
+      })
+
+
+    })
+
+  }
+
 
   delete(objectId: string): Observable<ApiResult<any>> {
     return this.http.delete<any>(`${this.host}/${this.urlDifferentiator}/${objectId}`)

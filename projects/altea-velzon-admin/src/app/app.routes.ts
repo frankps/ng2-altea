@@ -3,7 +3,9 @@ import { LayoutComponent } from './velzon/layouts/layout.component';
 import { AppComponent } from './app.component';
 import { DemoComponent } from './demo/demo/demo.component';
 
-export const appRoutes: Route[] = [{
+export const appRoutes: Route[] = [
+  { path: 'auth', loadChildren: () => import('./velzon/account/account.module').then(m => m.AccountModule)  },
+  {
   path: ':branch', component: LayoutComponent,
   //loadChildren: () => import('./resource/resource.module').then(m => m.ResourceModule) 
   children: [

@@ -58,6 +58,11 @@ export class FormCardSectionComponent {  //  implements OnInit
 
   //ngOnInit(): void { }
 
+  get sectionNameClass(): string {
+
+    return this.editMode?'sectionNameActive':'sectionName'
+
+  }
 
   get editMode(): boolean {
     return (this.sectionId === this.editSectionId && this.sectionParam === this.editSectionParam)

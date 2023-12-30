@@ -507,6 +507,8 @@
       "isQty": "Kwantumkorting",
       "isDay": "Prijs geldig op specifieke weekdagen",
       "isTime": "Prijs geldig gedurende een tijdsinterval",
+      "isExtraQty": "Klant ontvang extra beurten",
+      "extraQty": "Extra beurten",
       "from": "Vanaf (hh:mm)",
       "to": "Tot (hh:mm)",
       "help": {

@@ -9,7 +9,7 @@ const AUTH_API = GlobalComponent.AUTH_API;
 
 const httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
-  };
+};
 
 @Injectable({ providedIn: 'root' })
 
@@ -22,8 +22,19 @@ export class AuthenticationService {
     currentUserValue: any;
     private currentUserSubject: BehaviorSubject<User>;
 
-    constructor(private http: HttpClient) { 
-        this.currentUserSubject = new BehaviorSubject<User>(JSON.parse(localStorage.getItem('currentUser')!));
+    constructor(private http: HttpClient) {
+
+        
+        const currentUser = localStorage.getItem('currentUser')
+        console.error(currentUser)
+        if (currentUser && currentUser != 'undefined') {
+
+            
+            this.currentUserSubject = new BehaviorSubject<User>(JSON.parse(currentUser!));
+        } else {
+            this.currentUserSubject = new BehaviorSubject<User>(null);
+        }
+            
     }
 
     /**
@@ -32,17 +43,17 @@ export class AuthenticationService {
      * @param password password
      */
     register(email: string, first_name: string, password: string) {
-        // return getFirebaseBackend()!.registerUser(email, password).then((response: any) => {
-        //     const user = response;
-        //     return user;
-        // });
+        return getFirebaseBackend()!.registerUser(email, password).then((response: any) => {
+            const user = response;
+            return user;
+        });
 
         // Register Api
-        return this.http.post(AUTH_API + 'signup', {
-            email,
-            first_name,
-            password,
-          }, httpOptions);
+        /*         return this.http.post(AUTH_API + 'signup', {
+                    email,
+                    first_name,
+                    password,
+                  }, httpOptions); */
     }
 
     /**
@@ -51,15 +62,15 @@ export class AuthenticationService {
      * @param password password of user
      */
     login(email: string, password: string) {
-        // return getFirebaseBackend()!.loginUser(email, password).then((response: any) => {
-        //     const user = response;
-        //     return user;
-        // });
+        return getFirebaseBackend()!.loginUser(email, password).then((response: any) => {
+            const user = response;
+            return user;
+        });
 
-        return this.http.post(AUTH_API + 'signin', {
-            email,
-            password
-          }, httpOptions);
+        // return this.http.post(AUTH_API + 'signin', {
+        //     email,
+        //     password
+        //   }, httpOptions);
     }
 
     /**

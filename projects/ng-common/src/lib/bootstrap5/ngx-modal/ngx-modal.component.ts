@@ -46,6 +46,7 @@ export class NgxModalComponent implements OnInit {
   }
 
   show() {
+    console.warn('this.ngxBsModal?.show()')
     this.ngxBsModal?.show()
   }
 

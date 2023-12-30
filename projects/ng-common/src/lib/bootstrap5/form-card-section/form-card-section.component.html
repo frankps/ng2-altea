@@ -4,11 +4,11 @@
       <ng-container *ngIf="icon"><i [class]="icon"></i> &nbsp; </ng-container>
 
 
-      <span *ngIf="!trans" class="sectionName">
+      <span *ngIf="!trans" [class]="sectionNameClass">
         {{ sectionName }}
       </span>
 
-      <span *ngIf="trans" class="sectionName">
+      <span *ngIf="trans" [class]="sectionNameClass">
         {{ sectionName | translate }}
       </span>
 

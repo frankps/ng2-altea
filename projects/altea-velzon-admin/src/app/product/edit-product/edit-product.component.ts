@@ -4,7 +4,7 @@ import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, Produ
 import { DashboardService, FormCardSectionEventData, NgEditBaseComponent, ToastType, TranslationService } from 'ng-common'
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxModalComponent, DeleteModalComponent } from 'ng-common';
-import { BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, Translation, ObjectHelper, CollectionChangeTracker, ObjectWithId, ApiStatus } from 'ts-common'
+import { BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, Translation, ObjectHelper, CollectionChangeTracker, ObjectWithId, ApiStatus, CollectionChangeTrackerParams } from 'ts-common'
 import * as _ from "lodash";
 import { NgxSpinnerService } from "ngx-spinner"
 import { ManageProductService } from '../manage-product.service';
@@ -31,7 +31,7 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
 
   @ViewChild('deleteModal') public deleteModal: DeleteModalComponent;
 
-  @ViewChild('priceModal', { static: true }) priceModal?: NgxModalComponent;
+  @ViewChild('priceModal') public priceModal: NgxModalComponent;
   //  @ViewChild('deleteModal') public deleteModal?: NgxModalComponent; // NgTemplateOutlet | null = null
 
   nrOfPeople = [1, 2, 3, 4]
@@ -146,7 +146,12 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
     else
       object.options = []
 
-    this.priceChanges = new CollectionChangeTracker<Price>(object.prices, Price)
+
+
+    const priceChangeParams = new CollectionChangeTrackerParams()
+    priceChangeParams.propsToRemove = ['_startDate', '_endDate']
+
+    this.priceChanges = new CollectionChangeTracker<Price>(object.prices, Price, priceChangeParams)
 
     this.initProductResourceChangeTracker(object)
 
@@ -217,7 +222,12 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
 
       //     this.object.prices = _.sortBy(this.object.prices, p => p.start ? p.start : new Date(1900, 0, 1))  // Date(1900,0,1): we need to get null values first!
 
-      this.priceChanges = new CollectionChangeTracker<Price>(this.object.prices, Price)
+
+      const priceChangeParams = new CollectionChangeTrackerParams()
+      priceChangeParams.propsToRemove = ['_startDate', '_endDate']
+
+
+      this.priceChanges = new CollectionChangeTracker<Price>(this.object.prices, Price, priceChangeParams)
 
 
       this.editSectionId = '' // 'timing'
@@ -263,28 +273,83 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
 
   }
 
-  savePrices() {
-    const priceBatch = this.priceChanges?.getApiBatch()
+  hasActivePrices() {
 
-    if (!priceBatch || !priceBatch.hasChanges()) {
-      this.editSectionId = ''
-      return
-    }
-    console.error('Price changes')
-    console.error(priceBatch)
+    if (!this.Array.isArray(this.object?.prices) || this.object?.prices.length == 0)
+      return false
 
-    this.priceSvc.batchProcess(priceBatch).subscribe(res => {
+    const now = new Date()
+
+    const firstActivePrice = this.object?.prices.find(price => (price.start && price.startDate > now) || !price.start || !price.end || (price.end && price.endDate > now))
+
+    return firstActivePrice ? true : false
+  }
 
 
+  async savePrices() {
+
+    let allOk = true
+
+    try {
+
+      const priceBatch = this.priceChanges?.getApiBatch()
+
+      if (!priceBatch || !priceBatch.hasChanges()) {
+        this.editSectionId = ''
+        return
+      }
+      console.error('Price changes')
+      console.error(priceBatch)
+  
+      const hasActivePrices = this.hasActivePrices()
+  
+      const res = await this.priceSvc.batchProcess$(priceBatch)
+  
+      if (res.status != ApiStatus.ok)
+        allOk = false
+  
       this.resetOrigObject()
-
+  
       console.error(res)
       this.editSectionId = ''
-
+  
       this.priceChanges?.reset()
-    })
+  
+      if (this.object.advPricing != hasActivePrices) {
+  
+        this.object.advPricing = hasActivePrices
+  
+        const update: any = {}
+        update['id'] = this.object?.id
+        update['advPricing'] = hasActivePrices
+  
+        const prodUpdate = await this.objectSvc.update$(update)
+  
+        if (!prodUpdate.isOk)
+          allOk = false
+  
+        console.error(prodUpdate)
+  
+  
+      }
 
-    console.error(priceBatch)
+    } catch(err) {
+
+      allOk = false
+
+    } finally {
+
+      if (allOk) {
+        this.dashboardSvc.showToastType(ToastType.saveSuccess)
+      } else {
+        this.dashboardSvc.showToastType(ToastType.saveError)
+      }
+  
+
+    }
+
+    //this.object.advPricing = true
+    //console.error(priceBatch)
   }
 
 
@@ -536,7 +601,7 @@ if (this.editSection == 'pricing') {
 
     console.error(price)
 
-
+    price.value = this.object.salesPrice
 
 
     this.object?.prices?.push(price)

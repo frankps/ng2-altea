@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ScheduleService } from './schedule.service';
 import { DbQuery, QueryOperator } from 'ts-common';
+import { Branch } from 'ts-altea-model';
 
 @Injectable({
   providedIn: 'root'
@@ -25,5 +26,8 @@ export class SessionService {
 
   // public backend = "https://dvit-477c9.uc.r.appspot.com"
    public backend = "http://localhost:8080"
+
+   
+
 
 }

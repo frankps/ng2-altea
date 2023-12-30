@@ -1,4 +1,9 @@
 
+Firebase setup (via Velzon):
+
+https://themesbrand.com/velzon/docs/angular/social-setup.html
+
+
 
 
 

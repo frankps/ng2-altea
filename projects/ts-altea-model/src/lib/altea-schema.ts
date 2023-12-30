@@ -616,6 +616,9 @@ export class Product extends ObjectWithId {
   //@TransformToNumber()
   @Type(() => Number)
   salesPrice = 0
+  
+  advPricing = false
+
 
   getIcon(): string {
 
@@ -789,11 +792,11 @@ export class Price extends ObjectWithId {
   @Type(() => Number)
   value?: number = 0
 
-  @Type(() => Date)
-  start?: Date;
+//  @Type(() => Date)
+  start?: number | null;
 
-  @Type(() => Date)
-  end?: Date;
+//  @Type(() => Date)
+  end?: number| null;
 
   qty?: number = 1
 
@@ -804,6 +807,10 @@ export class Price extends ObjectWithId {
   isTime = false
   from?: string
   to?: string
+
+  isExtraQty = false
+  extraQty: number = 0
+  productItemId?: string
 
   idx = 0
 
@@ -828,6 +835,68 @@ export class Price extends ObjectWithId {
     }
 
   }
+
+  @Exclude()
+  _startDate: Date | null = null
+
+  @Exclude()
+  _endDate: Date | null = null
+
+
+  get startDate(): Date | null {
+
+    if (!this.start)
+      return null
+
+    if (this._startDate && DateHelper.yyyyMMddhhmmss(this._startDate) === this.start)
+      return this._startDate
+
+    this._startDate = DateHelper.parse(this.start)
+    return this._startDate
+
+
+  }
+
+
+  set startDate(value: Date | null) {
+
+    if (value) {
+      this.start = DateHelper.yyyyMMdd(value) * 1000000  // * 1000000 because we don't care about hhmmss
+      this._startDate = null
+    }
+    else
+      this.start = null
+
+  }
+  
+  
+    get endDate(): Date | null {
+
+    if (!this.end)
+      return null
+
+    if (this._endDate && DateHelper.yyyyMMddhhmmss(this._endDate) === this.end)
+      return this._endDate
+
+    this._endDate = DateHelper.parse(this.end)
+    return this._endDate
+
+  }
+
+
+  set endDate(value: Date | null) {
+
+    if (value) {
+      this.end = DateHelper.yyyyMMdd(value) * 1000000
+      this._endDate = null
+    }
+    else
+      this.end = null
+
+  }
+  
+  
+
 
 }
 
@@ -1235,7 +1304,6 @@ export class Resource extends ObjectWithId {
 
   get endDate(): Date | null {
 
-
     if (!this.end)
       return null
 
@@ -1244,16 +1312,6 @@ export class Resource extends ObjectWithId {
 
     this._endDate = DateHelper.parse(this.end)
     return this._endDate
-
-
-    // if (this._endDate) return this._endDate
-
-    // if (this.end)
-    //   this._endDate = DateHelper.parse(this.end)
-    // else
-    //   this._endDate = null
-
-    // return this._endDate
 
   }
 

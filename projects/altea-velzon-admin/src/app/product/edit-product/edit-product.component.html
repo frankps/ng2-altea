@@ -321,9 +321,13 @@
               €{{ price.value }}
               <!-- idx={{price.idx}} -->
             </div>
-            <div class="col-3">
-              <ng-container *ngIf="price.start">
-                vanaf {{ price.start | date : 'dd/MM/yyyy' }}
+            <div class="col-8">
+              <ng-container *ngIf="price.startDate">
+                vanaf {{ price.startDate | date : 'dd/MM/yyyy' }}
+              </ng-container>
+
+              <ng-container *ngIf="price.endDate">
+                tot {{ price.endDate | date : 'dd/MM/yyyy' }}
               </ng-container>
 
             </div>
@@ -334,12 +338,27 @@
           </div>
 
           <div class="row" *ngIf="price.isQty">
-            <div class="col-6">
+            <div class="col-2">
+
+            </div>
+            <div class="col">
 
               Kwantumkorting: {{price.qty}}
 
             </div>
           </div>
+
+          <div class="row" *ngIf="price.isExtraQty">
+            <div class="col-2">
+
+            </div>
+            <div class="col">
+
+              Extra beurten: {{price.extraQty}}
+
+            </div>
+          </div>
+
 
 
           <div class="row" *ngIf="price.isDay">
@@ -357,13 +376,8 @@
 
             </div>
           </div>
-
         </li>
       </ul>
-
-
-
-
 
     </ng-container>
   </ngx-altea-form-card-section>
@@ -374,9 +388,9 @@
 
 
 
-
   <ngx-altea-ngx-modal #priceModal title="{{ 'ui.price-modal.title' | translate }}" icon="fa-duotone fa-credit-card"
     size="lg">
+
     <ngx-altea-product-price *ngIf="price" [object]="price"></ngx-altea-product-price>
   </ngx-altea-ngx-modal>
 

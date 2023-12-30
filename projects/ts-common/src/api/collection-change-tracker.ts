@@ -230,8 +230,11 @@ export class CollectionChangeTracker<T extends ObjectWithId> {
 
     if (this.params.propsToUpdate && this.params.propsToUpdate.length > 0)
       batch.update = objectsToUpdate.map(obj => this.createPartialObjectForUpdate(obj, this.params.propsToUpdate)).filter(obj => obj != null)
-    else
-      batch.update = objectsToUpdate
+    else {
+      /* 
+      */
+      batch.update = objectsToUpdate.map(obj => this.createPartialObjectByRemovingProps(obj, this.params.propsToRemove))
+    }
 
     // if (this.params.propsToRemove && this.params.propsToRemove.length > 0)
     //   batch.update = batch.update.map(obj => this.createPartialObjectByRemovingProps(obj, this.params.propsToRemove))
