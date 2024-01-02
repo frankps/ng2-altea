@@ -314,11 +314,11 @@
         <li class="list-group-item" (click)="addPrice()" *ngIf="editSectionId === 'pricing'">
           Voeg prijs toe
         </li>
-        <li class="list-group-item" *ngFor="let price of object.prices">
+        <li class="list-group-item" *ngFor="let price of priceChanges.orderedCol()">
 
           <div class="row">
             <div class="col-2">
-              €{{ price.value }}
+              <span *ngIf="price.isAbsolute">€</span>{{ price.value }} <span *ngIf="price.isPercentage">%</span>
               <!-- idx={{price.idx}} -->
             </div>
             <div class="col-8">
@@ -376,6 +376,65 @@
 
             </div>
           </div>
+
+          <ng-container *ngIf="price.options">
+
+            <div class="row mt-1">
+              <div class="col-1">
+        
+              </div>
+
+              <div class="col">
+        
+                <ng-container *ngFor="let optionPrice of price.options; let idx = index">
+
+                  <div class="row mt-1">
+    
+                    <div class="col">
+                      {{optionPrice.name}}
+                    </div>
+                    <div class="col">
+                      <span *ngIf="!optionPrice.isPct">€</span>{{ optionPrice.value }} <span
+                        *ngIf="optionPrice.isPct">%</span>
+    
+                    </div>
+    
+                  </div>
+    
+                  <div class="row">
+    
+                    <div class="col">
+    
+                      <ul>
+                        <li *ngFor="let value of optionPrice.values">
+                          {{value.name}}
+                        </li>
+                      </ul>
+    
+                    </div>
+    
+    
+    
+                  </div>
+    
+    
+    
+    
+    
+                </ng-container>
+
+
+              </div>
+            </div>
+
+
+
+
+
+          </ng-container>
+
+
+  
         </li>
       </ul>
 
@@ -388,10 +447,10 @@
 
 
 
-  <ngx-altea-ngx-modal #priceModal title="{{ 'ui.price-modal.title' | translate }}" icon="fa-duotone fa-credit-card"
+  <ngx-altea-ngx-modal #priceModal title="{{ 'ui.price.title' | translate }}" icon="fa-duotone fa-credit-card"
     size="lg">
 
-    <ngx-altea-product-price *ngIf="price" [object]="price"></ngx-altea-product-price>
+    <ngx-altea-product-price *ngIf="price" [product]="object" [object]="price"></ngx-altea-product-price>
   </ngx-altea-ngx-modal>
 
 

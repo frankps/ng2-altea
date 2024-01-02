@@ -26,7 +26,7 @@ export class EditBranchComponent extends NgEditBaseComponent<Branch> {
   Math = Math
 
   vatPctgs = [...Array(30).keys()].map(i => { return { pct: i, label: `${i} %` } })
-  depositPctgs = [...Array(21).keys()].map(i => { return { pct: (i * 5) / 100, label: `${i * 5} %` } })
+  depositPctgs = [...Array(21).keys()].map(i => { return { pct: (i * 5), label: `${i * 5} %` } })
 
   @ViewChild('generalForm') generalForm: NgForm;
   @ViewChild('depositForm') depositForm: NgForm;

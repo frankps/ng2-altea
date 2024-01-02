@@ -182,8 +182,9 @@
     }
   },
   "ui": {
-    "price-modal": {
-      "title": "Prijs"
+    "price": {
+      "title": "Speciale prijzen & promoties",
+      "add-option": "Nieuwe prijs voor optie"
     },
     "delete-modal": {
       "title": "{{object_sc}} verwijderen",
@@ -302,7 +303,7 @@
             "title": "Planning"
           },
           "pricing": {
-            "title": "Prijszetting"
+            "title": "Speciale prijzen & promoties"
           },
           "serviceDetails": {
             "title": "Dienst info"
@@ -504,16 +505,33 @@
       "start": "Vanaf",
       "end": "Tot",
       "qty": "Vanaf aantal",
+      "sameBasePrice": "Zelfde basisprijs",
+      "isPromo": "Is promotie",
+      "title": "Promotie titel",
+      "title-tpl": "* promotie", 
+      "isAbsolute": "Andere basisprijs",
+      "absValue": "Nieuwe prijs",
+      "isPercentage": "Procentuele prijsaanpassing",
+      "pctValue": "% korting of toeslag",
       "isQty": "Kwantumkorting",
       "isDay": "Prijs geldig op specifieke weekdagen",
       "isTime": "Prijs geldig gedurende een tijdsinterval",
-      "isExtraQty": "Klant ontvang extra beurten",
+      "isExtraQty": "Klant ontvangt extra beurten",
+      "hasOptions": "Specifieke prijzen voor opties",
+      "options": "Kies optie",
       "extraQty": "Extra beurten",
       "from": "Vanaf (hh:mm)",
       "to": "Tot (hh:mm)",
       "help": {
         "price": "Prijs per behandeling"
       }
+    },
+    "optionPrice": {
+      "allValues": "Geldig voor alle optie waarden",
+      "value": "Aangepaste prijs",
+      "valuePct": "Nieuwe prijs (in %)",
+      "valueIds": "Optie waarden",
+      "isPct": "Is percentage"
     },
     "schedule": {
       "name": "Naam",

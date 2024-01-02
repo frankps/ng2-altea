@@ -40,7 +40,7 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> {
 
   // scheduleChanges?: CollectionChangeTracker<Schedule>
 
-  depositPctgs = [...Array(21).keys()].map(i => { return { pct: (i * 5) / 100, label: `${i * 5} %` }})
+  depositPctgs = [...Array(21).keys()].map(i => { return { pct: (i * 5), label: `${i * 5} %` }})
   depositMode = "default"   // default or custom
 
 
@@ -111,7 +111,7 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> {
 
     if (custom) {
 
-      this.object.depositPct = 0.5
+      this.object.depositPct = 50
 
     } else {
 

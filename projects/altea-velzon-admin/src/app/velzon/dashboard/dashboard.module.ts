@@ -16,7 +16,7 @@ import { SimplebarAngularModule } from 'simplebar-angular';
 // Apex Chart Package
 import { NgApexchartsModule } from 'ng-apexcharts';
 // Swiper Slider
-import { NgxUsefulSwiperModule } from 'ngx-useful-swiper';
+//import { NgxUsefulSwiperModule } from 'ngx-useful-swiper';
 // Flat Picker
 import { FlatpickrModule } from 'angularx-flatpickr';
 import { NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
@@ -28,7 +28,7 @@ import { ToastsContainer } from './dashboard/toasts-container.component';
   declarations: [DashboardComponent, ToastsContainer],
   imports: [CommonModule, DashboardRoutingModule,
     FeatherModule.pick(allIcons),
-    CountToModule,
+ //   CountToModule,
     NgbToastModule,
     LeafletModule,
     NgbDropdownModule,
@@ -36,7 +36,7 @@ import { ToastsContainer } from './dashboard/toasts-container.component';
     SimplebarAngularModule,
 
     NgApexchartsModule,
-    NgxUsefulSwiperModule,
+ //   NgxUsefulSwiperModule,
     FlatpickrModule.forRoot(),
     NgbTypeaheadModule,
     NgbPaginationModule,

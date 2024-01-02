@@ -8,6 +8,7 @@ import { DateRange, DateRangeSet, TimeBlock, TimeBlockSet, TimeSpan } from "./lo
 import * as dateFns from 'date-fns'
 import * as Handlebars from "handlebars"
 
+
 function TransformToNumber() {
 
   return Transform(({ value }) => {
@@ -616,7 +617,7 @@ export class Product extends ObjectWithId {
   //@TransformToNumber()
   @Type(() => Number)
   salesPrice = 0
-  
+
   advPricing = false
 
 
@@ -659,6 +660,21 @@ export class Product extends ObjectWithId {
   getBlockSeries(scheduleId: string) {
 
     return this.plan?.filter(blockSeries => Array.isArray(blockSeries.scheduleIds) && blockSeries.scheduleIds.indexOf(scheduleId) >= 0)
+  }
+
+  getOptionValues(optionId: string): ProductOptionValue[] {
+
+    if (!this.hasOptions())
+      return []
+
+    const option = this.options.find(o => o.id == optionId)
+
+    if (!option || !option.values)
+      return []
+
+    return option.values
+
+
   }
 
   isSubscription() {
@@ -785,22 +801,69 @@ export class ProductItem extends ObjectWithId {
   }
 }
 
+/* export enum OptionPriceMode {
+  abs = 'abs', // absolute price
+  pct = 'pct'  // percentage price change
+} */
+
+/**
+ * Used in price.options
+ */
+export class OptionPrice {
+  optionId?: string
+
+  name?: string
+
+  /** this value (price or percentage) is valid for all option values */
+  allValues: boolean = true
+
+  values = []  // array of {id, name} objects
+
+  /** value is percentage, otherwise it's an absolute price */
+  isPct: boolean = false
+
+  //mode: OptionPriceMode = OptionPriceMode.abs
+
+  /** The price change */
+  @Type(() => Number)
+  value?: number = 0
+
+}
+
+export enum PriceMode {
+  same = 'same', // same base price
+  abs = 'abs',  // absolute price change
+  pct = 'pct'   // percentage price change
+}
+
+/*
+isPromo Boolean @default(false) // not every price is a promotion, can also be more expensive price 
+title   String?
+descr   String?
+*/
+
 export class Price extends ObjectWithId {
 
   productId?: string;
   product?: Product;
-  productOptionValueId?: string;
-  productOptionValue?: ProductOptionValue;
+/*   productOptionValueId?: string;
+  productOptionValue?: ProductOptionValue; */
   type?: PriceType = PriceType.sales
+
+  isPromo = false
+  title?: string
+  descr?: string
+
+  mode: PriceMode = PriceMode.pct
 
   @Type(() => Number)
   value?: number = 0
 
-//  @Type(() => Date)
+  //  @Type(() => Date)
   start?: number | null;
 
-//  @Type(() => Date)
-  end?: number| null;
+  //  @Type(() => Date)
+  end?: number | null;
 
   qty?: number = 1
 
@@ -816,13 +879,19 @@ export class Price extends ObjectWithId {
   extraQty: number = 0
   productItemId?: string
 
+  hasOptions = false  // true if this price also has option specific price changes
+  options: OptionPrice[] = []
+
+
+
   idx = 0
 
-  constructor(productId?: string) {
+  constructor(productId?: string, title?: string) {
     super()
 
 
     this.productId = productId
+    this.title = title
 
     this.initDays()
     // this.start = new Date()
@@ -858,7 +927,30 @@ export class Price extends ObjectWithId {
     this._startDate = DateHelper.parse(this.start)
     return this._startDate
 
+  }
 
+  set sameBasePrice(value: boolean) {
+    this.mode = value ? PriceMode.same : PriceMode.pct
+  }
+
+  get sameBasePrice() {
+    return this.mode == PriceMode.same
+  }
+
+  set isAbsolute(value: boolean) {
+    this.mode = value ? PriceMode.abs : PriceMode.same
+  }
+
+  get isAbsolute() {
+    return this.mode == PriceMode.abs
+  }
+
+  set isPercentage(value: boolean) {
+    this.mode = value ? PriceMode.pct : PriceMode.same
+  }
+
+  get isPercentage() {
+    return this.mode == PriceMode.pct
   }
 
 
@@ -872,9 +964,9 @@ export class Price extends ObjectWithId {
       this.start = null
 
   }
-  
-  
-    get endDate(): Date | null {
+
+
+  get endDate(): Date | null {
 
     if (!this.end)
       return null
@@ -898,8 +990,8 @@ export class Price extends ObjectWithId {
       this.end = null
 
   }
-  
-  
+
+
 
 
 }
@@ -1025,7 +1117,7 @@ export class ReminderConfig {
     return TimeUnitHelper.numberOfSeconds(this.unit) * this.dur
   }
 
-  toReminder(appointmentDate: Date) : Reminder {
+  toReminder(appointmentDate: Date): Reminder {
     const seconds = this.seconds()
     const remindeOn = dateFns.addSeconds(appointmentDate, -seconds)
 
@@ -1468,7 +1560,7 @@ export class ProductOption extends ObjectWithId {
   hasPrice = false
 
   hasValue = false
-  hasFactor = false
+  // hasFactor = false
   factorOptionId?: string
 
   hasFormula = false
@@ -1486,6 +1578,11 @@ export class ProductOption extends ObjectWithId {
   active = true
   deleted = false
   deletedAt?: Date;
+
+
+  hasValues(): boolean {
+    return (Array.isArray(this.values) && this.values.length > 0)
+  }
 
   getDefaultValue(): ProductOptionValue | undefined {
     if (!this.values || this.values.length == 0)
@@ -1526,8 +1623,9 @@ export class ProductOptionValue extends ObjectWithId {
   @Type(() => Number)
   value = 0
 
+  /*
   @Type(() => Number)
-  factor = 0
+  factor = 0 */
 
   /** private option value: customers can't select specific value, only internally */
   pvt = false

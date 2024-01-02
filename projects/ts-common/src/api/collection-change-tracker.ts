@@ -8,7 +8,7 @@ import * as _ from "lodash";
 type EmptyObject = {
   [key: string]: any;
 }
- 
+
 
 
 export class CollectionChangeTrackerParams {
@@ -17,6 +17,9 @@ export class CollectionChangeTrackerParams {
   propsToUpdate?: string[] = []
   propsToRemove?: string[] = []
   deleteUniqueKey?: string
+
+  orderByProps?: string[] = []
+
   // enableCancel?= false
 }
 
@@ -35,8 +38,24 @@ export class CollectionChangeTracker<T extends ObjectWithId> {
 
     this.colOrig = this.col.map(obj => ObjectHelper.clone(obj, this.type))
 
-    // if (params.enableCancel) {
+
+
+
+    console.log(col)
+      // if (params.enableCancel) {
     // }
+
+  }
+
+
+  orderedCol() {
+
+    if (Array.isArray(this.params.orderByProps) && this.params.orderByProps.length > 0) {
+      const col = _.orderBy(this.col, this.params.orderByProps)
+      return col
+    }
+
+    return this.col
 
   }
 
@@ -153,7 +172,7 @@ export class CollectionChangeTracker<T extends ObjectWithId> {
     if (this.params.idProperties && this.params.idProperties.length > 0 && this.params.idProperties[0] != 'id') {
       let objToRemove: EmptyObject = {}
 
-      this.params.idProperties.forEach(idProp=> objToRemove[idProp as keyof object] = removed[idProp as keyof object])
+      this.params.idProperties.forEach(idProp => objToRemove[idProp as keyof object] = removed[idProp as keyof object])
 
       this.deleteIds.push(objToRemove)
 

@@ -150,6 +150,7 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
 
     const priceChangeParams = new CollectionChangeTrackerParams()
     priceChangeParams.propsToRemove = ['_startDate', '_endDate']
+    priceChangeParams.orderByProps = ['idx']
 
     this.priceChanges = new CollectionChangeTracker<Price>(object.prices, Price, priceChangeParams)
 
@@ -578,18 +579,23 @@ if (this.editSection == 'pricing') {
     if (!price)
       return
 
-    this.priceChanges?.deleteId(price.id)
+    this.priceChanges?.delete(price)
   }
 
 
-  addPrice() {
-
-    console.error('a test')
+  async addPrice() {
 
     if (!this.object?.id)
       return
 
-    const price = new Price(this.object?.id)
+    let title : string = await this.translationSvc.getTrans("objects.price.title-tpl")
+
+    
+    title = title.replace('*',this.object.name)
+
+    console.warn(title)
+
+    const price = new Price(this.object?.id, title)
 
     const priceMaxIdx = _.maxBy(this.object.prices, 'idx')
 
@@ -604,10 +610,10 @@ if (this.editSection == 'pricing') {
     price.value = this.object.salesPrice
 
 
-    this.object?.prices?.push(price)
-    this.object.prices = _.orderBy(this.object?.prices, ['idx'], ['desc'])
+    // this.object?.prices?.push(price)
+    //this.object.prices = _.orderBy(this.object?.prices, ['idx'], ['desc'])
 
-    this.priceChanges?.createId(price.id)
+    this.priceChanges?.add(price)  // createId(price.id)
 
     this.price = price
 

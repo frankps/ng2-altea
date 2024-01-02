@@ -1,12 +1,10 @@
-
-
 <div *ngIf="object">
 
   <div class="row">
     <div class="col-4 mb-3">
-      <ngx-altea-label-control label="{{ 'dic.price' | translate }}" for="name">
+      <!-- <ngx-altea-label-control label="{{ 'dic.price' | translate }}" for="name">
         <input type="number" id="price" name="price" required class="form-control" [(ngModel)]="object.value" />
-      </ngx-altea-label-control>
+      </ngx-altea-label-control> -->
     </div>
     <div class="col-4">
 
@@ -35,6 +33,98 @@
 
   <div></div>
 
+  <div class="row">
+    <div class="col-12">
+
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" id="sameBasePrice" [(ngModel)]="object.sameBasePrice"
+          (change)="changePriceMode($event)" />
+        <label class="form-check-label" for="sameBasePrice" translate="objects.price.sameBasePrice"></label>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" id="isAbsolute" [(ngModel)]="object.isAbsolute"
+          (change)="changePriceMode($event)" />
+        <label class="form-check-label" for="isAbsolute" translate="objects.price.isAbsolute"></label>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="row mt-2" *ngIf="object.isAbsolute">
+    <div class="col-2"></div>
+    <div class="col-3">
+
+      <ngx-altea-label-control label="objects.price.absValue" for="absValue">
+        <input type="number" id="absValue" name="absValue" class="form-control" [(ngModel)]="object.value" />
+      </ngx-altea-label-control>
+
+    </div>
+  </div>
+
+
+
+
+  <div class="row">
+    <div class="col-12">
+
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" id="isPercentage" [(ngModel)]="object.isPercentage"
+          (change)="changePriceMode($event)" />
+        <label class="form-check-label" for="isPercentage" translate="objects.price.isPercentage"></label>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="row mt-2" *ngIf="object.isPercentage">
+    <div class="col-2"></div>
+    <div class="col-5">
+
+      <ngx-altea-label-control label="objects.branch.vatPcts" for="pricePcts">
+        <ng-select id="pricePct" name="pricePct" [items]="pricePcts" bindLabel="label" bindValue="pct"
+          [clearable]="false" [multiple]="false" [(ngModel)]="object.value">
+        </ng-select>
+      </ngx-altea-label-control>
+
+
+
+      <!-- 
+      <ngx-altea-label-control label="{{ 'objects.price.pctValue' | translate }}" for="pctValue">
+        <input type="number" id="pctValue" name="pctValue" class="form-control" [(ngModel)]="object.value" />
+      </ngx-altea-label-control>
+ -->
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" id="isPromo" [(ngModel)]="object.isPromo" />
+        <label class="form-check-label" for="isPromo" translate="objects.price.isPromo"></label>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="row mt-2" *ngIf="object.isPromo">
+    <div class="col-2"></div>
+    <div class="col">  
+
+      <ngx-altea-label-control label="objects.price.title" for="title">
+        <input type="text" id="title" name="title" class="form-control" [(ngModel)]="object.title" />
+      </ngx-altea-label-control>
+
+    </div>
+  </div>
+
 
   <div class="row">
     <div class="col-12">
@@ -51,7 +141,7 @@
     <div class="col-2"></div>
     <div class="col-3">
 
-      <ngx-altea-label-control label="{{ 'objects.price.qty' | translate }}" for="qty">
+      <ngx-altea-label-control label="objects.price.qty" for="qty">
         <input type="number" id="qty" name="qty" required class="form-control" [(ngModel)]="object.qty" />
       </ngx-altea-label-control>
 
@@ -74,8 +164,9 @@
     <div class="col-2"></div>
     <div class="col-3">
 
-      <ngx-altea-label-control label="{{ 'objects.price.extraQty' | translate }}" for="extraQty">
-        <input type="number" id="extraQty" name="extraQty" required class="form-control" [(ngModel)]="object.extraQty" />
+      <ngx-altea-label-control label="objects.price.extraQty" for="extraQty">
+        <input type="number" id="extraQty" name="extraQty" required class="form-control"
+          [(ngModel)]="object.extraQty" />
       </ngx-altea-label-control>
 
     </div>
@@ -139,14 +230,14 @@
     <div class="col-2"></div>
 
     <div class="col-3">
-      <ngx-altea-label-control label="{{ 'objects.price.from' | translate }}" for="from">
-        <input type="time" id="from" name="from" class="form-control"  [(ngModel)]="object.from" pattern="\d\d" />
+      <ngx-altea-label-control label="objects.price.from" for="from">
+        <input type="time" id="from" name="from" class="form-control" [(ngModel)]="object.from" pattern="\d\d" />
       </ngx-altea-label-control>
     </div>
 
     <div class="col-3">
-      <ngx-altea-label-control label="{{ 'objects.price.to' | translate }}" for="to">
-        <input type="time" id="to" name="to" class="form-control"  [(ngModel)]="object.to" pattern="\d\d" />
+      <ngx-altea-label-control label="objects.price.to" for="to">
+        <input type="time" id="to" name="to" class="form-control" [(ngModel)]="object.to" pattern="\d\d" />
       </ngx-altea-label-control>
     </div>
 
@@ -154,7 +245,216 @@
   </div>
 
 
-  
+  <ng-container *ngIf="product.hasOptions()">
+
+    <div class="row">
+      <div class="col-12">
+
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="hasOptions" [(ngModel)]="object.hasOptions"
+            (change)="changeHasOptions($event)" />
+          <label class="form-check-label" for="hasOptions" translate="objects.price.hasOptions"></label>
+        </div>
+
+      </div>
+    </div>
+
+
+
+    <ng-container *ngIf="object.hasOptions">
+
+      <div class="row">
+
+        <div class="col-1">
+
+        </div>
+
+        <div class="col">
+
+          <div class="row mt-2" *ngIf="!showAddOptionPanel">
+            <div class="col d-flex justify-content-center">
+              <button type="button" class="btn btn-primary btn-sm" (click)="toggleShowAddOptionPanel()"
+                translate>ui.price.add-option</button>
+            </div>
+          </div>
+
+
+          <ng-container *ngIf="showAddOptionPanel">
+            <div class="row mt-2">
+
+
+              <div class="col">
+
+                <ngx-altea-label-control label="objects.price.options" for="options">
+                  <ng-select id="options" name="options" [items]="product.options" bindLabel="name" bindValue="id"
+                    [clearable]="false" [multiple]="false" [(ngModel)]="newOptionPrice.optionId"
+                    (change)="optionChanged($event)">
+                  </ng-select>
+                </ngx-altea-label-control>
+
+
+              </div>
+
+              <div class="col" *ngIf="!newOptionPrice.isPct">
+
+                <ngx-altea-label-control label="objects.optionPrice.value" for="optionValue">
+                  <input type="number" id="optionValue" name="optionValue" class="form-control"
+                    [(ngModel)]="newOptionPrice.value" />
+                </ngx-altea-label-control>
+
+              </div>
+
+              <div class="col" *ngIf="newOptionPrice.isPct">
+
+                <ngx-altea-label-control label="objects.optionPrice.valuePct" for="optionPct">
+                  <ng-select id="optionPct" name="optionPct" [items]="pricePcts" bindLabel="label" bindValue="pct"
+                    [clearable]="false" [multiple]="false" [(ngModel)]="newOptionPrice.value">
+                  </ng-select>
+                </ngx-altea-label-control>
+
+
+              </div>
+
+            </div>
+
+            <div class="row mt-2">
+
+              <div class="col">
+
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="isPct" [(ngModel)]="newOptionPrice.isPct" />
+                  <label class="form-check-label" for="isPct" translate="objects.optionPrice.isPct"></label>
+                </div>
+
+              </div>
+
+              <div class="col">
+
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="allValues"
+                    [(ngModel)]="newOptionPrice.allValues" />
+                  <label class="form-check-label" for="allValues" translate="objects.optionPrice.allValues"></label>
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <div class="row mt-2" *ngIf="newOptionPrice?.optionId && !newOptionPrice.allValues">
+
+              <div class="col">
+
+                <ngx-altea-label-control label="objects.optionPrice.valueIds" for="optionValues">
+                  <ng-select id="optionValues" name="optionValues" [items]="optionValues" bindLabel="name"
+                    [clearable]="false" [multiple]="true" [(ngModel)]="newOptionPrice.values">
+                  </ng-select>
+                </ngx-altea-label-control>
+
+              </div>
+            </div>
+
+            <div class="row mt-2">
+              <div class="col">
+                <button type="button" class="btn btn-primary btn-sm float-end" (click)="addOptionPrice()" [disabled]="!newOptionIsValid()"
+                  translate>dic.add</button>
+              </div>
+            </div>
+          </ng-container>
+
+
+          <ng-container *ngIf="object.options">
+
+            <ng-container *ngFor="let optionPrice of object.options; let idx = index">
+
+              <div class="row mt-1">
+
+                <div class="col">
+                  {{optionPrice.name}}
+                </div>
+                <div class="col">
+                  <span *ngIf="!optionPrice.isPct">€</span>{{ optionPrice.value }} <span
+                    *ngIf="optionPrice.isPct">%</span>
+
+                  <i class="fas fa-trash float-end" (click)="deleteOptionPrice(idx)"></i>
+                </div>
+
+              </div>
+
+              <div class="row">
+
+                <div class="col">
+
+                  <ul>
+                    <li *ngFor="let value of optionPrice.values">
+                      {{value.name}}
+                    </li>
+                  </ul>
+
+                </div>
+
+
+
+              </div>
+
+
+              <!--               <div class="row mt-2">
+                
+                <div class="col">
+        
+                </div>
+        
+                <div class="col">
+                </div>  
+        
+                <div class="col">  
+                  
+
+                </div>
+        
+              </div> -->
+
+
+
+            </ng-container>
+
+
+          </ng-container>
+
+
+
+        </div>
+
+
+      </div>
+
+
+
+
+
+
+
+
+
+
+    </ng-container>
+
+
+
+
+
+
+
+
+
+
+  </ng-container>
+
+
+
+
+
+
 
   <!-- 
   <div class="row">
