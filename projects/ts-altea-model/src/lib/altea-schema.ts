@@ -846,8 +846,8 @@ export class Price extends ObjectWithId {
 
   productId?: string;
   product?: Product;
-/*   productOptionValueId?: string;
-  productOptionValue?: ProductOptionValue; */
+  /*   productOptionValueId?: string;
+    productOptionValue?: ProductOptionValue; */
   type?: PriceType = PriceType.sales
 
   isPromo = false
@@ -1144,6 +1144,49 @@ export class Reminder {
   }
 }
 
+
+export class GiftMethods {
+  email = true
+  postal = false
+  pos = true
+  app = false
+}
+
+export class GiftTypes {
+  // an amount can be gifted
+  amount = true
+
+  // specific services can be gifted
+  svc = true
+
+  // specific products can be gifted
+  prod = false
+}
+
+export class GiftExpiration {
+  /** gift expiration is enabled */
+  on = true
+
+  /** how long is gift voucher valid */
+  after: number = 12
+
+  unit = TimeUnit.months
+}
+
+export class GiftConfig {
+
+  @Type(() => GiftMethods)
+  methods: GiftMethods = new GiftMethods()
+
+  @Type(() => GiftTypes)
+  types: GiftTypes = new GiftTypes()
+
+
+  @Type(() => GiftExpiration)
+  expire: GiftExpiration = new GiftExpiration()
+
+}
+
 export class Branch extends ObjectWithId {
 
   orders?: Order[];
@@ -1178,6 +1221,12 @@ export class Branch extends ObjectWithId {
   depositTerms?: DepositTerm[]
 
   reminders?: ReminderConfig[]
+
+  /** this branch uses the gift functionality */
+  giftOn = false
+
+  @Type(() => GiftConfig)
+  gift?: GiftConfig
 
   active = true;
   deleted = false;

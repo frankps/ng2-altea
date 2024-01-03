@@ -16,6 +16,7 @@
     "edit": "Aanpassen",
     "language": "Taal",
     "move": "Verplaatsen",
+    "months": "maanden",
     "name": "Naam",
     "gender": "Geslacht",
     "duration": "Duurtijd",
@@ -219,6 +220,9 @@
           "communication": {
             "title": "Communicatie"
           },
+          "gift": {
+            "title": "Cadeaubonnen"
+          },
           "deposit": {
             "title": "Voorschotten",
             "help": "Hier kan u een standaard voorschot percentage instellen. Dit percentage zal toegepast worden op alle orders. U kan dit percentage nog aanpassen per product of per klant. Op deze manier kan u bijvoorbeeld instellen dat sommige klanten geen voorschot hoeven te betalen ofwel alles moeten betalen."
@@ -367,7 +371,30 @@
       "language": "Primaire taal",
       "vatIncl": "Prijzen zijn BTW inclusief",
       "vatNr": "BTW nummer",
-      "smsOn": "Verstuur SMS berichten naar klanten"
+      "smsOn": "Verstuur SMS berichten naar klanten",
+      "gift": {
+        "on": "Gebruik cadeaubonnen",
+        "methods": {
+            "title": "Verzendingswijze",
+            "email": "Email",
+            "postal": "Per post",
+            "pos": "Afhalen in winkel"
+        },
+        "types": {
+          "title": "Wat kan er geschonken worden",
+          "amount": "Bedrag",
+          "svc": "Diensten",
+          "prod": "Producten"
+        },
+        "expire": {
+          "title": "Geldigheid",
+          "indefinite": "Onbeperkt geldig",
+          "limited": "Beperkt in tijd",
+          "on": "Cadeaubonnen vervallen",
+          "after": "Bonnen vervallen na (maanden)"
+        }
+
+      }
     },
     "reminder": {
       "dur": "Versturen voor aanvang"
@@ -508,7 +535,7 @@
       "sameBasePrice": "Zelfde basisprijs",
       "isPromo": "Is promotie",
       "title": "Promotie titel",
-      "title-tpl": "* promotie", 
+      "title-tpl": "* promotie",
       "isAbsolute": "Andere basisprijs",
       "absValue": "Nieuwe prijs",
       "isPercentage": "Procentuele prijsaanpassing",
