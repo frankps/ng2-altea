@@ -10,7 +10,7 @@ import { SessionService } from './session.service';
 export class TaskMgmtService extends BackendHttpServiceBase<TaskMgmt> {
 
   constructor(http: HttpClient, protected sessionSvc: SessionService) {
-    super(TaskMgmt, sessionSvc.backend, sessionSvc.branch + '/task-mgmt', http)
+    super(TaskMgmt, sessionSvc.backend, sessionSvc.branchUnique + '/task-mgmt', http)
   }
 
 }

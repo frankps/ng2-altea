@@ -10,7 +10,7 @@ import { SessionService } from './session.service';
 export class ContactService extends BackendHttpServiceBase<Contact> {
 
   constructor(http: HttpClient, protected sessionSvc: SessionService) {
-    super(Contact, sessionSvc.backend, sessionSvc.branch + '/contacts', http)
+    super(Contact, sessionSvc.backend, sessionSvc.branchUnique + '/contacts', http)
   }
 
 }

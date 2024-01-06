@@ -20,7 +20,7 @@ export class OrderMgrService {
 
     console.warn('Calling: getPossibleDates', order)
 
-    const observ = this.http.put<any>(`${this.sessionSvc.backend}/${this.sessionSvc.branch}/${this.urlDifferentiator}/get-possible-dates`, order).pipe(map(res => {
+    const observ = this.http.put<any>(`${this.sessionSvc.backend}/${this.sessionSvc.branchUnique}/${this.urlDifferentiator}/get-possible-dates`, order).pipe(map(res => {
 
       console.warn('Get possible dates', res)
 

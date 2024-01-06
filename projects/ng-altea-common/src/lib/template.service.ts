@@ -11,7 +11,7 @@ export class TemplateService extends BackendHttpServiceBase<Template> {
 
   constructor(http: HttpClient, protected sessionSvc: SessionService) {
 
-    super(Template, sessionSvc.backend, sessionSvc.branch + '/templates', http)
+    super(Template, sessionSvc.backend, sessionSvc.branchUnique + '/templates', http)
   }
 
 }

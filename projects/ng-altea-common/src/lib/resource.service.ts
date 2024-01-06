@@ -10,7 +10,7 @@ import { SessionService } from './session.service';
 export class ResourceService extends BackendHttpServiceBase<Resource> {
 
   constructor(http: HttpClient, protected sessionSvc: SessionService) {
-    super(Resource, sessionSvc.backend, sessionSvc.branch + '/resources', http)
+    super(Resource, sessionSvc.backend, sessionSvc.branchUnique + '/resources', http)
   }
 
 }

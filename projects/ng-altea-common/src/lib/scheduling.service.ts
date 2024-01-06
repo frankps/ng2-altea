@@ -11,7 +11,7 @@ export class SchedulingService extends BackendHttpServiceBase<Scheduling> {
 
   constructor(http: HttpClient, protected sessionSvc: SessionService) {
 
-    super(Scheduling, sessionSvc.backend, sessionSvc.branch + '/scheduling', http)
+    super(Scheduling, sessionSvc.backend, sessionSvc.branchUnique + '/scheduling', http)
   }
 
 }

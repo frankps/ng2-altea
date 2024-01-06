@@ -1,7 +1,7 @@
 
 import { Component, ViewChild, OnInit } from '@angular/core';
 import { ProductService, PriceService, ProductResourceService, ResourceService, ScheduleService, ContactService, SessionService, BranchService } from 'ng-altea-common'
-import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ResourceType, ResourceTypeIcons, Resource, Schedule, Contact, Language, Branch, DepositTerm, TimeUnit, MsgType, ReminderConfig, Country, GiftConfig } from 'ts-altea-model'
+import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ResourceType, ResourceTypeIcons, Resource, Schedule, Contact, Language, Branch, DepositTerm, TimeUnit, MsgType, ReminderConfig, Country, GiftConfig, GiftVatPct } from 'ts-altea-model'
 import { BackendHttpServiceBase, DashboardService, FormCardSectionEventData, NgEditBaseComponent, ToastType, TranslationService } from 'ng-common'
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxModalComponent, DeleteModalComponent } from 'ng-common';
@@ -50,7 +50,7 @@ export class EditBranchComponent extends NgEditBaseComponent<Branch> implements 
     else
       return this.timeUnitsPlural
 
-  }  
+  }
 
   constructor(protected contactSvc: BranchService, protected translationSvc: TranslationService, route: ActivatedRoute, protected router: Router,
     spinner: NgxSpinnerService, private modalService: NgbModal, dashboardSvc: DashboardService,
@@ -102,6 +102,9 @@ export class EditBranchComponent extends NgEditBaseComponent<Branch> implements 
       default:
         this.saveSection(this.sectionProps, this.editSectionId)
     }
+
+    // make sure other components see the updates
+    this.sessionSvc.branch = this.object
 
   }
 
@@ -157,6 +160,37 @@ export class EditBranchComponent extends NgEditBaseComponent<Branch> implements 
     console.warn(this.object.gift)
   }
 
+
+
+
+  initGiftVatPcts() {
+
+    if (!this.object.gift.invoice.on)
+      return
+
+    if (!this.object.gift.invoice.vatPcts)
+      this.object.gift.invoice.vatPcts = []
+
+    const vatPcts = this.object.gift.invoice.vatPcts
+
+    for (let pct of this.object.vatPcts) {
+
+      let giftVatPct = vatPcts.find(vat => vat.pct == pct)
+
+      if (!giftVatPct) {
+
+        giftVatPct = new GiftVatPct()
+        giftVatPct.pct = pct
+        giftVatPct.on = false
+        giftVatPct.descr = ''
+
+        vatPcts.push(giftVatPct)
+
+      }
+
+    }
+
+  }
 
 
 

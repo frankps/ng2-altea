@@ -10,7 +10,7 @@ import { SessionService } from './session.service';
 export class OrderService extends BackendHttpServiceBase<Order> {
 
   constructor(http: HttpClient, protected sessionSvc: SessionService) {
-    super(Order, sessionSvc.backend, sessionSvc.branch + '/orders', http)
+    super(Order, sessionSvc.backend, sessionSvc.branchUnique + '/orders', http)
   }
 
 }

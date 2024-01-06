@@ -19,7 +19,7 @@ export class ProductService extends BackendHttpServiceBase<Product> {
      * 
      * 
      */
-    super(Product, sessionSvc.backend, sessionSvc.branch + '/products', http)
+    super(Product, sessionSvc.backend, sessionSvc.branchUnique + '/products', http)
   }
 
 

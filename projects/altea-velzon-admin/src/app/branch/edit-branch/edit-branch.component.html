@@ -284,59 +284,115 @@
                 <div class="col">
 
 
-                        <div class="row mt-3">
-                            <div class="col-4" *ngIf="object.gift?.methods">
-    
-                                <div class="subSection" translate>objects.branch.gift.methods.title</div>
-                                <ul>
-                                    <li translate *ngIf="object.gift.methods.email">objects.branch.gift.methods.email</li>
-                                    <li translate *ngIf="object.gift.methods.postal">objects.branch.gift.methods.postal</li>
-                                    <li translate *ngIf="object.gift.methods.pos">objects.branch.gift.methods.pos</li>
+                    <div class="row mt-3">
+                        <div class="col-4" *ngIf="object.gift?.methods">
 
-                                    <li  *ngIf="!object.gift.methods.email"><s translate>objects.branch.gift.methods.email</s></li>
-                                    <li  *ngIf="!object.gift.methods.postal"><s translate>objects.branch.gift.methods.postal</s></li>
-                                    <li  *ngIf="!object.gift.methods.pos"><s translate>objects.branch.gift.methods.pos</s></li>
-                                </ul>
+                            <div class="subSection" translate>objects.branch.gift.methods.title</div>
+                            <ul>
+                                <li translate *ngIf="object.gift.methods.email">objects.branch.gift.methods.email</li>
+                                <li translate *ngIf="object.gift.methods.postal">{{'objects.branch.gift.methods.postal'
+                                    | translate}} <span *ngIf="object.gift.price.postal">: €{{object.gift.price.postal}}
+                                        extra</span></li>
+                                <li translate *ngIf="object.gift.methods.pos">objects.branch.gift.methods.pos</li>
 
-
-    
-                            </div>
-    
-                            <div class="col-4" *ngIf="object.gift?.types">
-    
-
-                                <div class="subSection" translate>objects.branch.gift.types.title</div>
-                                <ul>
-                                    <li translate *ngIf="object.gift.types.amount">objects.branch.gift.types.amount</li>
-                                    <li translate *ngIf="object.gift.types.svc">objects.branch.gift.types.svc</li>
-                                    <li translate *ngIf="object.gift.types.prod">objects.branch.gift.types.prod</li>
-
-                                    <li  *ngIf="!object.gift.types.amount"><s translate>objects.branch.gift.types.amount</s></li>
-                                    <li  *ngIf="!object.gift.types.svc"><s translate>objects.branch.gift.types.svc</s></li>
-                                    <li  *ngIf="!object.gift.types.prod"><s translate>objects.branch.gift.types.prod</s></li>
-                                </ul>
+                                <li *ngIf="!object.gift.methods.email"><s
+                                        translate>objects.branch.gift.methods.email</s></li>
+                                <li *ngIf="!object.gift.methods.postal"><s
+                                        translate>objects.branch.gift.methods.postal</s></li>
+                                <li *ngIf="!object.gift.methods.pos"><s translate>objects.branch.gift.methods.pos</s>
+                                </li>
+                            </ul>
 
 
-    
-                            </div>
-                        </div>
-    
-    
-    
-                        <div class="row mt-1">
-                            <div class="col-4">
-
-                                <div class="subSection" translate>objects.branch.gift.expire.title</div>
-
-                                <span *ngIf="!object.gift.expire.on" translate>objects.branch.gift.expire.indefinite</span>
-
-                                <span *ngIf="object.gift.expire.on">{{'objects.branch.gift.expire.limited' | translate}}: {{object.gift.expire.after}} {{'dic.months' | translate}}</span>
-
-
-                            </div>
 
                         </div>
-    
+
+                        <div class="col-4" *ngIf="object.gift?.types">
+
+
+                            <div class="subSection" translate>objects.branch.gift.types.title</div>
+                            <ul>
+                                <li translate *ngIf="object.gift.types.amount">objects.branch.gift.types.amount</li>
+                                <li translate *ngIf="object.gift.types.svc">objects.branch.gift.types.svc</li>
+                                <li translate *ngIf="object.gift.types.prod">objects.branch.gift.types.prod</li>
+
+                                <li *ngIf="!object.gift.types.amount"><s translate>objects.branch.gift.types.amount</s>
+                                </li>
+                                <li *ngIf="!object.gift.types.svc"><s translate>objects.branch.gift.types.svc</s></li>
+                                <li *ngIf="!object.gift.types.prod"><s translate>objects.branch.gift.types.prod</s></li>
+                            </ul>
+
+
+
+                        </div>
+                    </div>
+
+
+
+                    <div class="row mt-2">
+                        <div class="col-4">
+
+                            <div class="subSection" translate>objects.branch.gift.expire.title</div>
+
+                            <span *ngIf="!object.gift.expire.on" translate>objects.branch.gift.expire.indefinite</span>
+
+                            <span *ngIf="object.gift.expire.on">{{'objects.branch.gift.expire.limited' | translate}}:
+                                {{object.gift.expire.after}} {{'dic.months' | translate}}</span>
+
+
+                        </div>
+
+                        <div class="col-4">
+
+                            <div class="subSection" translate>objects.branch.gift.price.new-title</div>
+
+                            <span *ngIf="!object.gift.price.new" translate>objects.branch.gift.price.new-false</span>
+
+                            <span *ngIf="object.gift.price.new">{{'objects.branch.gift.price.new-true' | translate}}
+                                {{object.gift.price.newAfter}} {{'dic.months' | translate}}</span>
+
+
+                        </div>
+
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-4">
+
+                            <div class="subSection" translate>objects.branch.gift.invoice.title</div>
+
+                            <span *ngIf="object.gift.invoice.on" translate>objects.branch.gift.invoice.on</span>
+                            <span *ngIf="!object.gift.invoice.on" translate>objects.branch.gift.invoice.off</span>
+
+                            <ng-container *ngIf="object.gift.invoice.on && object.gift.invoice.vatPcts">
+                                <ng-container *ngFor="let vatPct of object.gift.invoice.vatPcts">
+                                    <div class="row" *ngIf="vatPct.on">
+                                        <div class="col-1">
+        
+                                        </div>
+        
+                                        <div class="col">
+        
+                                            {{vatPct.pct}}% <span *ngIf="vatPct.descr">: {{vatPct.descr}}</span>
+        
+                                        </div>
+        
+        
+                                    </div>
+                                </ng-container>
+        
+                            </ng-container>
+
+                        </div>
+
+                    </div>
+
+
+
+
+
+
+
 
 
                 </div>
@@ -368,95 +424,175 @@
                     <div class="col">
 
 
-                            <div class="row mt-3">
-                                <div class="col-4" *ngIf="object.gift?.methods">
-        
-                                    <ngx-altea-label-control layout="list" label="objects.branch.gift.methods.title"
-                                        for="visibility">
-        
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="email" name="email"
-                                                [(ngModel)]="object.gift.methods.email" />
-                                            <label class="form-check-label" for="email"
-                                                translate="objects.branch.gift.methods.email"></label>
-                                        </div>
-        
-        
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="postal" name="postal"
-                                                [(ngModel)]="object.gift.methods.postal" />
-                                            <label class="form-check-label" for="postal"
-                                                translate="objects.branch.gift.methods.postal"></label>
-                                        </div>
-        
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="pos" name="pos"
-                                                [(ngModel)]="object.gift.methods.pos" />
-                                            <label class="form-check-label" for="pos"
-                                                translate="objects.branch.gift.methods.pos"></label>
-                                        </div>
-        
-                                    </ngx-altea-label-control>
-        
-                                </div>
-        
-                                <div class="col-4" *ngIf="object.gift?.types">
-        
-                                    <ngx-altea-label-control layout="list" label="objects.branch.gift.types.title" for="types">
-        
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="amount" name="amount"
-                                                [(ngModel)]="object.gift.types.amount" />
-                                            <label class="form-check-label" for="amount"
-                                                translate="objects.branch.gift.types.amount"></label>
-                                        </div>
-        
-        
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="svc" name="svc"
-                                                [(ngModel)]="object.gift.types.svc" />
-                                            <label class="form-check-label" for="svc"
-                                                translate="objects.branch.gift.types.svc"></label>
-                                        </div>
-        
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="prod" name="prod"
-                                                [(ngModel)]="object.gift.types.prod" />
-                                            <label class="form-check-label" for="prod"
-                                                translate="objects.branch.gift.types.prod"></label>
-                                        </div>
-        
-                                    </ngx-altea-label-control>
-        
-        
-        
-                                </div>
-                            </div>
-        
-        
-        
-                            <div class="row mt-3">
-                                <div class="col-4">
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="expireOn" name="expireOn"
-                                            [(ngModel)]="object.gift.expire.on"  />
-                                        <label class="form-check-label" for="expireOn" translate="objects.branch.gift.expire.on"></label>
+                        <div class="row mt-3">
+                            <div class="col-4" *ngIf="object.gift?.methods">
+
+                                <ngx-altea-label-control layout="list" label="objects.branch.gift.methods.title"
+                                    for="visibility">
+
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="email" name="email"
+                                            [(ngModel)]="object.gift.methods.email" />
+                                        <label class="form-check-label" for="email"
+                                            translate="objects.branch.gift.methods.email"></label>
                                     </div>
-                                </div>
-                           
-                                <div class="col-4" *ngIf="object.gift.expire.on">
-        
-                                    <ngx-altea-label-control label="objects.branch.gift.expire.after" for="after">
-                                        <ng-select id="after" name="after" [items]="nrOfMonths" 
-                                            [clearable]="false" [multiple]="false" [(ngModel)]="object.gift.expire.after">
-                                        </ng-select>
-                                    </ngx-altea-label-control>
-            
-        
-        
+
+
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="postal" name="postal"
+                                            [(ngModel)]="object.gift.methods.postal" />
+                                        <label class="form-check-label" for="postal"
+                                            translate="objects.branch.gift.methods.postal"></label>
+
+                                    </div>
+
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="pos" name="pos"
+                                            [(ngModel)]="object.gift.methods.pos" />
+                                        <label class="form-check-label" for="pos"
+                                            translate="objects.branch.gift.methods.pos"></label>
+                                    </div>
+
+                                </ngx-altea-label-control>
+
+                            </div>
+
+                            <div class="col-4" *ngIf="object.gift?.types">
+
+                                <ngx-altea-label-control layout="list" label="objects.branch.gift.types.title"
+                                    for="types">
+
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="amount" name="amount"
+                                            [(ngModel)]="object.gift.types.amount" />
+                                        <label class="form-check-label" for="amount"
+                                            translate="objects.branch.gift.types.amount"></label>
+                                    </div>
+
+
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="svc" name="svc"
+                                            [(ngModel)]="object.gift.types.svc" />
+                                        <label class="form-check-label" for="svc"
+                                            translate="objects.branch.gift.types.svc"></label>
+                                    </div>
+
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="prod" name="prod"
+                                            [(ngModel)]="object.gift.types.prod" />
+                                        <label class="form-check-label" for="prod"
+                                            translate="objects.branch.gift.types.prod"></label>
+                                    </div>
+
+                                </ngx-altea-label-control>
+
+
+
+                            </div>
+                        </div>
+
+                        <div class="row mt-3" *ngIf="object.gift.methods.postal">
+                            <div class="col-3">
+                                <ngx-altea-label-control label="objects.branch.gift.price.postal" for="postalPrice">
+                                    <input required type="number" id="postalPrice" name="postalPrice"
+                                        class="form-control" [(ngModel)]="object.gift.price.postal" />
+                                </ngx-altea-label-control>
+                            </div>
+                        </div>
+
+
+                        <div class="row mt-3">
+                            <div class="col-4">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="expireOn" name="expireOn"
+                                        [(ngModel)]="object.gift.expire.on" />
+                                    <label class="form-check-label" for="expireOn"
+                                        translate="objects.branch.gift.expire.on"></label>
                                 </div>
                             </div>
-        
+
+                            <div class="col-4" *ngIf="object.gift.expire.on">
+
+                                <ngx-altea-label-control label="objects.branch.gift.expire.after" for="after">
+                                    <ng-select id="after" name="after" [items]="nrOfMonths" [clearable]="false"
+                                        [multiple]="false" [(ngModel)]="object.gift.expire.after">
+                                    </ng-select>
+                                </ngx-altea-label-control>
+
+
+
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-4">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="priceNew" name="priceNew"
+                                        [(ngModel)]="object.gift.price.new" />
+                                    <label class="form-check-label" for="expireOn"
+                                        translate="objects.branch.gift.price.new"></label>
+                                </div>
+                            </div>
+
+                            <div class="col-4" *ngIf="object.gift.price.new">
+
+                                <ngx-altea-label-control label="objects.branch.gift.price.newAfter" for="newAfter">
+                                    <ng-select id="newAfter" name="newAfter" [items]="nrOfMonths" [clearable]="false"
+                                        [multiple]="false" [(ngModel)]="object.gift.price.newAfter">
+                                    </ng-select>
+                                </ngx-altea-label-control>
+
+
+
+                            </div>
+                        </div>
+
+
+
+
+                        <div class="row mt-3">
+                            <div class="col-4">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="invoiceOn" name="invoiceOn"
+                                        [(ngModel)]="object.gift.invoice.on" (change)="initGiftVatPcts()" />
+                                    <label class="form-check-label" for="expireOn"
+                                        translate="objects.branch.gift.invoice.on"></label>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <ng-container *ngIf="object.gift.invoice.on && object.gift.invoice.vatPcts">
+                            <ng-container *ngFor="let vatPct of object.gift.invoice.vatPcts">
+                                <div class="row mt-1">
+                                    <div class="col-1">
+
+                                    </div>
+
+                                    <div class="col-1">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="vat{{vatPct.pct}}"
+                                                name="vat{{vatPct.pct}}" [(ngModel)]="vatPct.on" />
+                                            <label class="form-check-label"
+                                                for="vat{{vatPct.pct}}">{{vatPct.pct}}%</label>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="col-6">
+                                        <input type="text" id="vat{{vatPct.pct}}descr" name="vat{{vatPct.pct}}descr"
+                                            class="form-control" [(ngModel)]="vatPct.descr" />
+                                    </div>
+
+                                </div>
+                            </ng-container>
+
+
+                        </ng-container>
+
+
+
+
 
 
                     </div>

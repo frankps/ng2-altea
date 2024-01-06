@@ -261,7 +261,7 @@
 
                 <div class="row" *ngFor="let sub of object.subscriptions">
                     <div class="col-6">
-                        <a [routerLink]="['/', sessionSvc.branch,'subscriptions',sub.id]">{{sub.name}} </a>
+                        <a [routerLink]="['/', sessionSvc.branch.unique,'subscriptions',sub.id]">{{sub.name}} </a>
                     </div>
                     <div class="col-2 d-flex justify-content-center">{{sub.usedQty}}/{{sub.totalQty}}</div>
                     <div class="col-2 d-flex justify-content-center">{{sub.createdAt | date: sessionSvc.formats.date}}

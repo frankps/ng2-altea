@@ -12,7 +12,7 @@ export class ScheduleService extends BackendHttpServiceBase<Schedule> {
 
   constructor(http: HttpClient, protected sessionSvc: SessionService) {
 
-    super(Schedule, sessionSvc.backend, sessionSvc.branch + '/schedules', http)
+    super(Schedule, sessionSvc.backend, sessionSvc.branchUnique + '/schedules', http)
   }
 
   async getForBranch$(branchId: string): Promise<Schedule[]> {

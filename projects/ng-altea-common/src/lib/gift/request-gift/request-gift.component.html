@@ -1,0 +1,227 @@
+<form #giftForm="ngForm">
+
+
+
+    <div class="row mt-3">
+        <div class="col d-flex justify-content-center">
+
+            <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                <input type="radio" class="btn-check" name="btnTypes" id="btnAmount" value="amount"
+                    [(ngModel)]="gift.type" autocomplete="off" checked>
+                <label class="btn btn-outline-primary" for="btnAmount" translate>app.gift.types.amount</label>
+
+                <input type="radio" class="btn-check" name="btnTypes" id="btnSpecific" value="specific"
+                    [(ngModel)]="gift.type" autocomplete="off">
+                <label class="btn btn-outline-primary" for="btnSpecific" translate>app.gift.types.specific</label>
+            </div>
+
+        </div>
+    </div>
+
+    <ng-container *ngIf="gift.type">
+
+
+        <div class="row my-3">
+            <div class="col" *ngIf="gift.isAmount()" translate>app.gift.selected.amount</div>
+            <div class="col" *ngIf="gift.isSpecific()" translate>app.gift.selected.specific</div>
+        </div>
+
+        <ng-container *ngIf="gift.isAmount()">
+
+            <div class="row">
+                <div class="col">
+
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="invoice" name="invoice"
+                            [(ngModel)]="gift.invoice" />
+                        <label class="form-check-label" for="invoice" translate="app.gift.invoice.needed"></label>
+                    </div>
+
+                </div>
+            </div>
+
+            <ng-container *ngIf="shouldSelectVatPct()">
+
+                <div class="row mt-3">
+                    <div class="col-1"></div>
+                    <div class="col-10">
+                        <!-- {{'app.gift.invoice.selectVat' | translate}} -->
+
+
+                        <ngx-altea-label-control layout="list" label="app.gift.invoice.selectVat" for="online">
+
+                            <ng-container *ngFor="let item of vatPcts">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="select-item"
+                                        id="vatPct-{{item.pct}}" [value]="item.pct" [(ngModel)]="gift.vatPct">
+                                    <!--   -->
+                                    <label class="form-check-label" for="vatPct-{{item.pct}}">{{item.pct}}%:
+                                        {{item.descr}}
+                                    </label>
+                                </div>
+                            </ng-container>
+
+  
+                        </ngx-altea-label-control>
+
+                    </div>
+                </div>
+
+
+            </ng-container>
+
+
+
+
+
+
+
+        </ng-container>
+
+
+
+
+
+
+
+        <div class="row mt-3" *ngIf="gift.isAmount()">
+            <div class="col">
+                <ngx-altea-label-control label="objects.gift.value" for="value">
+                    <input required type="number" id="value" name="value" class="form-control"
+                        [(ngModel)]="gift.value" #value="ngModel"  />
+                </ngx-altea-label-control>
+
+                <div [hidden]="value.valid || value.pristine" class="alert alert-danger">
+                    {{lbl['valueInValid']}}
+                </div>
+
+            </div>
+        </div>
+
+
+        <div class="row mt-3">
+            <div class="col">
+
+                <ngx-altea-label-control label="objects.gift.fromName" for="fromName">
+                    <input [required]="!settings.internal" type="text" minlength="2" id="fromName" name="fromName" class="form-control"
+                        [(ngModel)]="gift.fromName" #fromName="ngModel" />
+                </ngx-altea-label-control>
+
+                <div [hidden]="fromName.valid || fromName.pristine" class="alert alert-danger">
+                    {{lbl['fromNameInValid']}}
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col">
+                <ngx-altea-label-control label="objects.gift.toName" for="toName">
+                    <input [required]="!settings.internal" type="text" minlength="2" id="toName" name="toName" class="form-control"
+                        [(ngModel)]="gift.toName" #toName="ngModel" />
+                </ngx-altea-label-control>
+
+                <div [hidden]="toName.valid || toName.pristine" class="alert alert-danger">
+                    {{lbl['toNameInValid']}}
+                </div>
+
+            </div>
+        </div>
+
+
+        <div class="row mt-3">
+            <div class="col">
+                <ngx-altea-label-control label="objects.gift.toMessage" for="toMessage">
+                    <textarea rows="4" class="form-control" id="toMessage" name="toMessage" style="height: 120px"
+                        [(ngModel)]="gift.toMessage"></textarea>
+                </ngx-altea-label-control>
+            </div>
+        </div>
+
+
+        <!-- <span class="mt-3" translate>app.gift.methods</span>:
+
+ -->
+
+
+        <div class="row mt-3">
+            <div class="col">
+
+                <ngx-altea-label-control layout="list" label="app.gift.methods.select" for="visibility">
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="emailFrom" name="emailFrom"
+                            [(ngModel)]="gift.methods.emailFrom" />
+                        <label class="form-check-label" for="emailFrom" translate="app.gift.methods.emailFrom"></label>
+                    </div>
+
+                    <div class="mx-5 my-2" *ngIf="gift.methods.emailFrom">
+                        <ngx-altea-label-control label="objects.gift.fromEmail" for="fromEmail">
+                            <input [required]="gift.methods.emailFrom" type="email" id="fromEmail" name="fromEmail" class="form-control"
+                                [(ngModel)]="gift.fromEmail" #fromEmail="ngModel"/>
+                        </ngx-altea-label-control>
+                        <div [hidden]="fromEmail.valid || fromEmail.pristine" class="alert alert-danger">
+                            {{lbl['fromEmailInValid']}}
+                        </div>
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="emailTo" name="emailTo"
+                            [(ngModel)]="gift.methods.emailTo" />
+                        <label class="form-check-label" for="emailTo" translate="app.gift.methods.emailTo"></label>
+                    </div>
+
+                    <div class="mx-5 my-2" *ngIf="gift.methods.emailTo">
+                        <ngx-altea-label-control label="objects.gift.toEmail" for="toEmail">
+                            <input required type="email" id="toEmail" name="toEmail" class="form-control"
+                                [(ngModel)]="gift.toEmail" #toEmail="ngModel"/>
+                        </ngx-altea-label-control>
+                        <div [hidden]="toEmail.valid || toEmail.pristine" class="alert alert-danger">
+                            {{lbl['toEmailInValid']}}
+                        </div>
+                    </div>
+
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="postal" name="postal" [(ngModel)]="gift.methods.postal" />
+                        <label class="form-check-label" for="postal">{{this.lbl['methods.postal']}}</label>
+                    </div>
+
+                    <div class="mx-5 my-2" *ngIf="gift.methods.postal">
+                        <ngx-altea-label-control label="objects.gift.toAddress" for="toEmail">
+                            <textarea required minlength="10" rows="4" class="form-control" id="toAddress" name="toAddress"
+                                style="height: 120px" [(ngModel)]="gift.toAddress" #toAddress="ngModel"></textarea>
+                        </ngx-altea-label-control>
+                        <div [hidden]="toAddress.valid || toAddress.pristine" class="alert alert-danger">
+                            {{lbl['toAddressInValid']}}
+                        </div>
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="pos" name="pos" [(ngModel)]="gift.methods.pos" />
+                        <label class="form-check-label" for="pos">{{this.lbl['methods.pos']}}</label>
+
+                        <!-- translate="app.gift.methods.pos" -->
+                    </div>
+                    <i class="mx-5" *ngIf="gift.methods.pos" translate>app.gift.methods.pos-remark</i>
+
+                </ngx-altea-label-control>
+            </div>
+        </div>
+
+        <div class="d-grid gap-2 col-lg-4 col-md-6 mx-auto mt-5" *ngIf="gift.type">
+            <button class="btn btn-primary" type="button" [disabled]="giftForm.form.pristine || !giftForm.form.valid || !this.gift.methodSelected()" (click)="buttonNext()">{{'app.gift.next.' + gift.type |
+                translate}}</button>
+        </div>
+
+
+    </ng-container>
+
+    <div class="row">
+        <div class="col">
+
+        </div>
+    </div>
+
+
+</form>

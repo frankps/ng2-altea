@@ -2,7 +2,8 @@
   "toasts": {},
   "msg": {
     "save": "Opslaan",
-    "api-problem": "Er was een probleem!!"
+    "api-problem": "Er was een probleem!!",
+    "input-not-valid": "'[input]' niet geldig!"
   },
   "dic": {
     "address": "Adres",
@@ -182,6 +183,7 @@
       "satisfaction": "Tevredenheid"
     }
   },
+  
   "ui": {
     "price": {
       "title": "Speciale prijzen & promoties",
@@ -351,10 +353,55 @@
           }
         }
       }
-    },
-    "gift": {}
+    }
+  },
+  "app": {
+    "gift": {
+      "choice": "Wat wenst u te schenken? Maak uw keuze:",
+      "types": {
+        "amount": "Bedrag",
+        "specific": "Specifiek"
+      },
+      "selected": {
+        "amount": "Uw keuze: cadeaubon met bedrag",
+        "specific": "Uw keuze: cadeaubon met arrangement. Na het invullen van dit scherm kan je uw cadeaubon naar eigen wens samenstellen! "
+      },
+      "invoice": {
+        "needed": "Wenst u een factuur voor de cadeaubon?",
+        "selectVat": "Omdat u een bedrag wenst te schenken en ook een factuur vraagt, moeten wij het correcte BTW percentage kunnen instellen. Maak daarom uw keuze:"
+      },
+      "methods": {
+        "select": "Selecteer één of meerdere aflevermethodes:",
+        "emailFrom": "Verstuur cadeaubon per email naar mezelf (de schenker)",
+        "emailTo": "Verstuur cadeaubon per email naar ontvanger",
+        "postal": "Verstuur cadeaubon per post",
+        "postalExtra":  "(+[price] voor aangetekende verzending)",
+        "pos": "Cadeaubon afhalen bij [branch]",
+        "pos-remark": "Opmerking: deze optie kan niet gecombineerd worden met versturen per post."
+      },
+      "next": {
+        "amount": "Cadeaubon afwerken",
+        "specific": "Cadeaubon samenstellen"
+      }
+    }
   },
   "objects": {
+    "gift": {
+      "_single": "Cadeaubon",
+      "value": "Waarde",
+      "used": "Gebruikt",
+      "isConsumed": "Is gebruikt",
+      "from": "Van",
+      "fromName": "Naam schenker",
+      "fromEmail": "Email schenker",
+      "to": "Aan",
+      "toName": "Naam ontvanger",
+      "toEmail": "Email ontvanger",
+      "toAddress": "Adres ontvanger",
+      "toMessage": "Persoonlijke boodschap aan ontvanger",
+      "toSendEmail": "Verstuur mail naar ontvanger",
+      "certificate": "Certificaat"
+    },
     "address": {
       "street": "Straat",
       "streetNr": "Straat Nr",
@@ -392,8 +439,20 @@
           "limited": "Beperkt in tijd",
           "on": "Cadeaubonnen vervallen",
           "after": "Bonnen vervallen na (maanden)"
+        },
+        "price": {
+          "new-title": "Nieuwe prijzen",
+          "new": "Nieuwe prijzen doorrekenen",
+          "new-false": "Nieuwe prijzen worden niet doorgerekend",
+          "new-true": "Nieuwe prijzen worden doorgerekend na",
+          "newAfter": "Nieuwe prijzen doorrekenen na (maanden)",
+          "postal": "Prijs om bon te versturen per post"
+        },
+        "invoice": {
+          "title": "Facturatie",
+          "on": "Cadeaubonnen kunnen gefactureerd worden",
+          "off": "Cadeaubonnen kunnen niet gefactureerd worden"
         }
-
       }
     },
     "reminder": {
@@ -567,22 +626,6 @@
     "scheduling": {
       "start": "Actief vanaf",
       "end": "Actief tot"
-    },
-    "gift": {
-      "_single": "Cadeaubon",
-      "value": "Waarde",
-      "used": "Gebruikt",
-      "isConsumed": "Is gebruikt",
-      "from": "Van",
-      "fromName": "Van",
-      "fromEmail": "Email",
-      "to": "Aan",
-      "toName": "Aan",
-      "toEmail": "Email",
-      "toAddress": "Adres",
-      "toMessage": "Boodschap",
-      "toSendEmail": "Verstuur mail naar ontvanger",
-      "certificate": "Certificaat"
     },
     "subscription": {
       "_single": "Abonnement",

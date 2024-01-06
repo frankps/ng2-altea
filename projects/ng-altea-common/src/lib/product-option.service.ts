@@ -11,7 +11,7 @@ export class ProductOptionService extends BackendHttpServiceBase<ProductOption> 
 
   constructor(http: HttpClient, protected sessionSvc: SessionService) {
 
-    super(ProductOption, sessionSvc.backend, sessionSvc.branch + '/product-options', http)
+    super(ProductOption, sessionSvc.backend, sessionSvc.branchUnique + '/product-options', http)
   }
 
 }

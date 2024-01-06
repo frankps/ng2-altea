@@ -41,9 +41,9 @@ export class ManageProductsComponent {
     const productType = this.productListComponent.productType
 
     if (product?.id)
-      this.router.navigate(['/' + this.sessionSvc.branch + '/catalog/' + productType, product.id])
+      this.router.navigate(['/' + this.sessionSvc.branch.unique + '/catalog/' + productType, product.id])
     else
-      this.router.navigate(['/' + this.sessionSvc.branch + '/catalog/' + productType])
+      this.router.navigate(['/' + this.sessionSvc.branch.unique + '/catalog/' + productType])
 
 
   }

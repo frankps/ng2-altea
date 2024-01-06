@@ -263,9 +263,9 @@ export class ProductListComponent extends NgBaseListComponent<Product> implement
     }
 
     if (product?.id)
-      this.router.navigate(['/' + this.sessionSvc.branch + '/catalog/' + this.productType, product.id])
+      this.router.navigate(['/' + this.sessionSvc.branchUnique + '/catalog/' + this.productType, product.id])
     else
-      this.router.navigate(['/' + this.sessionSvc.branch + '/catalog/' + this.productType])
+      this.router.navigate(['/' + this.sessionSvc.branchUnique + '/catalog/' + this.productType])
 
   }
 

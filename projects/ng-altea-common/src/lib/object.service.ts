@@ -21,7 +21,7 @@ export class ObjectService implements IDb {
 
 
 
-    return this.http.post<ApiResult<T>>(`${this.sessionSvc.backend}/${this.sessionSvc.branch}/objects/create`, dbObject).pipe(map(res => {
+    return this.http.post<ApiResult<T>>(`${this.sessionSvc.backend}/${this.sessionSvc.branchUnique}/objects/create`, dbObject).pipe(map(res => {
 
       if (res && res.object) {
 
@@ -56,7 +56,7 @@ export class ObjectService implements IDb {
 
 
 
-    return this.http.post<ApiResult<T[]>>(`${this.sessionSvc.backend}/${this.sessionSvc.branch}/objects/createMany`, dbObjects).pipe(map(res => {
+    return this.http.post<ApiResult<T[]>>(`${this.sessionSvc.backend}/${this.sessionSvc.branchUnique}/objects/createMany`, dbObjects).pipe(map(res => {
 
       if (res && res.object) {
 
@@ -105,7 +105,7 @@ export class ObjectService implements IDb {
 
   saveOrder(order: Order): Observable<ApiResult<Order>> {
 
-    return this.http.post<ApiResult<Order>>(`${this.sessionSvc.backend}/${this.sessionSvc.branch}/objects/saveOrder`, order).pipe(map(res => {
+    return this.http.post<ApiResult<Order>>(`${this.sessionSvc.backend}/${this.sessionSvc.branchUnique}/objects/saveOrder`, order).pipe(map(res => {
 
       console.error(res)
 
@@ -142,7 +142,7 @@ export class ObjectService implements IDb {
 
   sendMessage(message: Message): Observable<ApiResult<Message>> {
 
-    return this.http.post<ApiResult<Message>>(`${this.sessionSvc.backend}/${this.sessionSvc.branch}/objects/sendMessage`, message).pipe(map(res => {
+    return this.http.post<ApiResult<Message>>(`${this.sessionSvc.backend}/${this.sessionSvc.branchUnique}/objects/sendMessage`, message).pipe(map(res => {
 
       console.error(res)
 
@@ -183,7 +183,7 @@ export class ObjectService implements IDb {
 
     console.warn(query)
 
-    return this.http.post<ApiListResult<T>>(`${this.sessionSvc.backend}/${this.sessionSvc.branch}/objects/query`, query).pipe(map(res => {
+    return this.http.post<ApiListResult<T>>(`${this.sessionSvc.backend}/${this.sessionSvc.branchUnique}/objects/query`, query).pipe(map(res => {
 
       if (res.data) {
 

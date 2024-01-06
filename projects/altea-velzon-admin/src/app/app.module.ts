@@ -24,6 +24,7 @@ import { environment } from '../environments/environment';
 
 import { FakeBackendInterceptor } from './velzon/core/helpers/fake-backend';
 import { initFirebaseBackend } from './velzon/authUtils';
+import { NgAlteaCommonModule } from 'ng-altea-common';
 
 defineLocale('nl-be', nlBeLocale);
 
@@ -56,13 +57,18 @@ if (environment.defaultauth === 'firebase') {
         deps: [HttpClient],
       },
     }),
-    ContactModule
+    ContactModule,
+    NgAlteaCommonModule
     
   ],
   providers: [],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule {
+
+
+  
+}
 
 
 /*

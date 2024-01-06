@@ -1145,7 +1145,7 @@ export class Reminder {
 }
 
 
-export class GiftMethods {
+export class GiftConfigMethods {
   email = true
   postal = false
   pos = true
@@ -1173,18 +1173,58 @@ export class GiftExpiration {
   unit = TimeUnit.months
 }
 
+export class GiftPriceSetting {
+
+  /** If true, possible new prices will be charged to customer (=> old gift voucher might not be enough). 
+   * If false, customer can always use gift voucher for this product  */
+  new = false
+
+  /** if new=true, new prices will only be charged after time period (in units)   */
+  newAfter: number = 12
+  unit = TimeUnit.months
+
+  /** if branch.gift.methods.postal = true, cost that will be charged to send gift via post. */
+  postal: number = 0
+
+}
+
+export class GiftVatPct {
+
+  on = false
+
+  pct = 0
+
+  descr = ''
+
+}
+
+export class GiftInvoicing {
+  /** gift invoicing is enabled: customer can request invoice for gift */
+  on = false
+
+  /** when customer gifts an amount (no specific product) and requests an invoice, then he should select a VAT% (category). 
+   * Here we specify which percentages can be selected and give them a name.  */
+  vatPcts: GiftVatPct[] = []
+}
+
+
+
 export class GiftConfig {
 
-  @Type(() => GiftMethods)
-  methods: GiftMethods = new GiftMethods()
+  @Type(() => GiftConfigMethods)
+  methods: GiftConfigMethods = new GiftConfigMethods()
 
   @Type(() => GiftTypes)
   types: GiftTypes = new GiftTypes()
 
-
   @Type(() => GiftExpiration)
   expire: GiftExpiration = new GiftExpiration()
 
+  @Type(() => GiftPriceSetting)
+  price: GiftPriceSetting = new GiftPriceSetting()
+
+  @Type(() => GiftInvoicing)
+  invoice: GiftInvoicing = new GiftInvoicing()
 }
 
 export class Branch extends ObjectWithId {
@@ -1197,6 +1237,7 @@ export class Branch extends ObjectWithId {
 
   orgId?: string;
   name?: string;
+  unique?: string;
   short?: string;
   descr?: string;
   street?: string;
@@ -3014,8 +3055,11 @@ export class Template extends ObjectWithId {
 }
 
 export enum GiftType {
-  value = 'value',
-  product = 'product',
+  // none = 'none', // when nothing is selected yet
+  amount = 'amount',
+  specific = 'specific',
+  prod = 'prod',
+  svc = 'svc'
 }
 
 export enum GiftCertificate {
@@ -3024,11 +3068,29 @@ export enum GiftCertificate {
   postal = 'postal',
 }
 
+export class GiftMethods {
+  emailFrom = false
+  emailTo = false
+  postal = false
+  pos = false
+  app = false
+}
+
+
+/**
+ * Changes:
+ *   value?: number
+ *   type?: GiftType   specific
+ *   invoice = false
+ */
+
 export class Gift extends ObjectWithId {
   orgId?: string;
   branchId?: string;
 
   /*
+
+  
   fromId String? @db.Uuid
   from   Contact? @relation(name: "giftsGiven", fields: [fromId], references: [id])
 
@@ -3043,11 +3105,17 @@ export class Gift extends ObjectWithId {
   to?: Contact
 
   orderId?: string;
-  type = GiftType.value
+  type?: GiftType
+
+  invoice = false
+
+  /** the vat% that will be used if gift is invoice and type=amount  */
+  vatPct?: number
+
   code?: string;
   descr?: string;
   expiresOn?: Date;
-  value = 0
+  value?: number
   used = 0
   isConsumed = false
   fromName?: string;
@@ -3056,13 +3124,32 @@ export class Gift extends ObjectWithId {
   toEmail?: string;
   toAddress?: string;
   toMessage?: string;
-  toSendEmail = false
-  certificate: GiftCertificate = GiftCertificate.inStore
+//  toSendEmail = false
+
+
+  @Type(() => GiftMethods)
+  methods: GiftMethods = new GiftMethods()
+
+  //certificate: GiftCertificate = GiftCertificate.inStore
   active = true
   deleted = false
   createdAt = new Date()
   updatedAt?: Date
   deletedAt?: Date
+
+  isAmount() {
+    return this.type == GiftType.amount
+  }
+
+  isSpecific() {
+    return this.type == GiftType.specific
+  }
+
+  methodSelected() {
+    const methods = this.methods
+    return (methods.emailFrom || methods.emailTo || methods.pos || methods.postal)
+
+  }
 }
 
 

@@ -16,7 +16,7 @@ export class ResourceLinkService extends BackendHttpServiceBase<ResourceLink> {
      * 
      * 
      */
-    super(ResourceLink, sessionSvc.backend, sessionSvc.branch + '/resource-links', http)
+    super(ResourceLink, sessionSvc.backend, sessionSvc.branchUnique + '/resource-links', http)
   }
 
 }
