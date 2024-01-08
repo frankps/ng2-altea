@@ -35,6 +35,15 @@
     "end": "einde"
   },
   "enums": {
+    "pay-type": {
+      "cash": "Cash",
+      "transfer": "Overschrijving",
+      "credit": "VISA",
+      "dedit": "Bancontact",
+      "gift": "Cadeaubon",
+      "subs": "Abonnement"
+
+    },
     "msg-type": {
       "sms": "SMS",
       "email": "E-mail"
@@ -262,6 +271,12 @@
       "persons": {
         "title": "Personen selectie behandelingen",
         "how-many": "Hoeveel personen nemen een behandeling?"
+      },
+      "contacts": {
+        "title": "Zoek klant"
+      },
+      "pays": {
+        "title": "Betalingen"
       }
     },
     "resource": {
@@ -356,6 +371,33 @@
     }
   },
   "app": {
+    "menu": {
+      "title": "[branch] menu",
+      "new-reserv": {
+        "h1": "Nieuwe reservatie",
+        "inf": "Maak een nieuwe reservatie"
+      },
+      "use-gift": {
+        "h1": "Cadeaubon verzilveren",
+        "inf": "Ik heb een cadeaubon en wil graag reserveren"
+      },
+      "buy-gift": {
+        "h1": "Cadeaubon kopen",
+        "inf": "Ik wil een ccadeaubon kopen"
+      },
+      "my-reservs": {
+        "h1": "Mijn reservaties",
+        "inf": "Reservaties bekijken en aanpassen"
+      },
+      "my-subs": {
+        "h1": "Mijn abonnementen",
+        "inf": "Abonnementen bekijken en gebruiken"
+      },
+      "my-loyalty": {
+        "h1": "Mijn klantenkaart",
+        "inf": "Status van mijn klantenkaart"
+      }
+    },
     "gift": {
       "choice": "Wat wenst u te schenken? Maak uw keuze:",
       "types": {
@@ -383,6 +425,11 @@
         "amount": "Cadeaubon afwerken",
         "specific": "Cadeaubon samenstellen"
       }
+    },
+    "redeem": {
+      "code": "Cadeaubon code",
+      "invalid": "Ongeldige code"
+
     }
   },
   "objects": {

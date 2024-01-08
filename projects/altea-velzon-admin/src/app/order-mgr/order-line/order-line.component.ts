@@ -35,7 +35,7 @@ export class OrderLineComponent {
     console.error(this.orderMgrSvc.orderLine)
 
     this.orderMgrSvc.orderLine.markAsUpdated('qty')
-    this.orderMgrSvc.order.makeTotals()
+    this.orderMgrSvc.order.makeLineTotals()
   }
 
   optionChanged(option) {

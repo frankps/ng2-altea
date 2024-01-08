@@ -40,6 +40,21 @@
             </div>
 
         </ng-container>
+
+
+        <ng-container *ngIf="order.payments">
+
+            <div class="row" *ngFor="let pay of order.payments">
+                <div class="col-4">{{'enums.pay-type.' + pay.type | translate}}</div>
+                <div class="col-4">{{pay.amount}}</div>
+                <div class="col-4">
+                    <i class="fas fa-trash float-end" (click)="orderMgrSvc.deletePayment(pay)"></i>
+                </div>
+            </div>
+
+              
+        </ng-container>
+
         
 
         <div *ngFor="let line of order.lines" (click)="orderMgrSvc.selectExistingOrderLine(line)">

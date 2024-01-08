@@ -1,37 +1,58 @@
+.ng-valid[required],
+.ng-valid.required {
+    border-left: 5px solid #42A948;
+    /* green */
+}
 
-.ng-valid[required], .ng-valid.required  {
-    border-left: 5px solid #42A948; /* green */
-  }
-  
-  .ng-invalid:not(form)  {
-    border-left: 5px solid #FE8915; /* red */
-  }
+.ng-invalid:not(form) {
+    border-left: 5px solid #FE8915;
+    /* red */
+}
 
+.app-menu-title {
+    font-weight: 1.5em;
+    font-size: 1.8em;
+    text-align: center;
+}
+
+.app-menu-h1 {
+    font-weight: 1.2em;
+    font-size: 1.3em;
+    text-align: center;
+}
+
+.app-menu-inf {
+    color: #25a0e2;
+    font-style: italic;
+    text-align: center;
+    //font-size: 1.3em;
+
+}
 
 /* You can add global styles to this file, and also import other style files */
 
 .sectionName {
     color: #25a0e2;
-/*     margin-top: 5px;
+    /*     margin-top: 5px;
     margin-bottom: 3px; */
-    font-weight:1.2em;
+    font-weight: 1.2em;
     font-size: 1.3em;
 }
 
 
 .sectionNameActive {
     color: white;
-/*     margin-top: 5px;
+    /*     margin-top: 5px;
     margin-bottom: 3px; */
-    font-weight:1.2em;
+    font-weight: 1.2em;
     font-size: 1.3em;
 }
-
+  
 .subSection {
     color: #25a0e2;
     margin-top: 5px;
     margin-bottom: 3px;
-    font-weight:1.1em;
+    font-weight: 1.1em;
     font-size: 1.2em;
 }
 

@@ -46,4 +46,11 @@ export class DemoComponent {
 
   }
 
+
+  menuClicked(menuCode) {
+
+    console.error(menuCode)
+
+  }
+
 }

@@ -5,6 +5,8 @@ import { RequestGiftComponent } from './gift/request-gift/request-gift.component
 import { TranslateModule } from '@ngx-translate/core';
 import { Bootstrap5Module } from 'ng-common';
 import { FormsModule } from '@angular/forms';
+import { MainMenuComponent } from './app/main-menu/main-menu.component';
+import { RedeemGiftComponent } from './gift/redeem-gift/redeem-gift.component';
 
 @NgModule({
   imports: [CommonModule,
@@ -14,10 +16,14 @@ import { FormsModule } from '@angular/forms';
   FormsModule
 ],
   declarations: [
-    RequestGiftComponent
+    RequestGiftComponent,
+    MainMenuComponent,
+    RedeemGiftComponent
   ],
   exports: [
-    RequestGiftComponent
+    RequestGiftComponent,
+    RedeemGiftComponent,
+    MainMenuComponent
   ]
 })
 export class NgAlteaCommonModule {}

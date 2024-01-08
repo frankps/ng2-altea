@@ -1,5 +1,8 @@
 
 
-ng generate component order-mgr/contactSelect --project altea-velzon-admin
+ng generate component order-mgr/posPayment --project altea-velzon-admin
+
+
+ng generate component pos/posPayment --project ng-altea-common
 
 

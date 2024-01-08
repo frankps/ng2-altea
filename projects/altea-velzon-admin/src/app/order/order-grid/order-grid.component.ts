@@ -2,7 +2,7 @@
 import { OrderService } from 'ng-altea-common'
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Order, OrderLine, Product, ProductType, ProductTypeIcons, Resource } from 'ts-altea-model'
-import { ApiListResult, DbQuery, QueryOperator, Translation, ApiResult, ApiStatus, DateHelper } from 'ts-common'
+import { ApiListResult, DbQuery, QueryOperator, Translation, ApiResult, ApiStatus, DateHelper, SortOrder } from 'ts-common'
 import { ProductService } from 'ng-altea-common'
 import { DashboardService, TranslationService, NgBaseListComponent } from 'ng-common'
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -181,7 +181,7 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
 
     query.take = 10
     query.include('lines.planning.resource', 'contact')
-    query.orderBy('start')
+    query.orderBy('createdAt', SortOrder.desc)
 
     this.objects$ = this.orderSvc.query(query)
 

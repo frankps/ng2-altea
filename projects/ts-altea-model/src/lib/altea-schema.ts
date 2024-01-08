@@ -1244,6 +1244,10 @@ export class Branch extends ObjectWithId {
   streetNr?: string;
   postal?: string;
   country?: string;
+
+  /** currency */
+  cur?: string = 'EUR'
+
   city?: string;
   language?: string;
   emailFrom?: string;
@@ -1253,6 +1257,7 @@ export class Branch extends ObjectWithId {
   vatPct = 0
   vatPcts?: number[];
   vatNr?: string
+
 
   smsOn = false
 
@@ -1881,6 +1886,9 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
   @Type(() => OrderLine)
   lines?: OrderLine[] = []
 
+  @Type(() => Payment)
+  payments?: Payment[] = []
+
   @Type(() => Subscription)
   subscriptions?: Subscription[];
   // satisfaction?: Satisfaction;
@@ -1989,6 +1997,37 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
     return this.lines?.find(l => l.id == orderLineId)
   }
 
+  addPayment(payment: Payment) {
+
+    if (!this.payments)
+      this.payments = []
+
+    this.payments.push(payment)
+    payment.markAsNew()
+
+    this.makePayTotals()
+  }
+
+  makePayTotals() {
+
+
+
+    let totalPaid = 0
+
+    console.warn(this.payments)
+
+    if (Array.isArray(this.payments))
+      totalPaid = _.sumBy(this.payments, 'amount');
+
+    console.error(totalPaid)
+
+    if (totalPaid != this.paid) {
+      this.paid = totalPaid
+      this.markAsUpdated('paid')
+    }
+
+  }
+
   addLine(orderLine: OrderLine) {
 
     if (!this.lines)
@@ -2000,10 +2039,10 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
     orderLine.markAsNew()
 
 
-    this.makeTotals()
+    this.makeLineTotals()
   }
 
-  makeTotals(): number {
+  makeLineTotals(): number {
 
     if (!this.lines)
       return 0
@@ -2012,27 +2051,49 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
 
     for (const line of this.lines) {
 
-      line.incl = line.qty * line.unit
-      line.markAsUpdated('incl')
+      const lineIncl = line.qty * line.unit
+
+      if (lineIncl != line.incl) {
+        line.incl = lineIncl
+        line.markAsUpdated('incl')
+      }
 
       incl += line.incl
     }
 
-    this.incl = incl
-    this.markAsUpdated('incl')
+    if (incl != this.incl) {
+      this.incl = incl
+      this.markAsUpdated('incl')
+    }
 
     return this.incl
   }
 
+  deletePayment(payment: Payment) {
+
+    if (!this.payments || !payment)
+      return
+
+    const removed = _.remove(this.payments, l => l.id == payment.id)
+
+    if (Array.isArray(removed) && removed.length > 0 && !payment.m.n)  // orderLine.m.n = it was a new line not yet saved in backend
+      this.markAsRemoved('payments', payment.id)
+
+    this.makePayTotals()
+
+  }
 
   deleteLine(orderLine: OrderLine) {
 
     if (!this.lines || !orderLine)
       return
 
-    _.remove(this.lines, l => l.id == orderLine.id)
+    const removed = _.remove(this.lines, l => l.id == orderLine.id)
 
-    this.makeTotals()
+    if (Array.isArray(removed) && removed.length > 0 && !orderLine.m.n)  // orderLine.m.n = it was a new line not yet saved in backend
+      this.markAsRemoved('lines', orderLine.id)
+
+    this.makeLineTotals()
   }
 
   getProductIds(): string[] {
@@ -2378,6 +2439,10 @@ export class OrderLineOptionValue extends ObjectWithId {
     return this.name?.trim() != "0"
   }
 }
+
+
+
+
 
 export class OrderLine extends ObjectWithId {
 
@@ -3089,8 +3154,6 @@ export class Gift extends ObjectWithId {
   branchId?: string;
 
   /*
-
-  
   fromId String? @db.Uuid
   from   Contact? @relation(name: "giftsGiven", fields: [fromId], references: [id])
 
@@ -3124,7 +3187,7 @@ export class Gift extends ObjectWithId {
   toEmail?: string;
   toAddress?: string;
   toMessage?: string;
-//  toSendEmail = false
+  //  toSendEmail = false
 
 
   @Type(() => GiftMethods)
@@ -3150,6 +3213,35 @@ export class Gift extends ObjectWithId {
     return (methods.emailFrom || methods.emailTo || methods.pos || methods.postal)
 
   }
+}
+
+export class Payment extends ObjectWithId {
+
+  idx = 0
+
+  @Type(() => Order)
+  order?: Order;
+  orderId?: string;
+
+  @Type(() => Number)
+  amount = 0
+
+  type: string
+  loc: string
+
+  @Type(() => Gift)
+  gift?: Gift
+  giftId?: string
+
+  @Type(() => Subscription)
+  subs?: Subscription
+  subsId?: string
+
+  bankTxId?: string
+  bankTxNum?: string
+
+  date?: Date = new Date()
+
 }
 
 

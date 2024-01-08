@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import { Injectable } from '@angular/core';
-import { AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Contact, DateBorder, Order, OrderLine, OrderLineOption, OrderState, Product, ProductType, ProductTypeIcons, ReservationOption, Resource } from 'ts-altea-model'
+import { AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Contact, DateBorder, Order, OrderLine, OrderLineOption, OrderState, Payment, Product, ProductType, ProductTypeIcons, ReservationOption, Resource } from 'ts-altea-model'
 import { ApiListResult, ApiStatus, DateHelper, DbQuery, QueryOperator, Translation } from 'ts-common'
 import { AlteaService, ObjectService, OrderMgrService, OrderService, ProductService, SessionService } from 'ng-altea-common'
 import * as _ from "lodash";
@@ -146,7 +146,7 @@ export class OrderMgrUiService {
     this.spinner.show()
 
     // .resources.resource
-    this.orderSvc.get(orderId, "lines.planning.resource,lines.product,contact").subscribe(order => {
+    this.orderSvc.get(orderId, "lines.planning.resource,lines.product,contact,payments").subscribe(order => {
 
       this.order = order
 
@@ -248,6 +248,9 @@ export class OrderMgrUiService {
 
     const res = await this.alteaSvc.orderMgmtService.saveOrder(this.order)
 
+    console.error(res.object)
+
+
     if (res.isOk) {
       this.refreshOrder(res.object)
       this.dashboardSvc.showToastType(ToastType.saveSuccess)
@@ -345,6 +348,27 @@ export class OrderMgrUiService {
 
     this.order.deleteLine(this.orderLine)
     this.orderLine = null
+  }
+
+  deletePayment(payment: Payment) {
+
+    if (!payment)
+      return
+
+    this.order.deletePayment(payment)
+
+
+  }
+
+
+  addPayment(amount: number, type: string, location: string) {
+
+    const payment = new Payment()
+    payment.amount = amount
+    payment.type = type
+    payment.loc = location
+
+    this.order.addPayment(payment)
   }
 
   setContact(contact: Contact) {

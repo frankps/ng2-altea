@@ -1,0 +1,76 @@
+<form #redeemForm="ngForm">
+
+
+
+
+    <div class="d-grid gap-2 col-lg-6 col-md-8 mx-auto mt-3">
+
+
+        <div class="row mt-3">
+            <div class="col">
+
+                <ngx-altea-label-control label="app.redeem.code" for="giftCode">
+                    <input [required]="true" type="text" minlength="4" id="giftCode" name="giftCode"
+                        class="form-control" [(ngModel)]="code" #giftCode="ngModel" />
+                </ngx-altea-label-control>
+
+                <!--    -->
+
+                <div [hidden]="giftCode.valid || giftCode.pristine" class="alert alert-danger" translate>
+                    app.redeem.invalid
+                </div>
+
+            </div>
+        </div>
+
+
+        <!--  redeemForm.form.pristine || -->
+
+        <button class="btn btn-primary" type="button" [disabled]="!redeemForm.form.valid"
+            (click)="searchGift()">Zoeken</button>
+    </div>
+
+
+    <div class="d-grid gap-2 col-lg-8 col-md-10 mx-auto mt-3">
+
+
+        <div class="card mt-5" *ngIf="branch && gift">
+            <h5 class="card-header">{{branch.name}} cadeaubon</h5>
+            <div class="card-body">
+
+                <!-- <h5 class="card-title">Special title treatment</h5> -->
+
+                <p class="card-text">
+
+                    Waarde van cadeaubon: {{gift.value | currency:branch.cur}}<br/>
+                    <span *ngIf="gift.used">Reeds gebruikt: {{gift.used | currency:branch.cur}}<br/>
+                    Nog beschikbaar: {{gift.value - gift.used | currency:branch.cur}}
+                    </span>
+                </p>
+
+                <!--   <a href="#" class="btn btn-primary">Go somewhere</a>
+             -->
+            </div>
+        </div>
+
+    </div>
+
+
+
+
+
+</form>
+
+
+
+
+
+
+
+<!-- [required]="true" 
+-->
+
+<!-- 
+                      -->
+
+<!--    {{lbl['fromNameInValid']}} -->

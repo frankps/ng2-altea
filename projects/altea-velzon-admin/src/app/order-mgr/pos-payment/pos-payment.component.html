@@ -1,0 +1,55 @@
+<div class="card">
+    <!--     <div class="card-header" translate>
+        ui.order-mgr.pays.title
+    </div> -->
+    <div class="card-body">
+
+
+        <form #payForm="ngForm">
+            
+        <div class="row">
+
+            <div class="col-4"></div>
+            <div class="col-4 d-grid">
+                <button type="button" class="btn btn-secondary" *ngIf="totalToPay > 0"
+                    (click)="setAmountTotal()">{{totalToPay}}</button>
+            </div>
+            <div class="col-4"><input type="number" id="amount" name="amount" required class="form-control"
+                    [(ngModel)]="amount" />
+            </div>
+        </div>
+
+
+
+        <div class="row">
+            <div class="col-4 d-grid mt-2">
+                <button type="button" [disabled]="!payForm.form.valid" class="btn btn-primary" (click)="addPayment('cash')"
+                    translate>enums.pay-type.cash</button>
+            </div>
+            <div class="col-4 d-grid mt-2">
+                <button type="button" [disabled]="!payForm.form.valid" class="btn btn-primary" (click)="addPayment('transfer')"
+                    translate>enums.pay-type.transfer</button>
+            </div>
+            <div class="col-4 d-grid mt-2">
+                <button type="button" [disabled]="!payForm.form.valid" class="btn btn-primary" (click)="addPayment('credit')"
+                    translate>enums.pay-type.credit</button>
+            </div>
+            <div class="col-4 d-grid mt-2">
+                <button type="button" [disabled]="!payForm.form.valid" class="btn btn-primary" (click)="addPayment('dedit')"
+                    translate>enums.pay-type.dedit</button>
+            </div>
+            <div class="col-4 d-grid mt-2">
+                <button type="button" [disabled]="!payForm.form.valid" class="btn btn-primary" (click)="addPayment('gift')"
+                    translate>enums.pay-type.gift</button>
+            </div>
+        </div>
+
+    </form>
+
+
+
+
+
+
+    </div>
+</div>

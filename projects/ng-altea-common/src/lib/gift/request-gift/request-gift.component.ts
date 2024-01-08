@@ -1,17 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { Branch, Gift, GiftVatPct } from 'ts-altea-model';
-import { StringDictionary, TranslationService } from 'ng-common'
+import { TranslationService } from 'ng-common'
 import { SessionService } from '../../session.service';
 import * as _ from "lodash";
 
 
 export class AppSettings {
-
   internal = false
 }
 
 @Component({
-  selector: 'altea-request-gift',
+  selector: 'altea-lib-request-gift',
   templateUrl: './request-gift.component.html',
   styleUrls: ['./request-gift.component.css']
 })
@@ -27,26 +26,10 @@ export class RequestGiftComponent implements OnInit {
 
   vatPcts: GiftVatPct[] = []
 
-  /** pos = Point Of Sale = In Shop */
-/*   posLabel = ''
-  postalLabel = '' */
-
-  /*
-  fromNameNotValid = ''
-  toNameNotValid = ''
-  fromEmailNotValid = ''
-  toEmailNotValid = ''
-  toAddressNotValid = ''
-*/
-
   /** translated labels */
-  lbl = new StringDictionary()
-
+  lbl = {} 
 
   constructor(protected translationSvc: TranslationService, protected sessionSvc: SessionService) {
-
-
-    //this.branch = this.sessionSvc.branch
 
   }
 
@@ -56,19 +39,11 @@ export class RequestGiftComponent implements OnInit {
 
   }
 
-
-
-
-
   async ngOnInit() {
-
-    console.warn('ngOnInit --------')
-
 
     this.branch = await this.sessionSvc.branch$()
 
-    console.warn('ngOnInit 2 --------')
-
+    // retrieve possible vat percentages for gifts (in case amount + invoice)
     if (Array.isArray(this.branch.gift.invoice.vatPcts) && this.branch.gift.invoice.vatPcts.length > 0) {
       this.vatPcts = this.branch.gift.invoice.vatPcts.filter(pct => pct.on)
       this.vatPcts = _.orderBy(this.vatPcts, 'pct')
@@ -76,46 +51,28 @@ export class RequestGiftComponent implements OnInit {
       this.gift.vatPct = this.vatPcts[0].pct
     }
 
-    console.warn(this.vatPcts)
 
-/*     this.posLabel = await this.translationSvc.getTrans("app.gift.methods.pos")
-    this.posLabel = this.posLabel.replace('[branch]', this.branch.name)
+    const lbl = this.lbl
 
-    const postal = await this.translationSvc.getTrans("app.gift.methods.postal")
-    let postalExtra = ''
-
-    if (this.branch.gift.price.postal) {
-
-      postalExtra = await this.translationSvc.getTrans("app.gift.methods.postalExtra")
-
-      const price = `€${this.branch.gift.price.postal}`
-      console.warn(price)
-      postalExtra = postalExtra.replace('[price]', price)
+    /** the methods below will perform translations and put them inside this.lbl (and remove irrelevant part of key 'app.gift.' in this.lbl)*/
+    await this.translationSvc.getTranslations$(['app.gift.methods.pos', 'app.gift.methods.postal', 'app.gift.methods.postalExtra'], lbl, 'app.gift.')
 
 
-    }
-
-    this.postalLabel = `${postal} ${postalExtra} `
- */
-
-
-    await this.translationSvc.getTranslations$(['app.gift.methods.pos', 'app.gift.methods.postal', 'app.gift.methods.postalExtra'], this.lbl, 'app.gift.')
-
-    
-    if (this.lbl['methods.pos'])
-      this.lbl['methods.pos'] = this.lbl['methods.pos'].replace('[branch]', this.branch.name)
+    if (lbl['methods.pos'])
+      lbl['methods.pos'] = lbl['methods.pos'].replace('[branch]', this.branch.name)
 
     if (this.branch.gift.price.postal) {
       const price = `€${this.branch.gift.price.postal}`
-      this.lbl['methods.postalExtra'] = this.lbl['methods.postalExtra'].replace('[price]', price)
+      lbl['methods.postalExtra'] = lbl['methods.postalExtra'].replace('[price]', price)
 
-      this.lbl['methods.postal'] = `${this.lbl['methods.postal']} ${this.lbl['methods.postalExtra']} `
+      lbl['methods.postal'] = `${lbl['methods.postal']} ${lbl['methods.postalExtra']} `
     }
 
 
-    await this.translationSvc.templateReplacements$('msg.input-not-valid', this.lbl, '[input]', ['objects.gift.value', 'objects.gift.fromName', 'objects.gift.toName', 'objects.gift.fromEmail', 'objects.gift.toEmail', 'objects.gift.toAddress'], 'objects.gift.', 'InValid')
+    // tranlate 'msg.input-not-valid' and replace '[input]' by respective elements from array. results in this.lbl
+    await this.translationSvc.templateReplacements$('msg.input-not-valid', lbl, '[input]', ['objects.gift.value', 'objects.gift.fromName', 'objects.gift.toName', 'objects.gift.fromEmail', 'objects.gift.toEmail', 'objects.gift.toAddress'], 'objects.gift.', 'InValid')
 
-    console.error(this.lbl)
+    console.error(lbl)
 
 
   }

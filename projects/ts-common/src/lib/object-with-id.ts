@@ -2,6 +2,13 @@ import { Exclude, Type, Transform } from "class-transformer";
 import { DbObject } from "../api";
 import { ObjectHelper } from "./object-helper";
 
+export class RemovedFromCollection {
+
+  constructor(public col: string, public id: string) {
+
+  }
+}
+
 export class ObjectMgmt {
   /** new, set to true if new */
   n?: boolean
@@ -9,8 +16,8 @@ export class ObjectMgmt {
   /** updated, set to true if updated/dirty */
   u?: boolean
 
-  /** deleted, set to true if deleted */
-  d?: boolean
+  /** removed ids from collections */
+  r?: { [collection: string] : string[] }
 
   /** updated fields=properties */
   f?: string[]
@@ -50,6 +57,27 @@ export abstract class ManagedObject {
       this.m = new ObjectMgmt()
 
     this.m.n = true
+  }
+
+  markAsRemoved(collection: string, id: string) {
+    if (!this.m)
+      this.m = new ObjectMgmt()
+
+    if (!this.m.r)
+      this.m.r = {}
+
+    if (!this.m.r[collection]) {
+      this.m.r[collection] = [id]
+
+      console.error(this.m.r)
+
+      return
+    }
+
+    const ids = this.m.r[collection]
+    ids.push(id)
+
+    console.error(this.m.r)
   }
 
   markAsUpdated(...fields: string[]) {
