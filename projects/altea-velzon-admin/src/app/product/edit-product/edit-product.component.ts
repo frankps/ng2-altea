@@ -41,6 +41,11 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
   daysOfWeekShort: Translation[] = []
   staff = 2
 
+  deleteConfig = {
+    successUrl: '',
+    successUrlMobile: ''
+  }
+
   // id = ''
 
   // origObject?: Product
@@ -628,9 +633,26 @@ if (this.editSection == 'pricing') {
 
   delete() {
     console.error('new delete')
+
+    this.deleteConfig.successUrl = '/aqua/catalog/' + this.object.type
+    this.deleteConfig.successUrlMobile = `/aqua/catalog/${this.object.type}/mobile/`
+
     this.deleteModal?.delete()
   }
 
+
+  deleted(object: Product) {
+
+
+    console.error('Deleted')
+    console.error(object)
+
+    /*
+    if (object.id == this.object.id)
+      this.object = null
+*/
+
+  }
 
   /*
   

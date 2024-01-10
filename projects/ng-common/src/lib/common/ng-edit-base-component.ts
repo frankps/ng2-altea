@@ -219,24 +219,6 @@ export abstract class NgEditBaseComponent<T extends ObjectWithId> extends NgSect
             if (!_.isEqual(origObject[prop], newValue))
                 update[prop] = newValue
 
-
-            /*
-            if (typeof newValue === 'object' && newValue !== null) {
-                // then newValue is an object or an array >> check with Array.isArray(newValue)
-
-                // TODO: check if object/array has changed --> use 
-                update[prop] = newValue
-
-            } else {
-
-                if (origObject[prop] != newValue)
-                    update[prop] = newValue
-
-            }
-            */
-
-                
-
         })
 
         console.error('Sending update:')

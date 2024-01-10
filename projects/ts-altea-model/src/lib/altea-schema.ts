@@ -587,8 +587,6 @@ export class Product extends ObjectWithId {
   @Type(() => ProductRule)
   rules?: ProductRule[]
 
-
-
   duration = 0
 
   hasPre = false   // has preparation time
@@ -605,7 +603,7 @@ export class Product extends ObjectWithId {
   vatPct = 0
   branches?: string[];
 
-  deposit = 0
+  depositPct = 0
 
   personSelect = true  // if order is for multiple persons, then customer can specify for each orderLine the person
   staffSelect = true  // customer can specify which staffmember 

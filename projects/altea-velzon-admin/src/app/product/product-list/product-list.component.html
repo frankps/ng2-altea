@@ -66,8 +66,8 @@
 
 <div class="row">
   <div class="col-12 d-flex justify-content-center">
-    <ul class="list-group" style="width: 100%;" *ngIf="objects$ | async as products">
-      <li class="list-group-item" *ngFor="let product of products.data" (click)="selectProduct(product)">
+    <ul class="list-group" style="width: 100%;" *ngIf="objects">
+      <li class="list-group-item" *ngFor="let product of objects" (click)="selectProduct(product)">
 
         <input *ngIf="editMode" class="form-check-input me-2" type="checkbox" id="editMode" id="editMode"
           (change)="checkboxChanged(product, $event)" />
@@ -102,7 +102,7 @@
 
       <div class="col-12 d-flex justify-content-end">
 
-        <button type="button" class="btn btn-primary" (click)="moveSelected(moveModal)"
+        <button type="button" class="btn btn-primary" (click)="moveSelected(modal)"
           translate>ui.product.move-modal.confirm</button>
 
       </div>

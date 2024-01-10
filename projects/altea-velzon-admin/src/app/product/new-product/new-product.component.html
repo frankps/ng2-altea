@@ -1,18 +1,67 @@
 <ng-template #productTypeModal let-modal>
 
-    <div class="modal-header">
-      <h4>Toevoegen: {{ 'enums.product-type.' + newProduct.type |
-        translate }}</h4>
-  
-    </div>
-    <div class="modal-body">
-  
+  <div class="modal-header">
+    <h4>{{ 'ui.product.new.title' | translate }} {{ 'enums.product-type.' + newProduct.type | translate | lowercase }}
+      {{ 'ui.product.new.orFolder' | translate }}</h4>
+
+  </div>
+  <div class="modal-body">
+
+
+    <form #addProductForm="ngForm">
+
+
+      <div class="row">
+        <div class="col d-grid">
+
+          <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+            <input type="radio" class="btn-check" name="btnradio" id="product" autocomplete="off" checked
+              value="product" [(ngModel)]="productOrFolder">
+            <label class="btn btn-outline-primary" for="product">{{ 'enums.product-type.' + newProduct.type | translate
+              }}</label>
+
+            <input type="radio" class="btn-check" name="btnradio" id="folder" autocomplete="off" value="folder"
+              [(ngModel)]="productOrFolder">
+            <label class="btn btn-outline-primary" for="folder">Folder</label>
+
+          </div>
+
+        </div>
+      </div>
+
+      <div class="row mt-3">
+        <div class="col-12">
+          <ngx-altea-label-control label="dic.name" for="name">
+            <input type="text" id="name" name="name" required minlength="2" class="form-control"
+              [(ngModel)]="newProduct.name" />
+          </ngx-altea-label-control>
+        </div>
+      </div>
+
+      <div class="row mt-3">
+        <div class="col-12">
+
+          <button type="button" class="btn btn-primary float-end"
+            [disabled]="addProductForm.form.pristine || !addProductForm.form.valid" (click)="createProduct(modal)">{{
+            'dic.create' |
+            translate }}
+            <span *ngIf="!isFolder()">{{ 'enums.product-type.' + newProduct.type | translate }}</span>
+            <span *ngIf="isFolder()">{{ 'ui.product.new.folder' | translate | titlecase }}</span> </button>
+
+        </div>
+      </div>
+
+
+    </form>
+
+
+
+    <!-- 
+
   
       <ng-container [ngSwitch]="step">
         <ng-container *ngSwitchCase="-1">
           {{ 'msg.api-problem' | translate }}
-  
-          <!-- <div *ngIf="message">{{message}}</div> -->
   
         </ng-container>
         <ng-container *ngSwitchCase="1">
@@ -56,10 +105,8 @@
   
         </div>
       </div>
-  
-  
-    </div>
-  
-  </ng-template>
-  
-  
+   -->
+
+  </div>
+
+</ng-template>

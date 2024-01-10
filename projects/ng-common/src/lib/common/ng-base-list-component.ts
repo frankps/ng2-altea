@@ -2,7 +2,7 @@ import { ApiListResult, DbQuery, QueryOperator, Translation, ApiResult, ApiStatu
 import { Observable, take, takeUntil } from 'rxjs';
 import * as _ from "lodash";
 import { NgBaseComponent } from './ng-base-component';
-import { BackendHttpServiceBase } from '../services/backend-http-service-base';
+import { BackendHttpServiceBase, ObjectChange, ObjectChangeType } from '../services/backend-http-service-base';
 import { DashboardService } from '../services/dashboard.service';
 import { NgxSpinnerComponent, NgxSpinnerService } from 'ngx-spinner';
 import { Route, Router } from '@angular/router';
@@ -160,26 +160,36 @@ export abstract class NgBaseListComponent<T extends ObjectWithId> extends NgBase
 
 
 
-        this.objectSvc.changes$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((change: any) => {
+        this.objectSvc.changes$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((change: ObjectChange<T>) => {
+
+
+            console.error(change)
+
+            const changedObject = change.object
 
             // remove item from list (when doing soft delete)
-            if (change && change['deleted'] === true) {
-                _.remove(this.objects, o => o.id == change.id)
+            if (change.change == ObjectChangeType.delete) {
+                console.warn(this.objects)
+                const res = _.remove(this.objects, o => o.id == changedObject.id)
+                this.objects = [ ... this.objects ]
+                console.warn(this.objects)
+                console.error(res)
                 return
             }
 
             // update visible properties in the list
-            if (this.visiblePropertyChanged(change)) {
-                const object: any = this.objects.find(o => o.id == change.id)
+            if (this.visiblePropertyChanged(changedObject)) {
+                const object: any = this.objects.find(o => o.id == changedObject.id)
 
+                console.warn(object)
                 if (!object)
                     return
 
                 for (const prop of this.visibleProperties) {
-                    if (change[prop]) {
+                    if (changedObject[prop]) {
                         //console.warn('&&&& Property update:', prop, change[prop])
 
-                        object[prop] = change[prop]
+                        object[prop] = changedObject[prop]
                     }
                 }
             }

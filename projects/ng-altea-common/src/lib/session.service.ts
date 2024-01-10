@@ -45,7 +45,7 @@ export class SessionService implements OnInit {
   }
 
   set branch(value: Branch) {
-    this._branch = this.branch
+    this._branch = value
 
     this.branchSub.next(value)
   }

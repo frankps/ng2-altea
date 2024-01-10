@@ -30,7 +30,7 @@ export class ProductListComponent extends NgBaseListComponent<Product> implement
   currentId?: string
 
   categoryId: string
-  productType: string
+  productType: ProductType
 
   // used for moving products
   categories: Product[]
@@ -121,7 +121,13 @@ export class ProductListComponent extends NgBaseListComponent<Product> implement
         // filter out objects that are filtered away
         this.objects = this.objects.filter(p => p.catId == this.categoryId)
         this.dashboardSvc.showToastType(ToastType.saveSuccess)
+
+        this.editMode = false
+
+        console.error(modal)
         modal.close()
+
+        
 
       }
 
@@ -137,6 +143,13 @@ export class ProductListComponent extends NgBaseListComponent<Product> implement
 
   async ngOnInit() {
     super._ngOnInit()
+
+    this.route.url.subscribe(sub => {
+
+      console.warn(sub)
+
+    })
+
 
     this.route.params.pipe(takeUntil(this.ngUnsubscribe)).subscribe(params => {
       console.error('route PARAMS !!!')
@@ -222,9 +235,7 @@ export class ProductListComponent extends NgBaseListComponent<Product> implement
       // query.or('type', QueryOperator.equals, ProductType.category)
     }
 
-
     return query
-
   }
 
   override getSearchDbQuery(searchFor: string): DbQuery | null {
@@ -241,7 +252,7 @@ export class ProductListComponent extends NgBaseListComponent<Product> implement
 
   }
 
-
+  
   selectPathItem(item: Product) {
 
     console.error(item)
@@ -272,7 +283,7 @@ export class ProductListComponent extends NgBaseListComponent<Product> implement
 
   override addNew() {
     console.log('Add product')
-    this.newModal.show()
+    this.newModal.show(this.productType)
   }
 
 }

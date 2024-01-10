@@ -133,7 +133,7 @@
       "product": "Product",
       "service": "Dienst",
       "category": "Categorie",
-      "bundle": "Bundel",
+      "bundle": "Arrangement",
       "subscription": "Abonnement"
     },
     "planning-type": {
@@ -311,6 +311,11 @@
       }
     },
     "product": {
+      "new": {
+        "title": "Toevoegen:",
+        "folder": "folder",
+        "orFolder": "of folder"
+      },
       "move-modal": {
         "title": "Verplaatsen",
         "confirm": "Verplaats"

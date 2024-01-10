@@ -30,8 +30,11 @@ export class NewProductComponent implements OnInit {
 
   message = ''
 
+  productOrFolder = 'product'
+
   newProduct: Product = new Product()
 
+  productType: string
 
   constructor(private productSvc: ProductService, private sessionSvc: SessionService, public manageProductSvc: ManageProductService, private translationSvc: TranslationService, private modalService: NgbModal, protected route: ActivatedRoute, private router: Router, protected spinner: NgxSpinnerService) {
 
@@ -41,12 +44,15 @@ export class NewProductComponent implements OnInit {
     this.translationSvc.translateEnum(ProductType, 'enums.product-type.', this.productTypes)
   }
 
+  isFolder() {
+    return (this.productOrFolder == 'folder')
+  }
 
 
-  show() {
+  show(productType: ProductType) {
 
     this.newProduct = new Product()
-
+    this.newProduct.type = productType
 
     this.modalService.open(this.selectTypeModal)
 
@@ -63,6 +69,7 @@ export class NewProductComponent implements OnInit {
 
     this.newProduct.orgId = this.sessionSvc.orgId
     this.newProduct.branchId = this.sessionSvc.branchId
+    this.newProduct.isCategory = this.isFolder()
 
     this.productSvc.create(this.newProduct).subscribe((res: ApiResult<Product>) => {
 

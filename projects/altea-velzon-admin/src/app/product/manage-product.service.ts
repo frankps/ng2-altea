@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import { Injectable } from '@angular/core';
 import { Product, ProductType, ProductTypeIcons } from 'ts-altea-model'
-import { ApiListResult, DbQuery, QueryOperator, Translation } from 'ts-common'
+import { ApiListResult, DbQuery, ObjectWithId, QueryOperator, Translation } from 'ts-common'
 import { ProductService } from 'ng-altea-common'
 import * as _ from "lodash";
+import { TranslationService } from 'ng-common'
+
 
 /*
 import { Component, OnInit, ViewChild } from '@angular/core';
@@ -20,12 +22,14 @@ import { NgxSpinnerService } from "ngx-spinner"
 })
 export class ManageProductService {
 
+  type: ProductType
+  rootPathName = ''
   currentId?: string
   allCategories?: Product[] = []
 
-  public path: Product[] = []
+  public path: any[] = []
 
-  constructor(private productSvc: ProductService) {
+  constructor(private productSvc: ProductService, private translationSvc: TranslationService) {
 
     this.getAllCategories()
 
@@ -74,12 +78,35 @@ export class ManageProductService {
     return (match >= 0)
   }
 
+  async setRootPathName(type?: ProductType) {
 
-  showPath(id: string) {
+    if (type)
+      this.type = type
+    else
+      type = this.type    // just take over current product type
+
+    if (type)
+      this.rootPathName = await this.translationSvc.getTrans('menu.catalog.sub.' + type)
+    else
+      this.rootPathName = ''
+  }
+
+  showRootPathOnly() {
+    this.path = [{ id: null, name: this.rootPathName, catId: null }]
+
+  }
+
+  async showPath(id?: string) {
+
+    if (!id) {
+      this.path = []
+    }
 
 
     const temp = []
-    let cat = this.allCategories.find(c => c.id == id)
+    let cat: Product = this.allCategories.find(c => c.id == id)
+
+    await this.setRootPathName(cat.type)
 
 
     let count = 0
@@ -100,17 +127,19 @@ export class ManageProductService {
         break
     }
 
-    this.path = []
 
-    this.path = [{ id: null, name: 'Catalogus', catId: null }, ..._.reverse(temp)]  // , type: ProductType.category
+    // 
+    this.path = [{ id: null, name: this.rootPathName, catId: null }, ..._.reverse(temp)]  // , type: ProductType.category
 
   }
 
 
-  showPathForProduct(product: Product) {
+  async showPathForProduct(product: Product) {
 
     if (!product)
       this.path = []
+
+    await this.setRootPathName(product.type)
 
     const temp = []
     temp.push(product)
@@ -135,7 +164,8 @@ export class ManageProductService {
 
     this.path = []
 
-    this.path = [{ id: null, name: 'Catalogus', catId: null }, ..._.reverse(temp)]  // , type: ProductType.category
+    // { id: null, name: 'Catalogus', catId: null },
+    this.path = [{ id: null, name: this.rootPathName, catId: null }, ..._.reverse(temp)]  // , type: ProductType.category
 
   }
 

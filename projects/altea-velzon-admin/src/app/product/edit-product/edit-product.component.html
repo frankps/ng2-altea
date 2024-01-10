@@ -28,12 +28,6 @@
 
 
 
-
-
-
-
-
-
   <ngx-altea-form-card-section sectionName="ui.product.edit.sections.general.title" sectionId="general"
     [editSectionId]="editSectionId" [icon]="ProductTypeIcons[object.type]" (save)="save()" (cancel)="cancel()"
     (editModeChanged)="editModeChanged($event)">
@@ -459,7 +453,7 @@
 
 
 <ngx-altea-delete-modal #deleteModal objectType="product" [object]="object"
-  [objectSvc]="productSvc"></ngx-altea-delete-modal>
+  [objectSvc]="productSvc" [config]="deleteConfig" (deleted)="deleted($event)"></ngx-altea-delete-modal>
 
 
 <!-- <ng-template #deleteModal let-modal>

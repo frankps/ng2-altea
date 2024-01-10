@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild } from '@angular/core';
+import { Component, Input, ViewChild, Output, EventEmitter } from '@angular/core';
 import { NgxSpinnerService } from "ngx-spinner"
 import * as sc from 'stringcase'
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -23,6 +23,9 @@ export class DeleteModalComponent {
   @Input() config?: { successUrl?: string, successUrlMobile?: string }
 
   @Input() objectSvc?: BackendHttpServiceBase<ObjectWithId>
+
+  @Output() deleted: EventEmitter<any> = new EventEmitter();
+
 
   /** In some languages the article (lidwoord) is different for other words (HET paard vs DE koe) */
   deleteTransParams = { article: null, object_sc: '', object_lc: '', name: '' }
@@ -68,7 +71,7 @@ export class DeleteModalComponent {
       deletedAt: new Date()
     }
 
-    this.objectSvc?.update(update).subscribe(res => {
+    this.objectSvc?.update(update, true).subscribe(res => {
 
       console.error(res)
 
@@ -85,6 +88,8 @@ export class DeleteModalComponent {
           console.error(url)
           this.router.navigate([url])
         }
+
+        this.deleted.emit(this.object)
 
         modal.close()
 

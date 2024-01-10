@@ -4,11 +4,21 @@ import { instanceToPlain, plainToInstance } from "class-transformer";
 import { Observable, map, Subject, take } from "rxjs";
 
 
+export enum ObjectChangeType {
+  create = 'create',
+  update = 'update', 
+  delete = 'delete'
+}
+
+export class ObjectChange<T> {
+  constructor(public object: T, public change: ObjectChangeType) {}
+}
+
 
 
 export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServiceBase<T> {   //  extends BaseObject
 
-  changes$: Subject<T> = new Subject<T>()
+  changes$: Subject<ObjectChange<T>> = new Subject<ObjectChange<T>>()
 
   constructor(protected type: { new(): T; }, private host: string, private urlDifferentiator: string, private http: HttpClient) {
     super()
@@ -60,7 +70,8 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
 
   }
 
-  update(object: any): Observable<ApiResult<T>> {
+
+  update(object: any, isSoftDelete: boolean = false): Observable<ApiResult<T>> {
     console.log(object)
     const observ = this.http.put<any>(`${this.host}/${this.urlDifferentiator}/${object.id}`, object).pipe(map(res => {
 
@@ -68,17 +79,15 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
 
       if (res && res.status === ApiStatus.ok) {
         console.warn('triggering changes$ !')
-        this.changes$.next(object)
+
+        this.changes$.next(new ObjectChange(object, isSoftDelete?ObjectChangeType.delete: ObjectChangeType.update))
       }
 
       return res
     }))
 
-
-
     return observ
   }
-
 
   update$(object: any): Promise<ApiResult<T>> {
 
@@ -90,9 +99,7 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
         resolve(res)
       })
 
-
     })
-
   }
 
 

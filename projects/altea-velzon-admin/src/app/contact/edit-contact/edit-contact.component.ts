@@ -29,7 +29,6 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> {
   deleteConfig = {
     successUrl: '',
     successUrlMobile: ''
-    // get successUrl() { return '/aqua/resources' + }
   }
 
   Array = Array
