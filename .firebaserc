@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "altea-24"
+  },
+  "targets": {
+    "altea-24": {
+      "hosting": {
+        "altea-velzon-admin": [
+          "altea-velzon-admin"
+        ]
+      }
+    }
+  }
+}

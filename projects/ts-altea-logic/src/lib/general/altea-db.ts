@@ -37,9 +37,9 @@ export class AlteaDb {
             //l.product = undefinedf
         })
 
-        orderClone.info = undefined
+/*         orderClone.info = undefined
         orderClone.persons = undefined
-
+ */
         console.log(orderClone)
 
         // const orderDb = orderClone.asDbObject()

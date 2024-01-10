@@ -81,7 +81,7 @@
                                     <ng-select id="option_{{option.id}}" name="option_{{option.id}}"
                                         [items]="option.values" bindLabel="name" [clearable]="false" [multiple]="false"
                                         [(ngModel)]="orderLine.getOption(option).values[0]"
-                                        (change)="optionChanged(option)">
+                                        (change)="optionChanged(option, $event)">
                                     </ng-select>
                                 </div>
                             </div>

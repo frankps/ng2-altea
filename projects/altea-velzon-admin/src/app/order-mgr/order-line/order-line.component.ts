@@ -20,7 +20,7 @@ export class OrderLineComponent {
   }
 
   get product() {
-    return this.orderMgrSvc.product 
+    return this.orderMgrSvc.product
   }
 
   get orderLineOptions() {
@@ -35,17 +35,25 @@ export class OrderLineComponent {
     console.error(this.orderMgrSvc.orderLine)
 
     this.orderMgrSvc.orderLine.markAsUpdated('qty')
-    this.orderMgrSvc.order.makeLineTotals()
+    this.orderMgrSvc.order.calculateAll()
   }
 
-  optionChanged(option) {
+  optionChanged(option: OrderLineOption, optionValue: OrderLineOptionValue) {
 
-    console.warn(option)
     console.error(this.orderLine)
+    console.warn(option)
+
+    console.error(optionValue)
 
     this.orderLine.markAsUpdated("options")
 
+    console.error('has price!!')
+
     this.orderLine.calculateAll()
+    this.orderMgrSvc.order.calculateAll()
+
+
+
   }
 
   multiOptionValueChanged(option: OrderLineOption, value: OrderLineOptionValue, selected: boolean) {

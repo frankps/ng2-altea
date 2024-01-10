@@ -517,7 +517,7 @@
       "excl": "Totaal excl",
       "vat": "BTW",
       "incl": "Totaal",
-      "advance": "Voorschot",
+      "deposit": "Voorschot",
       "paid": "Betaald",
       "nrOfPersons": "Betaald",
       "toInvoice": "Te factureren",

@@ -1864,8 +1864,20 @@ export enum OrderState {
   timedOut = 'timedOut'
 }
 
+export class VatLine {
+
+  constructor(public pct: number, public excl: number, public incl: number) {
+
+
+
+
+  }
+
+}
 
 export class Order extends ObjectWithId implements IAsDbObject<Order> {
+
+  static jsonProps = ['vatLines', 'persons', 'info']
 
   organisation?: Organisation;
   orgId?: string;
@@ -1904,6 +1916,9 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
 
   @Type(() => Number)
   vat = 0;
+
+  @Type(() => VatLine)
+  vatLines?: VatLine[] = []  
 
   @Type(() => Number)
   incl = 0;
@@ -2036,9 +2051,63 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
 
     orderLine.markAsNew()
 
+    this.calculateAll()
 
-    this.makeLineTotals()
   }
+
+  calculateAll() {
+    
+    this.makeLineTotals()
+    this.calculateVat()
+  }
+
+  calculateVat() {
+
+    if (!this.hasLines())
+      this.vatLines = []
+
+    const vatMap = new Map<number, VatLine>()
+
+    for (let orderLine of this.lines) {
+
+      if (!orderLine || !orderLine.vatPct || orderLine.vatPct === 0)
+        continue
+
+      let vatLine: VatLine
+
+      if (vatMap.has(orderLine.vatPct))
+        vatLine = vatMap.get(orderLine.vatPct)
+      else {
+        vatLine = new VatLine(orderLine.vatPct, 0, 0)
+        vatMap.set(orderLine.vatPct, vatLine)
+      }
+
+      vatLine.excl += orderLine.excl
+      vatLine.incl += orderLine.incl
+    }
+
+    let calculatedVatLines = Array.from(vatMap.values())
+    calculatedVatLines = _.sortBy<VatLine>(calculatedVatLines, 'pct')
+
+    if (!this.vatLinesSame(this.vatLines, calculatedVatLines)) {
+      this.vatLines = calculatedVatLines
+      this.markAsUpdated('vatLines')
+    }
+
+
+  }
+
+  vatLinesSame(vatLinesA: VatLine[], vatLinesB: VatLine[]) {
+
+    const lengthA = !Array.isArray(vatLinesA) ? 0 : vatLinesA.length
+    const lengthB = !Array.isArray(vatLinesB) ? 0 : vatLinesB.length
+
+    if (lengthA != lengthB)
+      return false
+
+    return _.isEqual(vatLinesA, vatLinesB)
+  }
+
 
   makeLineTotals(): number {
 
@@ -2091,7 +2160,7 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
     if (Array.isArray(removed) && removed.length > 0 && !orderLine.m.n)  // orderLine.m.n = it was a new line not yet saved in backend
       this.markAsRemoved('lines', orderLine.id)
 
-    this.makeLineTotals()
+    this.calculateAll()
   }
 
   getProductIds(): string[] {
@@ -2315,6 +2384,9 @@ export class OrderLineOption extends ObjectWithId {
     return olOption
   }
 
+  hasFormula() : boolean {
+    return Array.isArray(this.formula) && this.formula.length > 0
+  }
 
 
   getValue(value: OrderLineOptionValue): OrderLineOptionValue {
