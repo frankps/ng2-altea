@@ -1,3 +1,11 @@
+Deploy:
+
+  Followed procedure from this document:
+  https://patricsteiner.github.io/multi-application-angular-project-with-ionic-and-firebase/
+
+  => changed .firebaserc and firebase.json
+
+
 
 Firebase setup (via Velzon):
 
