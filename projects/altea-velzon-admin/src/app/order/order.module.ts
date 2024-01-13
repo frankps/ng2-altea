@@ -13,14 +13,17 @@ import { TranslateModule } from '@ngx-translate/core';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { TimepickerModule } from 'ngx-bootstrap/timepicker';
 import { NgxSpinnerModule } from 'ngx-spinner';
+import { OrderMgrModule } from 'ng-altea-common';
+import { ManageOrderComponent } from './manage-order/manage-order.component';
 
 @NgModule({
-  declarations: [OrderGridComponent, OrderCardComponent],
+  declarations: [OrderGridComponent, OrderCardComponent, ManageOrderComponent],
   imports: [CommonModule,     
     OrderRoutingModule, 
     NgCommonModule, 
     FormsModule, 
     NgbModule, 
+    OrderMgrModule,
     BsDatepickerModule,
     Bootstrap5Module,    
     NgSelectModule,
@@ -28,6 +31,7 @@ import { NgxSpinnerModule } from 'ngx-spinner';
     ModalModule,
     TimepickerModule,
     NgxSpinnerModule,
+   
   ],
 })
 export class OrderModule { }

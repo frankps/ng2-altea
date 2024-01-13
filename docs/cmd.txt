@@ -1,4 +1,9 @@
 
+Serve:
+
+    ng serve altea-velzon-admin
+    ng serve altea-pub-app --port 4300
+
 
 Deploy:
 
@@ -10,10 +15,6 @@ Deploy:
     Hosting URL: https://altea-velzon-admin.web.app
 
 
-Serve:
-
-    ng serve altea-velzon-admin
-    ng serve altea-pub-app --port 4300
 
 
 ng generate component order-mgr/posPayment --project altea-velzon-admin

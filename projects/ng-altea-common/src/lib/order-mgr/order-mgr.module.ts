@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { OrderMgrRoutingModule } from './order-mgr-routing.module';
 import { BrowseCatalogComponent } from './browse-catalog/browse-catalog.component';
-import { ManageOrderComponent } from './manage-order/manage-order.component';
+//import { ManageOrderComponent } from '../../../../altea-velzon-admin/src/app/order/manage-order/manage-order.component';
 import { ProductListComponent } from './product-list/product-list.component';
 import { OrderLineComponent } from './order-line/order-line.component';
 
@@ -31,7 +31,7 @@ import { PosPaymentComponent } from './pos-payment/pos-payment.component';
 @NgModule({
   declarations: [
     BrowseCatalogComponent,
-    ManageOrderComponent,
+   // ManageOrderComponent,
     ProductListComponent,
     OrderLineComponent,
     OrderComponent,
@@ -58,5 +58,20 @@ import { PosPaymentComponent } from './pos-payment/pos-payment.component';
     TimepickerModule,
     NgxSpinnerModule,
   ],
+  exports: [
+    BrowseCatalogComponent,
+  //  ManageOrderComponent,
+    ProductListComponent,
+    OrderLineComponent,
+    OrderComponent,
+    SelectDateComponent,
+    PersonSelectComponent,
+    DebugAvailabilityComponent,
+    DebugResourceRequestComponent,
+    SelectTimeSlotComponent,
+    DemoOrdersComponent,
+    ContactSelectComponent,
+    PosPaymentComponent,
+  ]
 })
 export class OrderMgrModule {}

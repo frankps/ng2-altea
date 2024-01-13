@@ -25,6 +25,7 @@ import { environment } from '../environments/environment';
 import { FakeBackendInterceptor } from './velzon/core/helpers/fake-backend';
 import { initFirebaseBackend } from './velzon/authUtils';
 import { NgAlteaCommonModule } from 'ng-altea-common';
+import { OrderMgrModule } from 'ng-altea-common';
 
 defineLocale('nl-be', nlBeLocale);
 
@@ -46,6 +47,7 @@ if (environment.defaultauth === 'firebase') {
     FeatherModule.pick(allIcons),
     HttpClientModule,
     BrowserAnimationsModule,
+//    OrderMgrModule,
     NgxSpinnerModule,
     Bootstrap5Module,
     FullCalendarModule,
@@ -58,7 +60,7 @@ if (environment.defaultauth === 'firebase') {
       },
     }),
     ContactModule,
-    NgAlteaCommonModule
+    NgAlteaCommonModule,
     
   ],
   providers: [],

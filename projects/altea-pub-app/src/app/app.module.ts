@@ -13,6 +13,7 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { nlBeLocale } from 'ngx-bootstrap/locale';
 import { NgAlteaCommonModule } from 'ng-altea-common';
 import { MenuComponent } from './menu/menu.component';
+import { OrderMgrModule } from 'ng-altea-common';
 
 defineLocale('nl-be', nlBeLocale);
 
@@ -40,7 +41,8 @@ export function createTranslateLoader(http: HttpClient): any {
         deps: [HttpClient],
       },
     }),
-    NgAlteaCommonModule
+    NgAlteaCommonModule,
+    OrderMgrModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -7,6 +7,7 @@ import { Bootstrap5Module } from 'ng-common';
 import { FormsModule } from '@angular/forms';
 import { MainMenuComponent } from './app/main-menu/main-menu.component';
 import { RedeemGiftComponent } from './gift/redeem-gift/redeem-gift.component';
+import { OrderMgrModule } from './order-mgr/order-mgr.module';
 
 @NgModule({
   imports: [CommonModule,
@@ -23,7 +24,8 @@ import { RedeemGiftComponent } from './gift/redeem-gift/redeem-gift.component';
   exports: [
     RequestGiftComponent,
     RedeemGiftComponent,
-    MainMenuComponent
+    MainMenuComponent,
+    OrderMgrModule
   ]
 })
 export class NgAlteaCommonModule {}

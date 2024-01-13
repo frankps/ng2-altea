@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { OrderMgrUiService } from '../order-mgr-ui.service';
+import { OrderMgrUiService, BrowseCatalogComponent } from 'ng-altea-common';
 import { DashboardService, NgBaseComponent } from 'ng-common';
 import { Observable, take, takeUntil } from 'rxjs';
 

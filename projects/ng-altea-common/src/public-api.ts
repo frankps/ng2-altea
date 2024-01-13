@@ -26,3 +26,6 @@ export * from './lib/subscription.service'
 export * from './lib/template.service'
 export * from './lib/task.service'
 export * from './lib/task-mgmt.service'
+
+
+export * from './lib/order-mgr'
