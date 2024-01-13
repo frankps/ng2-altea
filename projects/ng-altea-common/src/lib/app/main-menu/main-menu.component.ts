@@ -54,6 +54,8 @@ export class MainMenuComponent implements OnInit {
 
   async ngOnInit() {
 
+    console.log(this.lbl)
+
     this.branch = await this.sessionSvc.branch$()
 
     const lbl = this.lbl
@@ -62,6 +64,9 @@ export class MainMenuComponent implements OnInit {
 
     if (lbl['menu.title'] && this.branch)
       lbl['menu.title'] = lbl['menu.title'].replace('[branch]', this.branch.name)
+
+
+    console.error(this.lbl)
 
   }
 

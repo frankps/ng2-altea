@@ -1,0 +1,1028 @@
+{
+  "toasts": {},
+  "msg": {
+    "save": "Opslaan",
+    "api-problem": "Er was een probleem!!",
+    "input-not-valid": "'[input]' niet geldig!"
+  },
+  "dic": {
+    "address": "Adres",
+    "actions": "Acties",
+    "add": "Toevoegen",
+    "cancel": "Annuleren",
+    "color": "Kleur",
+    "create": "Maak",
+    "delete": "Verwijderen",
+    "description": "Omschrijving",
+    "edit": "Aanpassen",
+    "language": "Taal",
+    "move": "Verplaatsen",
+    "months": "maanden",
+    "name": "Naam",
+    "gender": "Geslacht",
+    "duration": "Duurtijd",
+    "durationMin": "Duurtijd in minuten",
+    "hour": "uur",
+    "msgType": "Berichttype",
+    "ok": "OK",
+    "price": "Prijs",
+    "qty": "Aantal",
+    "timeUnit": "Tijdseenheid",
+    "save": "Opslaan",
+    "search": "Zoeken",
+    "spacingAfter": "Kuistijd in minuten",
+    "start": "begin",
+    "end": "einde"
+  },
+  "enums": {
+    "pay-type": {
+      "cash": "Cash",
+      "transfer": "Overschrijving",
+      "credit": "VISA",
+      "dedit": "Bancontact",
+      "gift": "Cadeaubon",
+      "subs": "Abonnement"
+
+    },
+    "msg-type": {
+      "sms": "SMS",
+      "email": "E-mail"
+    },
+    "time-units-plur": {
+      "s": "Seconden",
+      "m": "Minuten",
+      "h": "Uren",
+      "d": "Dagen",
+      "w": "Weken",
+      "M": "Maanden"
+    },
+    "time-units-sing": {
+      "s": "Second",
+      "m": "Minuut",
+      "h": "Uur",
+      "d": "Dag",
+      "w": "Week",
+      "M": "Maand"
+    },
+    "toast-type": {
+      "saveSuccess": "Aanpassing zijn succesvol bewaard!",
+      "saveError": "Er was een probleem bij het opslaan!",
+      "saveNoChanges": "Er waren geen aanpassingen..."
+    },
+    "bool": {
+      "true": "Ja",
+      "false": "Nee"
+    },
+    "gender": {
+      "undefined": "",
+      "female": "Vrouw",
+      "male": "Man",
+      "unisex": "Unisex"
+    },
+    "online-mode": {
+      "reserve": "Bestellen of reserveren",
+      "visible": "Zichtbaar",
+      "invisible": "Onzichtbaar",
+      "help": {
+        "reserve": "Klanten kunnen dit product online bestellen of reserveren",
+        "visible": "Klanten kunnen dit product zien, maar niet bestellen of reserveren",
+        "invisible": "Dit product is online niet zichtbaar"
+      }
+    },
+    "plan-mode": {
+      "none": "Niet planbaar",
+      "continuous": "Doorlopend",
+      "block": "Vaste blokken",
+      "help": {
+        "none": "Kan niet gepland worden",
+        "continuous": "Doorlopende planning",
+        "block": "De planning gebeurt op basis van vaste blokken"
+      }
+    },
+    "country": {
+      "BEL": "België",
+      "GBR": "Groot Britanië",
+      "NLD": "Nederland",
+      "USA": "Verenigde Staten"
+    },
+    "language": {
+      "nl": "Nederlands",
+      "en": "English",
+      "fr": "French",
+      "sp": "Español"
+    },
+    "days-of-week-short": {
+      "mo": "Ma",
+      "tu": "Di",
+      "we": "Wo",
+      "th": "Do",
+      "fr": "Vr",
+      "sa": "Za",
+      "su": "Zo"
+    },
+    "days-of-week": {
+      "mo": "Maandag",
+      "tu": "Dinsdag",
+      "we": "Woensdag",
+      "th": "Donderdag",
+      "fr": "Vrijdag",
+      "sa": "Zaterdag",
+      "su": "Zondag"
+    },
+    "product-type": {
+      "product": "Product",
+      "service": "Dienst",
+      "category": "Categorie",
+      "bundle": "Arrangement",
+      "subscription": "Abonnement"
+    },
+    "planning-type": {
+      "occ": "Bezet",
+      "hol": "Vakantie",
+      "bnk": "Feestdag",
+      "ill": "Ziekte",
+      "abs": "Afwezig",
+      "edu": "Opleiding",
+      "avl": "Beschikbaar"
+    },
+    "product-rule-type": {
+      "startAt": "Starttijden dienst",
+      "prePost": "Voor & na tijden"
+    },
+    "resource-type": {
+      "human": "Personeel",
+      "room": "Ruimte",
+      "device": "Toestel",
+      "group": "Groep",
+      "branch": "Branch"
+    },
+    "duration-mode": {
+      "product": "Zelfde als deze dienst",
+      "custom": "Aangepast",
+      "help": {
+        "product": "Hou deze resource bezet gedurende de volledige duurtijd van deze dienst",
+        "custom": "Definieer zelf een aangepaste bezetting"
+      }
+    },
+    "duration-reference": {
+      "start": "het begin van deze dienst",
+      "end": "het einde van deze dienst",
+      "help": {
+        "start": "start help",
+        "end": "end help"
+      }
+    },
+    "template-type": {
+      "general": "Algemeen",
+      "confirmation": "Confirmatie",
+      "cancel": "Annulatie",
+      "change": "Aanpassing",
+      "reminder": "Herinnering"
+    }
+  },
+  "templates": {
+    "order": {
+      "waitDeposit": "Wachten op voorschot",
+      "confirmed": "Confirmatie",
+      "noDepositCancel": "Annulatie - geen voorschot",
+      "inTimeCancel": "Annulatie - op tijd",
+      "lateCancel": "Late annulatie",
+      "reminder": "Herinnering",
+      "noShow": "No show",
+      "satisfaction": "Tevredenheid"
+    }
+  },
+  
+  "ui": {
+    "price": {
+      "title": "Speciale prijzen & promoties",
+      "add-option": "Nieuwe prijs voor optie"
+    },
+    "delete-modal": {
+      "title": "{{object_sc}} verwijderen",
+      "msg": "Ben je zeker dat je {{article}} {{object_lc}} '{{name}}' wil verwijderen?",
+      "confirm": "Ja, verwijder",
+      "cancel": "Sluit",
+      "error": "Oepss... er was een probleem bij het verwijderen."
+    },
+    "deposit": {
+      "none": "Geen voorschot ingesteld",
+      "request": "Gevraagde voorschot",
+      "default": "Standaard voorschot",
+      "custom": "Aangepaste voorschot",
+      "terms": {
+        "info": "Betalingstermijn:",
+        "same-day": "Reservatie zelfde dag",
+        "next-day": "Reservatie volgende dag",
+        "next-week": "Reservatie volgende week",
+        "next-month": "Reservatie volgende maand",
+        "help": {
+          "info": "Stel hierboven in hoeveel uur uw klanten de tijd hebben om hun voorschot te betalen in functie van wanneer de reservatie gemaakt is."
+        }
+      }
+    },
+    "branch": {
+      "edit": {
+        "sections": {
+          "general": {
+            "title": "Algemeen",
+            "vat": "BTW Instellingen"
+          },
+          "communication": {
+            "title": "Communicatie"
+          },
+          "gift": {
+            "title": "Cadeaubonnen"
+          },
+          "deposit": {
+            "title": "Voorschotten",
+            "help": "Hier kan u een standaard voorschot percentage instellen. Dit percentage zal toegepast worden op alle orders. U kan dit percentage nog aanpassen per product of per klant. Op deze manier kan u bijvoorbeeld instellen dat sommige klanten geen voorschot hoeven te betalen ofwel alles moeten betalen."
+          },
+          "reminders": {
+            "title": "Herinneringen",
+            "help": "Hier kan u instellen hoe (email,sms) en hoeveel tijd voorafgaand de reservatie herinneringen verstuurd worden."
+          }
+        }
+      }
+    },
+    "contact": {
+      "edit": {
+        "sections": {
+          "general": {
+            "title": "Algemene info"
+          },
+          "subscriptions": {
+            "title": "Abonnementen"
+          }
+        }
+      }
+    },
+    "order": {
+      "search-type-select": {
+        "appointmentsOn": "Afspraken op",
+        "appointmentsMadeOn": "Afspraken gemaakt op",
+        "toInvoice": "Te factureren",
+        "invoiced": "Gefactureerd",
+        "gifts": "Cadeaubonnen",
+        "nonAppointments": "Enkel producten"
+      }
+    },
+    "order-mgr": {
+      "persons": {
+        "title": "Personen selectie behandelingen",
+        "how-many": "Hoeveel personen nemen een behandeling?"
+      },
+      "contacts": {
+        "title": "Zoek klant"
+      },
+      "pays": {
+        "title": "Betalingen"
+      }
+    },
+    "resource": {
+      "edit": {
+        "sections": {
+          "general": {
+            "title": "Algemene info"
+          },
+          "groups": {
+            "showGroups": {
+              "title": "Behoort tot groepen",
+              "add-btn": "Groep toevoegen",
+              "empty-list": "Behoort tot geen groepen"
+            },
+            "showChildren": {
+              "title": "Bevat resources",
+              "add-btn": "Resource toevoegen",
+              "empty-list": "Bevat geen resources"
+            }
+          },
+          "schedule": {
+            "title": "Planning"
+          },
+          "scheduling": {
+            "title": "Planning"
+          },
+          "planning": {
+            "title": "Afwijkende planning",
+            "add-btn": "Toevoegen"
+          }
+        }
+      }
+    },
+    "product": {
+      "new": {
+        "title": "Toevoegen:",
+        "folder": "folder",
+        "orFolder": "of folder"
+      },
+      "move-modal": {
+        "title": "Verplaatsen",
+        "confirm": "Verplaats"
+      },
+      "edit": {
+        "sections": {
+          "general": {
+            "title": "Algemene info"
+          },
+          "planning": {
+            "title": "Planning"
+          },
+          "pricing": {
+            "title": "Speciale prijzen & promoties"
+          },
+          "serviceDetails": {
+            "title": "Dienst info"
+          },
+          "options": {
+            "none": "Dit product heeft geen opties",
+            "title": "Product opties",
+            "add-btn": "Optie toevoegen",
+            "add-value-btn": "Keuze toevoegen"
+          },
+          "items": {
+            "none": "Dit product heeft geen items",
+            "title": "Product items"
+          },
+          "resources": {
+            "none": "Dit product heeft geen resources",
+            "title": "Resources",
+            "select-resource": "Selecteer een resource",
+            "select-mode": "Bezetting van deze resource",
+            "select-reference": "Hou deze resource bezet vanaf"
+          },
+          "visibility": {
+            "title": "Zichtbaarheid"
+          },
+          "rules": {
+            "title": "Product regels",
+            "none": "Dit product heeft geen regels"
+          }
+        }
+      }
+    },
+    "template": {
+      "email-to-provider": "Emails naar uw zaak",
+      "sms-to-provider": "SMS'en naar uw zaak",
+      "email-to-client": "Emails naar klant",
+      "sms-to-client": "SMS'en naar klant",
+      "edit": {
+        "sections": {
+          "config": {
+            "title": "Configuratie E-mail & SMS"
+          }
+        }
+      }
+    }
+  },
+  "app": {
+    "menu": {
+      "title": "[branch] menu",
+      "new-reserv": {
+        "h1": "Nieuwe reservatie",
+        "inf": "Maak een nieuwe reservatie"
+      },
+      "use-gift": {
+        "h1": "Cadeaubon verzilveren",
+        "inf": "Ik heb een cadeaubon en wil graag reserveren"
+      },
+      "buy-gift": {
+        "h1": "Cadeaubon kopen",
+        "inf": "Ik wil een ccadeaubon kopen"
+      },
+      "my-reservs": {
+        "h1": "Mijn reservaties",
+        "inf": "Reservaties bekijken en aanpassen"
+      },
+      "my-subs": {
+        "h1": "Mijn abonnementen",
+        "inf": "Abonnementen bekijken en gebruiken"
+      },
+      "my-loyalty": {
+        "h1": "Mijn klantenkaart",
+        "inf": "Status van mijn klantenkaart"
+      }
+    },
+    "gift": {
+      "choice": "Wat wenst u te schenken? Maak uw keuze:",
+      "types": {
+        "amount": "Bedrag",
+        "specific": "Specifiek"
+      },
+      "selected": {
+        "amount": "Uw keuze: cadeaubon met bedrag",
+        "specific": "Uw keuze: cadeaubon met arrangement. Na het invullen van dit scherm kan je uw cadeaubon naar eigen wens samenstellen! "
+      },
+      "invoice": {
+        "needed": "Wenst u een factuur voor de cadeaubon?",
+        "selectVat": "Omdat u een bedrag wenst te schenken en ook een factuur vraagt, moeten wij het correcte BTW percentage kunnen instellen. Maak daarom uw keuze:"
+      },
+      "methods": {
+        "select": "Selecteer één of meerdere aflevermethodes:",
+        "emailFrom": "Verstuur cadeaubon per email naar mezelf (de schenker)",
+        "emailTo": "Verstuur cadeaubon per email naar ontvanger",
+        "postal": "Verstuur cadeaubon per post",
+        "postalExtra":  "(+[price] voor aangetekende verzending)",
+        "pos": "Cadeaubon afhalen bij [branch]",
+        "pos-remark": "Opmerking: deze optie kan niet gecombineerd worden met versturen per post."
+      },
+      "next": {
+        "amount": "Cadeaubon afwerken",
+        "specific": "Cadeaubon samenstellen"
+      }
+    },
+    "redeem": {
+      "code": "Cadeaubon code",
+      "invalid": "Ongeldige code"
+
+    }
+  },
+  "objects": {
+    "gift": {
+      "_single": "Cadeaubon",
+      "value": "Waarde",
+      "used": "Gebruikt",
+      "isConsumed": "Is gebruikt",
+      "from": "Van",
+      "fromName": "Naam schenker",
+      "fromEmail": "Email schenker",
+      "to": "Aan",
+      "toName": "Naam ontvanger",
+      "toEmail": "Email ontvanger",
+      "toAddress": "Adres ontvanger",
+      "toMessage": "Persoonlijke boodschap aan ontvanger",
+      "toSendEmail": "Verstuur mail naar ontvanger",
+      "certificate": "Certificaat"
+    },
+    "address": {
+      "street": "Straat",
+      "streetNr": "Straat Nr",
+      "postal": "Postcode",
+      "city": "Gemeente",
+      "country": "Land"
+    },
+    "branch": {
+      "name": "Naam",
+      "emailFrom": "Email versturen vanaf",
+      "emailBcc": "Email Bcc",
+      "vatPcts": "Mogelijke BTW percentages",
+      "vatPct": "Standaard BTW percentage",
+      "language": "Primaire taal",
+      "vatIncl": "Prijzen zijn BTW inclusief",
+      "vatNr": "BTW nummer",
+      "smsOn": "Verstuur SMS berichten naar klanten",
+      "gift": {
+        "on": "Gebruik cadeaubonnen",
+        "methods": {
+            "title": "Verzendingswijze",
+            "email": "Email",
+            "postal": "Per post",
+            "pos": "Afhalen in winkel"
+        },
+        "types": {
+          "title": "Wat kan er geschonken worden",
+          "amount": "Bedrag",
+          "svc": "Diensten",
+          "prod": "Producten"
+        },
+        "expire": {
+          "title": "Geldigheid",
+          "indefinite": "Onbeperkt geldig",
+          "limited": "Beperkt in tijd",
+          "on": "Cadeaubonnen vervallen",
+          "after": "Bonnen vervallen na (maanden)"
+        },
+        "price": {
+          "new-title": "Nieuwe prijzen",
+          "new": "Nieuwe prijzen doorrekenen",
+          "new-false": "Nieuwe prijzen worden niet doorgerekend",
+          "new-true": "Nieuwe prijzen worden doorgerekend na",
+          "newAfter": "Nieuwe prijzen doorrekenen na (maanden)",
+          "postal": "Prijs om bon te versturen per post"
+        },
+        "invoice": {
+          "title": "Facturatie",
+          "on": "Cadeaubonnen kunnen gefactureerd worden",
+          "off": "Cadeaubonnen kunnen niet gefactureerd worden"
+        }
+      }
+    },
+    "reminder": {
+      "dur": "Versturen voor aanvang"
+    },
+    "order": {
+      "start": "Start",
+      "end": "Einde",
+      "type": "Type",
+      "excl": "Totaal excl",
+      "vat": "BTW",
+      "incl": "Totaal",
+      "deposit": "Voorschot",
+      "paid": "Betaald",
+      "nrOfPersons": "Betaald",
+      "toInvoice": "Te factureren",
+      "invoiced": "Gefactureerd",
+      "invoiceNum": "Factuur nr",
+      "gift": "Is cadeaubon",
+      "giftCode": "Cadeaubon code"
+    },
+    "contact": {
+      "name": "Naam",
+      "first": "Voornaam",
+      "last": "Achternaam",
+      "gender": "Geslacht",
+      "birth": "Geboortedag",
+      "email": "E-mail",
+      "emailRemind": "Stuur e-mail herinneringen",
+      "mobile": "GSM nummer",
+      "smsRemind": "Stuur sms herinneringen",
+      "phone": "Telefoon",
+      "language": "Taal",
+      "company": "Bedrijf",
+      "vatNum": "BTW nummer",
+      "deposit": "Voorschot"
+    },
+    "template": {
+      "_name": "Template",
+      "subject": "Onderwerp",
+      "body": {
+        "email": "E-mail",
+        "sms": "SMS"
+      },
+      "short": "SMS"
+    },
+    "resource": {
+      "article": "de",
+      "qty": "Aantal",
+      "hasStart": "Stel startdatum in",
+      "start": "Vanaf",
+      "hasEnd": "Stel einddatum in",
+      "end": "Tot en met",
+      "isGroup": "Groep",
+      "customSchedule": "Aangepast uurrooster",
+      "help": {
+        "device-name": "De naam van het toestel",
+        "group-name": "De naam van de groep",
+        "device-qty": "Aantal van deze toestellen",
+        "start": "Deze resource is actief vanaf",
+        "end": "Deze resource is actief tot en met"
+      }
+    },
+    "product": {
+      "article": "het",
+      "pronoun": "dit",
+      "descr": "Omschrijving",
+      "no-descr": "Er is geen omschrijving",
+      "customers": "Aantal klanten",
+      "online": "Online zichtbaarheid",
+      "visibility": "Online zichtbare informatie",
+      "showDuration": "Toon duurtijd",
+      "showPrice": "Toon prijs",
+      "vatPct": "BTW Percentage",
+      "hasPre": "Deze dienst heeft een voorbereidingstijd",
+      "preTime": "Voorbereidingstijd",
+      "hasPost": "Deze dienst heeft een opruimtijd",
+      "postTime": "Opruimtijd",
+      "pos": "Instellingen voor de kassa",
+      "showPos": "Zichtbaar in kassa",
+      "salesPrice": "Verkoopprijs",
+      "personSelect": "Selecteer personen",
+      "staffSelect": "Selecteer specialistes",
+      "planMode": "Planning mode",
+      "help": {
+        "customers": "Aantal klanten dat gelijktijdig wordt bediend",
+        "product-name": "De naam van het product",
+        "service-name": "De naam van de dienst",
+        "duration": "Duurtijd v/d behandeling",
+        "salesPrice": "",
+        "online": "Wat kunnen de klanten online zien of doen?",
+        "visibility": "Welke informatie is online zichtbaar",
+        "planMode": "Specifieert hoe dit product kan gepland worden"
+      }
+    },
+    "productRule": {
+      "type": "Product regel"
+    },
+    "formulaTerm": {
+      "value": "Waarde"
+    },
+    "productOption": {
+      "public": "Klant kan optie zien & selecteren",
+      "required": "Een waarde moet geselecteerd worden",
+      "multiSelect": "Er kan meer dan 1 waarde selecteerd worden",
+      "hasDuration": "Deze optie heeft een duurtijd",
+      "hasPrice": "Deze optie heeft een prijs",
+      "hasValue": "Deze optie heeft een waarde",
+      "hasFormula": "Deze optie heeft een formule",
+      "pvt": "Private optie: klanten kunnen dit niet selecteren, enkel intern"
+    },
+    "productOptionValue": {
+      "name": "Naam",
+      "duration": "Duurtijd",
+      "price": "Prijs",
+      "value": "Waarde",
+      "factor": "Factor",
+      "default": "Standaard",
+      "pvt": "Privaat"
+    },
+    "prodRes": {
+      "offset": "Correctie (in min)",
+      "duration": "Hou bezet gedurende (in min)",
+      "scheduleIds": "Operationele modi (optioneel)",
+      "groupQty": "Aantal resources",
+      "groupAlloc": "Reserveren op groep",
+      "help": {
+        "offset": "Je kan ervoor kiezen om de bezetting van deze resource niet exact te laten aanvangen vanaf het begin of einde (bovenstaande keuze), maar wel met een correctie (in minuten)",
+        "duration": "Gedurende deze tijd (minuten) wordt de resource bezet gehouden",
+        "scheduleIds": "Deze resource bezetting zal enkel van toepassing zijn tijdens de opgegeven operationale modi.",
+        "groupQty": "Aantal te reserveren resources uit groep",
+        "groupAlloc": "Reserveer op basis van groep, niet op individuele resources."
+      }
+    },
+    "price": {
+      "start": "Vanaf",
+      "end": "Tot",
+      "qty": "Vanaf aantal",
+      "sameBasePrice": "Zelfde basisprijs",
+      "isPromo": "Is promotie",
+      "title": "Promotie titel",
+      "title-tpl": "* promotie",
+      "isAbsolute": "Andere basisprijs",
+      "absValue": "Nieuwe prijs",
+      "isPercentage": "Procentuele prijsaanpassing",
+      "pctValue": "% korting of toeslag",
+      "isQty": "Kwantumkorting",
+      "isDay": "Prijs geldig op specifieke weekdagen",
+      "isTime": "Prijs geldig gedurende een tijdsinterval",
+      "isExtraQty": "Klant ontvangt extra beurten",
+      "hasOptions": "Specifieke prijzen voor opties",
+      "options": "Kies optie",
+      "extraQty": "Extra beurten",
+      "from": "Vanaf (hh:mm)",
+      "to": "Tot (hh:mm)",
+      "help": {
+        "price": "Prijs per behandeling"
+      }
+    },
+    "optionPrice": {
+      "allValues": "Geldig voor alle optie waarden",
+      "value": "Aangepaste prijs",
+      "valuePct": "Nieuwe prijs (in %)",
+      "valueIds": "Optie waarden",
+      "isPct": "Is percentage"
+    },
+    "schedule": {
+      "name": "Naam",
+      "default": "Standaard"
+    },
+    "scheduling": {
+      "start": "Actief vanaf",
+      "end": "Actief tot"
+    },
+    "subscription": {
+      "_single": "Abonnement",
+      "name": "Naam",
+      "remark": "Opmerking",
+      "totalQty": "Totaal aantal beurten",
+      "usedQty": "Gebruikte beurten",
+      "contact": "Klant"
+    }
+  },
+  "HEADER": {
+    "MORE": {
+      "TEXT": "More"
+    }
+  },
+  "menu": {
+    "resources": {
+      "label": "Resources",
+      "sub": {
+        "human": "Personeel",
+        "device": "Toestellen",
+        "room": "Ruimtes",
+        "group": "Groepen",
+        "branch": "Afdelingen"
+      }
+    },
+    "catalog": {
+      "label": "Catalogus",
+      "sub": {
+        "product": "Producten",
+        "service": "Diensten",
+        "bundle": "Arrangementen",
+        "subscription": "Abonnementen"
+      }
+    },
+    "templates": {
+      "label": "Templates",
+      "sub": {}
+    },
+    "contacts": {
+      "label": "Klanten",
+      "sub": {}
+    },
+    "products": {
+      "label": "Products"
+    },
+    "services": {
+      "label": "Services"
+    },
+    "orders": {
+      "label": "Orders"
+    },
+    "calendar": {
+      "label": "Kalender"
+    },
+    "gifts": {
+      "label": "Cadeaubonnen"
+    },
+    "subscriptions": {
+      "label": "Abonnementen"
+    },
+    "order": {
+      "label": "Reservatie maken"
+    },
+    "branch": {
+      "label": "Instellingen"
+    }
+  },
+  "MENUITEMS": {
+    "MENU": {
+      "TEXT": "MENU"
+    },
+    "DASHBOARD": {
+      "TEXT": "Dashboards",
+      "BADGE": "New",
+      "LIST": {
+        "ANALYTICS": "Analytics",
+        "CRM": "CRM",
+        "ECOMMERCE": "Ecommerce",
+        "CRYPTO": "Crypto",
+        "PROJECTS": "Projects",
+        "NFT": "NFT",
+        "JOB": "Job"
+      }
+    },
+    "APPS": {
+      "TEXT": "Apps",
+      "LIST": {
+        "CALENDAR": "Calendar",
+        "CHAT": "Chat",
+        "EMAIL": "Email",
+        "MAILBOX": "Mailbox",
+        "MAILTEMPLATES": "Email Templates",
+        "BASICACTION": "Basic Action",
+        "ECOMMERCEACTION": "Ecommerce Action",
+        "ECOMMERCE": "Ecommerce",
+        "PRODUCTS": "Products",
+        "PRODUCTDETAILS": "Product Details",
+        "CREATEPRODUCT": "Create Product",
+        "ORDERS": "Orders",
+        "ORDERDETAILS": "Order Details",
+        "CUSTOMERS": "Customers",
+        "SHOPPINGCART": "Shopping Cart",
+        "CHECKOUT": "Checkout",
+        "SELLERS": "Sellers",
+        "SELLERDETAILS": "Seller Details",
+        "PROJECTS": "Projects",
+        "LIST": "List",
+        "OVERVIEW": "Overview",
+        "CREATEPROJECT": "Create Project",
+        "TASK": "Tasks",
+        "KANBANBOARD": "Kanban Board",
+        "LISTVIEW": "List View",
+        "TASKDETAILS": "Task Details",
+        "CRM": "CRM",
+        "CONTACTS": "Contacts",
+        "COMPANIES": "Companies",
+        "DEALS": "Deals",
+        "LEADS": "Leads",
+        "CRYPTO": "Crypto",
+        "TRANSACTIONS": "Transactions",
+        "BUY&SELL": "Buy & Sell",
+        "MYWALLET": "My Wallet",
+        "ICOLIST": "ICO List",
+        "KYCAPPLICATION": "KYC Application",
+        "INVOICES": "Invoices",
+        "DETAILS": "Details",
+        "CREATEINVOICE": "Create Invoice",
+        "SUPPORTTICKETS": "Support Tickets",
+        "TICKETDETAILS": "Ticket Details",
+        "NFTMARKETPLACE": "NFT Marketplace",
+        "MARKETPLACE": "Marketplace",
+        "EXPLORENOW": "Explore Now",
+        "LIVEAUCTION": "Live Auction",
+        "ITEMDETAILS": "Item Details",
+        "COLLECTIONS": "Collections",
+        "CREATORS": "Creators",
+        "RANKING": "Ranking",
+        "WALLETCONNECT": "Wallet Connect",
+        "CREATENFT": "Create NFT",
+        "FILEMANAGER": "File Manager",
+        "TODO": "To Do",
+        "JOBS": "Jobs",
+        "STATISTICS": "Statistics",
+        "JOBLISTS": "Job Lists",
+        "GRID": "Grid",
+        "CANDIDATELISTS": "Candidate Lists",
+        "GRIDVIEW": "Grid View",
+        "APPLICATION": "Application",
+        "NEWJOB": "New Job",
+        "COMPANIESLIST": "Companies List",
+        "JOBCATEGORIES": "Job Categories",
+        "APIKEY": "API Key"
+      }
+    },
+    "LAYOUTS": {
+      "TEXT": "Layouts",
+      "LIST": {
+        "HORIZONTAL": "Horizontal",
+        "DETACHED": "Detached",
+        "TWOCOLUMN": "Two Column",
+        "HOVERED": "Hovered"
+      }
+    },
+    "PAGES": {
+      "TEXT": "Pages"
+    },
+    "AUTHENTICATION": {
+      "TEXT": "Authentication",
+      "LIST": {
+        "BASIC": "Basic",
+        "COVER": "Cover",
+        "SIGNIN": "Sign In",
+        "SIGNUP": "Sign Up",
+        "PASSWORDRESET": "Password Reset",
+        "PASSWORDCREATE": "Password Create",
+        "LOCKSCREEN": "Lock Screen",
+        "LOGOUT": "Logout",
+        "SUCCESSMESSAGE": "Success Message",
+        "TWOSTEPVERIFICATION": "Two Step Verification",
+        "ERRORS": "Errors",
+        "404BASIC": "404 Basic",
+        "404COVER": "404 Cover",
+        "404ALT": "404 Alt",
+        "500": "500",
+        "OFFLINE": "Offline Page"
+      }
+    },
+    "PAGES": {
+      "TEXT": "Pages",
+      "LIST": {
+        "STARTER": "Starter",
+        "PROFILE": "Profile",
+        "SIMPLEPAGE": "Simple Page",
+        "SETTINGS": "Settings",
+        "TEAM": "Team",
+        "TIMELINE": "Timeline",
+        "FAQS": "FAQs",
+        "PRICING": "Pricing",
+        "GALLERY": "Gallery",
+        "MAINTENANCE": "Maintenance",
+        "COMINGSOON": "Coming Soon",
+        "SITEMAP": "Sitemap",
+        "SEARCHRESULTS": "Search Results",
+        "PRIVACYPOLICY": "Privacy Policy",
+        "TERMS&CONDITIONS": "Term & Conditions"
+      }
+    },
+    "LANDING": {
+      "TEXT": "Landing",
+      "LIST": {
+        "ONEPAGE": "One Page",
+        "NFTLANDING": "NFT Landing",
+        "JOB": "Job"
+      }
+    },
+    "COMPONENTS": {
+      "TEXT": "Components"
+    },
+    "BASEUI": {
+      "TEXT": "Base UI",
+      "LIST": {
+        "ALERTS": "Alerts",
+        "BADGES": "Badges",
+        "BUTTONS": "Buttons",
+        "COLORS": "Colors",
+        "CARDS": "Cards",
+        "CAROUSEL": "Carousel",
+        "DROPDOWNS": "Dropdowns",
+        "GRID": "Grid",
+        "IMAGES": "Images",
+        "TABS": "Tabs",
+        "ACCORDION&COLLAPSE": "Accordion & Collapse",
+        "MODALS": "Modals",
+        "OFFCANVAS": "Offcanvas",
+        "PLACEHOLDERS": "Placeholders",
+        "PROGRESS": "Progress",
+        "NOTIFICATIONS": "Notifications",
+        "MEDIAOBJECT": "Media object",
+        "EMBEDVIDEO": "Embed Video",
+        "TYPOGRAPHY": "Typography",
+        "LISTS": "Lists",
+        "GENERAL": "General",
+        "RIBBONS": "Ribbons",
+        "UTILITIES": "Utilities"
+      }
+    },
+    "ADVANCEUI": {
+      "TEXT": "Advance UI",
+      "LIST": {
+        "SWEETALERTS": "Sweet Alerts",
+        "NESTABLELIST": "Nestable List",
+        "SCROLLBAR": "Scrollbar",
+        "ANIMATION": "Animation",
+        "TOUR": "Tour",
+        "SWIPERSLIDER": "Swiper Slider",
+        "RATTINGS": "Ratings",
+        "HIGHLIGHT": "Highlight",
+        "SCROLLSPY": "ScrollSpy"
+      }
+    },
+    "WIDGETS": {
+      "TEXT": "Widgets"
+    },
+    "FORMS": {
+      "TEXT": "Forms",
+      "LIST": {
+        "BASICELEMENTS": "Basic Elements",
+        "FORMSELECT": "Form Select",
+        "CHECKBOXS&RADIOS": "Checkboxs & Radios",
+        "PICKERS": "Pickers",
+        "INPUTMASKS": "Input Masks",
+        "ADVANCED": "Advanced",
+        "RANGESLIDER": "Range Slider",
+        "VALIDATION": "Validation",
+        "WIZARD": "Wizard",
+        "EDITORS": "Editors",
+        "FILEUPLOADS": "File Uploads",
+        "FORMLAYOUTS": "Form Layouts"
+      }
+    },
+    "TABLES": {
+      "TEXT": "Tables",
+      "LIST": {
+        "BASICTABLES": "Basic Tables",
+        "GRIDJS": "Grid Js",
+        "LISTJS": "List Js",
+        "DATATABLES": "Datatables"
+      }
+    },
+    "CHARTS": {
+      "TEXT": "Charts",
+      "LIST": {
+        "APEXCHARTS": "Apexcharts",
+        "LINE": "Line",
+        "AREA": "Area",
+        "COLUMN": "Column",
+        "BAR": "Bar",
+        "MIXED": "Mixed",
+        "TIMELINE": "Timeline",
+        "CANDLSTICK": "Candlstick",
+        "BOXPLOT": "Boxplot",
+        "BUBBLE": "Bubble",
+        "SCATTER": "Scatter",
+        "HEATMAP": "Heatmap",
+        "TREEMAP": "Treemap",
+        "PIE": "Pie",
+        "RADIALBAR": "Radialbar",
+        "RADAR": "Radar",
+        "POLARAREA": "Polar Area",
+        "CHARTJS": "Chartjs",
+        "ECHARTS": "Echarts"
+      }
+    },
+    "ICONS": {
+      "TEXT": "Icons",
+      "LIST": {
+        "REMIX": "Remix",
+        "BOXICONS": "Boxicons",
+        "MATERIALDESIGN": "Material Design",
+        "LINEAWESOME": "Line Awesome",
+        "FEATHER": "Feather",
+        "CRYPTOSVG": "Crypto SVG"
+      }
+    },
+    "MAPS": {
+      "TEXT": "Maps",
+      "LIST": {
+        "GOOGLE": "Google",
+        "VECTOR": "Vector",
+        "LEAFLET": "Leaflet"
+      }
+    },
+    "MULTILEVEL": {
+      "TEXT": "Multi Level",
+      "LIST": {
+        "LEVEL1": {
+          "1": "Level 1.1",
+          "2": "Level 1.2",
+          "LEVEL2": {
+            "1": "Level 2.1",
+            "2": "Level 2.2"
+          }
+        }
+      }
+    }
+  }
+}

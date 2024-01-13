@@ -12,6 +12,7 @@ Deploy:
 
 Serve:
 
+    ng serve altea-velzon-admin
     ng serve altea-pub-app --port 4300
 
 
@@ -19,3 +20,8 @@ ng generate component order-mgr/posPayment --project altea-velzon-admin
 ng generate component pos/posPayment --project ng-altea-common
 
 
+
+
+App project
+
+    ng generate component menu --project altea-pub-app

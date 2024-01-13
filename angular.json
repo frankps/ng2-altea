@@ -301,7 +301,17 @@
               "projects/altea-pub-app/src/assets"
             ],
             "styles": [
-              "projects/altea-pub-app/src/styles.scss"
+              "projects/altea-pub-app/src/styles.scss",
+              "node_modules/shepherd.js/dist/css/shepherd.css",
+              "node_modules/flatpickr/dist/flatpickr.css",          
+              "node_modules/@ctrl/ngx-emoji-mart/picker.css",
+              "node_modules/swiper/swiper-bundle.css",
+              "projects/altea-velzon-admin/src/assets/scss/config/minimal/bootstrap.scss",
+              "projects/altea-velzon-admin/src/assets/scss/config/minimal/app.scss",
+              "projects/altea-velzon-admin/src/assets/scss/icons.scss",
+              "node_modules/ngx-bootstrap/datepicker/bs-datepicker.css", 
+              "node_modules/ngx-spinner/animations/ball-scale-multiple.css",
+              "node_modules/@ng-select/ng-select/themes/default.theme.css"  
             ],
             "scripts": []
           },
