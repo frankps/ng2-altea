@@ -55,7 +55,7 @@
 
         
 
-        <div *ngFor="let line of order.lines" (click)="orderMgrSvc.selectExistingOrderLine(line)">
+        <div *ngFor="let line of order.lines" (click)="selectOrderLine(line)">
             <div class="row mt-2">
                 <div class="col-8">{{line.qty}} x {{line.descr}}</div>
                 <div class="col-4 d-flex justify-content-end">€ {{line.incl}}</div>
@@ -136,6 +136,11 @@
             <div class="col-6 d-flex justify-content-end">
                 <button type="button" class="btn btn-primary btn-sm"
                 (click)="orderMgrSvc.getAvailabilities()">Slots</button>
+
+
+                <button type="button" class="btn btn-primary btn-sm mx-2" (click)="next()"
+                translate>msg.continue</button>
+
 
                 <button type="button" class="btn btn-primary btn-sm mx-2" (click)="orderMgrSvc.saveOrder()"
                     translate>dic.save</button>

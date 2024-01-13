@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { OrderMgrUiService } from '../order-mgr-ui.service';
 import { SessionService } from 'ng-altea-common';
-import { ResourceType } from 'ts-altea-model';
+import { Order, ResourceType } from 'ts-altea-model';
 import { DashboardService, ToastType } from 'ng-common'
 
 export class DemoOrderLine {
@@ -64,6 +64,8 @@ export class DemoOrder {
 })
 export class DemoOrdersComponent {
 
+  @Output() new: EventEmitter<Order> = new EventEmitter<Order>();
+
   wellnessId = "31eaebbc-af39-4411-a997-f2f286c58a9d"
   massageId = "51d89ac4-0ede-49ab-835f-2a3dda81bd70"
   manicureId = "46af990e-dc8f-461d-a48d-f39b9f782b0d"
@@ -108,6 +110,8 @@ export class DemoOrdersComponent {
     }
 
     console.error(this.orderMgrSvc.order)
+
+    this.new.emit(this.orderMgrSvc.order)
 
   }
 

@@ -110,7 +110,7 @@ export const MENU: MenuItem[] = [
     id: 10,
     label: 'menu.order.label',
     icon: 'home',
-    link: '/aqua/order',
+    link: '/aqua/orders/manage',
   },
   {
     id: 11,

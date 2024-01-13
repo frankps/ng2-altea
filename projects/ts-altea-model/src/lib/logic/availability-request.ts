@@ -19,6 +19,9 @@ export class AvailabilityRequest {
 
     debug = false
 
+    /** if preferred staff members: supply id's */
+    staffIds: string[] = []
+
     constructor(order?: Order) {
         this.order = order
 

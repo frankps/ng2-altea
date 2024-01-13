@@ -1,0 +1,46 @@
+<div class="card">
+    <div class="card-header" translate>
+        ui.order-mgr.staff.title
+    </div>
+    <div class="card-body">
+
+
+
+        <div class="d-grid gap-2">
+            <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                <input type="radio" class="btn-check" name="btnTypes" id="noPreferredStaff" value="noPreference"
+                    [(ngModel)]="preferredStaff" autocomplete="off" checked>
+                <label class="btn btn-outline-primary" for="noPreferredStaff"
+                    translate>ui.order-mgr.staff.no-pref</label>
+
+                <input type="radio" class="btn-check" name="btnTypes" id="preferredStaff" value="preference"
+                    [(ngModel)]="preferredStaff" autocomplete="off">
+                <label class="btn btn-outline-primary" for="preferredStaff" translate>ui.order-mgr.staff.pref</label>
+            </div>
+        </div>
+
+
+
+        <div class="mt-3 d-flex justify-content-center" *ngIf="preferredStaff == 'preference'">
+
+            <ngx-altea-label-control layout="list" label="ui.order-mgr.staff.lst-pref" for="preference">
+
+                <div class="form-check mt-2" *ngFor="let employee of staff">
+                    <input class="form-check-input" type="checkbox" [id]="employee.id" [(ngModel)]="selection[employee.id]"/>
+                    <!-- [(ngModel)]="object.showPrice" -->
+                    <label class="form-check-label" [for]="employee.id">{{employee.name}}</label>
+                </div>
+
+            </ngx-altea-label-control>
+
+        </div>
+
+        
+        <div class="d-grid mt-3">
+            <button *ngIf="preferredStaff" type="button" class="btn btn-outline-secondary float-end" (click)="continue()" translate>msg.continue</button>
+        </div>
+        
+
+
+    </div>
+</div>

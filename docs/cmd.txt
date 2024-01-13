@@ -16,6 +16,15 @@ Deploy:
 
 
 
+Dev:
+
+    Copy i18n files:
+    * open _copy.sh
+    * press F1
+    * Terminal: Run active file in active Terminal
+    
+
+
 
 ng generate component order-mgr/posPayment --project altea-velzon-admin
 ng generate component pos/posPayment --project ng-altea-common
@@ -25,4 +34,9 @@ ng generate component pos/posPayment --project ng-altea-common
 
 App project
 
-    ng generate component menu --project altea-pub-app
+    ng generate component order --project altea-pub-app
+
+
+
+
+ng generate component order-mgr/staff-select --project ng-altea-common

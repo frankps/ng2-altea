@@ -59,7 +59,7 @@ export class EditResourceComponent extends NgEditBaseComponent<Resource> impleme
       , resourceSvc
       , route, spinner, dashboardSvc)
 
-    this.sectionProps.set('general', ['name', 'descr', 'color', 'start', 'end', 'isGroup', 'type', 'customSchedule'])   // , 'color'
+    this.sectionProps.set('general', ['name', 'descr', 'color', 'start', 'end', 'isGroup', 'type', 'customSchedule', 'online'])   // , 'color'
     this.sectionProps.set('schedule', ['schedules'])
   }
 

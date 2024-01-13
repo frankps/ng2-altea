@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { OrderMgrUiService } from '../order-mgr-ui.service';
 import { SessionService } from 'ng-altea-common';
-import { ResourceType } from 'ts-altea-model';
+import { Order, OrderLine, ResourceType } from 'ts-altea-model';
 
 @Component({
   selector: 'order-mgr-order',
@@ -9,6 +9,12 @@ import { ResourceType } from 'ts-altea-model';
   styleUrls: ['./order.component.scss'],
 })
 export class OrderComponent {
+
+  @Output() orderLineSelected: EventEmitter<OrderLine> = new EventEmitter<OrderLine>();
+
+
+  @Output() continue: EventEmitter<Order> = new EventEmitter<Order>();
+
 
   ResourceTypeIcons = ResourceType
 
@@ -28,6 +34,17 @@ export class OrderComponent {
   }
 
   constructor(protected orderMgrSvc: OrderMgrUiService, protected sessionSvc: SessionService) {
+  }
+
+
+  next() {
+    this.continue.emit(this.orderMgrSvc.order)
+  }
+
+  selectOrderLine(line: OrderLine) {
+
+    this.orderMgrSvc.selectExistingOrderLine(line)
+    this.orderLineSelected.emit(line)
   }
 
 }

@@ -160,6 +160,14 @@ export class OrderMgrUiService {
 
   }
 
+  nrOfOrderLines(): number {
+
+    if (!this.order)
+      return 0
+
+    return this.order.nrOfLines()
+  }
+
   availabilityResponse: AvailabilityResponse
   options: ReservationOption[]
 

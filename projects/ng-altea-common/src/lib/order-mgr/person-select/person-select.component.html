@@ -3,9 +3,6 @@
     ui.order-mgr.persons.title
   </div>
   <div class="card-body">
-    <!--<h5 class="card-title" translate></h5>
-       <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-      <a href="#" class="btn btn-primary">Go somewhere</a> -->
 
     <div class="row mt-2 mb-3">
       <div class="col" translate>ui.order-mgr.persons.how-many
@@ -21,9 +18,8 @@
 
 
     <ng-container *ngIf="mgrUiSvc.order.nrOfPersons > 1">
-
       <div class="mt-2" *ngFor="let personLine of personLines">
-        <!-- (change)="selectOption(option.id,$event.target.value)"  [name]="option.id" -->
+
         <div class="row mt-2">
           <div class="col ms-2">
             {{personLine.descr}}
@@ -40,50 +36,7 @@
         </div>
 
       </div>
-
     </ng-container>
-
-
-
-
-
 
   </div>
 </div>
-
-
-
-
-
-<!-- <div class="row" *ngIf="showOptions && personLine.orderLine && personLine.orderLine.options">
-
-          <div class="col" style="margin-left: 10px">
-            <div *ngFor="let option of personLine.orderLine.options">
-
-              <div *ngIf="option.allowMultiSelect;then multiSelectInfo else singleSelectInfo">here is ignored</div>
-
-              <ng-template #multiSelectInfo>
-                <b>{{option.name}}: </b>
-                <ul *ngIf="option.values">
-                  <li *ngFor="let value of option.values"> {{value.name}}
-                    
-                  </li>
-                </ul>
-              </ng-template>
-
-              <ng-template #singleSelectInfo>
-                <div *ngIf="option.values[0].productOptionValueId !== 0">
-                  <i>{{option.name}}: </i> <span *ngIf="option.values && option.values.length > 0"> {{option.values[0].name}}</span>
-                </div>
-              </ng-template>
-
-            </div>
-
-
-          </div>
-
-
-
-
-
-        </div> -->

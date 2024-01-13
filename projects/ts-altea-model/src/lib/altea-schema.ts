@@ -1413,7 +1413,10 @@ export class Resource extends ObjectWithId {
   //isRole?: boolean;
   tel?: string;
   email?: string;
-  onlineBookings?: boolean;
+
+  /** human resources only: staff member can be selected online by customers as prefered */
+  online?: boolean;
+
   type?: ResourceType;
   branches?: string[];
   active?: boolean;
@@ -1918,7 +1921,7 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
   vat = 0;
 
   @Type(() => VatLine)
-  vatLines?: VatLine[] = []  
+  vatLines?: VatLine[] = []
 
   @Type(() => Number)
   incl = 0;
@@ -2005,6 +2008,14 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
     return (Array.isArray(this.lines) && this.lines.length > 0)
   }
 
+  nrOfLines(): number {
+    if (!Array.isArray(this.lines))
+      return 0
+
+    return this.lines.length
+
+  }
+
   getLine(orderLineId: string): OrderLine | undefined {
 
     return this.lines?.find(l => l.id == orderLineId)
@@ -2056,7 +2067,7 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
   }
 
   calculateAll() {
-    
+
     this.makeLineTotals()
     this.calculateVat()
   }
@@ -2384,7 +2395,7 @@ export class OrderLineOption extends ObjectWithId {
     return olOption
   }
 
-  hasFormula() : boolean {
+  hasFormula(): boolean {
     return Array.isArray(this.formula) && this.formula.length > 0
   }
 

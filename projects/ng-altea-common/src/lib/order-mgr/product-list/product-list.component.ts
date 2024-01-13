@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { OrderMgrUiService } from '../order-mgr-ui.service';
 import { Order, OrderLine, OrderLineOption, Product, ProductType, ProductTypeIcons, Resource } from 'ts-altea-model'
 
@@ -11,20 +11,23 @@ import { Order, OrderLine, OrderLineOption, Product, ProductType, ProductTypeIco
 })
 export class ProductListComponent {
 
+  @Output() productSelected: EventEmitter<Product> = new EventEmitter<Product>();
+
   constructor(protected orderMgrSvc: OrderMgrUiService) {
 
   }
 
-  productSelected(product: Product) {
+  select(product: Product) {
 
     if (!product)
       return
 
     if (product.isCategory)
       this.orderMgrSvc.showProductsInCategory(product.id)
-    else
+    else {
       this.orderMgrSvc.newOrderLine(product)
-
+      this.productSelected.emit(product)
+    }
 
   }
 

@@ -3,6 +3,22 @@
         {
             "filePath": "projects/ts-altea-model/src/lib/altea-schema.ts",
             "group": "Default"
+        },
+        {
+            "filePath": "projects/altea-velzon-admin/src/app/velzon/layouts/sidebar/menu.ts",
+            "group": "Default"
+        },
+        {
+            "filePath": "docs/cmd.txt",
+            "group": "Default"
+        },
+        {
+            "filePath": "projects/ng-altea-common/src/lib/order-mgr",
+            "group": "Default"
+        },
+        {
+            "filePath": "projects/altea-velzon-admin/src/assets/i18n/en.json",
+            "group": "Default"
         }
     ]
 }

@@ -14,6 +14,7 @@ import { nlBeLocale } from 'ngx-bootstrap/locale';
 import { NgAlteaCommonModule } from 'ng-altea-common';
 import { MenuComponent } from './menu/menu.component';
 import { OrderMgrModule } from 'ng-altea-common';
+import { OrderComponent } from './order/order.component';
 
 defineLocale('nl-be', nlBeLocale);
 
@@ -24,7 +25,8 @@ export function createTranslateLoader(http: HttpClient): any {
 @NgModule({
   declarations: [
     AppComponent,
-    MenuComponent
+    MenuComponent,
+    OrderComponent
   ],
   imports: [
     BrowserModule,

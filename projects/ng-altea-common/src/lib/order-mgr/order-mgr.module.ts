@@ -27,6 +27,7 @@ import { SelectTimeSlotComponent } from './select-time-slot/select-time-slot.com
 import { DemoOrdersComponent } from './demo-orders/demo-orders.component';
 import { ContactSelectComponent } from './contact-select/contact-select.component';
 import { PosPaymentComponent } from './pos-payment/pos-payment.component';
+import { StaffSelectComponent } from './staff-select/staff-select.component';
 
 @NgModule({
   declarations: [
@@ -43,6 +44,7 @@ import { PosPaymentComponent } from './pos-payment/pos-payment.component';
     DemoOrdersComponent,
     ContactSelectComponent,
     PosPaymentComponent,
+    StaffSelectComponent,
   ],
   imports: [
     CommonModule,
@@ -72,6 +74,7 @@ import { PosPaymentComponent } from './pos-payment/pos-payment.component';
     DemoOrdersComponent,
     ContactSelectComponent,
     PosPaymentComponent,
+    StaffSelectComponent
   ]
 })
 export class OrderMgrModule {}

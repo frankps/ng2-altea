@@ -5,7 +5,7 @@
         <div class="card-header">
 
             <div class="row">
-                <div class="col-10 d-flex justify-content-start align-items-center">
+                <div class="col-9 d-flex justify-content-start align-items-center">
 
                     <ng-select id="qty" name="qty" style="width: 60px;" [items]="qtyArray" [clearable]="false"
                         [multiple]="false" [(ngModel)]="orderLine.qty" (change)="qtyChanged()">
@@ -16,16 +16,20 @@
                     {{product.name}}
 
                 </div>
-                <div class="col">
+                <div class="col-3">
+
+                    <button *ngIf="!orderMgrSvc.orderLineIsNew" type="button" class="btn btn-primary btn-sm float-end ms-1"
+                    (click)="closeOrderLine()" translate><i
+                        class="fa-solid fa-basket-shopping fa-lg"></i></button>
 
 
                     <button *ngIf="orderMgrSvc.orderLineIsNew" type="button" class="btn btn-primary btn-sm float-end"
-                        (click)="orderMgrSvc.addOrderLine(orderLine)" translate><i
-                            class="fa-solid fa-plus fa-lg"></i></button>
+                        (click)="addOrderLine(orderLine)" translate><i class="fa-solid fa-plus fa-lg"></i></button>
 
                     <button *ngIf="!orderMgrSvc.orderLineIsNew" type="button" class="btn btn-primary btn-sm float-end"
-                        (click)="orderMgrSvc.deleteCurrentOrderLine()" translate><i
-                            class="fa-solid fa-minus fa-lg"></i></button>
+                        (click)="deleteOrderLine()" translate><i
+                            class="fa-solid fa-trash-can fa-lg"></i></button>
+
 
                 </div>
             </div>

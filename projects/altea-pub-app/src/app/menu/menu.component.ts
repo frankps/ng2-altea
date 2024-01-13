@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-menu',
@@ -7,9 +8,16 @@ import { Component } from '@angular/core';
 })
 export class MenuComponent {
 
+  constructor(protected router: Router) {}
+
+
   menuClicked(menuCode) {
 
     console.error(menuCode)
+
+    this.router.navigate(['/order'])
+
+
 
   }
 }

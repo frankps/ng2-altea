@@ -2,6 +2,7 @@
   "toasts": {},
   "msg": {
     "save": "Opslaan",
+    "continue": "Doorgaan",
     "api-problem": "Er was een probleem!!",
     "input-not-valid": "'[input]' niet geldig!"
   },
@@ -274,6 +275,12 @@
       },
       "contacts": {
         "title": "Zoek klant"
+      },
+      "staff": {
+        "title": "Keuze personeel",
+        "no-pref": "Geen voorkeur",
+        "pref": "Iemand kiezen",
+        "lst-pref": "Wie heeft jouw voorkeur?"
       },
       "pays": {
         "title": "Betalingen"
@@ -560,6 +567,7 @@
       "end": "Tot en met",
       "isGroup": "Groep",
       "customSchedule": "Aangepast uurrooster",
+      "online": "Klanten kunnen deze persoon selecteren",
       "help": {
         "device-name": "De naam van het toestel",
         "group-name": "De naam van de groep",

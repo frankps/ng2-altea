@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { OrderMgrUiService } from '../order-mgr-ui.service';
 import { ProductService, SessionService } from 'ng-altea-common'
-import { OrderLineOption, OrderLineOptionValue, Product, ProductType } from 'ts-altea-model';
+import { OrderLine, OrderLineOption, OrderLineOptionValue, Product, ProductType } from 'ts-altea-model';
 
 
 
@@ -11,6 +11,12 @@ import { OrderLineOption, OrderLineOptionValue, Product, ProductType } from 'ts-
   styleUrls: ['./order-line.component.scss'],
 })
 export class OrderLineComponent {
+
+
+  @Output() new: EventEmitter<OrderLine> = new EventEmitter<OrderLine>();
+  @Output() delete: EventEmitter<OrderLine> = new EventEmitter<OrderLine>();
+
+  @Output() close: EventEmitter<void> = new EventEmitter();
 
 
   // create array from 1 to 20 , to select quantity
@@ -37,6 +43,27 @@ export class OrderLineComponent {
     this.orderMgrSvc.orderLine.markAsUpdated('qty')
     this.orderMgrSvc.order.calculateAll()
   }
+
+  // orderMgrSvc.addOrderLine(orderLine)
+
+  addOrderLine(orderLine: OrderLine) {
+
+    this.orderMgrSvc.addOrderLine(orderLine)
+    this.new.emit(orderLine)
+
+  }
+
+  closeOrderLine() {
+    this.close.emit()
+  }
+
+  deleteOrderLine() {
+    const orderLine = this.orderMgrSvc.orderLine
+    
+    this.orderMgrSvc.deleteCurrentOrderLine()
+    this.delete.emit(orderLine)
+  }
+
 
   optionChanged(option: OrderLineOption, optionValue: OrderLineOptionValue) {
 
