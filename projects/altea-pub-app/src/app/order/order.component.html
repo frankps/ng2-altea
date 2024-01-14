@@ -1,5 +1,3 @@
-
-
 <ng-container [ngSwitch]="mode">
 
     <ng-container *ngSwitchCase="'demo-orders'">
@@ -19,13 +17,14 @@
 
     <ng-container *ngSwitchCase="'order-line'">
 
-        <order-mgr-order-line (new)="newOrderLine()" (close)="closeOrderLine()" (delete)="deleteOrderLine()"></order-mgr-order-line>
+        <order-mgr-order-line (new)="newOrderLine()" (close)="closeOrderLine()"
+            (delete)="deleteOrderLine()"></order-mgr-order-line>
 
     </ng-container>
 
     <ng-container *ngSwitchCase="'order'">
-    
-        <order-mgr-order (orderLineSelected)="orderLineSelected($event)"  (continue)="orderFinished()"></order-mgr-order>
+
+        <order-mgr-order (orderLineSelected)="orderLineSelected($event)" (continue)="orderFinished()"></order-mgr-order>
 
     </ng-container>
 
@@ -35,7 +34,21 @@
 
     </ng-container>
 
-    
+
+    <ng-container *ngSwitchCase="'person-select'">
+
+        <order-mgr-person-select (selected)="personsSelected()"></order-mgr-person-select>
+
+    </ng-container>
+
+
+    <ng-container *ngSwitchCase="'select-date'">
+
+
+        <order-mgr-select-date></order-mgr-select-date>
+
+    </ng-container>
+
 
 
     <ng-container *ngSwitchCase="'default'">
@@ -45,9 +58,3 @@
     <ng-container *ngSwitchDefault>
     </ng-container>
 </ng-container>
-
-
-
-
-
-

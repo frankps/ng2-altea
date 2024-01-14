@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Output, EventEmitter, OnInit } from '@angular/core';
 import { OrderMgrUiService } from '../order-mgr-ui.service';
 import { ObjectService, SessionService } from 'ng-altea-common';
 import { Order, OrderPerson, OrderPersonMgr, PersonLine } from 'ts-altea-model';
@@ -13,10 +13,14 @@ import * as _ from "lodash";
 })
 export class PersonSelectComponent implements OnInit {
 
+  @Output() selected: EventEmitter<void> = new EventEmitter();
+
   personLines: PersonLine[] = []
 
   // copied from order.persons
   persons: OrderPerson[] = []
+
+
 
   constructor(protected mgrUiSvc: OrderMgrUiService, protected sessionSvc: SessionService, protected dbSvc: ObjectService) {
 
@@ -66,7 +70,7 @@ export class PersonSelectComponent implements OnInit {
   }
 
 
-
+   
 
   refreshPersons() {
 
@@ -96,7 +100,13 @@ export class PersonSelectComponent implements OnInit {
       let mgr = new OrderPersonMgr(order.persons)
       mgr.checkPersons(order.nrOfPersons);
     }
+  }
 
+  continue() {
+
+    this.selected.emit()
 
   }
+
+
 }

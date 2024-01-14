@@ -1243,6 +1243,10 @@ export class Branch extends ObjectWithId {
   postal?: string;
   country?: string;
 
+  phone?: string
+  mobile?: string
+  email?: string
+
   /** currency */
   cur?: string = 'EUR'
 

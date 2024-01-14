@@ -36,11 +36,19 @@
         <ng-container readonly>
 
             <div class="row">
-                <div class="col-6">
+                <div class="col-4">
                     <div class="subSection" translate>dic.name</div>
-                    {{object.name}}
+                    <div>{{object.name}}</div>
+                    <span *ngIf="object.descr" style="font-style: italic;">{{object.descr}}</span>
                 </div>
-                <div class="col-6">
+                <div class="col-4">
+                    <div class="subSection" translate>dic.communication</div>
+
+                    <ngx-altea-label-value label="dic.email" [value]="object.email"></ngx-altea-label-value>
+                    <ngx-altea-label-value label="dic.phone" [value]="object.phone"></ngx-altea-label-value>
+                    <ngx-altea-label-value label="dic.mobile" [value]="object.mobile"></ngx-altea-label-value>
+                </div>
+                <div class="col-4">
                     <div class="subSection" translate>dic.language</div>
 
                     <ngx-altea-label-value label="objects.branch.language"
@@ -49,14 +57,14 @@
             </div>
 
             <div class="row mt-3">
-                <div class="col-6">
+                <div class="col-4">
                     <div class="subSection" translate>dic.address</div>
                     {{object.street}}, {{object.streetNr}}<br>
                     {{object.postal}} {{object.city}} - {{object.country}}
 
 
                 </div>
-                <div class="col-6">
+                <div class="col-4">  
 
 
                     <div class="subSection" translate>ui.branch.edit.sections.general.vat</div>
@@ -87,6 +95,14 @@
                                 [(ngModel)]="object.name" />
                         </ngx-altea-label-control>
                     </div>
+
+                    <div class="col-6">
+                        <ngx-altea-label-control label="dic.descr" for="descr">
+                            <input type="text" id="descr" name="descr" class="form-control"
+                                [(ngModel)]="object.descr" />
+                        </ngx-altea-label-control>
+                    </div>
+
                 </div>
 
 
@@ -102,6 +118,28 @@
                     </div>
                 </div>
 
+                <div class="subSectionEdit" translate>dic.communication</div>
+
+                <div class="row mt-3">
+                    <div class="col-3">
+                        <ngx-altea-label-control label="dic.email" for="email">
+                            <input type="text" id="email" name="email" class="form-control"
+                                [(ngModel)]="object.email" />
+                        </ngx-altea-label-control>
+                    </div>
+                    <div class="col-3">
+                        <ngx-altea-label-control label="dic.phone" for="phone">
+                            <input type="text" id="phone" name="phone" class="form-control"
+                                [(ngModel)]="object.phone" />
+                        </ngx-altea-label-control>
+                    </div>
+                    <div class="col-3">
+                        <ngx-altea-label-control label="dic.mobile" for="mobile">
+                            <input type="text" id="mobile" name="mobile" class="form-control"
+                                [(ngModel)]="object.mobile" />
+                        </ngx-altea-label-control>
+                    </div>
+                </div>
 
                 <div class="subSectionEdit" translate>dic.address</div>
 
@@ -368,19 +406,19 @@
                                 <ng-container *ngFor="let vatPct of object.gift.invoice.vatPcts">
                                     <div class="row" *ngIf="vatPct.on">
                                         <div class="col-1">
-        
+
                                         </div>
-        
+
                                         <div class="col">
-        
+
                                             {{vatPct.pct}}% <span *ngIf="vatPct.descr">: {{vatPct.descr}}</span>
-        
+
                                         </div>
-        
-        
+
+
                                     </div>
                                 </ng-container>
-        
+
                             </ng-container>
 
                         </div>

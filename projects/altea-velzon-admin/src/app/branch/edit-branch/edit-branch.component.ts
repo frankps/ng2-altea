@@ -59,7 +59,7 @@ export class EditBranchComponent extends NgEditBaseComponent<Branch> implements 
       , contactSvc
       , route, spinner, dashboardSvc)
 
-    this.sectionProps.set('general', ['name', 'street', 'streetNr', 'postal', 'country', 'city', 'language', 'vatPcts', 'vatPct', 'vatNr', 'vatIncl'])
+    this.sectionProps.set('general', ['name', 'descr', 'street', 'streetNr', 'postal', 'country', 'city', 'language', 'vatPcts', 'vatPct', 'vatNr', 'vatIncl', 'phone', 'mobile', 'email'])
     this.sectionProps.set('communication', ['emailFrom', 'emailBcc', 'smsOn'])
     this.sectionProps.set('reminders', ['reminders'])
     this.sectionProps.set('deposit', ['depositPct', 'depositTerms', 'reminders'])
@@ -89,7 +89,7 @@ export class EditBranchComponent extends NgEditBaseComponent<Branch> implements 
 
   override objectRetrieved(object: Branch): void {
 
-    this.editSectionId = 'gift'
+    //this.editSectionId = 'gift'
   }
 
   save() {

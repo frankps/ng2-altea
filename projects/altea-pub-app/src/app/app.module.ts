@@ -12,7 +12,6 @@ import { defineLocale } from 'ngx-bootstrap/chronos';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { nlBeLocale } from 'ngx-bootstrap/locale';
 import { NgAlteaCommonModule } from 'ng-altea-common';
-import { MenuComponent } from './menu/menu.component';
 import { OrderMgrModule } from 'ng-altea-common';
 import { OrderComponent } from './order/order.component';
 
@@ -25,7 +24,6 @@ export function createTranslateLoader(http: HttpClient): any {
 @NgModule({
   declarations: [
     AppComponent,
-    MenuComponent,
     OrderComponent
   ],
   imports: [

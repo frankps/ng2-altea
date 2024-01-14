@@ -10,13 +10,9 @@ import { OrderLine } from 'ts-altea-model';
 export class OrderComponent {
 
   constructor(protected orderMgrSvc: OrderMgrUiService) {
-
-
   }
 
-
   mode: string = 'demo-orders'
-
 
   newDemoOrder() {
     this.mode = 'order'
@@ -47,11 +43,16 @@ export class OrderComponent {
   }
 
   orderFinished() {
-    this.mode = 'staff-select'
+    // this.mode = 'staff-select'   // person-select
+
+    this.mode = 'person-select'
   }
 
   staffSelected(staff: string[]) {
-
+    this.mode = 'select-time-slot'
   }
 
+  personsSelected() {
+    this.mode = 'select-date'
+  }
 }

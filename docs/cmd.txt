@@ -22,10 +22,11 @@ Dev:
     * open _copy.sh
     * press F1
     * Terminal: Run active file in active Terminal
-    
 
 
 
+ng generate module branch --project altea-pub-app --routing
+ng generate component branch/branch --project altea-pub-app
 ng generate component order-mgr/posPayment --project altea-velzon-admin
 ng generate component pos/posPayment --project ng-altea-common
 
