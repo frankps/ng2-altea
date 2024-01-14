@@ -31,7 +31,7 @@ export class SessionService implements OnInit {
   //public backend = "https://altea-1.ew.r.appspot.com"
 
   // public backend = "https://dvit-477c9.uc.r.appspot.com"
-   public backend = "http://localhost:8080"
+  public backend = "http://localhost:8080"
 
 
   ngOnInit() {
@@ -50,6 +50,10 @@ export class SessionService implements OnInit {
     this.branchSub.next(value)
   }
 
+  delay(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
 
   async branch$(): Promise<Branch> {
     const me = this
@@ -57,16 +61,18 @@ export class SessionService implements OnInit {
     return new Promise<any>(function (resolve, reject) {
 
       // 
-      const sub = me.branchSub.pipe(Rx.filter(branch => branch != undefined && branch !== null)).subscribe(branch => {
+      const sub = me.branchSub.pipe(Rx.filter(branch => branch != undefined && branch !== null)).subscribe(async branch => {
 
         if (branch) {
           resolve(branch)
+
+          await me.delay(100)  // otherwise the unsubscribe below might not work (sub not yet assigned)
 
           if (sub)
             sub.unsubscribe()
         }
 
-  
+
       })
     })
   }

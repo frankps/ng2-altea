@@ -4,6 +4,10 @@ import { SessionService } from '../../session.service';
 import { Branch } from 'ts-altea-model';
 
 
+export class MenuItem {
+  constructor(public code: string) {}
+}
+
 @Component({
   selector: 'altea-lib-main-menu',
   templateUrl: './main-menu.component.html',
@@ -16,7 +20,7 @@ export class MainMenuComponent implements OnInit {
 
   branch: Branch
 
-  @Output() select: EventEmitter<string> = new EventEmitter();
+  @Output() select: EventEmitter<MenuItem> = new EventEmitter();
 
 
   menu = [
@@ -48,7 +52,7 @@ export class MainMenuComponent implements OnInit {
     console.error(menuItem)
 
     if (menuItem)
-      this.select.emit(menuItem.code)
+      this.select.emit(menuItem)
   }
 
 

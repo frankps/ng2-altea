@@ -63,6 +63,14 @@ export class OrderMgrUiService {
     this.order.branchId = this.sessionSvc.branchId
   }
 
+  hasOrderLines() {
+
+    if (!this.order)
+      return false
+
+    return this.order.hasLines()
+  }
+
   async autoCreateOrder() {
 
     // const wellnessId = "31eaebbc-af39-4411-a997-f2f286c58a9d"

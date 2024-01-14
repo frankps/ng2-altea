@@ -40,11 +40,15 @@
     "end": "einde"
   },
   "enums": {
+    "gift-type": {
+      "amount": "Bedrag",
+      "specific": "Specifiek"
+    },
     "pay-type": {
       "cash": "Cash",
       "transfer": "Overschrijving",
       "credit": "VISA",
-      "dedit": "Bancontact",
+      "debit": "Bancontact",
       "gift": "Cadeaubon",
       "subs": "Abonnement"
 
@@ -199,6 +203,7 @@
   },
   
   "ui": {
+    
     "price": {
       "title": "Speciale prijzen & promoties",
       "add-option": "Nieuwe prijs voor optie"
@@ -444,7 +449,8 @@
     },
     "redeem": {
       "code": "Cadeaubon code",
-      "invalid": "Ongeldige code"
+      "invalid": "Ongeldige code",
+      "use": "Gebruik deze bon"
 
     }
   },
@@ -463,7 +469,8 @@
       "toAddress": "Adres ontvanger",
       "toMessage": "Persoonlijke boodschap aan ontvanger",
       "toSendEmail": "Verstuur mail naar ontvanger",
-      "certificate": "Certificaat"
+      "certificate": "Certificaat",
+      "lines": "Specifieke keuze:"
     },
     "address": {
       "street": "Straat",

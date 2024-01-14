@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Output, EventEmitter, OnInit } from '@angular/core';
 import { TranslationService } from 'ng-common'
 import { SessionService } from '../../session.service';
 import { Branch, Gift } from 'ts-altea-model';
@@ -11,6 +11,9 @@ import { DbQuery, QueryOperator } from 'ts-common';
   styleUrls: ['./redeem-gift.component.css']
 })
 export class RedeemGiftComponent implements OnInit {
+
+
+  @Output() select: EventEmitter<Gift> = new EventEmitter<Gift>()
 
   code: string = 'B241F'
   lbl = {}
@@ -50,4 +53,9 @@ export class RedeemGiftComponent implements OnInit {
 
     console.log(gifts)
   }
+
+  useGift() {
+    this.select.emit(this.gift)
+  }
+
 }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { OrderMgrUiService } from 'ng-altea-common';
 import { OrderLine } from 'ts-altea-model';
 
@@ -7,12 +7,22 @@ import { OrderLine } from 'ts-altea-model';
   templateUrl: './order.component.html',
   styleUrls: ['./order.component.scss']
 })
-export class OrderComponent {
+export class OrderComponent implements OnInit {
+
+  mode: string = 'browse-catalog'  //'demo-orders'
 
   constructor(protected orderMgrSvc: OrderMgrUiService) {
   }
 
-  mode: string = 'demo-orders'
+  ngOnInit(): void {
+
+    if (this.orderMgrSvc.hasOrderLines())
+      this.mode = 'order'
+    else
+      this.mode = 'browse-catalog'
+  }
+
+
 
   newDemoOrder() {
     this.mode = 'order'

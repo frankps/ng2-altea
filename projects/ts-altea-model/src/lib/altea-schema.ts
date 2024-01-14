@@ -3227,6 +3227,29 @@ export class GiftMethods {
 }
 
 
+/** GiftLine is a reduced version of an orderLine.
+ *  It is used for specific gift (products/services are gifted) instead of an amount.
+ *  
+ */
+export class GiftLine {
+
+  qty = 1
+  val = 0
+  
+  /** product id */
+  pId?: string
+
+  /** options */
+  @Type(() => OrderLineOption)
+  opts: OrderLineOption[] = []
+
+  descr?: string
+
+
+
+}
+
+
 /**
  * Changes:
  *   value?: number
@@ -3254,6 +3277,8 @@ export class Gift extends ObjectWithId {
 
   orderId?: string;
   type?: GiftType
+
+  lines?: GiftLine[] = []
 
   invoice = false
 
@@ -3291,6 +3316,10 @@ export class Gift extends ObjectWithId {
 
   isSpecific() {
     return this.type == GiftType.specific
+  }
+
+  hasLines() {
+    return Array.isArray(this.lines) && this.lines.length > 0
   }
 
   methodSelected() {

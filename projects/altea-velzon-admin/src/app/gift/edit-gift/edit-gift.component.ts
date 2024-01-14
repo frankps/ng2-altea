@@ -97,6 +97,9 @@ export class EditGiftComponent extends NgEditBaseComponent<Gift> {
         this.saveSection(this.sectionProps, this.editSectionId)
     }
 
+
+    
+
   }
 
 
