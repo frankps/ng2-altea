@@ -1,9 +1,12 @@
 import { Component, Output, EventEmitter, OnInit } from '@angular/core';
 import { TranslationService } from 'ng-common'
 import { SessionService } from '../../session.service';
-import { Branch, Gift } from 'ts-altea-model';
+import { Branch, Gift, GiftType, RedeemGift } from 'ts-altea-model';
 import { GiftService } from '../../gift.service';
 import { DbQuery, QueryOperator } from 'ts-common';
+
+
+
 
 @Component({
   selector: 'altea-lib-redeem-gift',
@@ -13,9 +16,9 @@ import { DbQuery, QueryOperator } from 'ts-common';
 export class RedeemGiftComponent implements OnInit {
 
 
-  @Output() select: EventEmitter<Gift> = new EventEmitter<Gift>()
+  @Output() redeem: EventEmitter<RedeemGift> = new EventEmitter<RedeemGift>()
 
-  code: string = 'B241F'
+  code: string = 'AF9EF'   // AF9EF   D1BAA
   lbl = {}
   branch: Branch
   gift: Gift
@@ -41,11 +44,6 @@ export class RedeemGiftComponent implements OnInit {
     const query = new DbQuery()
     query.and('code', QueryOperator.equals, this.code)
 
-    /*     query.and('deleted', QueryOperator.equals, false)
-        query.take = 200
-        query.select('id', 'catId', 'name', 'type') */
-
-
     const gifts = await this.giftSvc.query$(query)
 
     if (Array.isArray(gifts) && gifts.length > 0)
@@ -54,8 +52,11 @@ export class RedeemGiftComponent implements OnInit {
     console.log(gifts)
   }
 
-  useGift() {
-    this.select.emit(this.gift)
+  useAmountGift() {
+    this.redeem.emit(new RedeemGift(this.gift, GiftType.amount))
   }
 
+  useSpecificGift() {
+    this.redeem.emit(new RedeemGift(this.gift, GiftType.specific))
+  }
 }

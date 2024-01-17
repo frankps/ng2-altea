@@ -40,14 +40,17 @@
     "end": "einde"
   },
   "enums": {
+    "gift-type": {
+      "amount": "Bedrag",
+      "specific": "Specifiek"
+    },
     "pay-type": {
       "cash": "Cash",
       "transfer": "Overschrijving",
       "credit": "VISA",
-      "dedit": "Bancontact",
+      "debit": "Bancontact",
       "gift": "Cadeaubon",
       "subs": "Abonnement"
-
     },
     "msg-type": {
       "sms": "SMS",
@@ -446,7 +449,9 @@
     "redeem": {
       "code": "Cadeaubon code",
       "invalid": "Ongeldige code",
-      "use": "Gebruik deze bon"
+      "use": "Gebruik deze bon",
+      "use-specific": "Boek dit arrangement",
+      "use-amount": "Boek iets anders"
 
     }
   },
@@ -465,7 +470,8 @@
       "toAddress": "Adres ontvanger",
       "toMessage": "Persoonlijke boodschap aan ontvanger",
       "toSendEmail": "Verstuur mail naar ontvanger",
-      "certificate": "Certificaat"
+      "certificate": "Certificaat",
+      "lines": "Specifieke keuze:"
     },
     "address": {
       "street": "Straat",

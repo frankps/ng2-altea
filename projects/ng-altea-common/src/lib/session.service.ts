@@ -18,6 +18,11 @@ export class SessionService implements OnInit {
   public currencySymbol = ' €'
   public idxStep = 100
 
+  /** location: payment for instance keep track of location = which piece of software performed action  */
+  public loc = 'pos'
+
+  public devMode = false
+  
   public orgId?: string = "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c"
   public branchUnique = "aqua"
   public branchId?: string = "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c"

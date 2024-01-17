@@ -19,6 +19,10 @@
         {
             "filePath": "projects/altea-velzon-admin/src/assets/i18n/en.json",
             "group": "Default"
+        },
+        {
+            "filePath": "projects/altea-velzon-admin/src/assets/i18n/_copy_i18n.sh",
+            "group": "Default"
         }
     ]
 }

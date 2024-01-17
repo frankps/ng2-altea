@@ -1,15 +1,20 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import { Injectable } from '@angular/core';
-import { AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Contact, DateBorder, Order, OrderLine, OrderLineOption, OrderState, Payment, Product, ProductType, ProductTypeIcons, ReservationOption, Resource } from 'ts-altea-model'
+import { AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Contact, CreateCheckoutSession, DateBorder, Gift, GiftType, Order, OrderLine, OrderLineOption, OrderState, Payment, PaymentType, Product, ProductType, ProductTypeIcons, RedeemGift, ReservationOption, Resource } from 'ts-altea-model'
 import { ApiListResult, ApiStatus, DateHelper, DbQuery, QueryOperator, Translation } from 'ts-common'
 import { AlteaService, ObjectService, OrderMgrService, OrderService, ProductService, SessionService } from 'ng-altea-common'
 import * as _ from "lodash";
 import { NgxSpinnerService } from "ngx-spinner"
 import { DashboardService, ToastType } from 'ng-common';
-import { Observable, take, takeUntil } from 'rxjs';
+import { BehaviorSubject, Observable, take, takeUntil } from 'rxjs';
 import { AlteaDb } from 'ts-altea-logic';
 import * as dateFns from 'date-fns'
+import { StripeService } from '../stripe.service';
 
+export enum OrderMode {
+  demoOrders = 'demo-orders',
+  browseCatalog = 'browse-catalog'
+}
 
 
 @Injectable({
@@ -45,10 +50,12 @@ export class OrderMgrUiService {
 
 
 
+  modeChanges: BehaviorSubject<string> = new BehaviorSubject<string>(null)
+
 
   constructor(private productSvc: ProductService, private orderSvc: OrderService, private orderMgrSvc: OrderMgrService
     , protected spinner: NgxSpinnerService, public dbSvc: ObjectService, protected alteaSvc: AlteaService, protected sessionSvc: SessionService,
-    public dashboardSvc: DashboardService) {
+    public dashboardSvc: DashboardService, protected stripeSvc: StripeService) {
 
     // this.alteaDb = new AlteaDb(dbSvc)
     // this.getAllCategories()
@@ -57,6 +64,9 @@ export class OrderMgrUiService {
 
   }
 
+  changeMode(mode: OrderMode | string) {
+    this.modeChanges.next(mode)
+  }
 
   newOrder() {
     this.order = new Order(true)
@@ -133,9 +143,46 @@ export class OrderMgrUiService {
     me.spinner.hide()
 
     return products
-
   }
 
+
+  async redeemGift(redeemGift: RedeemGift) {
+
+    console.error(redeemGift)
+
+    if (!redeemGift)
+      return
+
+    const gift = redeemGift.gift
+
+    const availableAmount = gift.availableAmount()
+
+    this.newOrder()
+
+    /** if specific gift: gift contains specific products/services */
+    if (redeemGift.mode == GiftType.specific && gift.hasLines()) {
+
+      const productIds = gift.lines.filter(l => l.pId).map(l => l.pId!)
+
+      const products = await this.loadProducts$(...productIds)
+
+      for (let line of gift.lines) {
+
+        const product = products.find(p => p.id == line.pId.toLowerCase())
+
+        if (product) {
+          const optionValues = line.getOptionValuesAsMap()
+          this.addOrderLineFromProduct(product, line.qty, optionValues)
+        }
+      }
+    }
+
+    this.addPayment(availableAmount, PaymentType.gift, this.sessionSvc.loc)
+
+    console.error(this.order)
+
+
+  }
 
 
   async selectExistingOrderLine(line: OrderLine) {
@@ -281,17 +328,6 @@ export class OrderMgrUiService {
 
 
 
-  // async getOrderContext(order: Order) {
-
-  //   let productIds = order.lines.map(ol => ol.productId).filter(productId => productId && productId.length > 0)
-
-  //   let products = await this.alteaSvc.db.getProducts(productIds)
-
-  //   console.error(products)
-  // }
-
-
-
   selectDate() {
 
   }
@@ -336,19 +372,19 @@ export class OrderMgrUiService {
 
   }
 
-  newOrderLine(product: Product, qty = 1): OrderLine {
+  newOrderLine(product: Product, qty = 1, initOptionValues?: Map<String, String[]>): OrderLine {
 
     console.error(product)
 
     this.orderLineIsNew = true
     this.prepareProduct(product)
-    this.orderLine = new OrderLine(product, qty)
+    this.orderLine = new OrderLine(product, qty, initOptionValues)
 
     return this.orderLine
   }
 
-  addOrderLineFromProduct(product: Product, qty = 1) {
-    let orderLine = this.newOrderLine(product, qty)
+  addOrderLineFromProduct(product: Product, qty = 1, initOptionValues?: Map<String, String[]>) {
+    let orderLine = this.newOrderLine(product, qty, initOptionValues)
     this.addOrderLine(orderLine)
   }
 
@@ -372,9 +408,8 @@ export class OrderMgrUiService {
       return
 
     this.order.deletePayment(payment)
-
-
   }
+
 
 
   addPayment(amount: number, type: string, location: string) {
@@ -407,6 +442,36 @@ export class OrderMgrUiService {
 
     console.error(subscriptions)
   }
+
+
+  /*
+STRIPE integration
+
+  Usage:
+
+    const stripPaymentUrl = await this.orderMgrSvc.initStripePayment(59) 
+    window.location.href = stripPaymentUrl;
+
+*/
+
+
+async initStripePayment(amount: number) : Promise<string> {
+
+  console.warn('next()')
+
+  const checkout = new CreateCheckoutSession(amount * 100, 'Voorschot boeking', 'http://localhost:4300/branch/aqua/menu', 'http://localhost:4300/branch/aqua/menu')
+
+  const apiResult = await this.stripeSvc.createCheckoutSession$(checkout)
+  
+  console.error(apiResult.object.url)
+
+  const stripPaymentUrl = apiResult.object.url
+
+  return stripPaymentUrl
+}
+
+
+
 
 
 

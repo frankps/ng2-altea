@@ -13,7 +13,7 @@ export class BranchComponent implements OnInit {
 
   branch: Branch
 
-  constructor(protected sessionSvc: SessionService, protected router: Router, protected orderMgrSvc: OrderMgrUiService) {
+  constructor(protected sessionSvc: SessionService, protected router: Router,  protected orderMgrSvc: OrderMgrUiService) {
 
   }
 
@@ -27,11 +27,18 @@ export class BranchComponent implements OnInit {
   }
 
 
-  gotoBasket() {
-    this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'order'])
+  async gotoBasket() {
+    console.warn('gotoBasket')
+    
+    // navigate works only when on other page then 'order', therefor we also have changeMode('order')
+    await this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'order'])   // , { queryParams: { mode: 'basket' }}
+    this.orderMgrSvc.changeMode('order')
   }
 
   gotoMenu() {
+    console.warn('gotoMenu')
     this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'menu'])
   }
 }
+
+

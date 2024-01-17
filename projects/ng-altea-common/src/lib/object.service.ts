@@ -6,7 +6,7 @@ import { plainToInstance } from "class-transformer";
 import { Observable, map, Subject, take } from "rxjs";
 import { SessionService } from './session.service';
 import { IDb } from 'ts-altea-logic';
-import { Message, Order } from 'ts-altea-model';
+import { CreateCheckoutSession, Message, Order } from 'ts-altea-model';
 
 
 @Injectable({
@@ -15,6 +15,39 @@ import { Message, Order } from 'ts-altea-model';
 export class ObjectService implements IDb {
 
   constructor(protected http: HttpClient, protected sessionSvc: SessionService) { }
+
+
+  //  async createCheckoutSession(checkout: CreateCheckoutSession) : Promise<Stripe.Response<Stripe.Checkout.Session>> {
+
+  /*
+
+  createCheckoutSession(checkout: CreateCheckoutSession): Observable<any> {
+
+    return this.http.post<any>(`${this.sessionSvc.backend}/stripe/createCheckoutSession`, checkout).pipe(map(session => {
+
+      console.error(session)
+
+      return session
+    }
+    ))
+  }
+
+  async createCheckoutSession$(checkout: CreateCheckoutSession): Promise<any> {
+
+    const me = this
+
+    return new Promise<any>(function (resolve, reject) {
+
+      me.createCheckoutSession(checkout).pipe(take(1)).subscribe(res => {
+        resolve(res)
+      })
+
+    })
+
+  }
+  */
+
+
 
 
   create<T>(dbObject: DbObject<T>): Observable<ApiResult<T>> {
@@ -76,7 +109,7 @@ export class ObjectService implements IDb {
 
 
 
-          
+
       }
 
       return res

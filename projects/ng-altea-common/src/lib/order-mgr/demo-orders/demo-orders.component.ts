@@ -104,7 +104,8 @@ export class DemoOrdersComponent {
 
       const product = products.find(p => p.id == line.productId)
 
-      this.orderMgrSvc.addOrderLineFromProduct(product, line.qty)
+      if (product)
+        this.orderMgrSvc.addOrderLineFromProduct(product, line.qty)
       // line.productId
 
     }

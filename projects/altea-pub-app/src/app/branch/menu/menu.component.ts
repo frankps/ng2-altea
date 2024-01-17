@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SessionService } from 'ng-altea-common';
+import { OrderMgrUiService, OrderMode, SessionService } from 'ng-altea-common';
 
 @Component({
   selector: 'app-menu',
@@ -9,7 +9,7 @@ import { SessionService } from 'ng-altea-common';
 })
 export class MenuComponent {
 
-  constructor(protected sessionSvc: SessionService, protected router: Router) { }
+  constructor(protected sessionSvc: SessionService, protected router: Router, protected orderMgrSvc: OrderMgrUiService) { }
 
 
   menuClicked(menuItem) {
@@ -24,6 +24,9 @@ export class MenuComponent {
     switch (menuItem.code) {
 
       case 'new-reserv':
+        
+        this.orderMgrSvc.newOrder()
+        this.orderMgrSvc.changeMode(OrderMode.browseCatalog)
         this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'order'])
         break
 

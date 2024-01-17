@@ -1,3 +1,13 @@
+
+Stripe:
+
+  CheckOut
+    https://stripe.com/docs/checkout/quickstart
+    https://stripe.com/docs/payments/checkout/how-checkout-works
+    
+
+
+
 Deploy:
 
   Followed procedure from this document:

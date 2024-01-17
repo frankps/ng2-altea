@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { OrderMgrUiService } from 'ng-altea-common';
 import { OrderLine } from 'ts-altea-model';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-order',
@@ -11,7 +12,7 @@ export class OrderComponent implements OnInit {
 
   mode: string = 'browse-catalog'  //'demo-orders'
 
-  constructor(protected orderMgrSvc: OrderMgrUiService) {
+  constructor(protected orderMgrSvc: OrderMgrUiService, protected route: ActivatedRoute) {
   }
 
   ngOnInit(): void {
@@ -20,6 +21,12 @@ export class OrderComponent implements OnInit {
       this.mode = 'order'
     else
       this.mode = 'browse-catalog'
+
+    this.orderMgrSvc.modeChanges.subscribe(newMode => {
+
+      if (newMode)
+        this.mode = newMode
+    })
   }
 
 

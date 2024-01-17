@@ -1,0 +1,1 @@
+cp * ../../../../altea-pub-app/src/assets/i18n

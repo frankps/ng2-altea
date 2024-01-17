@@ -1,5 +1,8 @@
 import { Component } from '@angular/core';
-import { Gift } from 'ts-altea-model';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Gift, RedeemGift } from 'ts-altea-model';
+import { OrderMgrUiService } from 'ng-altea-common';
+import { SessionService } from 'ng-altea-common';
 
 @Component({
   selector: 'app-use-gift',
@@ -8,11 +11,17 @@ import { Gift } from 'ts-altea-model';
 })
 export class UseGiftComponent {
 
+  constructor(protected sessionSvc: SessionService, protected orderMgrSvc: OrderMgrUiService, protected router: Router) {
+  }
 
+  async useGift(redeemGift: RedeemGift) {
 
-  useGift(gift: Gift) {
+    console.error(redeemGift)
 
-    console.error(gift)
+    await this.orderMgrSvc.redeemGift(redeemGift)
+
+    this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'order'])
+
 
     //gift.l
     

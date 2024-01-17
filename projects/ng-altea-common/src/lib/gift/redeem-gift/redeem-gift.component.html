@@ -48,13 +48,41 @@
                     </span>
                 </p>
 
-                <div class="d-grid mt-3">
-                    <button type="button" class="btn btn-outline-secondary float-end" (click)="useGift()"
-                      translate>app.redeem.use</button>
-                  </div>
+                <ng-container *ngIf="gift.hasLines()">
 
-                <!--   <a href="#" class="btn btn-primary">Go somewhere</a>
-             -->
+                    <div class="subSection mt-3" translate>objects.gift.lines</div>
+    
+                    <div class="row ms-3" *ngFor="let line of gift.lines">
+                        <div class="col">
+                            {{line.qty}} x {{line.descr}}
+                        </div>
+                    </div>
+    
+    
+    
+                </ng-container>
+
+
+
+                <div class="d-grid mt-3" *ngIf="gift.isAmount()">
+                    <button type="button" class="btn btn-outline-secondary float-end" (click)="useAmountGift()"
+                      translate>app.redeem.use</button>
+                </div>
+
+                <ng-container *ngIf="gift.isSpecific()">
+                    <div class="d-grid mt-3">
+                        <button type="button" class="btn btn-outline-secondary float-end" (click)="useSpecificGift()"
+                        translate>app.redeem.use-specific</button>
+                    </div>
+
+                    <div class="d-grid mt-3">
+                        <button type="button" class="btn btn-outline-secondary float-end" (click)="useAmountGift()"
+                        translate>app.redeem.use-amount</button>
+                    </div>
+
+
+                </ng-container>
+
             </div>
         </div>
 

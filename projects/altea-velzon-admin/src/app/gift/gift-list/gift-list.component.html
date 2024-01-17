@@ -13,14 +13,44 @@
                 <div class="row">
                     <div class="col-4"><b>{{ gift.code }}</b></div>
                     <div class="col-4">{{ gift.used }}/{{ gift.value }}</div>
-                    <div class="col-4 d-flex justify-content-end">{{ gift.createdAt | date: sessionSvc.formats.date }}</div>
+                    <div class="col-4"><span class="badge rounded-pill text-bg-primary float-end"
+                            translate>enums.gift-type.{{gift.type}}</span></div>
+
                 </div>
+
+
+                <ng-container *ngIf="gift.hasLines()">
+    
+                    
+                    <div class="row" *ngFor="let line of gift.lines">
+                        <div class="col ms-3">
+                            <small>{{line.qty}} x {{line.descr}}</small>
+                        </div>
+                    </div>
+    
+                </ng-container>
 
                 <!-- <i class="{{ResourceTypeIcons[contact.type]}}"></i> &nbsp;  -->
 
+    
+
+                <div class="row mt-2" >
+                    <div class="col-6"><span style="font-size: small">{{gift.fromName}}</span></div>
+                    <div class="col-6"><span class="float-end" style="font-size: small">{{gift.fromEmail}}</span></div>      
+                  </div>
+              
+
+
+
                 <div class="row">
-                    <div class="col">{{gift.fromName}} {{gift.fromEmail}}</div>
+                    <div class="col-4"></div>
+                    <div class="col-4"></div>
+                    <div class="col-4"><span class="float-end" style="font-size: small">{{ gift.createdAt | date: sessionSvc.formats.date }}</span></div>
                 </div>
+
+
+
+
 
 
 

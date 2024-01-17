@@ -40,20 +40,9 @@
         </ng-container>
 
 
-        <ng-container *ngIf="order.payments">
 
-            <div class="row" *ngFor="let pay of order.payments">
-                <div class="col-4">{{'enums.pay-type.' + pay.type | translate}}</div>
-                <div class="col-4">{{pay.amount}}</div>
-                <div class="col-4">
-                    <i class="fas fa-trash float-end" (click)="orderMgrSvc.deletePayment(pay)"></i>
-                </div>
-            </div>
 
-              
-        </ng-container>
 
-        
 
         <div *ngFor="let line of order.lines" (click)="selectOrderLine(line)">
             <div class="row mt-2">
@@ -87,13 +76,12 @@
 
 
             <ng-container *ngIf="line.product.isSubscription()">
-                
+
                 <button type="button" class="btn btn-secondary btn-sm float-end"
-                (click)="orderMgrSvc.createSubscriptions(line)">Maak abonnement</button>
+                    (click)="orderMgrSvc.createSubscriptions(line)">Maak abonnement</button>
 
 
             </ng-container>
-
 
         </div>
 
@@ -114,7 +102,26 @@
         </div>
 
 
-        <ng-container *ngIf="order.vatLines">
+
+        <ng-container *ngIf="order.hasPayments()">
+
+            Betalingen
+
+            <div class="row ms-2" *ngFor="let pay of order.payments">
+                <div class="col-4">{{'enums.pay-type.' + pay.type | translate}}</div>
+                <div class="col-4">€ {{pay.amount}}</div>
+                <div class="col-4">
+                    <i class="fas fa-trash float-end" (click)="orderMgrSvc.deletePayment(pay)"></i>
+                </div>
+            </div>
+
+        </ng-container>
+
+
+
+        <ng-container *ngIf="order.hasVatLines()">
+
+            Betalingen
 
             <div class="row" *ngFor="let vat of order.vatLines">
                 <div class="col-1"></div>
@@ -123,8 +130,10 @@
                 <div class="col">{{vat.incl}}</div>
             </div>
 
-              
+
         </ng-container>
+
+
 
 
 
@@ -132,23 +141,32 @@
     <div class="card-footer p-2">
         <div class="row text-muted" style="font-size: 80%;">
             <div class="col-6">Gemaakt op {{order.createdAt | date: sessionSvc.formats.dateShort}}</div>
+
+
+            <div class="d-grid mt-3">
+                <button type="button" class="btn btn-outline-secondary float-end" (click)="next()"
+                    translate>msg.continue</button>
+            </div>
+
+
+
             <!-- <div class="col-4"> </div> -->
-            <div class="col-6 d-flex justify-content-end">
+            <div class="col-6 d-flex justify-content-end" *ngIf="sessionSvc.devMode">
                 <button type="button" class="btn btn-primary btn-sm"
-                (click)="orderMgrSvc.getAvailabilities()">Slots</button>
+                    (click)="orderMgrSvc.getAvailabilities()">Slots</button>
 
 
                 <button type="button" class="btn btn-primary btn-sm mx-2" (click)="next()"
-                translate>msg.continue</button>
+                    translate>msg.continue</button>
 
 
                 <button type="button" class="btn btn-primary btn-sm mx-2" (click)="orderMgrSvc.saveOrder()"
                     translate>dic.save</button>
 
 
-                    <button type="button" class="btn btn-primary btn-sm mx-2" (click)="orderMgrSvc.changeState()"
-                    >Change state</button>
-            
+                <button type="button" class="btn btn-primary btn-sm mx-2" (click)="orderMgrSvc.changeState()">Change
+                    state</button>
+
 
             </div>
         </div>

@@ -450,7 +450,9 @@
     "redeem": {
       "code": "Cadeaubon code",
       "invalid": "Ongeldige code",
-      "use": "Gebruik deze bon"
+      "use": "Gebruik deze bon",
+      "use-specific": "Boek dit arrangement",
+      "use-amount": "Boek iets anders"
 
     }
   },

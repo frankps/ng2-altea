@@ -1684,12 +1684,21 @@ export class ProductOption extends ObjectWithId {
     return (Array.isArray(this.values) && this.values.length > 0)
   }
 
-  getDefaultValue(): ProductOptionValue | undefined {
+  getDefaultValues(): ProductOptionValue[] | undefined {
     if (!this.values || this.values.length == 0)
       return undefined
 
-    return this.values.find(v => v.default)
+    return this.values.filter(v => v.default)
+  }
 
+  getValues(ids: String[]): ProductOptionValue[] {
+
+    if (!Array.isArray(this.values) || !Array.isArray(ids))
+      return []
+
+    const values = this.values.filter(v => ids.indexOf(v.id) >= 0)
+
+    return values
   }
 
 
@@ -2036,6 +2045,10 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
     this.makePayTotals()
   }
 
+  hasPayments(): boolean {
+    return (Array.isArray(this.payments) && this.payments.length > 0)
+  }
+
   makePayTotals() {
 
 
@@ -2074,6 +2087,10 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
 
     this.makeLineTotals()
     this.calculateVat()
+  }
+
+  hasVatLines(): boolean {
+    return (Array.isArray(this.vatLines) && this.vatLines.length > 0)
   }
 
   calculateVat() {
@@ -2335,11 +2352,6 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
   }
 
 
-
-
-
-
-
 }
 
 /*
@@ -2352,6 +2364,16 @@ productId String  @db.Uuid
 planning ResourcePlanning[]
 */
 
+
+
+export class GiftLineOption {
+  id?: string
+  name?: string
+
+  @Type(() => GiftLineOptionValue)
+  vals: GiftLineOptionValue[] = []
+}
+
 export class OrderLineOption extends ObjectWithId {
   name?: string
 
@@ -2362,7 +2384,7 @@ export class OrderLineOption extends ObjectWithId {
   @Type(() => FormulaTerm)
   formula?: FormulaTerm[]
 
-  constructor(productOption?: ProductOption, productOptionValue?: ProductOptionValue) {
+  constructor(productOption?: ProductOption, ...productOptionValues: ProductOptionValue[]) {
     super()
     delete this.id
 
@@ -2375,14 +2397,10 @@ export class OrderLineOption extends ObjectWithId {
     if (productOption.hasFormula && productOption.formula && productOption.formula.length > 0)
       this.formula = productOption.formula
 
-    // if (productOption.hasFactor)
-    //   this.factorOptionId = productOption.factorOptionId
-
-    if (!productOptionValue)
-      return
-
-    const orderLineOptionValue = new OrderLineOptionValue(productOptionValue)
-    this.values.push(orderLineOptionValue)
+    if (Array.isArray(productOptionValues) && productOptionValues.length > 0) {
+      let lineOptionVals = productOptionValues.map(prodVal => new OrderLineOptionValue(prodVal))
+      this.values.push(...lineOptionVals)
+    }
 
   }
 
@@ -2428,6 +2446,13 @@ export class OrderLineOption extends ObjectWithId {
   }
 
 
+}
+
+
+export class GiftLineOptionValue {
+  id?: string
+  name?: string
+  prc = 0
 }
 
 export class OrderLineOptionValue extends ObjectWithId {
@@ -2582,7 +2607,7 @@ export class OrderLine extends ObjectWithId {
   deletedAt?: Date
 
 
-  constructor(product?: Product, qty = 1) {
+  constructor(product?: Product, qty = 1, initOptionValues?: Map<String, String[]>) {
     super()
 
 
@@ -2604,10 +2629,24 @@ export class OrderLine extends ObjectWithId {
 
     for (const option of product.options) {
 
-      const defaultValue = option.getDefaultValue()
+      let optionValues: ProductOptionValue[]
 
-      if (defaultValue) {
-        const orderLineOption = new OrderLineOption(option, defaultValue)
+      if (initOptionValues && initOptionValues.has(option.id)) {
+        let valueIds = initOptionValues.get(option.id)
+
+        if (Array.isArray(valueIds) && valueIds.length > 0) {
+
+          optionValues = option.getValues(valueIds)
+
+
+        }
+      }
+
+      if (!Array.isArray(optionValues) || optionValues.length == 0)
+        optionValues = option.getDefaultValues()
+
+      if (optionValues) {
+        const orderLineOption = new OrderLineOption(option, ...optionValues)
         this.options.push(orderLineOption)
       }
 
@@ -3234,17 +3273,40 @@ export class GiftMethods {
 export class GiftLine {
 
   qty = 1
-  val = 0
-  
+  prc = 0
+
   /** product id */
   pId?: string
 
   /** options */
-  @Type(() => OrderLineOption)
-  opts: OrderLineOption[] = []
+  @Type(() => GiftLineOption)
+  opts: GiftLineOption[] = []
 
   descr?: string
 
+
+  // initOptionValues?: Map<String, String[]>
+
+  getOptionValuesAsMap(): Map<String, String[]> {
+
+    const map = new Map<String, String[]>()
+
+    if (!Array.isArray(this.opts))
+      return map
+
+    for (let option of this.opts) {
+
+      const optionId = option.id
+      const valueIds = option.vals.map(val => val.id)
+
+      if (optionId && Array.isArray(valueIds) && valueIds.length > 0)
+        map.set(optionId, valueIds)
+
+    }
+
+
+    return map
+  }
 
 
 }
@@ -3278,6 +3340,7 @@ export class Gift extends ObjectWithId {
   orderId?: string;
   type?: GiftType
 
+  @Type(() => GiftLine)
   lines?: GiftLine[] = []
 
   invoice = false
@@ -3318,6 +3381,15 @@ export class Gift extends ObjectWithId {
     return this.type == GiftType.specific
   }
 
+  availableAmount() {
+
+    if (this.used && this.used > 0)  // we had a bug that used was negative
+      return this.value - this.used
+
+    return this.value
+
+  }
+
   hasLines() {
     return Array.isArray(this.lines) && this.lines.length > 0
   }
@@ -3328,6 +3400,19 @@ export class Gift extends ObjectWithId {
 
   }
 }
+
+
+export enum PaymentType {
+  cash = 'cash',
+  transfer = 'transfer',
+  credit = 'credit',
+  debit = 'debit',
+  gift = 'gift',
+  /** subscription */
+  subs = 'subs',
+}
+
+
 
 export class Payment extends ObjectWithId {
 
