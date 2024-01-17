@@ -37,16 +37,19 @@ export class OrderComponent {
   }
 
 
-
-
   async next() {
+    this.continue.emit(this.orderMgrSvc.order)
+  }
+
+
+  async nextStripe() {
 
     // Stripe test code: https://stripe.com/docs/testing
 
 
-    const stripPaymentUrl = await this.orderMgrSvc.initStripePayment(59) 
+   // const stripPaymentUrl = await this.orderMgrSvc.initStripePayment(59) 
 
-    window.location.href = stripPaymentUrl;
+   // window.location.href = stripPaymentUrl;
 
 
     /*

@@ -1,11 +1,28 @@
 
 
 export class CreateCheckoutSession {
-    public isTest = true
+    public test = true
+
+    // In case of Stripe-hosted payment page
+    public successUrl: string
+    public cancelUrl: string
+
+    // In case of embedded form
+    public returnUrl: string
+
+    public methodTypes: any[] = ['card', 'bancontact']
+
+    constructor(public amount: number, public currency: string, public description, public embedded = true) {
+    }
 
 
-    constructor(public amount: number, public description, public successUrl: string, public cancelUrl: string) {
+    static embedded(amount: number, currency: string, description: string, returnUrl: string): CreateCheckoutSession {
 
+        const session = new CreateCheckoutSession(amount, currency, description)
+
+        session.returnUrl = returnUrl  
+
+        return session
     }
 }
 

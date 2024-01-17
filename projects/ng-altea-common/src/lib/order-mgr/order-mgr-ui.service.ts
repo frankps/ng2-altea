@@ -11,11 +11,17 @@ import { AlteaDb } from 'ts-altea-logic';
 import * as dateFns from 'date-fns'
 import { StripeService } from '../stripe.service';
 
-export enum OrderMode {
+
+/** reflects the UI component that should be visible  */
+export enum OrderUiState {
   demoOrders = 'demo-orders',
   browseCatalog = 'browse-catalog'
 }
 
+export enum OrderUiMode {
+  newOrder = 'new-order',
+  newGift = 'new-gift'
+}
 
 @Injectable({
   providedIn: 'root'
@@ -32,7 +38,6 @@ export class OrderMgrUiService {
   // the product in focus: for existing or new order line
   product: Product
 
-
   // date range selection (used to search for availability)
   from = 0
   to = 0
@@ -48,10 +53,10 @@ export class OrderMgrUiService {
   resources: Resource[]
   //alteaDb: AlteaDb
 
+  /* used by order component to show correct UI component (rouing was not working when going to same page => we use rxjs) */
+  orderUiStateChanges: BehaviorSubject<string> = new BehaviorSubject<string>(null)
 
-
-  modeChanges: BehaviorSubject<string> = new BehaviorSubject<string>(null)
-
+  uiMode = OrderUiMode.newOrder
 
   constructor(private productSvc: ProductService, private orderSvc: OrderService, private orderMgrSvc: OrderMgrService
     , protected spinner: NgxSpinnerService, public dbSvc: ObjectService, protected alteaSvc: AlteaService, protected sessionSvc: SessionService,
@@ -64,13 +69,18 @@ export class OrderMgrUiService {
 
   }
 
-  changeMode(mode: OrderMode | string) {
-    this.modeChanges.next(mode)
+  changeUiState(mode: OrderUiState | string) {
+    this.orderUiStateChanges.next(mode)
   }
 
-  newOrder() {
+  setUiMode(uiMode: OrderUiMode) {
+    this.uiMode = uiMode
+  }
+
+  newOrder(uiMode: OrderUiMode = OrderUiMode.newOrder) {
     this.order = new Order(true)
     this.order.branchId = this.sessionSvc.branchId
+    this.uiMode = uiMode
   }
 
   hasOrderLines() {
@@ -455,20 +465,7 @@ STRIPE integration
 */
 
 
-async initStripePayment(amount: number) : Promise<string> {
 
-  console.warn('next()')
-
-  const checkout = new CreateCheckoutSession(amount * 100, 'Voorschot boeking', 'http://localhost:4300/branch/aqua/menu', 'http://localhost:4300/branch/aqua/menu')
-
-  const apiResult = await this.stripeSvc.createCheckoutSession$(checkout)
-  
-  console.error(apiResult.object.url)
-
-  const stripPaymentUrl = apiResult.object.url
-
-  return stripPaymentUrl
-}
 
 
 

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { OrderMgrUiService } from 'ng-altea-common';
+import { OrderMgrUiService, OrderUiMode } from 'ng-altea-common';
 import { OrderLine } from 'ts-altea-model';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -22,7 +22,7 @@ export class OrderComponent implements OnInit {
     else
       this.mode = 'browse-catalog'
 
-    this.orderMgrSvc.modeChanges.subscribe(newMode => {
+    this.orderMgrSvc.orderUiStateChanges.subscribe(newMode => {
 
       if (newMode)
         this.mode = newMode
@@ -62,7 +62,20 @@ export class OrderComponent implements OnInit {
   orderFinished() {
     // this.mode = 'staff-select'   // person-select
 
-    this.mode = 'person-select'
+    switch (this.orderMgrSvc.uiMode) {
+
+      /** for a new gift, we will pay */
+      case OrderUiMode.newGift:
+        this.mode = 'pay-online'
+        break
+
+      default:
+        this.mode = 'person-select'
+        break
+
+    }
+
+    
   }
 
   staffSelected(staff: string[]) {

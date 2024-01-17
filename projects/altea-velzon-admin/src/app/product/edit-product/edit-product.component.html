@@ -34,6 +34,7 @@
     <ng-container readonly>
       <!-- <div>{{ object.descr }}</div> -->
 
+      <ngx-altea-label-value label="objects.product.short" [value]="object.short"></ngx-altea-label-value>
 
       <ngx-altea-label-value label="objects.product.descr" [value]="object.descr"
         empty="objects.product.no-descr"></ngx-altea-label-value>
@@ -45,9 +46,16 @@
 
     </ng-container>
     <ng-container edit>
+
+
       <ngx-altea-label-control label="dic.name" for="name" help="objects.product.help.{{object.type}}-name">
         <input type="text" id="projectName" name="name" required class="form-control" [(ngModel)]="object.name" />
       </ngx-altea-label-control>
+
+      <ngx-altea-label-control class="mt-3" label="objects.product.short" for="short" help="objects.product.help.short">
+        <input type="text" id="short" name="short" class="form-control" [(ngModel)]="object.short" />
+      </ngx-altea-label-control>
+
 
       <br />
       <ngx-altea-label-control label="dic.descr" for="descr">

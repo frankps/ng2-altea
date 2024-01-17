@@ -51,6 +51,7 @@
       "debit": "Bancontact",
       "gift": "Cadeaubon",
       "subs": "Abonnement"
+
     },
     "msg-type": {
       "sms": "SMS",
@@ -419,7 +420,7 @@
       }
     },
     "gift": {
-      "choice": "Wat wenst u te schenken? Maak uw keuze:",
+      "choice": "Wat wenst u te schenken: een bedrag of kiest u liever zelf een dienst uit het aanbod?",
       "types": {
         "amount": "Bedrag",
         "specific": "Specifiek"
@@ -453,6 +454,9 @@
       "use-specific": "Boek dit arrangement",
       "use-amount": "Boek iets anders"
 
+    },
+    "stripe": {
+      "gift": "Cadeaubon"
     }
   },
   "objects": {
@@ -591,6 +595,7 @@
     "product": {
       "article": "het",
       "pronoun": "dit",
+      "short": "Korte omschrijving",
       "descr": "Omschrijving",
       "no-descr": "Er is geen omschrijving",
       "customers": "Aantal klanten",
@@ -610,6 +615,7 @@
       "staffSelect": "Selecteer specialistes",
       "planMode": "Planning mode",
       "help": {
+        "short": "Wordt getoond in product overzichten (menu's & zoekopdracheten) ",
         "customers": "Aantal klanten dat gelijktijdig wordt bediend",
         "product-name": "De naam van het product",
         "service-name": "De naam van de dienst",

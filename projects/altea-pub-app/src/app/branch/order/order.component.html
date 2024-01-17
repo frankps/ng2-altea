@@ -1,4 +1,12 @@
 <!-- Mode: {{mode}} -->
+<div class="row">
+    <div class="col-4">{{orderMgrSvc.uiMode}}</div>
+    <div class="col-4"></div>
+    <div class="col-4"></div>
+</div>
+
+
+
 
 <ng-container [ngSwitch]="mode">
 
@@ -52,6 +60,12 @@
     </ng-container>
 
 
+    <ng-container *ngSwitchCase="'pay-online'">
+
+
+        <app-pay-online></app-pay-online>
+
+    </ng-container>
 
     <ng-container *ngSwitchCase="'default'">
     </ng-container>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Output, EventEmitter, OnInit } from '@angular/core';
 import { Branch, Gift, GiftVatPct } from 'ts-altea-model';
 import { TranslationService } from 'ng-common'
 import { SessionService } from '../../session.service';
@@ -16,6 +16,8 @@ export class AppSettings {
 })
 export class RequestGiftComponent implements OnInit {
 
+  @Output() request: EventEmitter<Gift> = new EventEmitter<Gift>()
+
   // branch: Branch
   gift = new Gift()
 
@@ -30,8 +32,21 @@ export class RequestGiftComponent implements OnInit {
   lbl = {} 
 
   constructor(protected translationSvc: TranslationService, protected sessionSvc: SessionService) {
+   
+   
+    this.setTestData()
 
   }
+
+  setTestData() {
+
+    this.gift.value = 99
+    this.gift.fromName = "Frank"
+    this.gift.toName = "Hilde"
+    this.gift.methods.pos = true
+
+  }
+
 
   shouldSelectVatPct(): boolean {
 
@@ -79,6 +94,7 @@ export class RequestGiftComponent implements OnInit {
 
   buttonNext() {
 
+    this.request.emit(this.gift)
     console.warn(this.gift)
   }
 

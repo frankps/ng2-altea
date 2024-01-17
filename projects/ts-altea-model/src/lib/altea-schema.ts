@@ -1258,7 +1258,7 @@ export class Branch extends ObjectWithId {
   vatIncl = true
   vatPct = 0
   vatPcts?: number[];
-  vatNr?: string
+  vatNr?: string  
 
 
   smsOn = false
@@ -1753,13 +1753,7 @@ export class ProductOptionValue extends ObjectWithId {
     else
       return `${this.name} (+${this.price})`
   }
-
-
 }
-
-
-
-
 
 
 export class Invoice extends ObjectWithId {
@@ -2579,7 +2573,7 @@ export class OrderLine extends ObjectWithId {
   @Type(() => Number)
   qty = 1;
 
-  /** base price = price excluding options */
+  /** (unit) base price = price excluding options, only set when there are options */
   @Type(() => Number)
   base = 0;
 
@@ -2598,6 +2592,8 @@ export class OrderLine extends ObjectWithId {
 
   @Type(() => Number)
   incl = 0;
+
+
   persons?: string[];
   tag?: string;
   active = true;
@@ -2657,6 +2653,19 @@ export class OrderLine extends ObjectWithId {
   }
 
 
+  static custom(descr: string, unit: number, vatPct: number) : OrderLine {
+
+    const line = new OrderLine()
+    line.descr = descr
+    line.unit = unit
+    line.vatPct = vatPct
+
+    line.calculateInclExcl()
+
+    return line
+
+  }
+
   hasPersons(): boolean {
     return (Array.isArray(this.persons) && this.persons.length > 0)
   }
@@ -2702,7 +2711,7 @@ export class OrderLine extends ObjectWithId {
 
     console.warn('makeTotals')
 
-    if (!this.options)
+    if (!Array.isArray(this.options) || this.options.length == 0)
       return
 
     let unitPrice = this.base

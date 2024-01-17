@@ -8,13 +8,17 @@ import { NgAlteaCommonModule } from 'ng-altea-common';
 import { OrderMgrModule } from 'ng-altea-common';
 import { OrderComponent } from './order/order.component';
 import { UseGiftComponent } from './use-gift/use-gift.component';
+import { BuyGiftComponent } from './buy-gift/buy-gift.component';
+import { PayOnlineComponent } from './pay-online/pay-online.component';
 
 @NgModule({
   declarations: [
     BranchComponent,
     MenuComponent,
     OrderComponent,
-    UseGiftComponent
+    UseGiftComponent,
+    BuyGiftComponent,
+    PayOnlineComponent
   ],
   imports: [
     CommonModule,

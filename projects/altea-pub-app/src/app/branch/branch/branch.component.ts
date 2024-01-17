@@ -32,7 +32,7 @@ export class BranchComponent implements OnInit {
     
     // navigate works only when on other page then 'order', therefor we also have changeMode('order')
     await this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'order'])   // , { queryParams: { mode: 'basket' }}
-    this.orderMgrSvc.changeMode('order')
+    this.orderMgrSvc.changeUiState('order')
   }
 
   gotoMenu() {

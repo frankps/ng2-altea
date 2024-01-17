@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { OrderMgrUiService, OrderMode, SessionService } from 'ng-altea-common';
+import { OrderMgrUiService, OrderUiMode, OrderUiState, SessionService } from 'ng-altea-common';
 
 @Component({
   selector: 'app-menu',
@@ -25,8 +25,8 @@ export class MenuComponent {
 
       case 'new-reserv':
         
-        this.orderMgrSvc.newOrder()
-        this.orderMgrSvc.changeMode(OrderMode.browseCatalog)
+        this.orderMgrSvc.newOrder(OrderUiMode.newOrder)
+        this.orderMgrSvc.changeUiState(OrderUiState.browseCatalog)
         this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'order'])
         break
 
@@ -34,6 +34,9 @@ export class MenuComponent {
         this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'use-gift'])
         break
 
+        case 'buy-gift':
+        this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'buy-gift'])
+        break
   
 
     }

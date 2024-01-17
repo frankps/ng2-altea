@@ -26,7 +26,10 @@ Dev:
 
 
 ng generate module branch --project altea-pub-app --routing
+
 ng generate component branch/branch --project altea-pub-app
+ng generate component branch/pay-online --project altea-pub-app
+
 ng generate component order-mgr/posPayment --project altea-velzon-admin
 ng generate component pos/posPayment --project ng-altea-common
 ng generate service stripe --project ng-altea-common
