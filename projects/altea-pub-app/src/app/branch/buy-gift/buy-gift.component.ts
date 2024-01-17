@@ -17,6 +17,7 @@ export class BuyGiftComponent {
   buyGift(gift: Gift) {
 
     this.orderMgrSvc.newOrder(OrderUiMode.newGift)
+    this.orderMgrSvc.gift = gift
 
     if (gift.type == GiftType.amount) {
 
@@ -25,7 +26,7 @@ export class BuyGiftComponent {
 
       console.error(this.orderMgrSvc.order)
 
-      
+      this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'order'])
 
       // then we go to Stripe
     } else {

@@ -28,8 +28,46 @@ export class StripeService {
 
   }
 
+  async get$<T>(httpServer: string, pageUrl: string): Promise<T> {
 
-  createCheckoutSession(checkout: CreateCheckoutSession): Observable<any> {
+    const me = this
+
+    return new Promise<any>(function (resolve, reject) {
+
+      const fullUrl = `${httpServer}/${pageUrl}` 
+
+      me.http.get<any>(fullUrl).pipe(take(1)).subscribe(res => {
+        resolve(res)
+      })
+
+    })
+
+  }
+
+  // http://localhost:4300/branch/aqua/pay-finished?orderId=123&sessionId=cs_test_a1U1IuChwqT96gB86qVtIhznLrFQ7nE07GZ95cYWRqkKQd8fMYVSAsYB1x%27
+  async sessionStatus(sessionId: string): Promise<any> {
+    return this.get$(this.sessionSvc.backend, `stripe/sessionStatus/${sessionId}`)
+  }
+
+
+
+/*   async sessionStatus(sessionId: string): Promise<any> {
+    return this.post$(this.sessionSvc.backend, `stripe/sessionStatus`, { sessionId: sessionId})
+  } */
+
+
+  async createCheckoutSession$(checkout: CreateCheckoutSession): Promise<any> {
+
+    return this.post$(this.sessionSvc.backend, 'stripe/createCheckoutSession', checkout)
+
+  }
+
+/*   async sessionStatus(sessionId: string): Promise<any> {
+    return this.get$(this.sessionSvc.backend, `stripe/sessionStatus?sessionId=${sessionId}`)
+  } */
+
+
+/*   createCheckoutSession(checkout: CreateCheckoutSession): Observable<any> {
 
     return this.http.post<any>(`${this.sessionSvc.backend}/stripe/createCheckoutSession`, checkout).pipe(map(session => {
 
@@ -38,22 +76,7 @@ export class StripeService {
       return session
     }
     ))
-  }
+  } */
 
-  async createCheckoutSession$(checkout: CreateCheckoutSession): Promise<any> {
-
-    return this.post$(this.sessionSvc.backend, 'stripe/createCheckoutSession', checkout)
-    /*
-    const me = this
-
-    return new Promise<any>(function (resolve, reject) {
-
-      me.createCheckoutSession(checkout).pipe(take(1)).subscribe(res => {
-        resolve(res)
-      })
-
-    }) */
-
-  }
 
 }

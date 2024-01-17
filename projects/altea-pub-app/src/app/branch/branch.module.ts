@@ -10,6 +10,7 @@ import { OrderComponent } from './order/order.component';
 import { UseGiftComponent } from './use-gift/use-gift.component';
 import { BuyGiftComponent } from './buy-gift/buy-gift.component';
 import { PayOnlineComponent } from './pay-online/pay-online.component';
+import { PayFinishedComponent } from './pay-finished/pay-finished.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,8 @@ import { PayOnlineComponent } from './pay-online/pay-online.component';
     OrderComponent,
     UseGiftComponent,
     BuyGiftComponent,
-    PayOnlineComponent
+    PayOnlineComponent,
+    PayFinishedComponent
   ],
   imports: [
     CommonModule,

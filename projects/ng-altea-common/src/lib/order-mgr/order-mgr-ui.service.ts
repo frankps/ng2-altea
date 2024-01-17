@@ -50,6 +50,9 @@ export class OrderMgrUiService {
 
   order: Order = new Order(true)
 
+  /** when user is creating a new gift  */
+  gift: Gift
+
   resources: Resource[]
   //alteaDb: AlteaDb
 

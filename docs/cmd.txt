@@ -24,11 +24,17 @@ Dev:
     * Terminal: Run active file in active Terminal
 
 
+Test:
+
+    Visa    4242424242424242
+
+
+
 
 ng generate module branch --project altea-pub-app --routing
 
 ng generate component branch/branch --project altea-pub-app
-ng generate component branch/pay-online --project altea-pub-app
+ng generate component branch/pay-finished --project altea-pub-app
 
 ng generate component order-mgr/posPayment --project altea-velzon-admin
 ng generate component pos/posPayment --project ng-altea-common

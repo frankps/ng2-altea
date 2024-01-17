@@ -48,8 +48,13 @@ export class PayOnlineComponent implements OnInit {
 
     let userInfo = await this.translationSvc.getTrans('app.stripe.gift')
 
+    let amount = this.orderMgrSvc.order.incl
 
-    const createCheckout = CreateCheckoutSession.embedded(99 * 100, branch.cur, userInfo, 'http://localhost:4300/branch/aqua')
+    console.log(this.orderMgrSvc.order)
+
+    let returnUrl = `http://localhost:4300/branch/${branch.unique}/pay-finished?orderId=123&sessionId={CHECKOUT_SESSION_ID}'`
+
+    const createCheckout = CreateCheckoutSession.embedded(amount * 100, branch.cur, userInfo, returnUrl)
     const apiResult = await this.stripeSvc.createCheckoutSession$(createCheckout)
     
     console.error(apiResult)
