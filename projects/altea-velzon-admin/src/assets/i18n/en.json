@@ -14,6 +14,7 @@
     "color": "Kleur", 
     "create": "Maak",
     "communication": "Communicatie",
+    "currency": "Munteenheid",
     "delete": "Verwijderen",
     "descr": "Omschrijving",
     "email": "Email",
@@ -119,6 +120,18 @@
       "en": "English",
       "fr": "French",
       "sp": "Español"
+    },
+    "currency": {
+      "AUD": "Australian Dollar",
+      "CAD": "Canadian Dollar",
+      "CHF": "Swiss Franc",
+      "CNY": "Chinese Yuan",
+      "EUR": "Euro",
+      "GBP": "British Pound",
+      "HKD": "Hong Kong Dollar",
+      "JPY": "Japanese Yen",
+      "NZD": "New Zealand Dollar",
+      "USD": "US Dollar"
     },
     "days-of-week-short": {
       "mo": "Ma",

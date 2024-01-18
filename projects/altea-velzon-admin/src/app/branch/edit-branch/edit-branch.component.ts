@@ -1,7 +1,7 @@
 
 import { Component, ViewChild, OnInit } from '@angular/core';
 import { ProductService, PriceService, ProductResourceService, ResourceService, ScheduleService, ContactService, SessionService, BranchService } from 'ng-altea-common'
-import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ResourceType, ResourceTypeIcons, Resource, Schedule, Contact, Language, Branch, DepositTerm, TimeUnit, MsgType, ReminderConfig, Country, GiftConfig, GiftVatPct } from 'ts-altea-model'
+import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ResourceType, ResourceTypeIcons, Resource, Schedule, Contact, Language, Branch, DepositTerm, TimeUnit, MsgType, ReminderConfig, Country, GiftConfig, GiftVatPct, Currency } from 'ts-altea-model'
 import { BackendHttpServiceBase, DashboardService, FormCardSectionEventData, NgEditBaseComponent, ToastType, TranslationService } from 'ng-common'
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxModalComponent, DeleteModalComponent } from 'ng-common';
@@ -40,6 +40,7 @@ export class EditBranchComponent extends NgEditBaseComponent<Branch> implements 
   msgTypes: Translation[] = []
   countries: Translation[] = []
   languages: Translation[] = []
+  currencies: Translation[] = []
 
   newReminder = new ReminderConfig()
 
@@ -59,7 +60,7 @@ export class EditBranchComponent extends NgEditBaseComponent<Branch> implements 
       , contactSvc
       , route, spinner, dashboardSvc)
 
-    this.sectionProps.set('general', ['name', 'descr', 'street', 'streetNr', 'postal', 'country', 'city', 'language', 'vatPcts', 'vatPct', 'vatNr', 'vatIncl', 'phone', 'mobile', 'email'])
+    this.sectionProps.set('general', ['name', 'descr', 'street', 'streetNr', 'postal', 'country', 'city', 'language', 'vatPcts', 'vatPct', 'vatNr', 'vatIncl', 'phone', 'mobile', 'email', 'cur'])
     this.sectionProps.set('communication', ['emailFrom', 'emailBcc', 'smsOn'])
     this.sectionProps.set('reminders', ['reminders'])
     this.sectionProps.set('deposit', ['depositPct', 'depositTerms', 'reminders'])
@@ -73,6 +74,7 @@ export class EditBranchComponent extends NgEditBaseComponent<Branch> implements 
       this.getObject(branchId)
 
     this.translationSvc.translateEnum(Language, 'enums.language.', this.languages)
+    this.translationSvc.translateEnum(Currency, 'enums.currency.', this.currencies)
     this.translationSvc.translateEnum(Country, 'enums.country.', this.countries)
     this.translationSvc.translateEnum(MsgType, 'enums.msg-type.', this.msgTypes)
     this.translationSvc.translateEnum(TimeUnit, 'enums.time-units-plur.', this.timeUnitsPlural)

@@ -1,0 +1,91 @@
+{
+    "invoiceForm": {
+        "type": "form",
+        "bindTo": "object",
+        "translate": "objects.invoice.",
+        "elements": {
+            "company": {
+                "type": "text",
+                "required": true
+            },
+            "vat": {
+                "type": "text",
+                "required": true
+            },
+            "country": {
+                "type": "select",
+                "bindMode": "enum",
+                "required": true,
+                "enum": "Country"
+            },
+            "address": {
+                "type": "textarea",
+                "required": true
+            },
+            "request": {
+                "type": "button"
+            }
+        }
+    },
+    "posReserve": {
+        "type": "form",
+        "bindTo": "object",
+        "translate": "dic.",
+        "elements": {
+            "searchFor": {
+                "type": "text",
+                "required": false
+            },
+            "search": {
+                "type": "button"
+            },
+            "mobile": {
+                "type": "text",
+                "required": false
+            },
+            "email": {
+                "type": "text",
+                "required": false
+            },
+            "validity": {
+                "type": "select",
+                "bindMode": "custom",
+                "required": true
+            },
+            "sendOffer": {
+                "type": "button"
+            }
+        }
+    },
+    "recurringTask": {
+        "type": "form",
+        "bindTo": "object",
+        "translate": "objects.rTask.",
+        "elements": {
+            "name": {
+                "type": "text",
+                "required": true
+            },
+            "loc": {
+                "type": "text",
+                "required": false
+            },
+            "info": {
+                "type": "textarea",
+                "required": false
+            },
+            "email": {
+                "type": "text",
+                "required": false
+            },
+            "schedule": {
+                "type": "select",
+                "bindMode": "enum",
+                "required": true,
+                "enum": "TaskSchedule"
+            }
+        }
+    }
+
+}
+

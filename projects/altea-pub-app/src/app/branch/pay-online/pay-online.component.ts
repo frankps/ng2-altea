@@ -5,13 +5,13 @@ import { OrderMgrUiService, OrderUiMode, SessionService } from 'ng-altea-common'
 import { StripeService } from 'projects/ng-altea-common/src/lib/stripe.service';
 import { CreateCheckoutSession } from 'ts-altea-model';
 import { TranslationService } from 'ng-common'
+
 /*
+
 https://stripe.com/docs/payments/accept-a-payment?platform=web&ui=embedded-checkout
 
 import Stripe from 'stripe';
 const stripe = new Stripe('sk_test_DFr3nlEXpSATg1nltMs3kvbT');
-
-
 
 */
 
@@ -32,9 +32,7 @@ export class PayOnlineComponent implements OnInit {
 
   async ngOnInit() {
 
-    this.startPayment()
-
-    
+    this.startPayment()  
 
   }
 
@@ -52,7 +50,7 @@ export class PayOnlineComponent implements OnInit {
 
     console.log(this.orderMgrSvc.order)
 
-    let returnUrl = `http://localhost:4300/branch/${branch.unique}/pay-finished?orderId=123&sessionId={CHECKOUT_SESSION_ID}'`
+    let returnUrl = `http://localhost:4300/branch/${branch.unique}/pay-finished?orderId=123&sessionId={CHECKOUT_SESSION_ID}`
 
     const createCheckout = CreateCheckoutSession.embedded(amount * 100, branch.cur, userInfo, returnUrl)
     const apiResult = await this.stripeSvc.createCheckoutSession$(createCheckout)

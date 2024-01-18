@@ -38,6 +38,19 @@ export enum Language {
   sp = 'sp'
 }
 
+export enum Currency {
+  AUD = 'AUD',
+  CAD = 'CAD',
+  CHF = 'CHF',
+  CNY = 'CNY',
+  EUR = 'EUR',
+  GBP = 'GBP',
+  HKD = 'HKD',
+  JPY = 'JPY',
+  NZD = 'NZD',
+  USD = 'USD',
+}
+
 export enum DaysOfWeekShort {
   mo = 'mo',
   tu = 'tu',
@@ -1755,11 +1768,32 @@ export class ProductOptionValue extends ObjectWithId {
   }
 }
 
+export enum InvoiceState {
+  toInvoice = 'toInvoice',
+  invoiced = 'invoiced',
+  onHold = 'onHold'
+}
 
 export class Invoice extends ObjectWithId {
 
   orders?: Order[];
+
+  state: InvoiceState = InvoiceState.toInvoice
+
   num?: string;
+  
+  company?: string
+  vat?: string
+  country?: string
+  address?: string
+
+  email?: string
+
+  date?: Date
+
+  /** alternative message for on invoice */
+  alter?: string
+  
   active = true;
   deleted = false;
   createdAt?: Date;
@@ -3467,14 +3501,15 @@ export enum TaskStatus {
   done = 'done'
 }
 
-export class Task extends ObjectWithId {
+export class RecurringTask extends ObjectWithId {
   branchId?: string
-  name?: string
+  
+  name: string
   loc?: string
   info?: string
 
-  /** human resource = staff, links to a resource or resource group */
-  hrId?: string
+  /** human resources = staff, links to a resource or resource group */
+  hrIds?: string[] = []
 
   schedule = TaskSchedule.once
 
@@ -3485,13 +3520,21 @@ export class Task extends ObjectWithId {
   deletedAt?: Date
 }
 
-export class TaskMgmt extends ObjectWithId {
+export class Task extends ObjectWithId {
+  branchId?: string
+
+  rTask?: RecurringTask
+  rTaskId?: string
 
   /* the staff members that see the task, can be a resource group */
-  hrShowId?: string
+  hrShowIds?: string[] = []
 
   /* the staff member that executes/executed the task (never a resource group) */
   hrExecId?: string
+
+  name: string
+  loc?: string
+  info?: string
 
   status = TaskStatus.todo
 

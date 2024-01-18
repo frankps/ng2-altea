@@ -66,7 +66,6 @@
                 </div>
                 <div class="col-4">  
 
-
                     <div class="subSection" translate>ui.branch.edit.sections.general.vat</div>
 
                     <ngx-altea-label-value label="objects.branch.vatPcts" [value]="object.vatPcts"
@@ -76,6 +75,11 @@
                     <ngx-altea-label-value label="objects.branch.vatNr" [value]="object.vatNr"></ngx-altea-label-value>
                     <ngx-altea-label-value label="objects.branch.vatIncl" valueFormat="yesNo"
                         [value]="object.vatIncl"></ngx-altea-label-value>
+                </div>
+                <div class="col-4">
+                    <div class="subSection" translate>dic.currency</div>
+                    {{object.cur}} = {{'enums.currency.' + object.cur | translate}}
+                   
                 </div>
             </div>
 
@@ -117,6 +121,9 @@
                         </ngx-altea-label-control>
                     </div>
                 </div>
+
+
+
 
                 <div class="subSectionEdit" translate>dic.communication</div>
 
@@ -186,47 +193,79 @@
 
 
 
-                <div class="subSectionEdit" translate="">ui.branch.edit.sections.general.vat</div>
+                <div class="row">
+                    <div class="col-6">
 
-                <div class="row mt-3">
-                    <div class="col-3">
+                        <div class="subSectionEdit" translate="">ui.branch.edit.sections.general.vat</div>
 
-                        <ngx-altea-label-control label="objects.branch.vatPcts" for="vatPcts">
-                            <ng-select id="vatPcts" name="vatPcts" [items]="vatPctgs" bindLabel="label" bindValue="pct"
-                                [clearable]="false" [multiple]="true" [(ngModel)]="object.vatPcts">
-                            </ng-select>
-                        </ngx-altea-label-control>
-
-
-                    </div>
-                    <div class="col-3">
-                        <ngx-altea-label-control label="objects.branch.vatPct" for="vatPct">
-                            <ng-select id="vatPct" name="vatPct" [items]="object.vatPcts" [clearable]="false"
-                                [multiple]="false" [(ngModel)]="object.vatPct">
-                            </ng-select>
-                        </ngx-altea-label-control>
-
-                    </div>
-                    <div class="col-3"></div>
-                </div>
-
-                <div class="row mt-3">
-                    <div class="col-3">
-                        <ngx-altea-label-control label="objects.branch.vatNr" for="vatNr">
-                            <input type="text" id="vatNr" name="vatNr" class="form-control"
-                                [(ngModel)]="object.vatNr" />
-                        </ngx-altea-label-control>
-                    </div>
-
-                    <div class="col-4">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="vatIncl" name="vatIncl"
-                                [(ngModel)]="object.vatIncl" />
-                            <label class="form-check-label" for="vatIncl" translate="objects.branch.vatIncl"></label>
+                        <div class="row mt-3">
+                            <div class="col-6">
+        
+                                <ngx-altea-label-control label="objects.branch.vatPcts" for="vatPcts">
+                                    <ng-select id="vatPcts" name="vatPcts" [items]="vatPctgs" bindLabel="label" bindValue="pct"
+                                        [clearable]="false" [multiple]="true" [(ngModel)]="object.vatPcts">
+                                    </ng-select>
+                                </ngx-altea-label-control>
+        
+        
+                            </div>
+                            <div class="col-6">
+                                <ngx-altea-label-control label="objects.branch.vatPct" for="vatPct">
+                                    <ng-select id="vatPct" name="vatPct" [items]="object.vatPcts" [clearable]="false"
+                                        [multiple]="false" [(ngModel)]="object.vatPct">
+                                    </ng-select>
+                                </ngx-altea-label-control>
+        
+                            </div>
+                            
                         </div>
+        
+                        <div class="row mt-3">
+                            <div class="col-6">
+                                <ngx-altea-label-control label="objects.branch.vatNr" for="vatNr">
+                                    <input type="text" id="vatNr" name="vatNr" class="form-control"
+                                        [(ngModel)]="object.vatNr" />
+                                </ngx-altea-label-control>
+                            </div>
+        
+                            <div class="col-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="vatIncl" name="vatIncl"
+                                        [(ngModel)]="object.vatIncl" />
+                                    <label class="form-check-label" for="vatIncl" translate="objects.branch.vatIncl"></label>
+                                </div>
+                            </div>
+        
+                        </div>
+        
+
                     </div>
 
+                    <div class="col-6">
+
+
+                        <div class="subSectionEdit" translate>dic.currency</div>
+
+                        <div class="row mt-3">
+                            <div class="col-6">
+                                <ngx-altea-label-control label="dic.currency" [trans]="true" for="currency">
+                                    <ng-select id="currency" name="currency" [items]="currencies" bindLabel="trans"
+                                        bindValue="key" [clearable]="false" [multiple]="false" [(ngModel)]="object.cur">
+                                    </ng-select>
+                                </ngx-altea-label-control>
+                            </div>
+                        </div>
+
+
+                    </div>      
+
                 </div>
+              
+
+
+
+
+
 
 
             </form>

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Task, TaskMgmt } from 'ts-altea-model'
+import { RecurringTask } from 'ts-altea-model'
 import { BackendHttpServiceBase } from'ng-common';
 import { HttpClient } from '@angular/common/http';
 import { SessionService } from './session.service';
@@ -7,10 +7,10 @@ import { SessionService } from './session.service';
 @Injectable({
   providedIn: 'root'
 })
-export class TaskMgmtService extends BackendHttpServiceBase<TaskMgmt> {
+export class RecurringTaskService extends BackendHttpServiceBase<RecurringTask> {
 
   constructor(http: HttpClient, protected sessionSvc: SessionService) {
-    super(TaskMgmt, sessionSvc.backend, sessionSvc.branchUnique + '/task-mgmt', http)
+    super(RecurringTask, sessionSvc.backend, sessionSvc.branchUnique + '/recurring-tasks', http)
   }
 
 }

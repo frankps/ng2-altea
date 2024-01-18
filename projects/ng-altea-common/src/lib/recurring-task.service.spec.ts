@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { TaskMgmtService } from './task-mgmt.service';
+import { RecurringTaskService } from './recurring-task.service';
 
 describe('TaskMgmtService', () => {
-  let service: TaskMgmtService;
+  let service: RecurringTaskService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(TaskMgmtService);
+    service = TestBed.inject(RecurringTaskService);
   });
 
   it('should be created', () => {

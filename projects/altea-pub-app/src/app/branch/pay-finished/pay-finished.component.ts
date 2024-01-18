@@ -31,11 +31,13 @@ export class PayFinishedComponent implements OnInit {
       console.warn(queryParams)
 
       await this.process(queryParams)
-
-
     })
 
   }
+
+
+  // http://localhost:4300/branch/aqua/pay-finished?orderId=123&sessionId=cs_test_a19DqbHBympE97ESFCfTiKchDwrJx9YL6ah3ObRTU1Xh1CcJDZDrnICdL6%27
+
 
   async process(queryParams: PayFinishedParams) {
 
