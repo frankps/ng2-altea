@@ -1,8 +1,8 @@
 {
-    "invoiceForm": {
+    "invoiceForm":   {
         "type": "form",
-        "bindTo": "object",
-        "translate": "objects.invoice.",
+        "bind": { "mode": "ngModel", "to": "object" },
+        "label": { "mode": "ngx-altea-label-control", "translate": "objects.invoice"},
         "elements": {
             "company": {
                 "type": "text",
@@ -10,7 +10,7 @@
             },
             "vat": {
                 "type": "text",
-                "required": true
+                "required": false
             },
             "country": {
                 "type": "select",
@@ -86,6 +86,4 @@
             }
         }
     }
-
 }
-

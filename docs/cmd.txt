@@ -3,7 +3,7 @@ Serve:
 
     ng serve altea-velzon-admin
     ng serve altea-pub-app --port 4300
-
+    ng serve dvitGen --port 4400
 
 Deploy:
 
@@ -24,6 +24,7 @@ Dev:
     * Terminal: Run active file in active Terminal
 
 
+
 Test:
 
     Visa    4242424242424242
@@ -41,7 +42,8 @@ ng generate component pos/posPayment --project ng-altea-common
 ng generate service stripe --project ng-altea-common
 
 
-
+ng generate application dvitGen --style=scss --routing=true
+ng generate component ngbs5 --project dvit-gen
 
 App project
 

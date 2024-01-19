@@ -3,6 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { Ngbs5Component } from './ngbs5/ngbs5.component';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgxSpinnerModule } from "ngx-spinner"
@@ -13,35 +14,21 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { nlBeLocale } from 'ngx-bootstrap/locale';
 import { NgAlteaCommonModule } from 'ng-altea-common';
 import { OrderMgrModule } from 'ng-altea-common';
-import { OrderComponent } from './branch/order/order.component';
-
-defineLocale('nl-be', nlBeLocale);
-
-export function createTranslateLoader(http: HttpClient): any {
-  return new TranslateHttpLoader(http, 'assets/i18n/', '.json');
-}
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    Ngbs5Component
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
+    FormsModule,
     HttpClientModule,
     BrowserAnimationsModule,
     NgxSpinnerModule,
     Bootstrap5Module,
-    TranslateModule.forRoot({
-      defaultLanguage: 'en',
-      loader: {
-        provide: TranslateLoader,
-        useFactory: createTranslateLoader,
-        deps: [HttpClient],
-      },
-    }),
-    NgAlteaCommonModule,
-    //OrderMgrModule
   ],
   providers: [],
   bootstrap: [AppComponent]
