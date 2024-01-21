@@ -298,6 +298,10 @@
       "contacts": {
         "title": "Zoek klant"
       },
+      "offer": {
+        "validity": "Geldigheid",
+        "send": "Verstuur offerte"
+      },
       "staff": {
         "title": "Keuze personeel",
         "no-pref": "Geen voorkeur",
@@ -307,6 +311,7 @@
       "pays": {
         "title": "Betalingen"
       }
+      
     },
     "resource": {
       "edit": {
@@ -473,6 +478,12 @@
     }
   },
   "objects": {
+    "invoice": {
+      "company": "Bedrijf",
+      "vat": "BTW",
+      "address": "Adres",
+      "country": "Land"
+    },
     "gift": {
       "_single": "Cadeaubon",
       "value": "Waarde",

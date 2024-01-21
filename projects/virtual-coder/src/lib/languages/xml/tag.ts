@@ -1,6 +1,6 @@
 import { Attribute } from "./attribute";
 import * as _ from 'underscore'
-import * as indent from 'indent-string'
+import indentString, * as indent from 'indent-string'
 //import * as Model from "../../model";
 
 export interface IXml {
@@ -295,7 +295,7 @@ export class Tag extends Doc {
                     content += childTag.toString()                    
                 })
 
-                content = indent(content, 2)
+                content = indentString(content, 2)
             }
         }
 

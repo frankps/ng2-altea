@@ -45,6 +45,7 @@
     "date-fns": "^2.30.0",
     "firebase": "^10.7.1",
     "handlebars": "^4.7.8",
+    "indent-string": "^5.0.0",
     "leaflet": "^1.9.4",
     "lodash": "^4.17.21",
     "lord-icon-element": "^4.1.2",

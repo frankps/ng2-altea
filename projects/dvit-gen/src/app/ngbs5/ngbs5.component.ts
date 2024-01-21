@@ -10,41 +10,61 @@ export class Ngbs5Component {
 
   input = `{
     "type": "form",
-    "bind": { "mode": "ngModel", "to": "obj" },
-    "label": { "mode": "ngx-altea-label-control", "translate": "objects.invoice"},
+    "info": "Only used internally. To link a contact (customer) to an order. Search contact or send proposal to customer.",
+    "name": "offer",
+    "form": { "tag": true },
+    "bind": { "mode": "ngModel", "to": "offer", "type": "Offer", "import": "ts-altea-model" },
+    "label": { "mode": "ngx-altea-label-control", "translate": "ui.order-mgr.offer"},
     "rows": { "generate": true, "cols": 1 },
     "elements": {
-        "country": {
-          "type": "ng-select",
-          "source": { "mode": "enum", "name": "Country" },
-          "required": true,
-          "clearable": false,
-          "multiple": false
-      },
-        "company": {
+        "mobile": {
             "type": "text",
-            "required": true
+            "required": false,
+            "translate": "dic.mobile"
         },
-        "vat": {
+        "email": {
             "type": "text",
-            "required": false
+            "required": false,
+            "translate": "dic.email"
         },
-        "address": {
-            "type": "textarea",
+        "validity": {
+            "type": "ng-select",
+            "source": { "mode": "enum", "name": "Country", "import": "ts-altea-model", "translate": "enums.country" },
             "required": true,
-            "rows": 4
+            "clearable": false,
+            "multiple": false,
+            "translate": ""
         },
-        "request": {
+        "sendOffer": {
             "type": "button",
-            "translate": "dic.add",
-            "click": "test($event)"
+            "translate": ".send",
+            "click": "sendOffer($event)",
+            "class": { "style": "primary", "outline": false, "size": "", "block": true } ,
+            "disabled": { "enable": true, "pristine": true, "valid": false }
         }
     }
 }
   `
 
-  html = ''
+  /*
 
+  "btn-primary float-end"
+
+
+        "country": {
+          "type": "ng-select",
+          "source": { "mode": "enum", "name": "Country", "import": "ts-altea-model", "translate": "enums.country" },
+          "required": true,
+          "clearable": false,
+          "multiple": false
+      },
+
+
+  */
+
+
+  html = ''
+  code = ''
 
   generate() {
 
@@ -55,12 +75,16 @@ export class Ngbs5Component {
 
       case 'form':
         let formGen = new Ngbs5FormGenerator(obj)
-        let htmlDoc = formGen.generate()
+        let ngComponent = formGen.generate()
 
-        if (htmlDoc)
-          this.html = htmlDoc.toString()
-        else
+        if (ngComponent) {
+          this.html = ngComponent.html.toString()
+          this.code = ngComponent.code.toString()
+        }
+        else {
           this.html = ''
+          this.code = ''
+        }
 
         break
 

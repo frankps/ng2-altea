@@ -26,6 +26,7 @@ import { FakeBackendInterceptor } from './velzon/core/helpers/fake-backend';
 import { initFirebaseBackend } from './velzon/authUtils';
 import { NgAlteaCommonModule } from 'ng-altea-common';
 import { OrderMgrModule } from 'ng-altea-common';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 defineLocale('nl-be', nlBeLocale);
 
@@ -50,6 +51,7 @@ if (environment.defaultauth === 'firebase') {
 //    OrderMgrModule,
     NgxSpinnerModule,
     Bootstrap5Module,
+    NgSelectModule,
     FullCalendarModule,
     TranslateModule.forRoot({
       defaultLanguage: 'en',

@@ -1,9 +1,19 @@
 {
     "invoiceForm":   {
         "type": "form",
-        "bind": { "mode": "ngModel", "to": "object" },
+        "name": "invoice",
+        "form": { "tag": true },
+        "bind": { "mode": "ngModel", "to": "invoice", "type": "Invoice", "import": "ts-altea-model" },
         "label": { "mode": "ngx-altea-label-control", "translate": "objects.invoice"},
+        "rows": { "generate": true, "cols": 1 },
         "elements": {
+              "country": {
+                "type": "ng-select",
+                "source": { "mode": "enum", "name": "Country", "import": "ts-altea-model", "translate": "enums.country" },
+                "required": true,
+                "clearable": false,
+                "multiple": false
+            },
             "company": {
                 "type": "text",
                 "required": true
@@ -12,19 +22,75 @@
                 "type": "text",
                 "required": false
             },
-            "country": {
-                "type": "select",
-                "bindMode": "enum",
-                "required": true,
-                "enum": "Country"
-            },
             "address": {
                 "type": "textarea",
-                "required": true
+                "required": true,
+                "rows": 4
             },
             "request": {
-                "type": "button"
+                "type": "button",
+                "translate": "dic.add",
+                "click": "test($event)",
+                "class": { "style": "primary", "outline": false, "size": "", "block": true } ,
+                "disabled": { "enable": true, "pristine": true, "valid": false }
             }
+        }
+    },
+    "internalOrderContact":   {
+        "type": "form",
+        "info": "Only used internally. To link a contact (customer) to an order. Search contact or send proposal to customer.",
+        "name": "invoice",
+        "form": { "tag": true },
+        "bind": { "mode": "ngModel", "to": "invoice", "type": "Invoice", "import": "ts-altea-model" },
+        "label": { "mode": "ngx-altea-label-control", "translate": "objects.invoice"},
+        "rows": { "generate": true, "cols": 1 },
+        "elements": {
+            "searchFor": {
+                "type": "text",
+                "required": false
+            },
+            "search": {
+                "type": "button",
+                "translate": "dic.search",
+                "click": "searchContact($event)",
+                "class": { "style": "primary", "outline": false, "size": "", "block": true } ,
+                "disabled": { "enable": true, "pristine": true, "valid": false }
+            },
+            "mobile": {
+                "type": "text",
+                "required": false
+            },
+            "email": {
+                "type": "text",
+                "required": false
+            },
+            "validity": {
+                "type": "ng-select",
+                "source": { "mode": "enum", "name": "Country", "import": "ts-altea-model", "translate": "enums.country" },
+                "required": true,
+                "clearable": false,
+                "multiple": false
+            },
+            "sendOffer": {
+                "type": "button",
+                "translate": "dic.search",
+                "click": "searchContact($event)",
+                "class": { "style": "primary", "outline": false, "size": "", "block": true } ,
+                "disabled": { "enable": true, "pristine": true, "valid": false }
+            }
+        }
+    },
+    "orderSearch": {
+        "searchFor": {
+            "type": "text",
+            "required": false
+        },
+        "search": {
+            "type": "button",
+            "translate": "dic.search",
+            "click": "searchContact($event)",
+            "class": { "style": "primary", "outline": false, "size": "", "block": true } ,
+            "disabled": { "enable": true, "pristine": true, "valid": false }
         }
     },
     "posReserve": {

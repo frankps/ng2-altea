@@ -1784,7 +1784,7 @@ export class Invoice extends ObjectWithId {
   
   company?: string
   vat?: string
-  country?: string
+  country?: string = 'BEL'
   address?: string
 
   email?: string

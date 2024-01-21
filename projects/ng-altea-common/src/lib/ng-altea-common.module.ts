@@ -8,22 +8,26 @@ import { FormsModule } from '@angular/forms';
 import { MainMenuComponent } from './app/main-menu/main-menu.component';
 import { RedeemGiftComponent } from './gift/redeem-gift/redeem-gift.component';
 import { OrderMgrModule } from './order-mgr/order-mgr.module';
-
+import { RequestInvoiceComponent } from './invoice/request-invoice/request-invoice.component';
+import { NgSelectModule } from '@ng-select/ng-select';
 @NgModule({
   imports: [CommonModule,
   HttpClientModule,
   TranslateModule,
   Bootstrap5Module,
-  FormsModule
+  FormsModule,
+  NgSelectModule
 ],
   declarations: [
     RequestGiftComponent,
     MainMenuComponent,
-    RedeemGiftComponent
+    RedeemGiftComponent,
+    RequestInvoiceComponent
   ],
   exports: [
     RequestGiftComponent,
     RedeemGiftComponent,
+    RequestInvoiceComponent,
     MainMenuComponent,
     OrderMgrModule
   ]
