@@ -1,0 +1,19 @@
+<form #searchContactForm="ngForm">
+    <div class="row {{css_cls_row}}">
+      <div class="col">
+        <ngx-altea-label-control label="ui.order-mgr.search-contact.searchFor" for="searchFor">
+          <input type="text" id="searchFor" name="searchFor" class="form-control" required [(ngModel)]="searchContact.searchFor">
+        </ngx-altea-label-control>
+      </div>
+    </div>
+    <div class="row {{css_cls_row}}">
+      <div class="col">
+        <div class="d-grid gap-2">
+        
+            <button class="btn btn-primary" translate (click)="doSearch(searchContact)" [disabled]="searchContactForm.form.pristine || !searchContactForm.form.valid">ui.order-mgr.search-contact.search</button>
+            
+        </div>
+      </div>
+    </div>
+  </form>
+  

@@ -4,13 +4,12 @@ import { Contact, Country, Offer, TimeUnit } from 'ts-altea-model'
 import { TranslationService } from 'ng-common'
 import { Translation } from 'ts-common'
 
-
 @Component({
-  selector: 'altea-lib-request-invoice',
-  templateUrl: './request-invoice.component.html',
-  styleUrls: ['./request-invoice.component.css']
+  selector: 'order-mgr-send-offer',
+  templateUrl: './send-offer.component.html',
+  styleUrls: ['./send-offer.component.css']
 })
-export class RequestInvoiceComponent implements OnInit {
+export class SendOfferComponent {
 
 
   offer: Offer = new Offer()
@@ -21,22 +20,23 @@ export class RequestInvoiceComponent implements OnInit {
   country: Translation[] = []
 
   @Output()
-	send: EventEmitter<Offer>= new EventEmitter<Offer>()
+  send: EventEmitter<Offer> = new EventEmitter<Offer>()
 
   // durations = [].map(i => { return { pct: i, label: `${i} %` } })
   minutesInHour = 60
   minutesInDay = 60 * 24
 
   // 
-  durations = [ 15, 30, 60, 60 * 2, 60 * 4, 60 * 8, 60 * 12, this.minutesInDay, this.minutesInDay * 2, this.minutesInDay * 4, this.minutesInDay * 7 ].map(min => { return { value: min, label: `${min} minutes` } })
+  durations = [15, 30, 60, 60 * 2, 60 * 4, 60 * 8, 60 * 12, this.minutesInDay, this.minutesInDay * 2, this.minutesInDay * 4, this.minutesInDay * 7].map(min => { return { value: min, label: `${min} minutes` } })
 
   timeUnitsPlur: Translation[] = []
   timeUnitsSing: Translation[] = []
 
   constructor(protected translationSvc: TranslationService) {
     console.warn(this.durations)
-
   }
+  
+  
 
   async ngOnInit() {
     await this.translationSvc.translateEnum(Country, 'enums.country.', this.country)
@@ -54,8 +54,7 @@ export class RequestInvoiceComponent implements OnInit {
 
     console.warn(this.minutesInDay)
 
-    for (let dur of this.durations)
-    {
+    for (let dur of this.durations) {
 
       if (dur.value >= this.minutesInDay) {
         let days = dur.value / this.minutesInDay
@@ -86,7 +85,8 @@ export class RequestInvoiceComponent implements OnInit {
   sendOffer($event) {
     console.warn("Button 'sendOffer' clicked: 'sendOffer' method triggered!")
     console.warn(this.offer)
-   this.send.emit(this.offer)
+    this.send.emit(this.offer)
   }
+
 
 }

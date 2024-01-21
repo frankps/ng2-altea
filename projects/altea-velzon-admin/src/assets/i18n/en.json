@@ -41,6 +41,13 @@
     "end": "einde"
   },
   "enums": {
+    "task-schedule": {
+      "once": "Eénmalig",
+      "daily": "Dagelijks",
+      "weekly": "Wekelijks",
+      "monthly": "Maandelijks",
+      "yearly": "Jaarlijks"
+    },
     "gift-type": {
       "amount": "Bedrag",
       "specific": "Specifiek"
@@ -301,6 +308,10 @@
       "offer": {
         "validity": "Geldigheid",
         "send": "Verstuur offerte"
+      },
+      "search-contact": {
+        "searchFor": "Klant zoeken",
+        "search": "Zoeken"
       },
       "staff": {
         "title": "Keuze personeel",
@@ -736,6 +747,13 @@
       "totalQty": "Totaal aantal beurten",
       "usedQty": "Gebruikte beurten",
       "contact": "Klant"
+    },
+    "task": {
+      "name": "Taaknaam",
+      "loc": "Locatie",
+      "info": "Extra info",
+      "hrIds": "Uitvoerders",
+      "schedule": "Frequentie"
     }
   },
   "HEADER": {

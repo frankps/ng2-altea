@@ -28,6 +28,8 @@ import { DemoOrdersComponent } from './demo-orders/demo-orders.component';
 import { ContactSelectComponent } from './contact-select/contact-select.component';
 import { PosPaymentComponent } from './pos-payment/pos-payment.component';
 import { StaffSelectComponent } from './staff-select/staff-select.component';
+import { SendOfferComponent } from './send-offer/send-offer.component';
+import { SearchContactComponent } from './search-contact/search-contact.component';
 
 @NgModule({
   declarations: [
@@ -45,6 +47,8 @@ import { StaffSelectComponent } from './staff-select/staff-select.component';
     ContactSelectComponent,
     PosPaymentComponent,
     StaffSelectComponent,
+    SendOfferComponent,
+    SearchContactComponent,
   ],
   imports: [
     CommonModule,
@@ -74,7 +78,9 @@ import { StaffSelectComponent } from './staff-select/staff-select.component';
     DemoOrdersComponent,
     ContactSelectComponent,
     PosPaymentComponent,
-    StaffSelectComponent
+    StaffSelectComponent,
+    SendOfferComponent,
+    SearchContactComponent
   ]
 })
 export class OrderMgrModule {}

@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core'
 import { TranslationService } from 'ng-common'
 import { SessionService } from '../../session.service';
 import { Branch, Gift, GiftType, RedeemGift } from 'ts-altea-model';
@@ -22,6 +22,7 @@ export class RedeemGiftComponent implements OnInit {
   lbl = {}
   branch: Branch
   gift: Gift
+
 
   constructor(protected translationSvc: TranslationService, protected sessionSvc: SessionService, protected giftSvc: GiftService) {
 

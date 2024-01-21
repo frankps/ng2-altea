@@ -186,16 +186,18 @@ export class Ngbs5FormGenerator {
                 */
                 elementTag.attr('class', buttonClass)
 
-                if (elementSpec.translate) {
-                    elementTag.attr('translate')
+                //if (elementSpec.translate) {
+                elementTag.attr('translate')
 
-                    const translationPath = this.getLabelTranslationPath(formSpec, elementSpec, elementName)
-                    elementTag.addContent(translationPath)
-                }
+                const translationPath = this.getLabelTranslationPath(formSpec, elementSpec, elementName)
+                elementTag.addContent(translationPath)
+
+
+                let clickMethod: vc.TsMethod
 
                 if (elementSpec.click) {
                     elementTag.attr('(click)', elementSpec.click)
-                    const clickMethod = this.parseMethodSignature(elementSpec.click)
+                    clickMethod = this.parseMethodSignature(elementSpec.click)
 
 
                     if (clickMethod) {
@@ -227,12 +229,35 @@ export class Ngbs5FormGenerator {
                     elementTag.attr('[disabled]', disabledStatements.join(' || '))
                 }
 
-
+                // block (=full width button), then we place button inside another div container
                 if (elementSpec.class.block === true) {
-
                     let buttonContainer = vc.Tag.Div.addClass("d-grid gap-2")
                     buttonContainer.addChild(elementTag)
                     elementTag = buttonContainer
+                }
+
+                if (elementSpec.eventEmitter?.enable === true) {
+
+                    tsClass.addImport('@angular/core', 'Output', 'EventEmitter')
+
+                    let eventEmitterType = elementSpec.eventEmitter.type
+
+                    if (!eventEmitterType)
+                        eventEmitterType = formSpec.bind.type
+
+                    eventEmitterType = `EventEmitter<${eventEmitterType}>`
+
+                    const eventProp = tsClass.addProperty(elementSpec.eventEmitter.name, eventEmitterType, `new ${eventEmitterType}()`)
+                    eventProp.decorators.push('@Output()')
+
+                    if (clickMethod) {
+                        let emitValue = elementSpec.eventEmitter.value
+
+                        if (!emitValue)
+                            emitValue = formSpec.bind.to
+
+                        clickMethod.addCode(`this.${elementSpec.eventEmitter.name}.emit(this.${emitValue})`)
+                    }
                 }
 
 
@@ -338,7 +363,7 @@ export class Ngbs5FormGenerator {
 
     }
 
-    getLabelTranslationPath(formSpec, elementSpec, elementName) : string {
+    getLabelTranslationPath(formSpec, elementSpec, elementName): string {
 
         let label = ''
 
@@ -357,7 +382,7 @@ export class Ngbs5FormGenerator {
 
 
     }
-    
+
     addLabel(formSpec, elementSpec, elementName, elementTag) {
 
         if (formSpec.label.mode == "ngx-altea-label-control") {

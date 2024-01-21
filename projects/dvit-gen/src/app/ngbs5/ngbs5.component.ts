@@ -10,43 +10,61 @@ export class Ngbs5Component {
 
   input = `{
     "type": "form",
-    "info": "Only used internally. To link a contact (customer) to an order. Search contact or send proposal to customer.",
-    "name": "offer",
+    "info": "Setup recurring tasks",
+    "name": "recurring-task",
     "form": { "tag": true },
-    "bind": { "mode": "ngModel", "to": "offer", "type": "Offer", "import": "ts-altea-model" },
-    "label": { "mode": "ngx-altea-label-control", "translate": "ui.order-mgr.offer"},
+    "bind": { "mode": "ngModel", "to": "recurTask", "type": "RecurringTask", "import": "ts-altea-model" },
+    "label": { "mode": "ngx-altea-label-control", "translate": "objects.task"},
     "rows": { "generate": true, "cols": 1 },
     "elements": {
-        "mobile": {
+        "name": {
             "type": "text",
-            "required": false,
-            "translate": "dic.mobile"
+            "required": true,
+            "translate": ""
         },
-        "email": {
+        "loc": {
             "type": "text",
             "required": false,
-            "translate": "dic.email"
+            "translate": ""
+        },
+        "info": {
+            "type": "textarea",
+            "required": false,
+            "translate": ""
         },
         "validity": {
             "type": "ng-select",
-            "source": { "mode": "enum", "name": "Country", "import": "ts-altea-model", "translate": "enums.country" },
+            "source": { "mode": "enum", "name": "TaskSchedule", "import": "ts-altea-model", "translate": "enums.task-schedule" },
             "required": true,
             "clearable": false,
             "multiple": false,
             "translate": ""
         },
-        "sendOffer": {
+        "search": {
             "type": "button",
-            "translate": ".send",
-            "click": "sendOffer($event)",
+            "translate": "",
+            "click": "save(recurTask)",
+            "eventEmitter": { "enable": true, "name": "change", "type": "", "import": "", "value": "" },
             "class": { "style": "primary", "outline": false, "size": "", "block": true } ,
-            "disabled": { "enable": true, "pristine": true, "valid": false }
+            "disabled": { "enable": true, "pristine": true, "valid": false },
+            "help": {
+              "eventEmitter": [
+                "When type, import & value are blank, then we take this data from the bind property."
+              ]
+            } 
         }
     }
 }
   `
-
+  
   /*
+
+                  import { Output, EventEmitter } from '@angular/core';
+                  @Output() redeem: EventEmitter<RedeemGift> = new EventEmitter<RedeemGift>()
+                  this.redeem.emit(new RedeemGift(this.gift, GiftType.specific))
+
+
+
 
   "btn-primary float-end"
 

@@ -53,4 +53,5 @@ App project
 
 
 ng generate component order-mgr/staff-select --project ng-altea-common
+ng generate component order-mgr/send-offer --project ng-altea-common
 ng generate component invoice/request-invoice --project ng-altea-common
