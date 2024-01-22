@@ -151,12 +151,12 @@ export class TranslationService {
 
 
 
-  translateEnum(enumToTranslate: object, jsonTranslationPath: string, result: Translation[], includeHelp: boolean = false): Promise<Translation[]> {
+  translateEnum(enumToTranslate: object, jsonTranslationPath: string, result: Translation[], isNumeric: boolean = false, includeHelp: boolean = false): Promise<Translation[]> {
 
-    return new Promise<Translation[]>(this.translateBasicEnum(enumToTranslate, jsonTranslationPath, result, includeHelp))
+    return new Promise<Translation[]>(this.translateBasicEnum(enumToTranslate, jsonTranslationPath, result, isNumeric, includeHelp))
   }
 
-  translateBasicEnum(enumToTranslate: object, jsonTranslationPath: string, result: Translation[], includeHelp: boolean = false) {
+  translateBasicEnum(enumToTranslate: object, jsonTranslationPath: string, result: Translation[], isNumeric: boolean = false, includeHelp: boolean = false) {
 
     const me = this
 
@@ -167,12 +167,25 @@ export class TranslationService {
 
       me.translate.get(translationPaths).subscribe((res: any) => {
 
+        console.warn(res)
+
         Object.getOwnPropertyNames(res).forEach(prop => {
 
           const items = prop.split('.')
           const key = items[items.length - 1]
 
-          result.push(new Translation(key, res[prop]))
+          if (isNumeric) {
+            let num = Number(key)
+
+            if (!isNaN(num))
+              result.push(new Translation(num, res[prop]))
+
+          } else {
+
+            result.push(new Translation(key, res[prop]))
+          }
+
+
         })
 
         if (includeHelp) {

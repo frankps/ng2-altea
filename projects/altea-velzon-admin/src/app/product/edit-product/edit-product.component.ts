@@ -79,7 +79,7 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
       , route, spinner, dashboardSvc)
 
     this.translationSvc.translateEnum(Gender, 'enums.gender.', this.gender)
-    this.translationSvc.translateEnum(OnlineMode, 'enums.online-mode.', this.onlineMode, true)
+    this.translationSvc.translateEnum(OnlineMode, 'enums.online-mode.', this.onlineMode, false, true)
 
 
 

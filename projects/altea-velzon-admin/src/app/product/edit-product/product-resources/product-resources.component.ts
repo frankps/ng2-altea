@@ -57,8 +57,8 @@ export class ProductResourcesComponent implements OnInit {
       this.resources = res.data
     })
 
-    this.translationSvc.translateEnum(DurationMode, 'enums.duration-mode.', this.durationMode, true)
-    this.translationSvc.translateEnum(DurationReference, 'enums.duration-reference.', this.durationReference, true)
+    this.translationSvc.translateEnum(DurationMode, 'enums.duration-mode.', this.durationMode, false, true)
+    this.translationSvc.translateEnum(DurationReference, 'enums.duration-reference.', this.durationReference, false, true)
 
 
   }

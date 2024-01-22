@@ -1,31 +1,62 @@
-<form #offerForm="ngForm">
+<form #recurringTaskForm="ngForm">
     <div class="row {{css_cls_row}}">
         <div class="col">
-            <ngx-altea-label-control label="dic.mobile" for="mobile">
-                <input type="text" id="mobile" name="mobile" class="form-control" [(ngModel)]="offer.mobile">
+            <ngx-altea-label-control label="objects.task.name" for="name">
+                <input type="text" id="name" name="name" class="form-control" required [(ngModel)]="recurTask.name">
             </ngx-altea-label-control>
         </div>
     </div>
     <div class="row {{css_cls_row}}">
         <div class="col">
-            <ngx-altea-label-control label="dic.email" for="email">
-                <input type="text" id="email" name="email" class="form-control" [(ngModel)]="offer.email">
+            <ngx-altea-label-control label="objects.task.loc" for="loc">
+                <input type="text" id="loc" name="loc" class="form-control" [(ngModel)]="recurTask.loc">
             </ngx-altea-label-control>
         </div>
     </div>
     <div class="row {{css_cls_row}}">
         <div class="col">
-            <ngx-altea-label-control label="ui.order-mgr.offer.validity" for="validity">
-                <ng-select id="validity" name="validity" *ngIf="initialized" [items]="durations" bindLabel="label"
-                    bindValue="value" [clearable]="false" [multiple]="false" [(ngModel)]="offer.validity"></ng-select>
+            <ngx-altea-label-control label="objects.task.info" for="info">
+                <textarea id="info" name="info" class="form-control" [(ngModel)]="recurTask.info"></textarea>
+            </ngx-altea-label-control>
+        </div>
+    </div>
+    <div class="row {{css_cls_row}}">
+        <div class="col">
+            <ngx-altea-label-control label="objects.task.hrIds" for="hrIds">
+                <ng-select id="hrIds" name="hrIds" *ngIf="resources" [items]="resources" bindLabel="name" bindValue="id"
+                    [clearable]="true" [multiple]="true" [(ngModel)]="recurTask.hrIds"></ng-select>
+            </ngx-altea-label-control>
+        </div>
+    </div>
+    <div class="row {{css_cls_row}}">
+        <div class="col">
+            <ngx-altea-label-control label="objects.task.schedule" for="schedule">
+                <ng-select id="schedule" name="schedule" *ngIf="initialized" [items]="taskSchedule" bindLabel="trans"
+                    bindValue="key" [clearable]="false" [multiple]="false" [(ngModel)]="recurTask.schedule"></ng-select>
+            </ngx-altea-label-control>
+        </div>
+    </div>
+    <div class="row {{css_cls_row}}">
+        <div class="col">
+            <ngx-altea-label-control label="objects.task.fromTime" for="fromTime">
+                <input type="time" id="fromTime" name="fromTime" class="form-control"
+                    [(ngModel)]="recurTask.fromTime" />
+            </ngx-altea-label-control>
+        </div>
+    </div>
+    <div class="row {{css_cls_row}}">
+        <div class="col">
+            <ngx-altea-label-control label="objects.task.prio" for="prio">
+                <ng-select id="prio" name="prio" *ngIf="initialized" [items]="taskPriority" bindLabel="trans"
+                    bindValue="key" [clearable]="false" [multiple]="false" [(ngModel)]="recurTask.prio"></ng-select>
             </ngx-altea-label-control>
         </div>
     </div>
     <div class="row {{css_cls_row}}">
         <div class="col">
             <div class="d-grid gap-2">
-                <button class="btn btn-primary" translate (click)="sendOffer($event)"
-                    [disabled]="offerForm.form.pristine || !offerForm.form.valid">ui.order-mgr.offer.send</button>
+                <button class="btn btn-primary" translate (click)="save(recurTask)"
+                    [disabled]="recurringTaskForm.form.pristine || !recurringTaskForm.form.valid">dic.save</button>
             </div>
         </div>
     </div>

@@ -1,8 +1,11 @@
+
 import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core'
 import { NgForm } from '@angular/forms'
-import { Contact, Country, Offer, TimeUnit } from 'ts-altea-model'
+import { RecurringTask, Resource, ResourceType, TaskPriority, TaskSchedule, TaskStatus } from 'ts-altea-model'
 import { TranslationService } from 'ng-common'
-import { Translation } from 'ts-common'
+import { DbQuery, QueryOperator, Translation } from 'ts-common'
+import { ResourceService } from '../../resource.service'
+import { isThisSecond } from 'date-fns'
 
 
 @Component({
@@ -13,80 +16,59 @@ import { Translation } from 'ts-common'
 export class RequestInvoiceComponent implements OnInit {
 
 
-  offer: Offer = new Offer()
-  css_cls_row = 'mt-3'
-  initialized = false
-  @ViewChild('offerForm')
-  offerForm: NgForm
-  country: Translation[] = []
+	recurTask: RecurringTask= new RecurringTask()
+	css_cls_row= 'mt-3'
+	initialized= false
+	@ViewChild('recurringTaskForm')
+	recurringTaskForm: NgForm
+	taskSchedule: Translation[]= []
+  taskPriority: Translation[]= []
 
-  @Output()
-	send: EventEmitter<Offer>= new EventEmitter<Offer>()
+	@Output()
+	change: EventEmitter<RecurringTask>= new EventEmitter<RecurringTask>()
 
-  // durations = [].map(i => { return { pct: i, label: `${i} %` } })
-  minutesInHour = 60
-  minutesInDay = 60 * 24
+  resources: Resource[] = []
 
-  // 
-  durations = [ 15, 30, 60, 60 * 2, 60 * 4, 60 * 8, 60 * 12, this.minutesInDay, this.minutesInDay * 2, this.minutesInDay * 4, this.minutesInDay * 7 ].map(min => { return { value: min, label: `${min} minutes` } })
 
-  timeUnitsPlur: Translation[] = []
-  timeUnitsSing: Translation[] = []
+	constructor(protected translationSvc: TranslationService, protected resourceSvc: ResourceService) {
 
-  constructor(protected translationSvc: TranslationService) {
-    console.warn(this.durations)
+    
+	}
 
+	async ngOnInit() {
+
+		await this.translationSvc.translateEnum(TaskSchedule, 'enums.task-schedule.', this.taskSchedule)
+    console.warn('taskPriority')
+
+    await this.translationSvc.translateEnum(TaskPriority, 'enums.task-priority.', this.taskPriority, true)
+    await this.loadResources()  
+
+/*     this.taskPriority.push(new Translation(0, "Nul"))
+    this.taskPriority.push(new Translation(1, "Eén")) */
+
+		this.initialized = true
+
+    console.error(this.recurTask)
+
+    console.log(TaskStatus)
+    console.log(TaskPriority)
+
+	}
+
+  async loadResources() {
+    const query = new DbQuery()
+
+    query.and('type', QueryOperator.equals, ResourceType.human)
+
+    this.resources = await this.resourceSvc.query$(query)
   }
 
-  async ngOnInit() {
-    await this.translationSvc.translateEnum(Country, 'enums.country.', this.country)
-    await this.translationSvc.translateEnum(TimeUnit, 'enums.time-units-plur.', this.timeUnitsPlur)
-    await this.translationSvc.translateEnum(TimeUnit, 'enums.time-units-sing.', this.timeUnitsSing)
 
-    console.error(this.timeUnitsPlur)
+	save(recurTask) {
+		console.warn("Button 'search' clicked: 'save' method triggered!")
+		console.warn(this.recurTask)
+		this.change.emit(this.recurTask)
+	}  
 
-    let minutesTranslation = this.timeUnitsPlur.find(t => t.key == 'm')?.trans
-    let hoursTranslation = this.timeUnitsPlur.find(t => t.key == 'h')?.trans
-    let hourTranslation = this.timeUnitsSing.find(t => t.key == 'h')?.trans
-
-    let daysTranslation = this.timeUnitsPlur.find(t => t.key == 'd')?.trans
-    let dayTranslation = this.timeUnitsSing.find(t => t.key == 'd')?.trans
-
-    console.warn(this.minutesInDay)
-
-    for (let dur of this.durations)
-    {
-
-      if (dur.value >= this.minutesInDay) {
-        let days = dur.value / this.minutesInDay
-
-        if (days == 1)
-          dur.label = `${days} ${dayTranslation}`
-        else
-          dur.label = `${days} ${daysTranslation}`
-      } else if (dur.value >= this.minutesInHour) {
-        let hours = dur.value / this.minutesInHour
-
-        if (hours == 1)
-          dur.label = `${hours} ${hourTranslation}`
-        else
-          dur.label = `${hours} ${hoursTranslation}`
-
-      } else {
-        dur.label = `${dur.value} ${minutesTranslation}`
-      }
-
-    }
-
-    console.warn(this.durations)
-
-    this.initialized = true
-  }
-
-  sendOffer($event) {
-    console.warn("Button 'sendOffer' clicked: 'sendOffer' method triggered!")
-    console.warn(this.offer)
-   this.send.emit(this.offer)
-  }
 
 }

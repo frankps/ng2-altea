@@ -3,6 +3,20 @@ import * as vc from 'virtual-coder'
 import * as sc from 'stringcase'
 import { NgCommonModule } from 'ng-common'
 
+
+/*
+
+Hello Raffael,
+Please transfer €1825 to our account to make the reservations:
+ES6601824458310201545828
+
+
+
+
+
+
+*/
+
 export class Ngbs5FormGenerator {
 
     constructor(public formSpec: any) {
@@ -178,7 +192,7 @@ export class Ngbs5FormGenerator {
 
 
                 }
-
+  
                 let buttonClass = buttonClasses.join(' ')
                 /*
                                 if (elementSpec?.class)

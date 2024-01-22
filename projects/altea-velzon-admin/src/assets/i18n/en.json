@@ -41,6 +41,12 @@
     "end": "einde"
   },
   "enums": {
+    "task-priority": {
+      "0": "Niet dringend",
+      "10": "Normaal",
+      "20": "Zo snel mogelijk",
+      "30": "Dringend"
+    },
     "task-schedule": {
       "once": "Eénmalig",
       "daily": "Dagelijks",
@@ -753,7 +759,9 @@
       "loc": "Locatie",
       "info": "Extra info",
       "hrIds": "Uitvoerders",
-      "schedule": "Frequentie"
+      "schedule": "Frequentie",
+      "prio": "Prioriteit",
+      "fromTime": "Toon vanaf"
     }
   },
   "HEADER": {

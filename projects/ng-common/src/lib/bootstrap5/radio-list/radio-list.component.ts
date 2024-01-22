@@ -48,7 +48,7 @@ export class RadioListComponent implements OnInit {
 
     if (this.enum && this.transPath) {
 
-      await this.translationSvc.translateEnum(this.enum, this.transPath, this.items, true)
+      await this.translationSvc.translateEnum(this.enum, this.transPath, this.items, false, true)
 
       console.warn(this.items)
     }

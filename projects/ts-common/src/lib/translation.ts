@@ -3,5 +3,5 @@ export class Translation {
   public value = 0
   public help = ''
 
-  constructor(public key = '', public trans = '') { }
+  constructor(public key : string | number = '', public trans = '') { }
 }

@@ -3501,6 +3501,13 @@ export enum TaskStatus {
   done = 'done'
 }
 
+export enum TaskPriority {
+  notUrgent = 0,
+  normal = 10,
+  asap = 20,
+  urgent = 30
+}
+
 export class RecurringTask extends ObjectWithId {
   branchId?: string
   
@@ -3508,9 +3515,11 @@ export class RecurringTask extends ObjectWithId {
   loc?: string
   info?: string
 
-  /** human resources = staff, links to a resource or resource group */
-  hrIds?: string[] = []
+  prio = TaskPriority.urgent
+  fromTime: String  
 
+  /** human resources = staff, links to a resource or resource group */
+  hrIds?: string[] = []  
   schedule = TaskSchedule.once
 
   active = true

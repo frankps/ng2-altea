@@ -32,7 +32,7 @@ export class Ngbs5Component {
             "required": false,
             "translate": ""
         },
-        "validity": {
+        "schedule": {
             "type": "ng-select",
             "source": { "mode": "enum", "name": "TaskSchedule", "import": "ts-altea-model", "translate": "enums.task-schedule" },
             "required": true,
@@ -40,9 +40,17 @@ export class Ngbs5Component {
             "multiple": false,
             "translate": ""
         },
-        "search": {
+        "prio": {
+          "type": "ng-select",
+          "source": { "mode": "enum", "name": "TaskPriority", "import": "ts-altea-model", "translate": "enums.task-priority" },
+          "required": true,
+          "clearable": false,
+          "multiple": false,
+          "translate": ""
+      },
+        "save": {
             "type": "button",
-            "translate": "",
+            "translate": "dic.save",
             "click": "save(recurTask)",
             "eventEmitter": { "enable": true, "name": "change", "type": "", "import": "", "value": "" },
             "class": { "style": "primary", "outline": false, "size": "", "block": true } ,
@@ -56,7 +64,7 @@ export class Ngbs5Component {
     }
 }
   `
-  
+
   /*
 
                   import { Output, EventEmitter } from '@angular/core';
