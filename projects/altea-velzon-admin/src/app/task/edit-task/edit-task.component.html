@@ -1,0 +1,113 @@
+
+
+
+<button type="button" class="btn btn-primary btn-sm" (click)="scheduleTasks()">Schedule tasks</button>
+
+
+<ng-container *ngIf="object">
+
+    <ngx-altea-form-card-section sectionName="ui.task.edit.sections.general.title" sectionId="general"
+        [editSectionId]="editSectionId" (save)="save()" (cancel)="cancel()" (editModeChanged)="editModeChanged($event)"
+        [enableSave]="!taskForm?.form.pristine && taskForm?.form.valid">
+
+        <ng-container readonly>
+
+            <div class="row">
+                <div class="col-6"> <ngx-altea-label-value label="objects.task.name"
+                        [value]="object.name"></ngx-altea-label-value> </div>
+                <div class="col-6"> <ngx-altea-label-value label="objects.task.loc"
+                        [value]="object.loc"></ngx-altea-label-value> </div>
+            </div>
+
+            <div class="row">
+                <div class="col-6"> <ngx-altea-label-value label="objects.task.info"
+                        [value]="object.info"></ngx-altea-label-value> </div>
+                <div class="col-6"> <ngx-altea-label-value label="objects.task.schedule"
+                        value="{{'enums.task-schedule.' + object.schedule | translate}}"></ngx-altea-label-value> </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-6"> <ngx-altea-label-value label="objects.task.time"
+                        [value]="object.time"></ngx-altea-label-value> </div>
+                <div class="col-6"> <ngx-altea-label-value label="objects.task.prio"
+                        [value]="object.prio"></ngx-altea-label-value> </div>
+            </div>
+
+            <div class="row">
+                <div class="col-6"> <ngx-altea-label-value label="objects.task.hrIds"
+                        [value]="hrNames"></ngx-altea-label-value> </div>
+            </div>
+
+        </ng-container>
+
+        <ng-container edit>
+
+            <form #taskForm="ngForm">
+                <div class="row {{css_cls_row}}">
+                    <div class="col">
+                        <ngx-altea-label-control label="objects.task.name" for="name">
+                            
+                            <input type="text" id="name" name="name" class="form-control" required [(ngModel)]="object.name">
+                        </ngx-altea-label-control>
+                    </div>
+                </div>
+                <div class="row {{css_cls_row}}">
+                    <div class="col">
+                        <ngx-altea-label-control label="objects.task.loc" for="loc">
+                            <input type="text" id="loc" name="loc" class="form-control" [(ngModel)]="object.loc">
+                        </ngx-altea-label-control>
+                    </div>
+                </div>
+                <div class="row {{css_cls_row}}">
+                    <div class="col">
+                        <ngx-altea-label-control label="objects.task.info" for="info">
+                            <textarea id="info" name="info" class="form-control" style="height: 120px;" [(ngModel)]="object.info"></textarea>
+                        </ngx-altea-label-control>
+                    </div>
+                </div>  
+                <div class="row {{css_cls_row}}">
+                    <div class="col">
+                        <ngx-altea-label-control label="objects.task.hrIds" for="hrIds">
+                            <ng-select id="hrIds" name="hrIds" *ngIf="resources" [items]="resources" bindLabel="name" bindValue="id"
+                                [clearable]="true" [multiple]="true" [(ngModel)]="object.hrIds"></ng-select>
+                        </ngx-altea-label-control>
+                    </div>
+                </div>
+                <div class="row {{css_cls_row}}">
+                    <div class="col">
+                        <ngx-altea-label-control label="objects.task.schedule" for="schedule">
+                            <ng-select id="schedule" name="schedule" *ngIf="initialized" [items]="taskSchedule" bindLabel="trans"
+                                bindValue="key" [clearable]="false" [multiple]="false" [(ngModel)]="object.schedule"></ng-select>
+                        </ngx-altea-label-control>
+                    </div>
+                </div>
+                <div class="row {{css_cls_row}}">
+                    <div class="col">
+                        <ngx-altea-label-control label="objects.task.time" for="time">
+                            <input type="time" id="time" name="time" class="form-control"
+                                [(ngModel)]="object.time" />
+                        </ngx-altea-label-control>
+                    </div>  
+                </div>
+                <div class="row {{css_cls_row}}">
+                    <div class="col">
+                        <ngx-altea-label-control label="objects.task.prio" for="prio">
+                            <ng-select id="prio" name="prio" *ngIf="initialized" [items]="taskPriority" bindLabel="trans"
+                                bindValue="key" [clearable]="false" [multiple]="false" [(ngModel)]="object.prio"></ng-select>
+                        </ngx-altea-label-control>
+                    </div>
+                </div>
+            
+            </form>
+
+
+        </ng-container>
+
+    </ngx-altea-form-card-section>
+
+</ng-container>
+
+
+
+

@@ -34,6 +34,11 @@ export class MainMenuComponent implements OnInit {
       code: 'buy-gift'
     },
     {
+      code: 'demo-orders'
+    }
+
+    /*
+    {
       code: 'my-reservs'
     },
     {
@@ -41,7 +46,7 @@ export class MainMenuComponent implements OnInit {
     },
     {
       code: 'my-loyalty'
-    }
+    } */
   ]
 
   constructor(protected translationSvc: TranslationService, protected sessionSvc: SessionService) {

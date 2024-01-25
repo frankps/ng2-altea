@@ -11,7 +11,7 @@
     "actions": "Acties",
     "add": "Toevoegen",
     "cancel": "Annuleren",
-    "color": "Kleur", 
+    "color": "Kleur",
     "create": "Maak",
     "communication": "Communicatie",
     "currency": "Munteenheid",
@@ -65,7 +65,6 @@
       "debit": "Bancontact",
       "gift": "Cadeaubon",
       "subs": "Abonnement"
-
     },
     "msg-type": {
       "sms": "SMS",
@@ -227,9 +226,17 @@
       "satisfaction": "Tevredenheid"
     }
   },
-  
   "ui": {
-    
+    "task": {
+      "edit": {
+        "sections": {
+          "general": {
+            "title": "Algemeen"
+           
+          }
+        }
+      }
+    },
     "price": {
       "title": "Speciale prijzen & promoties",
       "add-option": "Nieuwe prijs voor optie"
@@ -328,7 +335,6 @@
       "pays": {
         "title": "Betalingen"
       }
-      
     },
     "resource": {
       "edit": {
@@ -452,6 +458,10 @@
       "my-loyalty": {
         "h1": "Mijn klantenkaart",
         "inf": "Status van mijn klantenkaart"
+      },
+      "demo-orders": {
+        "h1": "Demo order",
+        "inf": "Om snel te testen"
       }
     },
     "gift": {
@@ -473,7 +483,7 @@
         "emailFrom": "Verstuur cadeaubon per email naar mezelf (de schenker)",
         "emailTo": "Verstuur cadeaubon per email naar ontvanger",
         "postal": "Verstuur cadeaubon per post",
-        "postalExtra":  "(+[price] voor aangetekende verzending)",
+        "postalExtra": "(+[price] voor aangetekende verzending)",
         "pos": "Cadeaubon afhalen bij [branch]",
         "pos-remark": "Opmerking: deze optie kan niet gecombineerd worden met versturen per post."
       },
@@ -488,7 +498,6 @@
       "use": "Gebruik deze bon",
       "use-specific": "Boek dit arrangement",
       "use-amount": "Boek iets anders"
-
     },
     "stripe": {
       "gift": "Cadeaubon"
@@ -538,10 +547,10 @@
       "gift": {
         "on": "Gebruik cadeaubonnen",
         "methods": {
-            "title": "Verzendingswijze",
-            "email": "Email",
-            "postal": "Per post",
-            "pos": "Afhalen in winkel"
+          "title": "Verzendingswijze",
+          "email": "Email",
+          "postal": "Per post",
+          "pos": "Afhalen in winkel"
         },
         "types": {
           "title": "Wat kan er geschonken worden",
@@ -761,7 +770,7 @@
       "hrIds": "Uitvoerders",
       "schedule": "Frequentie",
       "prio": "Prioriteit",
-      "fromTime": "Toon vanaf"
+      "time": "Start op/vanaf"
     }
   },
   "HEADER": {
@@ -820,6 +829,9 @@
     },
     "branch": {
       "label": "Instellingen"
+    },
+    "tasks": {
+      "label": "Taken"
     }
   },
   "MENUITEMS": {

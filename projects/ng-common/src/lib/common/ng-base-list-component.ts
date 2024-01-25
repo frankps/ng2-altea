@@ -72,12 +72,12 @@ export abstract class NgBaseListComponent<T extends ObjectWithId> extends NgBase
 
     }
 
-    search(searchFor: string) {
-
+    search(searchFor?: string) {
+/* 
         if (!searchFor) {
             this.getListObjects()
             return
-        }
+        } */
 
         this.objects$ = null
         const query = this.getSearchDbQuery(searchFor)

@@ -4,6 +4,7 @@
 export enum QueryOperator {
   contains = 'contains',
   equals = 'equals',
+  not = 'not',
   startsWith = 'startsWith',
   endsWith = 'endsWith',
   greaterThanOrEqual = 'gte',

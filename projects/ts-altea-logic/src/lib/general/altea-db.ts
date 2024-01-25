@@ -1,5 +1,5 @@
 import { ApiListResult, ApiResult, DateHelper, DbObjectMulti, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
-import { Branch, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Template } from 'ts-altea-model'
+import { Branch, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { IDb } from '../interfaces/i-db'
 
@@ -222,10 +222,41 @@ export class AlteaDb {
 
         return schedules
 
-
-
     }
 
+    async getRecurringTasks() {
+
+        const qry = new DbQueryTyped<Task>('task', Task)
+
+        qry.and('schedule', QueryOperator.not, TaskSchedule.once)
+        qry.and('active', QueryOperator.equals, true)
+
+
+        console.error(qry)
+
+        const tasks = await this.db.query$<Task>(qry)
+
+        console.error(tasks)
+
+        return tasks
+    }
+
+    async getTasksToDoORFinishedAfter(recurringTaskIds: string [], finishedAfter: Date): Promise<Task[]> {
+  
+        const qry = new DbQueryTyped<Task>('task', Task)
+
+        qry.select('id', 'rTaskId', 'status', 'finishedAt')
+        qry.and('rTaskId', QueryOperator.in, recurringTaskIds)
+
+      //  qry.and('finishedAt', QueryOperator.greaterThan, finishedAfter)
+
+        qry.or('status', QueryOperator.equals, TaskStatus.todo)
+        qry.or('finishedAt', QueryOperator.greaterThan, finishedAfter)
+
+        const tasks = await this.db.query$<Task>(qry)
+
+        return tasks
+    }
 
 
 

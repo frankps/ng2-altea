@@ -24,7 +24,7 @@ export class MenuComponent {
     switch (menuItem.code) {
 
       case 'new-reserv':
-        
+
         this.orderMgrSvc.newOrder(OrderUiMode.newOrder)
         this.orderMgrSvc.changeUiState(OrderUiState.browseCatalog)
         this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'order'])
@@ -34,14 +34,20 @@ export class MenuComponent {
         this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'use-gift'])
         break
 
-        case 'buy-gift':
+      case 'buy-gift':
         this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'buy-gift'])
         break
-  
+
+      case 'demo-orders':
+
+        this.orderMgrSvc.newOrder(OrderUiMode.newOrder)
+        this.orderMgrSvc.changeUiState(OrderUiState.demoOrders)
+        this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'order'])
+        break
 
     }
 
-    
+
 
 
 

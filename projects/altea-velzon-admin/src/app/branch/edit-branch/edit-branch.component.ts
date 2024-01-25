@@ -82,11 +82,8 @@ export class EditBranchComponent extends NgEditBaseComponent<Branch> implements 
 
   }
 
-  async ngOnInit() {
-
-
-
-
+  override ngOnInit() {
+    super.ngOnInit()
   }
 
   override objectRetrieved(object: Branch): void {

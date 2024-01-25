@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit } from '@angular/core';
+import { Component, ViewChild, OnInit, Injectable } from '@angular/core';
 //import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ResourceType, ResourceTypeIcons, Resource, Schedule } from 'ts-altea-model'
 //import { BackendHttpServiceBase, DashboardService, FormCardSectionEventData, ToastType } from 'ng-common'
 import { ActivatedRoute, Router } from '@angular/router';
@@ -13,6 +13,7 @@ import * as Rx from "rxjs";
 import { DashboardService, ToastType } from '../services/dashboard.service';
 import { FormCardSectionEventData } from '../bootstrap5/form-card-section/form-card-section.component';
 import { BackendHttpServiceBase } from '../services/backend-http-service-base';
+
 
 export abstract class NgSectionsComponent {
     editSectionId = ''
@@ -64,8 +65,8 @@ export abstract class NgSectionsComponent {
     }
 }
 
-
-export abstract class NgEditBaseComponent<T extends ObjectWithId> extends NgSectionsComponent {
+@Injectable()
+export abstract class NgEditBaseComponent<T extends ObjectWithId> extends NgSectionsComponent implements OnInit {
 
 
     id = ''
@@ -75,6 +76,7 @@ export abstract class NgEditBaseComponent<T extends ObjectWithId> extends NgSect
 
     objectType = ''
     object?: T
+    isNew = false
 
 
 
@@ -89,6 +91,10 @@ export abstract class NgEditBaseComponent<T extends ObjectWithId> extends NgSect
         this.objectType = objectType
         //this.object = object
 
+    }
+
+    ngOnInit(): void {
+        
         this.route.params.subscribe(params => {
             
             console.error('edit-product')
@@ -101,7 +107,17 @@ export abstract class NgEditBaseComponent<T extends ObjectWithId> extends NgSect
                 if (id == this.id)
                     return
 
-                this.getObject(id)
+                if (id == 'new') {
+                    this.isNew = true
+                    this.object = new this.type
+                    this.initNewObject(this.object)
+
+                    console.error('new object', this.object)
+                } else {
+                    this.getObject(id)
+                }
+
+                
 
 
             }
@@ -114,12 +130,17 @@ export abstract class NgEditBaseComponent<T extends ObjectWithId> extends NgSect
         this.origObject = ObjectHelper.clone(this.object, this.type)
     }
 
+    initNewObject(object: T) {
+
+    }
+
     abstract objectRetrieved(object: T): void
 
     getObject(id: string) {
 
+        console.warn(`getObject('${id}')`)
 
-        this.spinner.show()
+        this.spinner.show()  
 
 
         // 'prices,options:orderBy=idx.values:orderBy=idx,items:orderBy=idx,resources:orderBy=idx.resource'
@@ -157,13 +178,14 @@ export abstract class NgEditBaseComponent<T extends ObjectWithId> extends NgSect
         }
 
 
-        if (!this.object?.id) {
+        if (!this.object?.id || this.isNew) {
             // then this is a new object => we save instead of update!
 
             this.objectSvc.create(this.object).subscribe((res: any) => {
 
                 if (res.status == ApiStatus.ok) {
                     this.dashboardSvc.showToastType(ToastType.saveSuccess)
+                    this.isNew = false
                     this.object = res.object
                 } else {
                     this.dashboardSvc.showToastType(ToastType.saveError)

@@ -63,7 +63,8 @@ export class EditResourceComponent extends NgEditBaseComponent<Resource> impleme
     this.sectionProps.set('schedule', ['schedules'])
   }
 
-  async ngOnInit() {
+  override async ngOnInit() {
+    super.ngOnInit()
     await this.translationSvc.translateEnum(ResourceType, 'enums.resource-type.', this.resourceTypes)
   }
 

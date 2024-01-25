@@ -31,6 +31,13 @@ Test:
 
 
 
+New component:
+
+ng generate component task/manage-tasks --project=altea-velzon-admin
+ng generate component task/editTask --project altea-velzon-admin
+ng generate component task/task-list --project=altea-velzon-admin
+
+
 
 ng generate module branch --project altea-pub-app --routing
 

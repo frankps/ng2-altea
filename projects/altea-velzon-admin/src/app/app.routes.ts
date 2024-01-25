@@ -17,11 +17,12 @@ export const appRoutes: Route[] = [
     { path: "calendar", loadChildren: () => import(`./calendar/calendar.module`).then(m => m.CalendarModule) },
     { path: "branch", loadChildren: () => import(`./branch/branch.module`).then(m => m.BranchModule) },
     { path: "gifts", loadChildren: () => import(`./gift/gift.module`).then(m => m.GiftModule) },
+    { path: "tasks", loadChildren: () => import(`./task/task.module`).then(m => m.TaskModule) },
     { path: "subscriptions", loadChildren: () => import(`./subscription/subscription.module`).then(m => m.SubscriptionModule) },
    // { path: "order", loadChildren: () => import(`./order-mgr/order-mgr.module`).then(m => m.OrderMgrModule) },
     { path: "demo", component: DemoComponent },
     { path: "", component: DemoComponent },  
-  ]
+  ]  
   
   //, loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule)
 

@@ -87,7 +87,7 @@ export class OrderMgrUiService {
   }
 
   hasOrderLines() {
-
+  
     if (!this.order)
       return false
 
@@ -125,7 +125,7 @@ export class OrderMgrUiService {
     return new Promise<any>(function (resolve, reject) {
 
 
-      me.productSvc.get(productId, 'options:orderBy=idx.values:orderBy=idx').subscribe(product => {
+      me.productSvc.get(productId, 'options:orderBy=idx.values:orderBy=idx,resources.resource').subscribe(product => {
         // 
         me.prepareProduct(product)
         // this.orderLine = new OrderLine()
@@ -149,7 +149,7 @@ export class OrderMgrUiService {
     const query = new DbQuery()
     query.and('id', QueryOperator.in, productIds)
 
-    query.include('options:orderBy=idx.values:orderBy=idx')
+    query.include('options:orderBy=idx.values:orderBy=idx','resources.resource')
 
     let products = await me.productSvc.query$(query)
 

@@ -3,6 +3,8 @@ import { OrderMgrUiService, OrderUiMode } from 'ng-altea-common';
 import { OrderLine } from 'ts-altea-model';
 import { ActivatedRoute, Router } from '@angular/router';
 
+
+
 @Component({
   selector: 'app-order',
   templateUrl: './order.component.html',
@@ -70,19 +72,71 @@ export class OrderComponent implements OnInit {
         break
 
       default:
-        this.mode = 'person-select'
+
+        this.mode = this.nextMode(this.mode)
+        /* 
+                const order = this.orderMgrSvc.order
+        
+                if (order.needsPersonSelect()) {
+                  this.mode = 'person-select'
+                  return
+                }
+                else if (order.needsPlanning()) {
+                  if (order.nrOfPersons == 1) {
+                    this.mode = 'staff-select'
+                    return
+                  } else {
+                    this.mode = 'select-date'
+                    return
+                  }
+                } else {
+                  this.mode = 'pay-online'
+                  break
+        
+                } */
         break
 
     }
+  }
 
-    
+  nextMode(currentMode: string) {
+
+    const modes = ['browse-catalog', 'order-line', 'order', 'person-select', 'staff-select', 'select-date', 'select-time-slot', 'pay-online']
+
+    const currentIdx = modes.indexOf(currentMode)
+    const personSelect = 3
+    const staffSelect = 4
+    const selectDate = 5
+
+    const order = this.orderMgrSvc.order
+
+    let nexMode = 'pay-online'
+
+    if (currentIdx < personSelect && order.needsPersonSelect()) {
+      nexMode = 'person-select'
+    }
+    else if (currentIdx < selectDate && order.needsPlanning()) {
+      if (currentIdx < staffSelect && order.needsStaffSelect() &&  order.nrOfPersons == 1) {
+        nexMode = 'staff-select'
+      } else {
+        nexMode = 'select-date'
+      }
+    }
+
+    console.warn(`Current mode = ${currentMode} -> nex mode = ${nexMode} `)
+
+    return nexMode
   }
 
   staffSelected(staff: string[]) {
-    this.mode = 'select-time-slot'
+    this.mode = this.nextMode(this.mode)
+
+    //this.mode = 'select-time-slot'
   }
 
   personsSelected() {
-    this.mode = 'select-date'
+    this.mode = this.nextMode(this.mode)
+
+    //this.mode = 'select-date'
   }
 }

@@ -120,6 +120,12 @@ export const MENU: MenuItem[] = [
   },
   {
     id: 12,
+    label: 'menu.tasks.label',
+    icon: 'home',
+    link: '/aqua/tasks',
+  },
+  {
+    id: 13,
     label: 'menu.demo.label',
     icon: 'home',
     link: '/aqua/demo',

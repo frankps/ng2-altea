@@ -10,7 +10,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NgxSpinnerService } from "ngx-spinner"
 import * as _ from "lodash";
 import { NewResourceComponent } from '../new-resource/new-resource.component';
-import { tr } from 'date-fns/locale';
+
 
 
 @Component({

@@ -109,8 +109,8 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
   // sectionProps = new Map<string, string[]>()
 
 
-  async ngOnInit() {
-
+  override async ngOnInit() {
+    super.ngOnInit()
     // delete
     //  this.objectName = 'Product'
 

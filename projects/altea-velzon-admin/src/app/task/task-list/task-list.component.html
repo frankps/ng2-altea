@@ -1,0 +1,60 @@
+<!-- <ngx-altea-new-contact #newModal></ngx-altea-new-contact>
+ -->
+
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h3>{{ 'menu.tasks.label' | translate }}</h3>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-8"><h5 class="card-title">Filter</h5></div>
+            <div class="col-4"><i class="fa-solid fa-magnifying-glass float-end" style="font-size: large;" (click)="search()"></i></div>      
+          </div>
+      
+       
+
+        
+
+        <div class="row {{css_cls_row}}">
+            <div class="col">
+                <ngx-altea-label-control label="objects.task.schedule" for="schedule">
+                    <ng-select id="schedule" class="form-control-sm" name="schedule" *ngIf="initialized" [items]="taskSchedule"
+                        bindLabel="trans" bindValue="key" [clearable]="true" [multiple]="false"
+                        [(ngModel)]="searchFor.schedule"></ng-select>
+                </ngx-altea-label-control>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-12 d-flex justify-content-center">
+        <ul class="list-group" style="width: 100%;" *ngIf="objects">
+            <li class="list-group-item" *ngFor="let task of objects" (click)="select(task)">
+
+                <div class="row">
+                    <div class="col-8"><i class="fa-solid fa-triangle-exclamation" [style]="task.htmlStyle()"></i>
+                        &nbsp; {{ task.name }}</div>
+                    <div class="col-4 d-flex justify-content-end">
+                        <span *ngIf="task.isRecurrent()" style="font-size: x-small;">{{'enums.task-schedule.' +
+                            task.schedule | translate}}&nbsp;<i class="fa-solid fa-rotate-right"></i></span>
+                    </div>
+                </div>
+
+
+                <!-- <i class="{{ResourceTypeIcons[contact.type]}}"></i> &nbsp;  -->
+
+
+                <!-- <i class="fa-solid fa-circle float-end" [style.color]="contact.color"></i> -->
+
+            </li>
+        </ul>
+    </div>
+
+</div>

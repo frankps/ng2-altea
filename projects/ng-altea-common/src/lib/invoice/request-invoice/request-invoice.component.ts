@@ -1,11 +1,11 @@
 
 import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core'
 import { NgForm } from '@angular/forms'
-import { RecurringTask, Resource, ResourceType, TaskPriority, TaskSchedule, TaskStatus } from 'ts-altea-model'
+import { Resource, ResourceType, Task, TaskPriority, TaskSchedule, TaskStatus } from 'ts-altea-model'
 import { TranslationService } from 'ng-common'
 import { DbQuery, QueryOperator, Translation } from 'ts-common'
 import { ResourceService } from '../../resource.service'
-import { isThisSecond } from 'date-fns'
+
 
 
 @Component({
@@ -16,7 +16,7 @@ import { isThisSecond } from 'date-fns'
 export class RequestInvoiceComponent implements OnInit {
 
 
-	recurTask: RecurringTask= new RecurringTask()
+	recurTask: Task = new Task()
 	css_cls_row= 'mt-3'
 	initialized= false
 	@ViewChild('recurringTaskForm')
@@ -25,7 +25,7 @@ export class RequestInvoiceComponent implements OnInit {
   taskPriority: Translation[]= []
 
 	@Output()
-	change: EventEmitter<RecurringTask>= new EventEmitter<RecurringTask>()
+	change: EventEmitter<Task>= new EventEmitter<Task>()
 
   resources: Resource[] = []
 

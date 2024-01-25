@@ -11,9 +11,10 @@
     "actions": "Acties",
     "add": "Toevoegen",
     "cancel": "Annuleren",
-    "color": "Kleur", 
+    "color": "Kleur",
     "create": "Maak",
     "communication": "Communicatie",
+    "currency": "Munteenheid",
     "delete": "Verwijderen",
     "descr": "Omschrijving",
     "email": "Email",
@@ -40,6 +41,19 @@
     "end": "einde"
   },
   "enums": {
+    "task-priority": {
+      "0": "Niet dringend",
+      "10": "Normaal",
+      "20": "Zo snel mogelijk",
+      "30": "Dringend"
+    },
+    "task-schedule": {
+      "once": "Eénmalig",
+      "daily": "Dagelijks",
+      "weekly": "Wekelijks",
+      "monthly": "Maandelijks",
+      "yearly": "Jaarlijks"
+    },
     "gift-type": {
       "amount": "Bedrag",
       "specific": "Specifiek"
@@ -51,7 +65,6 @@
       "debit": "Bancontact",
       "gift": "Cadeaubon",
       "subs": "Abonnement"
-
     },
     "msg-type": {
       "sms": "SMS",
@@ -119,6 +132,18 @@
       "en": "English",
       "fr": "French",
       "sp": "Español"
+    },
+    "currency": {
+      "AUD": "Australian Dollar",
+      "CAD": "Canadian Dollar",
+      "CHF": "Swiss Franc",
+      "CNY": "Chinese Yuan",
+      "EUR": "Euro",
+      "GBP": "British Pound",
+      "HKD": "Hong Kong Dollar",
+      "JPY": "Japanese Yen",
+      "NZD": "New Zealand Dollar",
+      "USD": "US Dollar"
     },
     "days-of-week-short": {
       "mo": "Ma",
@@ -201,9 +226,17 @@
       "satisfaction": "Tevredenheid"
     }
   },
-  
   "ui": {
-    
+    "task": {
+      "edit": {
+        "sections": {
+          "general": {
+            "title": "Algemeen"
+           
+          }
+        }
+      }
+    },
     "price": {
       "title": "Speciale prijzen & promoties",
       "add-option": "Nieuwe prijs voor optie"
@@ -284,6 +317,14 @@
       },
       "contacts": {
         "title": "Zoek klant"
+      },
+      "offer": {
+        "validity": "Geldigheid",
+        "send": "Verstuur offerte"
+      },
+      "search-contact": {
+        "searchFor": "Klant zoeken",
+        "search": "Zoeken"
       },
       "staff": {
         "title": "Keuze personeel",
@@ -417,6 +458,10 @@
       "my-loyalty": {
         "h1": "Mijn klantenkaart",
         "inf": "Status van mijn klantenkaart"
+      },
+      "demo-orders": {
+        "h1": "Demo order",
+        "inf": "Om snel te testen"
       }
     },
     "gift": {
@@ -438,7 +483,7 @@
         "emailFrom": "Verstuur cadeaubon per email naar mezelf (de schenker)",
         "emailTo": "Verstuur cadeaubon per email naar ontvanger",
         "postal": "Verstuur cadeaubon per post",
-        "postalExtra":  "(+[price] voor aangetekende verzending)",
+        "postalExtra": "(+[price] voor aangetekende verzending)",
         "pos": "Cadeaubon afhalen bij [branch]",
         "pos-remark": "Opmerking: deze optie kan niet gecombineerd worden met versturen per post."
       },
@@ -453,13 +498,18 @@
       "use": "Gebruik deze bon",
       "use-specific": "Boek dit arrangement",
       "use-amount": "Boek iets anders"
-
     },
     "stripe": {
       "gift": "Cadeaubon"
     }
   },
   "objects": {
+    "invoice": {
+      "company": "Bedrijf",
+      "vat": "BTW",
+      "address": "Adres",
+      "country": "Land"
+    },
     "gift": {
       "_single": "Cadeaubon",
       "value": "Waarde",
@@ -497,10 +547,10 @@
       "gift": {
         "on": "Gebruik cadeaubonnen",
         "methods": {
-            "title": "Verzendingswijze",
-            "email": "Email",
-            "postal": "Per post",
-            "pos": "Afhalen in winkel"
+          "title": "Verzendingswijze",
+          "email": "Email",
+          "postal": "Per post",
+          "pos": "Afhalen in winkel"
         },
         "types": {
           "title": "Wat kan er geschonken worden",
@@ -712,6 +762,15 @@
       "totalQty": "Totaal aantal beurten",
       "usedQty": "Gebruikte beurten",
       "contact": "Klant"
+    },
+    "task": {
+      "name": "Taaknaam",
+      "loc": "Locatie",
+      "info": "Extra info",
+      "hrIds": "Uitvoerders",
+      "schedule": "Frequentie",
+      "prio": "Prioriteit",
+      "time": "Start op/vanaf"
     }
   },
   "HEADER": {
@@ -770,6 +829,9 @@
     },
     "branch": {
       "label": "Instellingen"
+    },
+    "tasks": {
+      "label": "Taken"
     }
   },
   "MENUITEMS": {

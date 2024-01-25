@@ -1271,7 +1271,7 @@ export class Branch extends ObjectWithId {
   vatIncl = true
   vatPct = 0
   vatPcts?: number[];
-  vatNr?: string  
+  vatNr?: string
 
 
   smsOn = false
@@ -1781,7 +1781,7 @@ export class Invoice extends ObjectWithId {
   state: InvoiceState = InvoiceState.toInvoice
 
   num?: string;
-  
+
   company?: string
   vat?: string
   country?: string = 'BEL'
@@ -1793,7 +1793,7 @@ export class Invoice extends ObjectWithId {
 
   /** alternative message for on invoice */
   alter?: string
-  
+
   active = true;
   deleted = false;
   createdAt?: Date;
@@ -2112,10 +2112,12 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
   }
 
   calculateAll() {
-
     this.makeLineTotals()
     this.calculateVat()
   }
+
+
+
 
   hasVatLines(): boolean {
     return (Array.isArray(this.vatLines) && this.vatLines.length > 0)
@@ -2233,6 +2235,15 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
     return productIds
   }
 
+  getProducts(): Product[] {
+
+    if (!this.hasLines())
+      return []
+
+    const products = this.lines.map(l => l.product).filter(p => p)
+
+    return products
+  }
 
   /** Gets the resources that are defined in the configuration for all products (used in this order)   
    * 
@@ -2369,13 +2380,51 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
 
   }
 
+  /** if an order contains multiple services, then this order can be for 1 person or for more then 1 person => we will ask user
+   *  This info is essential for the planning that will be performed later on.
+   *  Remark: some services do not require this person selection (example: rental of wellness)
+   */
+  needsPersonSelect(): boolean {
+    if (this.gift || !this.hasLines())
+      return false
+
+    const personSelectLines = this.lines?.filter(ol => ol.product?.personSelect)
+
+    // ol.qty
+    const total = _.sumBy(personSelectLines, 'qty')
+
+    return (total > 1)
+  }
+
+  needsStaffSelect(): boolean {
+    if (this.gift || !this.hasLines())
+      return false
+
+    const staffSelectLine = this.lines?.find(ol => ol.product?.staffSelect)
+
+    return staffSelectLine?true:false
+  }
+
+  needsPlanning(): boolean {
+
+    console.warn('needsPlanning')
+
+    if (this.gift || !this.hasLines())
+      return false
+
+    // try to find an order line with resources
+    const planningLine = this.lines?.find(ol => ol.product?.planMode != PlanningMode.none)  // .hasResources()
+
+    return planningLine ? true : false
+  }
+
 
   linesWithPlanning(): OrderLine[] {
 
     if (!this.lines || this.lines.length == 0)
       return []
 
-    const orderlinesWithPlanning = this.lines?.filter(ol => ol.product?.hasResources())
+    const orderlinesWithPlanning = this.lines?.filter(ol => ol.product?.planMode != PlanningMode.none) // .hasResources()
     return orderlinesWithPlanning
   }
 
@@ -2687,7 +2736,7 @@ export class OrderLine extends ObjectWithId {
   }
 
 
-  static custom(descr: string, unit: number, vatPct: number) : OrderLine {
+  static custom(descr: string, unit: number, vatPct: number): OrderLine {
 
     const line = new OrderLine()
     line.descr = descr
@@ -3508,48 +3557,80 @@ export enum TaskPriority {
   urgent = 30
 }
 
-export class RecurringTask extends ObjectWithId {
+export class Task extends ObjectWithId {
   branchId?: string
-  
+
   name: string
   loc?: string
   info?: string
 
   prio = TaskPriority.urgent
-  fromTime: String  
 
-  /** human resources = staff, links to a resource or resource group */
-  hrIds?: string[] = []  
-  schedule = TaskSchedule.once
+  date?: number // format: yyyymmdd
+  time: string // format: hh:mm
 
-  active = true
-  deleted = false
-  createdAt = new Date()
-  updatedAt?: Date
-  deletedAt?: Date
-}
-
-export class Task extends ObjectWithId {
-  branchId?: string
-
-  rTask?: RecurringTask
+  // the parent recurring task
   rTaskId?: string
 
-  /* the staff members that see the task, can be a resource group */
-  hrShowIds?: string[] = []
+  schedule = TaskSchedule.once
+
+  /** human resources = staff, links to a resource or resource group */
+  hrIds?: string[] = []
 
   /* the staff member that executes/executed the task (never a resource group) */
   hrExecId?: string
 
-  name: string
-  loc?: string
-  info?: string
-
   status = TaskStatus.todo
+
+  cmt?: string
+
+  active = true
 
   createdAt = new Date()
   startedAt?: Date
   finishedAt?: Date
+  updatedAt?: Date
+  deletedAt?: Date
 
-  cmt?: string
+
+  /** Convert a recurring task (schedule<>'once') into a concrete task (schedule='once') */
+  toInstance(): Task {
+
+    let clone: Task = ObjectHelper.clone(this, Task)
+
+    clone.id = ObjectHelper.newGuid()
+    clone.createdAt = new Date()
+    clone.schedule = TaskSchedule.once
+    clone.rTaskId = this.id
+    // clone.id = null  // because it is a new task
+
+    return clone
+  }
+
+  isRecurrent(): boolean {
+    return this.schedule != TaskSchedule.once
+  }
+
+  htmlStyle(): string {
+    return `color: ${this.color()}`
+  }
+
+  color(): string {
+    switch (this.prio) {
+      case TaskPriority.urgent:
+        return 'red'
+      case TaskPriority.asap:
+        return 'orange'
+      default:
+        return 'green'
+    }
+  }
 }
+
+/*
+
+override ngOnInit() {
+  super.ngOnInit()
+}
+
+*/
