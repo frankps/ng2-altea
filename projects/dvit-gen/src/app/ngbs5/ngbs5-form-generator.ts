@@ -132,6 +132,32 @@ export class Ngbs5FormGenerator {
     }
 
 
+/*
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="invoice" name="invoice"
+                            [(ngModel)]="gift.invoice" />
+                        <label class="form-check-label" for="invoice" translate="app.gift.invoice.needed"></label>
+                    </div>
+*/
+
+    createSwitch(formSpec, elementSpec, elementName) : vc.Tag {
+        let elementTag = vc.Tag.Div
+        elementTag.addClass("form-check").addClass("form-switch")
+
+
+        const inputTag = vc.Tag.InputCheckbox.addClass("form-check-input").attr("id", elementName).attr("name", elementName)
+        this.addBinding(formSpec, elementSpec, elementName, inputTag)
+        elementTag.addChild(inputTag)
+
+        const labelTag = vc.Tag.Label.addClass("form-check-label").attr("for", elementName)
+
+        const label = this.getLabelTranslationPath(formSpec, elementSpec, elementName)
+        labelTag.attr("translate", label)
+        elementTag.addChild(labelTag)
+
+        return elementTag
+    }
+  
     generateElement(name, elementSpec, formSpec, formName, tsClass: vc.TsClass): vc.Tag {
 
         console.error(elementSpec)
@@ -141,6 +167,8 @@ export class Ngbs5FormGenerator {
         const elementType = elementSpec.type
 
         let elementTag: vc.Tag
+
+
 
         switch (elementType) {
 
@@ -155,7 +183,16 @@ export class Ngbs5FormGenerator {
 
             case 'textarea':
                 elementTag = vc.Tag.TextArea
+                elementTag.attr('style', "height: 120px;")
                 break
+
+            case 'switch':
+                elementTag = this.createSwitch(formSpec, elementSpec, name)
+                break
+
+
+
+
 
             case 'button':
                 // <button type="button" class="btn btn-primary btn-sm" (click)="addScheduling()" translate>dic.add</button>
@@ -199,6 +236,8 @@ export class Ngbs5FormGenerator {
                                     buttonClass = `btn ${elementSpec?.class}`
                 */
                 elementTag.attr('class', buttonClass)
+
+                
 
                 //if (elementSpec.translate) {
                 elementTag.attr('translate')
@@ -321,8 +360,8 @@ export class Ngbs5FormGenerator {
 
         }
 
-
-        if (elementType != 'button') {
+// elementType != 
+        if (['button', 'switch'].indexOf(elementType) == -1) {
 
             const labelTag = this.addLabel(formSpec, elementSpec, elementName, elementTag)
 
@@ -403,7 +442,7 @@ export class Ngbs5FormGenerator {
 
             let labelTag = new vc.Tag('ngx-altea-label-control')
 
-            let formTranslateRoot = formSpec.label.translate
+       //     let formTranslateRoot = formSpec.label.translate
 
             const label = this.getLabelTranslationPath(formSpec, elementSpec, elementName)
 

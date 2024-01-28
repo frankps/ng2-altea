@@ -3,7 +3,7 @@ Serve:
 
     ng serve altea-velzon-admin
     ng serve altea-pub-app --port 4300
-    ng serve dvitGen --port 4400
+    ng serve dvit-gen --port 4400
 
 Deploy:
 
@@ -62,3 +62,5 @@ App project
 ng generate component order-mgr/staff-select --project ng-altea-common
 ng generate component order-mgr/send-offer --project ng-altea-common
 ng generate component invoice/request-invoice --project ng-altea-common
+
+ng generate component order-mgr/contact-select2 --project ng-altea-common

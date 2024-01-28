@@ -1,6 +1,6 @@
 import { DateHelper } from "ts-common"
 import { SolutionSet } from "./solution"
-
+import * as dateFns from 'date-fns'
 
 export class ReservationOption {
 
@@ -62,4 +62,26 @@ export class ReservationOptionSet {
 
         this.add(...set.options)
     }
+
+    /** for UI testing: to have some options to click on */
+    static createDummy(date: Date = new Date()) {
+
+        const set = ReservationOptionSet.empty
+
+
+        let startOfDay = dateFns.startOfDay(date)
+
+        for (let hour = 9; hour < 17; hour++) {
+            let dateOption = dateFns.addHours(startOfDay, hour)
+            const dateNum = DateHelper.yyyyMMddhhmmss(dateOption)
+            let option = new ReservationOption(dateNum)
+            set.add(option)
+        }
+
+        return set
+
+    
+    }
+
+
 }

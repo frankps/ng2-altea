@@ -11,6 +11,8 @@
     "actions": "Acties",
     "add": "Toevoegen",
     "cancel": "Annuleren",
+    "confirm": "Confirmeren",
+    "continue": "Doorgaan",
     "color": "Kleur",
     "create": "Maak",
     "communication": "Communicatie",
@@ -308,12 +310,23 @@
         "invoiced": "Gefactureerd",
         "gifts": "Cadeaubonnen",
         "nonAppointments": "Enkel producten"
-      }
+      } 
     },
     "order-mgr": {
+      "order": {
+        "add-product": "Dienst of product toevoegen",
+        "empty": "Nog geen diensten of producten geselecteerd..."
+      },
       "persons": {
         "title": "Personen selectie behandelingen",
         "how-many": "Hoeveel personen nemen een behandeling?"
+      },
+      "select-date": {
+        "title": "Kies uw datum"
+      },
+      "select-time-slot": {
+        "title": "Keuze uur",
+        "other-date": "Kies andere datum"
       },
       "contacts": {
         "title": "Zoek klant"
@@ -325,6 +338,12 @@
       "search-contact": {
         "searchFor": "Klant zoeken",
         "search": "Zoeken"
+      },
+      "contact-select2": {
+        "title": "Mijn gegevens",
+        "my-profile": "Mijn profiel",
+        "select": "Voor het opgegeven email adres of telefoonnummer werd reeds een profiel teruggevonden. Selecteer een bestaand profiel indien deze gegevens correct zijn:",
+        "new": "Druk hieronder om een nieuw profiel aan te maken of om een correctie te maken:"
       },
       "staff": {
         "title": "Keuze personeel",
@@ -508,7 +527,9 @@
       "company": "Bedrijf",
       "vat": "BTW",
       "address": "Adres",
-      "country": "Land"
+      "email": "Email",
+      "country": "Land",
+      "needed": "Wenst u een factuur?"
     },
     "gift": {
       "_single": "Cadeaubon",
@@ -613,7 +634,8 @@
       "language": "Taal",
       "company": "Bedrijf",
       "vatNum": "BTW nummer",
-      "deposit": "Voorschot"
+      "deposit": "Voorschot",
+      "news": "Ik ontvang graag de {{company}} nieuwsbrief"
     },
     "template": {
       "_name": "Template",

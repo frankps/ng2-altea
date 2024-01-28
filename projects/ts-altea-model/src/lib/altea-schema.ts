@@ -7,7 +7,7 @@ import { PersonLine } from "./person-line";
 import { DateRange, DateRangeSet, TimeBlock, TimeBlockSet, TimeSpan } from "./logic";
 import * as dateFns from 'date-fns'
 import * as Handlebars from "handlebars"
-
+import * as sc from 'stringcase'
 
 function TransformToNumber() {
 
@@ -105,6 +105,7 @@ export class TimeUnitHelper {
 }
 
 export enum Gender {
+  unknown = 'unknown',
   female = 'female',
   male = 'male',
   unisex = 'unisex',
@@ -267,42 +268,72 @@ export class WeekSchedule {
 
 }
 
+
 export class Contact extends ObjectWithId {
   //@Type(() => Organisation)
   organisation?: Organisation;
 
-  orgId?: string;
+  orgId?: string
+  branchId?: string
 
   @Type(() => Order)
   orders?: Order[];
   name?: string;
   first?: string;
   last?: string;
-  gender: Gender = Gender.unisex
-  birth?: Date;
+  gender: Gender = Gender.unknown
+  birth?: number;  // format: yyyyMMdd
   email?: string;
   emailRemind = true
+  emailConf = false
+
   mobile?: string;
-  smsRemind = false
+  mobileConf = false
+  smsRemind = true
+
   phone?: string;
+  language?: string;
+
   street?: string;
   streetNr?: string;
   postal?: string;
-  country?: string;
   city?: string;
-  language?: string;
+  country?: string;
+
   company?: string;
   vatNum?: string;
   branches?: string[];
 
   depositPct?: number
 
+  news: boolean = false
+  rules: boolean = false
 
   active = true
   deleted = false
   deletedAt?: Date;
 
   subscriptions?: Subscription[]
+
+  setName() {
+
+    let components = []
+
+    if (this.first) {
+      this.first = sc.capitalcase(this.first)
+      components.push(this.first)
+    }
+
+    if (this.last) {
+      this.last = sc.capitalcase(this.last)
+      components.push(this.last)
+    }
+
+    if (components.length == 0 && this.company)
+      components.push(this.company)
+
+    this.name = components.join(' ')
+  }
 }
 
 // export class ScheduleLine extends ObjectWithId {
@@ -2041,6 +2072,10 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
     return ObjectHelper.clone(this, Order)
   }
 
+  isEmpty(): boolean {
+    return !this.hasLines()
+  }
+
   hasPersons(): boolean {
     return (Array.isArray(this.persons) && this.persons.length > 0)
   }
@@ -2402,7 +2437,7 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
 
     const staffSelectLine = this.lines?.find(ol => ol.product?.staffSelect)
 
-    return staffSelectLine?true:false
+    return staffSelectLine ? true : false
   }
 
   needsPlanning(): boolean {

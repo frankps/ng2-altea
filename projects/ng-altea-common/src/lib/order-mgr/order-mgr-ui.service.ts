@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import { Injectable } from '@angular/core';
-import { AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Contact, CreateCheckoutSession, DateBorder, Gift, GiftType, Order, OrderLine, OrderLineOption, OrderState, Payment, PaymentType, Product, ProductType, ProductTypeIcons, RedeemGift, ReservationOption, Resource } from 'ts-altea-model'
+import { AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Contact, CreateCheckoutSession, DateBorder, Gift, GiftType, Order, OrderLine, OrderLineOption, OrderState, Payment, PaymentType, Product, ProductType, ProductTypeIcons, RedeemGift, ReservationOption, ReservationOptionSet, Resource } from 'ts-altea-model'
 import { ApiListResult, ApiStatus, DateHelper, DbQuery, QueryOperator, Translation } from 'ts-common'
 import { AlteaService, ObjectService, OrderMgrService, OrderService, ProductService, SessionService } from 'ng-altea-common'
 import * as _ from "lodash";
@@ -15,7 +15,8 @@ import { StripeService } from '../stripe.service';
 /** reflects the UI component that should be visible  */
 export enum OrderUiState {
   demoOrders = 'demo-orders',
-  browseCatalog = 'browse-catalog'
+  browseCatalog = 'browse-catalog',
+  requestInvoice = 'request-invoice'
 }
 
 export enum OrderUiMode {
@@ -242,6 +243,14 @@ export class OrderMgrUiService {
 
   async getAvailabilities() {
 
+    // just for debugging
+    this.options = ReservationOptionSet.createDummy().options
+    console.error(this.options)
+
+    return
+
+
+
     console.warn(this.order)
 
     const request = new AvailabilityRequest(this.order)
@@ -365,9 +374,13 @@ export class OrderMgrUiService {
 
   showProductsInCategory(catId: string) {
 
-    this.productSvc.getProductsInCategory(catId).subscribe(res => {
+    this.spinner.show()
+
+    this.productSvc.getProductsInCategory(catId).pipe(take(1)).subscribe(res => {
       this.products = res
       console.error(res)
+
+      this.spinner.hide()
     })
   }
 
@@ -377,10 +390,14 @@ export class OrderMgrUiService {
     query.and('deleted', QueryOperator.equals, false)
     query.include('options:orderBy=idx.values:orderBy=idx')
     query.take = 20
+    
+    this.spinner.show()
 
-    this.productSvc.query(query).subscribe(res => {
+    this.productSvc.query(query).pipe(take(1)).subscribe(res => {
       this.products = res.data
       console.error(res)
+
+      this.spinner.hide()
     })
 
   }

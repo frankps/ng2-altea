@@ -34,7 +34,7 @@
 
     <ng-container *ngSwitchCase="'order'">
 
-        <order-mgr-order (orderLineSelected)="orderLineSelected($event)" (continue)="orderFinished()"></order-mgr-order>
+        <order-mgr-order [showVat]="false" (orderLineSelected)="orderLineSelected($event)" (addProduct)="browseCatalog()" (continue)="orderFinished()"></order-mgr-order>
 
     </ng-container>
 
@@ -49,23 +49,44 @@
 
         <order-mgr-person-select (selected)="personsSelected()"></order-mgr-person-select>
 
-    </ng-container>
+    </ng-container>  
 
 
     <ng-container *ngSwitchCase="'select-date'">
 
 
-        <order-mgr-select-date></order-mgr-select-date>
+        <order-mgr-select-date (selected)="dateSelected($event)"></order-mgr-select-date>
 
     </ng-container>
 
+    
+
+    <ng-container *ngSwitchCase="'select-time-slot'">
+<!--          -->
+        <order-mgr-select-time-slot (changeDate)="selectDate()" (selected)="timeSlotSelected($event)"></order-mgr-select-time-slot>
+
+    </ng-container>
+
+    <ng-container *ngSwitchCase="'contact-select'">
+        <order-mgr-contact-select2 (selected)="contactSelected($event)"></order-mgr-contact-select2>
+    </ng-container>
+    
 
     <ng-container *ngSwitchCase="'pay-online'">
-
 
         <app-pay-online></app-pay-online>
 
     </ng-container>
+
+
+    <ng-container *ngSwitchCase="'request-invoice'">
+
+        <altea-lib-request-invoice></altea-lib-request-invoice>
+
+    </ng-container>
+
+
+    
 
     <ng-container *ngSwitchCase="'default'">
     </ng-container>

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Gift, GiftType, OrderLine } from 'ts-altea-model';
-import { OrderMgrUiService, OrderUiMode } from 'ng-altea-common';
+import { OrderMgrUiService, OrderUiMode, OrderUiState } from 'ng-altea-common';
 import { SessionService } from 'ng-altea-common';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -26,6 +26,9 @@ export class BuyGiftComponent {
 
       console.error(this.orderMgrSvc.order)
 
+      if (gift.invoice)
+        this.orderMgrSvc.changeUiState(OrderUiState.requestInvoice)
+      
       this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'order'])
 
       // then we go to Stripe

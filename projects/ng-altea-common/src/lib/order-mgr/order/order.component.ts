@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, Input } from '@angular/core';
 import { OrderMgrUiService } from '../order-mgr-ui.service';
 import { ObjectService, SessionService } from 'ng-altea-common';
 import { CreateCheckoutSession, Order, OrderLine, ResourceType } from 'ts-altea-model';
@@ -12,9 +12,10 @@ export class OrderComponent {
 
   @Output() orderLineSelected: EventEmitter<OrderLine> = new EventEmitter<OrderLine>();
 
-
+  @Output() addProduct: EventEmitter<void> = new EventEmitter<void>();
   @Output() continue: EventEmitter<Order> = new EventEmitter<Order>();
 
+  @Input() showVat = false
 
   ResourceTypeIcons = ResourceType
 
@@ -36,6 +37,9 @@ export class OrderComponent {
     return this.orderMgrSvc.orderLineOptions
   }
 
+  emitAddProduct() {
+    this.addProduct.emit()
+  }
 
   async next() {
     this.continue.emit(this.orderMgrSvc.order)

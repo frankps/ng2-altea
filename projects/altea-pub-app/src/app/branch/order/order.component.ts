@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { OrderMgrUiService, OrderUiMode } from 'ng-altea-common';
-import { OrderLine } from 'ts-altea-model';
+import { Contact, OrderLine } from 'ts-altea-model';
 import { ActivatedRoute, Router } from '@angular/router';
 
 
@@ -26,12 +26,15 @@ export class OrderComponent implements OnInit {
 
     this.orderMgrSvc.orderUiStateChanges.subscribe(newMode => {
 
+      console.error('New state:', newMode)
       if (newMode)
         this.mode = newMode
     })
   }
 
-
+  browseCatalog() {
+    this.mode = 'browse-catalog'
+  }
 
   newDemoOrder() {
     this.mode = 'order'
@@ -101,12 +104,13 @@ export class OrderComponent implements OnInit {
 
   nextMode(currentMode: string) {
 
-    const modes = ['browse-catalog', 'order-line', 'order', 'person-select', 'staff-select', 'select-date', 'select-time-slot', 'pay-online']
+    const modes = ['browse-catalog', 'order-line', 'order', 'person-select', 'staff-select', 'select-date', 'select-time-slot', 'contact-select', 'pay-online']
 
     const currentIdx = modes.indexOf(currentMode)
     const personSelect = 3
     const staffSelect = 4
     const selectDate = 5
+    const selectTimeSlot = 6
 
     const order = this.orderMgrSvc.order
 
@@ -116,7 +120,7 @@ export class OrderComponent implements OnInit {
       nexMode = 'person-select'
     }
     else if (currentIdx < selectDate && order.needsPlanning()) {
-      if (currentIdx < staffSelect && order.needsStaffSelect() &&  order.nrOfPersons == 1) {
+      if (currentIdx < staffSelect && order.needsStaffSelect() && order.nrOfPersons == 1) {
         nexMode = 'staff-select'
       } else {
         nexMode = 'select-date'
@@ -139,4 +143,23 @@ export class OrderComponent implements OnInit {
 
     //this.mode = 'select-date'
   }
+
+  selectDate() {
+    this.mode = "select-date"
+  }
+
+  dateSelected(date: Date) {
+    this.mode = "select-time-slot"
+  }
+
+  timeSlotSelected(slot) {
+
+    this.mode = 'contact-select'
+  }
+
+  contactSelected(contact: Contact) {
+
+    this.mode = this.nextMode(this.mode)
+  }
+
 }

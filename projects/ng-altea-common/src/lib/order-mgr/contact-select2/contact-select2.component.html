@@ -1,0 +1,121 @@
+<ng-container *ngIf="!showContacts">
+
+    <div class="card">
+        <div class="card-header" translate>
+            ui.order-mgr.contact-select2.title
+        </div>
+        <div class="card-body">
+            <form #contactForm="ngForm">
+                <div class="row {{css_cls_row}}">
+                    <div class="col">
+                        <ngx-altea-label-control label="objects.contact.first" for="first">
+                            <input type="text" id="first" name="first" class="form-control" required
+                                [(ngModel)]="contact.first">
+                        </ngx-altea-label-control>
+                    </div>
+                </div>
+                <div class="row {{css_cls_row}}">
+                    <div class="col">
+                        <ngx-altea-label-control label="objects.contact.last" for="last">
+                            <input type="text" id="last" name="last" class="form-control" required
+                                [(ngModel)]="contact.last">
+                        </ngx-altea-label-control>
+                    </div>
+                </div>
+                <div class="row {{css_cls_row}}">
+                    <div class="col">
+                        <ngx-altea-label-control label="objects.contact.email" for="email">
+                            <input type="text" id="email" name="email" class="form-control" required
+                                [(ngModel)]="contact.email">
+                        </ngx-altea-label-control>
+                    </div>
+                </div>
+                <div class="row {{css_cls_row}}">
+                    <div class="col">
+                        <ngx-altea-label-control label="objects.contact.mobile" for="mobile">
+                            <input type="text" id="mobile" name="mobile" class="form-control" required
+                                [(ngModel)]="contact.mobile">
+                        </ngx-altea-label-control>
+                    </div>
+                </div>
+                <div class="row {{css_cls_row}}">
+                    <div class="col">
+                        <div class="form-check form-switch">
+                            <input type="checkbox" class="form-check-input" id="news" name="news"
+                                [(ngModel)]="contact.news">
+                            <label class="form-check-label" for="news">{{'objects.contact.news' |
+                                translate:translateParam}}</label>
+
+                            <!-- translate="" -->
+                        </div>
+                    </div>
+                </div>
+                <div class="row {{css_cls_row}}">
+                    <div class="col">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary" translate (click)="searchContact()"
+                                [disabled]="contactForm.form.pristine || !contactForm.form.valid">dic.continue</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+
+        </div>
+    </div>
+
+
+</ng-container>
+
+
+
+
+<ng-container *ngIf="showContacts">
+
+    <div class="card">
+        <div class="card-header" translate>
+            ui.order-mgr.contact-select2.my-profile
+        </div>
+        <div class="card-body">
+
+            <div translate>ui.order-mgr.contact-select2.select</div>
+
+            <ul class="list-group mt-3 mb-4">
+                <li class="list-group-item list-group-item-success" (click)="selectContact(contact)"
+                    *ngFor="let contact of contacts">
+
+                    <div class="row">
+                        <div class="col-6">{{contact.name}}</div>
+                        <div class="col-6"><span class="float-end">{{contact.mobile}}</span></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">{{contact.email}}</div>
+                    </div>
+
+                </li>
+            </ul>
+
+            <div translate>ui.order-mgr.contact-select2.new</div>
+
+            <ul class="list-group mt-3">
+                <li class="list-group-item list-group-item-primary py-3" (click)="createAsNew()">
+                    Maak nieuw profiel:
+
+                    <div class="ms-3">
+                        {{contact.name}}<br>
+                        {{contact.email}}<br>
+                        {{contact.mobile}}
+                    </div>
+
+                </li>
+                <li class="list-group-item list-group-item-secondary py-3" (click)="editContact()">
+
+                    Mijn gegevens aanpassen.
+
+                </li>
+            </ul>
+
+        </div>
+    </div>
+
+</ng-container>

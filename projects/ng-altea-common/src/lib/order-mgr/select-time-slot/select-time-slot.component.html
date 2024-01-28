@@ -2,17 +2,22 @@
 <ng-container *ngIf="orderMgrSvc.options">
 
     <div class="card">
-        <div class="card-header">Selecteer optie:</div>
+        <div class="card-header" translate>ui.order-mgr.select-time-slot.title</div>
         <div class="card-body">
 
             <ng-container *ngFor="let option of orderMgrSvc.options">
 
-                <span class="badge bg-danger" (click)="orderMgrSvc.selectTimeSlot(option)">{{option.date | date:"HH:mm"}}</span>
+                <span class="badge bg-danger" (click)="selectTimeSlot(option)">{{option.date | date:"HH:mm"}}</span>
                 &nbsp;
-        
+                
             </ng-container>
 
         </div>
     </div>
 
 </ng-container>
+
+<div class="d-grid mt-3">
+    <button type="button" class="btn btn-outline-secondary float-end" (click)="selectOtherDate()"
+      translate>ui.order-mgr.select-time-slot.other-date</button>
+  </div>

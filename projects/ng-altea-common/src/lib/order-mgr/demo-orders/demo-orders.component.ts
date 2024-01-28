@@ -3,6 +3,8 @@ import { OrderMgrUiService } from '../order-mgr-ui.service';
 import { SessionService } from 'ng-altea-common';
 import { Order, ResourceType } from 'ts-altea-model';
 import { DashboardService, ToastType } from 'ng-common'
+import { NgxSpinnerService } from "ngx-spinner"
+
 
 export class DemoOrderLine {
   // productId: string
@@ -84,7 +86,7 @@ export class DemoOrdersComponent {
 
   demoNames: string[] = []
 
-  constructor(protected orderMgrSvc: OrderMgrUiService, protected sessionSvc: SessionService) {
+  constructor(protected orderMgrSvc: OrderMgrUiService, protected sessionSvc: SessionService, protected spinner: NgxSpinnerService) {
 
     this.demoNames = Array.from(this.demos.keys())
 
@@ -93,6 +95,7 @@ export class DemoOrdersComponent {
 
   async createDemoOrder(demo: DemoOrder) {
 
+    this.spinner.show()
 
     console.error(demo)
 
@@ -113,6 +116,9 @@ export class DemoOrdersComponent {
     console.error(this.orderMgrSvc.order)
 
     this.new.emit(this.orderMgrSvc.order)
+
+    this.spinner.hide()
+
 
   }
 

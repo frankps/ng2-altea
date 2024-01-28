@@ -30,6 +30,7 @@ import { PosPaymentComponent } from './pos-payment/pos-payment.component';
 import { StaffSelectComponent } from './staff-select/staff-select.component';
 import { SendOfferComponent } from './send-offer/send-offer.component';
 import { SearchContactComponent } from './search-contact/search-contact.component';
+import { ContactSelect2Component } from './contact-select2/contact-select2.component';
 
 @NgModule({
   declarations: [
@@ -49,6 +50,7 @@ import { SearchContactComponent } from './search-contact/search-contact.componen
     StaffSelectComponent,
     SendOfferComponent,
     SearchContactComponent,
+    ContactSelect2Component,
   ],
   imports: [
     CommonModule,
@@ -77,6 +79,7 @@ import { SearchContactComponent } from './search-contact/search-contact.componen
     SelectTimeSlotComponent,
     DemoOrdersComponent,
     ContactSelectComponent,
+    ContactSelect2Component,
     PosPaymentComponent,
     StaffSelectComponent,
     SendOfferComponent,

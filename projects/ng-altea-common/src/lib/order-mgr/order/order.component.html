@@ -39,9 +39,15 @@
 
         </ng-container>
 
+  
+    
+        <ng-container *ngIf="order.isEmpty()">
+            
+            <div class="row mt-2">
+                <div class="col" translate>ui.order-mgr.order.empty</div>
+            </div>   
 
-
-
+        </ng-container>
 
 
         <div *ngFor="let line of order.lines" (click)="selectOrderLine(line)">
@@ -65,7 +71,7 @@
                     <div class="col-6">{{option.name}}</div>
                     <div class="col-5">
 
-
+  
                         <div *ngFor="let value of option.values">
                             {{value.name}}
                         </div>
@@ -83,6 +89,11 @@
 
             </ng-container>
 
+        </div>
+
+        <div class="d-grid mt-4">
+            <button type="button" class="btn btn-outline-secondary float-end btn-sm" (click)="emitAddProduct()"
+                translate>ui.order-mgr.order.add-product</button>
         </div>
 
 
@@ -119,9 +130,9 @@
 
 
 
-        <ng-container *ngIf="order.hasVatLines()">
+        <ng-container *ngIf="showVat && order.hasVatLines()">
 
-            Betalingen
+            BTW
 
             <div class="row" *ngFor="let vat of order.vatLines">
                 <div class="col-1"></div>
@@ -143,12 +154,10 @@
             <div class="col-6">Gemaakt op {{order.createdAt | date: sessionSvc.formats.dateShort}}</div>
 
 
-            <div class="d-grid mt-3">
+            <div class="d-grid mt-3" *ngIf="!order.isEmpty()">
                 <button type="button" class="btn btn-outline-secondary float-end" (click)="next()"
                     translate>msg.continue</button>
             </div>
-
-
 
             <!-- <div class="col-4"> </div> -->
             <div class="col-6 d-flex justify-content-end" *ngIf="sessionSvc.devMode">

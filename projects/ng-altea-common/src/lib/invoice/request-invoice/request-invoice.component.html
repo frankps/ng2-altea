@@ -1,0 +1,65 @@
+<form #requestInvoiceForm="ngForm">
+    <div class="row {{css_cls_row}}">
+        <div class="col">
+            <div class="form-check form-switch">
+                <input type="checkbox" class="form-check-input" id="needed" name="needed" [(ngModel)]="invoiceNeeded">
+                <label class="form-check-label" for="needed" translate="objects.invoice.needed"></label>
+            </div>
+        </div>
+    </div>
+
+    <ng-container *ngIf="invoiceNeeded">
+
+        <div class="row {{css_cls_row}}">
+            <div class="col">
+                <ngx-altea-label-control label="objects.invoice.country" for="country">
+                    <ng-select id="country" name="country" *ngIf="initialized" [items]="country" bindLabel="trans"
+                        bindValue="key" [clearable]="false" [multiple]="false"
+                        [(ngModel)]="invoice.country"></ng-select>
+                </ngx-altea-label-control>
+            </div>
+        </div>
+        <div class="row {{css_cls_row}}">
+            <div class="col">
+                <ngx-altea-label-control label="objects.invoice.company" for="company">
+                    <input type="text" id="company" name="company" class="form-control" required
+                        [(ngModel)]="invoice.company">
+                </ngx-altea-label-control>
+            </div>
+        </div>
+        <div class="row {{css_cls_row}}">
+            <div class="col">
+                <ngx-altea-label-control label="objects.invoice.vat" for="vat">
+                    <input type="text" id="vat" name="vat" class="form-control" required [(ngModel)]="invoice.vat">
+                </ngx-altea-label-control>
+            </div>
+        </div>
+        <div class="row {{css_cls_row}}">
+            <div class="col">
+                <ngx-altea-label-control label="objects.invoice.email" for="email">
+                    <input type="text" id="email" name="email" class="form-control" required
+                        [(ngModel)]="invoice.email">
+                </ngx-altea-label-control>
+            </div>
+        </div>
+        <div class="row {{css_cls_row}}">
+            <div class="col">
+                <ngx-altea-label-control label="objects.invoice.address" for="address">
+                    <textarea id="address" name="address" style="height: 120px;" class="form-control" required
+                        [(ngModel)]="invoice.address"></textarea>
+                </ngx-altea-label-control>
+            </div>
+        </div>
+
+
+    </ng-container>
+
+    <div class="row {{css_cls_row}}">
+        <div class="col">
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary" translate (click)="save(invoice)"
+                    [disabled]="requestInvoiceForm.form.pristine || !requestInvoiceForm.form.valid">msg.continue</button>
+            </div>
+        </div>
+    </div>
+</form>
