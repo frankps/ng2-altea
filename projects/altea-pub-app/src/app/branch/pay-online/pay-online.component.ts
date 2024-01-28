@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 //import Stripe from 'stripe';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrderMgrUiService, OrderUiMode, SessionService } from 'ng-altea-common';
@@ -22,8 +22,9 @@ declare var Stripe;
   templateUrl: './pay-online.component.html',
   styleUrls: ['./pay-online.component.scss']
 })
-export class PayOnlineComponent implements OnInit {
+export class PayOnlineComponent implements OnInit, OnDestroy {
 
+  checkout
 
   constructor(protected orderMgrSvc: OrderMgrUiService, protected route: ActivatedRoute, protected sessionSvc: SessionService, protected stripeSvc: StripeService,
     private translationSvc: TranslationService
@@ -33,6 +34,12 @@ export class PayOnlineComponent implements OnInit {
   async ngOnInit() {
 
     this.startPayment()  
+
+  }
+
+  async ngOnDestroy() {
+
+    this.checkout?.destroy()
 
   }
 
@@ -60,12 +67,12 @@ export class PayOnlineComponent implements OnInit {
     const clientSecret = apiResult.object.clientSecret
   
     
-    const checkout = await stripe.initEmbeddedCheckout({
+    this.checkout = await stripe.initEmbeddedCheckout({
       clientSecret,
     });
   
     // Mount Checkout
-    checkout.mount('#checkout');
+    this.checkout.mount('#checkout');
 
   }
 

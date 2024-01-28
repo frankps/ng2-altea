@@ -64,3 +64,7 @@ ng generate component order-mgr/send-offer --project ng-altea-common
 ng generate component invoice/request-invoice --project ng-altea-common
 
 ng generate component order-mgr/contact-select2 --project ng-altea-common
+
+
+ng generate module interface --project ng-altea-common
+ng generate component interface/upload --project ng-altea-common

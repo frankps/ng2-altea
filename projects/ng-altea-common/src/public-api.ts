@@ -3,6 +3,7 @@
  */
 
 export * from './lib/ng-altea-common.module';
+export * from './lib/interface/interface.module'
 export * from './lib/altea.service'
 export * from './lib/branch.service'
 export * from './lib/contact.service'

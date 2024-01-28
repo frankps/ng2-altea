@@ -24,7 +24,7 @@ import { environment } from '../environments/environment';
 
 import { FakeBackendInterceptor } from './velzon/core/helpers/fake-backend';
 import { initFirebaseBackend } from './velzon/authUtils';
-import { NgAlteaCommonModule } from 'ng-altea-common';
+import { InterfaceModule, NgAlteaCommonModule } from 'ng-altea-common';
 import { OrderMgrModule } from 'ng-altea-common';
 import { NgSelectModule } from '@ng-select/ng-select';
 
@@ -63,6 +63,8 @@ if (environment.defaultauth === 'firebase') {
     }),
     ContactModule,
     NgAlteaCommonModule,
+    InterfaceModule
+  
     
   ],
   providers: [],

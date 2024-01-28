@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { OrderMgrUiService, OrderUiMode } from 'ng-altea-common';
+import { OrderMgrUiService, OrderUiMode, SessionService } from 'ng-altea-common';
 import { Contact, OrderLine } from 'ts-altea-model';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -14,7 +14,8 @@ export class OrderComponent implements OnInit {
 
   mode: string = 'browse-catalog'  //'demo-orders'
 
-  constructor(protected orderMgrSvc: OrderMgrUiService, protected route: ActivatedRoute) {
+  // protected sessionSvc: SessionService, protected orderMgrSvc: OrderMgrUiService, protected router: Router
+  constructor(protected orderMgrSvc: OrderMgrUiService, protected route: ActivatedRoute, protected router: Router, protected sessionSvc: SessionService) {
   }
 
   ngOnInit(): void {
@@ -64,42 +65,43 @@ export class OrderComponent implements OnInit {
     this.mode = 'order'
   }
 
+
+  selectDate() {
+    this.mode = "select-date"
+  }
+
+  dateSelected(date: Date) {
+    this.mode = "select-time-slot"
+  }
+
+  timeSlotSelected(slot) {
+
+    this.mode = 'contact-select'
+  }
+
+
+
   orderFinished() {
-    // this.mode = 'staff-select'   // person-select
 
     switch (this.orderMgrSvc.uiMode) {
 
       /** for a new gift, we will pay */
       case OrderUiMode.newGift:
-        this.mode = 'pay-online'
+        this.payOnline()
         break
 
       default:
 
-        this.mode = this.nextMode(this.mode)
-        /* 
-                const order = this.orderMgrSvc.order
-        
-                if (order.needsPersonSelect()) {
-                  this.mode = 'person-select'
-                  return
-                }
-                else if (order.needsPlanning()) {
-                  if (order.nrOfPersons == 1) {
-                    this.mode = 'staff-select'
-                    return
-                  } else {
-                    this.mode = 'select-date'
-                    return
-                  }
-                } else {
-                  this.mode = 'pay-online'
-                  break
-        
-                } */
+        this.gotoNextMode()
+
         break
 
     }
+  }
+
+  payOnline() {
+    this.mode = 'pay-online'
+    this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'order'])
   }
 
   nextMode(currentMode: string) {
@@ -132,34 +134,25 @@ export class OrderComponent implements OnInit {
     return nexMode
   }
 
-  staffSelected(staff: string[]) {
+  gotoNextMode() {
     this.mode = this.nextMode(this.mode)
+  }
+
+  staffSelected(staff: string[]) {
+    this.gotoNextMode()
 
     //this.mode = 'select-time-slot'
   }
 
   personsSelected() {
-    this.mode = this.nextMode(this.mode)
+    this.gotoNextMode()
 
     //this.mode = 'select-date'
   }
 
-  selectDate() {
-    this.mode = "select-date"
-  }
-
-  dateSelected(date: Date) {
-    this.mode = "select-time-slot"
-  }
-
-  timeSlotSelected(slot) {
-
-    this.mode = 'contact-select'
-  }
-
   contactSelected(contact: Contact) {
 
-    this.mode = this.nextMode(this.mode)
+    this.gotoNextMode()
   }
 
 }
