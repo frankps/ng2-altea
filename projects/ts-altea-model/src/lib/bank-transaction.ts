@@ -1,5 +1,29 @@
 import { ObjectWithId } from "ts-common";
 
+export enum BankTxType {
+    unknown = 'unknown',
+    stripe = 'stripe',
+    depositTransfer = 'depositTransfer',
+    terminalBC = 'terminalBC',
+    terminalCredit = 'terminalCredit',
+    onlineBC = 'onlineBC',
+    onlineCredit = 'onlineCredit',
+    unidentifiedCredit = 'unidentifiedCredit'
+}
+
+export class BankTxInfo {
+
+    type: BankTxType
+    forDate: number // format yyyyMMdd
+
+    orig?: number
+    cost?: number
+
+    constructor(type: BankTxType) {
+        this.type = type
+    }
+
+}
 
 export class BankTransaction extends ObjectWithId {
 
@@ -7,28 +31,38 @@ export class BankTransaction extends ObjectWithId {
     num?: string
     numInt?: number
 
-    /** ExecutionDate */
-    execDate?: Date
+    /** Execution Date: format yyyyMMdd */
+    execDate?: number
 
-    /** ValueDate */
-    valDate?: Date
+    /** Value Date: format yyyyMMdd */
+    valDate?: number
+
+    /** Reference Date: format yyyyMMdd */
+    refDate?: number
+
 
     amount?: number
-    amountOrig?: number
-    amountCost?: number
-    amountCheck?: number
 
-    currency?: string
+    /** original amount */
+    orig?: number
+
+    cost?: number
+
+    check?: number
+
+    /* currency */
+    cur?: string
+
     account?: string
 
     /** CounterpartAccount */
-    otherAccount?: string
+    remoteAccount?: string
 
     /** CounterpartName */
-    otherName?: string
+    remoteName?: string
 
     details?: string
-    
+
     ok: boolean = false
 
     createdAt = new Date()
@@ -36,7 +70,6 @@ export class BankTransaction extends ObjectWithId {
     info?: string
     type?: string
 
-    refDate?: Date
 
     providerRef?: string
 }
