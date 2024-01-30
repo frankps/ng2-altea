@@ -1,16 +1,35 @@
 import { BankTransaction, BankTxInfo, BankTxType } from "ts-altea-model"
 import { CsvImport, ImportColumn, ImportDefinition } from "./csv-import"
 import * as dateFns from 'date-fns'
-import { DateHelper } from "ts-common"
+import { DateHelper, DbObjectMulti } from "ts-common"
+import { AlteaDb } from "../general/altea-db"
+import { IDb } from "../interfaces/i-db"
 
+
+/*
+
+        let now = new Date()
+        let dateString = dateMatches[1] + '/' +  dateFns.getYear(now)
+
+        --> change this code : if month is 12 and we're in January => take previous year !!
+
+    Compare upload with previous upload!!
+
+*/
 
 
 export class FortisBankImport extends CsvImport<BankTransaction> {
 
-    constructor() {
-        super(BankTransaction)
-    }
+    alteaDb: AlteaDb
 
+    constructor(db: IDb | AlteaDb) {
+        super(BankTransaction)
+
+        if (db instanceof AlteaDb)
+            this.alteaDb = db
+        else
+            this.alteaDb = new AlteaDb(db)
+    }
 
     importDefinition(): ImportDefinition {
 
@@ -20,17 +39,18 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
             ImportColumn.date('valDate', 2, 'd/M/yyyy', undefined, 'number:yyyyMMdd'),
             ImportColumn.decimal('amount', 3),
             ImportColumn.string('cur', 4),
-            ImportColumn.string('account', 5),
+     //       ImportColumn.string('account', 5),
             ImportColumn.string('remoteAccount', 7),
             ImportColumn.string('remoteName', 8),
             ImportColumn.string('info', 9),
             ImportColumn.string('details', 10),
             ImportColumn.init('check', 0),
-            ImportColumn.init('ok', false)
+            ImportColumn.init('ok', false),
+            ImportColumn.init('accountId', '438f4d70-65cf-46f5-9ef9-7f7dddef4b37')
         ])
     }
 
-    import(rowsOfCols: string[][]) {
+    async import(rowsOfCols: string[][]) {
 
 
         // remove the header row
@@ -39,6 +59,13 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
         this.importRows(rowsOfCols)
 
         this.lines = this.lines.map(line => this.customProcessing(line))
+
+
+        const dbUpload = new DbObjectMulti<BankTransaction>('bankTransaction', BankTransaction, this.lines)
+
+        let uploadResult = await this.alteaDb.db.createMany$<BankTransaction>(dbUpload)
+
+        console.error(uploadResult)
 
         console.error(this.lines)
 

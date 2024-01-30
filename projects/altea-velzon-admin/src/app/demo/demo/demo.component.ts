@@ -32,7 +32,7 @@ export class DemoComponent {
 
   fileText: string;
 
-  constructor(private http: HttpClient, public dbSvc: ObjectService, protected translationSvc: TranslationService) {
+  constructor(private http: HttpClient, public dbSvc: ObjectService, protected translationSvc: TranslationService, protected backEndSvc: ObjectService) {
 
     
 

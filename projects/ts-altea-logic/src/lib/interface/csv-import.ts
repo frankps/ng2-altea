@@ -107,6 +107,9 @@ export abstract class CsvImport<T> {
                     tx[col.name] = this.stringToDecimal(colData)
                     break
 
+                case ImportType.init:
+                    tx[col.name] = col.defaultValue
+
 
             }
         }

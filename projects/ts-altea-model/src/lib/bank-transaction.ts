@@ -27,6 +27,9 @@ export class BankTxInfo {
 
 export class BankTransaction extends ObjectWithId {
 
+
+    accountId?: string
+
     /** TransactionNum */
     num?: string
     numInt?: number
@@ -53,7 +56,6 @@ export class BankTransaction extends ObjectWithId {
     /* currency */
     cur?: string
 
-    account?: string
 
     /** CounterpartAccount */
     remoteAccount?: string
@@ -69,7 +71,6 @@ export class BankTransaction extends ObjectWithId {
     shortInfo?: string
     info?: string
     type?: string
-
 
     providerRef?: string
 }
