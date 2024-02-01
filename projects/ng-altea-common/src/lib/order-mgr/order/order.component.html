@@ -52,7 +52,7 @@
 
         <div *ngFor="let line of order.lines" (click)="selectOrderLine(line)">
             <div class="row mt-2">
-                <div class="col-8">{{line.qty}} x {{line.descr}}</div>
+                <div class="col-8">{{line.qty}} x {{line.descr}} <span class="badge bg-secondary float-end"><i class="fa-solid fa-pen"></i>&nbsp;Wijzig</span>   </div>
                 <div class="col-4 d-flex justify-content-end">€ {{line.incl}}</div>
             </div>
 

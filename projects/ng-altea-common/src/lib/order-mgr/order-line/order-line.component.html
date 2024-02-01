@@ -17,32 +17,20 @@
 
                 </div>
                 <div class="col-3">
-
-<!--                     <button *ngIf="!orderMgrSvc.orderLineIsNew" type="button" class="btn btn-primary btn-sm float-end ms-1"
-                    (click)="closeOrderLine()" translate><i
-                        class="fa-solid fa-basket-shopping fa-lg"></i></button> -->
-
-
-                    <button *ngIf="orderMgrSvc.orderLineIsNew" type="button" class="btn btn-primary btn-sm float-end"
-                        (click)="addOrderLine(orderLine)" translate><i class="fa-solid fa-plus fa-lg"></i></button>
-
-                    <button *ngIf="!orderMgrSvc.orderLineIsNew" type="button" class="btn btn-primary btn-sm float-end"
-                        (click)="deleteOrderLine()" translate><i
-                            class="fa-solid fa-trash-can fa-lg"></i></button>
-
-
+                    <span class="float-end"> {{orderLine.incl}} €</span>
                 </div>
             </div>
-
+            <!-- 
+            <div class="row">
+                <div class="col"></div>
+            </div>   <i class="fa-solid fa-backward-step"></i>
+ -->
             <!-- <div class="col-6 d-flex justify-content-end"></div> -->
 
         </div>
         <div class="card-body">
 
-            Prijs: {{orderLine.incl}} € <br>
-
             {{product.descr}}
-
 
             <ng-container *ngIf="orderLineOptions">
                 <div class="mt-4">
@@ -101,6 +89,46 @@
 
 
             </ng-container>
+
+
+            <div class="row mt-4" *ngIf="orderMgrSvc.orderLineIsNew">
+                <div class="col-5 d-grid">
+                    <button type="button" class="btn btn-outline-secondary float-end" (click)="deleteOrderLine()"><i
+                            class="fa-solid fa-backward-step"></i> &nbsp; {{ 'dic.back' | translate }} </button>
+                </div>
+                <div class="col-7 d-grid">
+                    <button type="button" class="btn btn-outline-primary"
+                    (click)="addOrderLine(orderLine)"><i class="fa-solid fa-circle-plus fa-lg"></i> &nbsp; {{ 'dic.add'
+                    | translate }} </button>
+                </div>
+            </div>
+
+
+
+
+<!--             <div class="d-grid mt-3">
+
+                <button *ngIf="orderMgrSvc.orderLineIsNew" type="button" class="btn btn-outline-secondary float-end"
+                    (click)="addOrderLine(orderLine)"><i class="fa-solid fa-circle-plus fa-lg"></i> &nbsp; {{ 'dic.add'
+                    | translate }} </button>
+            </div> -->
+
+            <div class="row mt-4" *ngIf="!orderMgrSvc.orderLineIsNew">
+                <div class="col-5 d-grid">
+                    <button type="button" class="btn btn-outline-secondary float-end" (click)="deleteOrderLine()"><i
+                            class="fa-solid fa-trash-can"></i> &nbsp; {{ 'dic.delete' | translate }} </button>
+                </div>
+                <div class="col-7 d-grid">
+                    <button type="button" class="btn btn-outline-primary float-end" (click)="triggerConfirm()"><i
+                            class="fa-solid fa-circle-check"></i> &nbsp; {{ 'dic.confirm' | translate }} </button>
+                </div>
+            </div>
+
+
+            <!--             <div class="d-grid mt-3">
+                <button *ngIf="!orderMgrSvc.orderLineIsNew" type="button" class="btn btn-outline-secondary float-end" (click)="triggerConfirm()"
+                    ><i class="fa-solid fa-circle-check"></i> &nbsp; {{ 'dic.confirm' | translate }} </button>
+            </div> -->
 
 
         </div>

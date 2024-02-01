@@ -10,14 +10,15 @@
     "address": "Adres",
     "actions": "Acties",
     "add": "Toevoegen",
+    "back": "Terug",
     "cancel": "Annuleren",
-    "confirm": "Confirmeren",
+    "confirm": "Bevestig",
     "continue": "Doorgaan",
     "color": "Kleur",
     "create": "Maak",
     "communication": "Communicatie",
     "currency": "Munteenheid",
-    "delete": "Verwijderen",
+    "delete": "Verwijder",
     "descr": "Omschrijving",
     "email": "Email",
     "edit": "Aanpassen",
@@ -316,6 +317,10 @@
       "order": {
         "add-product": "Dienst of product toevoegen",
         "empty": "Nog geen diensten of producten geselecteerd..."
+      },
+      "order-line": {
+        "confirm": ""
+
       },
       "persons": {
         "title": "Personen selectie behandelingen",

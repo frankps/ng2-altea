@@ -16,7 +16,7 @@ export class OrderLineComponent {
   @Output() new: EventEmitter<OrderLine> = new EventEmitter<OrderLine>();
   @Output() delete: EventEmitter<OrderLine> = new EventEmitter<OrderLine>();
 
-  @Output() close: EventEmitter<void> = new EventEmitter();
+  @Output() confirm: EventEmitter<OrderLine> = new EventEmitter<OrderLine>();
 
 
   // create array from 1 to 20 , to select quantity
@@ -54,12 +54,12 @@ export class OrderLineComponent {
   }
 
   closeOrderLine() {
-    this.close.emit()
+
   }
 
   deleteOrderLine() {
     const orderLine = this.orderMgrSvc.orderLine
-    
+
     this.orderMgrSvc.deleteCurrentOrderLine()
     this.delete.emit(orderLine)
   }
@@ -105,6 +105,14 @@ export class OrderLineComponent {
     this.orderLine.markAsUpdated("options")
 
 
+  }
+
+  triggerConfirm() {
+
+    if (this.orderMgrSvc.orderLineIsNew)
+      this.addOrderLine(this.orderLine)
+    else
+      this.confirm.emit(this.orderLine)
   }
 
 }

@@ -39,14 +39,15 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
             ImportColumn.date('valDate', 2, 'd/M/yyyy', undefined, 'number:yyyyMMdd'),
             ImportColumn.decimal('amount', 3),
             ImportColumn.string('cur', 4),
-     //       ImportColumn.string('account', 5),
+            //       ImportColumn.string('account', 5), we use accountId instead
+            ImportColumn.init('accountId', '438f4d70-65cf-46f5-9ef9-7f7dddef4b37'),
             ImportColumn.string('remoteAccount', 7),
             ImportColumn.string('remoteName', 8),
             ImportColumn.string('info', 9),
             ImportColumn.string('details', 10),
             ImportColumn.init('check', 0),
             ImportColumn.init('ok', false),
-            ImportColumn.init('accountId', '438f4d70-65cf-46f5-9ef9-7f7dddef4b37')
+
         ])
     }
 
@@ -160,7 +161,7 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
             if (dateMatches && amountMatches) {
 
                 let now = new Date()
-                let dateString = dateMatches[1] + '/' +  dateFns.getYear(now)
+                let dateString = dateMatches[1] + '/' + dateFns.getYear(now)
                 let transactionDate = dateFns.parse(dateString, 'dd/MM/yyyy', new Date())
 
                 let origAmount = amountMatches[1]
@@ -169,7 +170,7 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
                 let txInfo = new BankTxInfo(txType)
                 txInfo.forDate = DateHelper.yyyyMMdd(transactionDate)
                 txInfo.orig = parseFloat(origAmount.replace(',', '.'))
-                txInfo.cost = parseFloat(costAmount.replace(',', '.')) 
+                txInfo.cost = parseFloat(costAmount.replace(',', '.'))
 
                 return txInfo
 

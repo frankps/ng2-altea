@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Product, ProductType, ProductTypeIcons } from 'ts-altea-model'
+import { OnlineMode, Product, ProductType, ProductTypeIcons } from 'ts-altea-model'
 import { ApiListResult, DbQuery, QueryOperator, Translation, ApiResult, ApiStatus, CollectionChangeTracker } from 'ts-common'
 import { ProductService, SessionService } from 'ng-altea-common'
 import { DashboardService, TranslationService, NgBaseListComponent, ToastType } from 'ng-common'
@@ -217,7 +217,7 @@ export class ProductListComponent extends NgBaseListComponent<Product> implement
 
     const query = new DbQuery()
     query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
-    query.and('catId', QueryOperator.equals, this.categoryId)
+   // query.and('catId', QueryOperator.equals, this.categoryId)
     query.and('deleted', QueryOperator.equals, false)
 
     if (this.categoryId)
@@ -225,6 +225,7 @@ export class ProductListComponent extends NgBaseListComponent<Product> implement
     else
       query.and('catId', QueryOperator.equals, null)
 
+   // query.and('online', QueryOperator.not, OnlineMode.invisible)
     //   query.and('type', QueryOperator.equals, 'category')
 
     query.take = 100
@@ -244,6 +245,7 @@ export class ProductListComponent extends NgBaseListComponent<Product> implement
     query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
     query.and('name', QueryOperator.contains, searchFor)
     query.and('deleted', QueryOperator.equals, false)
+   // query.and('online', QueryOperator.not, OnlineMode.invisible)
 
     if (this.productType)
       query.and('type', QueryOperator.equals, this.productType)

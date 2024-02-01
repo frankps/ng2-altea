@@ -1,1 +1,36 @@
-<h5><span class="badge rounded-pill text-bg-primary me-1" *ngFor="let cat of categories" (click)="selectCategory(cat)">{{cat.name}}</span></h5>
+<div class="row">
+
+    <div class="col d-flex justify-content-center"> </div>
+</div>
+<div class="row">
+<!--     <div class="col-12 d-flex flex-wrap justify-content-center">
+        <h5><span class="badge rounded-pill text-bg-primary me-1" *ngFor="let cat of serviceCats"
+                (click)="selectCategory(cat)"><i class="{{cat.getIcon()}}"></i> &nbsp; {{cat.name}}</span></h5>
+    </div>
+ -->
+
+    <div class="col-12 d-flex flex-wrap justify-content-center">
+        <b>Reserveren:</b>&nbsp; <span class="badge rounded-pill text-bg-primary me-1 mt-1" style="font-size: 0.75rem;"
+            *ngFor="let cat of serviceCats" (click)="selectCategory(cat)"><i class="{{cat.getIcon()}}"></i> &nbsp;
+            {{cat.name}}</span>
+    </div>
+
+
+</div>
+
+
+<div class="row">
+
+    <div class="col d-flex justify-content-center"> </div>
+</div>
+<div class="row">
+
+    <div class="col-12 d-flex flex-wrap justify-content-center">
+        <b>Bestellen:</b>&nbsp; <span class="badge rounded-pill text-bg-secondary me-1 mt-1" style="font-size: 0.75rem;"
+            *ngFor="let cat of productCats" (click)="selectCategory(cat)"><i class="{{cat.getIcon()}}"></i> &nbsp;
+            {{cat.name}}</span>
+    </div>
+</div>
+
+<!-- 
+<h5 class="d-flex justify-content-center"></h5> -->

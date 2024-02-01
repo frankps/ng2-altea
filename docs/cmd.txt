@@ -63,6 +63,8 @@ ng generate component order-mgr/staff-select --project ng-altea-common
 ng generate component order-mgr/send-offer --project ng-altea-common
 ng generate component invoice/request-invoice --project ng-altea-common
 
+ng generate component bootstrap5/yesNoModal --project ng-common
+
 ng generate component order-mgr/contact-select2 --project ng-altea-common
 
 

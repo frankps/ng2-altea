@@ -15,6 +15,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { DeleteModalComponent } from './delete-modal/delete-modal.component';
 import { ToastsComponent } from './toasts/toasts.component';
 import { NgbModule, NgbToastModule  } from '@ng-bootstrap/ng-bootstrap';
+import { YesNoModalComponent } from './yes-no-modal/yes-no-modal.component';
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import { NgbModule, NgbToastModule  } from '@ng-bootstrap/ng-bootstrap';
     RadioListComponent,
     DeleteModalComponent,
     ToastsComponent,
+    YesNoModalComponent,
   ],
   imports: [
     CommonModule,

@@ -112,6 +112,7 @@ export enum Gender {
 }
 
 export enum OnlineMode {
+  //order = 'order',
   reserve = 'reserve',
   visible = 'visible',
   invisible = 'invisible',
@@ -125,6 +126,12 @@ export enum ProductTypeIcons {
   category = "fa-duotone fa-folder-open",
   bundle = "fa-duotone fa-boxes-stacked",
   subscription = "fa-duotone fa-id-card"
+}
+
+export enum ProductOnlineIcons {
+  reserve = 'fa-solid fa-cart-shopping',
+  visible = 'fa-solid fa-eye',
+  invisible = 'fa-sharp fa-solid fa-eye-slash'
 }
 
 export class HourMinute {
@@ -671,6 +678,14 @@ export class Product extends ObjectWithId {
       return ProductTypeIcons[this.type]
     else
       return ""
+  }
+
+  getOnlineIcon(): string {
+
+    if (this.online)
+      return ProductOnlineIcons[this.online]
+    
+    return ''
   }
 
   hasOptions() {

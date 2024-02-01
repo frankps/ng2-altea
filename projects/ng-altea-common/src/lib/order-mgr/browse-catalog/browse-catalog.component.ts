@@ -14,18 +14,34 @@ export class BrowseCatalogComponent {
 
   categories: Product[] = []
 
+  serviceCats: Product[] = []
+  productCats: Product[] = []
+
   constructor(protected orderMgrSvc: OrderMgrUiService, private productSvc: ProductService, protected spinner: NgxSpinnerService) {
 
-    this.showRootFolders()
+     this.showRootFolders()
+
+    
+    this.orderMgrSvc.orderUiStateChanges.subscribe(newState => {
+
+      console.error(newState)
+    
+    //  this.showRootFolders()
+    })
 
   }
 
   showRootFolders() {
 
-    this.spinner.show()
+    this.spinner.show()  
 
-    this.productSvc.getAllCategories(ProductType.service).pipe(take(1)).subscribe(res => {
+    // ProductType.service
+    this.productSvc.getAllCategories().pipe(take(1)).subscribe(res => {
       this.categories = res
+
+      this.serviceCats = this.categories.filter(cat => cat.type == ProductType.service)
+
+      this.productCats = this.categories.filter(cat => cat.type == ProductType.product)
       console.error(res)
 
       this.spinner.hide()
