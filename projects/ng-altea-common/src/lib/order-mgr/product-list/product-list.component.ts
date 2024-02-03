@@ -12,18 +12,42 @@ import { Order, OrderLine, OrderLineOption, Product, ProductType, ProductTypeIco
 export class ProductListComponent {
 
   @Output() productSelected: EventEmitter<Product> = new EventEmitter<Product>();
+/* 
+  productCats: Product[]
+  serviceCats: Product[] */
+
 
   constructor(protected orderMgrSvc: OrderMgrUiService) {
 
+    if (!Array.isArray(orderMgrSvc.path) || orderMgrSvc.path.length == 0)
+      this.showRootFolders()
   }
+
+  async showRootFolders() {
+
+    console.warn('showRootFolders')
+
+    await this.orderMgrSvc.showRootCategories()
+/* 
+    if (categories) {
+
+      this.productCats = categories.filter(c => c.type == ProductType.product)
+      this.serviceCats = categories.filter(c => c.type == ProductType.service)
+
+    }
+    console.debug(categories) */
+  }
+
 
   select(product: Product) {
 
     if (!product)
       return
 
+
+
     if (product.isCategory)
-      this.orderMgrSvc.showProductsInCategory(product.id)
+      this.orderMgrSvc.showProductsInCategory(product)
     else {
       this.orderMgrSvc.newOrderLine(product)
       this.productSelected.emit(product)

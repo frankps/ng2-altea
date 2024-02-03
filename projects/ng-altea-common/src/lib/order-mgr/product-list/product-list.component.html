@@ -1,4 +1,28 @@
-<ng-container *ngIf="orderMgrSvc.products">
+
+<ng-container *ngIf="!orderMgrSvc.currentCategoryId && orderMgrSvc.products">
+
+
+    <ul class="list-group">
+        <li class="list-group-item active">Diensten</li>
+        <li class="list-group-item" *ngFor="let service of orderMgrSvc.rootServiceCats" (click)="select(service)">
+            <i class="{{service.getIcon()}}"></i> &nbsp;    {{service.name}}
+        </li>
+    </ul>
+
+    <ul class="list-group">
+        <li class="list-group-item active">Producten</li>
+        <li class="list-group-item" *ngFor="let product of orderMgrSvc.rootProductCats" (click)="select(product)">
+            <i class="{{product.getIcon()}}"></i> &nbsp;    {{product.name}}
+        </li>
+    </ul>
+
+
+
+</ng-container>
+
+
+
+<ng-container *ngIf="orderMgrSvc.currentCategoryId && orderMgrSvc.products">
 
     <ul class="list-group">
         <li class="list-group-item" *ngFor="let product of orderMgrSvc.products" (click)="select(product)">

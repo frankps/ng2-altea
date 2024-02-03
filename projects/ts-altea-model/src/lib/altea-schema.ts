@@ -8,6 +8,7 @@ import { DateRange, DateRangeSet, TimeBlock, TimeBlockSet, TimeSpan } from "./lo
 import * as dateFns from 'date-fns'
 import * as Handlebars from "handlebars"
 import * as sc from 'stringcase'
+import { OrderPersonMgr } from "./order-person-mgr";
 
 function TransformToNumber() {
 
@@ -684,7 +685,7 @@ export class Product extends ObjectWithId {
 
     if (this.online)
       return ProductOnlineIcons[this.online]
-    
+
     return ''
   }
 
@@ -2016,6 +2017,8 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
   @Type(() => Number)
   deposit = 0;
 
+  /** number of minutes within deposit needs to be paid */
+  depositMins?: number = 60
 
   depositBy?: number  // format: yyyyMMddHHmmss
 
@@ -2077,6 +2080,13 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
     return DateHelper.parse(this.start)
   }
 
+  depositByDate(): Date {
+    return dateFns.addMinutes(this.createdAt, this.depositMins)
+  }
+
+  setDepositBy() {
+    this.depositBy = DateHelper.yyyyMMddhhmmss(this.depositByDate())
+  }
 
   asDbObject(): DbObject<Order> {
     return new DbObject<Order>('order', Order, this)
@@ -2391,6 +2401,11 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
     return linesWithPersonSelect;
   }
 
+
+  /**
+   * If order is for more then 1 person, then we need to assign order lines to specific persons.
+   * @returns 
+   */
   getPersonLines(): PersonLine[] {
 
     const orderLines = this.getOrderLinesWithPersonSelect()
@@ -2428,6 +2443,21 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
 
     return personLines;
 
+  }
+
+  /**
+   * if this.nrOfPersons is out of sync with this.persons
+   * then update this.persons
+   */
+  updatePersons() {
+
+    if (!this.persons)
+      this.persons = []
+
+    if (this.persons.length != this.nrOfPersons) {
+      let mgr = new OrderPersonMgr(this.persons)
+      mgr.checkPersons(this.nrOfPersons);
+    }
   }
 
   /** if an order contains multiple services, then this order can be for 1 person or for more then 1 person => we will ask user

@@ -57,6 +57,10 @@ export class OrderComponent implements OnInit {
       this.mode = 'order'
   }
 
+  showCatalog() {
+    this.mode = 'browse-catalog'
+  }
+
   orderLineSelected(line: OrderLine) {
     this.mode = 'order-line'
   }

@@ -1,8 +1,34 @@
 
 
 
-<ngx-altea-browse-catalog></ngx-altea-browse-catalog>
+<div class="row">
+    <div class="col-4">
 
+        <ngx-altea-browse-catalog></ngx-altea-browse-catalog>
+
+        <order-mgr-product-list></order-mgr-product-list>
+
+    </div>
+    <div class="col-4">
+
+        <order-mgr-order-line></order-mgr-order-line>
+
+    </div>
+    <div class="col-4">
+
+        <order-mgr-order></order-mgr-order>
+
+        <order-mgr-demo-orders></order-mgr-demo-orders>
+
+        <order-mgr-person-select></order-mgr-person-select>
+    </div>
+  </div>
+
+
+
+
+<!-- 
+<ngx-altea-browse-catalog></ngx-altea-browse-catalog>
 
 <div class="row">
     <div class="col-4">
@@ -42,4 +68,4 @@
 
 
 
-<order-mgr-debug-availability [response]="orderMgrSvc.availabilityResponse"></order-mgr-debug-availability>
+<order-mgr-debug-availability [response]="orderMgrSvc.availabilityResponse"></order-mgr-debug-availability> -->

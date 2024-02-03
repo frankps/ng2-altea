@@ -5,7 +5,7 @@
         <div class="card-header">
 
             <div class="row">
-                <div class="col-9 d-flex justify-content-start align-items-center">
+                <div class="col d-flex justify-content-start align-items-center">
 
                     <ng-select id="qty" name="qty" style="width: 60px;" [items]="qtyArray" [clearable]="false"
                         [multiple]="false" [(ngModel)]="orderLine.qty" (change)="qtyChanged()">
@@ -13,8 +13,8 @@
 
                     &nbsp;&nbsp;x&nbsp;
 
-                    {{product.name}}
-
+                    {{product.name}}<br>
+                    
                 </div>
                 <div class="col-3">
                     <span class="float-end"> {{orderLine.incl}} €</span>
@@ -93,7 +93,7 @@
 
             <div class="row mt-4" *ngIf="orderMgrSvc.orderLineIsNew">
                 <div class="col-5 d-grid">
-                    <button type="button" class="btn btn-outline-secondary float-end" (click)="deleteOrderLine()"><i
+                    <button type="button" class="btn btn-outline-secondary float-end" (click)="goBack()"><i
                             class="fa-solid fa-backward-step"></i> &nbsp; {{ 'dic.back' | translate }} </button>
                 </div>
                 <div class="col-7 d-grid">

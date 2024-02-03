@@ -1,20 +1,31 @@
-<div class="row">
+
+
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb" style="font-size: 0.7rem;">
+        <li class="breadcrumb-item" (click)="showRoot()">Home</li>
+        <li class="breadcrumb-item" *ngFor="let category of orderMgrSvc.path" (click)="showCategory(category)">{{category.name}}</li>
+        <!-- <li class="breadcrumb-item active">Data</li> -->
+    </ol>
+</nav>
+
+
+<!-- 
+    
+    <a href="#">Home</a>
+    
+    <div class="row">
 
     <div class="col d-flex justify-content-center"> </div>
 </div>
 <div class="row">
-<!--     <div class="col-12 d-flex flex-wrap justify-content-center">
-        <h5><span class="badge rounded-pill text-bg-primary me-1" *ngFor="let cat of serviceCats"
-                (click)="selectCategory(cat)"><i class="{{cat.getIcon()}}"></i> &nbsp; {{cat.name}}</span></h5>
-    </div>
- -->
+
 
     <div class="col-12 d-flex flex-wrap justify-content-center">
         <b>Reserveren:</b>&nbsp; <span class="badge rounded-pill text-bg-primary me-1 mt-1" style="font-size: 0.75rem;"
             *ngFor="let cat of serviceCats" (click)="selectCategory(cat)"><i class="{{cat.getIcon()}}"></i> &nbsp;
             {{cat.name}}</span>
     </div>
-
 
 </div>
 
@@ -31,6 +42,4 @@
             {{cat.name}}</span>
     </div>
 </div>
-
-<!-- 
-<h5 class="d-flex justify-content-center"></h5> -->
+ -->

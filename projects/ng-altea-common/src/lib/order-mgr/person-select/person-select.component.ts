@@ -57,14 +57,16 @@ export class PersonSelectComponent implements OnInit {
 
   increment() {
     this.mgrUiSvc.order.nrOfPersons++
-    this.updatePersons(this.mgrUiSvc.order)
+    // this.updatePersons(this.mgrUiSvc.order)
+    this.mgrUiSvc.order.updatePersons()
     this.refreshPersons()
   }
 
   decrement() {
     if (this.mgrUiSvc.order.nrOfPersons > 1) {
       this.mgrUiSvc.order.nrOfPersons--
-      this.updatePersons(this.mgrUiSvc.order)
+      //this.updatePersons(this.mgrUiSvc.order)
+      this.mgrUiSvc.order.updatePersons()
       this.refreshPersons()
     }
   }
@@ -91,16 +93,16 @@ export class PersonSelectComponent implements OnInit {
 
   }
 
-  updatePersons(order: Order) {
+/*     updatePersons(order: Order) {
 
-    if (!order.persons)
-      order.persons = []
+      if (!order.persons)
+        order.persons = []
 
-    if (order.persons.length != order.nrOfPersons) {
-      let mgr = new OrderPersonMgr(order.persons)
-      mgr.checkPersons(order.nrOfPersons);
-    }
-  }
+      if (order.persons.length != order.nrOfPersons) {
+        let mgr = new OrderPersonMgr(order.persons)
+        mgr.checkPersons(order.nrOfPersons);
+      }
+    } */
 
   continue() {
 

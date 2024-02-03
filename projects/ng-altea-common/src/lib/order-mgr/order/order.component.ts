@@ -1,7 +1,7 @@
 import { Component, Output, EventEmitter, Input } from '@angular/core';
 import { OrderMgrUiService } from '../order-mgr-ui.service';
 import { ObjectService, SessionService } from 'ng-altea-common';
-import { CreateCheckoutSession, Order, OrderLine, ResourceType } from 'ts-altea-model';
+import { CreateCheckoutSession, Order, OrderLine, OrderPerson, ResourceType } from 'ts-altea-model';
 
 @Component({
   selector: 'order-mgr-order',
@@ -9,6 +9,8 @@ import { CreateCheckoutSession, Order, OrderLine, ResourceType } from 'ts-altea-
   styleUrls: ['./order.component.scss'],
 })
 export class OrderComponent {
+
+  // @Input() order: Order
 
   @Output() orderLineSelected: EventEmitter<OrderLine> = new EventEmitter<OrderLine>();
 
@@ -19,7 +21,11 @@ export class OrderComponent {
 
   ResourceTypeIcons = ResourceType
 
-  constructor(protected orderMgrSvc: OrderMgrUiService, protected sessionSvc: SessionService, protected stripeSvc: ObjectService ) {
+  depositTimes = [1, 2, 3, 4, 6, 8, 12, 24, 48, 72].map(i => { return { mins: i * 60, label: `${i} u` } })
+
+
+
+  constructor(protected orderMgrSvc: OrderMgrUiService, protected sessionSvc: SessionService, protected stripeSvc: ObjectService) {
   }
 
   get order() { return this.orderMgrSvc.order }
@@ -51,9 +57,9 @@ export class OrderComponent {
     // Stripe test code: https://stripe.com/docs/testing
 
 
-   // const stripPaymentUrl = await this.orderMgrSvc.initStripePayment(59) 
+    // const stripPaymentUrl = await this.orderMgrSvc.initStripePayment(59) 
 
-   // window.location.href = stripPaymentUrl;
+    // window.location.href = stripPaymentUrl;
 
 
     /*
@@ -79,5 +85,64 @@ export class OrderComponent {
     this.orderMgrSvc.selectExistingOrderLine(line)
     this.orderLineSelected.emit(line)
   }
+
+
+  incrementPersons() {
+    this.order.nrOfPersons++
+    this.order.updatePersons()
+    /*     this.updatePersons(this.mgrUiSvc.order)
+        this.refreshPersons() */
+  }
+
+  decrementPersons() {
+    if (this.order.nrOfPersons > 1) {
+      this.order.nrOfPersons--
+      this.order.updatePersons()
+      /*       this.updatePersons(this.mgrUiSvc.order)
+            this.refreshPersons() */
+    }
+  }
+
+
+  togglePerson(line: OrderLine, person: OrderPerson, personIdx: number) {
+
+    if (!line || !person)
+      return
+
+    let idx = -1
+
+    if (!line.persons)
+      line.persons = []
+    else
+      idx = line.persons.indexOf(person.id)
+
+    if (idx >= 0)
+      line.persons.splice(idx)
+    else {
+      line.persons.push(person.id)
+
+      console.error(line.persons)
+
+      if (line.persons.length > line.qty)
+        line.persons.splice(0, 1)
+
+      console.error(line.persons)
+    }
+  }
+
+  personCssClass(line: OrderLine, person: OrderPerson) {
+
+    if (!line || !person || !Array.isArray(line.persons))
+      return 'btn-secondary'
+
+    let idx = line.persons.indexOf(person.id)
+
+    if (idx >= 0)
+      return 'btn-primary'
+    else
+      return 'btn-secondary'
+  }
+
+
 
 }

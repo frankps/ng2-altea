@@ -1,8 +1,9 @@
 import { Injectable, OnInit } from '@angular/core';
 import { ScheduleService } from './schedule.service';
 import { DbQuery, QueryOperator } from 'ts-common';
-import { Branch } from 'ts-altea-model';
+import { AppMode, Branch } from 'ts-altea-model';
 import * as Rx from "rxjs";
+
 
 @Injectable({
   providedIn: 'root'
@@ -28,9 +29,11 @@ export class SessionService implements OnInit {
   public branchId?: string = "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c"
 
   branchSub: Rx.BehaviorSubject<Branch> = new Rx.BehaviorSubject<Branch>(null)
-
-
   public _branch?: Branch
+
+  
+  public appMode = AppMode.consumerApp
+
 
   //public backend = "http://192.168.5.202:8080"
   //public backend = "https://altea-1.ew.r.appspot.com"

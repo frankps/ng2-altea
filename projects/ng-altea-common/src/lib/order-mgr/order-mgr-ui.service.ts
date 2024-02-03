@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import { Injectable } from '@angular/core';
-import { AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Contact, CreateCheckoutSession, DateBorder, Gift, GiftType, Order, OrderLine, OrderLineOption, OrderState, Payment, PaymentType, Product, ProductType, ProductTypeIcons, RedeemGift, ReservationOption, ReservationOptionSet, Resource } from 'ts-altea-model'
+import { AppMode, AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Contact, CreateCheckoutSession, DateBorder, Gift, GiftType, Order, OrderLine, OrderLineOption, OrderState, Payment, PaymentType, Product, ProductType, ProductTypeIcons, RedeemGift, ReservationOption, ReservationOptionSet, Resource } from 'ts-altea-model'
 import { ApiListResult, ApiStatus, DateHelper, DbQuery, QueryOperator, Translation } from 'ts-common'
 import { AlteaService, ObjectService, OrderMgrService, OrderService, ProductService, SessionService } from 'ng-altea-common'
 import * as _ from "lodash";
@@ -33,8 +33,14 @@ export class OrderMgrUiService {
 
   debug = true
 
+  // the current visible category (null=root)
+  currentCategoryId: string = null
+
+  // the products/categories inside the current category (currentCategoryId)
   products: Product[]
 
+  // all the selected categories (from root to current category)
+  path: Product[] = []
 
   // the product in focus: for existing or new order line
   product: Product
@@ -75,6 +81,14 @@ export class OrderMgrUiService {
 
   changeUiState(mode: OrderUiState | string) {
     this.orderUiStateChanges.next(mode)
+
+
+    switch (mode) {
+      case OrderUiState.browseCatalog:
+        this.currentCategoryId = null
+        this.path = []
+        break
+    }
   }
 
   setUiMode(uiMode: OrderUiMode) {
@@ -88,7 +102,7 @@ export class OrderMgrUiService {
   }
 
   hasOrderLines() {
-  
+
     if (!this.order)
       return false
 
@@ -150,7 +164,7 @@ export class OrderMgrUiService {
     const query = new DbQuery()
     query.and('id', QueryOperator.in, productIds)
 
-    query.include('options:orderBy=idx.values:orderBy=idx','resources.resource')
+    query.include('options:orderBy=idx.values:orderBy=idx', 'resources.resource')
 
     let products = await me.productSvc.query$(query)
 
@@ -271,6 +285,24 @@ export class OrderMgrUiService {
 
   }
 
+ maxWaitForDepositInMinutes(appMode: AppMode) : number {
+
+    switch (appMode) {
+
+      case AppMode.consumerApp:
+        return 15
+        break
+
+      case AppMode.pos:
+       // let branch = await this.sessionSvc.branch$()
+
+        //branch.depositTerms
+        return 0
+        break
+
+    }
+    return 0
+  }
 
   async selectTimeSlot(option: ReservationOption) {
 
@@ -279,6 +311,11 @@ export class OrderMgrUiService {
     this.spinner.show()
 
     const solutionForOption = this.availabilityResponse.solutionSet.getSolutionById(option.solutionIds[0])
+
+
+    const depositMinutes = this.maxWaitForDepositInMinutes(this.sessionSvc.appMode)
+
+
 
     const savedOrder = await this.alteaSvc.orderMgmtService.confirmOrder(this.order, option, solutionForOption)
 
@@ -372,11 +409,84 @@ export class OrderMgrUiService {
     console.error(this.orderLineOptions)
   }
 
-  showProductsInCategory(catId: string) {
+  rootCategories: Product[] = []
+  rootProductCats: Product[] = []
+  rootServiceCats: Product[] = []
+
+  async showRootCategories(): Promise<Product[]> {
+
+    this.path = []
+    this.currentCategoryId = null
+
+    if (Array.isArray(this.rootCategories) && this.rootCategories.length > 0) {
+      this.products = this.rootCategories
+      return this.rootCategories
+    }
+
+    const me = this
+
+    return new Promise<Product[]>(function (resolve, reject) {
+
+      //  me.spinner.show()
+
+
+
+      me.productSvc.getAllCategories().pipe(take(1)).subscribe(categories => {
+        me.products = categories
+
+        me.rootCategories = categories
+
+        if (categories) {
+
+          me.rootProductCats = categories.filter(c => c.type == ProductType.product)
+          me.rootServiceCats = categories.filter(c => c.type == ProductType.service)
+
+        }
+
+        resolve(categories)
+        // console.error(res)
+        //  me.spinner.hide()
+      })
+
+    })
+
+  }
+
+
+
+  /*   async showRootFolders() {
+  
+      console.warn('showRootFolders')
+  
+      const categories = await this.orderMgrSvc.showRootCategories()
+  
+      if (categories) {
+  
+        this.productCats = categories.filter(c => c.type == ProductType.product)
+        this.serviceCats = categories.filter(c => c.type == ProductType.service)
+  
+      }
+      console.debug(categories)
+    }
+   */
+
+
+
+  showProductsInCategory(category: Product) {
 
     this.spinner.show()
 
-    this.productSvc.getProductsInCategory(catId).pipe(take(1)).subscribe(res => {
+    this.currentCategoryId = category.id
+
+    if (this.path.length > 0) {
+      let idx = this.path.findIndex(cat => cat.id == category.id)
+      if (idx >= 0)
+        this.path.splice(idx)
+    }
+
+    this.path.push(category)
+
+    this.productSvc.getProductsInCategory(category.id).pipe(take(1)).subscribe(res => {
       this.products = res
       console.error(res)
 
@@ -390,7 +500,7 @@ export class OrderMgrUiService {
     query.and('deleted', QueryOperator.equals, false)
     query.include('options:orderBy=idx.values:orderBy=idx')
     query.take = 20
-    
+
     this.spinner.show()
 
     this.productSvc.query(query).pipe(take(1)).subscribe(res => {

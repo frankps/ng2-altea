@@ -28,7 +28,7 @@
     <ng-container *ngSwitchCase="'order-line'">
 
         <order-mgr-order-line (new)="newOrderLine()" (confirm)="closeOrderLine()"
-            (delete)="deleteOrderLine()"></order-mgr-order-line>
+            (delete)="deleteOrderLine()" (back)="showCatalog()"></order-mgr-order-line>
 
     </ng-container>
 

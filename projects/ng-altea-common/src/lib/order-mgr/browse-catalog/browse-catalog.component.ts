@@ -19,23 +19,33 @@ export class BrowseCatalogComponent {
 
   constructor(protected orderMgrSvc: OrderMgrUiService, private productSvc: ProductService, protected spinner: NgxSpinnerService) {
 
-     this.showRootFolders()
+//     this.showRootFolders()
 
     
-    this.orderMgrSvc.orderUiStateChanges.subscribe(newState => {
+/*     this.orderMgrSvc.orderUiStateChanges.subscribe(newState => {
 
       console.error(newState)
     
-    //  this.showRootFolders()
-    })
+    }) */
+
+  }
+  
+  showRoot() {
+
+    this.orderMgrSvc.showRootCategories()
+  }
+
+  showCategory(category) {
+
+    this.orderMgrSvc.showProductsInCategory(category)
 
   }
 
+/* 
   showRootFolders() {
 
     this.spinner.show()  
 
-    // ProductType.service
     this.productSvc.getAllCategories().pipe(take(1)).subscribe(res => {
       this.categories = res
 
@@ -50,8 +60,13 @@ export class BrowseCatalogComponent {
   }
 
   selectCategory(category: Product) {
-    this.orderMgrSvc.showProductsInCategory(category.id)
+    this.orderMgrSvc.showProductsInCategory(category)
   }
+ */
+
+
+
+
 
 
 }

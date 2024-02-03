@@ -18,6 +18,7 @@ export class OrderLineComponent {
 
   @Output() confirm: EventEmitter<OrderLine> = new EventEmitter<OrderLine>();
 
+  @Output() back: EventEmitter<void> = new EventEmitter<void>();
 
   // create array from 1 to 20 , to select quantity
   qtyArray = [...Array(20).keys()].map(i => i + 1)
@@ -50,6 +51,11 @@ export class OrderLineComponent {
 
     this.orderMgrSvc.addOrderLine(orderLine)
     this.new.emit(orderLine)
+
+  }
+
+  goBack() {
+    this.back.emit()
 
   }
 
