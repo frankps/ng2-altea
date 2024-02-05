@@ -7,7 +7,7 @@
 
 
 <ngx-altea-form-card-section
-    *ngIf="product && (product.type === ProductType.bundle || product.type === ProductType.subscription)"
+    *ngIf="product && (product.sub == ProductSubType.bundle || product.sub === ProductSubType.subs)"
     sectionName="ui.product.edit.sections.items.title" sectionId="items" [editSectionId]="parent.editSectionId"
     [showBody]="!product.hasItems()" icon="fa-duotone fa-credit-card" (save)="save()" (cancel)="cancel()"
     (editModeChanged)="editModeChanged($event)">

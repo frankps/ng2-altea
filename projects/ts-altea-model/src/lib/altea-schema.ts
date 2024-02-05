@@ -122,11 +122,16 @@ export enum OnlineMode {
 
 
 export enum ProductTypeIcons {
-  product = 'fa-duotone fa-box',
-  service = "fa-duotone fa-person-dress",
-  category = "fa-duotone fa-folder-open",
-  bundle = "fa-duotone fa-boxes-stacked",
-  subscription = "fa-duotone fa-id-card"
+  prod = 'fa-duotone fa-box',
+  svc = "fa-duotone fa-person-dress",
+  /** category */
+  cat = "fa-duotone fa-folder-open",
+
+  prod_bundle = "fa-duotone fa-boxes-stacked",
+  svc_bundle = "fa-duotone fa-people-dress",
+
+  prod_subs = "fa-duotone fa-id-card",
+  svc_subs = "fa-duotone fa-id-card"
 }
 
 export enum ProductOnlineIcons {
@@ -599,7 +604,7 @@ export class Product extends ObjectWithId {
   category?: ProductCategory | ConnectTo;
   catId?: string;
 
-  isCategory = false
+  //  isCategory = false
 
   @Type(() => Price)
   prices?: Price[]
@@ -612,6 +617,8 @@ export class Product extends ObjectWithId {
 
   lines?: OrderLine[]
 
+  //  bundle: boolean = false
+
   @Type(() => ProductItem)
   items?: ProductItem[]
 
@@ -620,7 +627,12 @@ export class Product extends ObjectWithId {
   idx?: number;
   name?: string;
   short?: string;
-  type?: ProductType = ProductType.product
+
+  type?: ProductType = ProductType.prod
+
+  /** Product sub type */
+  sub?: ProductSubType = ProductSubType.basic
+
   descr?: string;
   showPrice = true
   showDuration = true
@@ -673,71 +685,80 @@ export class Product extends ObjectWithId {
 
   getIcon(): string {
 
-    if (this.isCategory)
-      return ProductTypeIcons.category
-    else if (this.type)
+    if (this.isCategory())
+      return ProductTypeIcons.cat
+    else if (this.sub == ProductSubType.basic)
       return ProductTypeIcons[this.type]
     else
-      return ""
+      return ProductTypeIcons[`${this.type}_${this.sub}`]
   }
 
-  getOnlineIcon(): string {
+isCategory() {
+  return this.sub == ProductSubType.cat
+}
 
-    if (this.online)
-      return ProductOnlineIcons[this.online]
+isBundle() {
+  return this.sub == ProductSubType.bundle
+}
 
-    return ''
-  }
+isSubscription() {
+  return this.sub == ProductSubType.subs
+}
 
-  hasOptions() {
-    return (this.options && this.options.length > 0)
-  }
+getOnlineIcon(): string {
 
-  hasItems() {
-    return (this.items && this.items.length > 0)
-  }
+  if (this.online)
+    return ProductOnlineIcons[this.online]
 
-  hasResources() {
-    return (this.resources && this.resources.length > 0)
-  }
+  return ''
+}
 
-  hasRules() {
-    return (this.rules && this.rules.length > 0)
-  }
+hasOptions() {
+  return (this.options && this.options.length > 0)
+}
 
-  getResourcesForSchedule(scheduleId: string): ProductResource[] {
+hasItems() {
+  return (this.items && this.items.length > 0)
+}
 
-    if (!this.resources || this.resources.length == 0)
-      return []
+hasResources() {
+  return (this.resources && this.resources.length > 0)
+}
 
-    const prodResArray = this.resources.filter(r => (r.scheduleIds && r.scheduleIds.indexOf(scheduleId) >= 0) || !r.scheduleIds || r.scheduleIds.length == 0)
+hasRules() {
+  return (this.rules && this.rules.length > 0)
+}
 
-    return prodResArray
-  }
+getResourcesForSchedule(scheduleId: string): ProductResource[] {
 
-  getBlockSeries(scheduleId: string) {
+  if (!this.resources || this.resources.length == 0)
+    return []
 
-    return this.plan?.filter(blockSeries => Array.isArray(blockSeries.scheduleIds) && blockSeries.scheduleIds.indexOf(scheduleId) >= 0)
-  }
+  const prodResArray = this.resources.filter(r => (r.scheduleIds && r.scheduleIds.indexOf(scheduleId) >= 0) || !r.scheduleIds || r.scheduleIds.length == 0)
 
-  getOptionValues(optionId: string): ProductOptionValue[] {
+  return prodResArray
+}
 
-    if (!this.hasOptions())
-      return []
+getBlockSeries(scheduleId: string) {
 
-    const option = this.options.find(o => o.id == optionId)
+  return this.plan?.filter(blockSeries => Array.isArray(blockSeries.scheduleIds) && blockSeries.scheduleIds.indexOf(scheduleId) >= 0)
+}
 
-    if (!option || !option.values)
-      return []
+getOptionValues(optionId: string): ProductOptionValue[] {
 
-    return option.values
+  if (!this.hasOptions())
+    return []
+
+  const option = this.options.find(o => o.id == optionId)
+
+  if (!option || !option.values)
+    return []
+
+  return option.values
 
 
-  }
+}
 
-  isSubscription() {
-    return this.type == ProductType.subscription
-  }
 
 }
 
@@ -1417,7 +1438,10 @@ export class Branch extends ObjectWithId {
 
 export enum ResourceType {
   human = 'human',
+
+  // do NOT use anymore, use location instead!
   room = 'room',
+  location = 'location',
   device = 'device',
   //  group = 'group',
 }
@@ -1460,6 +1484,8 @@ export class Resource extends ObjectWithId {
   branchId?: string;
 
   name?: string;
+  type?: ResourceType;
+
   short?: string;
   descr?: string;
   color?: string;
@@ -1481,7 +1507,7 @@ export class Resource extends ObjectWithId {
   /** human resources only: staff member can be selected online by customers as prefered */
   online?: boolean;
 
-  type?: ResourceType;
+
   branches?: string[];
   active?: boolean;
   deleted?: boolean;
@@ -1959,11 +1985,17 @@ export class VatLine {
 
   constructor(public pct: number, public excl: number, public incl: number) {
 
-
-
-
   }
 
+}
+
+/** Resource preferences */
+export class ResourcePreferences {
+  /** list of preferred human resource ids */
+  humIds: string[] = []
+
+  /** list of preferred location resource ids */
+  locIds: string[] = []
 }
 
 export class Order extends ObjectWithId implements IAsDbObject<Order> {
@@ -2058,12 +2090,15 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
 
   remindLog?: Reminder[]
 
-
   active = true;
   deleted = false;
   createdAt = new Date();
   updatedAt?: Date;
   deletedAt?: Date;
+
+  /** resource preferences for order */
+  @Type(() => ResourcePreferences)
+  resPrefs?: ResourcePreferences
 
   constructor(markAsNew = false) {
     super()
@@ -2756,6 +2791,11 @@ export class OrderLine extends ObjectWithId {
   @Type(() => Number)
   incl = 0;
 
+  /** preferred human resource ids for this line */
+  hrIds?: string[]
+
+  /** preferred location resource ids for this line */
+  lrIds?: string[]
 
   persons?: string[];
   tag?: string;
@@ -3275,11 +3315,21 @@ export class ResourcePlanning extends ObjectWithId implements IAsDbObject<Resour
 
 
 export enum ProductType {
-  product = 'product',
-  service = 'service',
+  prod = 'prod',
+  svc = 'svc',
+  // OLD: do not use anymore
+  /* product = 'product',
+  service = 'service', */
   //  category = 'category',
-  bundle = 'bundle',
-  subscription = 'subscription',
+  // bundle = 'bundle',
+  // subscription = 'subscription',
+}
+
+export enum ProductSubType {
+  basic = 'basic',   // a basic product or service
+  cat = 'cat',       // a category
+  bundle = 'bundle', // a composed product or arrangement
+  subs = 'subs',     // a subscription
 }
 
 export enum PriceType {

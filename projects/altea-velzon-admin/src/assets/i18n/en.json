@@ -302,7 +302,7 @@
           }
         }
       }
-    },
+    },   
     "order": {
       "search-type-select": {
         "appointmentsOn": "Afspraken op",
@@ -314,6 +314,15 @@
       } 
     },
     "order-mgr": {
+      "pos": {
+        "menu": {
+          "compose": "Samenstellen",
+          "plan": "Plannen",
+          "contact": "Klant",
+          "pay": "Betalen"
+        }
+
+      },
       "order": {
         "add-product": "Dienst of product toevoegen",
         "empty": "Nog geen diensten of producten geselecteerd..."
@@ -691,6 +700,14 @@
       "personSelect": "Selecteer personen",
       "staffSelect": "Selecteer specialistes",
       "planMode": "Planning mode",
+      "types": {
+        "product": {
+          "bundle": "Bevat andere producten"
+        },
+        "service": {
+          "bundle": "Arrangement"
+        }
+      },
       "help": {
         "short": "Wordt getoond in product overzichten (menu's & zoekopdracheten) ",
         "customers": "Aantal klanten dat gelijktijdig wordt bediend",
@@ -819,10 +836,8 @@
     "catalog": {
       "label": "Catalogus",
       "sub": {
-        "product": "Producten",
-        "service": "Diensten",
-        "bundle": "Arrangementen",
-        "subscription": "Abonnementen"
+        "prod": "Producten",
+        "svc": "Diensten"
       }
     },
     "templates": {

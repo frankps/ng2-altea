@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Product, ProductType, ProductTypeIcons } from 'ts-altea-model'
+import { Product, ProductSubType, ProductType, ProductTypeIcons } from 'ts-altea-model'
 import { ApiListResult, DbQuery, QueryOperator, Translation, ApiResult, ApiStatus, ConnectTo } from 'ts-common'
 import { ProductService, SessionService } from 'ng-altea-common'
 import { Observable } from 'rxjs';
@@ -69,7 +69,12 @@ export class NewProductComponent implements OnInit {
 
     this.newProduct.orgId = this.sessionSvc.orgId
     this.newProduct.branchId = this.sessionSvc.branchId
-    this.newProduct.isCategory = this.isFolder()
+
+    if (this.isFolder())
+      this.newProduct.sub = ProductSubType.cat
+    else
+      this.newProduct.sub = ProductSubType.basic
+
 
     this.productSvc.create(this.newProduct).subscribe((res: ApiResult<Product>) => {
 

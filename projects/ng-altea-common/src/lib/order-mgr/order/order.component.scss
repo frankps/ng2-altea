@@ -1,0 +1,23 @@
+::ng-deep .ng-select .ng-select-container,
+::ng-deep .ng-select.ng-select-single .ng-select-container {
+  min-height: 5px;
+  font-size: 0.8em;
+}
+
+::ng-deep .ng-select.ng-select-single .ng-select-container {
+  height: 26px !important;
+  font-size: 0.8em !important;
+}
+
+
+// , ::ng-deep .ng-select.ng-select-single .ng-select-container
+
+/*
+
+::ng-deep .ng-select .ng-select-container , ::ng-deep .ng-select.ng-select-single .ng-select-container{
+    min-height: 5px;
+    font-size: 0.8em;
+  }
+
+
+  */

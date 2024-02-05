@@ -113,6 +113,17 @@
 
       </div>
 
+
+      
+<!--       <div class="row {{css_cls_row}}">
+        <div class="col">
+          <div class="form-check form-switch">
+            <input type="checkbox" class="form-check-input" id="bundle" name="bundle" [(ngModel)]="object.bundle">
+            <label class="form-check-label" for="bundle" translate="objects.product.types.{{object.type}}.bundle"></label>
+          </div>
+        </div>
+      </div>
+ -->
     </ng-container>
 
   </ngx-altea-form-card-section>
@@ -123,7 +134,7 @@
 
 
 
-  <ngx-altea-product-resources *ngIf="object.type === ProductType.service" [parent]="this" [product]="object"
+  <ngx-altea-product-resources *ngIf="object.type === ProductType.svc" [parent]="this" [product]="object"
     [collection]="object.resources"></ngx-altea-product-resources>
 
   <ngx-altea-product-rules [parent]="this" [product]="object" [collection]="object.rules"></ngx-altea-product-rules>
@@ -253,7 +264,7 @@
   </ngx-altea-form-card-section>
 
 
-  <ngx-altea-form-card-section *ngIf="object.type === ProductType.service"
+  <ngx-altea-form-card-section *ngIf="object.type === ProductType.svc"
     sectionName="ui.product.edit.sections.serviceDetails.title" sectionId="serviceDetails"
     [editSectionId]="editSectionId" icon="fa-duotone fa-user-hair-long" (save)="save()" (cancel)="cancel()"
     (editModeChanged)="editModeChanged($event)">

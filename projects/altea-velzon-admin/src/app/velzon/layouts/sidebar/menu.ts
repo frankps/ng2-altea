@@ -46,26 +46,14 @@ export const MENU: MenuItem[] = [
     subItems: [
       {
         id: 31,
-        label: 'menu.catalog.sub.product',
+        label: 'menu.catalog.sub.prod',
         link: '/aqua/catalog/product',
         parentId: 3
       },
       {
         id: 32,
-        label: 'menu.catalog.sub.service',
+        label: 'menu.catalog.sub.svc',
         link: '/aqua/catalog/service',
-        parentId: 3
-      },
-      {
-        id: 33,
-        label: 'menu.catalog.sub.bundle',
-        link: '/aqua/catalog/bundle',
-        parentId: 3
-      },
-      {
-        id: 34,
-        label: 'menu.catalog.sub.subscription',
-        link: '/aqua/catalog/subscription',
         parentId: 3
       }
     ]

@@ -1,6 +1,6 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { OrderMgrUiService } from '../order-mgr-ui.service';
-import { Order, OrderLine, OrderLineOption, Product, ProductType, ProductTypeIcons, Resource } from 'ts-altea-model'
+import { Order, OrderLine, OrderLineOption, Product, ProductSubType, ProductType, ProductTypeIcons, Resource } from 'ts-altea-model'
 
 
 
@@ -22,7 +22,7 @@ export class ProductListComponent {
     if (!Array.isArray(orderMgrSvc.path) || orderMgrSvc.path.length == 0)
       this.showRootFolders()
   }
-
+  
   async showRootFolders() {
 
     console.warn('showRootFolders')
@@ -45,8 +45,7 @@ export class ProductListComponent {
       return
 
 
-
-    if (product.isCategory)
+    if (product.isCategory())
       this.orderMgrSvc.showProductsInCategory(product)
     else {
       this.orderMgrSvc.newOrderLine(product)

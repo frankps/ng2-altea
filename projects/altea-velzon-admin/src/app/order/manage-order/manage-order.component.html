@@ -1,28 +1,99 @@
+<div class="row">
+    <div class="col d-flex justify-content-center">
 
+        <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+            <input type="radio" class="btn-check" name="menu" id="compose" value="compose" autocomplete="off" [(ngModel)]="menu">
+            <label class="btn btn-outline-primary" for="compose" translate>ui.order-mgr.pos.menu.compose</label>
+
+            <input type="radio" class="btn-check" name="menu" id="plan" value="plan" autocomplete="off" [(ngModel)]="menu">
+            <label class="btn btn-outline-primary" for="plan" translate>ui.order-mgr.pos.menu.plan</label>
+
+            <input type="radio" class="btn-check" name="menu" id="contact" value="contact" autocomplete="off" [(ngModel)]="menu">
+            <label class="btn btn-outline-primary" for="contact" translate>ui.order-mgr.pos.menu.contact</label>
+
+            <input type="radio" class="btn-check" name="menu" id="pay" value="pay" autocomplete="off" [(ngModel)]="menu">
+            <label class="btn btn-outline-primary" for="pay" translate>ui.order-mgr.pos.menu.pay</label>
+
+        </div>
+    </div>
+</div>
 
 
 <div class="row">
-    <div class="col-4">
+    
 
-        <ngx-altea-browse-catalog></ngx-altea-browse-catalog>
+    <div class="col-8">
 
-        <order-mgr-product-list></order-mgr-product-list>
+        <ng-container *ngIf="menu == 'compose'">
+
+            <div class="row">
+
+                <div class="col-6">
+
+                    <ngx-altea-browse-catalog></ngx-altea-browse-catalog>
+            
+                    <order-mgr-product-list></order-mgr-product-list>
+              
+                </div>
+                <div class="col-6">
+            
+                    <order-mgr-order-line></order-mgr-order-line>
+            
+                </div>
+            </div>
+
+        </ng-container>
+
+        <ng-container *ngIf="menu == 'plan'">
+        
+            <div class="row">
+
+                <div class="col-6">
+                    <order-mgr-select-date></order-mgr-select-date>
+              
+                </div>
+                <div class="col-6">
+
+                    <order-mgr-select-time-slot></order-mgr-select-time-slot>
+
+                </div>
+            </div>
+        
+        </ng-container>
+
+        <ng-container *ngIf="menu == 'contact'">
+        
+            <div class="row">
+
+                <div class="col-6">
+                   
+              
+                </div>
+                <div class="col-6">
+
+                    <order-mgr-contact-select></order-mgr-contact-select>
+                    
+                </div>
+            </div>
+        
+        </ng-container>
+
+
 
     </div>
-    <div class="col-4">
+    
 
-        <order-mgr-order-line></order-mgr-order-line>
 
-    </div>
+
     <div class="col-4">
 
         <order-mgr-order></order-mgr-order>
 
         <order-mgr-demo-orders></order-mgr-demo-orders>
-
-        <order-mgr-person-select></order-mgr-person-select>
+<!-- 
+        <order-mgr-person-select></order-mgr-person-select> -->
     </div>
-  </div>
+</div>
 
 
 

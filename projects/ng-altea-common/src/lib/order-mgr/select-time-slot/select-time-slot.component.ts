@@ -9,7 +9,7 @@ import { ReservationOption } from 'ts-altea-model';
 })
 export class SelectTimeSlotComponent {
 
-  debug = true
+  debug = false
 
   @Output() changeDate: EventEmitter<void> = new EventEmitter<void>();
 

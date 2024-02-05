@@ -1,6 +1,6 @@
 import { Component, ViewChild, OnInit, Input } from '@angular/core';
 import { ProductService, PriceService, ProductResourceService, ProductOptionService, SessionService, ProductOptionValueService, ProductItemService } from 'ng-altea-common'
-import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ProductOptionValue, ProductItem, ProductItemOptionValue } from 'ts-altea-model'
+import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ProductOptionValue, ProductItem, ProductItemOptionValue, ProductSubType } from 'ts-altea-model'
 import { DashboardService, FormCardSectionEventData, NgEditBaseComponent, ToastType, TranslationService } from 'ng-common'
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxModalComponent, DeleteModalComponent } from 'ng-common';
@@ -28,7 +28,10 @@ export class ProductItemsComponent {
   Array = Array
 
   thisSection = 'items'
+  
   ProductType = ProductType
+  ProductSubType = ProductSubType
+
   @Input() parent: EditProductComponent
 
   _product: Product

@@ -16,19 +16,23 @@ export class Ngbs5Component {
     },
     "bind": {
         "mode": "ngModel",
-        "to": "contact",
-        "type": "Contact",
+        "to": "object",
+        "type": "Product",
         "import": "ts-altea-model"
     },
     "label": {
         "mode": "ngx-altea-label-control",
-        "translate": "objects.contact"
+        "translate": "objects.product"
     },
     "rows": {
         "generate": true,
         "cols": 1
     },
     "elements": {
+        "bundle": {
+            "type": "switch",
+            "translate": ""
+        },
         "country": {
             "type": "ng-select",
             "source": {

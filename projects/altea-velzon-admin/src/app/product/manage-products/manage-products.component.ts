@@ -58,7 +58,7 @@ export class ManageProductsComponent implements OnInit {
       await this.manageProductSvc.setRootPathName()
       this.manageProductSvc.showRootPathOnly()
 
-    } else if (product.isCategory) {
+    } else if (product.isCategory()) {
       this.manageProductSvc.showPath(product.id)
       // this.showProductsInCategory(product.id)
     }

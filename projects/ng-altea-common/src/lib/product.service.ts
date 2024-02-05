@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { OnlineMode, Product, ProductType } from 'ts-altea-model'
+import { OnlineMode, Product, ProductSubType, ProductType } from 'ts-altea-model'
 import { BackendHttpServiceBase } from 'ng-common';
 import { HttpClient } from '@angular/common/http';
 import { SessionService } from './session.service';
@@ -31,12 +31,12 @@ export class ProductService extends BackendHttpServiceBase<Product> {
     if (type)
       query.and('type', QueryOperator.equals, type)
 
-    query.and('isCategory', QueryOperator.equals, true)
+    query.and('sub', QueryOperator.equals, ProductSubType.cat)
     query.and('deleted', QueryOperator.equals, false)
     query.and('catId', QueryOperator.equals, categoryId)
     query.and('online', QueryOperator.not, OnlineMode.invisible)
     query.take = 200
-    query.select('id', 'catId', 'name', 'type', 'isCategory')
+    query.select('id', 'catId', 'name', 'type', 'sub')
 
     return this.query(query).pipe(map(obj => obj.data ? obj.data : []))
   }

@@ -1,14 +1,14 @@
-import { Component, Output, EventEmitter, Input } from '@angular/core';
+import { Component, Output, EventEmitter, Input, OnInit } from '@angular/core';
 import { OrderMgrUiService } from '../order-mgr-ui.service';
-import { ObjectService, SessionService } from 'ng-altea-common';
-import { CreateCheckoutSession, Order, OrderLine, OrderPerson, ResourceType } from 'ts-altea-model';
+import { ObjectService, ResourceService, SessionService } from 'ng-altea-common';
+import { CreateCheckoutSession, Order, OrderLine, OrderPerson, Resource, ResourcePreferences, ResourceType } from 'ts-altea-model';
 
 @Component({
   selector: 'order-mgr-order',
   templateUrl: './order.component.html',
   styleUrls: ['./order.component.scss'],
 })
-export class OrderComponent {
+export class OrderComponent implements OnInit {
 
   // @Input() order: Order
 
@@ -23,10 +23,30 @@ export class OrderComponent {
 
   depositTimes = [1, 2, 3, 4, 6, 8, 12, 24, 48, 72].map(i => { return { mins: i * 60, label: `${i} u` } })
 
+  showHumanResources = false
+  humanResources: Resource[]
 
 
-  constructor(protected orderMgrSvc: OrderMgrUiService, protected sessionSvc: SessionService, protected stripeSvc: ObjectService) {
+  constructor(protected orderMgrSvc: OrderMgrUiService, protected sessionSvc: SessionService, protected stripeSvc: ObjectService, protected resourceSvc: ResourceService) {
   }
+
+  async ngOnInit(): Promise<void> {
+
+
+
+  }
+
+  async toggleHumanResources() {
+
+    if (!this.order.resPrefs)
+      this.order.resPrefs = new ResourcePreferences()
+
+    if (!this.humanResources)
+      this.humanResources = await this.resourceSvc.getByType$(ResourceType.human)
+
+    this.showHumanResources = !this.showHumanResources
+  }
+
 
   get order() { return this.orderMgrSvc.order }
 

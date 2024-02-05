@@ -34,6 +34,8 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
   @ViewChild('priceModal') public priceModal: NgxModalComponent;
   //  @ViewChild('deleteModal') public deleteModal?: NgxModalComponent; // NgTemplateOutlet | null = null
 
+  css_cls_row= 'mt-3'
+
   nrOfPeople = [1, 2, 3, 4]
   vatPcts = [0, 6, 12, 21]
   gender: Translation[] = []

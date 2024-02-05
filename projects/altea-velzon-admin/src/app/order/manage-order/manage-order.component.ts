@@ -4,12 +4,22 @@ import { OrderMgrUiService, BrowseCatalogComponent } from 'ng-altea-common';
 import { DashboardService, NgBaseComponent } from 'ng-common';
 import { Observable, take, takeUntil } from 'rxjs';
 
+export enum PosOrderMenuItem {
+  compose = 'compose',
+  plan = 'plan',
+  contact = 'contact',
+  pay = 'pay'
+}
+
 @Component({
   selector: 'ngx-altea-manage-order',
   templateUrl: './manage-order.component.html',
   styleUrls: ['./manage-order.component.scss'],
 })
 export class ManageOrderComponent extends NgBaseComponent {
+
+
+  menu: PosOrderMenuItem = PosOrderMenuItem.plan
 
   showPersonSelect = false
 

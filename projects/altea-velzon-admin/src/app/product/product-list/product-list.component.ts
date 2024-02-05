@@ -127,7 +127,7 @@ export class ProductListComponent extends NgBaseListComponent<Product> implement
         console.error(modal)
         modal.close()
 
-        
+
 
       }
 
@@ -164,6 +164,14 @@ export class ProductListComponent extends NgBaseListComponent<Product> implement
         this.productType = productType
 
         console.warn(this.productType)
+
+        if (productType.startsWith('prod'))
+          this.productType = ProductType.prod
+
+        if (productType.startsWith('service'))
+          this.productType = ProductType.svc
+
+
 
         //this.showProductsInCategory(null)
         // this.showResources(this.productType)
@@ -217,7 +225,7 @@ export class ProductListComponent extends NgBaseListComponent<Product> implement
 
     const query = new DbQuery()
     query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
-   // query.and('catId', QueryOperator.equals, this.categoryId)
+    // query.and('catId', QueryOperator.equals, this.categoryId)
     query.and('deleted', QueryOperator.equals, false)
 
     if (this.categoryId)
@@ -225,7 +233,7 @@ export class ProductListComponent extends NgBaseListComponent<Product> implement
     else
       query.and('catId', QueryOperator.equals, null)
 
-   // query.and('online', QueryOperator.not, OnlineMode.invisible)
+    // query.and('online', QueryOperator.not, OnlineMode.invisible)
     //   query.and('type', QueryOperator.equals, 'category')
 
     query.take = 100
@@ -245,7 +253,7 @@ export class ProductListComponent extends NgBaseListComponent<Product> implement
     query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
     query.and('name', QueryOperator.contains, searchFor)
     query.and('deleted', QueryOperator.equals, false)
-   // query.and('online', QueryOperator.not, OnlineMode.invisible)
+    // query.and('online', QueryOperator.not, OnlineMode.invisible)
 
     if (this.productType)
       query.and('type', QueryOperator.equals, this.productType)
@@ -254,7 +262,7 @@ export class ProductListComponent extends NgBaseListComponent<Product> implement
 
   }
 
-  
+
   selectPathItem(item: Product) {
 
     console.error(item)

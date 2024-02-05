@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import { Injectable } from '@angular/core';
-import { Product, ProductType, ProductTypeIcons } from 'ts-altea-model'
+import { Product, ProductSubType, ProductType, ProductTypeIcons } from 'ts-altea-model'
 import { ApiListResult, DbQuery, ObjectWithId, QueryOperator, Translation } from 'ts-common'
 import { ProductService } from 'ng-altea-common'
 import * as _ from "lodash";
@@ -39,7 +39,7 @@ export class ManageProductService {
   getAllCategories() {
 
     const query = new DbQuery()
-    query.and('isCategory', QueryOperator.equals, true)
+    query.and('sub', QueryOperator.equals, ProductSubType.cat)
     query.and('deleted', QueryOperator.equals, false)
     query.take = 200
     query.select('id', 'catId', 'name', 'type')

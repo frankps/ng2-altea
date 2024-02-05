@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import { Injectable } from '@angular/core';
-import { AppMode, AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Contact, CreateCheckoutSession, DateBorder, Gift, GiftType, Order, OrderLine, OrderLineOption, OrderState, Payment, PaymentType, Product, ProductType, ProductTypeIcons, RedeemGift, ReservationOption, ReservationOptionSet, Resource } from 'ts-altea-model'
+import { AppMode, AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Contact, CreateCheckoutSession, DateBorder, Gift, GiftType, Order, OrderLine, OrderLineOption, OrderState, Payment, PaymentType, Product, ProductType, ProductTypeIcons, RedeemGift, ReservationOption, ReservationOptionSet, Resource, ResourceType } from 'ts-altea-model'
 import { ApiListResult, ApiStatus, DateHelper, DbQuery, QueryOperator, Translation } from 'ts-common'
-import { AlteaService, ObjectService, OrderMgrService, OrderService, ProductService, SessionService } from 'ng-altea-common'
+import { AlteaService, ObjectService, OrderMgrService, OrderService, ProductService, ResourceService, SessionService } from 'ng-altea-common'
 import * as _ from "lodash";
 import { NgxSpinnerService } from "ngx-spinner"
 import { DashboardService, ToastType } from 'ng-common';
@@ -61,6 +61,8 @@ export class OrderMgrUiService {
   gift: Gift
 
   resources: Resource[]
+
+  allHumanResources: Resource[]
   //alteaDb: AlteaDb
 
   /* used by order component to show correct UI component (rouing was not working when going to same page => we use rxjs) */
@@ -70,7 +72,7 @@ export class OrderMgrUiService {
 
   constructor(private productSvc: ProductService, private orderSvc: OrderService, private orderMgrSvc: OrderMgrService
     , protected spinner: NgxSpinnerService, public dbSvc: ObjectService, protected alteaSvc: AlteaService, protected sessionSvc: SessionService,
-    public dashboardSvc: DashboardService, protected stripeSvc: StripeService) {
+    public dashboardSvc: DashboardService, protected stripeSvc: StripeService, protected resourceSvc: ResourceService) {
 
     // this.alteaDb = new AlteaDb(dbSvc)
     // this.getAllCategories()
@@ -78,6 +80,26 @@ export class OrderMgrUiService {
     this.autoCreateOrder()
 
   }
+
+
+  async loadResources()  {
+
+    /*
+    const query = new DbQuery()
+    query.and('code', QueryOperator.equals, this.code)
+
+    const gifts = await this.giftSvc.query$(query)
+    */
+    
+    const query = new DbQuery()
+    query.and('type', QueryOperator.equals, ResourceType.human)
+    query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
+    query.and('active', QueryOperator.equals, true)
+
+    this.allHumanResources = await this.resourceSvc.query$(query)
+
+  }
+
 
   changeUiState(mode: OrderUiState | string) {
     this.orderUiStateChanges.next(mode)
@@ -316,7 +338,6 @@ export class OrderMgrUiService {
     const depositMinutes = this.maxWaitForDepositInMinutes(this.sessionSvc.appMode)
 
 
-
     const savedOrder = await this.alteaSvc.orderMgmtService.confirmOrder(this.order, option, solutionForOption)
 
     if (savedOrder) {
@@ -438,8 +459,8 @@ export class OrderMgrUiService {
 
         if (categories) {
 
-          me.rootProductCats = categories.filter(c => c.type == ProductType.product)
-          me.rootServiceCats = categories.filter(c => c.type == ProductType.service)
+          me.rootProductCats = categories.filter(c => c.type == ProductType.prod)
+          me.rootServiceCats = categories.filter(c => c.type == ProductType.svc)
 
         }
 
