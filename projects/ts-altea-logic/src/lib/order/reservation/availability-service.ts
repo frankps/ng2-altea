@@ -78,7 +78,6 @@ export class AvailabilityService {
 
         //to do: check that resourceRoles are fetched => create an order with resource roles inside
 
-
         const createAvailabilityContext = new CreateAvailabilityContext(this.alteaDb)
         const availabilityCtx = await createAvailabilityContext.create(availabilityRequest)
         if (availabilityRequest.debug) response.debug.ctx = availabilityCtx
@@ -110,28 +109,23 @@ export class AvailabilityService {
         const optimizedRequests = ResourceRequestOptimizer.I.optimize(...initialResourceRequests)
         if (availabilityRequest.debug) response.debug.resourceRequests.push(...optimizedRequests)
 
+
+
         /** Look for possibilities: first we try to find solutions for the optimized resource request,
          *  if no solutions found, we try the original resourceRequest
          * 
          */
 
-        // if (optimizedRequest && !optimizedRequest.isEmpty()) {
-        //     if (availabilityRequest.debug) response.debug.resourceRequests.push(optimizedRequest)
-        //     response.options = SlotFinder.I.findSlots(optimizedRequest, availability)
-        // }
 
-        // if (response.options)
-        //     response.options = SlotFinder.I.findSlots(noGroupsResourceRequests, availability)
+        response.solutionSet = SlotFinder.I.findSlots(availability, availabilityCtx, ...initialResourceRequests)
 
-
-        response.solutionSet = SlotFinder.I.findSlots(availability, availabilityCtx, ...optimizedRequests)
+        // response.solutionSet = SlotFinder.I.findSlots(availability, availabilityCtx, ...optimizedRequests)
 
 
         response.optionSet = DetermineReservationOptions.I.getAllReservationOptions(response.solutionSet)
 
         console.error(response.optionSet)
-        //        response.solutionSet = SolutionPicker.I.pickAllBestSolutions(solutionSet)
-
+     
         return response
     }
 

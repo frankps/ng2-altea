@@ -125,13 +125,14 @@ export class SlotFinder {
 
 
 
+
     /**
      * 
      * 
      * @param requestItem 
      * @param solutionSet 
      */
-    handleResourceRequestItem(requestItem: ResourceRequestItem, solutionSet: SolutionSet, availability: ResourceAvailability, trackInvalidSolutions = false): SolutionSet {
+    handleResourceRequestItem(requestItem: ResourceRequestItem, solutionSet: SolutionSet, availability: ResourceAvailability, trackInvalidSolutions = true): SolutionSet {
 
 
         /**
@@ -146,7 +147,12 @@ export class SlotFinder {
          * We continue to build further upon existing solutions (solutionSet)
          */
 
-        for (const solution of solutionSet.validSolutions) {
+        for (const solution of solutionSet.solutions) {
+
+            if (!solution.valid) {
+                resultSolutions.add(solution)
+                continue
+            }
 
             //const refDate = solution.referenceDate()
 
@@ -163,9 +169,13 @@ export class SlotFinder {
                 const to = dateFns.addSeconds(from, requestItem.duration.seconds)
                 const range = new DateRange(from, to)
 
-                const availableResources = availability.getAvailableResourcesInRange(requestItem.resources, range)
+                
 
-                if (availableResources.length > 0) {
+                const resourcesWithNotes = availability.getAvailableResourcesInRange(requestItem.resources, range, requestItem.isPrepTime)
+                const availableResources = resourcesWithNotes.result
+                solution.addNotes(resourcesWithNotes.notes)
+
+                if (availableResources.length >= requestItem.qty) {
                     const solutionItem = new SolutionItem(requestItem, range.clone(), true, ...availableResources)
                     solution.add(solutionItem)
 
@@ -175,8 +185,29 @@ export class SlotFinder {
 
                     solution.valid = false
 
+                    const interval = `[${dateFns.format(from, 'dd/MM HH:mm')}, ${dateFns.format(to, 'dd/MM HH:mm')}]`
+
+                    let onlyAvailable = '/'
+                    if (availableResources.length > 0) {
+                         onlyAvailable = availableResources.map(r => r.shortOrName()).join(', ')
+                    }
+
+                    if (requestItem.resourceGroup) {
+                        let resourceName = requestItem.resourceGroup.name
+
+                        solution.addNote(`Not enough recources for '${resourceName}': ${availableResources.length}/${requestItem.qty}, ${interval}, available: ${onlyAvailable}`)
+
+                    } else if (requestItem.hasResources()) {
+
+                        solution.addNote(`No availability found for '${requestItem.resourceNames()}': ${availableResources.length}/${requestItem.qty}, ${interval}, available: ${onlyAvailable}`)
+
+                    }
+                        
+
+                    
+
                     if (trackInvalidSolutions)
-                        resultSolutions.add(solution)
+                        resultSolutions.add(solution.clone())
 
                 }
 

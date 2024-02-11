@@ -7,6 +7,7 @@ import { ResourceRequest, ResourceRequestItem } from "../resource-request"
 import { Solution, SolutionItem, SolutionSet } from "../solution"
 import { Resource, ResourcePlanning } from "../../altea-schema"
 import { TimeSpan } from "./time-span"
+import { DateHelper } from "ts-common"
 
 export class AvailabilitySets {
     constructor(public available: DateRangeSet = DateRangeSet.empty, public unAvailable: DateRangeSet = DateRangeSet.empty) {
@@ -211,6 +212,17 @@ export class DateRangeSet {
     }
 
 
+    subtractByDates(from: Date | number, to: Date | number): DateRangeSet {
+
+        let fromDate = from instanceof Date ? from : DateHelper.parse(from)
+        let toDate = to instanceof Date ? to : DateHelper.parse(to)
+
+        let range = new DateRange(fromDate, toDate)
+        let set = new DateRangeSet([range])
+
+        return this.subtract(set)
+
+    }
 
     subtract(toSubtract: DateRangeSet): DateRangeSet {
 
@@ -234,7 +246,7 @@ export class DateRangeSet {
         const subtractResults: DateRange[] = []
 
 
-        let subtractFrom = substractFromRanges.pop()
+        let subtractFrom : DateRange = substractFromRanges.pop()
 
         while (subtractFrom) {
 
@@ -246,23 +258,22 @@ export class DateRangeSet {
 
                 if (nrOfResults == 1)
                     subtractFrom = minusResults[0]
-                else if (nrOfResults == 0) // there was a full overlap, no date range left over
+                else if (nrOfResults == 0) {// there was a full overlap, no date range left over
+                    subtractFrom = null
                     break
+                }
                 else  // nrOfResults == 2 => subtractFrom was split in 2 
                 {
                     // we assume no overlaps anymore with minusResults[0] -> the next possible overlappingRange will be more in the future (because they were ordered)
                     subtractFrom = minusResults[1]
                 }
 
-
             }
-
-
 
             //  const res = subtractFrom?.subtract()
 
-
-            subtractResults.push(subtractFrom.clone())
+            if (subtractFrom)
+                subtractResults.push(subtractFrom.clone())
 
             subtractFrom = substractFromRanges.pop()
         }

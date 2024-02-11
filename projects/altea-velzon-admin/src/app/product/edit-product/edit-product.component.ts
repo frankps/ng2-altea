@@ -62,9 +62,9 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
 
   priceChanges?: CollectionChangeTracker<Price>
   resourceChanges?: CollectionChangeTracker<ProductResource>
+  
 
-
-  productResourcePropsToUpdate = ['offset', 'duration', 'resourceId', 'idx', 'durationMode', 'reference', 'scheduleIds', 'groupQty', 'groupAlloc']
+  productResourcePropsToUpdate = ['offset', 'duration', 'resourceId', 'idx', 'durationMode', 'reference', 'scheduleIds', 'groupQty', 'groupAlloc', 'prep', 'prepOverlap']
 
   OnlineMode = OnlineMode
 
@@ -363,6 +363,8 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
 
   saveResources() {
     const batch = this.resourceChanges?.getApiBatch()
+
+    console.error(batch)
 
     if (!batch || !batch.hasChanges()) {
       this.editSectionId = ''

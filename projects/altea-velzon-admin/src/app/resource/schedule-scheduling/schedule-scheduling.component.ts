@@ -1,5 +1,5 @@
 import { Component, Input, AfterViewInit, AfterViewChecked, OnInit, OnDestroy } from '@angular/core';
-import { ResourcePlanning, Schedule, Scheduling, ScheduleTimeBlock, WeekSchedule } from 'ts-altea-model'
+import { ResourcePlanning, Schedule, Scheduling, ScheduleTimeBlock, WeekSchedule, PlanningType } from 'ts-altea-model'
 import { SelectedDay } from '../schedule-day/schedule-day.component';
 import { BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, Translation, ObjectHelper, CollectionChangeTracker, ObjectWithId, DateHelper, ConnectTo } from 'ts-common'
 import { ResourcePlanningService, SchedulingService, SessionService } from 'ng-altea-common'
@@ -170,9 +170,8 @@ export class ScheduleSchedulingComponent implements OnDestroy {
 
     this.new.resourceId = this._schedule.resourceId
     this.new.scheduleId = this._schedule.id
-
-
-
+    this.new.type = PlanningType.sch
+    
   }
 
   rangePickerChanged(event: any) {

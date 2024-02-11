@@ -26,7 +26,7 @@ export class AvailabilityContext {
     /** all resources that are used in order.lines[x].product.resources[y].resource */
     configResources: Resource[] = []
 
-    /** a resource group is a special resource: it contains other 'real' resources */
+    /** A resource group is a special resource: it contains other 'real' resources, child resources are loaded into resource.children. */
     resourceGroups: Resource[] = []
 
     /** all resources combined: union of configResources and resourceGroups */
@@ -40,7 +40,7 @@ export class AvailabilityContext {
      */
     schedules: Schedule[] = []
 
-    /** Schedules converted to specific dates monday 09:00 till 17:00 -> [04/12/2022 09:00, 04/12/2022 17:00]. Map is indexed by schedule.id.   */
+    /** Schedules converted to specific dates monday 09:00 till 17:00 -> [04/12/2022 09:00, 04/12/2022 17:00]. Map is indexed by resourceId.   */
     scheduleDateRanges = new Map<string, DateRangeSet>()
 
     timeUnite = TimeUnit.minutes
@@ -53,6 +53,18 @@ export class AvailabilityContext {
     constructor(availabilityRequest: AvailabilityRequest) {
         this.request = availabilityRequest
         this.order = availabilityRequest.order
+    }
+
+    test() {
+        this.scheduleDateRanges.keys()
+
+        let ranges = this.scheduleDateRanges.get('123')
+
+        for (let range of ranges.ranges) {
+            range.from
+        }
+
+
     }
 
     getProduct(productId: string): Product | undefined {
@@ -117,6 +129,7 @@ export class AvailabilityContext {
 
         const result = new BranchSchedules()
 
+        // every branch is also a resource, containing the branch opening hours (schedules)
         const branchSchedules = this.schedules.filter(sched => sched.resourceId == this.branchId)
 
         // get the default opening hours of the branch 
@@ -135,7 +148,7 @@ export class AvailabilityContext {
 
             result.byDate.push(new BranchSchedule(dateRange.from, defaultSchedule))
             result.byDate.push(new BranchSchedule(dateRange.to, defaultSchedule))
-            
+
         } else {
 
             const nrOfPlannings = schedulePlannings.plannings.length
@@ -214,6 +227,38 @@ export class AvailabilityContext {
             return undefined
 
         return this.schedules.find(s => s.resourceId === resourceId && s.default)
+    }
+
+    /**
+     * A resource can have 0 or more schedules.
+     * There is most likely 1 default schedule and optionally 1 or more custom schedules that are only active during certain periods (defined via resource planning)
+     * @param resourceId 
+     * @param date 
+     * @returns 
+     */
+    getScheduleOnDate(resourceId: string, date: Date | number): Schedule {
+        if (!Array.isArray(this.schedules) || this.schedules.length == 0)
+            return undefined
+
+        let schedules = this.schedules.filter(s => s.resourceId === resourceId)
+        let scheduleIds = schedules.map(s => s.id)
+
+        // look for schedules active on given date
+        let plannings = this.resourcePlannings.filterBySchedulesDateRange2(scheduleIds, date, date)
+
+        // if not found, return default schedule
+        if (plannings.isEmpty()) {
+            let defaultSchedule = schedules.find(s => s.default)
+            return defaultSchedule
+        }
+            
+        // planning is found for a schedule => then return that schedule
+        let planning = plannings.plannings[0]
+        let scheduleId = planning.scheduleId
+
+        let schedule = this.schedules.find(s => s.id == scheduleId)
+
+        return schedule
     }
 
     getResourceOccupation(resourceId: string): AvailabilitySets {

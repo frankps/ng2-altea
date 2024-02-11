@@ -44,13 +44,18 @@ export class DetermineReservationOptions {
             return ReservationOptionSet.empty
 
         const refItem = solution.items[0]
-        const possibleStartDates = refItem.dateRange.getDatesEvery(TimeSpan.minutes(15))
+        let possibleStartDates: Date[] = []
+
+        if (refItem.exactStart)
+            possibleStartDates.push(refItem.dateRange.from)
+        else
+            possibleStartDates = refItem.dateRange.getDatesEvery(TimeSpan.minutes(15))
 
         return ReservationOptionSet.fromDates(possibleStartDates, solution.id)
     }
 
     removeDuplicates(optionSet: ReservationOptionSet): ReservationOptionSet {
-        
+
         /* to do: give a higher score if there are multiple options for a certain date
          also link back to the solution? => we can create the resourcePlannings much easier !
         */

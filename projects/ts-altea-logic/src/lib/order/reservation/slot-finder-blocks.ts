@@ -42,7 +42,7 @@ export class SlotFinderBlocks {
     getFullDayStartDates(product: Product, dateRange: DateRange, ctx: AvailabilityContext): DateRangeSet {
 
         /** Mostly there is only 1 branch schedule (the default operational mode) active in a given dateRange (can be 1 day for instance),
-         *  but exceptionally there can be more branch schedules in a given period.   
+         *  but exceptionally there can be more branch schedules in a given period (example: normal operations, later followed by holiday period) 
          **/
         const schedules = ctx.getBranchSchedules(dateRange)
 

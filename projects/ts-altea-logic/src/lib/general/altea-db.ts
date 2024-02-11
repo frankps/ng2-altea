@@ -211,9 +211,7 @@ export class AlteaDb {
         qry.and('active', QueryOperator.equals, true)
 
         qry.or('resourceId', QueryOperator.in, resourceIds)
-        qry.or('default', QueryOperator.equals, true)
-
-
+       // qry.or('default', QueryOperator.equals, true)
 
         if (Array.isArray(includes) && includes.length > 0)
             qry.include(...includes)

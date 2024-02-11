@@ -83,7 +83,7 @@ export class CreateResourceRequest {
 
             const product = orderLine.product!
 
-            let productResources
+            let productResources: ProductResource[]
 
             if (schedule?.id)
                 productResources = product.getResourcesForSchedule(schedule.id)     //product.resources
@@ -132,6 +132,8 @@ export class CreateResourceRequest {
 
                     resReqItem.qty = productResource.groupQty
 
+                    resReqItem.isPrepTime = productResource.prep
+                    resReqItem.productResource = productResource
 
 
                     resourceRequest.add(resReqItem)

@@ -21,6 +21,8 @@ export class EditProductResourceComponent {
   @Output() save: EventEmitter<ProductResource> = new EventEmitter();
   @Output() cancel: EventEmitter<any> = new EventEmitter();
 
+  css_cls_row= 'mt-3'
+  
   constructor() {
 
   }

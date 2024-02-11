@@ -178,6 +178,9 @@ export class ProductResourcesComponent implements OnInit {
     this.dirty = true
     this.mode = ListSectionMode.readOnly
 
+    console.warn(obj)
+
+
     this.parent.resourceChanges?.updateId(obj.id)
 
   }

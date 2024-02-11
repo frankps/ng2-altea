@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { OrderLine, OrderPerson, Product, Resource, ResourceType, Schedule } from "../altea-schema"
+import { OrderLine, OrderPerson, Product, ProductResource, Resource, ResourceType, Schedule } from "../altea-schema"
 import { OffsetDuration } from "./offset-duration"
 import { TimeSpan } from "./dates/time-span"
 import { DateRangeSet } from "./dates"
@@ -18,11 +18,16 @@ export class ResourceRequestItem {
 
     offset = TimeSpan.zero
     duration = TimeSpan.zero
-
     
-
     /** the number of resources that should be allocated from the resourceGroup (or from resources) */
     qty = 1
+
+    /** is preparation time => no actual treatment, but preparations or cleaning */
+    isPrepTime: boolean 
+
+    /** the originating product resource */
+    productResource: ProductResource
+
 
     /** the availability after applying all rules: schedules, resourcePlannings, etc ... */
     // availability: DateRangeSet = DateRangeSet.empty
@@ -53,6 +58,13 @@ export class ResourceRequestItem {
             return Array.isArray(this.resources) && this.resources.filter(r => r.type === type).length > 0
 
     }
+
+    resourceNames(separator = ', '): string {
+
+        let allNames = this.resources.map(r => r.shortOrName()).join(separator)
+        return allNames
+    }
+
 
     hasResourceGroups() {
         return Array.isArray(this.resources) && this.resources.filter(r => r.isGroup).length > 0

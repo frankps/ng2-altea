@@ -384,11 +384,29 @@ export class Schedule extends ObjectWithId {
   @Type(() => WeekSchedule)
   weeks?: WeekSchedule[] = []
 
+  /** Includes preparation time: extra work needed before & after actual booking such as prepartions before booking or cleaning time after is included in this schedule (=> system can not go outside given timings for preparations).
+   *  If true: possible preparations (defined via ProductResource, prep=true) must fall within this schedule 
+   */
+  prepIncl: boolean = true
+
   active = true;
   deleted = false;
   createdAt = new Date()
   updatedAt?: Date
   deletedAt?: Date
+
+
+  isInsideSchedule(dateRange: DateRange) {
+
+    let start = dateFns.startOfDay(dateRange.from)
+    let end = dateFns.endOfDay(dateRange.to)
+    
+    let scheduleRanges = this.toDateRangeSet(start, end)
+
+    let contains = scheduleRanges.contains(dateRange)
+
+    return contains
+  }
 
   getDaySchedule(day: Date): DaySchedule {
     const daySchedule = new DaySchedule()
@@ -693,71 +711,71 @@ export class Product extends ObjectWithId {
       return ProductTypeIcons[`${this.type}_${this.sub}`]
   }
 
-isCategory() {
-  return this.sub == ProductSubType.cat
-}
+  isCategory() {
+    return this.sub == ProductSubType.cat
+  }
 
-isBundle() {
-  return this.sub == ProductSubType.bundle
-}
+  isBundle() {
+    return this.sub == ProductSubType.bundle
+  }
 
-isSubscription() {
-  return this.sub == ProductSubType.subs
-}
+  isSubscription() {
+    return this.sub == ProductSubType.subs
+  }
 
-getOnlineIcon(): string {
+  getOnlineIcon(): string {
 
-  if (this.online)
-    return ProductOnlineIcons[this.online]
+    if (this.online)
+      return ProductOnlineIcons[this.online]
 
-  return ''
-}
+    return ''
+  }
 
-hasOptions() {
-  return (this.options && this.options.length > 0)
-}
+  hasOptions() {
+    return (this.options && this.options.length > 0)
+  }
 
-hasItems() {
-  return (this.items && this.items.length > 0)
-}
+  hasItems() {
+    return (this.items && this.items.length > 0)
+  }
 
-hasResources() {
-  return (this.resources && this.resources.length > 0)
-}
+  hasResources() {
+    return (this.resources && this.resources.length > 0)
+  }
 
-hasRules() {
-  return (this.rules && this.rules.length > 0)
-}
+  hasRules() {
+    return (this.rules && this.rules.length > 0)
+  }
 
-getResourcesForSchedule(scheduleId: string): ProductResource[] {
+  getResourcesForSchedule(scheduleId: string): ProductResource[] {
 
-  if (!this.resources || this.resources.length == 0)
-    return []
+    if (!this.resources || this.resources.length == 0)
+      return []
 
-  const prodResArray = this.resources.filter(r => (r.scheduleIds && r.scheduleIds.indexOf(scheduleId) >= 0) || !r.scheduleIds || r.scheduleIds.length == 0)
+    const prodResArray = this.resources.filter(r => (r.scheduleIds && r.scheduleIds.indexOf(scheduleId) >= 0) || !r.scheduleIds || r.scheduleIds.length == 0)
 
-  return prodResArray
-}
+    return prodResArray
+  }
 
-getBlockSeries(scheduleId: string) {
+  getBlockSeries(scheduleId: string) {
 
-  return this.plan?.filter(blockSeries => Array.isArray(blockSeries.scheduleIds) && blockSeries.scheduleIds.indexOf(scheduleId) >= 0)
-}
+    return this.plan?.filter(blockSeries => Array.isArray(blockSeries.scheduleIds) && blockSeries.scheduleIds.indexOf(scheduleId) >= 0)
+  }
 
-getOptionValues(optionId: string): ProductOptionValue[] {
+  getOptionValues(optionId: string): ProductOptionValue[] {
 
-  if (!this.hasOptions())
-    return []
+    if (!this.hasOptions())
+      return []
 
-  const option = this.options.find(o => o.id == optionId)
+    const option = this.options.find(o => o.id == optionId)
 
-  if (!option || !option.values)
-    return []
+    if (!option || !option.values)
+      return []
 
-  return option.values
+    return option.values
 
 
-}
+  }
 
 
 }
@@ -1513,6 +1531,7 @@ export class Resource extends ObjectWithId {
   deleted?: boolean;
   deletedAt?: Date;
 
+  /** Most resources use the schedule (opening hours) of the branch, but a custom schedule can be specified per resource  */
   customSchedule = false
 
   @Exclude()
@@ -1714,6 +1733,11 @@ export class ProductResource extends ObjectWithId {
   /** if rule only applies for certain schedules (typically branch schedules) */
   scheduleIds?: string[] = []
 
+  /** is preperation time (before or after actual treatment) */
+  prep: boolean = false
+
+  /** the preparation time after a booking/treatment can overlap with prep time before next booking (the max of before/after will be used) */
+  prepOverlap: boolean = false
 
 }
 
@@ -2092,6 +2116,8 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
 
   active = true;
   deleted = false;
+
+  @Type(() => Date)
   createdAt = new Date();
   updatedAt?: Date;
   deletedAt?: Date;
@@ -2142,6 +2168,13 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
 
   hasLines(): boolean {
     return (Array.isArray(this.lines) && this.lines.length > 0)
+  }
+
+  hasPlanningLines(): boolean {
+    if (!this.hasLines())
+      return false
+
+    return this.lines.findIndex(l => l.product.type == ProductType.svc) >= 0
   }
 
   nrOfLines(): number {
@@ -3022,7 +3055,8 @@ export enum PlanningType {
   ill = 'ill',
   abs = 'abs',   // absence, not paid by employer
   edu = 'edu',
-  avl = 'avl'    // available
+  avl = 'avl',    // available
+  sch = 'sch'     // planning schedule
 }
 
 
@@ -3066,7 +3100,47 @@ export class ResourcePlannings {
     return new ResourcePlannings(planningsForResource)
   }
 
+  filterByResourceDateRange(resourceId: string, from: Date | number, to: Date | number): ResourcePlannings {
 
+    let fromNum = from instanceof Date ? DateHelper.yyyyMMddhhmmss(from) : from
+    let toNum = to instanceof Date ? DateHelper.yyyyMMddhhmmss(to) : to
+
+    const planningsForResource = this.plannings.filter(rp => rp.resourceId == resourceId && rp.end > fromNum && rp.start < toNum)
+
+    if (!Array.isArray(planningsForResource))
+      return new ResourcePlannings()
+
+    return new ResourcePlannings(planningsForResource)
+  }
+
+
+
+  filterByScheduleDateRange(scheduleId: string, from: Date | number, to: Date | number): ResourcePlannings {
+
+    let fromNum = from instanceof Date ? DateHelper.yyyyMMddhhmmss(from) : from
+    let toNum = to instanceof Date ? DateHelper.yyyyMMddhhmmss(to) : to
+
+    let plannings = this.plannings.filter(rp => rp.scheduleId == scheduleId && rp.end > fromNum && rp.start < toNum)
+
+    return new ResourcePlannings(plannings)
+  }
+
+  filterBySchedulesDateRange2(scheduleIds: string[], from: Date | number, to: Date | number): ResourcePlannings {
+
+    let fromNum = from instanceof Date ? DateHelper.yyyyMMddhhmmss(from) : from
+    let toNum = to instanceof Date ? DateHelper.yyyyMMddhhmmss(to) : to
+
+    let plannings = this.plannings.filter(rp => rp.scheduleId && scheduleIds.indexOf(rp.scheduleId) >= 0 && rp.end > fromNum && rp.start < toNum)
+
+    return new ResourcePlannings(plannings)
+  }
+
+  /**
+   * 
+   * @param scheduleIds 
+   * @param dateRange 
+   * @returns 
+   */
   filterBySchedulesDateRange(scheduleIds: string[], dateRange: DateRange): ResourcePlannings {
 
     if (!Array.isArray(scheduleIds) || scheduleIds.length == 0)
@@ -3085,9 +3159,15 @@ export class ResourcePlannings {
     return new ResourcePlannings(planningsForSchedules)
   }
 
+  isFullAvailable() : boolean {
+    const unavailable = this.plannings.find(rp => rp.available == false && !rp.scheduleId)
+
+    return unavailable ? false : true
+  }
 
   filterByAvailable(available = true): ResourcePlannings {
-    const result = this.plannings.filter(rp => rp.available == available)
+
+    const result = this.plannings.filter(rp => rp.available == available && !rp.scheduleId)
 
     if (!Array.isArray(result))
       return new ResourcePlannings()

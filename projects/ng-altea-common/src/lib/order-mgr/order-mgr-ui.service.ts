@@ -280,10 +280,11 @@ export class OrderMgrUiService {
   async getAvailabilities() {
 
     // just for debugging
-    this.options = ReservationOptionSet.createDummy().options
+
+    /*     this.options = ReservationOptionSet.createDummy().options
     console.error(this.options)
 
-    return
+    return */
 
 
 

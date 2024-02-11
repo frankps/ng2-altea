@@ -46,7 +46,7 @@
 
         <ng-container *ngIf="menu == 'plan'">
         
-            <div class="row">
+            <div class="row" *ngIf="orderMgrSvc.order.hasPlanningLines()">
 
                 <div class="col-6">
                     <order-mgr-select-date></order-mgr-select-date>
@@ -72,7 +72,7 @@
                 <div class="col-6">
 
                     <order-mgr-contact-select></order-mgr-contact-select>
-                    
+
                 </div>
             </div>
         
@@ -94,6 +94,10 @@
         <order-mgr-person-select></order-mgr-person-select> -->
     </div>
 </div>
+
+
+
+<order-mgr-debug-availability [response]="orderMgrSvc.availabilityResponse"></order-mgr-debug-availability>
 
 
 

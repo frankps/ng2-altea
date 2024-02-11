@@ -42,7 +42,7 @@ export class CreateAvailabilityContext {
 
         ctx.configResources = ctx.order!.getProductResources()
 
-        
+
 
         ctx.branchId = ctx.order!.branchId!
 
@@ -60,14 +60,15 @@ export class CreateAvailabilityContext {
         /* Load schedules of resources that have custom scheduling*/
         const resourcesWithCustomSchedules = ctx.allResources.filter(r => r.customSchedule)
         const resourceIdsWithCustomSchedules = resourcesWithCustomSchedules.map(r => r.id!)
-        resourceIdsWithCustomSchedules.push(ctx.branchId)
+        //resourceIdsWithCustomSchedules.push(ctx.branchId)
         ctx.schedules = await this.loadSchedules(resourceIdsWithCustomSchedules, ctx.allResources)    // this.alteaDb.schedules(ctx.allResourceIds)
 
-        ctx.scheduleDateRanges = this.createScheduleDateRanges(ctx.schedules, availabilityRequest.from, availabilityRequest.to)
-
+        ctx.scheduleDateRanges = this.createScheduleDateRanges(resourceIdsWithCustomSchedules, ctx.schedules, availabilityRequest.from, availabilityRequest.to, ctx.resourcePlannings)
 
         return ctx
     }
+
+
 
     /**
      * Create a new set containing all resources from both set1 and set2, including possible child resources
@@ -144,19 +145,55 @@ export class CreateAvailabilityContext {
 
 
 
-    createScheduleDateRanges(schedules: Schedule[], from: Date | number, to: Date | number) {
+    createScheduleDateRanges(resourceIds: string[], schedules: Schedule[], from: Date | number, to: Date | number, resourcePlannings: ResourcePlannings): Map<string, DateRangeSet> {
 
 
         const index = new Map<string, DateRangeSet>()
 
-        if (!Array.isArray(schedules) || schedules.length == 0)
+        if (!Array.isArray(resourceIds) || resourceIds.length == 0 || !Array.isArray(schedules) || schedules.length == 0)
             return index
+        /*
+                for (const schedule of schedules) {
+        
+                    const dateRangeSet = schedule.toDateRangeSet(from, to)
+                    index.set(schedule.id!, dateRangeSet)
+                }
+                */
 
-        for (const schedule of schedules) {
+        for (const resourceId of resourceIds) {
 
-            const dateRangeSet = schedule.toDateRangeSet(from, to)
-            index.set(schedule.id!, dateRangeSet)
+            // start with the default schedule
+
+            const resourceSchedules = schedules.filter(s => s.resourceId == resourceId)
+
+            const defaultSchedule = resourceSchedules.find(s => s.default)
+            let dateRanges = defaultSchedule.toDateRangeSet(from, to)
+
+            const otherSchedules = resourceSchedules.filter(s => !s.default)
+
+            for (const otherSchedule of otherSchedules) {
+
+                console.warn('OTHER SCHEDULE')
+
+                // check if other schedule is active during period
+                let schedulePlannings = resourcePlannings.filterByScheduleDateRange(otherSchedule.id, from, to)
+
+                if (schedulePlannings.isEmpty())
+                    continue
+
+                for (let planning of schedulePlannings.plannings) {
+                    dateRanges = dateRanges.subtractByDates(planning.start, planning.end)
+
+                    let otherSet = otherSchedule.toDateRangeSet(from, to)
+
+                    dateRanges = dateRanges.add(otherSet)
+                }
+
+            }
+
+            index.set(resourceId, dateRanges)
         }
+
 
         return index
 

@@ -83,12 +83,13 @@
                 </div>
                 <div class="row" *ngFor="let prodRes of line.product.resources">
                     <div class="col-3">
-                        
+
                         <!-- <span
                             *ngIf="prodRes.resource.type == 'group' && prodRes.groupQty != 1">{{prodRes.groupQty}} x
                         </span> 
                          -->
-                        {{prodRes.resource.name}}</div>
+                        {{prodRes.resource.name}}
+                    </div>
                     <div class="col-2">{{prodRes.durationMode}}</div>
 
                     <ng-container [ngSwitch]="prodRes.durationMode">
@@ -208,6 +209,29 @@
 
 <h4>Schedules</h4>
 
+<ng-container *ngFor="let resourceId of ctx?.scheduleDateRanges?.keys()">
+
+    <div class="row" *ngIf="ctx.scheduleDateRanges.get(resourceId) as resourceScheduleRanges">
+        <div class="col-2">{{ctx.getResource(resourceId)?.name}}</div>
+
+
+        <div class="col">
+        
+            <ng-container *ngFor="let range of resourceScheduleRanges.ranges">
+
+                <span class="badge bg-danger" style="font-size: 0.8em;">{{range.from | date:'dd/MM HH:mm'}} - {{range.to | date:'HH:mm'}} </span> &nbsp;
+
+            </ng-container>
+        
+            {{resourceId}}
+        </div>
+
+    </div>
+
+</ng-container>
+
+<h4>Schedule definitions</h4>
+
 <ng-container *ngIf="ctx?.schedules">
     <ng-container *ngFor="let schedule of ctx.schedules">
         <div class="row">
@@ -275,7 +299,7 @@
                             - <span class="badge bg-secondary">{{solutionItem.dateRange.to | date:"HH:mm"}}</span>
 
                         </div>
-                        <div class="col-2">
+                        <div class="col">
 
                             <ng-container *ngFor="let resource of solutionItem.resources">
                                 <span class="badge bg-danger" style="font-size: 0.6em;">{{resource.name}}</span> &nbsp;
@@ -287,6 +311,14 @@
 
             </div>
         </div>
+        <div class="row" *ngFor="let note of solution.notes">
+            <div class="col-2">
+            </div>
+            <div class="col">
+                {{note.content}}
+            </div>
+        </div>
+
 
 
 

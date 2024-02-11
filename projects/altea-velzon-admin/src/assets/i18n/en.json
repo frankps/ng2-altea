@@ -751,6 +751,8 @@
       "scheduleIds": "Operationele modi (optioneel)",
       "groupQty": "Aantal resources",
       "groupAlloc": "Reserveren op groep",
+      "prep": "Is voorbereidings- of opkuistijd",
+      "prepOverlap": "Voorbereiding & opkuis overlappen elkaar",
       "help": {
         "offset": "Je kan ervoor kiezen om de bezetting van deze resource niet exact te laten aanvangen vanaf het begin of einde (bovenstaande keuze), maar wel met een correctie (in minuten)",
         "duration": "Gedurende deze tijd (minuten) wordt de resource bezet gehouden",
@@ -793,7 +795,8 @@
     },
     "schedule": {
       "name": "Naam",
-      "default": "Standaard"
+      "default": "Standaard",
+      "prepIncl": "Voorbereidings- en opkuistijden vallen altijd binnen deze planning"
     },
     "scheduling": {
       "start": "Actief vanaf",

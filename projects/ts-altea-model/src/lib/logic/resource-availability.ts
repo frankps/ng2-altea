@@ -6,8 +6,20 @@ import { AvailabilityRequest } from "./availability-request";
 import { AvailabilitySets, DateRange, DateRangeSet, DateRangeSets } from "./dates";
 import { AvailabilityContext } from "./availability-context";
 import { ObjectWithId } from 'ts-common'
+import { SolutionNote, SolutionNoteLevel } from "./solution";
+import * as dateFns from 'date-fns'
+
+export class ResultWithSolutionNotes<T> {
+    result: T
+    notes: SolutionNote[]= []
 
 
+    addNote(content: string, level: SolutionNoteLevel = SolutionNoteLevel.info) {
+
+        const note = new SolutionNote(content, level)
+        this.notes.push(note)
+    }
+}
 
 export class ResourceAvailability {
 
@@ -22,14 +34,14 @@ export class ResourceAvailability {
 
             const resourceId = resource.id!
 
-            const defaultSchedule = ctx.getDefaultSchedule(resourceId)
+            /*             const defaultSchedule = ctx.getDefaultSchedule(resourceId)
+            
+                        if (!defaultSchedule) {
+                            console.error(`No default schedule found for ${resource.name}`)
+                            continue
+                        } */
 
-            if (!defaultSchedule) {
-                console.error(`No default schedule found for ${resource.name}`)
-                continue
-            }
-
-            const resourceActive = ctx.scheduleDateRanges.get(defaultSchedule.id!)
+            const resourceActive = ctx.scheduleDateRanges.get(resourceId)
 
             if (!resourceActive) {
                 console.error(`No schedule date ranges found for ${resource.name}`)
@@ -135,11 +147,14 @@ export class ResourceAvailability {
     }
 
 
+    
+    getAvailableResourcesInRange(resources: Resource[], dateRange: DateRange, isPrepTime: boolean): ResultWithSolutionNotes<Resource[]>  {
 
-    getAvailableResourcesInRange(resources: Resource[], dateRange: DateRange): Resource[] {
+        let result = new ResultWithSolutionNotes<Resource[]>()
+        result.result = []
 
         if (!Array.isArray(resources) || resources.length == 0)
-            return []
+            return result
 
         const availableResources = []
 
@@ -150,11 +165,48 @@ export class ResourceAvailability {
 
             const set = this.getAvailabilitiesForResource(resource)
 
-            if (set.contains(dateRange))
+            if (set.contains(dateRange)) {
                 availableResources.push(resource)
+
+                continue
+            }
+
+            /*
+            If the schedule of the resource allows planning preparation blocks (not actual treatments) outside the schedule,
+            then check if resource is available
+            */
+
+            if (isPrepTime && resource.type == ResourceType.room) {
+
+                let activeSchedule = this.ctx.getScheduleOnDate(resource.id, dateRange.from)
+
+                if (!activeSchedule.prepIncl) {
+
+                    let isOutsideSchedule = !activeSchedule.isInsideSchedule(dateRange)
+
+                    if (isOutsideSchedule) {
+                        let existingPlannings = this.ctx.resourcePlannings.filterByResourceDateRange(resource.id, dateRange.from, dateRange.to)
+
+                        if (existingPlannings.isFullAvailable()) {
+                            availableResources.push(resource)
+
+                            result.addNote(`Preparation time outside schedule for ${resource.name} at ${dateFns.format(dateRange.from, 'dd/MM HH:mm')} allowed!`)
+                        }
+                            
+
+                    } else {
+                        result.addNote(`Preparation time outside schedule for ${resource.name} at ${dateFns.format(dateRange.from, 'dd/MM HH:mm')} NOT allowed!`)
+                    }
+                } else {
+                    result.addNote(`Preparation time outside schedule for ${resource.name} NOT allowed!`)
+                } 
+            }
+
+
         }
 
-        return availableResources
+        result.result = availableResources
+        return result
 
     }
 

@@ -46,6 +46,10 @@ export class ManageOrderComponent extends NgBaseComponent {
 
   }
 
+  test() {
+
+  }
+
 
 
 

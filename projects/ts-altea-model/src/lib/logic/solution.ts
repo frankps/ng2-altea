@@ -2,8 +2,20 @@ import { extend } from "lodash";
 import { Resource, ResourcePlanning, ResourcePlannings } from "../altea-schema";
 import { DateRange, DateRangeSet, TimeSpan } from "./dates";
 import { ResourceRequestItem } from "./resource-request";
-import { ObjectWithId } from "ts-common";
+import { ObjectHelper, ObjectWithId } from "ts-common";
 
+export enum SolutionNoteLevel {
+    info,
+    blocking
+}
+
+export class SolutionNote {
+
+    constructor(public content: string, public level: SolutionNoteLevel = SolutionNoteLevel.info) {
+
+    }
+
+}
 
 
 /**
@@ -32,6 +44,8 @@ export class Solution extends ObjectWithId {
 
     valid = true
 
+    notes: SolutionNote[] = []
+
     constructor(...items: SolutionItem[]) {
         super()
         this.items.push(...items)
@@ -43,6 +57,18 @@ export class Solution extends ObjectWithId {
             this.items = []
 
         this.items.push(item)
+    }
+
+    addNote(content: string, level: SolutionNoteLevel = SolutionNoteLevel.info) {
+
+        const note = new SolutionNote(content, level)
+        this.notes.push(note)
+
+    }
+
+    addNotes(notes: SolutionNote[]) {
+        if (Array.isArray(notes) && notes.length > 0)
+            this.notes.push(...notes)
     }
 
     /** most likely the reference date is the start date of this solution, but there can be exceptions */
@@ -74,9 +100,13 @@ export class Solution extends ObjectWithId {
 
     clone(): Solution {
 
+        //    return ObjectHelper.clone(this, Solution) as Solution
+
         const clone = new Solution(...this.items.map(item => item.clone()))
         clone.valid = this.valid
+        clone.notes = this.notes
         return clone
+
 
     }
 

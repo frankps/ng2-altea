@@ -22,14 +22,18 @@ export class Ngbs5Component {
     },
     "label": {
         "mode": "ngx-altea-label-control",
-        "translate": "objects.product"
+        "translate": "objects.prodRes"
     },
     "rows": {
         "generate": true,
         "cols": 1
     },
     "elements": {
-        "bundle": {
+        "prep": {
+            "type": "switch",
+            "translate": ""
+        },
+        "prepOverlap": {
             "type": "switch",
             "translate": ""
         },
