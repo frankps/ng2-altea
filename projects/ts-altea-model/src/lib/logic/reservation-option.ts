@@ -7,6 +7,10 @@ export class ReservationOption {
     /** a reservation option is originating from 1 or more solutions */
     solutionIds : string[] = []
 
+    /**
+     * 
+     * @param dateNum date number in format: yyyyMMddhhmmss
+     */
     constructor(public dateNum: number = 0) {
     }
 

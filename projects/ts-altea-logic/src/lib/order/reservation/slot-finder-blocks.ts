@@ -16,12 +16,20 @@ export class SlotFinderBlocks {
         return SlotFinderBlocks._I
     }
 
-    findSlots(resReqItem: ResourceRequestItem, inDateRange: DateRange, ctx: AvailabilityContext): DateRangeSet {
+    findSlots(resReqItem: ResourceRequestItem, inDateRange: DateRange, ctx: AvailabilityContext, availability: ResourceAvailability): DateRangeSet {
 
+        if (!Array.isArray(resReqItem.resources) || resReqItem.resources.length != 1) {
 
+            throw new Error(`SlotFinderBlocks`)
+        }
+            
+
+       // let resource = resReqItem.resources[0]
+
+        let availabilities = availability.getAvailabilityOfResourcesInRange(resReqItem.resources, inDateRange, resReqItem.duration)
+        console.error(availabilities)
 
         const product = resReqItem.product
-
 
         // then we get initial slots from product.plan
 
@@ -43,6 +51,9 @@ export class SlotFinderBlocks {
 
         /** Mostly there is only 1 branch schedule (the default operational mode) active in a given dateRange (can be 1 day for instance),
          *  but exceptionally there can be more branch schedules in a given period (example: normal operations, later followed by holiday period) 
+         * 
+         *  We need the schedules to determine the block series (just because these can vary by schedule)
+         * 
          **/
         const schedules = ctx.getBranchSchedules(dateRange)
 
@@ -52,8 +63,9 @@ export class SlotFinderBlocks {
             const schedule = schedules.byDate[i]
             const nextSchedule = schedules.byDate[i + 1]
 
-
             const dateRangeSameSchedule = new DateRange(schedule.start, nextSchedule.start)
+
+          //  ctx.resourcePlannings.
 
             // get definitions for block series for current schedule (= operational mode)
             const blockSeries = product.getBlockSeries(schedule.schedule.id!)

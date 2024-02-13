@@ -96,7 +96,7 @@ export class SlotFinder {
 
                 if (product.planMode == PlanningMode.block) {
 
-                    possibleDateRanges = SlotFinderBlocks.I.findSlots(firstRequestItem, availableRange, ctx)
+                    possibleDateRanges = SlotFinderBlocks.I.findSlots(firstRequestItem, availableRange, ctx, availability)
                     exactStart = true
 
                 } else {
@@ -174,6 +174,7 @@ export class SlotFinder {
                 const resourcesWithNotes = availability.getAvailableResourcesInRange(requestItem.resources, range, requestItem.isPrepTime)
                 const availableResources = resourcesWithNotes.result
                 solution.addNotes(resourcesWithNotes.notes)
+
 
                 if (availableResources.length >= requestItem.qty) {
                     const solutionItem = new SolutionItem(requestItem, range.clone(), true, ...availableResources)

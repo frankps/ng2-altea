@@ -264,6 +264,7 @@ export class DateRangeSet {
                 }
                 else  // nrOfResults == 2 => subtractFrom was split in 2 
                 {
+                    subtractResults.push(minusResults[0].clone())
                     // we assume no overlaps anymore with minusResults[0] -> the next possible overlappingRange will be more in the future (because they were ordered)
                     subtractFrom = minusResults[1]
                 }

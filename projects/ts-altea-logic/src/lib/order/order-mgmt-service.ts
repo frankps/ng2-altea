@@ -18,18 +18,18 @@ import * as _ from "lodash"
 export class OrderMgmtService {
 
 
-   // taskHub: TaskHub
-   // this.taskHub = new TaskHub(this.alteaDb)
+    // taskHub: TaskHub
+    // this.taskHub = new TaskHub(this.alteaDb)
 
 
     alteaDb: AlteaDb
-    
+
     constructor(db: IDb | AlteaDb) {
 
         if (db instanceof AlteaDb)
             this.alteaDb = db
         else
-            this.alteaDb = new AlteaDb(db)   
+            this.alteaDb = new AlteaDb(db)
     }
 
 
@@ -97,9 +97,9 @@ export class OrderMgmtService {
 
         order.start = reservationOption.dateNum
 
-        // order.lines = undefined
+        const plannings = this.createResourcePlanningsForNewOrder(order, reservationOption, solution)
 
-        /** Save order */
+        console.info(plannings)
 
         const orderApiResult = await this.alteaDb.saveOrder(order)
 
@@ -107,10 +107,6 @@ export class OrderMgmtService {
             console.error(orderApiResult)
             return undefined
         }
-
-        const plannings = this.createResourcePlanningsForNewOrder(order, reservationOption, solution)
-
-        console.info(plannings)
 
         const planningResult = await this.alteaDb.saveResourcePlannings(plannings)
 
@@ -141,7 +137,13 @@ export class OrderMgmtService {
             }
 
 
-            for (const resource of solItem.resources) {
+            /** Sometime we don't allocate the individual resource, but we allocate the resourcegroup  */
+            let groupAlloc = requestItem.productResource.groupAlloc && requestItem.productResource.resource.isGroup
+            let resourceGroup = requestItem.productResource.resource
+
+            for (let i = 0; i < requestItem.qty; i++) {
+
+                const resource = solItem.resources[i]
 
                 const resPlan = new ResourcePlanning()
 
@@ -149,18 +151,31 @@ export class OrderMgmtService {
                 resPlan.start = DateHelper.yyyyMMddhhmmss(startDate)
                 resPlan.end = DateHelper.yyyyMMddhhmmss(endDate)
 
-                const resourceInfo = new PlanningResourceInfo(resource.name, resource.type)
+                let resourceInfo = new PlanningResourceInfo(resource.name, resource.type)
+
+                if (groupAlloc) {
+                    resPlan.resourceGroupId = resourceGroup.id
+                    resourceInfo = new PlanningResourceInfo(resourceGroup.name, resource.type)
+                }
+                else
+                    resPlan.resourceId = resource.id
+
                 /** info will be stored as json inside resourcePlanning */
                 const info = new PlanningInfo(productInfo, contactInfo, resourceInfo)
 
                 resPlan.info = info
 
-
-                resPlan.resourceId = resource.id
+                resPlan.orderId = order.id
                 resPlan.orderLineId = requestItem.orderLine.id
-
+                resPlan.prep = requestItem.productResource.prep
 
                 plannings.push(resPlan)
+
+            }
+
+
+            for (const resource of solItem.resources) {
+
             }
         }
 

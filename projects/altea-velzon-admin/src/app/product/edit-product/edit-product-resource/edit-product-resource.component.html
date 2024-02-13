@@ -88,8 +88,9 @@
     </ng-container>
 
 
-
-    <!-- <div class="row mb-3" *ngIf="object?.resource?.type == 'group'">
+    <!-- *ngIf="object?.resource?.type == 'group'" -->
+    
+    <div class="row mb-3" *ngIf="object?.resource?.isGroup">
 
         <div class="col-6">
 
@@ -102,16 +103,27 @@
 
         </div>
 
+
         <div class="col-6">
+            <div class="form-check form-switch">
+                <input type="checkbox" class="form-check-input" id="groupAlloc" name="groupAlloc"
+                    [(ngModel)]="object.groupAlloc">
+                <label class="form-check-label" for="groupAlloc"
+                    translate="objects.prodRes.groupAlloc"></label>
+            </div>
+        </div>
+
+
+<!--         <div class="col-6">
 
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="groupAlloc" name="groupAlloc" [(ngModel)]="object.groupAlloc" />
                 <label class="form-check-label" for="groupAlloc" translate="objects.prodRes.groupAlloc"></label>
             </div>
 
-        </div>
+        </div> -->
 
-    </div> -->
+    </div> 
 
     <div class="row {{css_cls_row}}">
         <div class="col-6">

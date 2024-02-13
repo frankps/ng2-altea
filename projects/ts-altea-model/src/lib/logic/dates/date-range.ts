@@ -6,13 +6,12 @@ import { DateRangeSet } from './date-range-set';
 
 // Source: https://github.com/gund/time-slots/blob/master/packages/time-slots/src/lib
 
-
 export enum OverlapMode {
     noOverlap,
-    fullOverlap,
-    fullWithin,
-    endOverlap,
-    beginOverlap
+    otherOverlapsFull,
+    otherFullWithin,
+    otherOverlapsRight,
+    otherOverlapsLeft
 }
 
 export class DateRange {
@@ -144,34 +143,29 @@ export class DateRange {
 
     /**
      * How this date range overlaps a secondary date range
-     * @param secondary 
+     * @param other 
      * @returns 
      */
-    overlapWith(secondary: DateRange): OverlapMode {
+    overlapWith(other: DateRange): OverlapMode {
 
         let overlapMode = OverlapMode.noOverlap
 
-        if (this.from <= secondary.from) {
+        if (other.to <= this.from || other.from >= this.to)
+            return OverlapMode.noOverlap
 
-            if (this.to >= secondary.to)
-                overlapMode = OverlapMode.fullOverlap
-            else if (this.to <= secondary.from)
-                overlapMode = OverlapMode.noOverlap
-            else
-                overlapMode = OverlapMode.endOverlap
+        if (this.from < other.from && this.to > other.to)
+            return OverlapMode.otherFullWithin
 
-        } else {
+        if (this.from > other.from && this.to < other.to)
+            return OverlapMode.otherOverlapsFull
 
-            if (this.to < secondary.to)
-                overlapMode = OverlapMode.fullWithin
-            else if (this.from >= secondary.to)
-                overlapMode = OverlapMode.noOverlap
-            else
-                overlapMode = OverlapMode.beginOverlap
+        if (other.from <= this.from && other.to > this.from && other.to < this.to)
+            return OverlapMode.otherOverlapsLeft
 
-        }
+        if (other.to >= this.to && other.from > this.from && other.from < this.to)
+            return OverlapMode.otherOverlapsRight
 
-        return overlapMode
+        throw new Error('overlapWith unforseen situation?')
     }
 
 
@@ -192,15 +186,14 @@ export class DateRange {
         switch (overlapMode) {
             case OverlapMode.noOverlap:  // nothing to subtract
                 return [source.clone()]
-            case OverlapMode.fullWithin: // this range is full within the other range => nothing remains
+            case OverlapMode.otherOverlapsFull: // this range is full within the other range => nothing remains
                 return []
-            case OverlapMode.fullOverlap: // full overlap => the other range is within ours => this range will be cut into 2 pieces
+            case OverlapMode.otherFullWithin: // full overlap => the other range is within ours => this range will be cut into 2 pieces
                 return [new DateRange(source.from, other.from), new DateRange(other.to, source.to)]
-            case OverlapMode.endOverlap:  // this range overlaps the other at the end (of this range)
-                return [new DateRange(source.from, other.from)]
-            case OverlapMode.beginOverlap:  // this range overlaps the other at the start (of this range)
+            case OverlapMode.otherOverlapsLeft:  // this range overlaps the other at the end (of this range)
                 return [new DateRange(other.to, source.to)]
-
+            case OverlapMode.otherOverlapsRight:  // this range overlaps the other at the start (of this range)
+                return [new DateRange(source.from, other.from)]  // 
         }
 
         return []

@@ -177,7 +177,7 @@ export class CalendarComponent implements OnInit {
 
         var events = plannings.map(planning => ({
           id: planning.id,
-          title: planning.info ? planning.info.toString() : '',
+          title: planning.info ? planning.info.toString() + (planning.prep ? ' PREP' : '') : '',
           start: this.fullCalendarDate(planning.start),
           end: this.fullCalendarDate(planning.end),
           source: planning

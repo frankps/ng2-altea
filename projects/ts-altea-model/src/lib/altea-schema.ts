@@ -1739,6 +1739,7 @@ export class ProductResource extends ObjectWithId {
   /** the preparation time after a booking/treatment can overlap with prep time before next booking (the max of before/after will be used) */
   prepOverlap: boolean = false
 
+
 }
 
 
@@ -2049,6 +2050,10 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
   @Type(() => Subscription)
   subscriptions?: Subscription[];
   // satisfaction?: Satisfaction;
+
+  @Type(() => ResourcePlanning)
+  planning?: ResourcePlanning[]
+
   appointment = false;
 
   start?: number; // format: yyyyMMddHHmmss
@@ -3297,9 +3302,14 @@ export class ResourcePlanning extends ObjectWithId implements IAsDbObject<Resour
   resourceGroup?: Resource;
   resourceGroupId?: string;
 
+  orderId?: string
+  @Type(() => Order)
+  order?: Order;
+
+  orderLineId?: string;
   @Type(() => OrderLine)
   orderLine?: OrderLine;
-  orderLineId?: string;
+  
   autoResourceId?: string;
 
 
@@ -3319,6 +3329,10 @@ export class ResourcePlanning extends ObjectWithId implements IAsDbObject<Resour
 
   start?: number = DateHelper.yyyyMMddhhmmss(new Date())
   end?: number = DateHelper.yyyyMMddhhmmss(new Date())
+
+  /** is preperation time (before or after actual treatment) */
+  prep: boolean = false
+
   // service?: string;
   // customer?: string;
   pre = 0
