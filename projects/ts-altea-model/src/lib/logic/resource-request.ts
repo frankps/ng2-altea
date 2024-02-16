@@ -3,7 +3,7 @@ import { OrderLine, OrderPerson, Product, ProductResource, Resource, ResourceTyp
 import { OffsetDuration } from "./offset-duration"
 import { TimeSpan } from "./dates/time-span"
 import { DateRangeSet } from "./dates"
-
+import * as _ from "lodash";
 
 export class ResourceRequestItem {
     //person?: OrderPerson
@@ -23,7 +23,8 @@ export class ResourceRequestItem {
     qty = 1
 
     /** is preparation time => no actual treatment, but preparations or cleaning */
-    isPrepTime: boolean 
+    isPrepTime: boolean = false
+    prepOverlap: boolean = false
 
     /** the originating product resource */
     productResource: ProductResource
@@ -40,6 +41,10 @@ export class ResourceRequestItem {
         return this.offset.add(this.duration)
     }
     //offsetDuration: OffsetDuration = new OffsetDuration()
+
+    seconds() : number {
+        return this.duration.seconds
+    }
 
     addResource(resource: Resource) {
         this.resources.push(resource)
@@ -131,6 +136,13 @@ export class ResourceRequest {
         const resourceIds = allResources.filter(r => r?.id).map(res => res!.id!)
 
         return resourceIds
+    }
+
+
+    getItemsForResource(resourceId: string) : ResourceRequestItem[] {
+        const items = this.items.filter(i => i.resources.findIndex(r => r.id == resourceId) >= 0)
+
+        return _.orderBy(items, 'offset.seconds') 
     }
 
 

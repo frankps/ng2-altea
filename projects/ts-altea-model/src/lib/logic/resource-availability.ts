@@ -3,15 +3,16 @@ import { Order, OrderLine, Product, ProductResource, Resource, ResourcePlanning,
 import * as _ from "lodash";
 import { TimeSpan } from "./dates/time-span";
 import { AvailabilityRequest } from "./availability-request";
-import { AvailabilitySets, DateRange, DateRangeSet, DateRangeSets } from "./dates";
+import { ResourceOccupationSets, DateRange, DateRangeSet, DateRangeSets } from "./dates";
 import { AvailabilityContext } from "./availability-context";
 import { ObjectWithId } from 'ts-common'
 import { SolutionNote, SolutionNoteLevel } from "./solution";
 import * as dateFns from 'date-fns'
+import { ResourceRequestItem } from "./resource-request";
 
 export class ResultWithSolutionNotes<T> {
     result: T
-    notes: SolutionNote[]= []
+    notes: SolutionNote[] = []
 
 
     addNote(content: string, level: SolutionNoteLevel = SolutionNoteLevel.info) {
@@ -50,7 +51,7 @@ export class ResourceAvailability {
 
             const resourceOccupation = ctx.getResourceOccupation(resourceId)
 
-            const resourceActiveExtended = resourceActive.merge(resourceOccupation.available)
+            const resourceActiveExtended = resourceActive.union(resourceOccupation.available)
 
             const resourceStillAvailable = resourceActiveExtended.subtract(resourceOccupation.unAvailable)
 
@@ -147,8 +148,10 @@ export class ResourceAvailability {
     }
 
 
-    
-    getAvailableResourcesInRange(resources: Resource[], dateRange: DateRange, isPrepTime: boolean): ResultWithSolutionNotes<Resource[]>  {
+
+    getAvailableResourcesInRange(resources: Resource[], dateRange: DateRange, requestItem: ResourceRequestItem, stopWhenFound = true): ResultWithSolutionNotes<Resource[]> {
+
+        let isPrepTime = requestItem.isPrepTime
 
         let result = new ResultWithSolutionNotes<Resource[]>()
         result.result = []
@@ -163,6 +166,14 @@ export class ResourceAvailability {
             if (resource.isGroup)
                 continue
 
+            if (stopWhenFound && availableResources.length >= requestItem.qty)
+                break
+
+            /**
+             * getAvailabilitiesForResource: will only check inside the schedule of the resource
+             * (sometimes we allow that preparations are done outside schedule -> this is covered later)
+             * todo: sometimes preparations wan overlap (before/after)
+             */
             const set = this.getAvailabilitiesForResource(resource)
 
             if (set.contains(dateRange)) {
@@ -176,31 +187,64 @@ export class ResourceAvailability {
             then check if resource is available
             */
 
-            if (isPrepTime && resource.type == ResourceType.room) {
+            if (isPrepTime && resource.type == ResourceType.room) {   // 
+
 
                 let activeSchedule = this.ctx.getScheduleOnDate(resource.id, dateRange.from)
 
-                if (!activeSchedule.prepIncl) {
+                if (!activeSchedule)
+                    continue
 
-                    let isOutsideSchedule = !activeSchedule.isInsideSchedule(dateRange)
+                let insideSchedule = activeSchedule.isInsideSchedule(dateRange)
+                let outsideSchedule = !insideSchedule
 
-                    if (isOutsideSchedule) {
+                let preparationsOutsideScheduleOk = !activeSchedule.prepIncl
+
+                // check if preparations can be done outside schedule
+                if (outsideSchedule) {
+
+                    // remark: inside schedule was already covered above: this.getAvailabilitiesForResource(resource)
+                    if (preparationsOutsideScheduleOk) {
                         let existingPlannings = this.ctx.resourcePlannings.filterByResourceDateRange(resource.id, dateRange.from, dateRange.to)
 
                         if (existingPlannings.isFullAvailable()) {
                             availableResources.push(resource)
 
                             result.addNote(`Preparation time outside schedule for ${resource.name} at ${dateFns.format(dateRange.from, 'dd/MM HH:mm')} allowed!`)
+                            continue
                         }
-                            
 
                     } else {
-                        result.addNote(`Preparation time outside schedule for ${resource.name} at ${dateFns.format(dateRange.from, 'dd/MM HH:mm')} NOT allowed!`)
+                        result.addNote(`Preparation time outside schedule for ${resource.name} NOT allowed!`)
                     }
-                } else {
-                    result.addNote(`Preparation time outside schedule for ${resource.name} NOT allowed!`)
-                } 
+
+                }
+
+                // if we are inside a working schedule and overlap of preparations is allowed
+                if (insideSchedule && requestItem.prepOverlap) {
+
+                    let existingPlannings = this.ctx.resourcePlannings.filterByResourceDateRange(resource.id, dateRange.from, dateRange.to)
+
+                    if (existingPlannings.isPrepTimeOnly()) {
+                        availableResources.push(resource)
+                        result.addNote(`Overlapping prepartions allowed for '${resource.name}' at ${dateFns.format(dateRange.from, 'dd/MM HH:mm')} allowed!`)
+                        continue
+                    }
+                }
             }
+
+
+            /*             if (isPrepTime && requestItem.prepOverlap) {
+            
+                            let existingPlannings = this.ctx.resourcePlannings.filterByResourceDateRange(resource.id, dateRange.from, dateRange.to)
+            
+                            if (existingPlannings.isPrepTimeOnly()) {
+                                availableResources.push(resource)
+                                result.addNote(`Overlapping prepartions allowed for '${resource.name}' at ${dateFns.format(dateRange.from, 'dd/MM HH:mm')} allowed!`)
+                                continue
+                            }
+            
+                        } */
 
 
         }

@@ -133,6 +133,7 @@ export class CreateResourceRequest {
                     resReqItem.qty = productResource.groupQty
 
                     resReqItem.isPrepTime = productResource.prep
+                    resReqItem.prepOverlap = productResource.prepOverlap
                     resReqItem.productResource = productResource
 
 
@@ -146,7 +147,7 @@ export class CreateResourceRequest {
                 }
 
                 personOffset.addInternal(personOffsetToAdd)
-                
+
             }
 
             console.error(orderLine)
@@ -218,6 +219,9 @@ export class CreateResourceRequest {
 
                 if (productResource.reference == DurationReference.end)
                     offsetDuration.offset = offsetDuration.offset.add(productDuration)
+
+                if (productResource.offset)
+                    offsetDuration.offset.addMinutes(productResource.offset)
 
                 break
 

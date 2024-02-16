@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { AvailabilityContext, DateRange, DateRangeSet, PlanningBlockSeries, PlanningMode, PossibleSlots, Product, Resource, ResourceAvailability, ResourcePlanning, ResourceRequest, ResourceRequestItem, ResourceType, SlotInfo, Solution, SolutionItem, TimeSpan } from "ts-altea-model";
+import { AvailabilityContext, DateRange, DateRangeSet, PlanningBlockSeries, PlanningMode, PossibleSlots, Product, Resource, ResourceAvailability, ResourceAvailability2, ResourcePlanning, ResourceRequest, ResourceRequestItem, ResourceType, SlotInfo, Solution, SolutionItem, TimeSpan } from "ts-altea-model";
 import * as _ from "lodash"
 import { ResourceRequestOptimizer } from "./resource-request-optimizer";
 import { scheduled } from "rxjs";
@@ -22,11 +22,11 @@ export class SlotFinder {
     /**
      *  There can be multiple resourceRequests: for instance different requests per branch schedule 
      */
-    findSlots(availability: ResourceAvailability, ctx: AvailabilityContext, ...resourceRequests: ResourceRequest[]): SolutionSet {
+    findSlots(availability: ResourceAvailability, availability2: ResourceAvailability2, ctx: AvailabilityContext, ...resourceRequests: ResourceRequest[]): SolutionSet {
 
         const resourceRequest = resourceRequests[0]
 
-        const solutions = this.findSlotsInternal(availability, ctx, resourceRequest)
+        const solutions = this.findSlotsInternal(availability, availability2, ctx, resourceRequest)
 
 
         const exactSolutions = solutions //.toExactSolutions()
@@ -36,7 +36,7 @@ export class SlotFinder {
 
 
 
-    private findSlotsInternal(availability: ResourceAvailability, ctx: AvailabilityContext, resourceRequest: ResourceRequest): SolutionSet {
+    private findSlotsInternal(availability: ResourceAvailability, availability2: ResourceAvailability2, ctx: AvailabilityContext, resourceRequest: ResourceRequest): SolutionSet {
 
 
         console.error('Start findSlots()')
@@ -49,7 +49,7 @@ export class SlotFinder {
          * 
          *  To do: also do non-block resources ...
          */
-        let solutionSet = this.createInitialSolutions(availability, ctx, resourceRequest)
+        let solutionSet = this.createInitialSolutions(availability, availability2, ctx, resourceRequest)
 
         if (resourceRequest.items.length == 1)
             return solutionSet
@@ -73,15 +73,29 @@ export class SlotFinder {
 
 
 
-    createInitialSolutions(availability: ResourceAvailability, ctx: AvailabilityContext, resourceRequest: ResourceRequest): SolutionSet {
+    createInitialSolutions(availability: ResourceAvailability, availability2: ResourceAvailability2, ctx: AvailabilityContext, resourceRequest: ResourceRequest): SolutionSet {
 
         const solutionSet = new SolutionSet()
 
 
         const firstRequestItem = resourceRequest.items[0]
-        const firstItemAvailabilities = availability.getAvailabilities(firstRequestItem.resources)
 
         const product = firstRequestItem.product
+
+
+        if (product.planMode == PlanningMode.block) {
+
+            const solutionSet = SlotFinderBlocks.I.createInitialSolutions(availability2, ctx, resourceRequest)
+            return solutionSet
+        }
+
+
+
+        const firstItemAvailabilities = availability.getAvailabilities(firstRequestItem.resources)
+
+        const singleResource = (firstRequestItem.resources?.length === 1)
+        const firstResource = firstRequestItem.resources?.length > 0 ? firstRequestItem.resources[0] : null
+
 
         /** a set typically contains the availability for 1 resource */
         for (const set of firstItemAvailabilities.sets) {
@@ -92,27 +106,39 @@ export class SlotFinder {
                 let possibleDateRanges = DateRangeSet.empty
 
                 /** some services work with fixed blocks (like Wellness reservation), others or more floating blocks (service is possible within interval) */
-                let exactStart = false
+/*                 let exactStart = false
+                let processed = false */
 
+                /*
                 if (product.planMode == PlanningMode.block) {
 
-                    possibleDateRanges = SlotFinderBlocks.I.findSlots(firstRequestItem, availableRange, ctx, availability)
                     exactStart = true
 
+                    if (singleResource) {
+                        let existingPlanningsForDay = ctx.resourcePlannings.filterByResourceDateRange(firstResource.id, dateFns.startOfDay(range.from), dateFns.endOfDay(range.to))
+
+                        if (existingPlanningsForDay.isEmpty()) {
+                            possibleDateRanges = SlotFinderBlocks.I.getFullDayStartDates(product, range, ctx)   
+                            processed = true
+                        }
+
+                    }
+
+                    if (!processed)
+                        possibleDateRanges = SlotFinderBlocks.I.findSlots(firstRequestItem, availableRange, ctx, availability2)
+
+
                 } else {
-                    //possibleDateRanges = SlotFinderContinuous.I.findSlots(firstRequestItem, dateRange, ctx)
+                  
 
 
-                    availableRange.changeTo(-firstRequestItem.duration.seconds)
-                    possibleDateRanges.addRange(availableRange)
+                } */
+
+                availableRange.increaseToWithSeconds(-firstRequestItem.duration.seconds)
+                possibleDateRanges.addRange(availableRange)
 
 
-                }
-
-
-
-
-                const solutions = possibleDateRanges.toSolutions(resourceRequest, firstRequestItem, exactStart, set.resource)
+                const solutions = possibleDateRanges.toSolutions(resourceRequest, firstRequestItem, false, set.resource)
                 solutionSet.add(...solutions)
 
 
@@ -169,9 +195,12 @@ export class SlotFinder {
                 const to = dateFns.addSeconds(from, requestItem.duration.seconds)
                 const range = new DateRange(from, to)
 
-                
+                //requestItem.productResource.prepOverlap
 
-                const resourcesWithNotes = availability.getAvailableResourcesInRange(requestItem.resources, range, requestItem.isPrepTime)
+                /*                 requestItem.qty 
+                                p */
+
+                const resourcesWithNotes = availability.getAvailableResourcesInRange(requestItem.resources, range, requestItem)
                 const availableResources = resourcesWithNotes.result
                 solution.addNotes(resourcesWithNotes.notes)
 
@@ -190,7 +219,7 @@ export class SlotFinder {
 
                     let onlyAvailable = '/'
                     if (availableResources.length > 0) {
-                         onlyAvailable = availableResources.map(r => r.shortOrName()).join(', ')
+                        onlyAvailable = availableResources.map(r => r.shortOrName()).join(', ')
                     }
 
                     if (requestItem.resourceGroup) {
@@ -203,9 +232,9 @@ export class SlotFinder {
                         solution.addNote(`No availability found for '${requestItem.resourceNames()}': ${availableResources.length}/${requestItem.qty}, ${interval}, available: ${onlyAvailable}`)
 
                     }
-                        
 
-                    
+
+
 
                     if (trackInvalidSolutions)
                         resultSolutions.add(solution.clone())

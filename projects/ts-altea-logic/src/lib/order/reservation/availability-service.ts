@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ApiListResult, ApiResult, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
-import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, Organisation } from 'ts-altea-model'
+import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, Organisation, ResourceAvailability2 } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { AlteaDb } from '../../general/altea-db'
 import { IDb } from '../../interfaces/i-db'
@@ -89,6 +89,8 @@ export class AvailabilityService {
         const availability = new ResourceAvailability(availabilityCtx)
         if (availabilityRequest.debug) response.debug.availability = availability
 
+        const availability2 = new ResourceAvailability2(availabilityCtx)
+     //   if (availabilityRequest.debug) response.debug.availability = availability
 
         /** Create Resource Request
          *  _______________________
@@ -117,7 +119,7 @@ export class AvailabilityService {
          */
 
 
-        response.solutionSet = SlotFinder.I.findSlots(availability, availabilityCtx, ...initialResourceRequests)
+        response.solutionSet = SlotFinder.I.findSlots(availability, availability2, availabilityCtx, ...initialResourceRequests)
 
         // response.solutionSet = SlotFinder.I.findSlots(availability, availabilityCtx, ...optimizedRequests)
 

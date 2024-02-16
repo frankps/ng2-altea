@@ -167,7 +167,7 @@ export class CreateAvailabilityContext {
             const resourceSchedules = schedules.filter(s => s.resourceId == resourceId)
 
             const defaultSchedule = resourceSchedules.find(s => s.default)
-            let dateRanges = defaultSchedule.toDateRangeSet(from, to)
+            let dateRanges = defaultSchedule.toDateRangeSet(from, to, 'START', 'END')
 
             const otherSchedules = resourceSchedules.filter(s => !s.default)
 
@@ -176,15 +176,15 @@ export class CreateAvailabilityContext {
                 console.warn('OTHER SCHEDULE')
 
                 // check if other schedule is active during period
-                let schedulePlannings = resourcePlannings.filterByScheduleDateRange(otherSchedule.id, from, to)
+                let otherSchedulePlannings = resourcePlannings.filterByScheduleDateRange(otherSchedule.id, from, to)
 
-                if (schedulePlannings.isEmpty())
+                if (otherSchedulePlannings.isEmpty())
                     continue
 
-                for (let planning of schedulePlannings.plannings) {
+                for (let planning of otherSchedulePlannings.plannings) {
                     dateRanges = dateRanges.subtractByDates(planning.start, planning.end)
 
-                    let otherSet = otherSchedule.toDateRangeSet(from, to)
+                    let otherSet = otherSchedule.toDateRangeSet(from, to, 'START', 'END')
 
                     dateRanges = dateRanges.add(otherSet)
                 }

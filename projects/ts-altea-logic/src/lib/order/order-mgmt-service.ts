@@ -168,6 +168,8 @@ export class OrderMgmtService {
                 resPlan.orderId = order.id
                 resPlan.orderLineId = requestItem.orderLine.id
                 resPlan.prep = requestItem.productResource.prep
+                resPlan.overlap = requestItem.productResource.prepOverlap
+
 
                 plannings.push(resPlan)
 

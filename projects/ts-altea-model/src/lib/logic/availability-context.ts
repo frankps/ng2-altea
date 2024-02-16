@@ -3,7 +3,7 @@ import { Order, OrderLine, Product, ProductResource, Resource, ResourcePlanning,
 import * as _ from "lodash";
 import { TimeSpan } from "./dates/time-span";
 import { AvailabilityRequest } from "./availability-request";
-import { AvailabilitySets, DateRange, DateRangeSet } from "./dates";
+import { ResourceOccupationSets, DateRange, DateRangeSet } from "./dates";
 
 
 export class BranchSchedule {
@@ -251,7 +251,7 @@ export class AvailabilityContext {
             let defaultSchedule = schedules.find(s => s.default)
             return defaultSchedule
         }
-            
+
         // planning is found for a schedule => then return that schedule
         let planning = plannings.plannings[0]
         let scheduleId = planning.scheduleId
@@ -261,30 +261,47 @@ export class AvailabilityContext {
         return schedule
     }
 
-    getResourceOccupation(resourceId: string): AvailabilitySets {
+    getResourceOccupation(resourceId: string): ResourceOccupationSets {
 
-        const planningsForResource = this.resourcePlannings.filterByResource(resourceId)
+        const exclusivePlannings = this.resourcePlannings.filterByResourceOverlap(resourceId, false)
 
-        if (planningsForResource.isEmpty())
-            return new AvailabilitySets()
-
-
-        const availablePlannings = planningsForResource.filterByAvailable()
-        const unavailable = planningsForResource.filterByAvailable(false)
-
-        const result = new AvailabilitySets(availablePlannings.toDateRangeSet(), unavailable.toDateRangeSet())
+        if (exclusivePlannings.isEmpty())
+            return new ResourceOccupationSets()
 
 
-        // for (const planning of planningsForResource) {
+        const availablePlannings = exclusivePlannings.filterByAvailable()
+        const unavailable = exclusivePlannings.filterByAvailable(false)
 
-        //     const 
-        //     planning.start
-        // }
+        const result = new ResourceOccupationSets(availablePlannings.toDateRangeSet(), unavailable.toDateRangeSet())
 
         return result
 
+    }
+
+    getResourceOccupation2(resourceId: string): ResourceOccupationSets {
+
+        const exclusivePlannings = this.resourcePlannings.filterByResourceOverlap(resourceId, false)
+
+
+
+        // some plannings can overlap: preparations of next block might overlap with cleanup of previous block
+        const overlapAllowedPlannings = this.resourcePlannings.filterByResourceOverlap(resourceId, true)
+
+        if (exclusivePlannings.isEmpty() && overlapAllowedPlannings.isEmpty())
+            return new ResourceOccupationSets()
+
+        const availablePlannings = exclusivePlannings.filterByAvailable()
+        const unavailable = exclusivePlannings.filterByAvailable(false)
+
+        const result = new ResourceOccupationSets(
+            availablePlannings.toDateRangeSet(),
+            unavailable.toDateRangeSet(),
+            overlapAllowedPlannings.toDateRangeSet())
+
+        return result
 
     }
+
 
 
 

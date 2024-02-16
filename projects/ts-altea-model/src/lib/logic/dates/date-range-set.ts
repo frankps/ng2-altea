@@ -9,12 +9,29 @@ import { Resource, ResourcePlanning } from "../../altea-schema"
 import { TimeSpan } from "./time-span"
 import { DateHelper } from "ts-common"
 
-export class AvailabilitySets {
-    constructor(public available: DateRangeSet = DateRangeSet.empty, public unAvailable: DateRangeSet = DateRangeSet.empty) {
-
+/**
+ * This class focuses on pure DB data for a resource (coming from ResourcePlanning)
+ * available = extra availabilities (outside schedule), 
+ * unAvailable = existing plannings from ResourcePlanning
+ * overlapAllowed = existing preparation blocks from ResourcePlanning, where overlap is allowed
+ */
+export class ResourceOccupationSets {
+    constructor(public available: DateRangeSet = DateRangeSet.empty,
+        public unAvailable: DateRangeSet = DateRangeSet.empty,
+        public overlapAllowed: DateRangeSet = DateRangeSet.empty
+    ) {
     }
 }
 
+/**
+ *  This class focuses on what is available for a resource: available = schedule - occupation
+ */
+export class ResourceAvailabilitySets {
+    constructor(public available: DateRangeSet = DateRangeSet.empty,
+        public overlapAllowed: DateRangeSet = DateRangeSet.empty
+    ) {
+    }
+}
 
 export class DateRangeSets {
 
@@ -71,9 +88,9 @@ export class DateRangeSet {
         this.ranges.push(range)
     }
 
-    addRangeByDates(from: Date, to: Date) {
+    addRangeByDates(from: Date, to: Date, fromLabel?: string, toLabel?: string) {
 
-        const range = new DateRange(from, to)
+        const range = new DateRange(from, to, [fromLabel], [toLabel])
         this.addRange(range)
 
     }
@@ -123,6 +140,12 @@ export class DateRangeSet {
 
     }
 
+    getRangeWhereToEquals(to: Date) {
+
+
+        const match = this.ranges.find(r => dateFns.isEqual(r.to, to))
+        return match
+    }
 
     clip(insideRange: DateRange): DateRangeSet {
 
@@ -165,7 +188,7 @@ export class DateRangeSet {
         return new DateRangeSet(allRanges)
     }
 
-    merge(set: DateRangeSet): DateRangeSet {
+    union(set: DateRangeSet): DateRangeSet {
 
         //to implement !!
         let allRanges: DateRange[] = []
@@ -246,7 +269,7 @@ export class DateRangeSet {
         const subtractResults: DateRange[] = []
 
 
-        let subtractFrom : DateRange = substractFromRanges.pop()
+        let subtractFrom: DateRange = substractFromRanges.pop()
 
         while (subtractFrom) {
 

@@ -414,7 +414,7 @@ export class Schedule extends ObjectWithId {
     return daySchedule
   }
 
-  toDateRangeSet(from: Date | number, to: Date | number): DateRangeSet {
+  toDateRangeSet(from: Date | number, to: Date | number, fromLabel?: string, toLabel?: string): DateRangeSet {
 
     const dateRangeSet = new DateRangeSet()
 
@@ -459,7 +459,7 @@ export class Schedule extends ObjectWithId {
           let toDate = dateFns.addHours(dayDate, to.hour)
           toDate = dateFns.addMinutes(toDate, to.minute)
 
-          dateRangeSet.addRangeByDates(fromDate, toDate)
+          dateRangeSet.addRangeByDates(fromDate, toDate, fromLabel, toLabel)
 
         }
 
@@ -3105,6 +3105,18 @@ export class ResourcePlannings {
     return new ResourcePlannings(planningsForResource)
   }
 
+
+  filterByResourceOverlap(resourceId: string, overlap: boolean = false): ResourcePlannings {
+
+    const planningsForResource = this.plannings.filter(rp => rp.resourceId == resourceId && overlap == overlap && !rp.scheduleId)
+
+    if (!Array.isArray(planningsForResource))
+      return new ResourcePlannings()
+
+    return new ResourcePlannings(planningsForResource)
+  }
+
+
   filterByResourceDateRange(resourceId: string, from: Date | number, to: Date | number): ResourcePlannings {
 
     let fromNum = from instanceof Date ? DateHelper.yyyyMMddhhmmss(from) : from
@@ -3165,10 +3177,19 @@ export class ResourcePlannings {
   }
 
   isFullAvailable() : boolean {
-    const unavailable = this.plannings.find(rp => rp.available == false && !rp.scheduleId)
+    const unavailable = this.plannings.find(rp => rp.active && !rp.available && !rp.scheduleId)
 
     return unavailable ? false : true
   }
+
+  isPrepTimeOnly() : boolean {
+
+    // try to find a planning that is NOT a preparation
+    const nonPrep = this.plannings.find(rp => rp.active && !rp.prep)
+
+    return nonPrep ? false : true
+  }
+
 
   filterByAvailable(available = true): ResourcePlannings {
 
@@ -3332,6 +3353,9 @@ export class ResourcePlanning extends ObjectWithId implements IAsDbObject<Resour
 
   /** is preperation time (before or after actual treatment) */
   prep: boolean = false
+
+  /** overlap allowed (used if prep=true). Example: when cleaning of wellness can overlap the preparation of the next session */
+  overlap: boolean = false
 
   // service?: string;
   // customer?: string;

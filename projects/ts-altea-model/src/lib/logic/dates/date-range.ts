@@ -16,12 +16,23 @@ export enum OverlapMode {
 
 export class DateRange {
 
-    constructor(public from: Date, public to: Date) {
+    /* fromLabels & toLabels were introduced 
+    */
+/*     public fromLabels: string[] = []
+    public toLabels: string[] = [] */
+
+    constructor(public from: Date, public to: Date, public fromLabels: string[] = [], public toLabels: string[] = []) {
         if (to < from) {
             throw new Error(`DateRange: Date to is smaller than date from!
       From: ${from}
       To: ${to}`);
         }
+
+/*         if (fromLabel)
+            this.fromLabels.push(fromLabel)
+
+        if (toLabel)
+            this.toLabels.push(toLabel) */
     }
 
     /**
@@ -55,8 +66,24 @@ export class DateRange {
         return new TimeSpan(dif)
     }
 
+    seconds(): number {
+        return this.duration.seconds
+    }
+
+
+    /*     fromStartOfDay() {
+            return dateFns.startOfDay(this.from)
+        }
+    
+        fromStartOfDay() {
+            return dateFns.startOfDay(this.from)
+        } */
+
     clone() {
-        return new DateRange(new Date(this.from), new Date(this.to));
+        let clone = new DateRange(new Date(this.from), new Date(this.to));
+        clone.fromLabels.push(...this.fromLabels)
+        clone.toLabels.push(...this.toLabels)
+        return clone
     }
 
     invert(): DateRangeSet {
@@ -76,7 +103,7 @@ export class DateRange {
         return DateHelper.yyyyMMddhhmmss(this.to)
     }
 
-    changeTo(seconds: number) {
+    increaseToWithSeconds(seconds: number) {
         this.to = dateFns.addSeconds(this.to, seconds)
     }
 
@@ -89,6 +116,20 @@ export class DateRange {
 
 
         return dateBorders
+    }
+
+    containsLabels(fromLabel: string, toLabel?: string) {
+
+        const fromOk = fromLabel ? this.fromLabels.indexOf(fromLabel) >= 0 : true
+        const toOk = toLabel ? this.toLabels.indexOf(toLabel) >= 0 : true
+
+        return fromOk && toOk
+    }
+
+
+    containsFromLabel(fromLabel: string) {
+        const fromOk = fromLabel ? this.fromLabels.indexOf(fromLabel) >= 0 : true
+        return fromOk
     }
 
     /**
@@ -183,20 +224,31 @@ export class DateRange {
 
         const overlapMode = source.overlapWith(other)
 
+        let ranges = []
+
         switch (overlapMode) {
             case OverlapMode.noOverlap:  // nothing to subtract
-                return [source.clone()]
+                ranges = [source.clone()]
+                break
             case OverlapMode.otherOverlapsFull: // this range is full within the other range => nothing remains
-                return []
+                ranges = []
+                break
             case OverlapMode.otherFullWithin: // full overlap => the other range is within ours => this range will be cut into 2 pieces
-                return [new DateRange(source.from, other.from), new DateRange(other.to, source.to)]
+                let left = new DateRange(source.from, other.from, source.fromLabels, other.fromLabels)
+                let right = new DateRange(other.to, source.to, other.toLabels, source.toLabels)
+                ranges = [left, right]
+                break
             case OverlapMode.otherOverlapsLeft:  // this range overlaps the other at the end (of this range)
-                return [new DateRange(other.to, source.to)]
+                let newRight = new DateRange(other.to, source.to, other.toLabels, source.toLabels)
+                ranges = [newRight]
+                break
             case OverlapMode.otherOverlapsRight:  // this range overlaps the other at the start (of this range)
-                return [new DateRange(source.from, other.from)]  // 
+                let newLeft = new DateRange(source.from, other.from, source.fromLabels, other.fromLabels)
+                ranges = [newLeft]  
+                break
         }
 
-        return []
+        return ranges
 
     }
 
