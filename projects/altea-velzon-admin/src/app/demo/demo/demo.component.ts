@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
-import { Contact } from 'ts-altea-model';
+import { Contact, User } from 'ts-altea-model';
 import { SearchContactComponent } from '../../contact/search-contact/search-contact.component';
-import { ObjectService } from 'ng-altea-common';
+import { ObjectService, UserService } from 'ng-altea-common';
 import { CheckDeposists } from 'ts-altea-logic';
 import { TranslationService } from 'ng-common'
 import { Country } from 'ts-altea-model'
@@ -32,12 +32,25 @@ export class DemoComponent {
 
   fileText: string;
 
-  constructor(private http: HttpClient, public dbSvc: ObjectService, protected translationSvc: TranslationService, protected backEndSvc: ObjectService) {
+  constructor(private http: HttpClient, public dbSvc: ObjectService, protected translationSvc: TranslationService, protected backEndSvc: ObjectService, protected userSvc: UserService) {
 
     
 
   }
 
+
+  async createUser() {
+
+    let user = new User()
+
+    user.prov = 'google'
+    user.provEmail = "frank.paepens@davinci-it.be"
+    user.email = 'frank@dvit.eu'
+
+    let res = await this.userSvc.create$(user)
+
+    console.error(res)
+  }
 
 
 

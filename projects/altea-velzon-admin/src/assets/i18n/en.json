@@ -230,6 +230,10 @@
     }
   },
   "ui": {
+    "search-user": {
+      "search": "Zoek gebruiker",
+      "link": "Link"
+    },
     "task": {
       "edit": {
         "sections": {
@@ -670,6 +674,7 @@
       "isGroup": "Groep",
       "customSchedule": "Aangepast uurrooster",
       "online": "Klanten kunnen deze persoon selecteren",
+      "user": "Gelinkt met gebruiker",
       "help": {
         "device-name": "De naam van het toestel",
         "group-name": "De naam van de groep",

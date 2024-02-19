@@ -1,6 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { BranchService, SessionService } from 'ng-altea-common';
 import { BsLocaleService } from 'ngx-bootstrap/datepicker';
+import { Firestore } from '@angular/fire/firestore';
+import { AuthService } from './auth/auth.service';
+
 
 @Component({
   selector: 'app-root',
@@ -10,10 +13,13 @@ import { BsLocaleService } from 'ngx-bootstrap/datepicker';
 export class AppComponent {
   title = 'altea-pub-app'
 
+  //firestore: Firestore = inject(Firestore);
 
-  constructor(private localeService: BsLocaleService, private branchSvc: BranchService, private sessionSvc: SessionService) {
+
+  constructor(private localeService: BsLocaleService, private branchSvc: BranchService, private sessionSvc: SessionService, private authSvc: AuthService) {
     this.localeService.use('nl-be');
 
+    this.authSvc.init()
 
     this.branchSvc.get(this.sessionSvc.branchId).subscribe(branch => {
 

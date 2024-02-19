@@ -282,6 +282,23 @@ export class WeekSchedule {
 }
 
 
+export class User extends ObjectWithId {
+
+  uid?: string
+
+  prov?: string
+  provId?: string
+  provEmail?: string
+
+  first?: string
+  last?: string
+
+  email?: string
+  mobile?: string
+
+  resources: Resource[]
+}
+
 export class Contact extends ObjectWithId {
   //@Type(() => Organisation)
   organisation?: Organisation;
@@ -1525,6 +1542,9 @@ export class Resource extends ObjectWithId {
   /** human resources only: staff member can be selected online by customers as prefered */
   online?: boolean;
 
+  /** human resources only: can be linked to an actual user (that can log-in) */
+  userId?: string
+  user?: User
 
   branches?: string[];
   active?: boolean;
@@ -3293,18 +3313,13 @@ export class PlanningInfo {
     if (Array.isArray(this.prods)) {
 
       this.prods.forEach(prod => {
-
         info += `${prod.nm}`
-
       })
-
     }
-
 
     if (this.res) {
       info += ` ${this.res.nm}`
     }
-
 
     return info
   }

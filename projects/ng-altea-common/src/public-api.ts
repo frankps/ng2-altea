@@ -26,6 +26,6 @@ export * from './lib/scheduling.service'
 export * from './lib/subscription.service'
 export * from './lib/template.service'
 export * from './lib/task.service'
-
+export * from './lib/user.service'
 
 export * from './lib/order-mgr'  

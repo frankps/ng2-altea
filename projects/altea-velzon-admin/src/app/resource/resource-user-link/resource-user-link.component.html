@@ -1,0 +1,26 @@
+<form #searchUserForm="ngForm">
+    <div class="row {{css_cls_row}}">
+        <div class="col-8">
+            <ngx-altea-label-control label="ui.search-user.search" for="search">
+                <input type="text" id="search" name="search" class="form-control" required [(ngModel)]="search">
+            </ngx-altea-label-control>
+        </div>
+
+        <div class="col-4">
+            <button class="btn btn-primary" translate (click)="searchUser($event)"
+                [disabled]="searchUserForm.form.pristine || !searchUserForm.form.valid">dic.search</button>
+        </div>
+    </div>
+</form>
+<div class="row {{css_cls_row}}">
+    <div class="col-8">
+        <ul class="list-group" *ngIf="users">
+            <li class="list-group-item" *ngFor="let user of users">
+                {{user.provEmail}}
+                <button class="btn btn-primary btn-sm float-end" (click)="selectUser(user)"
+                    [disabled]="searchUserForm.form.pristine || !searchUserForm.form.valid"><i
+                        class="fa-duotone fa-link"></i> &nbsp; {{'ui.search-user.link' | translate}}</button>
+            </li>
+        </ul>
+    </div>
+</div>

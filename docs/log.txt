@@ -1,4 +1,15 @@
 
+http://localhost:4300/auth/sign-in
+http://localhost:4300/branch/aqua/menu
+
+firebase target:apply hosting altea-pub-app altea-pub-app
+firebase deploy --only hosting:altea-pub-app
+Firebase:
+
+  https://github.com/angular/angularfire/blob/HEAD/docs/auth.md#authentication
+
+
+
 Stripe:
 
   CheckOut

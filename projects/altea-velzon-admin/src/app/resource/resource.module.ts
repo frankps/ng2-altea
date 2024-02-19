@@ -23,6 +23,7 @@ import { ScheduleSchedulingComponent } from './schedule-scheduling/schedule-sche
 import { ResourceGroupsComponent } from './resource-groups/resource-groups.component';
 import { ResourcePlanningComponent } from './resource-planning/resource-planning.component';
 import { NgCommonModule } from 'ng-common';
+import { ResourceUserLinkComponent } from './resource-user-link/resource-user-link.component';
 @NgModule({
   declarations: [
     ManageResourcesComponent,
@@ -34,6 +35,7 @@ import { NgCommonModule } from 'ng-common';
     ScheduleSchedulingComponent,
     ResourceGroupsComponent,
     ResourcePlanningComponent,
+    ResourceUserLinkComponent,
   ],
   imports: [
     CommonModule,

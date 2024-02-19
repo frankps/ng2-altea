@@ -1,6 +1,6 @@
 import { Component, ViewChild, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { ProductService, PriceService, ProductResourceService, ResourceService, ScheduleService, SessionService } from 'ng-altea-common'
-import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ResourceType, ResourceTypeIcons, Resource, Schedule } from 'ts-altea-model'
+import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ResourceType, ResourceTypeIcons, Resource, Schedule, User } from 'ts-altea-model'
 import { BackendHttpServiceBase, DashboardService, FormCardSectionEventData, NgEditBaseComponent, ToastType, TranslationService } from 'ng-common'
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxModalComponent, DeleteModalComponent } from 'ng-common';
@@ -55,11 +55,11 @@ export class EditResourceComponent extends NgEditBaseComponent<Resource> impleme
   constructor(protected resourceSvc: ResourceService, protected translationSvc: TranslationService, route: ActivatedRoute, protected router: Router,
     spinner: NgxSpinnerService, private modalService: NgbModal, dashboardSvc: DashboardService,
     protected scheduleSvc: ScheduleService, protected sessionSvc: SessionService) {
-    super('resource', Resource, 'groups.group,schedules:orderBy=idx.planning,children.child'
+    super('resource', Resource, 'groups.group,schedules:orderBy=idx.planning,children.child,user'
       , resourceSvc
       , route, spinner, dashboardSvc)
 
-    this.sectionProps.set('general', ['name', 'descr', 'color', 'start', 'end', 'isGroup', 'type', 'customSchedule', 'online'])   // , 'color'
+    this.sectionProps.set('general', ['name', 'descr', 'color', 'start', 'end', 'isGroup', 'type', 'customSchedule', 'online', 'userId'])   // , 'color'
     this.sectionProps.set('schedule', ['schedules'])
   }
 
@@ -243,6 +243,16 @@ export class EditResourceComponent extends NgEditBaseComponent<Resource> impleme
 
 
 
+    }
+
+  }
+
+  linkUserToResource(user: User) {
+    console.error(user)
+    if (user) {
+      this.object.userId = user.id
+      this.object.user = user
+      this.resourceGeneralForm.form.markAsDirty()
     }
 
   }

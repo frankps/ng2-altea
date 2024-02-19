@@ -14,6 +14,11 @@ import { nlBeLocale } from 'ngx-bootstrap/locale';
 import { NgAlteaCommonModule } from 'ng-altea-common';
 import { OrderMgrModule } from 'ng-altea-common';
 import { OrderComponent } from './branch/order/order.component';
+import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
+import { getAuth, provideAuth } from '@angular/fire/auth';
+import { environment } from '../environments/environment';
+// import { SignInComponent } from './auth/sign-in/sign-in.component';
+
 
 defineLocale('nl-be', nlBeLocale);
 
@@ -30,6 +35,8 @@ export function createTranslateLoader(http: HttpClient): any {
     AppRoutingModule,
     HttpClientModule,
     BrowserAnimationsModule,
+    provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
+    provideAuth(() => getAuth()),
     NgxSpinnerModule,
     Bootstrap5Module,
     TranslateModule.forRoot({

@@ -7,8 +7,12 @@
       "hosting": {
         "altea-velzon-admin": [
           "altea-velzon-admin"
+        ],
+        "altea-pub-app": [
+          "altea-pub-app"
         ]
       }
     }
-  }
+  },
+  "etags": {}
 }

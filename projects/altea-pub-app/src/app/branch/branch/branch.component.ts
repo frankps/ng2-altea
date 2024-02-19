@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { SessionService } from 'ng-altea-common';
 import { Branch } from 'ts-altea-model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrderMgrUiService } from 'ng-altea-common';
+import { Auth, GoogleAuthProvider, signInWithRedirect, signInWithPopup, user, User, signOut } from '@angular/fire/auth';
+import { Subscription, of } from 'rxjs';
 
 @Component({
   selector: 'app-branch',
@@ -10,6 +12,7 @@ import { OrderMgrUiService } from 'ng-altea-common';
   styleUrls: ['./branch.component.scss']
 })
 export class BranchComponent implements OnInit {
+  auth: Auth = inject(Auth);
 
   branch: Branch
 
@@ -26,6 +29,9 @@ export class BranchComponent implements OnInit {
 
   }
 
+  appSignOut() {
+    return signOut(this.auth)
+  }
 
   async gotoBasket() {
     console.warn('gotoBasket')

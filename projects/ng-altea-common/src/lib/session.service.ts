@@ -38,7 +38,7 @@ export class SessionService implements OnInit {
   //public backend = "http://192.168.5.202:8080"
   //public backend = "https://altea-1.ew.r.appspot.com"
 
-  // public backend = "https://dvit-477c9.uc.r.appspot.com"
+  //public backend = "https://dvit-477c9.uc.r.appspot.com"
   public backend = "http://localhost:8080"
 
 
