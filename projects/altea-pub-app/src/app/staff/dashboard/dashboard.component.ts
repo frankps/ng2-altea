@@ -1,9 +1,10 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { Firestore, collection, collectionData, addDoc, CollectionReference, updateDoc, serverTimestamp, doc } from '@angular/fire/firestore';
+import { Firestore, collection, collectionData, addDoc, CollectionReference, updateDoc, serverTimestamp, doc, docData } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { ObjectHelper } from 'ts-common';
 import { instanceToPlain, plainToInstance } from "class-transformer";
 import { SessionService } from 'ng-altea-common';
+import { Task } from 'ts-altea-model';
 
 export class AppItem {
   uid = ObjectHelper.newSmallGuid()
@@ -16,10 +17,9 @@ export class AppItem {
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit {
-  private firestore: Firestore = inject(Firestore)
+  
+  task: Task
 
-  items$: Observable<any[]>;
-  itemCollection: CollectionReference;
 
   constructor(protected sessionSvc: SessionService) {
 
@@ -28,18 +28,27 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit() {
 
-    this.itemCollection = collection(this.firestore, 'branches', this.sessionSvc.branchId, 'updates')
 
-    this.items$ = collectionData(this.itemCollection);
-
-
-    this.items$.subscribe(item => {
-
-      console.warn('Update retrieved!')
-      console.warn(item)
-    })
 
   }
+
+
+  taskSelected(task: Task) {
+
+    this.task = task
+
+    console.error(task)
+
+  }
+
+
+/* 
+
+private firestore: Firestore = inject(Firestore)
+
+  items$: Observable<any[]>;
+  itemCollection: CollectionReference;
+
 
   async addItem() {
 
@@ -68,4 +77,7 @@ export class DashboardComponent implements OnInit {
 
     await updateDoc(docRef, { timestamp: ObjectHelper.newSmallGuid() })   // serverTimestamp()
   }
+ */
+
+
 }

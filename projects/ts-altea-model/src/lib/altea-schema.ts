@@ -3798,11 +3798,12 @@ export class Payment extends ObjectWithId {
 
 }
 
-
 export enum TaskSchedule {
   once = 'once',
   daily = 'daily',
+  twiceAWeek = 'twiceAWeek',
   weekly = 'weekly',
+  twiceAMonth = 'twiceAMonth',
   monthly = 'monthly',
   yearly = 'yearly'
 }
@@ -3810,7 +3811,8 @@ export enum TaskSchedule {
 export enum TaskStatus {
   todo = 'todo',
   progress = 'progress',
-  done = 'done'
+  done = 'done',
+  skip = 'skip'
 }
 
 export enum TaskPriority {
@@ -3842,6 +3844,9 @@ export class Task extends ObjectWithId {
 
   /* the staff member that executes/executed the task (never a resource group) */
   hrExecId?: string
+
+  /* the user */
+  userId?: string
 
   status = TaskStatus.todo
 

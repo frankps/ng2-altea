@@ -33,6 +33,7 @@ export class EditTaskComponent extends NgEditBaseComponent<Task> {
   recurringTaskForm: NgForm
   taskSchedule: Translation[] = []
   taskPriority: Translation[] = []
+  taskStatus: Translation[] = []
 
   @Output()
   change: EventEmitter<Task> = new EventEmitter<Task>()
@@ -58,18 +59,21 @@ export class EditTaskComponent extends NgEditBaseComponent<Task> {
       , taskSvc
       , route, spinner, dashboardSvc)
 
-    this.sectionProps.set('general', ['name', 'loc', 'info', 'prio', 'date', 'time', 'hrIds', 'schedule', 'cmt'])
+    this.sectionProps.set('general', ['name', 'loc', 'info', 'prio', 'date', 'time', 'hrIds', 'schedule', 'cmt', 'status'])
 
 
   }
 
   override async ngOnInit() {
-
+  
     super.ngOnInit()
     await this.translationSvc.translateEnum(TaskSchedule, 'enums.task-schedule.', this.taskSchedule)
     console.warn('taskPriority')
 
     await this.translationSvc.translateEnum(TaskPriority, 'enums.task-priority.', this.taskPriority, true)
+
+    await this.translationSvc.translateEnum(TaskStatus, 'enums.task-status.', this.taskStatus)
+
     await this.loadResources()
 
     /*     this.taskPriority.push(new Translation(0, "Nul"))

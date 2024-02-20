@@ -1,21 +1,34 @@
 <ul class="list-group">
-    <li class="list-group-item" *ngFor="let task of tasks">
+    <li class="list-group-item" *ngFor="let task of tasks" (click)="selectTask(task)">
 
 
-        <div class="row">
+        <ng-container *ngIf="task.id != selectedId">
 
-            <div class="col-6">{{task.name}}</div>
-            <div class="col-6"><span class="float-end">{{task.loc}}</span></div>
+            <div class="row">
 
-        </div>
-        <div class="row">
-            <div class="col">
-                {{task.info}}
+                <div class="col-6">{{task.name}}</div>
+                <div class="col-6"><span class="float-end">{{task.loc}}</span></div>
+
             </div>
-        </div>
+
+
+            <div class="row">
+                <div class="col">
+                    {{task.info}}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-6">{{task.status}}</div>
+            </div>
+
+        </ng-container>
+
+        <ng-container *ngIf="task.id == selectedId">
+
+            <app-task [task]="task" (close)="closeTask($event)"></app-task>
+
+        </ng-container>
 
     </li>
 </ul>
-
-
-

@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { ObjectWithId, BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, ApiBatchResult, DbQuery, ObjectHelper, ApiStatus, ConnectTo } from 'ts-common'
 import { instanceToPlain, plainToInstance } from "class-transformer";
 import { Observable, map, Subject, take } from "rxjs";
-import { Firestore, collection, collectionData, addDoc, CollectionReference, updateDoc, serverTimestamp, doc } from '@angular/fire/firestore';
+import { Firestore, collection, collectionData, addDoc, CollectionReference, updateDoc, serverTimestamp, doc, setDoc } from '@angular/fire/firestore';
 import { inject } from '@angular/core';
 
 export enum ObjectChangeType {
@@ -22,7 +22,15 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
 
   changes$: Subject<ObjectChange<T>> = new Subject<ObjectChange<T>>()
 
-  constructor(protected type: { new(): T; }, private host: string, private urlDifferentiator: string, private http: HttpClient, private firestoreUrl?: string) {
+  /**
+   * 
+   * @param type 
+   * @param host 
+   * @param urlDifferentiator 
+   * @param http 
+   * @param firestoreDocUrl the full path of a firestore document that will be updated whenever this object type is updated
+   */
+  constructor(protected type: { new(): T; }, private host: string, private urlDifferentiator: string, private http: HttpClient, private firestoreDocUrl?: string) {
     super()
   }
 
@@ -96,10 +104,10 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
 
   async updateFirestore() {
 
-    let path = ''
-  
-    const docRef = doc(this.firestore, this.firestoreUrl)   // 'branches/aqua/updates/task'
-    await updateDoc(docRef, { timestamp: serverTimestamp() })   
+    if (this.firestoreDocUrl) {
+      const docRef = doc(this.firestore, this.firestoreDocUrl)
+      await setDoc(docRef, { timestamp: serverTimestamp() })
+    }
   }
 
 

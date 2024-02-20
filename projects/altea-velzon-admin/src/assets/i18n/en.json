@@ -53,9 +53,17 @@
     "task-schedule": {
       "once": "Eénmalig",
       "daily": "Dagelijks",
+      "twiceAWeek": "Twee keer per week",
       "weekly": "Wekelijks",
+      "twiceAMonth": "Twee keer per maand",
       "monthly": "Maandelijks",
       "yearly": "Jaarlijks"
+    },
+    "task-status": {
+      "todo": "Todo",
+      "progress": "Gestart",
+      "done": "Gedaan",
+      "skip": "Overslaan"
     },
     "gift-type": {
       "amount": "Bedrag",
@@ -827,7 +835,8 @@
       "hrIds": "Uitvoerders",
       "schedule": "Frequentie",
       "prio": "Prioriteit",
-      "time": "Start op/vanaf"
+      "time": "Start op/vanaf",
+      "status": "Status"
     }
   },
   "HEADER": {

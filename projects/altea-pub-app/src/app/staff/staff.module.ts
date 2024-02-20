@@ -6,11 +6,13 @@ import { TasksComponent } from './tasks/tasks.component';
 import { NgAlteaCommonModule } from 'ng-altea-common';
 import { OrderMgrModule } from 'ng-altea-common';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { TaskComponent } from './task/task.component';
 
 @NgModule({
   declarations: [
     TasksComponent,
-    DashboardComponent
+    DashboardComponent,
+    TaskComponent
   ],
   imports: [
     CommonModule,
