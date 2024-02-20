@@ -27,6 +27,9 @@ import { initFirebaseBackend } from './velzon/authUtils';
 import { InterfaceModule, NgAlteaCommonModule } from 'ng-altea-common';
 import { OrderMgrModule } from 'ng-altea-common';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
+import { getAuth, provideAuth } from '@angular/fire/auth';
+import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 
 defineLocale('nl-be', nlBeLocale);
 
@@ -48,6 +51,9 @@ if (environment.defaultauth === 'firebase') {
     FeatherModule.pick(allIcons),
     HttpClientModule,
     BrowserAnimationsModule,
+    provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
+    provideAuth(() => getAuth()),
+    provideFirestore(() => getFirestore()),
 //    OrderMgrModule,
     NgxSpinnerModule,
     Bootstrap5Module,

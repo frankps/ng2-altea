@@ -6,6 +6,33 @@
 
 <ng-container *ngIf="object">
 
+    <ngx-altea-delete-modal #deleteModal objectType="task" [object]="object" [objectSvc]="taskSvc"
+    [config]="deleteConfig"></ngx-altea-delete-modal>
+
+  <div class="row">
+    <div class="col-9">
+      <h4>{{object.name}}</h4>
+    </div>
+    <div class="col-3">
+
+      <div class="d-inline-block float-end" ngbDropdown #myDrop="ngbDropdown">
+        <button type="button" class="btn btn-outline-primary me-2" id="dropdownManual" ngbDropdownAnchor
+          (focus)="myDrop.open()">
+          Acties
+        </button>
+        <div ngbDropdownMenu aria-labelledby="dropdownManual">
+          <button ngbDropdownItem (click)="delete()"><i class="fa-duotone fa-trash me-1"></i>
+            Verwijderen</button>
+        </div>
+      </div>
+
+
+    </div>
+
+  </div>
+
+
+
     <ngx-altea-form-card-section sectionName="ui.task.edit.sections.general.title" sectionId="general"
         [editSectionId]="editSectionId" (save)="save()" (cancel)="cancel()" (editModeChanged)="editModeChanged($event)"
         [enableSave]="!taskForm?.form.pristine && taskForm?.form.valid">

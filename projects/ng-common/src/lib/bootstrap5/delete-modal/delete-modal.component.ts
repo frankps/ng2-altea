@@ -3,7 +3,7 @@ import { NgxSpinnerService } from "ngx-spinner"
 import * as sc from 'stringcase'
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ApiStatus, ObjectWithId } from 'ts-common'
+import { ApiResult, ApiStatus, ObjectWithId } from 'ts-common'
 import { TranslationService } from '../../services/translation.service';
 import { BackendHttpServiceBase } from '../../services/backend-http-service-base';
 import { DashboardService } from '../../services/dashboard.service';
@@ -63,7 +63,17 @@ export class DeleteModalComponent {
 
   confirmDelete(modal: any) {
 
+    let me = this
+
     this.spinner.show()
+
+    this.objectSvc?.delete(this.object.id).subscribe(res => {
+      console.error(res)
+
+      me.postDelete(modal, res)
+    })
+
+    return
 
     const update = {
       id: this.object.id,
@@ -73,30 +83,7 @@ export class DeleteModalComponent {
 
     this.objectSvc?.update(update, true).subscribe(res => {
 
-      console.error(res)
-
-      this.spinner.hide()
-      if (res.status === ApiStatus.ok) {
-        let url //= this.config?.successUrl
-
-        if (this.dashboardSvc.isMobile && this.config?.successUrlMobile)
-          url = this.config?.successUrlMobile
-        else
-          url = this.config?.successUrl
-
-        if (url) {
-          console.error(url)
-          this.router.navigate([url])
-        }
-
-        this.deleted.emit(this.object)
-
-        modal.close()
-
-      } else {
-        this.error = true
-        this.errorMsg = res?.message
-      }
+      me.postDelete(modal, res)
 
 
 
@@ -106,6 +93,38 @@ export class DeleteModalComponent {
 
 
   }
+
+
+  postDelete(modal: any, res: ApiResult<any>) {
+
+    console.error(res)
+
+    this.spinner.hide()
+    if (res.status === ApiStatus.ok) {
+      let url //= this.config?.successUrl
+
+      if (this.dashboardSvc.isMobile && this.config?.successUrlMobile)
+        url = this.config?.successUrlMobile
+      else
+        url = this.config?.successUrl
+
+      if (url) {
+        console.error(url)
+        this.router.navigate([url])
+      }
+
+      this.deleted.emit(this.object)
+
+      modal.close()
+
+    } else {
+      this.error = true
+      this.errorMsg = res?.message
+    }
+
+
+  }
+
 
   cancelDelete(modal: any) {
 

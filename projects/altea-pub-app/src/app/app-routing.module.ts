@@ -6,9 +6,10 @@ import { authGuard } from './auth/auth.guard';
 // import { SignInComponent } from './auth/sign-in/sign-in.component';
 
 const routes: Routes = [
-  { path: "", component: MenuComponent },   // , canActivate: [ authGuard]
+ // { path: "", component: MenuComponent, canActivate: [ authGuard] },   // , canActivate: [ authGuard]
  // { path: "signIn", component: SignInComponent },
-  { path: 'branch', loadChildren: () => import('./branch/branch.module').then(m => m.BranchModule)  },   // , canActivate: [ authGuard]
+  { path: 'branch', loadChildren: () => import('./branch/branch.module').then(m => m.BranchModule), canActivate: [ authGuard]  },   // , canActivate: [ authGuard]
+  { path: 'staff', loadChildren: () => import('./staff/staff.module').then(m => m.StaffModule), canActivate: [ authGuard]  },
   { path: 'auth', loadChildren: () => import('./auth/auth.module').then(m => m.AuthModule)  },
 ];
 

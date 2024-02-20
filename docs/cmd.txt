@@ -45,11 +45,17 @@ ng generate module branch --project altea-pub-app --routing
 ng generate component branch/branch --project altea-pub-app
 ng generate component branch/pay-finished --project altea-pub-app
 
+ng generate component branch/tasks --project altea-pub-app
+ng generate component branch/task --project altea-pub-app
+
 ng generate module auth --project altea-pub-app --routing
 ng generate component auth/signIn --project altea-pub-app
 ng generate component auth/signOut --project altea-pub-app
 ng generate guard auth/auth --project altea-pub-app
 ng generate service auth/auth --project altea-pub-app
+
+ng generate module staff --project altea-pub-app --routing
+ng generate component staff/dashboard --project altea-pub-app
 
 ng generate component order-mgr/posPayment --project altea-velzon-admin
 ng generate component pos/posPayment --project ng-altea-common

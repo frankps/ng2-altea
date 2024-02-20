@@ -17,6 +17,7 @@ import { OrderComponent } from './branch/order/order.component';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { environment } from '../environments/environment';
+import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 // import { SignInComponent } from './auth/sign-in/sign-in.component';
 
 
@@ -37,6 +38,7 @@ export function createTranslateLoader(http: HttpClient): any {
     BrowserAnimationsModule,
     provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
     provideAuth(() => getAuth()),
+    provideFirestore(() => getFirestore()),
     NgxSpinnerModule,
     Bootstrap5Module,
     TranslateModule.forRoot({

@@ -10,7 +10,9 @@ import { SessionService } from './session.service';
 export class TaskService extends BackendHttpServiceBase<Task> {
 
   constructor(http: HttpClient, protected sessionSvc: SessionService) {
-    super(Task, sessionSvc.backend, sessionSvc.branchUnique + '/tasks', http)
+    super(Task, sessionSvc.backend, sessionSvc.branchUnique + '/tasks', http, `branches/${sessionSvc.branchUnique}/updates/task`)
   }
+
+  // 'branches/aqua/updates/task'
 
 }

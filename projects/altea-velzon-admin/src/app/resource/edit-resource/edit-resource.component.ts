@@ -217,7 +217,7 @@ export class EditResourceComponent extends NgEditBaseComponent<Resource> impleme
 
     })
   }
-
+  
   save() {
 
     console.error(this.editSectionId)

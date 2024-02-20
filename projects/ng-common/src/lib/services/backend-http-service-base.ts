@@ -2,25 +2,27 @@ import { HttpClient } from '@angular/common/http';
 import { ObjectWithId, BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, ApiBatchResult, DbQuery, ObjectHelper, ApiStatus, ConnectTo } from 'ts-common'
 import { instanceToPlain, plainToInstance } from "class-transformer";
 import { Observable, map, Subject, take } from "rxjs";
-
+import { Firestore, collection, collectionData, addDoc, CollectionReference, updateDoc, serverTimestamp, doc } from '@angular/fire/firestore';
+import { inject } from '@angular/core';
 
 export enum ObjectChangeType {
   create = 'create',
-  update = 'update', 
+  update = 'update',
   delete = 'delete'
 }
 
 export class ObjectChange<T> {
-  constructor(public object: T, public change: ObjectChangeType) {}
+  constructor(public object: T, public change: ObjectChangeType) { }
 }
 
 
 
 export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServiceBase<T> {   //  extends BaseObject
+  private firestore: Firestore = inject(Firestore)
 
   changes$: Subject<ObjectChange<T>> = new Subject<ObjectChange<T>>()
 
-  constructor(protected type: { new(): T; }, private host: string, private urlDifferentiator: string, private http: HttpClient) {
+  constructor(protected type: { new(): T; }, private host: string, private urlDifferentiator: string, private http: HttpClient, private firestoreUrl?: string) {
     super()
   }
 
@@ -80,7 +82,9 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
       if (res && res.status === ApiStatus.ok) {
         console.warn('triggering changes$ !')
 
-        this.changes$.next(new ObjectChange(object, isSoftDelete?ObjectChangeType.delete: ObjectChangeType.update))
+        this.changes$.next(new ObjectChange(object, isSoftDelete ? ObjectChangeType.delete : ObjectChangeType.update))
+
+        this.updateFirestore()
       }
 
       return res
@@ -88,6 +92,17 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
 
     return observ
   }
+
+
+  async updateFirestore() {
+
+    let path = ''
+  
+    const docRef = doc(this.firestore, this.firestoreUrl)   // 'branches/aqua/updates/task'
+    await updateDoc(docRef, { timestamp: serverTimestamp() })   
+  }
+
+
 
   update$(object: any): Promise<ApiResult<T>> {
 
@@ -215,6 +230,17 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
 
     })
 
+  }
+
+
+  async queryFirst$(query: DbQuery): Promise<T> {
+
+    let res = await this.query$(query)
+
+    if (res?.length > 0)
+      return res[0]
+    else
+      return undefined
   }
 
 

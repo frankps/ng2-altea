@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { OrderMgrUiService } from 'ng-altea-common';
 import { Auth, GoogleAuthProvider, signInWithRedirect, signInWithPopup, user, User, signOut } from '@angular/fire/auth';
 import { Subscription, of } from 'rxjs';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-branch',
@@ -16,7 +17,7 @@ export class BranchComponent implements OnInit {
 
   branch: Branch
 
-  constructor(protected sessionSvc: SessionService, protected router: Router,  protected orderMgrSvc: OrderMgrUiService) {
+  constructor(protected sessionSvc: SessionService, protected router: Router,  protected orderMgrSvc: OrderMgrUiService, protected authSvc: AuthService) {
 
   }
 

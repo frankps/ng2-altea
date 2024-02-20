@@ -8,6 +8,8 @@ import { BuyGiftComponent } from './buy-gift/buy-gift.component';
 import { PayFinishedComponent } from './pay-finished/pay-finished.component';
 import { PayOnlineComponent } from './pay-online/pay-online.component';
 
+import { TaskComponent } from './task/task.component';
+
 const routes: Routes = [{
   path: ':branch', component: BranchComponent,
   children: [
@@ -17,6 +19,8 @@ const routes: Routes = [{
     { path: "buy-gift", component: BuyGiftComponent },
     { path: "pay-online", component: PayOnlineComponent },
     { path: "pay-finished", component: PayFinishedComponent },
+
+    { path: "task", component: TaskComponent },
   ]
 }]
 

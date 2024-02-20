@@ -499,6 +499,10 @@
       "demo-orders": {
         "h1": "Demo order",
         "inf": "Om snel te testen"
+      },
+      "tasks": {
+        "h1": "Taken",
+        "inf": "Overzicht taken"
       }
     },
     "gift": {
@@ -816,6 +820,7 @@
       "contact": "Klant"
     },
     "task": {
+      "article": "de",
       "name": "Taaknaam",
       "loc": "Locatie",
       "info": "Extra info",

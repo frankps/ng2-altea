@@ -12,6 +12,8 @@ import { BuyGiftComponent } from './buy-gift/buy-gift.component';
 import { PayOnlineComponent } from './pay-online/pay-online.component';
 import { PayFinishedComponent } from './pay-finished/pay-finished.component';
 
+import { TaskComponent } from './task/task.component';
+
 @NgModule({
   declarations: [
     BranchComponent,
@@ -20,7 +22,9 @@ import { PayFinishedComponent } from './pay-finished/pay-finished.component';
     UseGiftComponent,
     BuyGiftComponent,
     PayOnlineComponent,
-    PayFinishedComponent
+    PayFinishedComponent,
+
+    TaskComponent
   ],
   imports: [
     CommonModule,

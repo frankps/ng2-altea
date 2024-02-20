@@ -230,6 +230,10 @@
     }
   },
   "ui": {
+    "search-user": {
+      "search": "Zoek gebruiker",
+      "link": "Link"
+    },
     "task": {
       "edit": {
         "sections": {
@@ -302,7 +306,7 @@
           }
         }
       }
-    },
+    },   
     "order": {
       "search-type-select": {
         "appointmentsOn": "Afspraken op",
@@ -314,6 +318,15 @@
       } 
     },
     "order-mgr": {
+      "pos": {
+        "menu": {
+          "compose": "Samenstellen",
+          "plan": "Plannen",
+          "contact": "Klant",
+          "pay": "Betalen"
+        }
+
+      },
       "order": {
         "add-product": "Dienst of product toevoegen",
         "empty": "Nog geen diensten of producten geselecteerd..."
@@ -486,6 +499,10 @@
       "demo-orders": {
         "h1": "Demo order",
         "inf": "Om snel te testen"
+      },
+      "tasks": {
+        "h1": "Taken",
+        "inf": "Overzicht taken"
       }
     },
     "gift": {
@@ -661,6 +678,7 @@
       "isGroup": "Groep",
       "customSchedule": "Aangepast uurrooster",
       "online": "Klanten kunnen deze persoon selecteren",
+      "user": "Gelinkt met gebruiker",
       "help": {
         "device-name": "De naam van het toestel",
         "group-name": "De naam van de groep",
@@ -691,6 +709,14 @@
       "personSelect": "Selecteer personen",
       "staffSelect": "Selecteer specialistes",
       "planMode": "Planning mode",
+      "types": {
+        "product": {
+          "bundle": "Bevat andere producten"
+        },
+        "service": {
+          "bundle": "Arrangement"
+        }
+      },
       "help": {
         "short": "Wordt getoond in product overzichten (menu's & zoekopdracheten) ",
         "customers": "Aantal klanten dat gelijktijdig wordt bediend",
@@ -734,6 +760,8 @@
       "scheduleIds": "Operationele modi (optioneel)",
       "groupQty": "Aantal resources",
       "groupAlloc": "Reserveren op groep",
+      "prep": "Is voorbereidings- of opkuistijd",
+      "prepOverlap": "Voorbereiding & opkuis overlappen elkaar",
       "help": {
         "offset": "Je kan ervoor kiezen om de bezetting van deze resource niet exact te laten aanvangen vanaf het begin of einde (bovenstaande keuze), maar wel met een correctie (in minuten)",
         "duration": "Gedurende deze tijd (minuten) wordt de resource bezet gehouden",
@@ -776,7 +804,8 @@
     },
     "schedule": {
       "name": "Naam",
-      "default": "Standaard"
+      "default": "Standaard",
+      "prepIncl": "Voorbereidings- en opkuistijden vallen altijd binnen deze planning"
     },
     "scheduling": {
       "start": "Actief vanaf",
@@ -819,10 +848,8 @@
     "catalog": {
       "label": "Catalogus",
       "sub": {
-        "product": "Producten",
-        "service": "Diensten",
-        "bundle": "Arrangementen",
-        "subscription": "Abonnementen"
+        "prod": "Producten",
+        "svc": "Diensten"
       }
     },
     "templates": {

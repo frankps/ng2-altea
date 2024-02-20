@@ -21,6 +21,7 @@ import { AlteaDb, TaskSchedulingService } from 'ts-altea-logic'
 })
 export class EditTaskComponent extends NgEditBaseComponent<Task> {
 
+  @ViewChild('deleteModal') public deleteModal: DeleteModalComponent;
 
   recurTask: Task = new Task()
   css_cls_row = 'mt-3'
@@ -39,6 +40,12 @@ export class EditTaskComponent extends NgEditBaseComponent<Task> {
   resources: Resource[] = []
 
   hrNames: string
+
+  deleteConfig = {
+    successUrl: '',
+    successUrlMobile: ''
+    // get successUrl() { return '/aqua/resources' + }
+  }
 
   /* 	constructor(protected translationSvc: TranslationService, protected resourceSvc: ResourceService) {
   
@@ -166,6 +173,15 @@ export class EditTaskComponent extends NgEditBaseComponent<Task> {
     svc.instantiateRecurringTasks()
 
 
+  }
+
+
+  delete() {
+    console.error('new delete')
+
+    this.deleteConfig.successUrl = '/aqua/tasks/' 
+    this.deleteConfig.successUrlMobile = '/aqua/tasks/' 
+    this.deleteModal?.delete()
   }
 
   /*   save(recurTask) {

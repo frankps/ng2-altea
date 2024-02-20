@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { TranslationService } from 'ng-common'
 import { SessionService } from '../../session.service';
 import { Branch } from 'ts-altea-model';
@@ -22,32 +22,7 @@ export class MainMenuComponent implements OnInit {
 
   @Output() select: EventEmitter<MenuItem> = new EventEmitter();
 
-
-  menu = [
-    {
-      code: 'new-reserv'
-    },
-    {
-      code: 'use-gift'
-    },
-    {
-      code: 'buy-gift'
-    },
-    {
-      code: 'demo-orders'
-    }
-
-    /*
-    {
-      code: 'my-reservs'
-    },
-    {
-      code: 'my-subs'
-    },
-    {
-      code: 'my-loyalty'
-    } */
-  ]
+  @Input() menu = []
 
   constructor(protected translationSvc: TranslationService, protected sessionSvc: SessionService) {
 

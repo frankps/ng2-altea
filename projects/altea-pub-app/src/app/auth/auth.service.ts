@@ -2,8 +2,8 @@ import { Injectable, inject } from '@angular/core';
 import { Subscription, of } from 'rxjs';
 import { Auth, GoogleAuthProvider, signInWithRedirect, signInWithPopup, user, User, authState } from '@angular/fire/auth';
 import { ActivatedRoute, Router } from '@angular/router';
-import { UserService } from 'ng-altea-common';
-import * as altea  from 'ts-altea-model';
+import { ResourceService, UserService } from 'ng-altea-common';
+import * as altea from 'ts-altea-model';
 import { DbQuery, QueryOperator } from 'ts-common';
 
 @Injectable({
@@ -13,13 +13,24 @@ export class AuthService {
   auth: Auth = inject(Auth);
   authState$ = authState(this.auth);
 
-  user$ = user(this.auth);
-  user
+  fbUser$ = user(this.auth);
+  fbUser
+
+  user: altea.User
+
+  /**
+   *  if user is also a humlan resource
+   */
+  resource: altea.Resource
+
+  /** resource id of human resource + all ids of resource groups it belongs to */
+  resourceIds: string[] = []
+
 
   userSubscription: Subscription;
   authStateSubscription: Subscription;
 
-  constructor(protected router: Router, protected userSvc: UserService) {
+  constructor(protected router: Router, protected userSvc: UserService, protected resourceSvc: ResourceService) {
 
   }
 
@@ -27,39 +38,35 @@ export class AuthService {
   init() {
 
     // https://github.com/angular/angularfire/blob/HEAD/docs/auth.md#authentication
-    /*
-    this.userSubscription = this.user$.subscribe((aUser: User | null) => {
-      //handle user state changes here. Note, that user will be null if there is no currently logged in user.
-      //console.warn(aUser);
-      console.error('user$ CHANGES')
-      console.log(aUser);
-      this.user = aUser
-    }) */
-
 
     this.authStateSubscription = this.authState$.subscribe(async (aUser: User | null) => {
       //handle auth state changes here. Note, that user will be null if there is no currently logged in user.
       console.error('authState$ CHANGES')
       console.log(aUser);
 
-      this.user = aUser
+      this.fbUser = aUser
 
 
       if (aUser) {
 
-        let alteaUser = await this.userSvc.getByUid(aUser.uid)
+        this.user = await this.userSvc.getByUid(aUser.uid)
 
-        if (!alteaUser) {
-          alteaUser = await this.createUser$(aUser)
+        if (!this.user) {
+          this.user = await this.createUser$(aUser)
           console.log('User NOT found!')
-          console.warn(alteaUser)
+          console.warn(this.user)
         } else {
           console.log('User found!')
-          console.warn(alteaUser)
+          console.warn(this.user)
         }
-          
+
+        await this.loadResources(this.user.id)
+
+
         console.error('forwarding user!')
-        this.router.navigate(['branch', 'aqua', 'menu'])
+        //   this.router.navigate(['branch', 'aqua', 'menu'])
+        this.router.navigate(['staff', 'dashboard'])
+
       } else {
         this.router.navigate(['auth', 'sign-in'])
       }
@@ -67,11 +74,7 @@ export class AuthService {
 
   }
 
-
-
-
-
-  async createUser$(firebaseUser: User) : Promise<altea.User> {
+  async createUser$(firebaseUser: User): Promise<altea.User> {
 
     let user = new altea.User()
 
@@ -86,6 +89,34 @@ export class AuthService {
     console.error(res)
     return res.object
   }
+
+
+  async loadResources(userId: string) {
+
+    console.warn('Load resources')
+
+    const query = new DbQuery()
+    //  query.select('id', 'name')
+    query.and('userId', QueryOperator.equals, userId)
+    query.include('groups')
+
+    this.resource = await this.resourceSvc.queryFirst$(query)
+
+    this.resourceIds = []
+
+    if (this.resource) {
+
+      if (Array.isArray(this.resource.groups))
+        this.resourceIds = this.resource.groups.map(lnk => lnk.groupId)
+
+      this.resourceIds.push(this.resource.id)
+    }
+
+    console.warn('resourceIds:', this.resourceIds)
+
+  }
+
+
 
 
 

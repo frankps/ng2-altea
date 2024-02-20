@@ -9,6 +9,36 @@ import { OrderMgrUiService, OrderUiMode, OrderUiState, SessionService } from 'ng
 })
 export class MenuComponent {
 
+
+  menu = [
+    {
+      code: 'tasks'
+    },
+    {
+      code: 'new-reserv'
+    },
+    {
+      code: 'use-gift'
+    },
+    {
+      code: 'buy-gift'
+    },
+    {
+      code: 'demo-orders'
+    }
+
+    /*
+    {
+      code: 'my-reservs'
+    },
+    {
+      code: 'my-subs'
+    },
+    {
+      code: 'my-loyalty'
+    } */
+  ]
+
   constructor(protected sessionSvc: SessionService, protected router: Router, protected orderMgrSvc: OrderMgrUiService) { }
 
 
@@ -30,13 +60,13 @@ export class MenuComponent {
         this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'order'])
         break
 
-      case 'use-gift':
+/*       case 'use-gift':
         this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'use-gift'])
         break
 
       case 'buy-gift':
         this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'buy-gift'])
-        break
+        break */
 
       case 'demo-orders':
 
@@ -44,6 +74,9 @@ export class MenuComponent {
         this.orderMgrSvc.changeUiState(OrderUiState.demoOrders)
         this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'order'])
         break
+
+      default:
+        this.router.navigate(['/branch', this.sessionSvc.branchUnique, menuItem.code])
 
     }
 
