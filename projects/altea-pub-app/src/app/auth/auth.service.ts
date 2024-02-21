@@ -17,11 +17,13 @@ export class AuthService {
   fbUser
 
   user: altea.User
+  userId: string
 
   /**
-   *  if user is also a humlan resource
+   *  if user is also a human resource
    */
   resource: altea.Resource
+  resourceId: string
 
   /** resource id of human resource + all ids of resource groups it belongs to */
   resourceIds: string[] = []
@@ -59,6 +61,8 @@ export class AuthService {
           console.log('User found!')
           console.warn(this.user)
         }
+
+        this.userId = this.user.id
 
         await this.loadResources(this.user.id)
 
@@ -102,9 +106,13 @@ export class AuthService {
 
     this.resource = await this.resourceSvc.queryFirst$(query)
 
+    console.warn(this.resource)
+
     this.resourceIds = []
 
     if (this.resource) {
+
+      this.resourceId = this.resource.id
 
       if (Array.isArray(this.resource.groups))
         this.resourceIds = this.resource.groups.map(lnk => lnk.groupId)

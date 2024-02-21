@@ -1,23 +1,19 @@
-<div class="mb-3" *ngIf="task && show">
+<div class="" *ngIf="task && show">
 
-    <div class="row">
+<!--     <div class="row">
         <div class="col">{{task.name}}</div>
     </div>
     <div class="row">
         <div class="col" *ngIf="task.loc">{{task.loc}}</div>
-    </div>
-
-    <div class="row">
-        <div class="col-6">{{task.status}}</div>
-    </div>
+    </div> -->
 
     <div class="row">
 
-        <div class="col d-flex justify-content-center">
+        <div class="col d-flex justify-content-center my-3">
 
             <div class="btn-group" role="group" aria-label="Basic example">
                 <button type="button" class="btn btn-outline-primary" (click)="closeTask($event)">Sluiten</button>
-                <button type="button" class="btn btn-outline-primary" (click)="changeStatus(TaskStatus.skip)">Reeds in orde</button>
+                <button type="button" class="btn btn-outline-primary" (click)="changeStatus(TaskStatus.progress)">Bezig</button>
                 <button type="button" class="btn btn-primary" (click)="changeStatus(TaskStatus.done)">Gedaan</button>
             </div>
         </div>

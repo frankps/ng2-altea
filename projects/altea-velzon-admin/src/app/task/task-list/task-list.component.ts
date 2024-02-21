@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Product, ProductType, ProductTypeIcons, ResourceTypeIcons, Resource, ResourceType, Task, TaskSchedule } from 'ts-altea-model'
+import { Product, ProductType, ProductTypeIcons, ResourceTypeIcons, Resource, ResourceType, Task, TaskSchedule, TaskStatus } from 'ts-altea-model'
 import { ApiListResult, DbQuery, QueryOperator, Translation, ApiResult, ApiStatus, ObjectWithId } from 'ts-common'
 import { ProductService, ResourceService, SessionService, TaskService } from 'ng-altea-common'
 import { Observable, take, takeUntil } from 'rxjs';
@@ -20,15 +20,17 @@ export class TaskListComponent extends NgBaseListComponent<Task> implements OnIn
   css_cls_row = 'mt-3'
   searchFor: Task = new Task()
   taskSchedule: Translation[] = []
+  taskStatus: Translation[] = []
   initialized = false
 
   constructor(objectSvc: TaskService, private translationSvc: TranslationService,
     dashboardSvc: DashboardService,
     private modalService: NgbModal, protected route: ActivatedRoute, router: Router, spinner: NgxSpinnerService, protected sessionSvc: SessionService) {
-    super(['name', 'prio', 'schedule'], { searchEnabled: true, addEnabled: true, path: 'tasks' }
+    super(['name', 'prio', 'schedule', 'loc'], { searchEnabled: true, addEnabled: true, path: 'tasks' }
       , objectSvc, dashboardSvc, spinner, router)
 
     this.searchFor.schedule = undefined
+    this.searchFor.status = undefined
   }
 
   override ngOnDestroy() {
@@ -41,6 +43,7 @@ export class TaskListComponent extends NgBaseListComponent<Task> implements OnIn
 
     this.getListObjects()
     await this.translationSvc.translateEnum(TaskSchedule, 'enums.task-schedule.', this.taskSchedule)
+    await this.translationSvc.translateEnum(TaskStatus, 'enums.task-status.', this.taskStatus)
 
     this.initialized = true
   }
@@ -76,7 +79,12 @@ export class TaskListComponent extends NgBaseListComponent<Task> implements OnIn
     if (this.searchFor.schedule)
       query.and('schedule', QueryOperator.equals, this.searchFor.schedule)
 
+    if (this.searchFor.status)
+      query.and('status', QueryOperator.equals, this.searchFor.status)
+
     query.and('active', QueryOperator.equals, true)
+
+    query.orderBy('loc').orderBy('name')
 
     return query
   }

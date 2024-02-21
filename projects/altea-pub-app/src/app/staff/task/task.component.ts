@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { TaskService } from 'ng-altea-common';
 import { Task, TaskStatus } from 'ts-altea-model';
 import { ApiStatus } from 'ts-common';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-task',
@@ -18,18 +19,18 @@ export class TaskComponent {
 
   errorMsg?: string
 
-  constructor(protected taskSvc: TaskService) {
+  constructor(protected taskSvc: TaskService, protected auth: AuthService) {
   }
 
   closeTask(event?: any) {
 
     if (event)
       event.stopPropagation();
-    
-      this.show = false
+
+    this.show = false
     this.close.emit(this.task)
   }
-
+// 11f462c2-838b-4196-9b4d-3b79d7fdf5ae
   async changeStatus(newStatus: TaskStatus) {
 
     this.task.status = newStatus
@@ -38,13 +39,22 @@ export class TaskComponent {
     update['id'] = this.task.id
     update['status'] = newStatus
 
+    if (newStatus == TaskStatus.progress)
+      update['startedAt'] = new Date()
+
+    if (newStatus == TaskStatus.done || newStatus == TaskStatus.skip)
+      update['finishedAt'] = new Date()
+
+    update['hrExecId'] = this.auth.resourceId
+    update['userId'] = this.auth.userId
+
     const res = await this.taskSvc.update$(update)
 
     if (res.status == ApiStatus.ok) {
       this.closeTask()
       return
     }
-    
+
     this.errorMsg = res.message
     console.error(res)
   }

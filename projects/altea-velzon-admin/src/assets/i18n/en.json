@@ -52,12 +52,12 @@
     },
     "task-schedule": {
       "once": "Eénmalig",
-      "daily": "Dagelijks",
-      "twiceAWeek": "Twee keer per week",
-      "weekly": "Wekelijks",
-      "twiceAMonth": "Twee keer per maand",
-      "monthly": "Maandelijks",
-      "yearly": "Jaarlijks"
+      "daily": "Dag",
+      "twiceAWeek": "2/Week",
+      "weekly": "Week",
+      "twiceAMonth": "2/Maand",
+      "monthly": "Maand",
+      "yearly": "Jaar"
     },
     "task-status": {
       "todo": "Todo",

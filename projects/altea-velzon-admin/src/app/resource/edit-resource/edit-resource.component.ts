@@ -217,7 +217,7 @@ export class EditResourceComponent extends NgEditBaseComponent<Resource> impleme
 
     })
   }
-  
+
   save() {
 
     console.error(this.editSectionId)
@@ -257,6 +257,16 @@ export class EditResourceComponent extends NgEditBaseComponent<Resource> impleme
 
   }
 
+
+  unlinkUser() {
+
+    if (this.object.userId) {
+      this.object.userId = null
+      this.object.user = null
+      this.resourceGeneralForm.form.markAsDirty()
+    }
+
+  }
 
 
 

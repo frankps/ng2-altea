@@ -11,8 +11,25 @@ export enum ObjectChangeType {
   delete = 'delete'
 }
 
-export class ObjectChange<T> {
-  constructor(public object: T, public change: ObjectChangeType) { }
+export class ObjectChange<T extends ObjectWithId> {
+  constructor(public object: T | string, public change: ObjectChangeType) { }
+
+  objectId(): string {
+
+    if (!this.object)
+      return undefined
+
+    if (typeof this.object == 'string')
+      return this.object
+
+    return this.object.id
+  }
+
+  obj(): T {
+    return this.object as T
+  }
+
+
 }
 
 
@@ -174,13 +191,21 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
 
 
   delete(objectId: string): Observable<ApiResult<any>> {
-    return this.http.delete<any>(`${this.host}/${this.urlDifferentiator}/${objectId}`)
+    const res = this.http.delete<any>(`${this.host}/${this.urlDifferentiator}/${objectId}`)
+
+    this.changes$.next(new ObjectChange<T>(objectId, ObjectChangeType.delete))
+
+    return res
   }
 
   create(object: any): Observable<ApiResult<T>> {
     return this.http.post<any>(`${this.host}/${this.urlDifferentiator}`, object).pipe(map(res => {
       if (res.object)
         res.object = plainToInstance(this.type, res.object)
+
+      if (res.status == ApiStatus.ok)
+        this.changes$.next(new ObjectChange(res.object, ObjectChangeType.create))
+
       return res
     }
     ))

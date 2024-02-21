@@ -37,9 +37,9 @@ export class AlteaDb {
             //l.product = undefinedf
         })
 
-/*         orderClone.info = undefined
-        orderClone.persons = undefined
- */
+        /*         orderClone.info = undefined
+                orderClone.persons = undefined
+         */
         console.log(orderClone)
 
         // const orderDb = orderClone.asDbObject()
@@ -211,7 +211,7 @@ export class AlteaDb {
         qry.and('active', QueryOperator.equals, true)
 
         qry.or('resourceId', QueryOperator.in, resourceIds)
-       // qry.or('default', QueryOperator.equals, true)
+        // qry.or('default', QueryOperator.equals, true)
 
         if (Array.isArray(includes) && includes.length > 0)
             qry.include(...includes)
@@ -239,16 +239,16 @@ export class AlteaDb {
         return tasks
     }
 
-    async getTasksToDoORFinishedAfter(recurringTaskIds: string [], finishedAfter: Date): Promise<Task[]> {
-  
+    async getTasksToDoORFinishedAfter(recurringTaskIds: string[], finishedAfter: Date): Promise<Task[]> {
+
         const qry = new DbQueryTyped<Task>('task', Task)
 
         qry.select('id', 'rTaskId', 'status', 'finishedAt')
         qry.and('rTaskId', QueryOperator.in, recurringTaskIds)
 
-      //  qry.and('finishedAt', QueryOperator.greaterThan, finishedAfter)
+        //  qry.and('finishedAt', QueryOperator.greaterThan, finishedAfter)
 
-        qry.or('status', QueryOperator.equals, TaskStatus.todo)
+        qry.or('status', QueryOperator.in, [TaskStatus.todo, TaskStatus.progress])
         qry.or('finishedAt', QueryOperator.greaterThan, finishedAfter)
 
         const tasks = await this.db.query$<Task>(qry)

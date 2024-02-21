@@ -97,7 +97,7 @@ export abstract class NgEditBaseComponent<T extends ObjectWithId> extends NgSect
         
         this.route.params.subscribe(params => {
             
-            console.error('edit-product')
+            console.error('route.params triggered')
 
             console.error(params)
 
@@ -111,6 +111,8 @@ export abstract class NgEditBaseComponent<T extends ObjectWithId> extends NgSect
                     this.isNew = true
                     this.object = new this.type
                     this.initNewObject(this.object)
+
+                    this.editSectionId = 'general'
 
                     console.error('new object', this.object)
                 } else {

@@ -34,10 +34,13 @@ export class TaskSchedulingService {
 
             const newRecurTaskInstances: Task[] = []
 
+            let newDayTasks = await this.tasksToPerformForPeriod(recurTasks, TaskSchedule.daily)
+            let newTwiceAWeekTasks = await this.tasksToPerformForPeriod(recurTasks, TaskSchedule.twiceAWeek)
             let newWeekTasks = await this.tasksToPerformForPeriod(recurTasks, TaskSchedule.weekly)
+            let newMonthTasks = await this.tasksToPerformForPeriod(recurTasks, TaskSchedule.monthly)
 
-            if (Array.isArray(newWeekTasks) && newWeekTasks.length >= 0)
-                newRecurTaskInstances.push(...newWeekTasks)
+            // if (Array.isArray(newWeekTasks) && newWeekTasks.length >= 0)
+            newRecurTaskInstances.push(...newDayTasks, ...newTwiceAWeekTasks, ...newWeekTasks, ...newMonthTasks)
 
             // still to do: days, months
 
@@ -75,6 +78,10 @@ export class TaskSchedulingService {
     async tasksToPerformForPeriod(recurTasks: Task[], schedule: TaskSchedule): Promise<Task[]> {
 
         const periodTasks = recurTasks.filter(t => t.schedule == schedule)
+
+        if (!Array.isArray(periodTasks) || periodTasks.length == 0)
+            return []
+
         const periodTaskIds = periodTasks.map(task => task.id)
 
         let finishedAfter = new Date()
@@ -83,8 +90,14 @@ export class TaskSchedulingService {
             case TaskSchedule.daily:
                 finishedAfter = dateFns.addDays(finishedAfter, -1)
                 break
+            case TaskSchedule.twiceAWeek:
+                finishedAfter = dateFns.addDays(finishedAfter, -3)
+                break
             case TaskSchedule.weekly:
                 finishedAfter = dateFns.addWeeks(finishedAfter, -1)
+                break
+            case TaskSchedule.twiceAMonth:
+                finishedAfter = dateFns.addWeeks(finishedAfter, -2)
                 break
             case TaskSchedule.monthly:
                 finishedAfter = dateFns.addMonths(finishedAfter, -1)
@@ -102,14 +115,14 @@ export class TaskSchedulingService {
         const tasksForPeriod = await this.alteaDb.getTasksToDoORFinishedAfter(periodTaskIds, finishedAfter)
 
         // finished tasks within period (=> it's ok, task is finished for period => no need to recreate at this moment)
-        const finishedTasks = tasksForPeriod.filter(t => t.status == TaskStatus.done)
+        const finishedTasks = tasksForPeriod.filter(t => t.status == TaskStatus.done || t.status == TaskStatus.skip)  
         const finishedPeriodTaskIds = finishedTasks.map(t => t.rTaskId)
 
         // still open tasks waiting for completion (=> also no need to recreate, already existing)
-        const existingToDos = tasksForPeriod.filter(t => t.status == TaskStatus.todo)
+        const existingToDos = tasksForPeriod.filter(t => t.status == TaskStatus.todo || t.status == TaskStatus.progress)
         const existingToDoIds = existingToDos.map(t => t.rTaskId)
 
-        // from all recuriing tasks for period, remove the 2 sets above => we only need to recreate the resulting set 
+        // from all recurring tasks for period, remove the 2 sets above => we only need to recreate the resulting set 
         let toDoPeriodTaskIds = _.difference(periodTaskIds, finishedPeriodTaskIds)
         toDoPeriodTaskIds = _.difference(toDoPeriodTaskIds, existingToDoIds)
 

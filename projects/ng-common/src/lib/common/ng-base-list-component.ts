@@ -12,7 +12,7 @@ export class NgBaseListConfig {
     public searchEnabled = false
     public addEnabled = false
     public path = ''
-    public pathIdPrefix?= ''
+    public pathIdPrefix? = ''
 
     /** path used to navigate from list to edit object */
 
@@ -73,11 +73,11 @@ export abstract class NgBaseListComponent<T extends ObjectWithId> extends NgBase
     }
 
     search(searchFor?: string) {
-/* 
-        if (!searchFor) {
-            this.getListObjects()
-            return
-        } */
+        /* 
+                if (!searchFor) {
+                    this.getListObjects()
+                    return
+                } */
 
         this.objects$ = null
         const query = this.getSearchDbQuery(searchFor)
@@ -165,21 +165,41 @@ export abstract class NgBaseListComponent<T extends ObjectWithId> extends NgBase
 
             console.error(change)
 
-            const changedObject = change.object
+
+            const objectId = change.objectId()
+
 
             // remove item from list (when doing soft delete)
-            if (change.change == ObjectChangeType.delete) {
+            if (change.change == ObjectChangeType.delete && objectId) {
                 console.warn(this.objects)
-                const res = _.remove(this.objects, o => o.id == changedObject.id)
-                this.objects = [ ... this.objects ]
+
+                const res = _.remove(this.objects, o => o.id == objectId)
+                this.objects = [... this.objects]
                 console.warn(this.objects)
                 console.error(res)
                 return
             }
 
+            switch (change.change) {
+
+                case ObjectChangeType.create:
+                    const newObject = change.obj()
+
+                    if (!newObject)
+                        break
+
+                    this.objects = [... this.objects, newObject]
+                    break
+
+
+            }
+
+
+            const changedObject = change.object
+
             // update visible properties in the list
-            if (this.visiblePropertyChanged(changedObject)) {
-                const object: any = this.objects.find(o => o.id == changedObject.id)
+            if (changedObject && this.visiblePropertyChanged(changedObject)) {
+                const object: any = this.objects.find(o => o.id == objectId)
 
                 console.warn(object)
                 if (!object)
@@ -187,7 +207,6 @@ export abstract class NgBaseListComponent<T extends ObjectWithId> extends NgBase
 
                 for (const prop of this.visibleProperties) {
                     if (changedObject[prop]) {
-                        //console.warn('&&&& Property update:', prop, change[prop])
 
                         object[prop] = changedObject[prop]
                     }

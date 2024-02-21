@@ -26,7 +26,7 @@
   </div>
 
 
-  
+
   <ngx-altea-form-card-section sectionName="ui.resource.edit.sections.general.title" sectionId="general"
     [editSectionId]="editSectionId" [icon]="ResourceTypeIcons[object.type]" (save)="save()" (cancel)="cancel()"
     (editModeChanged)="editModeChanged($event)"
@@ -48,7 +48,7 @@
         [value]="object.endDate"></ngx-altea-label-value>
 
 
-      <ngx-altea-label-value label="objects.resource.user"  *ngIf="object.user"
+      <ngx-altea-label-value label="objects.resource.user" *ngIf="object.user"
         [value]="object.user.provEmail"></ngx-altea-label-value>
 
 
@@ -206,6 +206,15 @@
 
         </div>
 
+        <div class="row mt-3" *ngIf="object.user">
+
+          <div class="col-6">
+            {{object.user.provEmail}} <i class="fa-solid fa-link-slash" (click)="unlinkUser()"></i>
+
+
+          </div>
+
+        </div>
 
         <ngx-altea-resource-user-link (select)="linkUserToResource($event)"></ngx-altea-resource-user-link>
 

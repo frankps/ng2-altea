@@ -14,6 +14,7 @@ import { Firestore, collection, collectionData, addDoc, CollectionReference, upd
 export class TasksComponent implements OnInit {
   private firestore: Firestore = inject(Firestore)
 
+  TaskStatus = TaskStatus
   @Output() select: EventEmitter<Task> = new EventEmitter<Task>()
 
   resourceIds: string[]
@@ -57,7 +58,9 @@ export class TasksComponent implements OnInit {
     const query = new DbQuery()
     query.and('hrIds', QueryOperator.hasSome, this.resourceIds)
     query.and('schedule', QueryOperator.equals, TaskSchedule.once)
-    query.and('status', QueryOperator.equals, TaskStatus.todo)
+    query.and('status', QueryOperator.in, [TaskStatus.todo, TaskStatus.progress])
+
+    query.orderBy('loc').orderBy('name')
 
     this.tasks = await this.taskSvc.query$(query)
 

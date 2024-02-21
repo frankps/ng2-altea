@@ -3829,7 +3829,7 @@ export class Task extends ObjectWithId {
   loc?: string
   info?: string
 
-  prio = TaskPriority.urgent
+  prio = TaskPriority.normal
 
   date?: number // format: yyyymmdd
   time: string // format: hh:mm
@@ -3839,6 +3839,9 @@ export class Task extends ObjectWithId {
 
   schedule = TaskSchedule.once
 
+  /** if coming from recurring task: schedule of recurring task */
+  origSched?: TaskSchedule
+
   /** human resources = staff, links to a resource or resource group */
   hrIds?: string[] = []
 
@@ -3847,6 +3850,9 @@ export class Task extends ObjectWithId {
 
   /* the user */
   userId?: string
+
+  /* name of user executing/executed task */
+  by?: string
 
   status = TaskStatus.todo
 
@@ -3868,8 +3874,10 @@ export class Task extends ObjectWithId {
 
     clone.id = ObjectHelper.newGuid()
     clone.createdAt = new Date()
+    clone.origSched = this.schedule
     clone.schedule = TaskSchedule.once
     clone.rTaskId = this.id
+    
     // clone.id = null  // because it is a new task
 
     return clone

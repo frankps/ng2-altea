@@ -81,27 +81,32 @@ export class DbQuery {
   
   includes = new Array<string>()
 
-  and(field: string, operator: QueryOperator, value?: any) {
+  and(field: string, operator: QueryOperator, value?: any) : DbQuery {
     const condition = new QueryCondition(field, operator, value)
     this.where.and.push(condition)
+    return this
   }
 
-  or(field: string, operator: QueryOperator, value?: any) {
+  or(field: string, operator: QueryOperator, value?: any) : DbQuery {
     const condition = new QueryCondition(field, operator, value)
     this.where.or.push(condition)
+    return this
   }
 
-  orderBy(field?: string, order: SortOrder = SortOrder.asc) {
+  orderBy(field?: string, order: SortOrder = SortOrder.asc) : DbQuery {
     const newOrder = new OrderByProperty(field, order)
     this.order.push(newOrder)
+    return this
   }
 
-  select(...fields: string[]) {
+  select(...fields: string[]) : DbQuery {
     this.selects.push(...fields)
+    return this
   }
 
-  include(...includes: string[]) {
+  include(...includes: string[]) : DbQuery {
     this.includes.push(...includes)
+    return this
   }
 
 
