@@ -8,9 +8,14 @@ Serve:
 Deploy:
 
     ng build --aot --project altea-velzon-admin
-    firebase deploy
+    firebase deploy --only hosting:altea-velzon-admin
+    https://altea-velzon-admin.web.app/aqua/branch
+
 
     ng build --aot --project altea-pub-app
+    firebase deploy --only hosting:altea-pub-app
+    https://altea-pub-app.web.app
+
 
     Project Console: https://console.firebase.google.com/project/altea-24/overview
     Hosting URL: https://altea-velzon-admin.web.app
@@ -38,7 +43,7 @@ ng generate component task/manage-tasks --project=altea-velzon-admin
 ng generate component task/editTask --project altea-velzon-admin
 ng generate component task/task-list --project=altea-velzon-admin
 
-
+ng generate component task/task-dashboard --project=altea-velzon-admin
 
 ng generate module branch --project altea-pub-app --routing
 

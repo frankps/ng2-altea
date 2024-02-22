@@ -74,7 +74,7 @@ export class EditTaskComponent extends NgEditBaseComponent<Task> {
 
     await this.translationSvc.translateEnum(TaskStatus, 'enums.task-status.', this.taskStatus)
 
-    await this.loadResources()
+    this.resources = await this.resourceSvc.getHumanResources()
 
     /*     this.taskPriority.push(new Translation(0, "Nul"))
         this.taskPriority.push(new Translation(1, "Eén")) */
@@ -141,13 +141,13 @@ export class EditTaskComponent extends NgEditBaseComponent<Task> {
   }
 
 
-  async loadResources() {
+/*   async loadResources() {
     const query = new DbQuery()
 
     query.and('type', QueryOperator.equals, ResourceType.human)
 
     this.resources = await this.resourceSvc.query$(query)
-  }
+  } */
 
   startEditSection(sectionId: string, sectionParam: string) {
   }

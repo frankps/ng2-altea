@@ -30,7 +30,7 @@ export class TaskComponent {
     this.show = false
     this.close.emit(this.task)
   }
-// 11f462c2-838b-4196-9b4d-3b79d7fdf5ae
+  // 11f462c2-838b-4196-9b4d-3b79d7fdf5ae
   async changeStatus(newStatus: TaskStatus) {
 
     this.task.status = newStatus
@@ -47,6 +47,12 @@ export class TaskComponent {
 
     update['hrExecId'] = this.auth.resourceId
     update['userId'] = this.auth.userId
+
+    if (this.auth?.resource) {
+      const humanResource = this.auth?.resource
+      update['by'] = humanResource.shortOrName()
+    }
+
 
     const res = await this.taskSvc.update$(update)
 

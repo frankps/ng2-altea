@@ -26,7 +26,7 @@ export class TaskListComponent extends NgBaseListComponent<Task> implements OnIn
   constructor(objectSvc: TaskService, private translationSvc: TranslationService,
     dashboardSvc: DashboardService,
     private modalService: NgbModal, protected route: ActivatedRoute, router: Router, spinner: NgxSpinnerService, protected sessionSvc: SessionService) {
-    super(['name', 'prio', 'schedule', 'loc'], { searchEnabled: true, addEnabled: true, path: 'tasks' }
+    super(['name', 'prio', 'schedule', 'loc'], { searchEnabled: true, addEnabled: true, path: 'tasks/manage' }
       , objectSvc, dashboardSvc, spinner, router)
 
     this.searchFor.schedule = undefined
@@ -50,7 +50,7 @@ export class TaskListComponent extends NgBaseListComponent<Task> implements OnIn
 
   override addNew() {
     console.log('Add task')
-    this.router.navigate([this.sessionSvc.branchUnique, 'tasks', 'new'])
+    this.router.navigate([this.sessionSvc.branchUnique, 'tasks', 'manage', 'new'])
   }
 
 

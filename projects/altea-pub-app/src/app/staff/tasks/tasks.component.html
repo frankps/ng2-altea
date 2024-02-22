@@ -1,13 +1,39 @@
 <ul class="list-group">
     <li class="list-group-item" *ngFor="let task of tasks" (click)="selectTask(task)">
 
+        <div class="row">
+
+            <div class="col-7"> <i class="fa-solid fa-triangle-exclamation" *ngIf="task.prio >= 20" [style]="task.htmlStyle()"></i> {{task.loc}}  </div>
+            <div class="col-5">
+
+                <span class="badge text-bg-light float-end ms-2" style="font-size: 0.6em;"><i class="fa-solid fa-rotate"></i>
+                    &nbsp;{{'enums.task-schedule.' + task.origSched | translate}}</span>
 
 
+                <span class="badge text-bg-success float-end  ms-2" style="font-size: 0.6em;" *ngIf="task.status == TaskStatus.progress">
+                    <i class="fa-solid fa-hourglass-half"></i> &nbsp; Bezig</span>
+            </div>
+
+        </div>
 
         <div class="row">
 
-            <div class="col-6">{{task.loc}}: {{task.name}}</div>
-<!--             <div class="col-6"><span class="float-end"></span></div> -->
+            <div class="col">{{task.name}}</div>
+
+
+        </div>
+
+        <div class="row mt-2" *ngIf="task.info">
+            <div class="col" style="text-align: center; font-style: italic; font-size: smaller;">
+                {{task.info}}
+            </div>
+        </div>
+
+        <!-- 
+        <div class="row">
+
+            <div class="col-6">{{task.name}}</div>
+            <div class="col-6"><span class="float-end">{{task.loc}}</span></div>
 
         </div>
 
@@ -23,19 +49,17 @@
             <div class="col-6"></div>
             <div class="col-6">
 
-                <span class="badge text-bg-info float-end ms-2" *ngIf="task.status == TaskStatus.progress"><i
-                    class="fa-solid fa-rotate"></i> &nbsp;{{task.origSched}}</span>
+                <span class="badge text-bg-light float-end ms-2"><i
+                    class="fa-solid fa-rotate"></i> &nbsp;{{'enums.task-schedule.' + task.origSched | translate}}</span>
 
                 
-                <span class="badge text-bg-success float-end  ms-2" *ngIf="task.status == TaskStatus.progress"><i
-                        class="fa-solid fa-rotate"></i> &nbsp; Bezig</span>
+                <span class="badge text-bg-success float-end  ms-2" *ngIf="task.status == TaskStatus.progress">
+                    <i class="fa-solid fa-hourglass-half"></i> &nbsp; Bezig</span>
 
             </div>
 
         </div>
-
-<!--         <ng-container *ngIf="task.id != selectedId">
-        </ng-container> -->
+ -->
 
         <ng-container *ngIf="task.id == selectedId">
 

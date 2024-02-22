@@ -239,7 +239,12 @@ export abstract class NgBaseListComponent<T extends ObjectWithId> extends NgBase
 
         const path = []
 
-        path.push(this.dashboardSvc.rootPath, this.config.path)
+        path.push(this.dashboardSvc.rootPath)
+
+        let items = this.config.path.split('/')
+
+        path.push(...items)
+
 
         if (this.dashboardSvc.isMobile)
             path.push('mobile')
@@ -249,6 +254,9 @@ export abstract class NgBaseListComponent<T extends ObjectWithId> extends NgBase
 
         if (object?.id)
             path.push(object?.id)
+
+        console.error(path)
+
 
         this.router.navigate(path)
 

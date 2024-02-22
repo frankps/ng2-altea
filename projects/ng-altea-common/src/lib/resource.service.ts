@@ -29,5 +29,17 @@ export class ResourceService extends BackendHttpServiceBase<Resource> {
   }
   
 
+  async getByType(type: ResourceType) : Promise<Resource[]> {
+    const query = new DbQuery()
+
+    query.and('type', QueryOperator.equals, type)
+
+    return this.query$(query)
+  }
+
+  async getHumanResources() : Promise<Resource[]> {
+    return this.getByType(ResourceType.human)
+  }
+
 }
 

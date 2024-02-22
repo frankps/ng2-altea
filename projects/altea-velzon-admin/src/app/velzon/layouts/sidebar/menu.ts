@@ -111,6 +111,20 @@ export const MENU: MenuItem[] = [
     label: 'menu.tasks.label',
     icon: 'home',
     link: '/aqua/tasks',
+    subItems: [
+      {
+        id: 121,
+        label: 'menu.tasks.sub.manage',
+        link: '/aqua/tasks/manage',
+        parentId: 12
+      },
+      {
+        id: 122,
+        label: 'menu.tasks.sub.dashboard',
+        link: '/aqua/tasks/dashboard',
+        parentId: 12
+      }
+    ]
   },
   {
     id: 13,

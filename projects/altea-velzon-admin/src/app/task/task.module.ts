@@ -16,12 +16,14 @@ import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { TimepickerModule } from 'ngx-bootstrap/timepicker';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerModule } from 'ngx-spinner';
+import { TaskDashboardComponent } from './task-dashboard/task-dashboard.component';
 
 @NgModule({
   declarations: [
     EditTaskComponent,
     ManageTasksComponent,
-    TaskListComponent
+    TaskListComponent,
+    TaskDashboardComponent
   ],
   imports: [
     CommonModule,

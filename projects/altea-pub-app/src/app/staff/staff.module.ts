@@ -7,6 +7,7 @@ import { NgAlteaCommonModule } from 'ng-altea-common';
 import { OrderMgrModule } from 'ng-altea-common';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { TaskComponent } from './task/task.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,8 @@ import { TaskComponent } from './task/task.component';
     CommonModule,
     StaffRoutingModule,
     NgAlteaCommonModule,
-    OrderMgrModule
+    OrderMgrModule,
+    TranslateModule
   ]
 })
 export class StaffModule { }

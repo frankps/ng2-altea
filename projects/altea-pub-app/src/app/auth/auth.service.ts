@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ResourceService, UserService } from 'ng-altea-common';
 import * as altea from 'ts-altea-model';
 import { DbQuery, QueryOperator } from 'ts-common';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Injectable({
   providedIn: 'root'
@@ -32,7 +33,7 @@ export class AuthService {
   userSubscription: Subscription;
   authStateSubscription: Subscription;
 
-  constructor(protected router: Router, protected userSvc: UserService, protected resourceSvc: ResourceService) {
+  constructor(protected router: Router, protected userSvc: UserService, protected resourceSvc: ResourceService, protected spinner: NgxSpinnerService) {
 
   }
 
@@ -51,25 +52,41 @@ export class AuthService {
 
       if (aUser) {
 
-        this.user = await this.userSvc.getByUid(aUser.uid)
+        this.spinner.show()
 
-        if (!this.user) {
-          this.user = await this.createUser$(aUser)
-          console.log('User NOT found!')
-          console.warn(this.user)
-        } else {
-          console.log('User found!')
-          console.warn(this.user)
+        /*         try {
+                  
+                } */
+
+        try {
+          this.user = await this.userSvc.getByUid(aUser.uid)
+
+          if (!this.user) {
+            this.user = await this.createUser$(aUser)
+            console.log('User NOT found!')
+            console.warn(this.user)
+          } else {
+            console.log('User found!')
+            console.warn(this.user)
+          }
+  
+          this.userId = this.user.id
+  
+          await this.loadResources(this.user.id)
+  
+  
+          console.error('forwarding user!')
+          //   this.router.navigate(['branch', 'aqua', 'menu'])
+          this.router.navigate(['staff', 'dashboard'])
+  
+        } finally {
+
+          this.spinner.hide()
+
         }
 
-        this.userId = this.user.id
-
-        await this.loadResources(this.user.id)
 
 
-        console.error('forwarding user!')
-        //   this.router.navigate(['branch', 'aqua', 'menu'])
-        this.router.navigate(['staff', 'dashboard'])
 
       } else {
         this.router.navigate(['auth', 'sign-in'])

@@ -1,9 +1,10 @@
 import { Component, EventEmitter, OnInit, inject, Output } from '@angular/core';
 import { AuthService } from '../../auth/auth.service';
 import { SessionService, TaskService } from 'ng-altea-common';
-import { DbQuery, QueryOperator } from 'ts-common';
+import { DbQuery, QueryOperator, SortOrder } from 'ts-common';
 import { Task, TaskSchedule, TaskStatus } from 'ts-altea-model';
-import { Firestore, collection, collectionData, addDoc, CollectionReference, updateDoc, serverTimestamp, doc, docData } from '@angular/fire/firestore';
+import { Firestore, collection, collectionData, addDoc, CollectionReference, updateDoc, serverTimestamp, doc, docData, DocumentChange, DocumentData } from '@angular/fire/firestore';
+import { Observable } from 'rxjs';
 
 
 @Component({
@@ -36,10 +37,10 @@ export class TasksComponent implements OnInit {
 
     let i = 0
 
-    const taskDocRef = doc(this.firestore, 'branches', this.sessionSvc.branchUnique, 'updates', 'task')
-    const taskDocData$ = docData(taskDocRef)
+/*     const taskDocRef = doc(this.firestore, 'branches', this.sessionSvc.branchUnique, 'updates', 'task')
+    const taskDocData$ = docData(taskDocRef) */
 
-    taskDocData$.subscribe(async tasksChanged => {
+    this.taskSvc.changeObservable().subscribe(async tasksChanged => {
 
       console.warn(`Tasks changed!! ${i}`)
 
@@ -49,8 +50,10 @@ export class TasksComponent implements OnInit {
       i++
     })
 
-
   }
+
+
+
 
 
   async getTasks() {
@@ -60,7 +63,7 @@ export class TasksComponent implements OnInit {
     query.and('schedule', QueryOperator.equals, TaskSchedule.once)
     query.and('status', QueryOperator.in, [TaskStatus.todo, TaskStatus.progress])
 
-    query.orderBy('loc').orderBy('name')
+    query.orderBy('prio', SortOrder.desc).orderBy('loc').orderBy('name')
 
     this.tasks = await this.taskSvc.query$(query)
 

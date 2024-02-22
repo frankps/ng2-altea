@@ -99,6 +99,12 @@ export class DbQuery {
     return this
   }
 
+  orderByDesc(field?: string) : DbQuery {
+    const newOrder = new OrderByProperty(field, SortOrder.desc)
+    this.order.push(newOrder)
+    return this
+  }
+
   select(...fields: string[]) : DbQuery {
     this.selects.push(...fields)
     return this

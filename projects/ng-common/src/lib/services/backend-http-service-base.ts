@@ -35,7 +35,7 @@ export class ObjectChange<T extends ObjectWithId> {
 
 
 export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServiceBase<T> {   //  extends BaseObject
-  private firestore: Firestore = inject(Firestore)
+  protected firestore: Firestore = inject(Firestore)
 
   changes$: Subject<ObjectChange<T>> = new Subject<ObjectChange<T>>()
 
@@ -203,8 +203,10 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
       if (res.object)
         res.object = plainToInstance(this.type, res.object)
 
-      if (res.status == ApiStatus.ok)
+      if (res.status == ApiStatus.ok) {
         this.changes$.next(new ObjectChange(res.object, ObjectChangeType.create))
+        this.updateFirestore()
+      }
 
       return res
     }

@@ -52,10 +52,18 @@
     },
     "task-schedule": {
       "once": "Eénmalig",
-      "daily": "Dagelijks",
-      "weekly": "Wekelijks",
-      "monthly": "Maandelijks",
-      "yearly": "Jaarlijks"
+      "daily": "Dag",
+      "twiceAWeek": "2/Week",
+      "weekly": "Week",
+      "twiceAMonth": "2/Maand",
+      "monthly": "Maand",
+      "yearly": "Jaar"
+    },
+    "task-status": {
+      "todo": "Todo",
+      "progress": "Gestart",
+      "done": "Gedaan",
+      "skip": "Overslaan"
     },
     "gift-type": {
       "amount": "Bedrag",
@@ -820,13 +828,15 @@
       "contact": "Klant"
     },
     "task": {
+      "article": "de",
       "name": "Taaknaam",
       "loc": "Locatie",
       "info": "Extra info",
       "hrIds": "Uitvoerders",
       "schedule": "Frequentie",
       "prio": "Prioriteit",
-      "time": "Start op/vanaf"
+      "time": "Start op/vanaf",
+      "status": "Status"
     }
   },
   "HEADER": {

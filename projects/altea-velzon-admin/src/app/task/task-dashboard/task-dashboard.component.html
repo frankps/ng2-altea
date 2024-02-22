@@ -1,0 +1,145 @@
+<div class="row">
+    <div class="col-4">
+
+        <ul class="list-group">
+
+            <li class="list-group-item active" aria-current="true" style="text-align: center;">Bezig & Gedaan</li>
+
+            <li class="list-group-item" *ngFor="let task of progressDone">
+
+
+                <div class="row">
+                    <div class="col">
+
+                        <!-- *ngIf="task.prio >= 20" -->
+
+                        <i class="fa-solid fa-triangle-exclamation" [style]="task.htmlStyle()"></i>
+                        {{task.loc}}
+                        <span class="badge rounded-pill text-bg-primary float-end ms-2"
+                            *ngIf="task.by">{{task.by}}</span>
+                        <span class="badge rounded-pill text-bg-success float-end ms-2">{{task.status}}</span>
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col">{{task.name}}</div>
+
+                </div>
+
+
+
+
+
+            </li>
+        </ul>
+
+    </div>
+    <div class="col-4">
+
+
+        <ul class="list-group">
+
+            <li class="list-group-item active" aria-current="true" style="text-align: center;">Todo</li>
+
+            <li class="list-group-item" *ngFor="let task of todo">
+
+
+                <div class="row">
+                    <div class="col">
+
+                        <!-- *ngIf="task.prio >= 20" -->
+
+                        <i class="fa-solid fa-triangle-exclamation" [style]="task.htmlStyle()"></i>
+                        {{task.loc}}
+                        <span class="badge rounded-pill text-bg-primary float-end ms-2"
+                            *ngIf="task.by">{{task.by}}</span>
+
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col">{{task.name}}</div>
+
+                </div>
+
+
+
+
+
+            </li>
+        </ul>
+
+
+
+
+    </div>
+    <div class="col-4">
+
+
+        <ul class="list-group">
+
+            <li class="list-group-item active" aria-current="true" style="text-align: center;">Taak toevoegen</li>
+
+            <li class="list-group-item">
+
+
+                <div class="row">
+                    <div class="col">
+
+                        <ng-select id="vatPcts" name="vatPcts" [items]="manual" bindLabel="name" [clearable]="false"
+                            [multiple]="false" [(ngModel)]="newManual">
+
+                        </ng-select>
+
+                    </div>
+                </div>
+
+                <ng-container *ngIf="newManual">
+
+                    <div class="row mt-2">
+                        <div class="col">
+    
+                            <ng-select id="hrIds" name="hrIds" *ngIf="humanResources" [items]="humanResources" bindLabel="name" bindValue="id"
+                            [clearable]="true" [multiple]="true" [(ngModel)]="newManual.hrIds"></ng-select>
+    
+                        </div>
+                    </div>
+
+                    <div class="row mt-2">
+                        <div class="col">
+    
+                            <ng-select id="prio" name="prio" *ngIf="initialized" [items]="taskPriority"
+                                bindLabel="trans" bindValue="key" [clearable]="false" [multiple]="false"
+                                [(ngModel)]="newManual.prio"></ng-select>
+
+                        </div>
+                    </div>
+
+    
+                    <div class="row mt-2">
+                        <div class="col d-grid">
+                            <button type="button" class="btn btn-primary btn-sm" (click)="addManualTask()"
+                                translate>dic.add</button>
+    
+                        </div>
+    
+                    </div>
+
+
+
+                </ng-container>
+
+
+
+
+
+
+            </li>
+        </ul>
+
+
+
+    </div>
+</div>
+
+

@@ -3805,7 +3805,8 @@ export enum TaskSchedule {
   weekly = 'weekly',
   twiceAMonth = 'twiceAMonth',
   monthly = 'monthly',
-  yearly = 'yearly'
+  yearly = 'yearly',
+  manual = 'manual'
 }
 
 export enum TaskStatus {
@@ -3848,6 +3849,8 @@ export class Task extends ObjectWithId {
   /* the staff member that executes/executed the task (never a resource group) */
   hrExecId?: string
 
+  hrExec?: Resource
+
   /* the user */
   userId?: string
 
@@ -3856,7 +3859,8 @@ export class Task extends ObjectWithId {
 
   status = TaskStatus.todo
 
-  cmt?: string
+  imp?: string  // important
+  cmt?: string  // comment
 
   active = true
 
@@ -3877,7 +3881,7 @@ export class Task extends ObjectWithId {
     clone.origSched = this.schedule
     clone.schedule = TaskSchedule.once
     clone.rTaskId = this.id
-    
+
     // clone.id = null  // because it is a new task
 
     return clone
