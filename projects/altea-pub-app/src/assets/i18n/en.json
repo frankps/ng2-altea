@@ -57,7 +57,8 @@
       "weekly": "Week",
       "twiceAMonth": "2/Maand",
       "monthly": "Maand",
-      "yearly": "Jaar"
+      "yearly": "Jaar",
+      "manual": "Manueel"
     },
     "task-status": {
       "todo": "Todo",
@@ -895,7 +896,11 @@
       "label": "Instellingen"
     },
     "tasks": {
-      "label": "Taken"
+      "label": "Taken",
+      "sub": {
+        "manage": "Beheer",
+        "dashboard": "Overzicht"
+      }
     }
   },
   "MENUITEMS": {

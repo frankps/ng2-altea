@@ -1,6 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { Auth, GoogleAuthProvider, signInWithRedirect, signInWithPopup, user, User, signOut } from '@angular/fire/auth';
 import { Subscription, of } from 'rxjs';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-sign-out',
@@ -10,12 +11,23 @@ import { Subscription, of } from 'rxjs';
 export class SignOutComponent implements OnInit {
   auth: Auth = inject(Auth);
 
+  constructor(protected authSvc: AuthService) {
+
+  }
 
   ngOnInit() {
 
-    //this.auth.
 
-    signOut(this.auth)
+    
+
+
+
 
   }
+
+  logOut() {
+    this.authSvc.logout()
+  }
+
+
 }

@@ -52,12 +52,12 @@ export class EditResourceComponent extends NgEditBaseComponent<Resource> impleme
 
   public saveScheduling$: Rx.Subject<any> = new Rx.Subject<any>()
 
-  constructor(protected resourceSvc: ResourceService, protected translationSvc: TranslationService, route: ActivatedRoute, protected router: Router,
+  constructor(protected resourceSvc: ResourceService, protected translationSvc: TranslationService, route: ActivatedRoute, router: Router,
     spinner: NgxSpinnerService, private modalService: NgbModal, dashboardSvc: DashboardService,
     protected scheduleSvc: ScheduleService, protected sessionSvc: SessionService) {
     super('resource', Resource, 'groups.group,schedules:orderBy=idx.planning,children.child,user'
       , resourceSvc
-      , route, spinner, dashboardSvc)
+      , router, route, spinner, dashboardSvc)
 
     this.sectionProps.set('general', ['name', 'descr', 'color', 'start', 'end', 'isGroup', 'type', 'customSchedule', 'online', 'userId'])   // , 'color'
     this.sectionProps.set('schedule', ['schedules'])

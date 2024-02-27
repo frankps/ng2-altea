@@ -98,9 +98,26 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
   }
 
 
+  makeApiResultTyped(res: ApiResult<T>) {
+
+    if (!res)
+      return res
+
+    const result = plainToInstance(ApiResult<T>, res)
+
+    if (res.object)
+      result.object = plainToInstance(this.type, res.object)
+
+    return result
+
+  }
+
+
   update(object: any, isSoftDelete: boolean = false): Observable<ApiResult<T>> {
     console.log(object)
     const observ = this.http.put<any>(`${this.host}/${this.urlDifferentiator}/${object.id}`, object).pipe(map(res => {
+
+      res = this.makeApiResultTyped(res)
 
       console.warn('Update happened!!!', res)
 
@@ -119,6 +136,7 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
   }
 
 
+  /** update a document in Firestore => other logic/apps know about update */
   async updateFirestore() {
 
     if (this.firestoreDocUrl) {
@@ -191,17 +209,48 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
 
 
   delete(objectId: string): Observable<ApiResult<any>> {
-    const res = this.http.delete<any>(`${this.host}/${this.urlDifferentiator}/${objectId}`)
+    const res = this.http.delete<any>(`${this.host}/${this.urlDifferentiator}/${objectId}`).pipe(map(res => {
 
-    this.changes$.next(new ObjectChange<T>(objectId, ObjectChangeType.delete))
+      res = this.makeApiResultTyped(res)
+
+      if (res.status == ApiStatus.ok) {
+        this.changes$.next(new ObjectChange<T>(objectId, ObjectChangeType.delete))
+        this.updateFirestore()
+      }
+
+      return res
+    }
+    ))
+
+    //this.changes$.next(new ObjectChange<T>(objectId, ObjectChangeType.delete))
 
     return res
   }
 
+  delete$(objectId: string): Promise<ApiResult<T>> {
+
+    const me = this
+
+    return new Promise<any>(function (resolve, reject) {
+
+      me.delete(objectId).pipe(take(1)).subscribe(res => {
+
+        //res = this.makeApiResultTyped(res)
+
+        resolve(res)
+      })
+
+
+    })
+
+  }
+
+
+
   create(object: any): Observable<ApiResult<T>> {
     return this.http.post<any>(`${this.host}/${this.urlDifferentiator}`, object).pipe(map(res => {
-      if (res.object)
-        res.object = plainToInstance(this.type, res.object)
+
+      res = this.makeApiResultTyped(res)
 
       if (res.status == ApiStatus.ok) {
         this.changes$.next(new ObjectChange(res.object, ObjectChangeType.create))

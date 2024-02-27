@@ -72,13 +72,13 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
 
   constructor(public manageProductSvc: ManageProductService, protected productSvc: ProductService, private priceSvc: PriceService,
     private productResourceSvc: ProductResourceService,
-    private translationSvc: TranslationService, route: ActivatedRoute, protected router: Router,
+    private translationSvc: TranslationService, route: ActivatedRoute, router: Router,
     spinner: NgxSpinnerService, private modalService: NgbModal,
     dashboardSvc: DashboardService) {
 
     super('product', Product, 'prices,options:orderBy=idx.values:orderBy=idx,items:orderBy=idx,resources:orderBy=idx.resource'
       , productSvc
-      , route, spinner, dashboardSvc)
+      , router, route, spinner, dashboardSvc)
 
     this.translationSvc.translateEnum(Gender, 'enums.gender.', this.gender)
     this.translationSvc.translateEnum(OnlineMode, 'enums.online-mode.', this.onlineMode, false, true)

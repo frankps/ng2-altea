@@ -84,8 +84,8 @@ export abstract class NgEditBaseComponent<T extends ObjectWithId> extends NgSect
     sectionProps = new Map<string, string[]>()
 
     constructor(objectType: string, protected type: { new(): T; }, protected includes: string
-        , protected objectSvc: BackendHttpServiceBase<T>, protected route: ActivatedRoute, protected spinner: NgxSpinnerService,
-        public dashboardSvc: DashboardService) {
+        , protected objectSvc: BackendHttpServiceBase<T>, protected router: Router,  protected route: ActivatedRoute, protected spinner: NgxSpinnerService,
+        public dashboardSvc: DashboardService) {  //
         super()
 
         this.objectType = objectType
@@ -189,6 +189,10 @@ export abstract class NgEditBaseComponent<T extends ObjectWithId> extends NgSect
                     this.dashboardSvc.showToastType(ToastType.saveSuccess)
                     this.isNew = false
                     this.object = res.object
+
+                    this.router.navigate([`../${res.object.id}`], {relativeTo: this.route});
+                   // this.router.navigate([this.sessionSvc.branchUnique, 'tasks', 'manage', '4678e36c-a0c5-4a86-837c-764c099bc5b2'])
+
                 } else {
                     this.dashboardSvc.showToastType(ToastType.saveError)
                 }

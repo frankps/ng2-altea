@@ -53,12 +53,12 @@ export class EditBranchComponent extends NgEditBaseComponent<Branch> implements 
 
   }
 
-  constructor(protected contactSvc: BranchService, protected translationSvc: TranslationService, route: ActivatedRoute, protected router: Router,
+  constructor(protected contactSvc: BranchService, protected translationSvc: TranslationService, route: ActivatedRoute, router: Router,
     spinner: NgxSpinnerService, private modalService: NgbModal, dashboardSvc: DashboardService,
     protected scheduleSvc: ScheduleService, protected sessionSvc: SessionService) {
     super('branch', Branch, ''
       , contactSvc
-      , route, spinner, dashboardSvc)
+      , router, route, spinner, dashboardSvc)
 
     this.sectionProps.set('general', ['name', 'descr', 'street', 'streetNr', 'postal', 'country', 'city', 'language', 'vatPcts', 'vatPct', 'vatNr', 'vatIncl', 'phone', 'mobile', 'email', 'cur'])
     this.sectionProps.set('communication', ['emailFrom', 'emailBcc', 'smsOn'])

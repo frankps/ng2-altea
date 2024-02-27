@@ -45,12 +45,12 @@ export class EditGiftComponent extends NgEditBaseComponent<Gift> {
   // scheduleChanges?: CollectionChangeTracker<Schedule>
   // public saveScheduling$: Rx.Subject<any> = new Rx.Subject<any>()
 
-  constructor(protected giftSvc: GiftService, protected translationSvc: TranslationService, route: ActivatedRoute, protected router: Router,
+  constructor(protected giftSvc: GiftService, protected translationSvc: TranslationService, route: ActivatedRoute, router: Router,
     spinner: NgxSpinnerService, private modalService: NgbModal, dashboardSvc: DashboardService,
     protected sessionSvc: SessionService) {
     super('gift', Gift, 'from'
       , giftSvc
-      , route, spinner, dashboardSvc)
+      , router, route, spinner, dashboardSvc)
 
     this.sectionProps.set('general', ['value', 'used', 'isConsumed', 'fromName', 'fromEmail', 'toName', 'toEmail', 'toAddress', 'toMessage', 'toSendEmail', 'fromId'])
     // this.translationSvc.translateEnum(Gender, 'enums.gender.', this.gender)

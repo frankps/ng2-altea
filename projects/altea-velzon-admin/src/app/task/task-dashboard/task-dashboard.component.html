@@ -41,7 +41,7 @@
 
             <li class="list-group-item active" aria-current="true" style="text-align: center;">Todo</li>
 
-            <li class="list-group-item" *ngFor="let task of todo">
+            <li class="list-group-item" *ngFor="let task of todo" (click)="editTask(task)">
 
 
                 <div class="row">
@@ -61,7 +61,32 @@
                     <div class="col">{{task.name}}</div>
 
                 </div>
+                <div class="row mt-2" *ngIf="task.info">
+                    <div class="col" style="text-align: center; font-style: italic; font-size: smaller;">
+                        {{task.info}}
+                    </div>
+                </div>
+                <div class="row">
 
+                    <div class="col">
+
+                        <!--  *ngIf="task.isRecurrent()" -->
+
+<!--                         <span style="font-size: x-small;">{{'enums.task-schedule.' +
+                            task.schedule | translate}}&nbsp;<i class="fa-solid fa-rotate-right"></i></span> -->
+
+                        <span class="badge rounded-pill text-bg-secondary float-end ms-2" *ngIf="task.origSched"
+                           ><i class="fa-solid fa-rotate-right"></i> &nbsp; {{'enums.task-schedule.' + task.origSched | translate}}</span>
+
+
+                        <span class="badge rounded-pill text-bg-primary float-end ms-2"
+                            *ngFor="let id of task.hrIds">{{getResourceName(id)}}</span>
+
+                    </div>
+
+
+
+                </div>
 
 
 
@@ -75,10 +100,12 @@
     </div>
     <div class="col-4">
 
+        <button type="button" class="btn btn-primary btn-sm" (click)="webPush()">Web push</button>
+
 
         <ul class="list-group">
 
-            <li class="list-group-item active" aria-current="true" style="text-align: center;">Taak toevoegen</li>
+            <li class="list-group-item active" aria-current="true" style="text-align: center;">Taak beheren</li>
 
             <li class="list-group-item">
 
@@ -86,43 +113,117 @@
                 <div class="row">
                     <div class="col">
 
-                        <ng-select id="vatPcts" name="vatPcts" [items]="manual" bindLabel="name" [clearable]="false"
-                            [multiple]="false" [(ngModel)]="newManual">
+                        <ng-select id="taskTemplates" name="taskTemplates" [items]="manual" bindLabel="name"
+                            [clearable]="false" [multiple]="false" [(ngModel)]="manualTask"
+                            (change)="newTaskSelected($event)" placeholder="Nieuwe taak">
 
                         </ng-select>
-
                     </div>
                 </div>
 
-                <ng-container *ngIf="newManual">
+                <ng-container *ngIf="task">
 
-                    <div class="row mt-2">
+                    <div class="row {{css_cls_row}}">
                         <div class="col">
-    
-                            <ng-select id="hrIds" name="hrIds" *ngIf="humanResources" [items]="humanResources" bindLabel="name" bindValue="id"
-                            [clearable]="true" [multiple]="true" [(ngModel)]="newManual.hrIds"></ng-select>
-    
+
+                            <ngx-altea-label-control label="objects.task.name" for="name">
+                                <input type="text" id="name" name="name" class="form-control" required
+                                    [(ngModel)]="task.name">
+                            </ngx-altea-label-control>
+
                         </div>
                     </div>
 
-                    <div class="row mt-2">
+                    <div class="row {{css_cls_row}}">
                         <div class="col">
-    
+
+                            <ngx-altea-label-control label="objects.task.loc" for="loc">
+                                <input type="text" id="loc" name="loc" class="form-control" [(ngModel)]="task.loc">
+                            </ngx-altea-label-control>
+
+                        </div>
+                    </div>
+
+                    <div class="row {{css_cls_row}}">
+                        <div class="col">
+                            <ngx-altea-label-control label="objects.task.info" for="info">
+                                <textarea id="info" name="info" class="form-control" style="height: 120px;"
+                                    [(ngModel)]="task.info"></textarea>
+                            </ngx-altea-label-control>
+                        </div>
+                    </div>
+
+
+                    <div class="row {{css_cls_row}}">
+                        <div class="col">
+
+                            <ng-select id="hrIds" name="hrIds" *ngIf="humanResources" [items]="humanResources"
+                                bindLabel="name" bindValue="id" [clearable]="true" [multiple]="true"
+                                [(ngModel)]="task.hrIds"></ng-select>
+
+                        </div>
+                    </div>
+
+                    <div class="row {{css_cls_row}}">
+                        <div class="col">
+
                             <ng-select id="prio" name="prio" *ngIf="initialized" [items]="taskPriority"
                                 bindLabel="trans" bindValue="key" [clearable]="false" [multiple]="false"
-                                [(ngModel)]="newManual.prio"></ng-select>
+                                [(ngModel)]="task.prio"></ng-select>
 
                         </div>
                     </div>
 
-    
-                    <div class="row mt-2">
-                        <div class="col d-grid">
-                            <button type="button" class="btn btn-primary btn-sm" (click)="addManualTask()"
-                                translate>dic.add</button>
-    
+                    <div class="row {{css_cls_row}}">
+                        <div class="col">
+                            <ngx-altea-label-control label="objects.task.time" for="time">
+                                <input type="time" id="time" name="time" class="form-control" [(ngModel)]="task.time" />
+                            </ngx-altea-label-control>
                         </div>
-    
+                    </div>
+
+                    <div class="row {{css_cls_row}}">
+                        <div class="col-6">
+
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="template" name="template"
+                                    [(ngModel)]="task.template" />
+                                <label class="form-check-label" for="template">Template</label>
+
+                            </div>
+
+                        </div>
+                        <div class="col-6">
+
+                            <div class="form-check form-switch" *ngIf="!task.template">
+                                <input class="form-check-input" type="checkbox" id="sendPush" name="sendPush"
+                                    [(ngModel)]="sendPush" />
+                                <label class="form-check-label" for="template">Web push</label>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <div class="row {{css_cls_row}}">
+                        <div class="col d-grid" *ngIf="taskMode == ManageTaskMode.edit">
+                            <button type="button" class="btn btn-primary btn-sm" (click)="deleteTask()"
+                                translate>dic.delete</button>
+                        </div>
+                        <div class="col d-grid">
+                            <button type="button" class="btn btn-primary btn-sm" (click)="saveTask()"
+                                translate>dic.save</button>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="row {{css_cls_row}}">
+                        <div class="col">
+
+                        </div>
                     </div>
 
 
@@ -141,5 +242,3 @@
 
     </div>
 </div>
-
-

@@ -1,5 +1,6 @@
 <button type="button" class="btn btn-primary btn-sm" (click)="scheduleTasks()">Schedule tasks</button>
 
+<button type="button" class="btn btn-primary btn-sm" (click)="gotoOther()">Other task</button>
 
 <ng-container *ngIf="object">
 
@@ -71,7 +72,6 @@
                 <div class="row {{css_cls_row}}">
                     <div class="col">
                         <ngx-altea-label-control label="objects.task.name" for="name">
-
                             <input type="text" id="name" name="name" class="form-control" required
                                 [(ngModel)]="object.name">
                         </ngx-altea-label-control>

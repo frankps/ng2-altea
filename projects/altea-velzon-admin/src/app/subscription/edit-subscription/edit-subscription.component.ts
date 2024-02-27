@@ -39,12 +39,12 @@ export class EditSubscriptionComponent extends NgEditBaseComponent<Subscription>
   // scheduleChanges?: CollectionChangeTracker<Schedule>
   // public saveScheduling$: Rx.Subject<any> = new Rx.Subject<any>()
 
-  constructor(protected subscriptionSvc: SubscriptionService, protected translationSvc: TranslationService, route: ActivatedRoute, protected router: Router,
+  constructor(protected subscriptionSvc: SubscriptionService, protected translationSvc: TranslationService, route: ActivatedRoute, router: Router,
     spinner: NgxSpinnerService, private modalService: NgbModal, dashboardSvc: DashboardService,
     protected sessionSvc: SessionService) {
     super('subscription', Subscription, 'contact,order'
       , subscriptionSvc
-      , route, spinner, dashboardSvc)
+      , router, route, spinner, dashboardSvc)
 
     this.sectionProps.set('general', ['name', 'remark', 'totalQty', 'usedQty'])
     // this.translationSvc.translateEnum(Gender, 'enums.gender.', this.gender)

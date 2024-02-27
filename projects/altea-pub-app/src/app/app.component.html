@@ -1,7 +1,16 @@
 <ngx-spinner type="ball-scale-multiple" [fullScreen]="false"></ngx-spinner>
+<!-- 
+<button type="button" class="btn btn-primary btn-sm" (click)="subscribeToNotifications()">Subscribe</button> -->
 
 <div class="container">
+
+    <button type="button"  class="btn btn-light float-end ml-2"><i class="fa-duotone fa-right-from-bracket" (click)="signOut()"></i></button>
+
+    <button type="button" *ngIf="!webPushSubscribed && authSvc.user" class="btn btn-light float-end ml-2"><i class="fa-duotone fa-sparkle" (click)="subscribeToNotifications()"></i></button>
+<!-- 
+     -->
+
     <router-outlet></router-outlet>
 </div>
 
-  
+

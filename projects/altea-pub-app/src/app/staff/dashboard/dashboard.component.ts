@@ -42,42 +42,5 @@ export class DashboardComponent implements OnInit {
   }
 
 
-/* 
-
-private firestore: Firestore = inject(Firestore)
-
-  items$: Observable<any[]>;
-  itemCollection: CollectionReference;
-
-
-  async addItem() {
-
-    let guid = ObjectHelper.newSmallGuid()
-
-    const item = {
-      uid: guid,
-      name: guid,
-      timestamp: serverTimestamp()
-    }
-
-    const docRef = await addDoc(this.itemCollection, item)
-
-    // const docRef = await updateDoc(this.itemCollection, item)
-
-    //updateDoc()
-    console.log(`New id: ${docRef.id}`)
-
-  }
-
-
-  async updateItem() {
-
-    let path = ''
-    const docRef = doc(this.firestore, 'branches', 'aqua', 'updates', 'task')   // this.sessionSvc.branchId
-
-    await updateDoc(docRef, { timestamp: ObjectHelper.newSmallGuid() })   // serverTimestamp()
-  }
- */
-
 
 }

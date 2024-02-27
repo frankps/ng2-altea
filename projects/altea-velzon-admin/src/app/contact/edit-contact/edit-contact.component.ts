@@ -45,12 +45,12 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> {
 
   public saveScheduling$: Rx.Subject<any> = new Rx.Subject<any>()
 
-  constructor(protected contactSvc: ContactService, protected translationSvc: TranslationService, route: ActivatedRoute, protected router: Router,
+  constructor(protected contactSvc: ContactService, protected translationSvc: TranslationService, route: ActivatedRoute, router: Router,
     spinner: NgxSpinnerService, private modalService: NgbModal, dashboardSvc: DashboardService,
     protected scheduleSvc: ScheduleService, protected sessionSvc: SessionService) {
     super('contact', Contact, 'subscriptions'
       , contactSvc
-      , route, spinner, dashboardSvc)
+      , router, route, spinner, dashboardSvc)
 
     this.sectionProps.set('general', ['first', 'last', 'gender', 'birth', 'email', 'emailRemind', 'mobile', 'smsRemind', 'language', 'depositPct'])
     this.translationSvc.translateEnum(Gender, 'enums.gender.', this.gender)

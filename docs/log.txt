@@ -1,12 +1,51 @@
 
+http://localhost:4300/auth/sign-out
 http://localhost:4300/auth/sign-in
 http://localhost:4300/branch/aqua/menu
+http://localhost:4300/staff/dashboard
+
 
 firebase target:apply hosting altea-pub-app altea-pub-app
 firebase deploy --only hosting:altea-pub-app
 Firebase:
 
   https://github.com/angular/angularfire/blob/HEAD/docs/auth.md#authentication
+
+
+Error: browser kept refreshing in endless loop
+--> was caused by same issue below
+
+  ServiceWorkerModule.register('ngsw-worker.js', {
+        enabled: !isDevMode(), 
+
+
+Webpush
+
+  https://blog.angular-university.io/angular-push-notifications/
+  sudo npm install web-push -g
+
+
+  web-push generate-vapid-keys --json
+
+  { "publicKey":"BAerWF47sf38F0pwPyBSGzrL5sufyBAHY_Ol9ThbZubqfDewAfghj7SsOA26GEMmJ-IB7LIa0fE68sE0nZvAfbQ",
+    "privateKey":"DGRWcQuw8AmsLa0urUgu2sp74tpsPjdKqfvVGOGcIrM"}
+
+  Front end app: add a service worker
+  https://blog.angular-university.io/angular-service-worker/
+  ng add @angular/pwa --project altea-pub-app
+
+
+  Error in browser:
+    Could not subscribe to notifications Error: Service workers are disabled or not supported by this browser
+    https://stackoverflow.com/questions/52513466/angular-6-service-workers-are-disabled-or-not-supported-error
+
+              Just set the service worker to work in dev environment also in 'AppModule'
+
+              ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production})
+              To
+
+              ServiceWorkerModule.register('ngsw-worker.js', { enabled: true})
+
 
 
 

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Product, Resource, ResourceType } from 'ts-altea-model'
-import { BackendHttpServiceBase } from'ng-common';
+import { BackendHttpServiceBase } from 'ng-common';
 import { HttpClient } from '@angular/common/http';
 import { SessionService } from './session.service';
 import { DbQuery, QueryOperator } from 'ts-common';
@@ -15,9 +15,12 @@ export class ResourceService extends BackendHttpServiceBase<Resource> {
   }
 
 
-  async getByType$(type: ResourceType, isGroup: boolean = false) : Promise<Resource[]> {
+  async getByType$(type: ResourceType, isGroup: boolean = false): Promise<Resource[]> {
 
     const query = new DbQuery()
+
+
+
     query.and('type', QueryOperator.equals, type)
     query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
     query.and('active', QueryOperator.equals, true)
@@ -27,18 +30,21 @@ export class ResourceService extends BackendHttpServiceBase<Resource> {
     return await this.query$(query)
 
   }
-  
 
-  async getByType(type: ResourceType) : Promise<Resource[]> {
+
+  async getByType(type: ResourceType, includes?: string[]): Promise<Resource[]> {
     const query = new DbQuery()
+
+    if (includes)
+      query.includes = includes
 
     query.and('type', QueryOperator.equals, type)
 
     return this.query$(query)
   }
 
-  async getHumanResources() : Promise<Resource[]> {
-    return this.getByType(ResourceType.human)
+  async getHumanResources(includes?: string[]): Promise<Resource[]> {
+    return this.getByType(ResourceType.human, includes)
   }
 
 }

@@ -417,7 +417,7 @@ export class Schedule extends ObjectWithId {
 
     let start = dateFns.startOfDay(dateRange.from)
     let end = dateFns.endOfDay(dateRange.to)
-    
+
     let scheduleRanges = this.toDateRangeSet(start, end)
 
     let contains = scheduleRanges.contains(dateRange)
@@ -3196,13 +3196,13 @@ export class ResourcePlannings {
     return new ResourcePlannings(planningsForSchedules)
   }
 
-  isFullAvailable() : boolean {
+  isFullAvailable(): boolean {
     const unavailable = this.plannings.find(rp => rp.active && !rp.available && !rp.scheduleId)
 
     return unavailable ? false : true
   }
 
-  isPrepTimeOnly() : boolean {
+  isPrepTimeOnly(): boolean {
 
     // try to find a planning that is NOT a preparation
     const nonPrep = this.plannings.find(rp => rp.active && !rp.prep)
@@ -3345,7 +3345,7 @@ export class ResourcePlanning extends ObjectWithId implements IAsDbObject<Resour
   orderLineId?: string;
   @Type(() => OrderLine)
   orderLine?: OrderLine;
-  
+
   autoResourceId?: string;
 
 
@@ -3895,6 +3895,47 @@ export class Task extends ObjectWithId {
     return `color: ${this.color()}`
   }
 
+  get template(): boolean {
+    return this.schedule == TaskSchedule.manual
+  }
+
+  set template(value: boolean) {
+
+    if (value)
+      this.schedule = TaskSchedule.manual
+    else
+      this.schedule = TaskSchedule.once
+
+    //return this.schedule == TaskSchedule.manual
+  }
+
+  private backColorForSchedule(schedule: TaskSchedule): string {
+
+    switch (schedule) {
+
+      case TaskSchedule.daily:
+        return '#FFF0F0'
+
+      case TaskSchedule.twiceAWeek:
+        return '#F2FAFF'
+
+      case TaskSchedule.weekly:
+        return '#E5F5FF'
+
+    }
+
+    return "white"
+  }
+
+
+  backColor() {
+
+    if (this.origSched)
+      return this.backColorForSchedule(this.origSched)
+    else return this.backColorForSchedule(this.schedule)
+
+  }
+
   color(): string {
     switch (this.prio) {
       case TaskPriority.urgent:
@@ -3907,10 +3948,31 @@ export class Task extends ObjectWithId {
   }
 }
 
-/*
+export class CustomJson extends ObjectWithId {
+  objId?: string
 
-override ngOnInit() {
-  super.ngOnInit()
+  type?: string
+
+  label?: string
+
+  json?: any
+
+  createdAt = new Date()
 }
+/*
+model CustomJson {
+  id String @id(map: "newtable_pk") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  objId String? @db.Uuid
+  type String?   // the object type
+
+  label String?  // specifies what the json is about
+
+  json Json?
+
+  createdAt DateTime @default(now())
+}
+
+
 
 */

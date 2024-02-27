@@ -73,7 +73,7 @@ export class DbQuery {
     and: new Array<QueryCondition>()
   }
 
-  take = 10
+  take = 50
 
   order = new Array<OrderByProperty>()
   selects = new Array<string>()

@@ -8,6 +8,7 @@ import { authGuard } from './auth/auth.guard';
 const routes: Routes = [
  // { path: "", component: MenuComponent, canActivate: [ authGuard] },   // , canActivate: [ authGuard]
  // { path: "signIn", component: SignInComponent },
+  { path: '', redirectTo: '/staff/dashboard', pathMatch: 'full' },
   { path: 'branch', loadChildren: () => import('./branch/branch.module').then(m => m.BranchModule), canActivate: [ authGuard]  },   // , canActivate: [ authGuard]
   { path: 'staff', loadChildren: () => import('./staff/staff.module').then(m => m.StaffModule), canActivate: [ authGuard]  },
   { path: 'auth', loadChildren: () => import('./auth/auth.module').then(m => m.AuthModule)  },

@@ -53,15 +53,20 @@ export class EditTaskComponent extends NgEditBaseComponent<Task> {
       
     } */
 
-  constructor(protected taskSvc: TaskService, protected resourceSvc: ResourceService, protected translationSvc: TranslationService, route: ActivatedRoute, protected router: Router,
+  constructor(protected taskSvc: TaskService, protected resourceSvc: ResourceService, protected translationSvc: TranslationService, route: ActivatedRoute, router: Router,
     spinner: NgxSpinnerService, private modalService: NgbModal, dashboardSvc: DashboardService, protected sessionSvc: SessionService, protected backEndSvc: ObjectService) {
     super('task', Task, ''
       , taskSvc
-      , route, spinner, dashboardSvc)
+      , router, route, spinner, dashboardSvc)
 
     this.sectionProps.set('general', ['name', 'loc', 'info', 'prio', 'date', 'time', 'hrIds', 'schedule', 'cmt', 'status'])
 
 
+  }
+
+  gotoOther() {
+    this.router.navigate(['../4678e36c-a0c5-4a86-837c-764c099bc5b2'], {relativeTo: this.route});
+    // this.router.navigateByUrl('../4678e36c-a0c5-4a86-837c-764c099bc5b2')
   }
 
   override async ngOnInit() {

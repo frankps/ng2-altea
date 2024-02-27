@@ -298,7 +298,8 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "projects/altea-pub-app/src/favicon.ico",
-              "projects/altea-pub-app/src/assets"
+              "projects/altea-pub-app/src/assets",
+              "projects/altea-pub-app/src/manifest.webmanifest"
             ],
             "styles": [
               "projects/altea-pub-app/src/styles.scss",
@@ -313,7 +314,9 @@
               "node_modules/ngx-spinner/animations/ball-scale-multiple.css",
               "node_modules/@ng-select/ng-select/themes/default.theme.css"  
             ],
-            "scripts": []
+            "scripts": [],
+            "serviceWorker": true,
+            "ngswConfigPath": "projects/altea-pub-app/ngsw-config.json"
           },
           "configurations": {
             "production": {
@@ -371,7 +374,8 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "projects/altea-pub-app/src/favicon.ico",
-              "projects/altea-pub-app/src/assets"
+              "projects/altea-pub-app/src/assets",
+              "projects/altea-pub-app/src/manifest.webmanifest"
             ],
             "styles": [
               "projects/altea-pub-app/src/styles.scss"

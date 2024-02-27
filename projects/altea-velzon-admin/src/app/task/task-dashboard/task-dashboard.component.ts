@@ -1,10 +1,19 @@
 import { Component } from '@angular/core';
-import { ResourceService, TaskService } from 'ng-altea-common';
-import { Resource, Task, TaskPriority, TaskSchedule, TaskStatus } from 'ts-altea-model';
+import { CustomJsonService, ResourceService, SessionService, TaskService } from 'ng-altea-common';
+import { Resource, Task, TaskPriority, TaskSchedule, TaskStatus, WebPushToUsers } from 'ts-altea-model';
 import { DbQuery, QueryOperator, Translation } from 'ts-common';
 import * as dateFns from 'date-fns'
-import { th } from 'date-fns/locale';
+import { th, tr } from 'date-fns/locale';
 import { TranslationService } from 'ng-common';
+import { NgxSpinnerService } from "ngx-spinner"
+import { DashboardService, ToastType } from 'ng-common'
+import { MessagingService } from 'projects/ng-altea-common/src/lib/messaging.service';
+
+enum ManageTaskMode {
+  none,
+  edit,
+  new
+}
 
 @Component({
   selector: 'app-task-dashboard',
@@ -13,18 +22,44 @@ import { TranslationService } from 'ng-common';
 })
 export class TaskDashboardComponent {
 
+  css_cls_row = 'mt-2'
+
   progressDone: Task[]
   todo: Task[]
   manual: Task[]
 
-  newManual: Task
+  ManageTaskMode = ManageTaskMode
+  taskMode = ManageTaskMode.none
+  task: Task
+  manualTask: Task  // task selected from dropdown
 
   humanResources: Resource[]
+  humanResourcesById: Map<string, Resource> = new Map<string, Resource>()
 
   initialized = false
   taskPriority: Translation[] = []
 
-  constructor(protected taskSvc: TaskService, protected resourceSvc: ResourceService,  protected translationSvc: TranslationService) {
+  /** if true: a push notification will be sent */
+  sendPush: boolean = false
+
+
+  constructor(protected taskSvc: TaskService, protected resourceSvc: ResourceService, protected translationSvc: TranslationService
+    , protected spinner: NgxSpinnerService, public dashboardSvc: DashboardService, protected sessionSvc: SessionService,
+    public customJsonSvc: CustomJsonService, protected messagingSvc: MessagingService) {
+
+  }
+
+
+  async webPush() {
+
+    const msg = new WebPushToUsers('Aquasense', 'Hallo!!')
+    msg.userIds = ['886c48d3-55c6-4436-a6b7-803cd7539f90']
+
+    console.warn(msg)
+
+    const res = await this.messagingSvc.webPushToUsers$(msg)
+
+    console.error(res)
 
   }
 
@@ -33,13 +68,15 @@ export class TaskDashboardComponent {
 
     await this.translationSvc.translateEnum(TaskPriority, 'enums.task-priority.', this.taskPriority, true)
 
-    this.humanResources = await this.resourceSvc.getHumanResources()
+    this.humanResources = await this.resourceSvc.getHumanResources(['children'])
+    this.indexHumanResources(this.humanResources)
 
     this.getTasks()
 
     this.getManualTasks()
 
     let i = 0
+
 
     this.taskSvc.changeObservable().subscribe(async tasksChanged => {
 
@@ -51,24 +88,238 @@ export class TaskDashboardComponent {
       i++
     })
 
+    await this.getWebPushData()
+
 
     this.initialized = true
+  }
+
+  indexHumanResources(resources: Resource[]) {
+
+    this.humanResourcesById.clear()
+
+    if (!Array.isArray(resources))
+      return
+
+    resources.forEach(resource => { this.humanResourcesById.set(resource.id, resource) })
+  }
+
+  getResourceName(resourceId: string) {
+
+    if (!this.humanResourcesById.has(resourceId))
+      return undefined
+
+    return this.humanResourcesById.get(resourceId).shortOrName()
 
   }
 
-  addManualTask() {
+  isEdit(): boolean {
+    return this.taskMode == ManageTaskMode.edit
+  }
 
+  isNewOrEdit(): boolean {
+    return (this.taskMode == ManageTaskMode.edit || this.taskMode == ManageTaskMode.new)
+  }
 
-    if (!this.newManual)
+  editTask(task: Task) {
+    this.task = task
+    this.taskMode = ManageTaskMode.edit
+  }
+
+  newTaskSelected(task: Task) {
+
+    this.taskMode = ManageTaskMode.new
+    this.task = this.manualTask.toInstance()
+
+    console.warn(this.task.id)
+
+    if (task.id == 'empty') {
+      this.task.name = ''
+      this.task.rTaskId = null
+    }
+
+  }
+
+  async saveTask() {
+
+    if (!this.task)
       return
 
-    console.error(this.newManual)
 
-    let newTask = this.newManual.toInstance()
+    let error = false
 
-    let res = this.taskSvc.create$(newTask)
+    this.spinner.show()
 
-    console.warn(res)
+    try {
+      console.error(this.task)
+
+      let result
+
+      switch (this.taskMode) {
+
+        case ManageTaskMode.new:
+
+
+          // let newTask = this.manualTask.toInstance()
+          result = await this.taskSvc.create$(this.task)
+          console.warn('New task:', result)
+          this.manualTask = undefined
+
+          if (result.isOk) {
+
+            if (this.task.template) {
+              this.manual.push(this.task)
+            }
+
+            if (!this.task.template && this.sendPush) {
+
+              let userIds = this.getUserIdsForTask(this.task)
+
+              if (userIds.length == 0)
+                break
+
+              let body = ''
+              if (this.task.loc) body = this.task.loc
+              if (this.task.info) body += ': ' + this.task.info
+
+              const msg = new WebPushToUsers(this.task.name, body)
+              msg.userIds = userIds
+
+              console.warn('web push msg', msg)
+
+
+/*               const pushRes = await this.messagingSvc.webPushToUsers$(msg)
+              console.warn('push res:', pushRes)
+ */
+
+            }
+
+          }
+
+
+          break
+
+        case ManageTaskMode.edit:
+
+
+
+          result = await this.taskSvc.update$(this.task)
+          console.warn('Task updated:', result)
+          break
+
+        default:
+          console.warn(`Task mode '${this.taskMode}' not supported in saveTask()`)
+          break
+      }
+
+      if (result) {
+        if (result?.isOk) {
+          this.dashboardSvc.showToastType(ToastType.saveSuccess)
+
+          this.taskMode = ManageTaskMode.edit  // for new tasks
+        } else {
+          error = true
+        }
+      }
+
+    } catch (err) {
+      error = true
+    }
+    finally {
+
+      this.spinner.hide()
+
+      if (error)
+        this.dashboardSvc.showToastType(ToastType.saveError)
+
+    }
+
+  }
+
+  getUserIdsForTask(task: Task): string[] {
+
+    if (!task || !Array.isArray(task.hrIds) || task.hrIds.length == 0)
+      return []
+
+    let hr = this.humanResources.filter(hr => task.hrIds.indexOf(hr.id) >= 0)
+    // hr can contain both contain group and child resources
+    // we must replace group resources by their group of child resources
+
+    let childResources: Resource[] = hr.filter(resource => !resource.isGroup)
+
+    let childResourceIds = []
+
+    if (Array.isArray(childResources))
+      childResourceIds = childResources.map(res => res.id)
+
+    const groupResources: Resource[] = hr.filter(resource => resource.isGroup)
+
+    if (Array.isArray(groupResources) && groupResources.length >= 0) {
+      groupResources.forEach(groupRes => {
+        let groupChildIds = groupRes.children.map(link => link.childId)
+
+        if (Array.isArray(groupChildIds))
+          childResourceIds.push(...groupChildIds)
+      })
+    }
+
+    childResources = this.humanResources.filter(hr => childResourceIds.indexOf(hr.id) >= 0)
+
+    const userIds = childResources.filter(hr => hr.userId).map(hr => hr.userId)
+
+    console.error(userIds)
+
+    return userIds
+  }
+
+
+  async deleteTask() {
+
+    if (!this.task)
+      return
+
+    let error = false
+
+    this.spinner.show()
+
+    try {
+      console.error(this.task)
+
+      let result
+
+      switch (this.taskMode) {
+
+        case ManageTaskMode.edit:
+
+          result = await this.taskSvc.delete$(this.task.id)
+          console.warn('Task deleted:', result)
+          break
+        default:
+          return
+      }
+
+      if (result?.isOk) {
+        this.dashboardSvc.showToastType(ToastType.saveSuccess)
+      } else {
+        error = true
+      }
+
+    } catch (err) {
+      error = true
+    }
+    finally {
+
+
+      this.spinner.hide()
+
+      if (error)
+        this.dashboardSvc.showToastType(ToastType.saveError)
+      else {
+        this.taskMode = ManageTaskMode.none
+        this.task = undefined
+      }
+
+    }
 
   }
 
@@ -87,6 +338,16 @@ export class TaskDashboardComponent {
   async getManualTasks() {
     const manualQry = this.getManualTasksQuery()
     this.manual = await this.taskSvc.query$(manualQry)
+
+
+    const emptyTask = new Task()
+    emptyTask.id = "empty"
+    emptyTask.name = 'Lege taak'
+    emptyTask.branchId = this.sessionSvc.branchId
+    emptyTask.schedule = TaskSchedule.once
+    this.manual.push(emptyTask)
+
+
   }
 
   getProgressDoneQuery() {
@@ -111,14 +372,12 @@ export class TaskDashboardComponent {
   getTodoQuery() {
     const query = new DbQuery()
 
-
     query.and('status', QueryOperator.in, [TaskStatus.todo])
     query.and('schedule', QueryOperator.equals, TaskSchedule.once)
 
     query.orderByDesc('prio').orderBy('loc').orderBy('name')
 
     return query
-
   }
 
   getManualTasksQuery() {
@@ -131,6 +390,33 @@ export class TaskDashboardComponent {
 
     return query
   }
+
+
+  async getWebPushData() {
+
+    let webPushData = await this.customJsonSvc.query$(this.getWebPushSubscriptions())
+
+    console.error(webPushData)
+
+    let webPushUserIds = webPushData.map(customJson => customJson.objId)
+
+    let humanResourcesWithWebPush = this.humanResources.filter(hr => webPushUserIds.indexOf(hr.userId) >= 0)
+
+    console.warn(humanResourcesWithWebPush)
+  }
+
+
+  getWebPushSubscriptions() {
+    const query = new DbQuery()
+
+    // query.and('status', QueryOperator.in, [ TaskStatus.todo ])
+    query.and('label', QueryOperator.equals, 'web-push-subscr')
+    query.and('type', QueryOperator.equals, 'user')
+
+    return query
+  }
+
+
 
 
 }

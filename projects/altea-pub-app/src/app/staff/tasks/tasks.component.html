@@ -1,5 +1,8 @@
+
+
+
 <ul class="list-group">
-    <li class="list-group-item" *ngFor="let task of tasks" (click)="selectTask(task)">
+    <li class="list-group-item" *ngFor="let task of tasks" (click)="selectTask(task)" [style.background-color]="task.backColor()">
 
         <div class="row">
 

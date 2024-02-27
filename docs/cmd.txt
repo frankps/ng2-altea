@@ -15,6 +15,7 @@ Deploy:
     ng build --aot --project altea-pub-app
     firebase deploy --only hosting:altea-pub-app
     https://altea-pub-app.web.app
+    https://altea-pub-app.web.app/auth/sign-in
 
 
     Project Console: https://console.firebase.google.com/project/altea-24/overview
@@ -66,6 +67,9 @@ ng generate component staff/task --project altea-pub-app
 ng generate component order-mgr/posPayment --project altea-velzon-admin
 ng generate component pos/posPayment --project ng-altea-common
 ng generate service stripe --project ng-altea-common
+
+ng generate service messaging --project ng-altea-common
+
 ng generate component resource/resourceUserLink --project altea-velzon-admin
 
 
@@ -93,3 +97,18 @@ ng generate component interface/upload --project ng-altea-common
 
 
 ng generate service user --project=ng-altea-common
+
+
+
+
+
+
+ng generate service custom-json --project=ng-altea-common
+
+
+ng generate module branch --routing --project=altea-velzon-admin
+
+ng generate component <TYPE>/manage-<TYPES> --project=altea-velzon-admin
+ng generate component <TYPE>/edit-<TYPE> --project=altea-velzon-admin
+ng generate component <TYPE>/<TYPE>-list --project=altea-velzon-admin
+
