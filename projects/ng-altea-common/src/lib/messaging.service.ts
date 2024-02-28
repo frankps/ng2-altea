@@ -28,15 +28,6 @@ export class MessagingService {
 
         })
         
-        
-/*         .pipe(map(res => {
-
-          console.log(res)
-          resolve(res)
-        }
-        )) */
-
-
       } catch (error) {
         throw error
       }

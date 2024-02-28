@@ -51,6 +51,28 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
     super()
   }
 
+  async post$<T>(url: string, body: any): Promise<T> {
+    const me = this
+
+    return new Promise<T>(function (resolve, reject) {
+
+      try {
+        console.warn('post$', url, body)
+
+        // .pipe(take(1))
+        me.http.post<T>(url, body).pipe(take(1)).subscribe(res => {
+          console.log(res)
+          resolve(res)
+
+        })
+        
+      } catch (error) {
+        throw error
+      }
+
+    })
+  }
+
   get(id: string, includes: string | null = null): Observable<T> {
 
     const queryString = []
@@ -313,6 +335,14 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
 
 
     })
+
+  }
+
+  async deleteMany$(query: DbQuery): Promise<ApiResult<any>> {
+
+    let res = await this.post$<ApiResult<any>>(`${this.host}/${this.urlDifferentiator}/deleteMany`, query)
+
+    return res
 
   }
 

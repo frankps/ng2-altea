@@ -1,7 +1,8 @@
 import { AfterContentChecked, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { AvailabilityContext, AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Order, PossibleSlots, ReservationOptionSet, ResourceAvailability, ResourcePlanning, ResourceRequest, Schedule, SlotInfo, Solution, SolutionSet } from 'ts-altea-model';
 import * as _ from "lodash"
-import { AlteaService } from 'ng-altea-common';
+import { AlteaService, OrderService, ResourcePlanningService } from 'ng-altea-common';
+import { DbQuery, QueryOperator } from 'ts-common';
 
 @Component({
   selector: 'order-mgr-debug-availability',
@@ -75,15 +76,15 @@ export class DebugAvailabilityComponent implements OnInit {
 
   }
 
-  constructor(protected alteaSvc: AlteaService) {
+  constructor(protected alteaSvc: AlteaService, protected planSvc: ResourcePlanningService, protected orderSvc: OrderService) {
 
   }
-/* 
-  , AfterContentChecked
-  , private changeDetector: ChangeDetectorRef
-  ngAfterContentChecked(): void {
-    this.changeDetector.detectChanges();
-  } */
+  /* 
+    , AfterContentChecked
+    , private changeDetector: ChangeDetectorRef
+    ngAfterContentChecked(): void {
+      this.changeDetector.detectChanges();
+    } */
 
   async ngOnInit() {
 
@@ -91,6 +92,33 @@ export class DebugAvailabilityComponent implements OnInit {
 
     console.error(this.branchSchedules)
   }
+
+
+  async deleteTestData() {
+
+    const start = 20240201000000
+    const end = 20240401000000
+
+
+
+    const deleteOrderQuery = new DbQuery()
+
+    deleteOrderQuery.and('start', QueryOperator.greaterThanOrEqual, start)
+    deleteOrderQuery.and('start', QueryOperator.lessThan, end)
+
+    /* this will also delete related objects (as defined in prisma schema)
+     */
+    let orders = await this.orderSvc.deleteMany$(deleteOrderQuery)
+
+    console.error(orders)
+
+
+  }
+
+
+
+
+
 
   resourceHasplannings(resourceId: string): boolean {
     if (!this.plannings)

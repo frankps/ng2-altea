@@ -8,8 +8,6 @@ import * as _ from "lodash";
 export class ResourceRequestItem {
     //person?: OrderPerson
 
-    
-
     /** only filled in if request is based on a resource group  */
     resourceGroup?: Resource
 
@@ -29,6 +27,8 @@ export class ResourceRequestItem {
     /** the originating product resource */
     productResource: ProductResource
 
+    // set to true when processed
+    isProcessed = false
 
     /** the availability after applying all rules: schedules, resourcePlannings, etc ... */
     // availability: DateRangeSet = DateRangeSet.empty

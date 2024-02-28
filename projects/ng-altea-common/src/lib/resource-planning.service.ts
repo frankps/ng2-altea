@@ -3,6 +3,7 @@ import { Product, ProductResource, ResourcePlanning } from 'ts-altea-model'
 import { BackendHttpServiceBase } from 'ng-common';
 import { HttpClient } from '@angular/common/http';
 import { SessionService } from './session.service';
+import { DbQuery, QueryOperator } from 'ts-common';
 
 @Injectable({
   providedIn: 'root'
@@ -17,5 +18,9 @@ export class ResourcePlanningService extends BackendHttpServiceBase<ResourcePlan
      */
     super(ResourcePlanning, sessionSvc.backend, sessionSvc.branchUnique + '/resource-plannings', http)
   }
+
+
+
+
 
 }
