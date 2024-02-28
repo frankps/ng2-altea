@@ -1,18 +1,19 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ApiListResult, ApiResult, ApiStatus, DateHelper, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
-import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, Reminder } from 'ts-altea-model'
+import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, Reminder, ConfirmOrderResponse } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { AlteaDb } from '../general/altea-db'
 import { IDb } from '../interfaces/i-db'
 import { CreateResourceRequest } from './reservation/create-resource-request'
 import { CreateAvailabilityContext } from './reservation/create-availability-context'
 import { SlotFinder } from './reservation/slot-finder'
-import { ResourceRequestOptimizer, ResourceSet } from './reservation/resource-request-optimizer'
+import { ResourceRequestOptimizer } from './reservation/resource-request-optimizer'
 import { SolutionPicker } from './reservation/solution-picker'
 import { DetermineReservationOptions } from './reservation/determine-reservation-options'
 import * as dateFns from 'date-fns'
 import * as Handlebars from "handlebars"
 import * as _ from "lodash"
+
 
 
 export class OrderMgmtService {
@@ -93,13 +94,15 @@ export class OrderMgmtService {
      * @param solution 
      * @returns 
      */
-    async confirmOrder(order: Order, reservationOption: ReservationOption, solution: Solution): Promise<Order | undefined> {
+    async confirmOrder(order: Order, reservationOption: ReservationOption, solution: Solution): Promise<ConfirmOrderResponse | undefined> {
 
         order.start = reservationOption.dateNum
 
-        const plannings = this.createResourcePlanningsForNewOrder(order, reservationOption, solution)
+        const response = new ConfirmOrderResponse()
 
-        console.info(plannings)
+        response.plannings = this.createResourcePlanningsForNewOrder(order, reservationOption, solution)
+
+        console.info(response.plannings)
 
         const orderApiResult = await this.alteaDb.saveOrder(order)
 
@@ -108,9 +111,11 @@ export class OrderMgmtService {
             return undefined
         }
 
-        const planningResult = await this.alteaDb.saveResourcePlannings(plannings)
+        response.order = orderApiResult.object
 
-        return orderApiResult.object
+        const planningResult = await this.alteaDb.saveResourcePlannings(response.plannings)
+
+        return response
 
         /** Save all the resource plannings */
     }
@@ -155,10 +160,13 @@ export class OrderMgmtService {
 
                 if (groupAlloc) {
                     resPlan.resourceGroupId = resourceGroup.id
+                    resPlan.resourceGroup = resourceGroup
                     resourceInfo = new PlanningResourceInfo(resourceGroup.name, resource.type)
                 }
-                else
+                else {
                     resPlan.resourceId = resource.id
+                    resPlan.resource = resource
+                }
 
                 /** info will be stored as json inside resourcePlanning */
                 const info = new PlanningInfo(productInfo, contactInfo, resourceInfo)

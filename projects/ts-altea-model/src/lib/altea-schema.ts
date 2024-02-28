@@ -3331,7 +3331,7 @@ export class ResourcePlanning extends ObjectWithId implements IAsDbObject<Resour
   branchId?: string;
 
   @Type(() => Resource)
-  resource?: Resource | ConnectTo
+  resource?: Resource //| ConnectTo
   resourceId?: string;
 
   @Type(() => Resource)
@@ -3355,7 +3355,6 @@ export class ResourcePlanning extends ObjectWithId implements IAsDbObject<Resour
 
   /** label coming from ProductResource */
   label?: string
-
 
   /** stored as JSON in database */
   @Type(() => PlanningInfo)

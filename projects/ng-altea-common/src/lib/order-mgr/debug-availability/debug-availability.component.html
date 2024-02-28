@@ -209,13 +209,13 @@
 
 <h4>Schedules</h4>
 
-<ng-container *ngFor="let resourceId of ctx?.scheduleDateRanges?.keys()">
+<ng-container *ngFor="let resourceId of ctx?.scheduleDateRangeKeys()">   <!-- ctx?.scheduleDateRanges?.keys() -->
 
     <div class="row" *ngIf="ctx.scheduleDateRanges.get(resourceId) as resourceScheduleRanges">
         <div class="col-2">{{ctx.getResource(resourceId)?.name}}</div>
 
 
-        <div class="col">
+        <div class="col" *ngIf="resourceScheduleRanges?.ranges">
         
             <ng-container *ngFor="let range of resourceScheduleRanges.ranges">
 

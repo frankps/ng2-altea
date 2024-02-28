@@ -15,6 +15,28 @@ export class ObjectHelper {
         return typedClone
     }
 
+    /** before saving to the backend we want to remove linked objects (propsToRemove), we don't want to this on the original objects, but on a clone
+     * => the original objects still have the linked objects
+     */
+    static unType(objects: any[], propsToRemove: string[]): any[] {
+
+        if (!Array.isArray(objects))
+            return []
+
+        const unTypedObjects = objects.map(obj => {
+            const unTyped = instanceToPlain(obj)
+
+            propsToRemove.forEach(prop => {
+                if (unTyped[prop])
+                    delete unTyped[prop]
+            })
+
+            return unTyped
+        })
+
+        return unTypedObjects
+    }
+
 
     static newSmallGuid(nrOfDigits = -1) {
 

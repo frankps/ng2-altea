@@ -66,6 +66,22 @@ export class AvailabilityContext {
 
 
     }
+    // ctx?.scheduleDateRanges?.keys()
+
+    _scheduleDateRangeKeys: string[]
+
+    // implemented to fix: NG0100: ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked.
+    scheduleDateRangeKeys(): string[] {
+
+        if (!this.scheduleDateRanges)
+            return []
+
+        if (!this._scheduleDateRangeKeys || this._scheduleDateRangeKeys.length != this.scheduleDateRanges.size)
+            this._scheduleDateRangeKeys = Array.from(this.scheduleDateRanges.keys())
+
+        return this._scheduleDateRangeKeys
+    }
+
 
     getProduct(productId: string): Product | undefined {
         return this.products.find(p => p.id == productId)

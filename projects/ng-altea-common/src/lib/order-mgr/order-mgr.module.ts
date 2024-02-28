@@ -31,6 +31,7 @@ import { StaffSelectComponent } from './staff-select/staff-select.component';
 import { SendOfferComponent } from './send-offer/send-offer.component';
 import { SearchContactComponent } from './search-contact/search-contact.component';
 import { ContactSelect2Component } from './contact-select2/contact-select2.component';
+import { DebugPlanningsComponent } from './debug-plannings/debug-plannings.component';
 
 @NgModule({
   declarations: [
@@ -51,6 +52,7 @@ import { ContactSelect2Component } from './contact-select2/contact-select2.compo
     SendOfferComponent,
     SearchContactComponent,
     ContactSelect2Component,
+    DebugPlanningsComponent,
   ],
   imports: [
     CommonModule,
@@ -83,7 +85,8 @@ import { ContactSelect2Component } from './contact-select2/contact-select2.compo
     PosPaymentComponent,
     StaffSelectComponent,
     SendOfferComponent,
-    SearchContactComponent
+    SearchContactComponent,
+    DebugPlanningsComponent
   ]
 })
 export class OrderMgrModule {}

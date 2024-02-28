@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { AfterContentChecked, ChangeDetectorRef, Component } from '@angular/core';
 import { BranchService, SessionService } from 'ng-altea-common';
 import { BsLocaleService } from 'ngx-bootstrap/datepicker';
 
@@ -7,7 +7,7 @@ import { BsLocaleService } from 'ngx-bootstrap/datepicker';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent {
+export class AppComponent{
   title = 'altea-velzon-admin';
 
   constructor(private localeService: BsLocaleService, private branchSvc: BranchService, private sessionSvc: SessionService) {
@@ -24,4 +24,12 @@ export class AppComponent {
   
     
   }
+
+/*   implements AfterContentChecked 
+  , private changeDetector: ChangeDetectorRef
+  ngAfterContentChecked(): void {
+    this.changeDetector.detectChanges();
+  } */
+
+
 }

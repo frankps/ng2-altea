@@ -1,4 +1,4 @@
-import { ApiListResult, ApiResult, DateHelper, DbObjectMulti, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
+import { ApiListResult, ApiResult, DateHelper, DbObjectMulti, DbQuery, DbQueryTyped, ObjectHelper, QueryOperator } from 'ts-common'
 import { Branch, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { IDb } from '../interfaces/i-db'
@@ -54,7 +54,12 @@ export class AlteaDb {
 
     async saveResourcePlannings(plannings: ResourcePlanning[]): Promise<ApiResult<ResourcePlanning[]>> {
 
-        const dbPlannings = new DbObjectMulti<ResourcePlanning>('resourcePlanning', ResourcePlanning, plannings)
+
+        console.error('saveResourcePlannings', plannings)
+
+        let planningsForDb = ObjectHelper.unType(plannings, ['resource', 'resourceGroup', 'schedule', 'orderLine'])
+
+        const dbPlannings = new DbObjectMulti<ResourcePlanning>('resourcePlanning', ResourcePlanning, planningsForDb)
 
         const res = await this.db.createMany$<ResourcePlanning>(dbPlannings)
 

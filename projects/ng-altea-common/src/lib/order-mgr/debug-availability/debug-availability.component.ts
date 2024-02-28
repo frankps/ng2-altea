@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { AfterContentChecked, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { AvailabilityContext, AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Order, PossibleSlots, ReservationOptionSet, ResourceAvailability, ResourcePlanning, ResourceRequest, Schedule, SlotInfo, Solution, SolutionSet } from 'ts-altea-model';
 import * as _ from "lodash"
 import { AlteaService } from 'ng-altea-common';
@@ -78,6 +78,12 @@ export class DebugAvailabilityComponent implements OnInit {
   constructor(protected alteaSvc: AlteaService) {
 
   }
+/* 
+  , AfterContentChecked
+  , private changeDetector: ChangeDetectorRef
+  ngAfterContentChecked(): void {
+    this.changeDetector.detectChanges();
+  } */
 
   async ngOnInit() {
 

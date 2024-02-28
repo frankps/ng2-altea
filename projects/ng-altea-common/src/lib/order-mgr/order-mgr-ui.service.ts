@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import { Injectable } from '@angular/core';
-import { AppMode, AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Contact, CreateCheckoutSession, DateBorder, Gift, GiftType, Order, OrderLine, OrderLineOption, OrderState, Payment, PaymentType, Product, ProductType, ProductTypeIcons, RedeemGift, ReservationOption, ReservationOptionSet, Resource, ResourceType } from 'ts-altea-model'
+import { AppMode, AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, ConfirmOrderResponse, Contact, CreateCheckoutSession, DateBorder, Gift, GiftType, Order, OrderLine, OrderLineOption, OrderState, Payment, PaymentType, Product, ProductType, ProductTypeIcons, RedeemGift, ReservationOption, ReservationOptionSet, Resource, ResourcePlanning, ResourceType } from 'ts-altea-model'
 import { ApiListResult, ApiStatus, DateHelper, DbQuery, QueryOperator, Translation } from 'ts-common'
 import { AlteaService, ObjectService, OrderMgrService, OrderService, ProductService, ResourceService, SessionService } from 'ng-altea-common'
 import * as _ from "lodash";
@@ -69,6 +69,14 @@ export class OrderMgrUiService {
   orderUiStateChanges: BehaviorSubject<string> = new BehaviorSubject<string>(null)
 
   uiMode = OrderUiMode.newOrder
+
+  /** available after calling getAvailabilities() */
+  availabilityResponse: AvailabilityResponse
+  options: ReservationOption[]
+
+  /** resource plannings associated with current order */
+  plannings: ResourcePlanning[]
+
 
   constructor(private productSvc: ProductService, private orderSvc: OrderService, private orderMgrSvc: OrderMgrService
     , protected spinner: NgxSpinnerService, public dbSvc: ObjectService, protected alteaSvc: AlteaService, protected sessionSvc: SessionService,
@@ -273,8 +281,7 @@ export class OrderMgrUiService {
     return this.order.nrOfLines()
   }
 
-  availabilityResponse: AvailabilityResponse
-  options: ReservationOption[]
+
 
 
   async getAvailabilities() {
@@ -326,7 +333,7 @@ export class OrderMgrUiService {
     return 0
   }
 
-  async selectTimeSlot(option: ReservationOption) {
+  async selectTimeSlot(option: ReservationOption) : Promise<ConfirmOrderResponse> {
 
     console.warn(option)
 
@@ -334,21 +341,31 @@ export class OrderMgrUiService {
 
     const solutionForOption = this.availabilityResponse.solutionSet.getSolutionById(option.solutionIds[0])
 
+    console.warn(solutionForOption)
+
+/*     this.spinner.hide()
+    return */
 
     const depositMinutes = this.maxWaitForDepositInMinutes(this.sessionSvc.appMode)
 
 
-    const savedOrder = await this.alteaSvc.orderMgmtService.confirmOrder(this.order, option, solutionForOption)
+    const confirmOrderResponse = await this.alteaSvc.orderMgmtService.confirmOrder(this.order, option, solutionForOption)
 
-    if (savedOrder) {
+    if (confirmOrderResponse?.order) {
 
-      this.refreshOrder(savedOrder)
+      this.refreshOrder(confirmOrderResponse?.order)
       this.dashboardSvc.showToastType(ToastType.saveSuccess)
     }
     else
       this.dashboardSvc.showToastType(ToastType.saveError)
 
+    
+    this.plannings = confirmOrderResponse.plannings
+
+
     this.spinner.hide()
+
+    return confirmOrderResponse
   }
 
   /** when an order is saved, we need to refresh all associated objects */

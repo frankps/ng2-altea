@@ -37,8 +37,8 @@ export class TasksComponent implements OnInit {
 
     let i = 0
 
-/*     const taskDocRef = doc(this.firestore, 'branches', this.sessionSvc.branchUnique, 'updates', 'task')
-    const taskDocData$ = docData(taskDocRef) */
+    /*     const taskDocRef = doc(this.firestore, 'branches', this.sessionSvc.branchUnique, 'updates', 'task')
+        const taskDocData$ = docData(taskDocRef) */
 
     this.taskSvc.changeObservable().subscribe(async tasksChanged => {
 
@@ -67,7 +67,7 @@ export class TasksComponent implements OnInit {
 
     this.tasks = await this.taskSvc.query$(query)
 
-    console.warn(this.tasks)
+    console.warn('tasks', this.tasks)
 
 
   }

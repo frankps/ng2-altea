@@ -176,6 +176,8 @@
       "su": "Zondag"
     },
     "product-type": {
+      "prod": "Product",
+      "svc": "Dienst",
       "product": "Product",
       "service": "Dienst",
       "category": "Categorie",

@@ -95,7 +95,7 @@
     </div>
 </div>
 
-
+<order-mgr-debug-plannings *ngIf="orderMgrSvc.plannings" [plannings]="orderMgrSvc.plannings" ></order-mgr-debug-plannings>
 
 <order-mgr-debug-availability [response]="orderMgrSvc.availabilityResponse"></order-mgr-debug-availability>
 
@@ -103,6 +103,9 @@
 
 
 <!-- 
+
+[resources]="orderMgrSvc.resources"
+
 <ngx-altea-browse-catalog></ngx-altea-browse-catalog>
 
 <div class="row">

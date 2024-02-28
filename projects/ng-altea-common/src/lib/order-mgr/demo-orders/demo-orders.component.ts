@@ -1,9 +1,10 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, OnInit } from '@angular/core';
 import { OrderMgrUiService } from '../order-mgr-ui.service';
 import { SessionService } from 'ng-altea-common';
 import { Order, ResourceType } from 'ts-altea-model';
 import { DashboardService, ToastType } from 'ng-common'
 import { NgxSpinnerService } from "ngx-spinner"
+import { ObjectHelper } from 'ts-common';
 
 
 export class DemoOrderLine {
@@ -64,7 +65,7 @@ export class DemoOrder {
   templateUrl: './demo-orders.component.html',
   styleUrls: ['./demo-orders.component.scss'],
 })
-export class DemoOrdersComponent {
+export class DemoOrdersComponent implements OnInit {
 
   @Output() new: EventEmitter<Order> = new EventEmitter<Order>();
 
@@ -86,12 +87,53 @@ export class DemoOrdersComponent {
 
   demoNames: string[] = []
 
+  preselect: string = 'Wellness 2h/2p'
+  onDate: number = 20240315000000
+
+
   constructor(protected orderMgrSvc: OrderMgrUiService, protected sessionSvc: SessionService, protected spinner: NgxSpinnerService) {
 
     this.demoNames = Array.from(this.demos.keys())
 
   }
 
+  async delaySeconds(seconds: number) {
+    return new Promise(resolve => setTimeout(resolve, seconds * 1000));
+
+
+
+  }
+
+  async ngOnInit() {
+
+    if (this.preselect) {
+
+      const demoOrder = this.demos.get(this.preselect)
+
+      if (demoOrder) {
+        await this.delaySeconds(1)
+        await this.createDemoOrder(demoOrder)
+
+        if (this.onDate) {
+          this.orderMgrSvc.from = this.onDate
+
+          this.spinner.show()
+
+          await this.orderMgrSvc.getAvailabilities()
+
+          this.spinner.hide()
+        }
+
+
+
+
+      }
+
+
+    }
+
+
+  }
 
   async createDemoOrder(demo: DemoOrder) {
 

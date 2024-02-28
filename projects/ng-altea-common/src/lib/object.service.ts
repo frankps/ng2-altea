@@ -56,6 +56,7 @@ export class ObjectService implements IDb {
 
   createMany<T>(dbObjects: DbObjectMulti<T>): Observable<ApiResult<T[]>> {
 
+    
 
 
     return this.http.post<ApiResult<T[]>>(`${this.sessionSvc.backend}/${this.sessionSvc.branchUnique}/objects/createMany`, dbObjects).pipe(map(res => {
@@ -63,21 +64,6 @@ export class ObjectService implements IDb {
       if (res && res.object) {
 
         res.object = plainToInstance(dbObjects.type, res.object)
-
-        // if (Array.isArray(res.object)) {
-
-        //   const typedArray = []
-
-        //   for (let obj of res.object) {
-        //     const typed = plainToInstance(dbObjects.type, res.object)
-        //     typedArray.push()
-        //   }
-
-        //   res.object = 
-        // }
-
-
-
 
       }
 
