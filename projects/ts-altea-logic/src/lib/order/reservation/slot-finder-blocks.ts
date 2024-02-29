@@ -71,10 +71,10 @@ export class SlotFinderBlocks {
 
     findSlotsInRange(resource: Resource, availableRange: DateRange, resReqItem: ResourceRequestItem, resourceRequest: ResourceRequest, availability: ResourceAvailability2, ctx: AvailabilityContext) {
 
-
         //const solutionSet = new SolutionSet()
 
-        const solutions = []
+        const solutions: Solution[] = []
+        let currentSolution: Solution
 
         let searchDirection = SlotSearchDirection.forward
 
@@ -87,7 +87,6 @@ export class SlotFinderBlocks {
         */
         let requestItemsSameResource = resourceRequest.getItemsForResource(resource.id)
 
-        //if (requestItemsSameResource.length > 1) {
 
         const firstRequestItem = requestItemsSameResource[0]
 
@@ -95,76 +94,114 @@ export class SlotFinderBlocks {
 
 
         if (firstRequestItem.isPrepTime && firstRequestItem.prepOverlap) {
-            // this is a preparation block that can overlap with existing (preparations) => try to find one
-            let existingPrepBlock = availability.getPreparationBlockJustBefore(resource.id, availableRange.from)
+ 
 
-            let prepFrom: Date, prepTo: Date
+            let solutionItem = this.handlePreparationRequestItem(resource, firstRequestItem, availableRange, availability, ctx)
 
 
-            console.log(existingPrepBlock)
+           // set the reference date for this solution
+           offsetZeroDate = dateFns.addSeconds(solutionItem.dateRange.from, -firstRequestItem.offset.seconds)
 
-            if (existingPrepBlock) {
-
-                if (existingPrepBlock.seconds() >= firstRequestItem.seconds()) {
-                    // the requested time block fits into the existing one
-                    prepTo = existingPrepBlock.to   // same as availableRange.from
-                    prepFrom = dateFns.addSeconds(prepTo, -firstRequestItem.seconds())
-                } else {
-                    prepFrom = existingPrepBlock.from
-                    prepTo = dateFns.addSeconds(prepFrom, firstRequestItem.seconds())
-                }
-            } else {
-
-                // there is no existing preparation block where we can overlap with => create inside the available range
-                prepFrom = availableRange.from
-
-                if (availableRange.containsFromLabel('START')) {
-                    // get the current schedule in order to see if preparations can be done outside schedule
-                    let schedule = ctx.getScheduleOnDate(resource.id, prepFrom)
-
-                    if (!schedule)
-                        throw new Error(`No schedule found`)
-
-                    // check if preparations can be done outside schedule
-                    if (!schedule.prepIncl)
-                        prepFrom = dateFns.addSeconds(availableRange.from, -firstRequestItem.seconds())
-                }
-
-                prepTo = dateFns.addSeconds(prepFrom, firstRequestItem.seconds())
-            }
-
-            let newPreparationRange = new DateRange(prepFrom, prepTo)
-
-            offsetZeroDate = dateFns.addSeconds(prepFrom, -firstRequestItem.offset.seconds)
-
-            let solutionItem = new SolutionItem(firstRequestItem, newPreparationRange, true, resource)
             //  solutionSet.add(new Solution(solutionItem))
-            solutions.push(new Solution(solutionItem))
-            firstRequestItem.isProcessed = true
+            currentSolution = new Solution(solutionItem)
+            solutions.push(currentSolution)
+
+            //firstRequestItem.isProcessed = true
         }
 
+
+        // reminder: we work inside an availableRange
 
         for (let i = 1; i < requestItemsSameResource.length; i++) {
 
             let requestItem = requestItemsSameResource[i]
+            let solutionItem = this.handleBasicRequestItem(resource, requestItem, offsetZeroDate, availableRange)
 
-            let requestFrom = dateFns.addSeconds(offsetZeroDate, requestItem.offset.seconds)
-            let requestTo = dateFns.addSeconds(requestFrom, requestItem.duration.seconds)
+            currentSolution.add(solutionItem)
 
-            let requestRange = new DateRange(requestFrom, requestTo)
-
-            // check if resource free
-
-            console.error(requestItem)
-
+            if (!solutionItem.valid) {
+                currentSolution.valid = false
+                break  // we don't continue with current solution
+            }
+                
         }
 
 
         console.error(requestItemsSameResource)
 
+        // we mark all request items as processed
+        requestItemsSameResource.forEach(requestItem => requestItem.isProcessed = true)
 
         return solutions
 
+    }
+
+    handlePreparationRequestItem(resource: Resource, firstRequestItem: ResourceRequestItem, availableRange: DateRange, availability: ResourceAvailability2, ctx: AvailabilityContext): SolutionItem {
+           // this is a preparation block that can overlap with existing (preparations) => try to find one
+           let existingPrepBlock = availability.getPreparationBlockJustBefore(resource.id, availableRange.from)
+
+           let prepFrom: Date, prepTo: Date
+
+
+           console.log(existingPrepBlock)
+
+           if (existingPrepBlock) {
+
+               if (existingPrepBlock.seconds() >= firstRequestItem.seconds()) {
+                   // the requested time block fits into the existing one
+                   prepTo = existingPrepBlock.to   // same as availableRange.from
+                   prepFrom = dateFns.addSeconds(prepTo, -firstRequestItem.seconds())
+               } else {
+                   prepFrom = existingPrepBlock.from
+                   prepTo = dateFns.addSeconds(prepFrom, firstRequestItem.seconds())
+               }
+           } else {
+
+               // there is no existing preparation block where we can overlap with => create inside the available range
+               prepFrom = availableRange.from
+
+               if (availableRange.containsFromLabel('START')) {
+                   // get the current schedule in order to see if preparations can be done outside schedule
+                   let schedule = ctx.getScheduleOnDate(resource.id, prepFrom)
+
+                   if (!schedule)
+                       throw new Error(`No schedule found`)
+
+                   // check if preparations can be done outside schedule
+                   if (!schedule.prepIncl)
+                       prepFrom = dateFns.addSeconds(availableRange.from, -firstRequestItem.seconds())
+               }
+
+               prepTo = dateFns.addSeconds(prepFrom, firstRequestItem.seconds())
+           }
+
+           let newPreparationRange = new DateRange(prepFrom, prepTo)
+
+
+           let solutionItem = new SolutionItem(firstRequestItem, newPreparationRange, true, resource)
+
+           return solutionItem
+    }
+
+
+
+    handleBasicRequestItem(resource: Resource, requestItem: ResourceRequestItem, offsetZeroDate: Date, availableRange: DateRange): SolutionItem {
+
+        let requestFrom = dateFns.addSeconds(offsetZeroDate, requestItem.offset.seconds)
+        let requestTo = dateFns.addSeconds(requestFrom, requestItem.duration.seconds)
+
+        let requestRange = new DateRange(requestFrom, requestTo)
+
+        // if requestRange is still within available range: then all is still ok
+
+        let solutionItem = new SolutionItem(requestItem, requestRange, true, resource)
+        solutionItem.valid = requestRange.isInsideOf(availableRange)
+
+        if (!solutionItem.valid) {
+            solutionItem.addNote(`${requestRange.toString()} not in available range ${availableRange.toString()}`)
+        }
+
+        return solutionItem
     }
 
 
@@ -229,6 +266,8 @@ export class SlotFinderBlocks {
                 // convert to actual dates
                 const dateRangeSet = this.getActualBlocks(blockSeries, dateRangeSameSchedule)
                 resultBlocks = resultBlocks.add(dateRangeSet)
+
+
             }
         }
 

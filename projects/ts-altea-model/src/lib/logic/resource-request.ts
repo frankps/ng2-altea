@@ -16,7 +16,7 @@ export class ResourceRequestItem {
 
     offset = TimeSpan.zero
     duration = TimeSpan.zero
-    
+
     /** the number of resources that should be allocated from the resourceGroup (or from resources) */
     qty = 1
 
@@ -37,12 +37,12 @@ export class ResourceRequestItem {
 
     }
 
-    get endsAt() : TimeSpan {
+    get endsAt(): TimeSpan {
         return this.offset.add(this.duration)
     }
     //offsetDuration: OffsetDuration = new OffsetDuration()
 
-    seconds() : number {
+    seconds(): number {
         return this.duration.seconds
     }
 
@@ -130,6 +130,29 @@ export class ResourceRequest {
         return (!Array.isArray(this.items) || this.items.length === 0)
     }
 
+    hasItemsToProcess(): boolean {
+        if (this.isEmpty())
+            return false
+
+        return (this.items.findIndex(i => !i.isProcessed) >= 0)
+    }
+
+    nextItemToProcess(): ResourceRequestItem {
+        if (this.isEmpty())
+            return undefined
+
+        return this.items.find(i => !i.isProcessed)
+
+    }
+
+    itemsNotYetProcessed(): ResourceRequestItem[] {
+
+        if (this.isEmpty())
+            return []
+
+        return this.items.filter(i => !i.isProcessed)
+    }
+
     getAllResources() {
 
         const allResources = this.items.flatMap(item => item.resources)
@@ -139,10 +162,10 @@ export class ResourceRequest {
     }
 
 
-    getItemsForResource(resourceId: string) : ResourceRequestItem[] {
+    getItemsForResource(resourceId: string): ResourceRequestItem[] {
         const items = this.items.filter(i => i.resources.findIndex(r => r.id == resourceId) >= 0)
 
-        return _.orderBy(items, 'offset.seconds') 
+        return _.orderBy(items, 'offset.seconds')
     }
 
 

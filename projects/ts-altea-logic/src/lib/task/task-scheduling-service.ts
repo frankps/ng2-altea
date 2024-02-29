@@ -88,7 +88,8 @@ export class TaskSchedulingService {
 
         switch (schedule) {
             case TaskSchedule.daily:
-                finishedAfter = dateFns.addDays(finishedAfter, -1)
+                //finishedAfter = dateFns.addDays(finishedAfter, -1)
+                finishedAfter = dateFns.startOfDay(finishedAfter)
                 break
             case TaskSchedule.twiceAWeek:
                 finishedAfter = dateFns.addDays(finishedAfter, -3)

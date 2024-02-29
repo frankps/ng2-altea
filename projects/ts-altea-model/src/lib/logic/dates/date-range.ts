@@ -18,8 +18,8 @@ export class DateRange {
 
     /* fromLabels & toLabels were introduced 
     */
-/*     public fromLabels: string[] = []
-    public toLabels: string[] = [] */
+    /*     public fromLabels: string[] = []
+        public toLabels: string[] = [] */
 
     constructor(public from: Date, public to: Date, public fromLabels: string[] = [], public toLabels: string[] = []) {
         if (to < from) {
@@ -28,11 +28,11 @@ export class DateRange {
       To: ${to}`);
         }
 
-/*         if (fromLabel)
-            this.fromLabels.push(fromLabel)
-
-        if (toLabel)
-            this.toLabels.push(toLabel) */
+        /*         if (fromLabel)
+                    this.fromLabels.push(fromLabel)
+        
+                if (toLabel)
+                    this.toLabels.push(toLabel) */
     }
 
     /**
@@ -57,6 +57,12 @@ export class DateRange {
         const toDate = DateHelper.parse(to)
 
         return new DateRange(fromDate, toDate);
+    }
+
+    toString(format: string = 'HH:mm'): string {   //  'dd/MM HH:mm'
+
+        return `[${dateFns.format(this.from, format)}-${dateFns.format(this.to, format)}]`
+
     }
 
     get duration(): TimeSpan {
@@ -181,6 +187,9 @@ export class DateRange {
         return dates;
     }
 
+    isInsideOf(other: DateRange): boolean {
+        return (this.from >= other.from && this.to <= other.to)
+    }
 
     /**
      * How this date range overlaps a secondary date range
@@ -244,7 +253,7 @@ export class DateRange {
                 break
             case OverlapMode.otherOverlapsRight:  // this range overlaps the other at the start (of this range)
                 let newLeft = new DateRange(source.from, other.from, source.fromLabels, other.fromLabels)
-                ranges = [newLeft]  
+                ranges = [newLeft]
                 break
         }
 

@@ -58,12 +58,18 @@ export class SlotFinder {
          *  Given the initial solution, we need to check availabilities for other resource request items
          */
 
-        for (let i = 1; i < resourceRequest.items.length; i++) {
-            const requestItem = resourceRequest.items[i]
+        while (resourceRequest.hasItemsToProcess()) {
+            const requestItem = resourceRequest.nextItemToProcess()
 
             solutionSet = this.handleResourceRequestItem(requestItem, solutionSet, availability)
-
         }
+        /* 
+                for (let i = 1; i < resourceRequest.items.length; i++) {
+                    const requestItem = resourceRequest.items[i]
+        
+                    solutionSet = this.handleResourceRequestItem(requestItem, solutionSet, availability)
+        
+                } */
 
 
 
@@ -106,8 +112,8 @@ export class SlotFinder {
                 let possibleDateRanges = DateRangeSet.empty
 
                 /** some services work with fixed blocks (like Wellness reservation), others or more floating blocks (service is possible within interval) */
-/*                 let exactStart = false
-                let processed = false */
+                /*                 let exactStart = false
+                                let processed = false */
 
                 /*
                 if (product.planMode == PlanningMode.block) {
@@ -153,7 +159,8 @@ export class SlotFinder {
 
 
     /**
-     * 
+     * evaluates each solution from existing solutionSet, and tries to fulfill the next requestItem. If fulfilled, a new corresponding solution item is added to the soltion. 
+     * If not fulfilled, solution becomes invalid.
      * 
      * @param requestItem 
      * @param solutionSet 
@@ -195,11 +202,8 @@ export class SlotFinder {
                 const to = dateFns.addSeconds(from, requestItem.duration.seconds)
                 const range = new DateRange(from, to)
 
-                //requestItem.productResource.prepOverlap
 
-                /*                 requestItem.qty 
-                                p */
-
+                // the notes are for extra debug info
                 const resourcesWithNotes = availability.getAvailableResourcesInRange(requestItem.resources, range, requestItem)
                 const availableResources = resourcesWithNotes.result
                 solution.addNotes(resourcesWithNotes.notes)
@@ -290,13 +294,10 @@ export class SlotFinder {
 
                 console.warn(availableResources)
                 //availability.getAvailability()
-
-
             }
-
-
-
         }
+
+        requestItem.isProcessed = true
 
         return resultSolutions
 

@@ -26,6 +26,10 @@ export class SolutionItem {
 
     resources: Resource[] = []
 
+    valid = true
+
+    notes: SolutionNote[] = []
+
     constructor(public request: ResourceRequestItem, public dateRange: DateRange, public exactStart = false, ...resources: Resource[]) {
         if (Array.isArray(resources))
             this.resources = resources
@@ -33,6 +37,18 @@ export class SolutionItem {
 
     clone(): SolutionItem {
         return new SolutionItem(this.request, this.dateRange.clone(), this.exactStart, ...this.resources)
+    }
+
+    addNote(content: string, level: SolutionNoteLevel = SolutionNoteLevel.info) {
+
+        const note = new SolutionNote(content, level)
+        this.notes.push(note)
+
+    }
+
+    addNotes(notes: SolutionNote[]) {
+        if (Array.isArray(notes) && notes.length > 0)
+            this.notes.push(...notes)
     }
 }
 
