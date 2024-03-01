@@ -191,6 +191,27 @@ export class DateRange {
         return (this.from >= other.from && this.to <= other.to)
     }
 
+    contains(other: DateRange): boolean {
+        return (this.from <= other.from && this.to >= other.to)
+    }
+
+
+    containsSet(dateRanges: DateRangeSet): boolean {
+
+        if (dateRanges.isEmpty())
+            return true
+
+        for (let range of dateRanges.ranges) {
+
+            if (!this.contains(range))
+                return false
+
+
+        }
+
+        return true
+    }
+
     /**
      * How this date range overlaps a secondary date range
      * @param other 
@@ -221,7 +242,14 @@ export class DateRange {
 
     subtractSet(set: DateRangeSet): DateRangeSet {
 
-        return DateRangeSet.empty
+        let result = new DateRangeSet([this.clone()])
+
+        if (set.isEmpty())
+            return result
+
+        result = result.subtract(set)
+
+        return result
     }
 
 

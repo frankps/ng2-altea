@@ -36,7 +36,9 @@ export class SolutionItem {
     }
 
     clone(): SolutionItem {
-        return new SolutionItem(this.request, this.dateRange.clone(), this.exactStart, ...this.resources)
+        const item = new SolutionItem(this.request, this.dateRange.clone(), this.exactStart, ...this.resources)
+        item.notes = this.notes
+        return item
     }
 
     addNote(content: string, level: SolutionNoteLevel = SolutionNoteLevel.info) {
@@ -55,6 +57,9 @@ export class SolutionItem {
 
 /** Short for reservation solution. */
 export class Solution extends ObjectWithId {
+
+    /** offset reference date: resource planning is always done with an offset to this date (in this solution) */
+    offsetRefDate: Date
 
     items: SolutionItem[] = []
 
@@ -121,6 +126,7 @@ export class Solution extends ObjectWithId {
         const clone = new Solution(...this.items.map(item => item.clone()))
         clone.valid = this.valid
         clone.notes = this.notes
+        clone.offsetRefDate = this.offsetRefDate
         return clone
 
 

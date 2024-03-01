@@ -1,4 +1,3 @@
-
 <button type="button" class="btn btn-primary btn-sm" (click)="deleteTestData()">Verwijder orders maart '24</button>
 
 
@@ -213,20 +212,21 @@
 
 <h4>Schedules</h4>
 
-<ng-container *ngFor="let resourceId of ctx?.scheduleDateRangeKeys()">   <!-- ctx?.scheduleDateRanges?.keys() -->
+<ng-container *ngFor="let resourceId of ctx?.scheduleDateRangeKeys()"> <!-- ctx?.scheduleDateRanges?.keys() -->
 
     <div class="row" *ngIf="ctx.scheduleDateRanges.get(resourceId) as resourceScheduleRanges">
         <div class="col-2">{{ctx.getResource(resourceId)?.name}}</div>
 
 
         <div class="col" *ngIf="resourceScheduleRanges?.ranges">
-        
+
             <ng-container *ngFor="let range of resourceScheduleRanges.ranges">
 
-                <span class="badge bg-danger" style="font-size: 0.8em;">{{range.from | date:'dd/MM HH:mm'}} - {{range.to | date:'HH:mm'}} </span> &nbsp;
+                <span class="badge bg-danger" style="font-size: 0.8em;">{{range.from | date:'dd/MM HH:mm'}} - {{range.to
+                    | date:'HH:mm'}} </span> &nbsp;
 
             </ng-container>
-        
+
             {{resourceId}}
         </div>
 
@@ -303,12 +303,23 @@
                             - <span class="badge bg-secondary">{{solutionItem.dateRange.to | date:"HH:mm"}}</span>
 
                         </div>
-                        <div class="col">
+                        <div class="col-3">
 
                             <ng-container *ngFor="let resource of solutionItem.resources">
                                 <span class="badge bg-danger" style="font-size: 0.6em;">{{resource.name}}</span> &nbsp;
                             </ng-container>
                         </div>
+                        <div class="col">
+
+                            <span *ngIf="!solutionItem.valid" style="color: red;">Invalid:</span>
+
+                            <ng-container *ngIf="solutionItem.notes">
+                                <span *ngFor="let note of solutionItem.notes">{{note.content}}</span>
+                            </ng-container>
+
+
+                        </div>
+
                     </div>
 
                 </ng-container>
@@ -330,23 +341,7 @@
 
 
 
-    <!--     
-    <div class="row" *ngFor="let day of options.startDays()">
 
-    </div>
-
-
-    <div class="row" *ngFor="let day of options.startDays()">
-        <div class="col-2">{{day | date:'dd/MM'}}</div>
-        <div class="col">
-
-
-            <div class="row">
-                <div class="col-1" *ngFor="let slot of options.getSlotsForDay(day)">{{slot.startDate | date:"HH:mm"}}
-                </div>
-            </div>
-        </div>
-    </div> -->
 
 
 

@@ -63,16 +63,6 @@ export class SlotFinder {
 
             solutionSet = this.handleResourceRequestItem(requestItem, solutionSet, availability)
         }
-        /* 
-                for (let i = 1; i < resourceRequest.items.length; i++) {
-                    const requestItem = resourceRequest.items[i]
-        
-                    solutionSet = this.handleResourceRequestItem(requestItem, solutionSet, availability)
-        
-                } */
-
-
-
 
         return solutionSet
     }
@@ -110,35 +100,6 @@ export class SlotFinder {
                 const availableRange = range.clone()
 
                 let possibleDateRanges = DateRangeSet.empty
-
-                /** some services work with fixed blocks (like Wellness reservation), others or more floating blocks (service is possible within interval) */
-                /*                 let exactStart = false
-                                let processed = false */
-
-                /*
-                if (product.planMode == PlanningMode.block) {
-
-                    exactStart = true
-
-                    if (singleResource) {
-                        let existingPlanningsForDay = ctx.resourcePlannings.filterByResourceDateRange(firstResource.id, dateFns.startOfDay(range.from), dateFns.endOfDay(range.to))
-
-                        if (existingPlanningsForDay.isEmpty()) {
-                            possibleDateRanges = SlotFinderBlocks.I.getFullDayStartDates(product, range, ctx)   
-                            processed = true
-                        }
-
-                    }
-
-                    if (!processed)
-                        possibleDateRanges = SlotFinderBlocks.I.findSlots(firstRequestItem, availableRange, ctx, availability2)
-
-
-                } else {
-                  
-
-
-                } */
 
                 availableRange.increaseToWithSeconds(-firstRequestItem.duration.seconds)
                 possibleDateRanges.addRange(availableRange)
@@ -190,15 +151,15 @@ export class SlotFinder {
             //const refDate = solution.referenceDate()
 
             const referenceSolutionItem = solution.items[0]
-            const refFrom = referenceSolutionItem.dateRange.from
-            const refTo = referenceSolutionItem.dateRange.to
 
-            if (!refFrom)
-                throw new Error(`No reference (start) date available`)
 
             if (referenceSolutionItem.exactStart) {
 
-                const from = dateFns.addSeconds(refFrom, requestItem.offset.seconds)
+                if (!solution.offsetRefDate)
+                    throw new Error(`solution.offsetRefDate not set!`)
+
+
+                const from = dateFns.addSeconds(solution.offsetRefDate, requestItem.offset.seconds)
                 const to = dateFns.addSeconds(from, requestItem.duration.seconds)
                 const range = new DateRange(from, to)
 
@@ -252,6 +213,16 @@ export class SlotFinder {
                 It can START in the range [referenceSolutionItem.dateRange.from, referenceSolutionItem.dateRange.to]
                 => we need to check the availability of the new requestItem relativly to the above range (see what is possible)
                 */
+
+
+                // IMPORTANT: maybe convert refFrom to solution.offsetRefDate (same as done in if then statement above)
+
+                const refFrom = referenceSolutionItem.dateRange.from
+                const refTo = referenceSolutionItem.dateRange.to
+
+                if (!refFrom)
+                    throw new Error(`No reference (start) date available`)
+
 
                 const startFrom = dateFns.addSeconds(refFrom, requestItem.offset.seconds)
                 const startTo = dateFns.addSeconds(refTo, requestItem.offset.seconds)

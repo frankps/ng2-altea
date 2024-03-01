@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { AvailabilityContext, DateRange, DateRangeSet, PlanningBlockSeries, PlanningMode, PossibleSlots, Product, Resource, ResourceAvailability, ResourceAvailability2, ResourceRequest, ResourceRequestItem, ResourceType, SlotInfo, Solution, SolutionItem, SolutionSet, TimeSpan } from "ts-altea-model";
+import { AvailabilityContext, DateRange, DateRangeSet, PlanningBlockSeries, PlanningMode, PossibleSlots, Product, Resource, ResourceAvailability, ResourceAvailability2, ResourceRequest, ResourceRequestItem, ResourceType, SlotInfo, Solution, SolutionItem, SolutionNoteLevel, SolutionSet, TimeSpan } from "ts-altea-model";
 import * as _ from "lodash"
 import { ResourceRequestOptimizer } from "./resource-request-optimizer";
 import { scheduled } from "rxjs";
@@ -87,45 +87,51 @@ export class SlotFinderBlocks {
         */
         let requestItemsSameResource = resourceRequest.getItemsForResource(resource.id)
 
-
         const firstRequestItem = requestItemsSameResource[0]
 
-        let offsetZeroDate: Date
+        let offsetRefDate: Date = availableRange.from
 
+        let isFirstLoop = true
 
-        if (firstRequestItem.isPrepTime && firstRequestItem.prepOverlap) {
- 
+        // we try to find slots until we reach end of availableRange
+        while (offsetRefDate < availableRange.to) {
 
-            let solutionItem = this.handlePreparationRequestItem(resource, firstRequestItem, availableRange, availability, ctx)
+            currentSolution = new Solution()
+            currentSolution.offsetRefDate = offsetRefDate
 
-
-           // set the reference date for this solution
-           offsetZeroDate = dateFns.addSeconds(solutionItem.dateRange.from, -firstRequestItem.offset.seconds)
-
-            //  solutionSet.add(new Solution(solutionItem))
-            currentSolution = new Solution(solutionItem)
             solutions.push(currentSolution)
 
-            //firstRequestItem.isProcessed = true
-        }
+            let firstRequestProcessed = false
+
+            if (isFirstLoop && firstRequestItem.isPrepTime && firstRequestItem.prepOverlap) {
+
+                let solutionItem = this.handlePreparationRequestItem(resource, firstRequestItem, availableRange, availability, ctx)
+
+                // set the reference date for this solution
+                offsetRefDate = dateFns.addSeconds(solutionItem.dateRange.from, -firstRequestItem.offset.seconds)
+                currentSolution.offsetRefDate = offsetRefDate
+
+                //  solutionSet.add(new Solution(solutionItem))
+                currentSolution.add(solutionItem)
+
+                firstRequestProcessed = true
 
 
-        // reminder: we work inside an availableRange
-
-        for (let i = 1; i < requestItemsSameResource.length; i++) {
-
-            let requestItem = requestItemsSameResource[i]
-            let solutionItem = this.handleBasicRequestItem(resource, requestItem, offsetZeroDate, availableRange)
-
-            currentSolution.add(solutionItem)
-
-            if (!solutionItem.valid) {
-                currentSolution.valid = false
-                break  // we don't continue with current solution
+                //firstRequestItem.isProcessed = true
             }
-                
-        }
 
+            let requestItemsToProcess = [...requestItemsSameResource]   //.splice(0, 1)
+
+            if (firstRequestProcessed)
+                requestItemsToProcess.splice(0, 1)
+
+            this.handleBasicRequestItems(true, resource, requestItemsToProcess, offsetRefDate, availableRange, currentSolution, availability, ctx)
+
+
+            isFirstLoop = false
+            offsetRefDate = dateFns.addMinutes(offsetRefDate, 135)
+
+        }
 
         console.error(requestItemsSameResource)
 
@@ -136,72 +142,161 @@ export class SlotFinderBlocks {
 
     }
 
+
+
+
     handlePreparationRequestItem(resource: Resource, firstRequestItem: ResourceRequestItem, availableRange: DateRange, availability: ResourceAvailability2, ctx: AvailabilityContext): SolutionItem {
-           // this is a preparation block that can overlap with existing (preparations) => try to find one
-           let existingPrepBlock = availability.getPreparationBlockJustBefore(resource.id, availableRange.from)
+        // this is a preparation block that can overlap with existing (preparations) => try to find one
+        let existingPrepBlock = availability.getPreparationBlockJustBefore(resource.id, availableRange.from)
 
-           let prepFrom: Date, prepTo: Date
-
-
-           console.log(existingPrepBlock)
-
-           if (existingPrepBlock) {
-
-               if (existingPrepBlock.seconds() >= firstRequestItem.seconds()) {
-                   // the requested time block fits into the existing one
-                   prepTo = existingPrepBlock.to   // same as availableRange.from
-                   prepFrom = dateFns.addSeconds(prepTo, -firstRequestItem.seconds())
-               } else {
-                   prepFrom = existingPrepBlock.from
-                   prepTo = dateFns.addSeconds(prepFrom, firstRequestItem.seconds())
-               }
-           } else {
-
-               // there is no existing preparation block where we can overlap with => create inside the available range
-               prepFrom = availableRange.from
-
-               if (availableRange.containsFromLabel('START')) {
-                   // get the current schedule in order to see if preparations can be done outside schedule
-                   let schedule = ctx.getScheduleOnDate(resource.id, prepFrom)
-
-                   if (!schedule)
-                       throw new Error(`No schedule found`)
-
-                   // check if preparations can be done outside schedule
-                   if (!schedule.prepIncl)
-                       prepFrom = dateFns.addSeconds(availableRange.from, -firstRequestItem.seconds())
-               }
-
-               prepTo = dateFns.addSeconds(prepFrom, firstRequestItem.seconds())
-           }
-
-           let newPreparationRange = new DateRange(prepFrom, prepTo)
+        let prepFrom: Date, prepTo: Date
 
 
-           let solutionItem = new SolutionItem(firstRequestItem, newPreparationRange, true, resource)
+        console.log(existingPrepBlock)
 
-           return solutionItem
+        if (existingPrepBlock) {
+
+            if (existingPrepBlock.seconds() >= firstRequestItem.seconds()) {
+                // the requested time block fits into the existing one
+                prepTo = existingPrepBlock.to   // same as availableRange.from
+                prepFrom = dateFns.addSeconds(prepTo, -firstRequestItem.seconds())
+            } else {
+                prepFrom = existingPrepBlock.from
+                prepTo = dateFns.addSeconds(prepFrom, firstRequestItem.seconds())
+            }
+        } else {
+
+            // there is no existing preparation block where we can overlap with => create inside the available range
+            prepFrom = availableRange.from
+
+            if (availableRange.containsFromLabel('START')) {
+                // get the current schedule in order to see if preparations can be done outside schedule
+                let schedule = ctx.getScheduleOnDate(resource.id, prepFrom)
+
+                if (!schedule)
+                    throw new Error(`No schedule found`)
+
+                // check if preparations can be done outside schedule
+                if (!schedule.prepIncl)
+                    prepFrom = dateFns.addSeconds(availableRange.from, -firstRequestItem.seconds())
+            }
+
+            prepTo = dateFns.addSeconds(prepFrom, firstRequestItem.seconds())
+        }
+
+        let newPreparationRange = new DateRange(prepFrom, prepTo)
+
+
+        let solutionItem = new SolutionItem(firstRequestItem, newPreparationRange, true, resource)
+
+        return solutionItem
+    }
+
+    handleBasicRequestItems(searchForward: boolean, resource: Resource, requestItemsSameResource: ResourceRequestItem[], startDate: Date, availableRange: DateRange, solution: Solution
+        , availability: ResourceAvailability2, ctx: AvailabilityContext) {
+
+        for (let i = 0; i < requestItemsSameResource.length; i++) {
+
+            let requestItem = requestItemsSameResource[i]
+            let solutionItem = this.handleBasicRequestItem(searchForward, resource, requestItem, startDate, availableRange, availability, ctx)
+
+            solution.add(solutionItem)
+
+            if (!solutionItem.valid) {
+
+
+                solution.valid = false
+                break  // we don't continue with current solution
+            }
+        }
+
     }
 
 
+    handleBasicRequestItem(searchForward: boolean, resource: Resource, requestItem: ResourceRequestItem, startDate: Date, availableRange: DateRange
+        , availability: ResourceAvailability2, ctx: AvailabilityContext): SolutionItem {
 
-    handleBasicRequestItem(resource: Resource, requestItem: ResourceRequestItem, offsetZeroDate: Date, availableRange: DateRange): SolutionItem {
-
-        let requestFrom = dateFns.addSeconds(offsetZeroDate, requestItem.offset.seconds)
+        let requestFrom = dateFns.addSeconds(startDate, requestItem.offset.seconds)
         let requestTo = dateFns.addSeconds(requestFrom, requestItem.duration.seconds)
 
         let requestRange = new DateRange(requestFrom, requestTo)
 
         // if requestRange is still within available range: then all is still ok
+        let outsideOfRange = !requestRange.isInsideOf(availableRange)
 
         let solutionItem = new SolutionItem(requestItem, requestRange, true, resource)
-        solutionItem.valid = requestRange.isInsideOf(availableRange)
 
-        if (!solutionItem.valid) {
-            solutionItem.addNote(`${requestRange.toString()} not in available range ${availableRange.toString()}`)
+
+        if (outsideOfRange) {
+            solutionItem.valid = false
+
+            // then maybe check if preparation outside or overlapping with other preparation time if allowed 
+            if (requestItem.isPrepTime) {
+
+                // check if outside 
+                solutionItem = this.handlePreparationRequestItem2(searchForward, resource, requestItem, requestRange, availableRange, availability, ctx)
+
+
+            }
+
+
+            if (!solutionItem.valid)
+                solutionItem.addNote(`${requestRange.toString()} not in available range ${availableRange.toString()}`)
         }
 
         return solutionItem
+    }
+
+    handlePreparationRequestItem2(searchForward: boolean, resource: Resource, requestItem: ResourceRequestItem, requestRange: DateRange, availableRange: DateRange, availability: ResourceAvailability2, ctx: AvailabilityContext) {
+
+        let solutionItem = new SolutionItem(requestItem, requestRange, true, resource)
+        solutionItem.valid = false
+
+        // check if preparations can be done outside schedule
+        let schedule = ctx.getScheduleOnDate(resource.id, requestRange.from)
+
+        if (!schedule)
+            throw new Error(`No schedule found ${resource.name}`)
+
+        if (!schedule.prepIncl) {  // meaning: preparations outside schedule are allowed
+
+            // outsideSchedule = partially or fully outside schedule
+            let outsideSchedule = !schedule.isInsideSchedule(requestRange)
+
+            if (outsideSchedule && searchForward) {
+
+                // 2 options: 
+                //    1) requestRange is completly outside schedule 
+                //    2) requestRange is partially outside schedule => investigate if part inside schedule is available!
+                let rangesOutsideSchedule = schedule.outsideSchedule(requestRange)
+
+                if (rangesOutsideSchedule.contains(requestRange)) {
+                    solutionItem.valid = true
+                    solutionItem.addNote(`${requestRange.toString()} is preparation time AND is completely outside schedule, but this is allowed!`, SolutionNoteLevel.info)
+                } else {
+                    
+                    // preparation partially outside schedule
+
+                    let rangesInsideSchedule = schedule.insideSchedule(requestRange)
+
+                    if (availableRange.containsSet(rangesInsideSchedule)) {
+                        solutionItem.valid = true
+                        solutionItem.addNote(`${requestRange.toString()} is preparation time AND is partially outside schedule, but this is allowed!`, SolutionNoteLevel.info)
+                    }
+
+                }
+
+                // check if we are outside schedule
+                console.warn('NOW WE NEED TO LOOK OUTSIDE SCHEDULE')
+
+
+            }
+
+
+        }
+
+        return solutionItem
+
     }
 
 

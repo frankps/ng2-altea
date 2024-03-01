@@ -425,6 +425,25 @@ export class Schedule extends ObjectWithId {
     return contains
   }
 
+  /** returns the date ranges of the given dateRange that are outside schedule */
+  outsideSchedule(dateRange: DateRange): DateRangeSet {
+
+    let start = dateFns.startOfDay(dateRange.from)
+    let end = dateFns.endOfDay(dateRange.to)
+
+    let scheduleRanges = this.toDateRangeSet(start, end)
+
+    let outside = dateRange.subtractSet(scheduleRanges)
+
+    return outside
+  }
+
+  /** returns the date ranges of the given dateRange outside schedule */
+  insideSchedule(dateRange: DateRange): DateRangeSet {
+
+    return DateRangeSet.empty
+  }
+
   getDaySchedule(day: Date): DaySchedule {
     const daySchedule = new DaySchedule()
     daySchedule.blocks.push(new ScheduleTimeBlock())

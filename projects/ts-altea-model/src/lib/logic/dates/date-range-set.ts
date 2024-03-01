@@ -338,6 +338,7 @@ export class DateRangeSet {
                 solutionItem.resources.push(resource)
 
             const solution = new Solution(solutionItem)
+            solution.offsetRefDate = range.from
 
             return solution
         })

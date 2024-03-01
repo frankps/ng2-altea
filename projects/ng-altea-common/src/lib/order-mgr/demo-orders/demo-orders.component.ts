@@ -88,7 +88,7 @@ export class DemoOrdersComponent implements OnInit {
   demoNames: string[] = []
 
   preselect: string = 'Wellness 2h/2p'
-  onDate: number = 20240315000000
+  onDate: number // = 20240315000000
 
 
   constructor(protected orderMgrSvc: OrderMgrUiService, protected sessionSvc: SessionService, protected spinner: NgxSpinnerService) {
