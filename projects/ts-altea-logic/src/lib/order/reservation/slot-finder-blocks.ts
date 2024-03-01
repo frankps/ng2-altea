@@ -41,21 +41,33 @@ export class SlotFinderBlocks {
 
             console.warn(availabilities)
 
-            for (const range of availabilities.ranges) {
+            for (const availableRange of availabilities.ranges) {
 
-                const availableRange = range.clone()
+                // const availableRange = range.clone()
                 let possibleDateRanges = DateRangeSet.empty
 
-                let scheduleIsEmpty = range.containsLabels('START', 'END')
+                let scheduleIsEmpty = availableRange.containsLabels('START', 'END')
+
+                let searchForward = false   // by default we work backwards to fill an availableRange
+
+                let fromScheduleStart = availableRange.containsFromLabel('START')
+
+                /*
+                    fromScheduleStart = true => availableRange starts at beginning of schedule 
+
+                */
+                if (!fromScheduleStart)  // => there is already a booking to the left of availableRange
+                    searchForward = true   // => because we want to work forward from an existing booking (to reduce empty spaces in calendar)
 
                 // if the range has no occupations yet
                 if (scheduleIsEmpty) {
-                    possibleDateRanges = this.getFullDayStartDates(product, range, ctx)
+                    possibleDateRanges = this.getFullDayStartDates(product, availableRange, ctx)
                     const solutions = possibleDateRanges.toSolutions(resourceRequest, firstRequestItem, true, resource)
                     solutionSet.add(...solutions)
 
                 } else {
-                    const solutions = this.findSlotsInRange(resource, range, firstRequestItem, resourceRequest, availability, ctx)
+
+                    const solutions = this.findSlotsInRange(searchForward, resource, availableRange, firstRequestItem, resourceRequest, availability, ctx)
                     solutionSet.add(...solutions)
                 }
 
@@ -65,18 +77,20 @@ export class SlotFinderBlocks {
 
         }
 
+        firstRequestItem.isProcessed = true
+
         return solutionSet
     }
 
 
-    findSlotsInRange(resource: Resource, availableRange: DateRange, resReqItem: ResourceRequestItem, resourceRequest: ResourceRequest, availability: ResourceAvailability2, ctx: AvailabilityContext) {
+    findSlotsInRange(searchForward: boolean, resource: Resource, availableRange: DateRange, resReqItem: ResourceRequestItem, resourceRequest: ResourceRequest, availability: ResourceAvailability2, ctx: AvailabilityContext) {
 
         //const solutionSet = new SolutionSet()
 
         const solutions: Solution[] = []
         let currentSolution: Solution
 
-        let searchDirection = SlotSearchDirection.forward
+        //  let searchDirection = SlotSearchDirection.forward
 
         /*
         There can exist multiple resource requests for same resource, example (in chronological order):
@@ -85,16 +99,25 @@ export class SlotFinderBlocks {
             Wellness cleanup: 30min         (Preparation, Overlap allowed)
 
         */
-        let requestItemsSameResource = resourceRequest.getItemsForResource(resource.id)
 
-        const firstRequestItem = requestItemsSameResource[0]
+        let sortOrder: 'asc' | 'desc' = 'asc'
 
-        let offsetRefDate: Date = availableRange.from
+        if (!searchForward)
+            sortOrder = 'desc'
+
+
+        let requestItemsSameResource = resourceRequest.getItemsForResource(resource.id, sortOrder)
+
+        let firstRequestItem: ResourceRequestItem = requestItemsSameResource[0]
+
+
+        let offsetRefDate: Date = searchForward ? availableRange.from : availableRange.to
 
         let isFirstLoop = true
 
         // we try to find slots until we reach end of availableRange
-        while (offsetRefDate < availableRange.to) {
+        while ((searchForward && offsetRefDate < availableRange.to)
+            || (!searchForward && offsetRefDate > availableRange.from)) {
 
             currentSolution = new Solution()
             currentSolution.offsetRefDate = offsetRefDate
@@ -105,7 +128,7 @@ export class SlotFinderBlocks {
 
             if (isFirstLoop && firstRequestItem.isPrepTime && firstRequestItem.prepOverlap) {
 
-                let solutionItem = this.handlePreparationRequestItem(resource, firstRequestItem, availableRange, availability, ctx)
+                let solutionItem = this.handlePreparationRequestItem(searchForward, resource, firstRequestItem, availableRange, availability, ctx)
 
                 // set the reference date for this solution
                 offsetRefDate = dateFns.addSeconds(solutionItem.dateRange.from, -firstRequestItem.offset.seconds)
@@ -129,8 +152,11 @@ export class SlotFinderBlocks {
 
 
             isFirstLoop = false
-            offsetRefDate = dateFns.addMinutes(offsetRefDate, 135)
 
+            if (searchForward)
+                offsetRefDate = dateFns.addMinutes(offsetRefDate, 135)
+            else
+                offsetRefDate = dateFns.addMinutes(offsetRefDate, -135)
         }
 
         console.error(requestItemsSameResource)
@@ -145,9 +171,15 @@ export class SlotFinderBlocks {
 
 
 
-    handlePreparationRequestItem(resource: Resource, firstRequestItem: ResourceRequestItem, availableRange: DateRange, availability: ResourceAvailability2, ctx: AvailabilityContext): SolutionItem {
+    handlePreparationRequestItem(searchForward: boolean, resource: Resource, firstRequestItem: ResourceRequestItem, availableRange: DateRange, availability: ResourceAvailability2, ctx: AvailabilityContext): SolutionItem {
         // this is a preparation block that can overlap with existing (preparations) => try to find one
-        let existingPrepBlock = availability.getPreparationBlockJustBefore(resource.id, availableRange.from)
+
+        let existingPrepBlock: DateRange
+
+        if (searchForward)
+            existingPrepBlock = availability.getPreparationBlockJustBefore(resource.id, availableRange.from)
+        else
+            existingPrepBlock = availability.getPreparationBlockJustAfter(resource.id, availableRange.to)
 
         let prepFrom: Date, prepTo: Date
 
@@ -156,14 +188,43 @@ export class SlotFinderBlocks {
 
         if (existingPrepBlock) {
 
-            if (existingPrepBlock.seconds() >= firstRequestItem.seconds()) {
-                // the requested time block fits into the existing one
-                prepTo = existingPrepBlock.to   // same as availableRange.from
-                prepFrom = dateFns.addSeconds(prepTo, -firstRequestItem.seconds())
-            } else {
-                prepFrom = existingPrepBlock.from
-                prepTo = dateFns.addSeconds(prepFrom, firstRequestItem.seconds())
+            let existingPrepBlockLonger = existingPrepBlock.seconds() >= firstRequestItem.seconds()
+
+            if (searchForward) {
+
+                if (existingPrepBlockLonger) {
+                    // the requested time block fits into the existing one
+                    prepTo = existingPrepBlock.to   // same as availableRange.from
+                    prepFrom = dateFns.addSeconds(prepTo, -firstRequestItem.seconds())
+                } else {
+                    prepFrom = existingPrepBlock.from
+                    prepTo = dateFns.addSeconds(prepFrom, firstRequestItem.seconds())
+                }
+
+            } else {  // search backward
+
+                if (existingPrepBlockLonger) {
+
+                    // the requested time block fits into the existing one
+                    prepFrom = existingPrepBlock.from
+                    prepTo = dateFns.addSeconds(prepFrom, firstRequestItem.seconds())
+
+
+                    /* prepTo = existingPrepBlock.to   // same as availableRange.from
+                    prepFrom = dateFns.addSeconds(prepTo, -firstRequestItem.seconds()) */
+                } else {
+
+                    prepTo = existingPrepBlock.to
+                    prepFrom = dateFns.addSeconds(prepTo, -firstRequestItem.seconds())
+
+
+                    /* prepFrom = existingPrepBlock.from
+                    prepTo = dateFns.addSeconds(prepFrom, firstRequestItem.seconds()) */
+                }
+
+
             }
+
         } else {
 
             // there is no existing preparation block where we can overlap with => create inside the available range
@@ -273,8 +334,9 @@ export class SlotFinderBlocks {
                 if (rangesOutsideSchedule.contains(requestRange)) {
                     solutionItem.valid = true
                     solutionItem.addNote(`${requestRange.toString()} is preparation time AND is completely outside schedule, but this is allowed!`, SolutionNoteLevel.info)
+                    return solutionItem
                 } else {
-                    
+
                     // preparation partially outside schedule
 
                     let rangesInsideSchedule = schedule.insideSchedule(requestRange)
@@ -282,6 +344,7 @@ export class SlotFinderBlocks {
                     if (availableRange.containsSet(rangesInsideSchedule)) {
                         solutionItem.valid = true
                         solutionItem.addNote(`${requestRange.toString()} is preparation time AND is partially outside schedule, but this is allowed!`, SolutionNoteLevel.info)
+                        return solutionItem
                     }
 
                 }
@@ -291,9 +354,35 @@ export class SlotFinderBlocks {
 
 
             }
+        }
+
+
+        if (searchForward) {
+
+            /* handle case that preparation at the end can overlap preparation at the beginning
+            */
+
+            let existingPrepBlock = availability.getPreparationBlockJustAfter(resource.id, requestRange.from)
+
+            if (existingPrepBlock?.isEqualOrLongerThen(requestRange)) {
+                solutionItem.valid = true
+                return solutionItem
+            }
+
+
+        } else { // search backward (but currently not used?)
+
+            let existingPrepBlock = availability.getPreparationBlockJustBefore(resource.id, requestRange.to)
+
+            if (existingPrepBlock?.isEqualOrLongerThen(requestRange)) {
+                solutionItem.valid = true
+                return solutionItem
+            }
 
 
         }
+
+
 
         return solutionItem
 

@@ -106,6 +106,7 @@ export class DebugAvailabilityComponent implements OnInit {
     deleteOrderQuery.and('start', QueryOperator.greaterThanOrEqual, start)
     deleteOrderQuery.and('start', QueryOperator.lessThan, end)
 
+    // deleteOrderQuery.and('start', QueryOperator.equals, null)
     /* this will also delete related objects (as defined in prisma schema)
      */
     let orders = await this.orderSvc.deleteMany$(deleteOrderQuery)

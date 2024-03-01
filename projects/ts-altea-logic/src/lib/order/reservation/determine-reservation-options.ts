@@ -47,9 +47,11 @@ export class DetermineReservationOptions {
         let possibleStartDates: Date[] = []
 
         if (refItem.exactStart)
-            possibleStartDates.push(refItem.dateRange.from)
+            possibleStartDates.push(solution.offsetRefDate)
         else
             possibleStartDates = refItem.dateRange.getDatesEvery(TimeSpan.minutes(15))
+
+        //possibleStartDates = _.sortedUniq(possibleStartDates)   //_.orderBy(possibleStartDates)
 
         return ReservationOptionSet.fromDates(possibleStartDates, solution.id)
     }
@@ -60,7 +62,8 @@ export class DetermineReservationOptions {
          also link back to the solution? => we can create the resourcePlannings much easier !
         */
 
-        const uniqOptions = _.uniqBy(optionSet.options, 'dateNum')
+        let uniqOptions = _.uniqBy(optionSet.options, 'dateNum')
+        uniqOptions = _.orderBy(uniqOptions, 'dateNum')
         return new ReservationOptionSet(uniqOptions)
     }
 

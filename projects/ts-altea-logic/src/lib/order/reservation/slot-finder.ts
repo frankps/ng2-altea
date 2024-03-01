@@ -89,8 +89,8 @@ export class SlotFinder {
 
         const firstItemAvailabilities = availability.getAvailabilities(firstRequestItem.resources)
 
-        const singleResource = (firstRequestItem.resources?.length === 1)
-        const firstResource = firstRequestItem.resources?.length > 0 ? firstRequestItem.resources[0] : null
+/*         const singleResource = (firstRequestItem.resources?.length === 1)
+        const firstResource = firstRequestItem.resources?.length > 0 ? firstRequestItem.resources[0] : null */
 
 
         /** a set typically contains the availability for 1 resource */
@@ -111,6 +111,8 @@ export class SlotFinder {
 
             }
         }
+
+        firstRequestItem.isProcessed = true
 
         return solutionSet
 

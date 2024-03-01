@@ -58,6 +58,15 @@ export class ResourceAvailability2 {
         return result
     }
 
+    getPreparationBlockJustAfter(resourceId: string, date: Date) : DateRange {
+
+        let sets = this.availability.get(resourceId)
+        
+        let result = sets.overlapAllowed.getRangeWhereFromEquals(date)
+
+        return result
+    }
+
     /** All availabilities of 1 resource are grouped within a DateRangeSet.
      *  Since this request is for multiple resources, we return DateRangeSets (plural)!
      */

@@ -162,10 +162,10 @@ export class ResourceRequest {
     }
 
 
-    getItemsForResource(resourceId: string): ResourceRequestItem[] {
+    getItemsForResource(resourceId: string, sortOrder: 'asc' | 'desc' = 'asc'): ResourceRequestItem[] {
         const items = this.items.filter(i => i.resources.findIndex(r => r.id == resourceId) >= 0)
 
-        return _.orderBy(items, 'offset.seconds')
+        return _.orderBy(items, 'offset.seconds', sortOrder)
     }
 
 

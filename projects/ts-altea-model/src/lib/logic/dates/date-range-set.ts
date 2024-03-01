@@ -141,11 +141,15 @@ export class DateRangeSet {
     }
 
     getRangeWhereToEquals(to: Date) {
-
-
         const match = this.ranges.find(r => dateFns.isEqual(r.to, to))
         return match
     }
+
+    getRangeWhereFromEquals(from: Date) {
+        const match = this.ranges.find(r => dateFns.isEqual(r.from, from))
+        return match
+    }
+
 
     clip(insideRange: DateRange): DateRangeSet {
 

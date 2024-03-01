@@ -76,6 +76,12 @@ export class DateRange {
         return this.duration.seconds
     }
 
+    // existingPrepBlockEqualOrLonger
+
+    isEqualOrLongerThen(other: DateRange) : boolean {
+        return (this.seconds() >= other.seconds())
+
+    }
 
     /*     fromStartOfDay() {
             return dateFns.startOfDay(this.from)
@@ -131,6 +137,12 @@ export class DateRange {
 
         return fromOk && toOk
     }
+
+    containsToLabel(toLabel: string) {
+        const toOk = toLabel ? this.toLabels.indexOf(toLabel) >= 0 : true
+        return toOk
+    }
+
 
 
     containsFromLabel(fromLabel: string) {
