@@ -122,7 +122,7 @@ export class SlotFinderBlocks {
 
         // we try to find slots until we reach end of availableRange
         while ((searchForward && offsetRefDate < availableRange.to)
-            || (!searchForward && offsetRefDate > availableRange.from)) {
+            || (!searchForward && offsetRefDate >= availableRange.from)) {
 
             currentSolution = new Solution()
             currentSolution.offsetRefDate = offsetRefDate
