@@ -73,12 +73,14 @@ export class DemoOrdersComponent implements OnInit {
   massageId = "51d89ac4-0ede-49ab-835f-2a3dda81bd70"
   manicureId = "46af990e-dc8f-461d-a48d-f39b9f782b0d"
   pedicureId = "678f7000-5865-4d58-9d92-9a64193b48c4"
+  bodyslimmingId = "b910237f-09cf-4dff-a265-4e6013224c57"
 
 
   names = ['Wellness 2h/2p', 'Massage']
 
   demos = new Map<string, DemoOrder>([
     ['Empty', new DemoOrder()],
+    ['Bodyslimming sessie', DemoOrder.fromProducts(this.bodyslimmingId)],
     ['Manicure', DemoOrder.fromProducts(this.manicureId)],
     ['Pedicure', DemoOrder.fromProducts(this.pedicureId)],
     ['Wellness 2h/2p', DemoOrder.fromProducts(this.wellnessId)],
@@ -87,7 +89,7 @@ export class DemoOrdersComponent implements OnInit {
 
   demoNames: string[] = []
 
-  preselect: string = 'Wellness 2h/2p'
+  preselect: string = 'Bodyslimming sessie' // 'Wellness 2h/2p'
   onDate: number // = 20240315000000
 
 

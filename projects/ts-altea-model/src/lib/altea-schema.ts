@@ -610,6 +610,12 @@ export class PlanningBlockSeries {
 
   scheduleIds: string[] = []
 
+  /** equals duration of default space + post (time between 2 blocks) */
+  durationEmptyBlock() {
+    return this.dur + this.post
+  }
+
+
   /** apply this series definition within given date range (inRange) */
   makeBlocks(inRange: DateRange): DateRangeSet {
 
@@ -620,7 +626,7 @@ export class PlanningBlockSeries {
     let loop = start
     let count = 0
 
-    while (loop < inRange.to && count < this.count) {
+    while (loop < inRange.to && (!this.count || count < this.count)) {
 
       const end = dateFns.addMinutes(loop, this.dur)
 
@@ -793,9 +799,14 @@ export class Product extends ObjectWithId {
     return prodResArray
   }
 
-  getBlockSeries(scheduleId: string) {
+  getBlockSeries(scheduleId: string): PlanningBlockSeries[] {
 
-    return this.plan?.filter(blockSeries => Array.isArray(blockSeries.scheduleIds) && blockSeries.scheduleIds.indexOf(scheduleId) >= 0)
+    let series = this.plan?.filter(blockSeries => Array.isArray(blockSeries.scheduleIds) && blockSeries.scheduleIds.indexOf(scheduleId) >= 0)
+
+    if (!Array.isArray(series) || series.length == 0)
+      series = this.plan?.filter(blockSeries => !Array.isArray(blockSeries.scheduleIds) || blockSeries.scheduleIds.length == 0)
+
+    return series
   }
 
   getOptionValues(optionId: string): ProductOptionValue[] {
@@ -3192,7 +3203,8 @@ export class ResourcePlannings {
   }
 
   /**
-   * 
+   *  example use: given all schedules for a branch (default opening hours, holidays, special openings,... -> defined by scheduleIds), return only
+   *  those (resource plannings=schedules & their date-ranges) during a certain interval
    * @param scheduleIds 
    * @param dateRange 
    * @returns 
@@ -3205,7 +3217,8 @@ export class ResourcePlannings {
     const fromNum = dateRange.fromToNum()
     const toNum = dateRange.toToNum()
 
-    let planningsForSchedules = this.plannings.filter(rp => rp.scheduleId && scheduleIds.indexOf(rp.scheduleId) >= 0 && rp.end && rp.end > fromNum && rp.start && rp.start < toNum)
+    let planningsForSchedules = this.plannings.filter(rp => rp.scheduleId && scheduleIds.indexOf(rp.scheduleId) >= 0
+      && rp.end && rp.end > fromNum && rp.start && rp.start < toNum)
 
     if (!Array.isArray(planningsForSchedules))
       return new ResourcePlannings()
@@ -3213,6 +3226,22 @@ export class ResourcePlannings {
     planningsForSchedules = _.orderBy(planningsForSchedules, 'start')
 
     return new ResourcePlannings(planningsForSchedules)
+  }
+
+  filterBySchedulesDate(scheduleIds: string[], date: Date): ResourcePlanning {
+
+    if (!Array.isArray(scheduleIds) || scheduleIds.length == 0)
+      return undefined
+
+    const dateNum = DateHelper.yyyyMMddhhmmss(date) //dateRange.fromToNum()
+
+    let planningsForSchedules = this.plannings.filter(rp => rp.scheduleId && scheduleIds.indexOf(rp.scheduleId) >= 0
+      && rp.start && rp.end && rp.start <= dateNum && dateNum < rp.end)
+
+    if (!Array.isArray(planningsForSchedules) || planningsForSchedules.length == 0)
+      return undefined
+
+    return planningsForSchedules[0]
   }
 
   isFullAvailable(): boolean {

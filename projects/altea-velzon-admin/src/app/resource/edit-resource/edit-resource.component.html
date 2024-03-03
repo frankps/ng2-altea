@@ -284,7 +284,7 @@
 
 <!-- && (!object.schedules || object.schedules.length === 0) -->
 
-<div *ngIf="object" class="mt-4">
+<div *ngIf="object?.customSchedule" class="mt-4">
   Deze resource heeft nog geen planning!
 
   <button type="button" class="btn btn-primary" (click)="createSchedule()">Maak nieuwe planning</button>

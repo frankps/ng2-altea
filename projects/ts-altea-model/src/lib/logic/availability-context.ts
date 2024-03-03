@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { Order, OrderLine, Product, ProductResource, Resource, ResourcePlanning, ResourcePlannings, ResourceType, Schedule, TimeUnit } from "../altea-schema";
+import { Order, OrderLine, PlanningBlockSeries, PlanningMode, Product, ProductResource, Resource, ResourcePlanning, ResourcePlannings, ResourceType, Schedule, TimeUnit } from "../altea-schema";
 import * as _ from "lodash";
 import { TimeSpan } from "./dates/time-span";
 import { AvailabilityRequest } from "./availability-request";
@@ -138,6 +138,22 @@ export class AvailabilityContext {
         return this.productResources.filter(pr => pr.productId = ol.productId)
     }
 
+    getBranchScheduleOnDate(date: Date): Schedule {
+        // every branch is also a resource, containing the branch opening hours (schedules)
+        const branchSchedules = this.schedules.filter(sched => sched.resourceId == this.branchId)
+
+        const branchScheduleIds = branchSchedules.map(sched => sched.id!)
+        const planning = this.resourcePlannings.filterBySchedulesDate(branchScheduleIds, date)
+
+        if (planning) {
+            let branchSchedule = branchSchedules.find(s => s.id == planning.scheduleId)
+            return branchSchedule
+        }
+
+        return this.getDefaultSchedule(this.branchId)
+
+    }
+
     /** returns all the schedules ordered per date within requested dateRange, starting with the schedule on dateRange.from, and ending with the schedule on dateRange.to.
      * So the array contains at least 2 items.
     */
@@ -244,6 +260,33 @@ export class AvailabilityContext {
 
         return this.schedules.find(s => s.resourceId === resourceId && s.default)
     }
+
+    /**
+     *  Only for products with planning mode block  (product.planMode == PlanningMode.block)
+     */
+    getBlockSeries(product: Product, onDate: Date): PlanningBlockSeries {
+
+        if (product?.planMode != PlanningMode.block)
+            throw `getBlockSeries(...) only for planMode=block`
+
+        let schedule = this.getBranchScheduleOnDate(onDate)
+
+        if (!schedule)
+            throw `no branch schedule found on date`
+
+        let blockSeries = product.getBlockSeries(schedule.id)
+
+        /**
+         * needs more fine-tuning! 
+         */
+        if (Array.isArray(blockSeries) && blockSeries.length > 0)
+            return blockSeries[0]
+
+        return undefined
+
+    }
+
+
 
     /**
      * A resource can have 0 or more schedules.

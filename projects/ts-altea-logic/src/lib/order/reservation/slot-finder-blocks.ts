@@ -112,8 +112,13 @@ export class SlotFinderBlocks {
 
 
         let offsetRefDate: Date = searchForward ? availableRange.from : availableRange.to
-
         let isFirstLoop = true
+
+
+        /** get the active schedule -> in order to know block size  */
+
+
+
 
         // we try to find slots until we reach end of availableRange
         while ((searchForward && offsetRefDate < availableRange.to)
@@ -153,10 +158,20 @@ export class SlotFinderBlocks {
 
             isFirstLoop = false
 
+            /**
+             * retrieve block definition (series) in order to know the default space between reservations  
+             */
+            const series = ctx.getBlockSeries(resReqItem.product, offsetRefDate)
+
+            if (!series)
+                throw `Block definition NOT found`
+
+            let durationEmptyBlock = series.durationEmptyBlock()
+
             if (searchForward)
-                offsetRefDate = dateFns.addMinutes(offsetRefDate, 135)
+                offsetRefDate = dateFns.addMinutes(offsetRefDate, durationEmptyBlock)
             else
-                offsetRefDate = dateFns.addMinutes(offsetRefDate, -135)
+                offsetRefDate = dateFns.addMinutes(offsetRefDate, -durationEmptyBlock)
         }
 
         console.error(requestItemsSameResource)
