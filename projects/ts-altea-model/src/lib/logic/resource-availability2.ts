@@ -33,13 +33,33 @@ export class ResourceAvailability2 {
                 continue
             }
 
-            // get bot the available & un-available date ranges
+            // get both the available & un-available date ranges
             const resourceOccupation = ctx.getResourceOccupation2(resourceId)
 
             const extendedSchedule = normalScheduleRanges.union(resourceOccupation.available)
 
-            let resourceStillAvailable = extendedSchedule.subtract(resourceOccupation.unAvailable)
+
+            let unavailable = resourceOccupation.unAvailable
+
+
+            if (resource.qty > 1) {
+
+                console.warn('SUM UP Resource usage')
+
+                unavailable = resourceOccupation.unAvailable.sumUp()
+                unavailable = unavailable.removeRangesWithQtyLowerThen(resource.qty)
+                console.error(unavailable)
+
+            }
+
+
+
+            let resourceStillAvailable = extendedSchedule.subtract(unavailable)
             resourceStillAvailable = resourceStillAvailable.subtract(resourceOccupation.overlapAllowed)
+
+
+
+
 
 
             let availability = new ResourceAvailabilitySets(resourceStillAvailable, resourceOccupation.overlapAllowed)
@@ -49,19 +69,19 @@ export class ResourceAvailability2 {
         }
     }
 
-    getPreparationBlockJustBefore(resourceId: string, date: Date) : DateRange {
+    getPreparationBlockJustBefore(resourceId: string, date: Date): DateRange {
 
         let sets = this.availability.get(resourceId)
-        
+
         let result = sets.overlapAllowed.getRangeWhereToEquals(date)
 
         return result
     }
 
-    getPreparationBlockJustAfter(resourceId: string, date: Date) : DateRange {
+    getPreparationBlockJustAfter(resourceId: string, date: Date): DateRange {
 
         let sets = this.availability.get(resourceId)
-        
+
         let result = sets.overlapAllowed.getRangeWhereFromEquals(date)
 
         return result
@@ -143,11 +163,6 @@ export class ResourceAvailability2 {
 
         let availability = this.availability.get(resource.id)
 
-        /*         if (resource.customSchedule)
-                    set = this.availability.get(resource.id)
-                else
-                    set = this.availability.get(this.ctx.branchId)  // otherwise we fall back to the default schedule (of the branch)
-         */
         let set: DateRangeSet = availability.available
 
         if (minTime)

@@ -3156,9 +3156,9 @@ export class ResourcePlannings {
   }
 
 
-  filterByResourceOverlap(resourceId: string, overlap: boolean = false): ResourcePlannings {
+  filterByResourceOverlapAllowed(resourceId: string, overlap: boolean = false): ResourcePlannings {
 
-    const planningsForResource = this.plannings.filter(rp => rp.resourceId == resourceId && overlap == overlap && !rp.scheduleId)
+    const planningsForResource = this.plannings.filter(rp => rp.resourceId == resourceId && rp.overlap == overlap && !rp.scheduleId)
 
     if (!Array.isArray(planningsForResource))
       return new ResourcePlannings()

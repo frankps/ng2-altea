@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { DateBorder } from "./date-border"
+import { DateBorder, DateBorderInfo } from "./date-border"
 import { DateRange } from "./date-range"
 import * as _ from "lodash"
 import * as dateFns from 'date-fns'
@@ -190,6 +190,56 @@ export class DateRangeSet {
 
 
         return new DateRangeSet(allRanges)
+    }
+
+    /** used for multi-instance resources (resource.qty > 1), then we know how many resources are free/occupied.
+     * DataRange.qty is used to keep track of how many resources are occupied
+    */
+    sumUp() {
+        // let rangesOrdered = _.orderBy(this.ranges, ['from', 'to'])
+
+        const result = DateRangeSet.empty
+
+        let allFroms = this.ranges.map(r => r.from)
+        let allTos = this.ranges.map(r => r.to)
+
+        let allBorders = [...allFroms, ...allTos]
+
+        
+
+        //   hier probleem !!! ...DateBorder  _.uniqBy(dates, 'getTime()')
+
+        let times = allBorders.map(d => d.getTime())
+        console.log(times)
+
+        allBorders = _.uniqBy(allBorders, d => d.getTime()) // _.uniq(allBorders, )
+        allBorders = allBorders.sort()
+
+        for (let i = 0; i < allBorders.length - 1; i++) {
+            const from = allBorders[i]
+            const to = allBorders[i + 1]
+
+            const inRange = this.ranges.filter(range => range.from <= from && from < range.to)
+            const qtyInRange = inRange.length
+
+            let newRange = new DateRange(from, to)
+            newRange.qty = qtyInRange
+
+            result.addRange(newRange)
+
+        }
+
+        return result
+    }
+
+    removeRangesWithQtyLowerThen(qty: number): DateRangeSet {
+        const ranges = this.ranges.filter(range => range.qty >= qty)
+        return new DateRangeSet(ranges)
+    }
+
+    removeRangesWithMinQty(qty: number): DateRangeSet {
+        const ranges = this.ranges.filter(range => range.qty < qty)
+        return new DateRangeSet(ranges)
     }
 
     union(set: DateRangeSet): DateRangeSet {

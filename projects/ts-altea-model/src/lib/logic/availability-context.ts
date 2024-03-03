@@ -322,7 +322,7 @@ export class AvailabilityContext {
 
     getResourceOccupation(resourceId: string): ResourceOccupationSets {
 
-        const exclusivePlannings = this.resourcePlannings.filterByResourceOverlap(resourceId, false)
+        const exclusivePlannings = this.resourcePlannings.filterByResourceOverlapAllowed(resourceId, false)
 
         if (exclusivePlannings.isEmpty())
             return new ResourceOccupationSets()
@@ -339,12 +339,12 @@ export class AvailabilityContext {
 
     getResourceOccupation2(resourceId: string): ResourceOccupationSets {
 
-        const exclusivePlannings = this.resourcePlannings.filterByResourceOverlap(resourceId, false)
+        const exclusivePlannings = this.resourcePlannings.filterByResourceOverlapAllowed(resourceId, false)
 
 
 
         // some plannings can overlap: preparations of next block might overlap with cleanup of previous block
-        const overlapAllowedPlannings = this.resourcePlannings.filterByResourceOverlap(resourceId, true)
+        const overlapAllowedPlannings = this.resourcePlannings.filterByResourceOverlapAllowed(resourceId, true)
 
         if (exclusivePlannings.isEmpty() && overlapAllowedPlannings.isEmpty())
             return new ResourceOccupationSets()
@@ -356,6 +356,8 @@ export class AvailabilityContext {
             availablePlannings.toDateRangeSet(),
             unavailable.toDateRangeSet(),
             overlapAllowedPlannings.toDateRangeSet())
+
+        console.warn('AVAILABILITY', result)
 
         return result
 

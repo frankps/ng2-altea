@@ -8,6 +8,7 @@ import { DateRangeSet } from './date-range-set';
 
 export enum OverlapMode {
     noOverlap,
+    exact,
     otherOverlapsFull,
     otherFullWithin,
     otherOverlapsRight,
@@ -16,10 +17,8 @@ export enum OverlapMode {
 
 export class DateRange {
 
-    /* fromLabels & toLabels were introduced 
-    */
-    /*     public fromLabels: string[] = []
-        public toLabels: string[] = [] */
+    /** quantity is used for resources with multiple instances (multi-cabine) */
+    public qty = 1
 
     constructor(public from: Date, public to: Date, public fromLabels: string[] = [], public toLabels: string[] = []) {
         if (to < from) {
@@ -78,7 +77,7 @@ export class DateRange {
 
     // existingPrepBlockEqualOrLonger
 
-    isEqualOrLongerThen(other: DateRange) : boolean {
+    isEqualOrLongerThen(other: DateRange): boolean {
         return (this.seconds() >= other.seconds())
 
     }
@@ -236,6 +235,9 @@ export class DateRange {
         if (other.to <= this.from || other.from >= this.to)
             return OverlapMode.noOverlap
 
+        if (this.from.getTime() === other.from.getTime() && this.to.getTime() === other.to.getTime())
+            return OverlapMode.exact
+
         if (this.from < other.from && this.to > other.to)
             return OverlapMode.otherFullWithin
 
@@ -247,6 +249,7 @@ export class DateRange {
 
         if (other.to >= this.to && other.from > this.from && other.from < this.to)
             return OverlapMode.otherOverlapsRight
+
 
         throw new Error('overlapWith unforseen situation?')
     }
@@ -280,6 +283,7 @@ export class DateRange {
                 ranges = [source.clone()]
                 break
             case OverlapMode.otherOverlapsFull: // this range is full within the other range => nothing remains
+            case OverlapMode.exact:
                 ranges = []
                 break
             case OverlapMode.otherFullWithin: // full overlap => the other range is within ours => this range will be cut into 2 pieces
