@@ -161,8 +161,11 @@ export class CalendarComponent implements OnInit {
 
     const query = new DbQuery()
     //query.and('appointment', QueryOperator.equals, true)
+    query.include('resource')
     query.and('start', QueryOperator.greaterThanOrEqual, DateHelper.yyyyMMddhhmmss(start))
     query.and('start', QueryOperator.lessThan, DateHelper.yyyyMMddhhmmss(end))
+    query.and('prep', QueryOperator.equals, false)
+    query.and('scheduleId', QueryOperator.equals, null)
 
     query.orderBy('start')
     query.take = 50
@@ -180,7 +183,9 @@ export class CalendarComponent implements OnInit {
           title: planning.info ? planning.info.toString() + (planning.prep ? ' PREP' : '') : '',
           start: this.fullCalendarDate(planning.start),
           end: this.fullCalendarDate(planning.end),
-          source: planning
+          source: planning,
+         // color: 'green',
+          backgroundColor: planning.resource?.color
         }))
 
         console.warn(events)

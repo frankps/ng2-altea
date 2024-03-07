@@ -1,6 +1,6 @@
 import { Component, ViewChild, OnInit } from '@angular/core';
 import { ProductService, PriceService, ProductResourceService } from 'ng-altea-common'
-import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource } from 'ts-altea-model'
+import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ProductSubType } from 'ts-altea-model'
 import { DashboardService, FormCardSectionEventData, NgEditBaseComponent, ToastType, TranslationService } from 'ng-common'
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxModalComponent, DeleteModalComponent } from 'ng-common';
@@ -34,13 +34,17 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
   @ViewChild('priceModal') public priceModal: NgxModalComponent;
   //  @ViewChild('deleteModal') public deleteModal?: NgxModalComponent; // NgTemplateOutlet | null = null
 
-  css_cls_row= 'mt-3'
+  css_cls_row = 'mt-3'
+  initialized = false
 
   nrOfPeople = [1, 2, 3, 4]
   vatPcts = [0, 6, 12, 21]
   gender: Translation[] = []
   onlineMode: Translation[] = []
   daysOfWeekShort: Translation[] = []
+  productType: Translation[] = []
+  productSubType: Translation[]= []
+
   staff = 2
 
   deleteConfig = {
@@ -62,7 +66,7 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
 
   priceChanges?: CollectionChangeTracker<Price>
   resourceChanges?: CollectionChangeTracker<ProductResource>
-  
+
 
   productResourcePropsToUpdate = ['offset', 'duration', 'resourceId', 'idx', 'durationMode', 'reference', 'scheduleIds', 'groupQty', 'groupAlloc', 'prep', 'prepOverlap']
 
@@ -80,29 +84,9 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
       , productSvc
       , router, route, spinner, dashboardSvc)
 
-    this.translationSvc.translateEnum(Gender, 'enums.gender.', this.gender)
-    this.translationSvc.translateEnum(OnlineMode, 'enums.online-mode.', this.onlineMode, false, true)
 
 
 
-    // this.route.params.subscribe(params => {
-
-    //   console.error('edit-product')
-
-    //   console.error(params)
-
-    //   if (params && params['id']) {
-    //     const id = params['id']
-
-    //     if (id == this.id)
-    //       return
-
-    //     this.getObject(id)
-
-
-    //   }
-
-    // })
 
 
     this.processParametersForNew()
@@ -124,7 +108,7 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
     let value = 1
     daysOfWeekShort.forEach(day => day.value = value++ % 7)
 
-    this.sectionProps.set('general', ['name', 'descr', 'salesPrice', 'vatPct', 'color', 'personSelect', 'staffSelect'])
+    this.sectionProps.set('general', ['name', 'descr', 'salesPrice', 'vatPct', 'color', 'personSelect', 'staffSelect', 'type', 'sub'])
     this.sectionProps.set('planning', ['duration', 'hasPre', 'preTime', 'hasPost', 'postTime', 'planMode', 'plan'])
     this.sectionProps.set('serviceDetails', ['customers', 'gender', 'online', 'showPrice', 'duration', 'spacingAfter'])
     // pricing
@@ -134,6 +118,11 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
     this.sectionProps.set('options', ['options'])
     this.sectionProps.set('rules', ['rules'])
 
+    await this.translationSvc.translateEnum(Gender, 'enums.gender.', this.gender)
+    await this.translationSvc.translateEnum(OnlineMode, 'enums.online-mode.', this.onlineMode, false, true)
+    await this.translationSvc.translateEnum(ProductType, 'enums.product-type.', this.productType)
+		await this.translationSvc.translateEnum(ProductSubType, 'enums.product-sub-type.', this.productSubType)
+    this.initialized = true
   }
 
   initProductResourceChangeTracker(product: Product) {
@@ -308,40 +297,40 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
       }
       console.error('Price changes')
       console.error(priceBatch)
-  
+
       const hasActivePrices = this.hasActivePrices()
-  
+
       const res = await this.priceSvc.batchProcess$(priceBatch)
-  
+
       if (res.status != ApiStatus.ok)
         allOk = false
-  
+
       this.resetOrigObject()
-  
+
       console.error(res)
       this.editSectionId = ''
-  
+
       this.priceChanges?.reset()
-  
+
       if (this.object.advPricing != hasActivePrices) {
-  
+
         this.object.advPricing = hasActivePrices
-  
+
         const update: any = {}
         update['id'] = this.object?.id
         update['advPricing'] = hasActivePrices
-  
+
         const prodUpdate = await this.objectSvc.update$(update)
-  
+
         if (!prodUpdate.isOk)
           allOk = false
-  
+
         console.error(prodUpdate)
-  
-  
+
+
       }
 
-    } catch(err) {
+    } catch (err) {
 
       allOk = false
 
@@ -352,7 +341,7 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
       } else {
         this.dashboardSvc.showToastType(ToastType.saveError)
       }
-  
+
 
     }
 
@@ -597,10 +586,10 @@ if (this.editSection == 'pricing') {
     if (!this.object?.id)
       return
 
-    let title : string = await this.translationSvc.getTrans("objects.price.title-tpl")
+    let title: string = await this.translationSvc.getTrans("objects.price.title-tpl")
 
-    
-    title = title.replace('*',this.object.name)
+
+    title = title.replace('*', this.object.name)
 
     console.warn(title)
 

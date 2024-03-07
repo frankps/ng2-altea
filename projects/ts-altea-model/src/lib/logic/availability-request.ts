@@ -8,6 +8,7 @@ import * as dateFns from 'date-fns'
 import { DateRange } from "./dates";
 import { SolutionSet } from "./solution";
 import { ReservationOptionSet } from "./reservation-option";
+import { ResourceAvailability2 } from "./resource-availability2";
 
 export class AvailabilityRequest {
 
@@ -37,7 +38,7 @@ export class AvailabilityDebugInfo {
     resourceRequests: ResourceRequest[] = []
 
     optimizedRequest?: ResourceRequest
-    availability?: ResourceAvailability
+    availability?: ResourceAvailability2
 }
 
 export class PossibleSlots {

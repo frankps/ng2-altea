@@ -36,6 +36,13 @@ export class OrderComponent implements OnInit {
 
   }
 
+
+  humanResourcesChanged() {
+
+    this.orderMgrSvc.orderDirty = true
+
+  }
+
   async toggleHumanResources() {
 
     if (!this.order.resPrefs)
@@ -71,6 +78,10 @@ export class OrderComponent implements OnInit {
     this.continue.emit(this.orderMgrSvc.order)
   }
 
+  async save() {
+
+    await this.orderMgrSvc.saveOrder()
+  }
 
   async nextStripe() {
 
@@ -109,6 +120,7 @@ export class OrderComponent implements OnInit {
 
   incrementPersons() {
     this.order.nrOfPersons++
+    this.orderMgrSvc.orderDirty = true
     this.order.updatePersons()
     /*     this.updatePersons(this.mgrUiSvc.order)
         this.refreshPersons() */
@@ -117,6 +129,7 @@ export class OrderComponent implements OnInit {
   decrementPersons() {
     if (this.order.nrOfPersons > 1) {
       this.order.nrOfPersons--
+      this.orderMgrSvc.orderDirty = true
       this.order.updatePersons()
       /*       this.updatePersons(this.mgrUiSvc.order)
             this.refreshPersons() */

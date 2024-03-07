@@ -101,6 +101,32 @@ export class ObjectHelper {
         return data
     }
 
+    static extractArrayProperties(objects: any[], properties: string[]): any[] {
+
+        if (!Array.isArray(objects) || objects.length == 0)
+            return []
+
+
+        return objects.map(obj => this.extractObjectProperties(obj, properties))
+    }
+
+    /** Return a sub object with only the specified properties */
+    static extractObjectProperties(obj: any, properties: string[]) {
+        if (!obj)
+            return obj
+
+        if (!Array.isArray(properties) || properties.length == 0)
+            return []
+
+        let newObj = {}
+
+        for (let prop of properties) {
+            newObj[prop] = obj[prop]
+        }
+
+        return newObj
+    }
+
 
     /**
      * Removes a certain property in obj and in all sub-objects

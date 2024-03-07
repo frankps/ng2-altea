@@ -1,5 +1,5 @@
 import { AfterContentChecked, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
-import { AvailabilityContext, AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Order, PossibleSlots, ReservationOptionSet, ResourceAvailability, ResourcePlanning, ResourceRequest, Schedule, SlotInfo, Solution, SolutionSet } from 'ts-altea-model';
+import { AvailabilityContext, AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Order, PossibleSlots, ReservationOptionSet, ResourceAvailability, ResourceAvailability2, ResourcePlanning, ResourceRequest, Schedule, SlotInfo, Solution, SolutionSet } from 'ts-altea-model';
 import * as _ from "lodash"
 import { AlteaService, OrderService, ResourcePlanningService } from 'ng-altea-common';
 import { DbQuery, QueryOperator } from 'ts-common';
@@ -16,7 +16,7 @@ export class DebugAvailabilityComponent implements OnInit {
   ctx: AvailabilityContext
 
   resourceRequests: ResourceRequest[]
-  availability: ResourceAvailability
+  availability: ResourceAvailability2
   order: Order
 
   solutionSet: SolutionSet

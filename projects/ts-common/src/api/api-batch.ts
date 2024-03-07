@@ -3,7 +3,7 @@ import { ApiStatus } from "./api-status"
 
 export class ApiBatchProcess<ObjectType> {
     create?: ObjectType[] = []
-    update?: ObjectType[] = []
+    update?: unknown[] = []
     delete?: unknown[] = [] // list of ids or list of objects with key identifiers (example: many-many relations)
 
 
@@ -22,9 +22,9 @@ export class ApiBatchItemResult<T> extends ApiResultBase {
 
     // status: ApiStatus
     // message?: string
-    object: T | { id: string }
+    object: T | { id: string } | unknown
 
-    constructor(obj: T | { id: string }, status: ApiStatus = ApiStatus.ok, message?: string) {
+    constructor(obj: T | { id: string } | unknown, status: ApiStatus = ApiStatus.ok, message?: string) {
         super()
         
         this.object = obj
@@ -35,7 +35,7 @@ export class ApiBatchItemResult<T> extends ApiResultBase {
 
 export class ApiBatchResult<T> extends ApiResultBase {
 
-    update: ApiBatchItemResult<T>[] = []
+    update: ApiBatchItemResult<unknown>[] = []
     create: ApiBatchItemResult<T>[] = []
     delete: ApiBatchItemResult<T>[] = []
 

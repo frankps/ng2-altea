@@ -55,6 +55,7 @@ export class OrderMgrUiService {
   orderLine: OrderLine
   orderLineIsNew = false
 
+  orderDirty = false
   order: Order = new Order(true)
 
   /** when user is creating a new gift  */
@@ -89,8 +90,11 @@ export class OrderMgrUiService {
 
   }
 
+  dirtyColor() {
+    return this.orderDirty ? 'red' : 'green'
+  }
 
-  async loadResources()  {
+  async loadResources() {
 
     /*
     const query = new DbQuery()
@@ -98,7 +102,7 @@ export class OrderMgrUiService {
 
     const gifts = await this.giftSvc.query$(query)
     */
-    
+
     const query = new DbQuery()
     query.and('type', QueryOperator.equals, ResourceType.human)
     query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
@@ -126,9 +130,13 @@ export class OrderMgrUiService {
   }
 
   newOrder(uiMode: OrderUiMode = OrderUiMode.newOrder) {
+
     this.order = new Order(true)
+    this.orderDirty = false
+
     this.order.branchId = this.sessionSvc.branchId
     this.uiMode = uiMode
+
   }
 
   hasOrderLines() {
@@ -194,7 +202,7 @@ export class OrderMgrUiService {
     const query = new DbQuery()
     query.and('id', QueryOperator.in, productIds)
 
-    query.include('options:orderBy=idx.values:orderBy=idx', 'resources.resource')
+    query.include('options:orderBy=idx.values:orderBy=idx', 'resources.resource', 'items')
 
     let products = await me.productSvc.query$(query)
 
@@ -266,6 +274,8 @@ export class OrderMgrUiService {
       this.orderLineOptions = null
       this.orderLine = null
       this.resources = order.getResources()
+      this.orderDirty = false
+
       this.spinner.hide()
 
       console.error(order)
@@ -287,10 +297,10 @@ export class OrderMgrUiService {
   async getAvailabilities() {
 
     // just for debugging
-/*     this.options = ReservationOptionSet.createDummy().options
-    console.error(this.options)
-
-    return */
+    /*     this.options = ReservationOptionSet.createDummy().options
+        console.error(this.options)
+    
+        return */
 
 
 
@@ -314,7 +324,7 @@ export class OrderMgrUiService {
 
   }
 
- maxWaitForDepositInMinutes(appMode: AppMode) : number {
+  maxWaitForDepositInMinutes(appMode: AppMode): number {
 
     switch (appMode) {
 
@@ -323,7 +333,7 @@ export class OrderMgrUiService {
         break
 
       case AppMode.pos:
-       // let branch = await this.sessionSvc.branch$()
+        // let branch = await this.sessionSvc.branch$()
 
         //branch.depositTerms
         return 0
@@ -333,7 +343,7 @@ export class OrderMgrUiService {
     return 0
   }
 
-  async selectTimeSlot(option: ReservationOption) : Promise<ConfirmOrderResponse> {
+  async selectTimeSlot(option: ReservationOption): Promise<ConfirmOrderResponse> {
 
     console.warn(option)
 
@@ -343,8 +353,8 @@ export class OrderMgrUiService {
 
     console.warn(solutionForOption)
 
-/*     this.spinner.hide()
-    return */
+    /*     this.spinner.hide()
+        return */
 
     const depositMinutes = this.maxWaitForDepositInMinutes(this.sessionSvc.appMode)
 
@@ -359,7 +369,7 @@ export class OrderMgrUiService {
     else
       this.dashboardSvc.showToastType(ToastType.saveError)
 
-    
+
     this.plannings = confirmOrderResponse.plannings
 
 
@@ -413,6 +423,7 @@ export class OrderMgrUiService {
 
     if (res.isOk) {
       this.refreshOrder(res.object)
+      this.orderDirty = false
       this.dashboardSvc.showToastType(ToastType.saveSuccess)
     } else {
       this.dashboardSvc.showToastType(ToastType.saveError)
@@ -569,6 +580,7 @@ export class OrderMgrUiService {
   addOrderLine(orderLine: OrderLine, qty = 1) {
     // orderLine.orderId = this.order.id
     this.order.addLine(orderLine)
+    this.orderDirty = true
     this.orderLineIsNew = false
   }
 
@@ -576,7 +588,9 @@ export class OrderMgrUiService {
     if (!this.orderLine)
       return
 
-    this.order.deleteLine(this.orderLine)
+    if (this.order.deleteLine(this.orderLine))
+      this.orderDirty = true
+
     this.orderLine = null
   }
 
@@ -585,19 +599,23 @@ export class OrderMgrUiService {
     if (!payment)
       return
 
-    this.order.deletePayment(payment)
+    if (this.order.deletePayment(payment))
+      this.orderDirty = true
   }
 
 
 
-  addPayment(amount: number, type: string, location: string) {
+  addPayment(amount: number, type: string, location: string) : Payment {
 
     const payment = new Payment()
     payment.amount = amount
     payment.type = type
     payment.loc = location
-
+    
     this.order.addPayment(payment)
+    this.orderDirty = true
+
+    return payment
   }
 
   setContact(contact: Contact) {

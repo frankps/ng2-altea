@@ -234,17 +234,7 @@ export class ResourceAvailability {
             }
 
 
-            /*             if (isPrepTime && requestItem.prepOverlap) {
-            
-                            let existingPlannings = this.ctx.resourcePlannings.filterByResourceDateRange(resource.id, dateRange.from, dateRange.to)
-            
-                            if (existingPlannings.isPrepTimeOnly()) {
-                                availableResources.push(resource)
-                                result.addNote(`Overlapping prepartions allowed for '${resource.name}' at ${dateFns.format(dateRange.from, 'dd/MM HH:mm')} allowed!`)
-                                continue
-                            }
-            
-                        } */
+
 
 
         }

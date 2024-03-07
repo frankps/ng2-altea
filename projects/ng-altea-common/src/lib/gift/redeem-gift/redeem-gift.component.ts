@@ -42,11 +42,15 @@ export class RedeemGiftComponent implements OnInit {
 
   async searchGift() {
 
+    /*
     const query = new DbQuery()
     query.and('code', QueryOperator.equals, this.code)
 
     const gifts = await this.giftSvc.query$(query)
+*/
 
+    const gifts = await this.giftSvc.searchGift(this.code)
+    
     if (Array.isArray(gifts) && gifts.length > 0)
       this.gift = gifts[0]
 

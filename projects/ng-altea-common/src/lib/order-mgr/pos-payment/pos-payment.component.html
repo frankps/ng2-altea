@@ -6,45 +6,68 @@
 
 
         <form #payForm="ngForm">
-            
-        <div class="row">
 
-            <div class="col-4"></div>
-            <div class="col-4 d-grid">
-                <button type="button" class="btn btn-secondary" *ngIf="totalToPay > 0"
-                    (click)="setAmountTotal()">{{totalToPay}}</button>
-            </div>
-            <div class="col-4"><input type="number" id="amount" name="amount" required class="form-control"
-                    [(ngModel)]="amount" />
-            </div>
-        </div>
+            <div class="row">
 
+                <div class="col-4"></div>
+                <div class="col-4 d-grid">
+                    <button type="button" class="btn btn-secondary" *ngIf="totalToPay > 0"
+                        (click)="setAmountTotal()">{{totalToPay}}</button>
+                </div>
+                <div class="col-4"><input type="number" id="amount" name="amount" required class="form-control"
+                        [(ngModel)]="amount" />
+                </div>
+            </div>
 
+            <div class="row">
+                <div class="col-4 d-grid mt-2">
+                    <button type="button" [disabled]="!payForm.form.valid" class="btn btn-primary"
+                        (click)="addPayment('cash')" translate>enums.pay-type.cash</button>
+                </div>
+                <div class="col-4 d-grid mt-2">
+                    <button type="button" [disabled]="!payForm.form.valid" class="btn btn-primary"
+                        (click)="addPayment('transfer')" translate>enums.pay-type.transfer</button>
+                </div>
+                <div class="col-4 d-grid mt-2">
+                    <button type="button" [disabled]="!payForm.form.valid" class="btn btn-primary"
+                        (click)="addPayment('credit')" translate>enums.pay-type.credit</button>
+                </div>
+                <div class="col-4 d-grid mt-2">
+                    <button type="button" [disabled]="!payForm.form.valid" class="btn btn-primary"
+                        (click)="addPayment('debit')" translate>enums.pay-type.debit</button>
+                </div>
+            </div>
 
-        <div class="row">
-            <div class="col-4 d-grid mt-2">
-                <button type="button" [disabled]="!payForm.form.valid" class="btn btn-primary" (click)="addPayment('cash')"
-                    translate>enums.pay-type.cash</button>
-            </div>
-            <div class="col-4 d-grid mt-2">
-                <button type="button" [disabled]="!payForm.form.valid" class="btn btn-primary" (click)="addPayment('transfer')"
-                    translate>enums.pay-type.transfer</button>
-            </div>
-            <div class="col-4 d-grid mt-2">
-                <button type="button" [disabled]="!payForm.form.valid" class="btn btn-primary" (click)="addPayment('credit')"
-                    translate>enums.pay-type.credit</button>
-            </div>
-            <div class="col-4 d-grid mt-2">
-                <button type="button" [disabled]="!payForm.form.valid" class="btn btn-primary" (click)="addPayment('dedit')"
-                    translate>enums.pay-type.dedit</button>
-            </div>
-            <div class="col-4 d-grid mt-2">
-                <button type="button" [disabled]="!payForm.form.valid" class="btn btn-primary" (click)="addPayment('gift')"
-                    translate>enums.pay-type.gift</button>
-            </div>
-        </div>
+            <div class="row">
+                <div class="col-4 d-grid mt-2">
 
-    </form>
+                    <input type="text" [disabled]="!payForm.form.valid" id="giftCode" name="giftCode"
+                        class="form-control" placeholder="Cadeaubon" [(ngModel)]="giftCode" />
+
+                </div>
+
+                <div class="col-4 d-grid mt-2">
+                    <button type="button" [disabled]="!payForm.form.valid" class="btn btn-primary"
+                        (click)="addPayment('gift')" translate>enums.pay-type.gift</button>
+                </div>
+            </div>
+
+        </form>
+
+        <ul class="list-group mt-3" *ngIf="showGifts">
+            <li class="list-group-item" *ngFor="let gift of gifts">
+                <div class="row">
+                    <div class="col-4">{{gift.code}}</div>
+                    <div class="col-4">{{gift.used}}/{{gift.value}}</div>
+                    <div class="col-4"> 
+                        <button type="button" class="btn btn-primary btn-sm" (click)="useGift(gift)">{{gift.availableAmount()}}</button>
+                    </div>
+                  </div>
+              
+                </li>
+           
+        </ul>
+
 
 
 

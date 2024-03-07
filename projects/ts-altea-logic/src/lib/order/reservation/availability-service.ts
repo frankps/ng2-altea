@@ -86,11 +86,11 @@ export class AvailabilityService {
          *  Calculate the final availability of all the resources based on all the data previously fetched (availability context)
          */
 
-        const availability = new ResourceAvailability(availabilityCtx)
-        if (availabilityRequest.debug) response.debug.availability = availability
+/*         const availability = new ResourceAvailability(availabilityCtx)
+        if (availabilityRequest.debug) response.debug.availability = availability */
 
         const availability2 = new ResourceAvailability2(availabilityCtx)
-     //   if (availabilityRequest.debug) response.debug.availability = availability
+       if (availabilityRequest.debug) response.debug.availability = availability2
 
         /** Create Resource Request
          *  _______________________
@@ -119,7 +119,7 @@ export class AvailabilityService {
          */
 
 
-        response.solutionSet = SlotFinder.I.findSlots(availability, availability2, availabilityCtx, ...initialResourceRequests)
+        response.solutionSet = SlotFinder.I.findSlots(availability2, availabilityCtx, ...initialResourceRequests)
 
         // response.solutionSet = SlotFinder.I.findSlots(availability, availabilityCtx, ...optimizedRequests)
 

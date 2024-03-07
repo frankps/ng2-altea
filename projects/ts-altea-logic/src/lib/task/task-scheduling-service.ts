@@ -24,7 +24,7 @@ export class TaskSchedulingService {
     }
 
 
-    async instantiateRecurringTasks() {
+    async instantiateRecurringTasks(includeLessFrequentTasks: boolean = true) {
 
         try {
 
@@ -36,11 +36,19 @@ export class TaskSchedulingService {
 
             let newDayTasks = await this.tasksToPerformForPeriod(recurTasks, TaskSchedule.daily)
             let newTwiceAWeekTasks = await this.tasksToPerformForPeriod(recurTasks, TaskSchedule.twiceAWeek)
-            let newWeekTasks = await this.tasksToPerformForPeriod(recurTasks, TaskSchedule.weekly)
-            let newMonthTasks = await this.tasksToPerformForPeriod(recurTasks, TaskSchedule.monthly)
+            let newWeekTasks = []
+            let newMonthTasks = []
+            let newQuarterTasks = []
 
-            // if (Array.isArray(newWeekTasks) && newWeekTasks.length >= 0)
-            newRecurTaskInstances.push(...newDayTasks, ...newTwiceAWeekTasks, ...newWeekTasks, ...newMonthTasks)
+            if (includeLessFrequentTasks) {
+                newWeekTasks = await this.tasksToPerformForPeriod(recurTasks, TaskSchedule.weekly)
+                newMonthTasks = await this.tasksToPerformForPeriod(recurTasks, TaskSchedule.monthly)
+                newQuarterTasks = await this.tasksToPerformForPeriod(recurTasks, TaskSchedule.quarterly)
+            }
+
+
+
+            newRecurTaskInstances.push(...newDayTasks, ...newTwiceAWeekTasks, ...newWeekTasks, ...newMonthTasks, ...newQuarterTasks)
 
             // still to do: days, months
 
@@ -103,6 +111,11 @@ export class TaskSchedulingService {
             case TaskSchedule.monthly:
                 finishedAfter = dateFns.addMonths(finishedAfter, -1)
                 break
+            case TaskSchedule.quarterly:
+                finishedAfter = dateFns.addMonths(finishedAfter, -3)
+                break
+            default:
+                return []
         }
 
         /*
@@ -116,7 +129,7 @@ export class TaskSchedulingService {
         const tasksForPeriod = await this.alteaDb.getTasksToDoORFinishedAfter(periodTaskIds, finishedAfter)
 
         // finished tasks within period (=> it's ok, task is finished for period => no need to recreate at this moment)
-        const finishedTasks = tasksForPeriod.filter(t => t.status == TaskStatus.done || t.status == TaskStatus.skip)  
+        const finishedTasks = tasksForPeriod.filter(t => t.status == TaskStatus.done || t.status == TaskStatus.skip)
         const finishedPeriodTaskIds = finishedTasks.map(t => t.rTaskId)
 
         // still open tasks waiting for completion (=> also no need to recreate, already existing)

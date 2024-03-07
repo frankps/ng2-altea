@@ -2247,6 +2247,9 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
 
   addPayment(payment: Payment) {
 
+    if (!payment)
+      return
+
     if (!this.payments)
       this.payments = []
 
@@ -2381,24 +2384,27 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
     return this.incl
   }
 
-  deletePayment(payment: Payment) {
+  deletePayment(payment: Payment): boolean {
 
     if (!this.payments || !payment)
-      return
+      return false
 
     const removed = _.remove(this.payments, l => l.id == payment.id)
 
     if (Array.isArray(removed) && removed.length > 0 && !payment.m.n)  // orderLine.m.n = it was a new line not yet saved in backend
+    {
       this.markAsRemoved('payments', payment.id)
+    }
 
     this.makePayTotals()
 
+    return (Array.isArray(removed) && removed.length > 0)
   }
 
-  deleteLine(orderLine: OrderLine) {
+  deleteLine(orderLine: OrderLine): boolean {
 
     if (!this.lines || !orderLine)
-      return
+      return false
 
     const removed = _.remove(this.lines, l => l.id == orderLine.id)
 
@@ -2406,6 +2412,8 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
       this.markAsRemoved('lines', orderLine.id)
 
     this.calculateAll()
+
+    return (Array.isArray(removed) && removed.length > 0)
   }
 
   getProductIds(): string[] {
@@ -3002,26 +3010,27 @@ export class OrderLine extends ObjectWithId {
 
     console.warn('makeTotals')
 
-    if (!Array.isArray(this.options) || this.options.length == 0)
-      return
+
 
     let unitPrice = this.base
     //let totalDuration = 0
 
-    for (const option of this.options) {
-      if (!option.values)
-        continue
+    if (!Array.isArray(this.options) || this.options.length == 0) {
+      for (const option of this.options) {
+        if (!option.values)
+          continue
 
-      // let factorOption = null
+        // let factorOption = null
 
-      // if (option.factorOptionId) {
-      //   factorOption = this.options.find(o => o.id == option.factorOptionId)
-      // }
+        // if (option.factorOptionId) {
+        //   factorOption = this.options.find(o => o.id == option.factorOptionId)
+        // }
 
 
-      for (const orderLineOptionValue of option.values) {
-        unitPrice += orderLineOptionValue.getPrice(option.formula, this.options)
-        // totalDuration += value.duration
+        for (const orderLineOptionValue of option.values) {
+          unitPrice += orderLineOptionValue.getPrice(option.formula, this.options)
+          // totalDuration += value.duration
+        }
       }
     }
 
@@ -3365,9 +3374,9 @@ export class PlanningInfo {
       })
     }
 
-    if (this.res) {
-      info += ` ${this.res.nm}`
-    }
+    /*     if (this.res) {
+          info += ` ${this.res.nm}`
+        } */
 
     return info
   }
@@ -3714,6 +3723,16 @@ export class GiftLine {
 }
 
 
+export enum CanUseGiftMsg {
+  notActive = 'notActive',
+  alreadyConsumed = 'alreadyConsumed',
+  invalidAmount = 'invalidAmount',
+  partialAmount = 'partialAmount'
+}
+export class CanUseGift {
+  constructor(public valid: boolean, public amount: number, public msg?: CanUseGiftMsg, public debug?: string) { }
+}
+
 /**
  * Changes:
  *   value?: number
@@ -3748,13 +3767,19 @@ export class Gift extends ObjectWithId {
   invoice = false
 
   /** the vat% that will be used if gift is invoice and type=amount  */
+  @Type(() => Number)
   vatPct?: number
 
   code?: string;
   descr?: string;
   expiresOn?: Date;
+
+  @Type(() => Number)
   value?: number
+
+  @Type(() => Number)
   used = 0
+
   isConsumed = false
   fromName?: string;
   fromEmail?: string;
@@ -3778,6 +3803,52 @@ export class Gift extends ObjectWithId {
   isAmount() {
     return this.type == GiftType.amount
   }
+
+  /** check if given amount (or less) can be used */
+  canUse(amount: number): CanUseGift {
+
+    if (!amount || amount <= 0)
+      return new CanUseGift(false, 0, CanUseGiftMsg.invalidAmount, `amount=${amount}`)
+
+    if (!this.active)
+      return new CanUseGift(false, 0, CanUseGiftMsg.notActive)
+
+    if (this.isConsumed)
+      return new CanUseGift(false, 0, CanUseGiftMsg.alreadyConsumed, `isConsumed=true`)
+
+    let available = this.availableAmount()
+
+    if (!available || available < 0)
+      return new CanUseGift(false, 0, CanUseGiftMsg.alreadyConsumed, `available=${available}`)
+
+
+    if (amount <= available)
+      return new CanUseGift(true, amount)
+    else {
+      return new CanUseGift(true, amount, CanUseGiftMsg.partialAmount)
+    }
+
+  }
+
+  use(amount: number) {
+
+    this.used += amount
+
+    if (this.used >= this.value)
+      this.isConsumed = true
+    else
+      this.isConsumed = false
+  }
+
+  free(amount: number) {
+
+    this.used -= amount
+
+    if (this.used < this.value)
+      this.isConsumed = false
+
+  }
+
 
   isSpecific() {
     return this.type == GiftType.specific
@@ -3830,6 +3901,7 @@ export class Payment extends ObjectWithId {
   type: string
   loc: string
 
+
   @Type(() => Gift)
   gift?: Gift
   giftId?: string
@@ -3843,6 +3915,9 @@ export class Payment extends ObjectWithId {
 
   date?: Date = new Date()
 
+  info?: string
+  declared: boolean = false
+
 }
 
 export enum TaskSchedule {
@@ -3852,6 +3927,7 @@ export enum TaskSchedule {
   weekly = 'weekly',
   twiceAMonth = 'twiceAMonth',
   monthly = 'monthly',
+  quarterly = 'quarterly',
   yearly = 'yearly',
   manual = 'manual'
 }
@@ -3995,6 +4071,10 @@ export class Task extends ObjectWithId {
   }
 }
 
+
+/**
+ *  Introduced to store web push subscriptions for users, but any extra JSON can be stored here for any object
+ */
 export class CustomJson extends ObjectWithId {
   objId?: string
 
@@ -4006,6 +4086,54 @@ export class CustomJson extends ObjectWithId {
 
   createdAt = new Date()
 }
+
+export enum ObjectLogAction {
+
+  /** new object */
+  new = 'new',
+
+  /** update */
+  upd = 'upd',
+
+  /** soft delete */
+  sftDel = 'sftDel',
+
+  /** hard delete */
+  hrdDel = 'sftDel'
+}
+
+export class ObjectLog extends ObjectWithId {
+
+  branchId?: string
+
+  /** if obj belongs to another parent object (example: objId is a payment-id & parentId is order-id) */
+  parentId?: string
+
+  objId?: string
+
+  userId?: string
+
+  action?: ObjectLogAction
+
+  data?: any
+
+  date = new Date()
+
+
+  static update(objId?: string, data?: any): ObjectLog {
+    let log = new ObjectLog()
+
+    log.objId = objId
+    log.data = data
+    log.action = ObjectLogAction.upd
+
+    return log
+  }
+
+
+}
+
+
 /*
 model CustomJson {
   id String @id(map: "newtable_pk") @default(dbgenerated("gen_random_uuid()")) @db.Uuid

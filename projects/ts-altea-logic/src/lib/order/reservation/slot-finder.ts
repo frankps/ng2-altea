@@ -22,11 +22,12 @@ export class SlotFinder {
     /**
      *  There can be multiple resourceRequests: for instance different requests per branch schedule 
      */
-    findSlots(availability: ResourceAvailability, availability2: ResourceAvailability2, ctx: AvailabilityContext, ...resourceRequests: ResourceRequest[]): SolutionSet {
+    findSlots(availability2: ResourceAvailability2, ctx: AvailabilityContext, ...resourceRequests: ResourceRequest[]): SolutionSet {
 
         const resourceRequest = resourceRequests[0]
 
-        const solutions = this.findSlotsInternal(availability, availability2, ctx, resourceRequest)
+        // availability,
+        const solutions = this.findSlotsInternal(availability2, ctx, resourceRequest)
 
 
         const exactSolutions = solutions //.toExactSolutions()
@@ -36,7 +37,8 @@ export class SlotFinder {
 
 
 
-    private findSlotsInternal(availability: ResourceAvailability, availability2: ResourceAvailability2, ctx: AvailabilityContext, resourceRequest: ResourceRequest): SolutionSet {
+    // availability: ResourceAvailability,
+    private findSlotsInternal(availability2: ResourceAvailability2, ctx: AvailabilityContext, resourceRequest: ResourceRequest): SolutionSet {
 
 
         console.error('Start findSlots()')
@@ -49,7 +51,7 @@ export class SlotFinder {
          * 
          *  To do: also do non-block resources ...
          */
-        let solutionSet = this.createInitialSolutions(availability, availability2, ctx, resourceRequest)
+        let solutionSet = this.createInitialSolutions(availability2, ctx, resourceRequest)
 
         if (resourceRequest.items.length == 1)
             return solutionSet
@@ -61,7 +63,7 @@ export class SlotFinder {
         while (resourceRequest.hasItemsToProcess()) {
             const requestItem = resourceRequest.nextItemToProcess()
 
-            solutionSet = this.handleResourceRequestItem(requestItem, solutionSet, availability)
+            solutionSet = this.handleResourceRequestItem(requestItem, solutionSet, availability2)
         }
 
         return solutionSet
@@ -69,7 +71,7 @@ export class SlotFinder {
 
 
 
-    createInitialSolutions(availability: ResourceAvailability, availability2: ResourceAvailability2, ctx: AvailabilityContext, resourceRequest: ResourceRequest): SolutionSet {
+    createInitialSolutions(availability2: ResourceAvailability2, ctx: AvailabilityContext, resourceRequest: ResourceRequest): SolutionSet {
 
         const solutionSet = new SolutionSet()
 
@@ -78,6 +80,8 @@ export class SlotFinder {
 
         const product = firstRequestItem.product
 
+        // PlanningMode = BLOCK
+        // ====================
 
         if (product.planMode == PlanningMode.block) {
 
@@ -85,13 +89,10 @@ export class SlotFinder {
             return solutionSet
         }
 
+        // PlanningMode = CONTINOUS
+        // ========================
 
-
-        const firstItemAvailabilities = availability.getAvailabilities(firstRequestItem.resources)
-
-/*         const singleResource = (firstRequestItem.resources?.length === 1)
-        const firstResource = firstRequestItem.resources?.length > 0 ? firstRequestItem.resources[0] : null */
-
+        const firstItemAvailabilities = availability2.getAvailabilities(firstRequestItem.resources)
 
         /** a set typically contains the availability for 1 resource */
         for (const set of firstItemAvailabilities.sets) {
@@ -101,6 +102,7 @@ export class SlotFinder {
 
                 let possibleDateRanges = DateRangeSet.empty
 
+                // we reduce by the duration because we want interval with possible start dates
                 availableRange.increaseToWithSeconds(-firstRequestItem.duration.seconds)
                 possibleDateRanges.addRange(availableRange)
 
@@ -128,7 +130,7 @@ export class SlotFinder {
      * @param requestItem 
      * @param solutionSet 
      */
-    handleResourceRequestItem(requestItem: ResourceRequestItem, solutionSet: SolutionSet, availability: ResourceAvailability, trackInvalidSolutions = true): SolutionSet {
+    handleResourceRequestItem(requestItem: ResourceRequestItem, solutionSet: SolutionSet, availability: ResourceAvailability2, trackInvalidSolutions = true): SolutionSet {
 
 
         /**
@@ -156,6 +158,7 @@ export class SlotFinder {
 
 
             if (referenceSolutionItem.exactStart) {
+                /* exactStart = true !!! => the first item in the solution has exact start and end */
 
                 if (!solution.offsetRefDate)
                     throw new Error(`solution.offsetRefDate not set!`)

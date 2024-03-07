@@ -1,6 +1,6 @@
 <div class="card" *ngIf="order">
     <!-- <img src="..." class="card-img-top" alt="..."> -->
-    <div class="card-header p-2">
+    <div class="card-header p-2" [style.background-color]="orderMgrSvc.dirtyColor()">
         <div class="row">
             <div class="col-5" *ngIf="order.contact">{{order.contact.name}}</div>
             <div class="col-5"> {{order.start | intdate}}</div>
@@ -87,7 +87,7 @@
             </div>
             <ng-container *ngIf="line.product?.isSubscription()">
 
-                <button type="button" class="btn btn-secondary btn-sm float-end"
+                <button type="button" class="btn btn-secondary btn-sm float-end" [disabled]="!orderMgrSvc.order.contact"
                     (click)="orderMgrSvc.createSubscriptions(line)">Maak abonnement</button>
 
 
@@ -191,7 +191,7 @@
         <div class="row  my-2">
             <div class="col">
                 <ng-select id="humanResources" name="humanResources" *ngIf="showHumanResources" [items]="humanResources" placeholder="Personeel"
-                    bindLabel="name" bindValue="id" [clearable]="true" [multiple]="true" [(ngModel)]="order.resPrefs.humIds">
+                    bindLabel="name" bindValue="id" [clearable]="true" [multiple]="true" [(ngModel)]="order.resPrefs.humIds" (change)="humanResourcesChanged()">
                 </ng-select>
 
             </div>
@@ -230,6 +230,13 @@
     <div class="card-footer p-2">
         <div class="row text-muted" style="font-size: 80%;">
             <div class="col-6">Gemaakt op {{order.createdAt | date: sessionSvc.formats.dateShort}}</div>
+
+
+            <div class="d-grid mt-3">
+                <button type="button" class="btn btn-outline-secondary float-end" (click)="save()"
+                    translate>msg.save</button>
+            </div>
+
 
 
             <div class="d-grid mt-3" *ngIf="!order.isEmpty()">

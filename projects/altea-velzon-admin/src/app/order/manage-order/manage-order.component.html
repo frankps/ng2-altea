@@ -24,6 +24,9 @@
 
     <div class="col-8">
 
+        
+
+
         <ng-container *ngIf="menu == 'compose'">
 
             <div class="row">
@@ -78,6 +81,22 @@
         
         </ng-container>
 
+        <ng-container *ngIf="menu == 'pay'">
+        
+            <div class="row">
+
+                <div class="col-6">
+                   
+              
+                </div>
+                <div class="col-6">
+
+                    <order-mgr-pos-payment></order-mgr-pos-payment>
+
+                </div>
+            </div>
+        
+        </ng-container>
 
 
     </div>

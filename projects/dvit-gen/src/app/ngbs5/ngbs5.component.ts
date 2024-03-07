@@ -16,19 +16,43 @@ export class Ngbs5Component {
     },
     "bind": {
         "mode": "ngModel",
-        "to": "search",
+        "to": "object",
         "type": "",
         "import": ""
     },
     "label": {
         "mode": "ngx-altea-label-control",
-        "translate": "objects.prodRes"
+        "translate": "objects.product"
     },
     "rows": {
         "generate": true,
         "cols": 1
     },
     "elements": {
+        "type": {
+            "type": "ng-select",
+            "source": {
+                "mode": "enum",
+                "name": "ProductType",
+                "import": "ts-altea-model",
+                "translate": "enums.product-type"
+            },
+            "required": true,
+            "clearable": false,
+            "multiple": false
+        },
+        "sub": {
+            "type": "ng-select",
+            "source": {
+                "mode": "enum",
+                "name": "ProductSubType",
+                "import": "ts-altea-model",
+                "translate": "enums.product-sub-type"
+            },
+            "required": true,
+            "clearable": false,
+            "multiple": false
+        },
         "search": {
             "type": "text",
             "required": true
@@ -69,13 +93,25 @@ export class Ngbs5Component {
     },
     "label": {
         "mode": "ngx-altea-label-control",
-        "translate": "objects.prodRes"
+        "translate": "objects.product"
     },
     "rows": {
         "generate": true,
         "cols": 1
     },
     "elements": {
+        "type": {
+            "type": "ng-select",
+            "source": {
+                "mode": "enum",
+                "name": "ProductType",
+                "import": "ts-altea-model",
+                "translate": "enums.product-type"
+            },
+            "required": true,
+            "clearable": false,
+            "multiple": false
+        },
         "email": {
             "type": "text",
             "required": true

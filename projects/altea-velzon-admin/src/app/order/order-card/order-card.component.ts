@@ -30,7 +30,7 @@ export class OrderCardComponent {
 
   openOrder(orderId: string) {
 
-    this.router.navigate(['/aqua/order', orderId])
+    this.router.navigate(['/aqua/orders/manage', orderId])
 
 
   }

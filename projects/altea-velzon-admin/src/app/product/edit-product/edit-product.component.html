@@ -114,6 +114,23 @@
       </div>
 
 
+      <div class="row {{css_cls_row}}">
+        <div class="col">
+          <ngx-altea-label-control label="objects.product.type" for="type">
+            <ng-select id="type" name="type" *ngIf="initialized" [items]="productType" bindLabel="trans" bindValue="key" [clearable]="false" [multiple]="false" [(ngModel)]="object.type"></ng-select>
+          </ngx-altea-label-control>
+        </div>
+      </div>
+
+
+
+      <div class="row {{css_cls_row}}">
+        <div class="col">
+          <ngx-altea-label-control label="objects.product.sub" for="sub">
+            <ng-select id="sub" name="sub" *ngIf="initialized" [items]="productSubType" bindLabel="trans" bindValue="key" [clearable]="false" [multiple]="false" [(ngModel)]="object.sub"></ng-select>
+          </ngx-altea-label-control>
+        </div>
+      </div>
       
 <!--       <div class="row {{css_cls_row}}">
         <div class="col">

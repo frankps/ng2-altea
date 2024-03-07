@@ -74,6 +74,7 @@ export class DemoOrdersComponent implements OnInit {
   manicureId = "46af990e-dc8f-461d-a48d-f39b9f782b0d"
   pedicureId = "678f7000-5865-4d58-9d92-9a64193b48c4"
   bodyslimmingId = "b910237f-09cf-4dff-a265-4e6013224c57"
+  bodysculptor12x30 = "3667402e-2e5b-4655-b93e-a9e6955cbd4d"
 
 
   names = ['Wellness 2h/2p', 'Massage']
@@ -84,12 +85,14 @@ export class DemoOrdersComponent implements OnInit {
     ['Manicure', DemoOrder.fromProducts(this.manicureId)],
     ['Pedicure', DemoOrder.fromProducts(this.pedicureId)],
     ['Wellness 2h/2p', DemoOrder.fromProducts(this.wellnessId)],
-    ['Massage & Manicure', DemoOrder.new(this.massageId, 1).add(this.manicureId, 1)]  // .fromProducts(this.massageId, this.manicureId)
+    ['Massage & Manicure', DemoOrder.new(this.massageId, 1).add(this.manicureId, 1)],  // .fromProducts(this.massageId, this.manicureId)
+    ['BodySculptor 12x30min', DemoOrder.fromProducts(this.bodysculptor12x30)]
+    // 
   ]);
 
   demoNames: string[] = []
 
-  preselect: string = 'Bodyslimming sessie' // 'Wellness 2h/2p'
+  preselect: string // = 'Bodyslimming sessie' // 'Wellness 2h/2p'
   onDate: number // = 20240315000000
 
 
@@ -146,6 +149,8 @@ export class DemoOrdersComponent implements OnInit {
     this.orderMgrSvc.newOrder()
 
     const products = await this.orderMgrSvc.loadProducts$(...demo.productIds())
+
+    console.error(products)
 
     for (let line of demo.lines) {
 

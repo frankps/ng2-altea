@@ -57,6 +57,7 @@
       "weekly": "Week",
       "twiceAMonth": "2/Maand",
       "monthly": "Maand",
+      "quarterly": "Kwartaal",
       "yearly": "Jaar",
       "manual": "Manueel"
     },
@@ -566,6 +567,7 @@
     },
     "gift": {
       "_single": "Cadeaubon",
+      "code": "Code",
       "value": "Waarde",
       "used": "Gebruikt",
       "isConsumed": "Is gebruikt",

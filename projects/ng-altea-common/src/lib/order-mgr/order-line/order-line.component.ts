@@ -41,6 +41,7 @@ export class OrderLineComponent {
   qtyChanged() {
     console.error(this.orderMgrSvc.orderLine)
 
+    this.orderMgrSvc.orderDirty = true
     this.orderMgrSvc.orderLine.markAsUpdated('qty')
     this.orderMgrSvc.order.calculateAll()
   }
@@ -78,13 +79,15 @@ export class OrderLineComponent {
 
     console.error(optionValue)
 
+    
+
     this.orderLine.markAsUpdated("options")
 
     console.error('has price!!')
 
     this.orderLine.calculateAll()
     this.orderMgrSvc.order.calculateAll()
-
+    this.orderMgrSvc.orderDirty = true
 
 
   }
@@ -109,6 +112,7 @@ export class OrderLineComponent {
     }
 
     this.orderLine.markAsUpdated("options")
+    this.orderMgrSvc.orderDirty = true
 
 
   }

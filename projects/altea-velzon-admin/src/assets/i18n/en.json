@@ -57,6 +57,7 @@
       "weekly": "Week",
       "twiceAMonth": "2/Maand",
       "monthly": "Maand",
+      "quarterly": "Kwartaal",
       "yearly": "Jaar",
       "manual": "Manueel"
     },
@@ -183,6 +184,12 @@
       "category": "Categorie",
       "bundle": "Arrangement",
       "subscription": "Abonnement"
+    },
+    "product-sub-type": {
+      "basic": "Basis",
+      "cat": "Categorie",
+      "bundle": "Arrangement",
+      "subs": "Abonnement"
     },
     "planning-type": {
       "occ": "Bezet",
@@ -566,6 +573,7 @@
     },
     "gift": {
       "_single": "Cadeaubon",
+      "code": "Code",
       "value": "Waarde",
       "used": "Gebruikt",
       "isConsumed": "Is gebruikt",
@@ -720,6 +728,8 @@
       "personSelect": "Selecteer personen",
       "staffSelect": "Selecteer specialistes",
       "planMode": "Planning mode",
+      "type": "Type",
+      "sub": "Sub type",
       "types": {
         "product": {
           "bundle": "Bevat andere producten"
