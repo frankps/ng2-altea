@@ -36,6 +36,10 @@
                     <button type="button" [disabled]="!payForm.form.valid" class="btn btn-primary"
                         (click)="addPayment('debit')" translate>enums.pay-type.debit</button>
                 </div>
+                <div class="col-4 d-grid mt-2">
+                    <button type="button" class="btn btn-primary"
+                        (click)="addPayment('subs')" translate>enums.pay-type.subs</button>
+                </div>
             </div>
 
             <div class="row">
@@ -59,13 +63,41 @@
                 <div class="row">
                     <div class="col-4">{{gift.code}}</div>
                     <div class="col-4">{{gift.used}}/{{gift.value}}</div>
-                    <div class="col-4"> 
-                        <button type="button" class="btn btn-primary btn-sm" (click)="useGift(gift)">{{gift.availableAmount()}}</button>
+                    <div class="col-4">
+                        <button type="button" [disabled]="gift.availableAmount() <= 0" class="btn btn-primary btn-sm"
+                            (click)="useGift(gift)">{{gift.availableAmount()}}</button>
                     </div>
-                  </div>
-              
-                </li>
-           
+                </div>
+
+            </li>
+
+        </ul>
+
+
+
+        <ul class="list-group mt-3" *ngIf="showSubscriptions">
+            <li class="list-group-item" *ngFor="let sub of subscriptions">
+                <div class="row">
+                    <div class="col-8"><small>{{sub.name}}</small></div>
+                    <div class="col-4">{{sub.usedQty}}/{{sub.totalQty}}
+
+                        <button type="button" class="btn btn-primary btn-sm float-end"
+                            (click)="useSubscription(sub)"><i class="fa-duotone fa-stamp"></i></button>
+                    
+                    </div>
+
+
+
+
+                    <!--                     <div class="col-4">
+                        <button type="button" [disabled]="gift.availableAmount() <= 0" class="btn btn-primary btn-sm"
+                            (click)="useGift(gift)">{{gift.availableAmount()}}</button>
+                    </div> -->
+
+                </div>
+
+            </li>
+
         </ul>
 
 

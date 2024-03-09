@@ -2245,6 +2245,11 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
     return this.lines?.find(l => l.id == orderLineId)
   }
 
+  getLineByProduct(productId: string): OrderLine | undefined {
+
+    return this.lines?.find(l => l.productId == productId)
+  }
+
   addPayment(payment: Payment) {
 
     if (!payment)
@@ -2893,6 +2898,9 @@ export class OrderLine extends ObjectWithId {
   /** preferred location resource ids for this line */
   lrIds?: string[]
 
+  /** custom info: json.subs: contains array of subscriptionIds */
+  json: any
+
   persons?: string[];
   tag?: string;
   active = true;
@@ -3087,6 +3095,23 @@ export class OrderLine extends ObjectWithId {
     }
 
     return optionValues
+  }
+
+
+  /**
+   * When subscriptions
+   * @returns 
+   */
+  subscriptionsCreated(): boolean {
+
+    if (!this.json)
+      return false
+
+    if (this.json['subs'])
+      return true
+    else
+      return false
+
   }
 
 
@@ -3916,7 +3941,9 @@ export class Payment extends ObjectWithId {
   date?: Date = new Date()
 
   info?: string
-  declared: boolean = false
+
+  /** amount is declared */
+  decl: boolean = false
 
 }
 

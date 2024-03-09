@@ -3,6 +3,7 @@ import { AvailabilityContext, AvailabilityDebugInfo, AvailabilityRequest, Availa
 import * as _ from "lodash"
 import { AlteaService, OrderService, ResourcePlanningService } from 'ng-altea-common';
 import { DbQuery, QueryOperator } from 'ts-common';
+import * as dateFns from 'date-fns'
 
 @Component({
   selector: 'order-mgr-debug-availability',
@@ -96,23 +97,33 @@ export class DebugAvailabilityComponent implements OnInit {
 
   async deleteTestData() {
 
-    const start = 20240201000000
-    const end = 20240401000000
+    /*     const startNum = 20240201000000
+        const endNum = 20240401000000
+    
+        const deleteOrderQuery = new DbQuery()
+    
+        deleteOrderQuery.and('start', QueryOperator.greaterThanOrEqual, startNum)
+        deleteOrderQuery.and('start', QueryOperator.lessThan, endNum) */
 
+    const today = new Date()
 
+    const startDate = dateFns.startOfMonth(today)
+    const endDate = dateFns.endOfMonth(today)
 
     const deleteOrderQuery = new DbQuery()
 
-    deleteOrderQuery.and('start', QueryOperator.greaterThanOrEqual, start)
-    deleteOrderQuery.and('start', QueryOperator.lessThan, end)
+    deleteOrderQuery.and('createdAt', QueryOperator.greaterThanOrEqual, startDate)
+    deleteOrderQuery.and('createdAt', QueryOperator.lessThan, endDate)
 
-    // deleteOrderQuery.and('start', QueryOperator.equals, null)
-    /* this will also delete related objects (as defined in prisma schema)
-     */
+    let april = new Date(2024, 3, 1)
+
+    if (today > april)
+      throw 'Are you sure?';
+
+
     let orders = await this.orderSvc.deleteMany$(deleteOrderQuery)
 
     console.error(orders)
-
 
   }
 

@@ -17,11 +17,92 @@ export class ObjectService implements IDb {
   constructor(protected http: HttpClient, protected sessionSvc: SessionService) { }
 
 
+  async post$<T>(httpServer: string, pageUrl: string, body: any): Promise<T> {
 
+    const me = this
+
+    return new Promise<any>(function (resolve, reject) {
+
+      const fullUrl = `${httpServer}/${pageUrl}` 
+
+      me.http.post<any>(fullUrl, body).pipe(take(1)).subscribe(res => {
+        resolve(res)
+      })
+
+    })
+
+  }
+
+  async put$<T>(httpServer: string, pageUrl: string, body: any): Promise<T> {
+
+    const me = this
+
+    return new Promise<any>(function (resolve, reject) {
+
+      const fullUrl = `${httpServer}/${pageUrl}` 
+
+      me.http.put<any>(fullUrl, body).pipe(take(1)).subscribe(res => {
+        resolve(res)
+      })
+
+    })
+
+  }
+
+
+
+
+  update<T extends ObjectWithId>(dbObject: DbObject<T>): Observable<ApiResult<T>> {
+
+    return this.http.put<ApiResult<T>>(`${this.sessionSvc.backend}/${this.sessionSvc.branchUnique}/objects/update`, dbObject).pipe(map(res => {
+
+      if (res && res.object) {
+
+        res.object = plainToInstance(dbObject.type, res.object)
+      }
+
+      return res
+
+    }
+    ))
+  }
+
+
+
+  async update$<T extends ObjectWithId>(dbObject: DbObject<T>): Promise<ApiResult<T>> {
+
+    const me = this
+
+    return new Promise<ApiResult<T>>(function (resolve, reject) {
+
+      me.update<T>(dbObject).pipe(take(1)).subscribe(res => {
+        resolve(res)
+      })
+
+    })
+
+  }
+
+  async updateMany$<T extends ObjectWithId>(dbObject: DbObjectMulti<T>): Promise<ApiListResult<T>> {
+
+    let res = await this.put$(this.sessionSvc.backend,`${this.sessionSvc.branchUnique}/objects/updateMany`, dbObject)
+
+    let typedRes : ApiListResult<T> = plainToInstance(ApiListResult<T>, res)
+
+    typedRes.data = plainToInstance(dbObject.type, typedRes.data)
+
+    return typedRes
+  }
+
+  /*
+  async createCheckoutSession$(checkout: CreateCheckoutSession): Promise<any> {
+
+    return this.post$(this.sessionSvc.backend, 'stripe/createCheckoutSession', checkout)
+
+  }
+*/
 
   create<T>(dbObject: DbObject<T>): Observable<ApiResult<T>> {
-
-
 
     return this.http.post<ApiResult<T>>(`${this.sessionSvc.backend}/${this.sessionSvc.branchUnique}/objects/create`, dbObject).pipe(map(res => {
 
@@ -56,7 +137,7 @@ export class ObjectService implements IDb {
 
   createMany<T>(dbObjects: DbObjectMulti<T>): Observable<ApiResult<T[]>> {
 
-    
+
 
 
     return this.http.post<ApiResult<T[]>>(`${this.sessionSvc.backend}/${this.sessionSvc.branchUnique}/objects/createMany`, dbObjects).pipe(map(res => {

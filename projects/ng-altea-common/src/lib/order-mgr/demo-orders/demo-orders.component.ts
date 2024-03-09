@@ -1,6 +1,6 @@
 import { Component, Output, EventEmitter, OnInit } from '@angular/core';
 import { OrderMgrUiService } from '../order-mgr-ui.service';
-import { SessionService } from 'ng-altea-common';
+import { ContactService, SessionService } from 'ng-altea-common';
 import { Order, ResourceType } from 'ts-altea-model';
 import { DashboardService, ToastType } from 'ng-common'
 import { NgxSpinnerService } from "ngx-spinner"
@@ -75,7 +75,7 @@ export class DemoOrdersComponent implements OnInit {
   pedicureId = "678f7000-5865-4d58-9d92-9a64193b48c4"
   bodyslimmingId = "b910237f-09cf-4dff-a265-4e6013224c57"
   bodysculptor12x30 = "3667402e-2e5b-4655-b93e-a9e6955cbd4d"
-
+  bodysculptorReveal30min = "578fd568-5560-473c-931b-1fb770ed85d6"
 
   names = ['Wellness 2h/2p', 'Massage']
 
@@ -86,8 +86,9 @@ export class DemoOrdersComponent implements OnInit {
     ['Pedicure', DemoOrder.fromProducts(this.pedicureId)],
     ['Wellness 2h/2p', DemoOrder.fromProducts(this.wellnessId)],
     ['Massage & Manicure', DemoOrder.new(this.massageId, 1).add(this.manicureId, 1)],  // .fromProducts(this.massageId, this.manicureId)
-    ['BodySculptor 12x30min', DemoOrder.fromProducts(this.bodysculptor12x30)]
-    // 
+    ['BodySculptor 12x30min', DemoOrder.fromProducts(this.bodysculptor12x30)],
+    ['BodySculptor Reveal 30min', DemoOrder.fromProducts(this.bodysculptorReveal30min)]
+    //  
   ]);
 
   demoNames: string[] = []
@@ -96,7 +97,7 @@ export class DemoOrdersComponent implements OnInit {
   onDate: number // = 20240315000000
 
 
-  constructor(protected orderMgrSvc: OrderMgrUiService, protected sessionSvc: SessionService, protected spinner: NgxSpinnerService) {
+  constructor(protected orderMgrSvc: OrderMgrUiService, protected sessionSvc: SessionService, protected spinner: NgxSpinnerService, protected contactSvc: ContactService) {
 
     this.demoNames = Array.from(this.demos.keys())
 
@@ -161,6 +162,11 @@ export class DemoOrdersComponent implements OnInit {
       // line.productId
 
     }
+
+    const contact = await this.contactSvc.get$('ebdb691e-e2ca-4f14-aa63-8eb4c7d6e621')
+
+    if (contact)
+      this.orderMgrSvc.setContact(contact)
 
     console.error(this.orderMgrSvc.order)
 

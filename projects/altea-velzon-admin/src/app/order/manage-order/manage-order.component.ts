@@ -41,7 +41,7 @@ export class ManageOrderComponent extends NgBaseComponent {
     this.dashboardSvc.showSearch = true
 
     this.dashboardSvc.search$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(searchString => {
-      this.orderMgrSvc.searchProducts(searchString)
+      this.orderMgrSvc.searchProductsOld(searchString)
     })
 
   }

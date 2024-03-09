@@ -94,6 +94,25 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
     ))
   }
 
+  get$(id: string, includes: string | null = null): Promise<T> {
+
+    const me = this
+
+    return new Promise<any>(function (resolve, reject) {
+
+      me.get(id, includes).pipe(take(1)).subscribe(res => {
+        resolve(res)
+      })
+
+
+    })
+
+  }
+
+
+
+
+
   getMany(take: number = 100): Observable<ApiListResult<T>> {
     return this.http.get<ApiListResult<T>>(`${this.host}/${this.urlDifferentiator}?take=${take}`)
   }

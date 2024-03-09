@@ -1,6 +1,8 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, OnInit } from '@angular/core';
 import { OrderMgrUiService } from '../order-mgr-ui.service';
 import { Order, OrderLine, OrderLineOption, Product, ProductSubType, ProductType, ProductTypeIcons, Resource } from 'ts-altea-model'
+import { DashboardService, NgBaseComponent } from 'ng-common';
+import { takeUntil } from 'rxjs';
 
 
 
@@ -9,33 +11,42 @@ import { Order, OrderLine, OrderLineOption, Product, ProductSubType, ProductType
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.scss'],
 })
-export class ProductListComponent {
+export class ProductListComponent extends NgBaseComponent implements OnInit {
 
   @Output() productSelected: EventEmitter<Product> = new EventEmitter<Product>();
-/* 
-  productCats: Product[]
-  serviceCats: Product[] */
+  /* 
+    productCats: Product[]
+    serviceCats: Product[] */
 
 
-  constructor(protected orderMgrSvc: OrderMgrUiService) {
+  constructor(protected orderMgrSvc: OrderMgrUiService, protected dashboardSvc: DashboardService) {
+    super()
 
     if (!Array.isArray(orderMgrSvc.path) || orderMgrSvc.path.length == 0)
       this.showRootFolders()
   }
-  
+
+  ngOnInit() {
+
+/*     this.dashboardSvc.search$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(async searchString => {
+      await this.orderMgrSvc.searchProducts(searchString)
+    })
+ */
+  }
+
   async showRootFolders() {
 
     console.warn('showRootFolders')
 
     await this.orderMgrSvc.showRootCategories()
-/* 
-    if (categories) {
-
-      this.productCats = categories.filter(c => c.type == ProductType.product)
-      this.serviceCats = categories.filter(c => c.type == ProductType.service)
-
-    }
-    console.debug(categories) */
+    /* 
+        if (categories) {
+    
+          this.productCats = categories.filter(c => c.type == ProductType.product)
+          this.serviceCats = categories.filter(c => c.type == ProductType.service)
+    
+        }
+        console.debug(categories) */
   }
 
 

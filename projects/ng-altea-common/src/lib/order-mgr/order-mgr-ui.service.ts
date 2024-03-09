@@ -7,7 +7,7 @@ import * as _ from "lodash";
 import { NgxSpinnerService } from "ngx-spinner"
 import { DashboardService, ToastType } from 'ng-common';
 import { BehaviorSubject, Observable, take, takeUntil } from 'rxjs';
-import { AlteaDb } from 'ts-altea-logic';
+import { AlteaDb, PaymentProcessing } from 'ts-altea-logic';
 import * as dateFns from 'date-fns'
 import { StripeService } from '../stripe.service';
 
@@ -90,6 +90,17 @@ export class OrderMgrUiService {
 
   }
 
+  async testPaymentProcessing() {
+    // normally server side
+
+    const payProcessing = new PaymentProcessing(this.alteaSvc.db)
+
+    const res = await payProcessing.doSubscriptionPayments(this.order.payments)
+
+    return res
+  }
+
+
   dirtyColor() {
     return this.orderDirty ? 'red' : 'green'
   }
@@ -112,6 +123,12 @@ export class OrderMgrUiService {
 
   }
 
+  getProduct(productId: string) {
+
+    let product = this.products.find(p => p.id == productId)
+
+    return product
+  }
 
   changeUiState(mode: OrderUiState | string) {
     this.orderUiStateChanges.next(mode)
@@ -186,12 +203,11 @@ export class OrderMgrUiService {
 
         me.spinner.hide()
       })
-
-
-
     })
 
   }
+
+
 
 
   async loadProducts$(...productIds: string[]): Promise<Product[]> {
@@ -210,6 +226,34 @@ export class OrderMgrUiService {
 
     return products
   }
+
+  /*   async searchProducts(searchFor: string): Promise<void> {
+  
+      const query = this.searchProductsDbQuery(searchFor)
+  
+  
+      this.spinner.show()
+  
+      this.products = await this.productSvc.query$(query)
+  
+      this.spinner.hide()
+  
+  
+    }
+  
+    searchProductsDbQuery(searchFor: string): DbQuery | null {
+  
+      const query = new DbQuery()
+      query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
+      query.and('name', QueryOperator.contains, searchFor)
+      query.and('deleted', QueryOperator.equals, false)
+  
+  
+  
+      return query
+  
+    }
+   */
 
 
   async redeemGift(redeemGift: RedeemGift) {
@@ -543,8 +587,11 @@ export class OrderMgrUiService {
     })
   }
 
-  searchProducts(searchFor: string) {
+  async searchProductsOld(searchFor: string) {
     const query = new DbQuery()
+
+    query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
+
     query.and('name', QueryOperator.contains, searchFor)
     query.and('deleted', QueryOperator.equals, false)
     query.include('options:orderBy=idx.values:orderBy=idx')
@@ -552,12 +599,21 @@ export class OrderMgrUiService {
 
     this.spinner.show()
 
-    this.productSvc.query(query).pipe(take(1)).subscribe(res => {
-      this.products = res.data
-      console.error(res)
+    this.products = await this.productSvc.query$(query)
 
-      this.spinner.hide()
-    })
+    this.currentCategoryId = 'search'
+
+    console.log(this.products)
+
+    this.spinner.hide()
+
+
+    /*     this.productSvc.query(query).pipe(take(1)).subscribe(res => {
+          this.products = res.data
+          console.error(res)
+    
+          this.spinner.hide()
+        }) */
 
   }
 
@@ -605,13 +661,13 @@ export class OrderMgrUiService {
 
 
 
-  addPayment(amount: number, type: string, location: string) : Payment {
+  addPayment(amount: number, type: string, location: string): Payment {
 
     const payment = new Payment()
     payment.amount = amount
     payment.type = type
     payment.loc = location
-    
+
     this.order.addPayment(payment)
     this.orderDirty = true
 
@@ -622,6 +678,7 @@ export class OrderMgrUiService {
 
     this.order.contactId = contact.id
     this.order.m.setDirty('contactId')
+    this.orderDirty = true
 
     this.order.contact = contact
 
@@ -634,7 +691,7 @@ export class OrderMgrUiService {
     if (!orderLine.product.isSubscription())
       throw `Can't create subscription!`
 
-    const subscriptions = this.alteaSvc.subscriptionMgmtService.createSubscriptions(this.order, orderLine)
+    const subscriptions = this.alteaSvc.subscriptionMgmtService.createSubscriptions(this.order, orderLine, true)
 
     console.error(subscriptions)
   }

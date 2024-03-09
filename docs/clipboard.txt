@@ -1,0 +1,9 @@
+"
+Invalid `this.prisma[this.prismaObjectProperty].deleteMany()` invocation in
+/Users/frankpaepens/code/altea/altea-api/src/_common/base-object-service.ts:312:70
+
+  309 
+  310 try {
+  311 
+→ 312     const obj = await this.prisma[this.prismaObjectProperty].deleteMany(
+Foreign key constraint failed on the field: `(not available)`"

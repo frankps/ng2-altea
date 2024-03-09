@@ -186,6 +186,13 @@ export class DbQueryTyped<T> extends DbQuery {
 
 
 export class DbObject<T> {
+  /**
+   * 
+   * @param typeName 
+   * @param type 
+   * @param object 
+   * 
+   */
   constructor(public typeName: string, public type: { new(): T; }, public object: T) {
   }
 }

@@ -1,6 +1,6 @@
 
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { ApiListResult, ApiResult, ApiStatus, DateHelper, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
+import { ApiListResult, ApiResult, ApiStatus, DateHelper, DbObject, DbObjectMulti, DbQuery, DbQueryTyped, ObjectHelper, QueryOperator } from 'ts-common'
 import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, Reminder, OrderLine, Subscription } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { AlteaDb } from '../general/altea-db'
@@ -30,12 +30,12 @@ export class SubscriptionMgmtService {
 
 
     /** Mostly only 1 subscription will be created, except if orderLine.qty > 1 or more subscription products (product item) in product */
-    createSubscriptions(order: Order, orderLine: OrderLine): Subscription[] {
+    async createSubscriptions(order: Order, orderLine: OrderLine, saveToDb: boolean = true): Promise<Subscription[]> {
 
         if (!orderLine.product.isSubscription())
             throw `Can't create subscription!`
 
-        const subscriptions = []
+        let subscriptions : Subscription[] = []
 
         const prod = orderLine.product
 
@@ -59,6 +59,39 @@ export class SubscriptionMgmtService {
                 subscriptions.push(sub)
             }
         }
+
+
+
+        if (saveToDb) {
+            console.warn(subscriptions)
+
+            let batch = new DbObjectMulti<Subscription>('subscription', Subscription, subscriptions)
+            let res = await this.alteaDb.db.createMany$(batch)
+
+            console.error(res)
+
+            //subscriptions = res.object
+
+            let subscriptionIds = subscriptions.map(sub => sub.id)
+
+            /** Update order line  */
+            if (!orderLine.json)
+                orderLine.json = {}
+
+            orderLine.json['subs'] = subscriptionIds
+
+            let obj = ObjectHelper.extractObjectProperties(orderLine, ['id', 'json'])
+
+            let orderLineUpdate = new DbObject<OrderLine>('orderLine', OrderLine, obj)
+            let orderLineRes = await this.alteaDb.db.update$(orderLineUpdate)
+
+            console.log(orderLineUpdate)
+            console.log(orderLineRes)
+
+
+        }
+
+
 
         return subscriptions
     }
