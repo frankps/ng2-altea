@@ -84,8 +84,6 @@ export class ObjectService implements IDb {
   }
 
 
-  // updateMany$<Inp extends ObjectWithId, Out>(dbObject: DbObjectMulti<Inp | ObjectWithId>): Promise<ApiListResult<Out>>
-
   async updateMany$<Inp extends ObjectWithId, Out>(dbObject: DbObjectMulti<Out>): Promise<ApiListResult<Out>> {
 
     let res = await this.put$(this.sessionSvc.backend,`${this.sessionSvc.branchUnique}/objects/updateMany`, dbObject)

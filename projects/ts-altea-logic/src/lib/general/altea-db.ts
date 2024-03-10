@@ -269,7 +269,7 @@ export class AlteaDb {
         if (!Array.isArray(ids) || ids.length == 0)
             return []
 
-        const qry = new DbQueryTyped<T>('subscription', type)
+        const qry = new DbQueryTyped<T>(typeName, type)
         qry.and('id', QueryOperator.in, ids)
 
         let objects: T[] = await this.db.query$<T>(qry)
@@ -295,7 +295,7 @@ export class AlteaDb {
 
     async getGiftsByIds(ids: string[]): Promise<Gift[]> {
 
-        const gifts = this.getObjectsByIds('gift', Gift, ids)
+        const gifts = await this.getObjectsByIds('gift', Gift, ids)
         return gifts
     }
 
@@ -311,7 +311,7 @@ export class AlteaDb {
 
     async getSubscriptionsByIds(ids: string[]): Promise<Subscription[]> {
 
-        const gifts = this.getObjectsByIds('subscription', Subscription, ids)
+        const gifts = await this.getObjectsByIds('subscription', Subscription, ids)
 
         return gifts
 
@@ -323,6 +323,8 @@ export class AlteaDb {
         return updateResult
 
     }
+
+    // "60dcf09d-49f5-42df-83cc-2f1ee6d11161"
 
 
 }
