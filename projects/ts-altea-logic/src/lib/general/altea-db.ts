@@ -1,5 +1,5 @@
-import { ApiListResult, ApiResult, ApiStatus, DateHelper, DbObjectMulti, DbQuery, DbQueryTyped, ObjectHelper, ObjectWithId, QueryOperator } from 'ts-common'
-import { Branch, Gift, Subscription, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template } from 'ts-altea-model'
+import { ApiListResult, ApiResult, ApiStatus, DateHelper, DbObject, DbObjectCreate, DbObjectMulti, DbObjectMultiCreate, DbQuery, DbQueryTyped, ObjectHelper, ObjectWithId, QueryOperator } from 'ts-common'
+import { Branch, Gift, Subscription, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template, OrderLine, BankTransaction } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { IDb } from '../interfaces/i-db'
 
@@ -53,14 +53,14 @@ export class AlteaDb {
     }
 
 
-    async saveResourcePlannings(plannings: ResourcePlanning[]): Promise<ApiResult<ResourcePlanning[]>> {
+    async saveResourcePlannings(plannings: ResourcePlanning[]): Promise<ApiListResult<ResourcePlanning>> {
 
 
         console.error('saveResourcePlannings', plannings)
 
         let planningsForDb = ObjectHelper.unType(plannings, ['resource', 'resourceGroup', 'schedule', 'orderLine'])
 
-        const dbPlannings = new DbObjectMulti<ResourcePlanning>('resourcePlanning', ResourcePlanning, planningsForDb)
+        const dbPlannings = new DbObjectMultiCreate<ResourcePlanning>('resourcePlanning', ResourcePlanning, planningsForDb)
 
         const res = await this.db.createMany$<ResourcePlanning>(dbPlannings)
 
@@ -262,7 +262,17 @@ export class AlteaDb {
         return tasks
     }
 
-    /** Generic */
+    /** Generic methods 
+     * 
+     *  important: generate the specific methods with the generator, use (replace typeName):
+    
+        {
+        "type": "dbMethods",
+        "typeName": "gift",
+        "plural": null
+        }
+
+    */
 
     async getObjectsByIds<T>(typeName: string, type: { new(): T; }, ids: string[]): Promise<T[]> {
 
@@ -275,6 +285,20 @@ export class AlteaDb {
         let objects: T[] = await this.db.query$<T>(qry)
 
         return objects
+    }
+
+    async updateObject<T>(typeName: string, type: { new(): T; }, object: T, propertiesToUpdate: string[]): Promise<ApiResult<T>> {
+
+        if (!object)
+            return new ApiResult(null, ApiStatus.error, 'No object supplied to update!')
+
+        let objectToUpdate = ObjectHelper.extractObjectProperties(object, ['id', ...propertiesToUpdate])
+
+        let dbObject = new DbObject(typeName, type, objectToUpdate)
+
+        let updateResult = await this.db.update$<ObjectWithId, T>(dbObject)
+
+        return updateResult
     }
 
     async updateObjects<T>(typeName: string, type: { new(): T; }, objects: T[], propertiesToUpdate: string[]): Promise<ApiListResult<T>> {
@@ -291,30 +315,62 @@ export class AlteaDb {
         return updateResult
     }
 
+    async createObjects<T>(typeName: string, type: { new(): T; }, objects: T[]): Promise<ApiListResult<T>> {
+
+        if (!Array.isArray(objects) || objects.length == 0)
+            return new ApiListResult([], ApiStatus.ok)
+
+        let batch = new DbObjectMultiCreate<T>(typeName, type, objects)
+        let createResult = await this.db.createMany$(batch)
+
+        return createResult
+    }
+
+
+
     /** Gifts */
 
     async getGiftsByIds(ids: string[]): Promise<Gift[]> {
+        const objects = await this.getObjectsByIds('gift', Gift, ids)
+        return objects
+    }
 
-        const gifts = await this.getObjectsByIds('gift', Gift, ids)
-        return gifts
+    async createGifts(gifts: Gift[]): Promise<ApiListResult<Gift>> {
+        let createResult = await this.createObjects('gift', Gift, gifts)
+        return createResult
+    }
+
+    async updateGift(gift: Gift, propertiesToUpdate: string[]): Promise<ApiResult<Gift>> {
+        let updateResult = await this.updateObject('gift', Gift, gift, propertiesToUpdate)
+        return updateResult
     }
 
     async updateGifts(gifts: Gift[], propertiesToUpdate: string[]): Promise<ApiListResult<Gift>> {
-
         let updateResult = await this.updateObjects('gift', Gift, gifts, propertiesToUpdate)
         return updateResult
-
     }
+
 
 
     /** Subscriptions */
 
     async getSubscriptionsByIds(ids: string[]): Promise<Subscription[]> {
 
-        const gifts = await this.getObjectsByIds('subscription', Subscription, ids)
+        const objects = await this.getObjectsByIds('subscription', Subscription, ids)
+        return objects
+    }
 
-        return gifts
+    async createSubscriptions(subscriptions: Subscription[]): Promise<ApiListResult<Subscription>> {
 
+        let createResult = await this.createObjects('subscription', Subscription, subscriptions)
+        return createResult
+
+    }
+
+    async updateSubscription(subscription: Subscription, propertiesToUpdate: string[]): Promise<ApiResult<Subscription>> {
+
+        let updateResult = await this.updateObject('subscription', Subscription, subscription, propertiesToUpdate)
+        return updateResult
     }
 
     async updateSubscriptions(subscriptions: Subscription[], propertiesToUpdate: string[]): Promise<ApiListResult<Subscription>> {
@@ -324,7 +380,53 @@ export class AlteaDb {
 
     }
 
-    // "60dcf09d-49f5-42df-83cc-2f1ee6d11161"
+    /** Orderline */
+
+    async getOrderlinesByIds(ids: string[]): Promise<OrderLine[]> {
+        const objects = await this.getObjectsByIds('orderLine', OrderLine, ids)
+        return objects
+    }
+
+    async createOrderlines(orderLines: OrderLine[]): Promise<ApiListResult<OrderLine>> {
+        let createResult = await this.createObjects('orderLine', OrderLine, orderLines)
+        return createResult
+    }
+
+    async updateOrderline(orderLine: OrderLine, propertiesToUpdate: string[]): Promise<ApiResult<OrderLine>> {
+        let updateResult = await this.updateObject('orderLine', OrderLine, orderLine, propertiesToUpdate)
+        return updateResult
+    }
+
+    async updateOrderlines(orderLines: OrderLine[], propertiesToUpdate: string[]): Promise<ApiListResult<OrderLine>> {
+        let updateResult = await this.updateObjects('orderLine', OrderLine, orderLines, propertiesToUpdate)
+        return updateResult
+    }
+
+    /** BankTransaction */
+
+    async getBankTransactionsByIds(ids: string[]): Promise<BankTransaction[]> {
+        const objects = await this.getObjectsByIds('bankTransaction', BankTransaction, ids)
+        return objects
+    }
+
+    async createBankTransactions(bankTransactions: BankTransaction[]): Promise<ApiListResult<BankTransaction>> {
+        let createResult = await this.createObjects('bankTransaction', BankTransaction, bankTransactions)
+        return createResult
+    }
+
+    async updateBankTransaction(bankTransaction: BankTransaction, propertiesToUpdate: string[]): Promise<ApiResult<BankTransaction>> {
+        let updateResult = await this.updateObject('bankTransaction', BankTransaction, bankTransaction, propertiesToUpdate)
+        return updateResult
+    }
+
+    async updateBankTransactions(bankTransactions: BankTransaction[], propertiesToUpdate: string[]): Promise<ApiListResult<BankTransaction>> {
+        let updateResult = await this.updateObjects('bankTransaction', BankTransaction, bankTransactions, propertiesToUpdate)
+        return updateResult
+    }
+
+
+
+
 
 
 }

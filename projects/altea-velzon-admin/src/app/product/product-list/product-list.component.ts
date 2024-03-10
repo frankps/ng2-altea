@@ -83,6 +83,21 @@ export class ProductListComponent extends NgBaseListComponent<Product> implement
 
   }
 
+  async export() {
+    let objects = await this.productSvc.getAllProductsForExport()
+    console.warn(objects)
+
+    const link = document.createElement("a");
+    const content = JSON.stringify(objects, null, 3)
+    const file = new Blob([content], { type: 'text/plain' });
+    link.href = URL.createObjectURL(file);
+    link.download = "products.txt";
+    link.click();
+    URL.revokeObjectURL(link.href);
+
+  }
+
+
   startMoveSelected() {
 
     this.categories = this.manageProductSvc.allCategories

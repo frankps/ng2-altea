@@ -1,5 +1,5 @@
 import { Exclude, Type, Transform } from "class-transformer";
-import { DbObject } from "../api";
+import { DbObjectCreate } from "../api";
 import { ObjectHelper } from "./object-helper";
 
 export class RemovedFromCollection {
@@ -144,5 +144,5 @@ export class ObjectReference {
 
 
 export interface IAsDbObject<T> {
-  asDbObject(): DbObject<T>
+  asDbObject(): DbObjectCreate<T>
 }

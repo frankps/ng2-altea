@@ -1,0 +1,163 @@
+[
+    {
+       "m": {},
+       "id": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "idx": 0,
+       "cur": "EUR",
+       "vatIncl": true,
+       "vatPct": 21,
+       "smsOn": false,
+       "giftOn": true,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.198Z",
+       "orgId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Aquasense",
+       "unique": "aqua",
+       "short": null,
+       "descr": "Wellness, Beauty & Afslanken",
+       "street": "Groenstraat",
+       "streetNr": "17a",
+       "postal": "9041",
+       "country": "BEL",
+       "city": "Oostakker",
+       "language": "nl",
+       "phone": "09 329 81 14",
+       "mobile": "0477 26 72 22",
+       "email": "contact@aquasense.be",
+       "emailFrom": "info@aquasense.be",
+       "emailBcc": "frank@dvit.eu",
+       "vatPcts": [
+          6,
+          12,
+          21
+       ],
+       "vatNr": "BE0465371059",
+       "depositPct": 75,
+       "depositTerms": [
+          {
+             "bt": 1,
+             "btu": "d",
+             "pt": 4,
+             "ptu": "h"
+          },
+          {
+             "bt": 0,
+             "btu": "d",
+             "pt": 2,
+             "ptu": "h"
+          },
+          {
+             "bt": 7,
+             "btu": "d",
+             "pt": 24,
+             "ptu": "h"
+          },
+          {
+             "bt": 30,
+             "btu": "d",
+             "pt": 48,
+             "ptu": "h"
+          }
+       ],
+       "reminders": [
+          {
+             "dur": 4,
+             "type": "email",
+             "unit": "d"
+          },
+          {
+             "dur": 1,
+             "type": "email",
+             "unit": "d"
+          }
+       ],
+       "gift": {
+          "methods": {
+             "email": true,
+             "postal": true,
+             "pos": true,
+             "app": false
+          },
+          "types": {
+             "amount": true,
+             "svc": true,
+             "prod": false
+          },
+          "expire": {
+             "on": true,
+             "after": 33,
+             "unit": "M"
+          },
+          "price": {
+             "new": true,
+             "newAfter": 12,
+             "unit": "M",
+             "postal": 8
+          },
+          "invoice": {
+             "on": true,
+             "vatPcts": [
+                {
+                   "descr": "Wellness",
+                   "on": true,
+                   "pct": 6
+                },
+                {
+                   "descr": "",
+                   "on": false,
+                   "pct": 12
+                },
+                {
+                   "descr": "Behandelingen",
+                   "on": true,
+                   "pct": 21
+                }
+             ]
+          },
+          "invoicing": {
+             "on": false,
+             "vatPcts": []
+          }
+       },
+       "updatedAt": "2024-01-25T13:34:44.405Z",
+       "deletedAt": null
+    },
+    {
+       "m": {},
+       "id": "c4f4a01d-7225-4e7a-bf59-bc2d3c682222",
+       "idx": 0,
+       "cur": null,
+       "vatIncl": true,
+       "vatPct": 0,
+       "smsOn": false,
+       "giftOn": true,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.198Z",
+       "orgId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Da Vinci Innovation",
+       "unique": null,
+       "short": null,
+       "descr": null,
+       "street": null,
+       "streetNr": null,
+       "postal": null,
+       "country": null,
+       "city": null,
+       "language": null,
+       "phone": null,
+       "mobile": null,
+       "email": null,
+       "emailFrom": null,
+       "emailBcc": null,
+       "vatPcts": [],
+       "vatNr": null,
+       "depositPct": 0,
+       "depositTerms": null,
+       "reminders": null,
+       "gift": null,
+       "updatedAt": null,
+       "deletedAt": null
+    }
+ ]

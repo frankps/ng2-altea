@@ -57,4 +57,20 @@ export class ProductService extends BackendHttpServiceBase<Product> {
 
 
 
+  // 'prices,options:orderBy=idx.values:orderBy=idx,items:orderBy=idx,resources:orderBy=idx.resource'
+
+  
+  async getAllProductsForExport(): Promise<Product[]> {
+
+    const query = new DbQuery()
+    query.includes = 'prices,options:orderBy=idx.values:orderBy=idx,items:orderBy=idx,resources:orderBy=idx.resource'.split(',')
+    query.take = 1000
+
+    const products = await this.query$(query)
+
+    return products
+  }
+
+
+
 }

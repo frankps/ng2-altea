@@ -1,0 +1,3710 @@
+[
+    {
+       "m": {},
+       "id": "168e22ac-8e08-4daa-9da7-c4ad3cedfd90",
+       "qty": 1,
+       "isGroup": false,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Cabine 17 links",
+       "short": "Cab17L",
+       "descr": null,
+       "color": "#8be97d",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "room",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2023-11-17T12:03:26.087Z",
+       "deletedAt": null,
+       "children": [],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "192aa972-38c4-4926-b1fe-589f9c63c7f4",
+       "qty": 1,
+       "isGroup": false,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Lpg",
+       "short": "Lpg",
+       "descr": null,
+       "color": "#33FF33",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "device",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": null,
+       "deletedAt": null,
+       "children": [],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "1b6f35ea-1152-4435-83c7-617c75e13897",
+       "qty": 1,
+       "isGroup": false,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Lusien Van Rumst",
+       "short": "Lusien",
+       "descr": null,
+       "color": "#FFAE00",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": true,
+       "type": "human",
+       "branches": [],
+       "userId": "e7001b25-97da-482f-b53f-11097473b5e1",
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2024-02-21T20:57:12.645Z",
+       "deletedAt": null,
+       "children": [],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "239322d0-eafc-48a6-b550-69c2adcb0c0c",
+       "qty": 4,
+       "isGroup": true,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Schoonheidsspecialiste",
+       "short": "Spec",
+       "descr": null,
+       "color": "#050505",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "human",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2023-11-17T11:50:38.849Z",
+       "deletedAt": null,
+       "children": [
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "239322d0-eafc-48a6-b550-69c2adcb0c0c",
+             "childId": "1b6f35ea-1152-4435-83c7-617c75e13897",
+             "createdAt": "2024-02-21T20:58:27.110Z",
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "239322d0-eafc-48a6-b550-69c2adcb0c0c",
+             "childId": "348bfc74-04bd-4e49-8064-2f3b43dbd76e",
+             "createdAt": "2024-02-23T16:58:11.775Z",
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "239322d0-eafc-48a6-b550-69c2adcb0c0c",
+             "childId": "3d841573-7667-46f0-a4b2-b496ed027740",
+             "createdAt": "2024-02-21T19:21:27.036Z",
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "239322d0-eafc-48a6-b550-69c2adcb0c0c",
+             "childId": "cc241d0c-b650-429c-86d6-f3cbd5c32e88",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "239322d0-eafc-48a6-b550-69c2adcb0c0c",
+             "childId": "cc241d0c-b650-429c-86d6-f3cbd5c32e89",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "239322d0-eafc-48a6-b550-69c2adcb0c0c",
+             "childId": "e738d496-a66d-414e-a098-d5ca84403e9d",
+             "createdAt": "2024-02-23T13:15:38.893Z",
+             "updatedAt": null,
+             "deletedAt": null
+          }
+       ],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "239322d0-eafc-48a6-b550-69c2adcb0c0d",
+       "qty": 0,
+       "isGroup": true,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Schoonheidsspecialiste Iris",
+       "short": "Spec",
+       "descr": null,
+       "color": "#050505",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "human",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2023-11-17T11:50:58.535Z",
+       "deletedAt": null,
+       "children": [],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "2ed2300d-076c-4bc1-987c-245e336f91a2",
+       "qty": 3,
+       "isGroup": true,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "CabineLuxe",
+       "short": "CabLux",
+       "descr": null,
+       "color": "#3f0f47",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "room",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2023-11-17T11:49:01.527Z",
+       "deletedAt": null,
+       "children": [
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "2ed2300d-076c-4bc1-987c-245e336f91a2",
+             "childId": "168e22ac-8e08-4daa-9da7-c4ad3cedfd90",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "2ed2300d-076c-4bc1-987c-245e336f91a2",
+             "childId": "55705eca-b2a9-42b6-8408-38aff41447e7",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "2ed2300d-076c-4bc1-987c-245e336f91a2",
+             "childId": "c44b0cae-c9da-4e46-a5e5-f45e7fd0b947",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          }
+       ],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "318e6c23-5672-4986-9aea-783de0f0e8ac",
+       "qty": 1,
+       "isGroup": false,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "JI Make-up stand",
+       "short": "JaIr",
+       "descr": null,
+       "color": "#33FF33",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "device",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": null,
+       "deletedAt": null,
+       "children": [],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "348bfc74-04bd-4e49-8064-2f3b43dbd76e",
+       "qty": 1,
+       "isGroup": false,
+       "customSchedule": true,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Frank",
+       "short": null,
+       "descr": null,
+       "color": "#10e04e",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "human",
+       "branches": [],
+       "userId": "b175bf4f-4c0c-43b2-9e43-7761adea02ea",
+       "active": true,
+       "deleted": false,
+       "createdAt": "2024-02-10T09:29:00.845Z",
+       "updatedAt": "2024-02-23T10:10:24.362Z",
+       "deletedAt": null,
+       "children": [],
+       "products": [],
+       "schedules": [
+          {
+             "m": {},
+             "id": "d5b4ac1e-83b7-453f-b881-7f0570bf274c",
+             "idx": 100,
+             "default": true,
+             "weeks": [
+                {
+                   "idx": 1,
+                   "days": [
+                      {
+                         "idx": 1,
+                         "on": true,
+                         "day": "mo",
+                         "blocks": [
+                            {
+                               "from": "08:00",
+                               "to": "23:50"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 2,
+                         "on": true,
+                         "day": "tu",
+                         "blocks": [
+                            {
+                               "from": "08:00",
+                               "to": "23:50"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 3,
+                         "on": true,
+                         "day": "we",
+                         "blocks": [
+                            {
+                               "from": "08:00",
+                               "to": "23:50"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 4,
+                         "on": true,
+                         "day": "th",
+                         "blocks": [
+                            {
+                               "from": "08:00",
+                               "to": "23:50"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 5,
+                         "on": true,
+                         "day": "fr",
+                         "blocks": [
+                            {
+                               "from": "08:00",
+                               "to": "23:50"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 6,
+                         "on": true,
+                         "day": "sa",
+                         "blocks": [
+                            {
+                               "from": "08:00",
+                               "to": "23:50"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 7,
+                         "on": true,
+                         "day": "su",
+                         "blocks": [
+                            {
+                               "from": "08:00",
+                               "to": "23:50"
+                            }
+                         ]
+                      }
+                   ]
+                }
+             ],
+             "prepIncl": false,
+             "active": true,
+             "deleted": false,
+             "createdAt": "2024-02-10T09:31:00.467Z",
+             "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+             "resourceId": "348bfc74-04bd-4e49-8064-2f3b43dbd76e",
+             "name": null,
+             "start": null,
+             "updatedAt": null,
+             "deletedAt": null
+          }
+       ]
+    },
+    {
+       "m": {},
+       "id": "3d841573-7667-46f0-a4b2-b496ed027740",
+       "qty": 1,
+       "isGroup": false,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Lindsey Jonniau",
+       "short": "Lindsey",
+       "descr": null,
+       "color": "#269dbd",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": true,
+       "type": "human",
+       "branches": [],
+       "userId": "dd872ea8-39dc-429b-aaf8-064fffd2fe96",
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2024-02-21T19:21:40.124Z",
+       "deletedAt": null,
+       "children": [],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "3edda867-5978-4205-b50f-62dfa3defbfe",
+       "qty": 3,
+       "isGroup": true,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Cabine 17",
+       "short": "Cab17",
+       "descr": null,
+       "color": "#3f0f47",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "room",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2023-11-17T11:47:55.488Z",
+       "deletedAt": null,
+       "children": [
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "3edda867-5978-4205-b50f-62dfa3defbfe",
+             "childId": "168e22ac-8e08-4daa-9da7-c4ad3cedfd90",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "3edda867-5978-4205-b50f-62dfa3defbfe",
+             "childId": "55705eca-b2a9-42b6-8408-38aff41447e7",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "3edda867-5978-4205-b50f-62dfa3defbfe",
+             "childId": "9ea3ae65-8aa6-4153-b719-be3540adff35",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          }
+       ],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "4419877a-c7f6-458f-a34a-78a4e6662795",
+       "qty": 1,
+       "isGroup": false,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Backup SP",
+       "short": "Admin",
+       "descr": null,
+       "color": "",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "group",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": true,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2023-11-17T11:52:40.222Z",
+       "deletedAt": "2023-11-17T11:52:40.220Z",
+       "children": [],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "4664aeee-d787-459e-9842-49ffc3cf0540",
+       "qty": 2,
+       "isGroup": false,
+       "customSchedule": true,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Bodyslimming",
+       "short": "BS",
+       "descr": null,
+       "color": "#3f48cc",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "device",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2024-03-03T19:15:27.419Z",
+       "deletedAt": null,
+       "children": [],
+       "products": [
+          {
+             "m": {},
+             "id": "f091366a-1bdf-41d1-b7cd-972c831d5869",
+             "durationMode": "product",
+             "reference": "start",
+             "offset": 0,
+             "duration": 0,
+             "groupQty": 1,
+             "groupAlloc": false,
+             "scheduleIds": [],
+             "prep": false,
+             "prepOverlap": false,
+             "productId": "b910237f-09cf-4dff-a265-4e6013224c57",
+             "resourceId": "4664aeee-d787-459e-9842-49ffc3cf0540",
+             "label": null,
+             "idx": 0,
+             "active": true,
+             "deleted": false,
+             "createdAt": "2024-03-02T09:37:51.095Z",
+             "updatedAt": null,
+             "deletedAt": null
+          }
+       ],
+       "schedules": [
+          {
+             "m": {},
+             "id": "01871d8b-298b-4d54-b62b-46673c98f833",
+             "idx": 100,
+             "default": true,
+             "weeks": [
+                {
+                   "idx": 1,
+                   "days": [
+                      {
+                         "idx": 1,
+                         "on": true,
+                         "day": "mo",
+                         "blocks": [
+                            {
+                               "from": "09:00",
+                               "to": "11:00"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 2,
+                         "on": true,
+                         "day": "tu",
+                         "blocks": [
+                            {
+                               "from": "08:00",
+                               "to": "22:00"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 3,
+                         "on": true,
+                         "day": "we",
+                         "blocks": [
+                            {
+                               "from": "08:00",
+                               "to": "22:00"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 4,
+                         "on": true,
+                         "day": "th",
+                         "blocks": [
+                            {
+                               "from": "08:00",
+                               "to": "22:00"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 5,
+                         "on": true,
+                         "day": "fr",
+                         "blocks": [
+                            {
+                               "from": "08:00",
+                               "to": "22:00"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 6,
+                         "on": true,
+                         "day": "sa",
+                         "blocks": [
+                            {
+                               "from": "08:00",
+                               "to": "22:00"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 7,
+                         "on": false,
+                         "day": "su",
+                         "blocks": []
+                      }
+                   ]
+                }
+             ],
+             "prepIncl": true,
+             "active": true,
+             "deleted": false,
+             "createdAt": "2024-03-02T09:33:13.383Z",
+             "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+             "resourceId": "4664aeee-d787-459e-9842-49ffc3cf0540",
+             "name": "Bodyslimming",
+             "start": null,
+             "updatedAt": "2024-03-03T17:24:04.575Z",
+             "deletedAt": null
+          }
+       ]
+    },
+    {
+       "m": {},
+       "id": "4fce441f-ec56-420a-b22f-12cc6f8fe27a",
+       "qty": 1,
+       "isGroup": false,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Cryo",
+       "short": "Cryo",
+       "descr": null,
+       "color": "#33FF33",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "device",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": null,
+       "deletedAt": null,
+       "children": [],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "50288d61-0a06-42d8-925b-5540a6dc04b8",
+       "qty": 2,
+       "isGroup": true,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Cabine 19",
+       "short": "Cab19",
+       "descr": null,
+       "color": "#3f0f47",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "room",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2023-11-17T11:48:26.217Z",
+       "deletedAt": null,
+       "children": [
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "50288d61-0a06-42d8-925b-5540a6dc04b8",
+             "childId": "9bb988d4-f147-4716-be96-07486ae2395c",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "50288d61-0a06-42d8-925b-5540a6dc04b8",
+             "childId": "c44b0cae-c9da-4e46-a5e5-f45e7fd0b947",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          }
+       ],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "52424a29-086b-419c-a8f3-c2bee39b22f3",
+       "qty": 1,
+       "isGroup": false,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Presso",
+       "short": "Presso",
+       "descr": null,
+       "color": "#efe4b0",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "device",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": null,
+       "deletedAt": null,
+       "children": [],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "55705eca-b2a9-42b6-8408-38aff41447e7",
+       "qty": 1,
+       "isGroup": false,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Cabine 17 rechts",
+       "short": "Cab17R",
+       "descr": null,
+       "color": "#79c021",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "device",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": null,
+       "deletedAt": null,
+       "children": [],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "5bd3a3a8-bfeb-4e59-98cf-a82b6d8ab441",
+       "qty": 4,
+       "isGroup": true,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Cabine Basic+",
+       "short": "CabineBasic+",
+       "descr": null,
+       "color": "#3f0f47",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "room",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2023-11-17T11:48:49.721Z",
+       "deletedAt": null,
+       "children": [
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "5bd3a3a8-bfeb-4e59-98cf-a82b6d8ab441",
+             "childId": "168e22ac-8e08-4daa-9da7-c4ad3cedfd90",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "5bd3a3a8-bfeb-4e59-98cf-a82b6d8ab441",
+             "childId": "55705eca-b2a9-42b6-8408-38aff41447e7",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "5bd3a3a8-bfeb-4e59-98cf-a82b6d8ab441",
+             "childId": "9ea3ae65-8aa6-4153-b719-be3540adff35",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "5bd3a3a8-bfeb-4e59-98cf-a82b6d8ab441",
+             "childId": "c44b0cae-c9da-4e46-a5e5-f45e7fd0b947",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          }
+       ],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "5d03d8ea-75a1-4dcb-a526-1e249847dc33",
+       "qty": 1,
+       "isGroup": false,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Cerefino",
+       "short": "Cerefino",
+       "descr": null,
+       "color": "",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "device",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": null,
+       "deletedAt": null,
+       "children": [],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "65b878e9-0c32-4ea6-ba05-c9ab70689c83",
+       "qty": 1,
+       "isGroup": false,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Arctik",
+       "short": "Arctik",
+       "descr": null,
+       "color": "33FF33",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "device",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": null,
+       "deletedAt": null,
+       "children": [],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "66d54bd5-e96f-449d-9b7c-f560cb38b6ba",
+       "qty": 2,
+       "isGroup": true,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "AssistentieBodySculptor",
+       "short": "BSculpt",
+       "descr": null,
+       "color": "#cdc6c6",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "human",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2023-11-17T11:46:07.560Z",
+       "deletedAt": null,
+       "children": [
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "66d54bd5-e96f-449d-9b7c-f560cb38b6ba",
+             "childId": "e738d496-a66d-414e-a098-d5ca84403e9d",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          }
+       ],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "qty": 1,
+       "isGroup": false,
+       "customSchedule": true,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Aquasense",
+       "short": "Aquasense",
+       "descr": null,
+       "color": "red",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "branch",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2024-02-09T09:55:23.319Z",
+       "deletedAt": null,
+       "children": [],
+       "products": [],
+       "schedules": [
+          {
+             "m": {},
+             "id": "85bc260c-7ef5-4434-80ba-3606add6fdc4",
+             "idx": 200,
+             "default": false,
+             "weeks": [
+                {
+                   "idx": 1,
+                   "days": [
+                      {
+                         "idx": 1,
+                         "on": true,
+                         "day": "mo",
+                         "blocks": [
+                            {
+                               "from": "11:00",
+                               "to": "15:00"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 2,
+                         "on": true,
+                         "day": "tu",
+                         "blocks": [
+                            {
+                               "from": "11:00",
+                               "to": "16:00"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 3,
+                         "on": true,
+                         "day": "we",
+                         "blocks": [
+                            {
+                               "from": "11:00",
+                               "to": "16:00"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 4,
+                         "on": true,
+                         "day": "th",
+                         "blocks": [
+                            {
+                               "from": "11:00",
+                               "to": "15:00"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 5,
+                         "on": true,
+                         "day": "fr",
+                         "blocks": [
+                            {
+                               "from": "11:00",
+                               "to": "15:00"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 6,
+                         "on": false,
+                         "day": "sa",
+                         "blocks": []
+                      },
+                      {
+                         "idx": 7,
+                         "on": false,
+                         "day": "su",
+                         "blocks": []
+                      }
+                   ]
+                }
+             ],
+             "prepIncl": false,
+             "active": true,
+             "deleted": false,
+             "createdAt": "2023-10-16T09:30:21.695Z",
+             "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+             "resourceId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+             "name": "HiFr Afwezig",
+             "start": null,
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "id": "a227f5c3-5da7-4a3d-9342-515319e76849",
+             "idx": 100,
+             "default": true,
+             "weeks": [
+                {
+                   "idx": 1,
+                   "days": [
+                      {
+                         "idx": 1,
+                         "on": true,
+                         "day": "mo",
+                         "blocks": [
+                            {
+                               "from": "09:00",
+                               "to": "18:00"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 2,
+                         "on": true,
+                         "day": "tu",
+                         "blocks": [
+                            {
+                               "from": "09:00",
+                               "to": "21:00"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 3,
+                         "on": true,
+                         "day": "we",
+                         "blocks": [
+                            {
+                               "from": "09:00",
+                               "to": "21:00"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 4,
+                         "on": true,
+                         "day": "th",
+                         "blocks": [
+                            {
+                               "from": "09:00",
+                               "to": "21:00"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 5,
+                         "on": true,
+                         "day": "fr",
+                         "blocks": [
+                            {
+                               "from": "09:00",
+                               "to": "21:00"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 6,
+                         "on": true,
+                         "day": "sa",
+                         "blocks": [
+                            {
+                               "from": "09:00",
+                               "to": "18:00"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 7,
+                         "on": false,
+                         "day": "su",
+                         "blocks": []
+                      }
+                   ]
+                }
+             ],
+             "prepIncl": false,
+             "active": true,
+             "deleted": false,
+             "createdAt": "2023-10-14T16:25:16.275Z",
+             "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+             "resourceId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+             "name": "Standaard planning",
+             "start": null,
+             "updatedAt": "2024-02-09T16:02:48.165Z",
+             "deletedAt": null
+          }
+       ]
+    },
+    {
+       "m": {},
+       "id": "6c8a6f6d-8e9e-4c59-9cec-477dabd3ba05",
+       "qty": 3,
+       "isGroup": false,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Gelish",
+       "short": "Gelish",
+       "descr": null,
+       "color": "#33FF33",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "device",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": null,
+       "deletedAt": null,
+       "children": [],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "716698b3-fee1-4688-bed7-a4d228b358a1",
+       "qty": 1,
+       "isGroup": true,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Wellness supervisor",
+       "short": null,
+       "descr": null,
+       "color": "#2db1d2",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "human",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-16T13:56:09.676Z",
+       "updatedAt": "2023-11-17T12:00:23.602Z",
+       "deletedAt": null,
+       "children": [
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "716698b3-fee1-4688-bed7-a4d228b358a1",
+             "childId": "1b6f35ea-1152-4435-83c7-617c75e13897",
+             "createdAt": "2023-10-16T13:57:25.305Z",
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "716698b3-fee1-4688-bed7-a4d228b358a1",
+             "childId": "348bfc74-04bd-4e49-8064-2f3b43dbd76e",
+             "createdAt": "2024-02-10T09:30:26.227Z",
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "716698b3-fee1-4688-bed7-a4d228b358a1",
+             "childId": "3d841573-7667-46f0-a4b2-b496ed027740",
+             "createdAt": "2023-10-16T13:59:27.552Z",
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "716698b3-fee1-4688-bed7-a4d228b358a1",
+             "childId": "cc241d0c-b650-429c-86d6-f3cbd5c32e88",
+             "createdAt": "2023-10-16T13:57:24.944Z",
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "716698b3-fee1-4688-bed7-a4d228b358a1",
+             "childId": "cc241d0c-b650-429c-86d6-f3cbd5c32e89",
+             "createdAt": "2023-10-16T13:57:24.797Z",
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "716698b3-fee1-4688-bed7-a4d228b358a1",
+             "childId": "e738d496-a66d-414e-a098-d5ca84403e9d",
+             "createdAt": "2023-10-16T13:57:24.564Z",
+             "updatedAt": null,
+             "deletedAt": null
+          }
+       ],
+       "products": [
+          {
+             "m": {},
+             "id": "7998c2ca-d9b5-486d-b39c-379280b432c6",
+             "durationMode": "custom",
+             "reference": "end",
+             "offset": 0,
+             "duration": 15,
+             "groupQty": 2,
+             "groupAlloc": true,
+             "scheduleIds": [
+                "a227f5c3-5da7-4a3d-9342-515319e76849"
+             ],
+             "prep": true,
+             "prepOverlap": true,
+             "productId": "31eaebbc-af39-4411-a997-f2f286c58a9d",
+             "resourceId": "716698b3-fee1-4688-bed7-a4d228b358a1",
+             "label": null,
+             "idx": 300,
+             "active": true,
+             "deleted": false,
+             "createdAt": "2023-10-29T15:18:21.948Z",
+             "updatedAt": "2024-02-09T16:26:33.535Z",
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "id": "c0901330-36f7-4804-8425-4ba0c3356b63",
+             "durationMode": "custom",
+             "reference": "end",
+             "offset": 0,
+             "duration": 30,
+             "groupQty": 1,
+             "groupAlloc": true,
+             "scheduleIds": [
+                "85bc260c-7ef5-4434-80ba-3606add6fdc4"
+             ],
+             "prep": true,
+             "prepOverlap": true,
+             "productId": "31eaebbc-af39-4411-a997-f2f286c58a9d",
+             "resourceId": "716698b3-fee1-4688-bed7-a4d228b358a1",
+             "label": null,
+             "idx": 400,
+             "active": true,
+             "deleted": false,
+             "createdAt": "2023-10-29T15:18:22.484Z",
+             "updatedAt": "2024-02-09T16:26:33.562Z",
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "id": "cb3f14a7-d750-4d5a-a734-187e65486d27",
+             "durationMode": "custom",
+             "reference": "start",
+             "offset": -15,
+             "duration": 15,
+             "groupQty": 1,
+             "groupAlloc": true,
+             "scheduleIds": [],
+             "prep": true,
+             "prepOverlap": true,
+             "productId": "31eaebbc-af39-4411-a997-f2f286c58a9d",
+             "resourceId": "716698b3-fee1-4688-bed7-a4d228b358a1",
+             "label": null,
+             "idx": 500,
+             "active": true,
+             "deleted": false,
+             "createdAt": "2024-02-14T10:56:30.566Z",
+             "updatedAt": null,
+             "deletedAt": null
+          }
+       ],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "7c6cb6df-5d4b-4577-9a92-565d81c81875",
+       "qty": 1,
+       "isGroup": false,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Wave",
+       "short": "wave",
+       "descr": null,
+       "color": "#ff8833",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "device",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": null,
+       "deletedAt": null,
+       "children": [],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "87d98dd0-b31b-4a1f-b28e-a8abdd342b4b",
+       "qty": 1,
+       "isGroup": false,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Chromo IOS",
+       "short": "",
+       "descr": null,
+       "color": "#ff0c96",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "device",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": null,
+       "deletedAt": null,
+       "children": [],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "9bb988d4-f147-4716-be96-07486ae2395c",
+       "qty": 1,
+       "isGroup": false,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Cabine lpg",
+       "short": "CabLpg",
+       "descr": null,
+       "color": "#33cfff",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "room",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2023-11-17T12:03:49.324Z",
+       "deletedAt": null,
+       "children": [],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "9bc1e435-84de-4a02-b970-6e3d325e9715",
+       "qty": 1,
+       "isGroup": false,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "BodySculptor",
+       "short": "Sculpt",
+       "descr": null,
+       "color": "#60836a",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "device",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": null,
+       "deletedAt": null,
+       "children": [],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "9ea3ae65-8aa6-4153-b719-be3540adff35",
+       "qty": 1,
+       "isGroup": false,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Cabine 17 ios",
+       "short": "CabIOS",
+       "descr": null,
+       "color": "#ccf3a7",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "room",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2023-11-17T12:03:18.505Z",
+       "deletedAt": null,
+       "children": [],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "a49f182c-25cd-4fa8-91b4-c10998eb74c7",
+       "qty": 1,
+       "isGroup": false,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "MotusAyLaser",
+       "short": "MotusAyLaser",
+       "descr": null,
+       "color": "",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "device",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": null,
+       "deletedAt": null,
+       "children": [],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "ab1203f8-1afb-4304-ad72-9a6cf53f7142",
+       "qty": 3,
+       "isGroup": true,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "SprayTanSpecialiste",
+       "short": "SprayTanSpec",
+       "descr": null,
+       "color": "#171616",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "human",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2023-11-17T11:51:06.971Z",
+       "deletedAt": null,
+       "children": [
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "ab1203f8-1afb-4304-ad72-9a6cf53f7142",
+             "childId": "cc241d0c-b650-429c-86d6-f3cbd5c32e88",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "ab1203f8-1afb-4304-ad72-9a6cf53f7142",
+             "childId": "cc241d0c-b650-429c-86d6-f3cbd5c32e89",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          }
+       ],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "b39b2d8a-9a06-46b8-8334-4fc400cfc2c5",
+       "qty": 1,
+       "isGroup": false,
+       "customSchedule": true,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Wellness",
+       "short": "Wellness",
+       "descr": null,
+       "color": "#209d9b",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "room",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2024-03-04T20:37:12.796Z",
+       "deletedAt": null,
+       "children": [],
+       "products": [
+          {
+             "m": {},
+             "id": "65f01ed6-e45f-4f62-a1fc-e2fe4e121fe0",
+             "durationMode": "product",
+             "reference": "start",
+             "offset": 0,
+             "duration": 0,
+             "groupQty": 1,
+             "groupAlloc": false,
+             "scheduleIds": [],
+             "prep": false,
+             "prepOverlap": false,
+             "productId": "31eaebbc-af39-4411-a997-f2f286c58a9d",
+             "resourceId": "b39b2d8a-9a06-46b8-8334-4fc400cfc2c5",
+             "label": null,
+             "idx": 0,
+             "active": true,
+             "deleted": false,
+             "createdAt": "2023-10-16T13:45:49.231Z",
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "id": "894b3cc8-b96d-41f0-81bd-ad58ab1f0aef",
+             "durationMode": "custom",
+             "reference": "start",
+             "offset": -15,
+             "duration": 15,
+             "groupQty": 1,
+             "groupAlloc": true,
+             "scheduleIds": [],
+             "prep": true,
+             "prepOverlap": true,
+             "productId": "31eaebbc-af39-4411-a997-f2f286c58a9d",
+             "resourceId": "b39b2d8a-9a06-46b8-8334-4fc400cfc2c5",
+             "label": null,
+             "idx": 600,
+             "active": true,
+             "deleted": false,
+             "createdAt": "2024-02-14T11:21:05.304Z",
+             "updatedAt": "2024-02-14T11:21:54.272Z",
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "id": "948200bc-1976-48bf-9beb-465d74fbbe11",
+             "durationMode": "custom",
+             "reference": "end",
+             "offset": 0,
+             "duration": 30,
+             "groupQty": 1,
+             "groupAlloc": false,
+             "scheduleIds": [
+                "85bc260c-7ef5-4434-80ba-3606add6fdc4"
+             ],
+             "prep": true,
+             "prepOverlap": true,
+             "productId": "31eaebbc-af39-4411-a997-f2f286c58a9d",
+             "resourceId": "b39b2d8a-9a06-46b8-8334-4fc400cfc2c5",
+             "label": null,
+             "idx": 200,
+             "active": true,
+             "deleted": false,
+             "createdAt": "2023-10-16T16:03:34.638Z",
+             "updatedAt": "2024-02-09T16:26:33.509Z",
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "id": "e8ac6f25-abdc-4f03-87b3-fcf7eea47bee",
+             "durationMode": "custom",
+             "reference": "end",
+             "offset": 0,
+             "duration": 15,
+             "groupQty": 1,
+             "groupAlloc": false,
+             "scheduleIds": [
+                "a227f5c3-5da7-4a3d-9342-515319e76849"
+             ],
+             "prep": true,
+             "prepOverlap": true,
+             "productId": "31eaebbc-af39-4411-a997-f2f286c58a9d",
+             "resourceId": "b39b2d8a-9a06-46b8-8334-4fc400cfc2c5",
+             "label": null,
+             "idx": 100,
+             "active": true,
+             "deleted": false,
+             "createdAt": "2023-10-16T14:05:00.082Z",
+             "updatedAt": "2024-02-09T16:26:33.431Z",
+             "deletedAt": null
+          }
+       ],
+       "schedules": [
+          {
+             "m": {},
+             "id": "eee8fc6b-37cc-4744-a9f2-b617edf669ab",
+             "idx": 0,
+             "default": true,
+             "weeks": [
+                {
+                   "idx": 1,
+                   "days": [
+                      {
+                         "idx": 1,
+                         "on": true,
+                         "day": "mo",
+                         "blocks": [
+                            {
+                               "from": "09:00",
+                               "to": "23:15"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 2,
+                         "on": true,
+                         "day": "tu",
+                         "blocks": [
+                            {
+                               "from": "09:00",
+                               "to": "23:15"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 3,
+                         "on": true,
+                         "day": "we",
+                         "blocks": [
+                            {
+                               "from": "09:00",
+                               "to": "23:15"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 4,
+                         "on": true,
+                         "day": "th",
+                         "blocks": [
+                            {
+                               "from": "09:00",
+                               "to": "23:15"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 5,
+                         "on": true,
+                         "day": "fr",
+                         "blocks": [
+                            {
+                               "from": "09:00",
+                               "to": "23:15"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 6,
+                         "on": true,
+                         "day": "sa",
+                         "blocks": [
+                            {
+                               "from": "09:00",
+                               "to": "23:15"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 7,
+                         "on": true,
+                         "day": "su",
+                         "blocks": [
+                            {
+                               "from": "09:00",
+                               "to": "23:15"
+                            }
+                         ]
+                      }
+                   ]
+                }
+             ],
+             "prepIncl": false,
+             "active": true,
+             "deleted": false,
+             "createdAt": "2023-10-14T14:18:52.889Z",
+             "branchId": null,
+             "resourceId": "b39b2d8a-9a06-46b8-8334-4fc400cfc2c5",
+             "name": "Aquasense openingsuren",
+             "start": null,
+             "updatedAt": "2024-02-11T21:23:37.720Z",
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "id": "eee8fc6b-37cc-4744-a9f2-b617edf669ac",
+             "idx": 0,
+             "default": false,
+             "weeks": [
+                {
+                   "idx": 1,
+                   "days": [
+                      {
+                         "idx": 1,
+                         "on": true,
+                         "day": "mo",
+                         "blocks": [
+                            {
+                               "from": "09:00",
+                               "to": "17:00"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 2,
+                         "on": true,
+                         "day": "tu",
+                         "blocks": [
+                            {
+                               "from": "09:00",
+                               "to": "23:15"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 3,
+                         "on": true,
+                         "day": "we",
+                         "blocks": [
+                            {
+                               "from": "09:00",
+                               "to": "17:00"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 4,
+                         "on": true,
+                         "day": "th",
+                         "blocks": [
+                            {
+                               "from": "09:00",
+                               "to": "17:00"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 5,
+                         "on": true,
+                         "day": "fr",
+                         "blocks": [
+                            {
+                               "from": "09:00",
+                               "to": "17:00"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 6,
+                         "on": false,
+                         "day": "sa",
+                         "blocks": []
+                      },
+                      {
+                         "idx": 7,
+                         "on": false,
+                         "day": "su",
+                         "blocks": []
+                      }
+                   ]
+                }
+             ],
+             "prepIncl": true,
+             "active": true,
+             "deleted": false,
+             "createdAt": "2023-10-14T14:18:52.889Z",
+             "branchId": null,
+             "resourceId": "b39b2d8a-9a06-46b8-8334-4fc400cfc2c5",
+             "name": "Aquasense openingsuren verlof",
+             "start": null,
+             "updatedAt": "2024-02-11T21:59:22.567Z",
+             "deletedAt": null
+          }
+       ]
+    },
+    {
+       "m": {},
+       "id": "b760b369-4ccb-478f-8a7b-e93cf18d81b4",
+       "qty": 4,
+       "isGroup": false,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Warmer suikerwax",
+       "short": "Phandy",
+       "descr": null,
+       "color": "#33FF33",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "device",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": null,
+       "deletedAt": null,
+       "children": [],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "c2d81991-4363-4227-9468-5062f2dae75b",
+       "qty": 1,
+       "isGroup": true,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Nieuwe groep",
+       "short": null,
+       "descr": null,
+       "color": null,
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "human",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-11-17T12:09:23.016Z",
+       "updatedAt": null,
+       "deletedAt": null,
+       "children": [],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "c44b0cae-c9da-4e46-a5e5-f45e7fd0b947",
+       "qty": 1,
+       "isGroup": false,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Cabine 19 beauty",
+       "short": "Cab19Beauty",
+       "descr": null,
+       "color": "#1e9cb2",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "room",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2023-11-17T12:03:39.968Z",
+       "deletedAt": null,
+       "children": [],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "c8536aa7-e1d3-4154-bc80-883083304e3a",
+       "qty": 1,
+       "isGroup": false,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "GRP 1",
+       "short": null,
+       "descr": null,
+       "color": null,
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "group",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": true,
+       "createdAt": "2023-11-17T09:59:20.183Z",
+       "updatedAt": "2023-11-17T11:52:32.925Z",
+       "deletedAt": "2023-11-17T11:52:32.923Z",
+       "children": [],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "cc241d0c-b650-429c-86d6-f3cbd5c32e88",
+       "qty": 1,
+       "isGroup": false,
+       "customSchedule": true,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Hèra Coene",
+       "short": "Hèra",
+       "descr": null,
+       "color": "#b3f3b3",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": true,
+       "type": "human",
+       "branches": [],
+       "userId": "886c48d3-55c6-4436-a6b7-803cd7539f90",
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2024-02-23T12:16:31.610Z",
+       "deletedAt": null,
+       "children": [],
+       "products": [],
+       "schedules": [
+          {
+             "m": {},
+             "id": "12f3246b-7b4d-4bf7-b7ae-cecda486708c",
+             "idx": 100,
+             "default": true,
+             "weeks": [
+                {
+                   "idx": 1,
+                   "days": [
+                      {
+                         "idx": 1,
+                         "on": true,
+                         "day": "mo",
+                         "blocks": [
+                            {
+                               "from": "09:00",
+                               "to": "17:00"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 2,
+                         "on": true,
+                         "day": "tu",
+                         "blocks": [
+                            {
+                               "from": "09:00",
+                               "to": "17:00"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 3,
+                         "on": true,
+                         "day": "we",
+                         "blocks": [
+                            {
+                               "from": "09:00",
+                               "to": "17:00"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 4,
+                         "on": true,
+                         "day": "th",
+                         "blocks": [
+                            {
+                               "from": "09:00",
+                               "to": "17:00"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 5,
+                         "on": true,
+                         "day": "fr",
+                         "blocks": [
+                            {
+                               "from": "09:00",
+                               "to": "17:00"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 6,
+                         "on": false,
+                         "day": "sa",
+                         "blocks": []
+                      },
+                      {
+                         "idx": 7,
+                         "on": false,
+                         "day": "su",
+                         "blocks": []
+                      }
+                   ]
+                }
+             ],
+             "prepIncl": true,
+             "active": true,
+             "deleted": false,
+             "createdAt": "2023-11-16T11:05:31.034Z",
+             "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+             "resourceId": "cc241d0c-b650-429c-86d6-f3cbd5c32e88",
+             "name": null,
+             "start": null,
+             "updatedAt": "2024-02-14T13:58:10.142Z",
+             "deletedAt": null
+          }
+       ]
+    },
+    {
+       "m": {},
+       "id": "cc241d0c-b650-429c-86d6-f3cbd5c32e89",
+       "qty": 1,
+       "isGroup": false,
+       "customSchedule": true,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Iris Verplancke",
+       "short": "Iris",
+       "descr": null,
+       "color": "#cc3fab",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": true,
+       "type": "human",
+       "branches": [],
+       "userId": "c691b172-e1a7-4d55-9a3a-0cc0105daf2b",
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2024-02-23T10:06:21.563Z",
+       "deletedAt": null,
+       "children": [],
+       "products": [],
+       "schedules": [
+          {
+             "m": {},
+             "id": "19ed31fb-fc91-4e2e-8c73-23a7fad05341",
+             "idx": 100,
+             "default": true,
+             "weeks": [
+                {
+                   "idx": 1,
+                   "days": [
+                      {
+                         "idx": 1,
+                         "on": true,
+                         "day": "mo",
+                         "blocks": [
+                            {
+                               "from": "09:00",
+                               "to": "17:00"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 2,
+                         "on": true,
+                         "day": "tu",
+                         "blocks": [
+                            {
+                               "from": "09:00",
+                               "to": "17:00"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 3,
+                         "on": true,
+                         "day": "we",
+                         "blocks": [
+                            {
+                               "from": "09:00",
+                               "to": "17:00"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 4,
+                         "on": true,
+                         "day": "th",
+                         "blocks": [
+                            {
+                               "from": "09:00",
+                               "to": "17:00"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 5,
+                         "on": true,
+                         "day": "fr",
+                         "blocks": [
+                            {
+                               "from": "09:00",
+                               "to": "17:00"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 6,
+                         "on": false,
+                         "day": "sa",
+                         "blocks": []
+                      },
+                      {
+                         "idx": 7,
+                         "on": false,
+                         "day": "su",
+                         "blocks": []
+                      }
+                   ]
+                }
+             ],
+             "prepIncl": true,
+             "active": true,
+             "deleted": false,
+             "createdAt": "2023-10-14T16:23:56.838Z",
+             "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+             "resourceId": "cc241d0c-b650-429c-86d6-f3cbd5c32e89",
+             "name": "Uurrooster",
+             "start": null,
+             "updatedAt": "2024-02-14T13:58:37.755Z",
+             "deletedAt": null
+          }
+       ]
+    },
+    {
+       "m": {},
+       "id": "d38f3bd7-8f9f-4ffc-ac25-fc28bcc5e973",
+       "qty": 4,
+       "isGroup": true,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "LpgSpecialiste",
+       "short": "LpgSpec",
+       "descr": null,
+       "color": "#000000",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "human",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2023-11-17T11:50:12.658Z",
+       "deletedAt": null,
+       "children": [
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "d38f3bd7-8f9f-4ffc-ac25-fc28bcc5e973",
+             "childId": "cc241d0c-b650-429c-86d6-f3cbd5c32e88",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "d38f3bd7-8f9f-4ffc-ac25-fc28bcc5e973",
+             "childId": "cc241d0c-b650-429c-86d6-f3cbd5c32e89",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          }
+       ],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "d5f5f3e2-c6d1-47f9-8194-47cee4b12854",
+       "qty": 1,
+       "isGroup": true,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Verantwoordelijke",
+       "short": "Verantw",
+       "descr": null,
+       "color": "#33FF33",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "human",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2023-11-17T11:51:50.736Z",
+       "deletedAt": null,
+       "children": [],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "d8989925-1d83-463f-9427-3662a865f90e",
+       "qty": 4,
+       "isGroup": true,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "BrowseLashes",
+       "short": "BrowseLashes",
+       "descr": null,
+       "color": "#000000",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "human",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2023-11-17T11:47:09.002Z",
+       "deletedAt": null,
+       "children": [
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "d8989925-1d83-463f-9427-3662a865f90e",
+             "childId": "cc241d0c-b650-429c-86d6-f3cbd5c32e88",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "d8989925-1d83-463f-9427-3662a865f90e",
+             "childId": "cc241d0c-b650-429c-86d6-f3cbd5c32e89",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          }
+       ],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "d8989925-1d83-463f-9427-3662a865f91e",
+       "qty": 3,
+       "isGroup": true,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "UCWspecialiste",
+       "short": "UCWspecialiste",
+       "descr": null,
+       "color": "#000000",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "human",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2023-11-17T11:52:10.018Z",
+       "deletedAt": null,
+       "children": [
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "d8989925-1d83-463f-9427-3662a865f91e",
+             "childId": "cc241d0c-b650-429c-86d6-f3cbd5c32e88",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "d8989925-1d83-463f-9427-3662a865f91e",
+             "childId": "cc241d0c-b650-429c-86d6-f3cbd5c32e89",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          }
+       ],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "d8989925-1d83-463f-9427-3662a865f92e",
+       "qty": 4,
+       "isGroup": true,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Make-upspecialiste",
+       "short": "Make-upspec",
+       "descr": null,
+       "color": "#000000",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "human",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2023-11-17T11:50:23.751Z",
+       "deletedAt": null,
+       "children": [
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "d8989925-1d83-463f-9427-3662a865f92e",
+             "childId": "cc241d0c-b650-429c-86d6-f3cbd5c32e88",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "d8989925-1d83-463f-9427-3662a865f92e",
+             "childId": "cc241d0c-b650-429c-86d6-f3cbd5c32e89",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          }
+       ],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "d8989925-1d83-463f-9427-3662a865f93e",
+       "qty": 1,
+       "isGroup": true,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Laserspecialiste",
+       "short": "Laserspec",
+       "descr": null,
+       "color": "#000000",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "human",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2023-11-17T11:50:04.084Z",
+       "deletedAt": null,
+       "children": [
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "d8989925-1d83-463f-9427-3662a865f93e",
+             "childId": "cc241d0c-b650-429c-86d6-f3cbd5c32e89",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          }
+       ],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "d8989925-1d83-463f-9427-3662a865f94e",
+       "qty": 4,
+       "isGroup": true,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Suikerspecialiste",
+       "short": "Suikerspec",
+       "descr": null,
+       "color": "#673e3e",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "human",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2023-11-17T11:52:02.498Z",
+       "deletedAt": null,
+       "children": [
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "d8989925-1d83-463f-9427-3662a865f94e",
+             "childId": "cc241d0c-b650-429c-86d6-f3cbd5c32e88",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "d8989925-1d83-463f-9427-3662a865f94e",
+             "childId": "cc241d0c-b650-429c-86d6-f3cbd5c32e89",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          }
+       ],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "d8989925-1d83-463f-9427-3662a865f95e",
+       "qty": 4,
+       "isGroup": true,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Afslankcoach",
+       "short": "Afslankcoach",
+       "descr": null,
+       "color": "#000000",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "human",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2023-11-17T10:58:43.770Z",
+       "deletedAt": null,
+       "children": [
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "d8989925-1d83-463f-9427-3662a865f95e",
+             "childId": "cc241d0c-b650-429c-86d6-f3cbd5c32e88",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "d8989925-1d83-463f-9427-3662a865f95e",
+             "childId": "cc241d0c-b650-429c-86d6-f3cbd5c32e89",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "d8989925-1d83-463f-9427-3662a865f95e",
+             "childId": "e738d496-a66d-414e-a098-d5ca84403e9d",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          }
+       ],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "d8989925-1d83-463f-9427-3662a865f96e",
+       "qty": 4,
+       "isGroup": true,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Face specialiste",
+       "short": "FaceSpec",
+       "descr": null,
+       "color": "#000000",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "human",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2023-11-17T11:49:26.209Z",
+       "deletedAt": null,
+       "children": [
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "d8989925-1d83-463f-9427-3662a865f96e",
+             "childId": "cc241d0c-b650-429c-86d6-f3cbd5c32e88",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "d8989925-1d83-463f-9427-3662a865f96e",
+             "childId": "cc241d0c-b650-429c-86d6-f3cbd5c32e89",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          }
+       ],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "d8989925-1d83-463f-9427-3662a865f97e",
+       "qty": 4,
+       "isGroup": true,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Voet specialiste",
+       "short": "VoetSpec",
+       "descr": null,
+       "color": "#000000",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "human",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2023-11-17T11:51:37.107Z",
+       "deletedAt": null,
+       "children": [
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "d8989925-1d83-463f-9427-3662a865f97e",
+             "childId": "cc241d0c-b650-429c-86d6-f3cbd5c32e88",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "d8989925-1d83-463f-9427-3662a865f97e",
+             "childId": "cc241d0c-b650-429c-86d6-f3cbd5c32e89",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          }
+       ],
+       "products": [
+          {
+             "m": {},
+             "id": "9fffaca1-bdfe-4cea-82e0-209ed89e9bcf",
+             "durationMode": "product",
+             "reference": "start",
+             "offset": 0,
+             "duration": 0,
+             "groupQty": 1,
+             "groupAlloc": false,
+             "scheduleIds": [],
+             "prep": false,
+             "prepOverlap": false,
+             "productId": "678f7000-5865-4d58-9d92-9a64193b48c4",
+             "resourceId": "d8989925-1d83-463f-9427-3662a865f97e",
+             "label": null,
+             "idx": 0,
+             "active": true,
+             "deleted": false,
+             "createdAt": "2023-10-14T16:18:44.642Z",
+             "updatedAt": null,
+             "deletedAt": null
+          }
+       ],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "d8989925-1d83-463f-9427-3662a865f98e",
+       "qty": 2,
+       "isGroup": true,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Huidtherapeute",
+       "short": "Huidther",
+       "descr": null,
+       "color": "#000000",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "human",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2023-11-17T11:49:56.121Z",
+       "deletedAt": null,
+       "children": [
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "d8989925-1d83-463f-9427-3662a865f98e",
+             "childId": "cc241d0c-b650-429c-86d6-f3cbd5c32e88",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "d8989925-1d83-463f-9427-3662a865f98e",
+             "childId": "cc241d0c-b650-429c-86d6-f3cbd5c32e89",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          }
+       ],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "d8989925-1d83-463f-9427-3662a865f99d",
+       "qty": 1,
+       "isGroup": true,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Gelspecialiste",
+       "short": "GelSpec",
+       "descr": null,
+       "color": "#000000",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "human",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2023-11-17T11:49:42.950Z",
+       "deletedAt": null,
+       "children": [
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "d8989925-1d83-463f-9427-3662a865f99d",
+             "childId": "cc241d0c-b650-429c-86d6-f3cbd5c32e88",
+             "createdAt": "2023-11-19T11:00:09.426Z",
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "d8989925-1d83-463f-9427-3662a865f99d",
+             "childId": "cc241d0c-b650-429c-86d6-f3cbd5c32e89",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          }
+       ],
+       "products": [
+          {
+             "m": {},
+             "id": "0f9a54f9-7392-434e-91d1-40b00d20f302",
+             "durationMode": "product",
+             "reference": "start",
+             "offset": 0,
+             "duration": 0,
+             "groupQty": 1,
+             "groupAlloc": false,
+             "scheduleIds": [],
+             "prep": false,
+             "prepOverlap": false,
+             "productId": "46af990e-dc8f-461d-a48d-f39b9f782b0d",
+             "resourceId": "d8989925-1d83-463f-9427-3662a865f99d",
+             "label": null,
+             "idx": 0,
+             "active": true,
+             "deleted": false,
+             "createdAt": "2023-10-14T16:17:06.213Z",
+             "updatedAt": null,
+             "deletedAt": null
+          }
+       ],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "d8989925-1d83-463f-9427-3662a865f99e",
+       "qty": 4,
+       "isGroup": true,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Gelish specialiste",
+       "short": "GelishSpec",
+       "descr": null,
+       "color": "#000000",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "human",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2023-11-17T11:49:34.353Z",
+       "deletedAt": null,
+       "children": [
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "d8989925-1d83-463f-9427-3662a865f99e",
+             "childId": "cc241d0c-b650-429c-86d6-f3cbd5c32e88",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "d8989925-1d83-463f-9427-3662a865f99e",
+             "childId": "cc241d0c-b650-429c-86d6-f3cbd5c32e89",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          }
+       ],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "d8989925-1d83-463f-9427-3662a865f99f",
+       "qty": 5,
+       "isGroup": true,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Massage specialiste",
+       "short": "MassageSpec",
+       "descr": null,
+       "color": "#000000",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "human",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2023-11-17T11:50:31.645Z",
+       "deletedAt": null,
+       "children": [
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "d8989925-1d83-463f-9427-3662a865f99f",
+             "childId": "cc241d0c-b650-429c-86d6-f3cbd5c32e88",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "d8989925-1d83-463f-9427-3662a865f99f",
+             "childId": "cc241d0c-b650-429c-86d6-f3cbd5c32e89",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "d8989925-1d83-463f-9427-3662a865f99f",
+             "childId": "e738d496-a66d-414e-a098-d5ca84403e9d",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          }
+       ],
+       "products": [
+          {
+             "m": {},
+             "id": "f7172ca7-7a74-4d76-86d1-347bc1056f7b",
+             "durationMode": "product",
+             "reference": "start",
+             "offset": 0,
+             "duration": 0,
+             "groupQty": 1,
+             "groupAlloc": false,
+             "scheduleIds": [],
+             "prep": false,
+             "prepOverlap": false,
+             "productId": "51d89ac4-0ede-49ab-835f-2a3dda81bd70",
+             "resourceId": "d8989925-1d83-463f-9427-3662a865f99f",
+             "label": null,
+             "idx": 0,
+             "active": true,
+             "deleted": false,
+             "createdAt": "2023-10-14T16:17:31.854Z",
+             "updatedAt": null,
+             "deletedAt": null
+          }
+       ],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "dc192d2a-e1c1-4ca5-ba4e-906a6b95884c",
+       "qty": 1,
+       "isGroup": false,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Test",
+       "short": null,
+       "descr": null,
+       "color": null,
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "human",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": true,
+       "createdAt": "2023-10-14T16:09:46.062Z",
+       "updatedAt": "2023-10-14T16:10:12.232Z",
+       "deletedAt": "2023-10-14T16:10:12.230Z",
+       "children": [],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "e0a0a8c4-75ff-4e14-a0f9-2a95ea22e5c7",
+       "qty": 2,
+       "isGroup": false,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Nailbar",
+       "short": "",
+       "descr": null,
+       "color": "33FF33",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "room",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2023-11-17T12:04:02.357Z",
+       "deletedAt": null,
+       "children": [],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "e238c289-3e84-463a-84ca-1108d98ebaf4",
+       "qty": 1,
+       "isGroup": false,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Ucw",
+       "short": "Ucw",
+       "descr": null,
+       "color": "#b6c9b6",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "device",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": null,
+       "deletedAt": null,
+       "children": [],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "e522366b-eccf-4a04-ade4-b0e32bd046bb",
+       "qty": 2,
+       "isGroup": false,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Microneedling",
+       "short": "PEN",
+       "descr": null,
+       "color": "33FF33",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "device",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": null,
+       "deletedAt": null,
+       "children": [],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "e54c6c3d-fe5f-44d8-87aa-4c7c4e504f94",
+       "qty": 2,
+       "isGroup": true,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Cabine 17 duo",
+       "short": "Cab17Duo",
+       "descr": null,
+       "color": "#3f0f47",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "room",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2023-11-17T11:48:16.520Z",
+       "deletedAt": null,
+       "children": [
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "e54c6c3d-fe5f-44d8-87aa-4c7c4e504f94",
+             "childId": "168e22ac-8e08-4daa-9da7-c4ad3cedfd90",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          },
+          {
+             "m": {},
+             "pref": 0,
+             "groupId": "e54c6c3d-fe5f-44d8-87aa-4c7c4e504f94",
+             "childId": "55705eca-b2a9-42b6-8408-38aff41447e7",
+             "createdAt": "2023-10-14T14:18:53.024Z",
+             "updatedAt": null,
+             "deletedAt": null
+          }
+       ],
+       "products": [
+          {
+             "m": {},
+             "id": "379b6fbc-0688-46a3-ac09-b0e8b00569a1",
+             "durationMode": "product",
+             "reference": "start",
+             "offset": 0,
+             "duration": 0,
+             "groupQty": 1,
+             "groupAlloc": false,
+             "scheduleIds": [],
+             "prep": false,
+             "prepOverlap": false,
+             "productId": "46af990e-dc8f-461d-a48d-f39b9f782b0d",
+             "resourceId": "e54c6c3d-fe5f-44d8-87aa-4c7c4e504f94",
+             "label": null,
+             "idx": 100,
+             "active": true,
+             "deleted": false,
+             "createdAt": "2023-10-30T19:42:19.343Z",
+             "updatedAt": null,
+             "deletedAt": null
+          }
+       ],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "e656f723-66a6-4e3d-abfe-a9cf7ee22cee",
+       "qty": 1,
+       "isGroup": false,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Touch Skin",
+       "short": "Touch",
+       "descr": null,
+       "color": "33FF33",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "device",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": null,
+       "deletedAt": null,
+       "children": [],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "e738d496-a66d-414e-a098-d5ca84403e9d",
+       "qty": 1,
+       "isGroup": false,
+       "customSchedule": true,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Hilde Van Driessche",
+       "short": "Hilde",
+       "descr": null,
+       "color": "#27f2e5",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "human",
+       "branches": [],
+       "userId": "e57d20c2-9d61-4792-899c-3c15c5ebdbc4",
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": "2024-02-23T10:14:21.995Z",
+       "deletedAt": null,
+       "children": [],
+       "products": [],
+       "schedules": [
+          {
+             "m": {},
+             "id": "335c9500-67ad-41a0-b725-0aa76d5b6d75",
+             "idx": 100,
+             "default": true,
+             "weeks": [
+                {
+                   "idx": 1,
+                   "days": [
+                      {
+                         "idx": 1,
+                         "on": true,
+                         "day": "mo",
+                         "blocks": [
+                            {
+                               "from": "08:00",
+                               "to": "23:50"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 2,
+                         "on": true,
+                         "day": "tu",
+                         "blocks": [
+                            {
+                               "from": "08:00",
+                               "to": "23:50"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 3,
+                         "on": true,
+                         "day": "we",
+                         "blocks": [
+                            {
+                               "from": "08:00",
+                               "to": "23:50"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 4,
+                         "on": true,
+                         "day": "th",
+                         "blocks": [
+                            {
+                               "from": "08:00",
+                               "to": "23:50"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 5,
+                         "on": true,
+                         "day": "fr",
+                         "blocks": [
+                            {
+                               "from": "08:00",
+                               "to": "23:50"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 6,
+                         "on": true,
+                         "day": "sa",
+                         "blocks": [
+                            {
+                               "from": "08:00",
+                               "to": "23:50"
+                            }
+                         ]
+                      },
+                      {
+                         "idx": 7,
+                         "on": true,
+                         "day": "su",
+                         "blocks": [
+                            {
+                               "from": "08:00",
+                               "to": "23:50"
+                            }
+                         ]
+                      }
+                   ]
+                }
+             ],
+             "prepIncl": false,
+             "active": true,
+             "deleted": false,
+             "createdAt": "2024-02-09T17:13:25.044Z",
+             "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+             "resourceId": "e738d496-a66d-414e-a098-d5ca84403e9d",
+             "name": null,
+             "start": null,
+             "updatedAt": null,
+             "deletedAt": null
+          }
+       ]
+    },
+    {
+       "m": {},
+       "id": "e816e395-c937-4bac-b1d1-72731cc9ad9a",
+       "qty": 1,
+       "isGroup": false,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Spray Tanning",
+       "short": "Tanning",
+       "descr": null,
+       "color": "#49ecce",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "device",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": null,
+       "deletedAt": null,
+       "children": [],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "efccf456-c568-4093-8393-529c9dbe3d2c",
+       "qty": 6,
+       "isGroup": false,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Plaats workshop make up",
+       "short": "",
+       "descr": null,
+       "color": "33FF33",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "device",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": null,
+       "deletedAt": null,
+       "children": [],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "f6f5f822-7429-4f31-ac78-be4db7c8c4d6",
+       "qty": 2,
+       "isGroup": false,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Materiaal verven wimpers",
+       "short": "MatVerv",
+       "descr": null,
+       "color": "#33FF33",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "device",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": null,
+       "deletedAt": null,
+       "children": [],
+       "products": [],
+       "schedules": []
+    },
+    {
+       "m": {},
+       "id": "ff5ad1b0-baba-483e-aa6c-e4f9f21f5d94",
+       "qty": 1,
+       "isGroup": false,
+       "customSchedule": false,
+       "_startDate": null,
+       "_endDate": null,
+       "orgId": null,
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Lichaamsmeting",
+       "short": "BodyMet",
+       "descr": null,
+       "color": "#3f48cc",
+       "start": null,
+       "end": null,
+       "label": null,
+       "prio": 0,
+       "tel": null,
+       "email": null,
+       "online": false,
+       "type": "device",
+       "branches": [],
+       "userId": null,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.645Z",
+       "updatedAt": null,
+       "deletedAt": null,
+       "children": [],
+       "products": [],
+       "schedules": []
+    }
+ ]

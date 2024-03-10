@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { Exclude, Type, Transform } from "class-transformer";
 import 'reflect-metadata';
-import { ConnectTo, DateHelper, DbObject, IAsDbObject, ManagedObject, ObjectHelper, ObjectMgmt, ObjectReference, ObjectWithId, QueryOperator, TimeHelper } from 'ts-common'
+import { ConnectTo, DateHelper, DbObjectCreate, IAsDbObject, ManagedObject, ObjectHelper, ObjectMgmt, ObjectReference, ObjectWithId, QueryOperator, TimeHelper } from 'ts-common'
 import * as _ from "lodash";
 import { PersonLine } from "./person-line";
 import { DateRange, DateRangeSet, TimeBlock, TimeBlockSet, TimeSpan } from "./logic";
@@ -515,7 +515,7 @@ export class Schedule extends ObjectWithId {
   }
 }
 
-
+/*
 export class Scheduling extends ObjectWithId {
 
   idx = 0
@@ -554,7 +554,7 @@ export class Scheduling extends ObjectWithId {
     return DateHelper.parse(this.end)
   }
 }
-
+*/
 export enum ProductRuleType {
   startAt = 'startAt',
   prePost = 'prePost'
@@ -1180,8 +1180,8 @@ export class Organisation extends ObjectWithId {
   updatedAt?: Date
   deletedAt?: Date
 
-  asDbObject(): DbObject<Organisation> {
-    return new DbObject<Organisation>('organisation', Organisation, this)
+  asDbObject(): DbObjectCreate<Organisation> {
+    return new DbObjectCreate<Organisation>('organisation', Organisation, this)
   }
 }
 
@@ -1536,8 +1536,8 @@ export class Resource extends ObjectWithId {
   @Type(() => ProductResource)
   products?: ProductResource[];
 
-  @Type(() => Scheduling)
-  scheduling?: Scheduling[];
+/*   @Type(() => Scheduling)
+  scheduling?: Scheduling[]; */
 
   @Type(() => Schedule)
   schedules?: Schedule[];
@@ -2204,8 +2204,8 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
     this.depositBy = DateHelper.yyyyMMddhhmmss(this.depositByDate())
   }
 
-  asDbObject(): DbObject<Order> {
-    return new DbObject<Order>('order', Order, this)
+  asDbObject(): DbObjectCreate<Order> {
+    return new DbObjectCreate<Order>('order', Order, this)
   }
 
   clone(): Order {
@@ -3464,8 +3464,8 @@ export class ResourcePlanning extends ObjectWithId implements IAsDbObject<Resour
   deletedAt?: Date
 
 
-  asDbObject(): DbObject<ResourcePlanning> {
-    return new DbObject<ResourcePlanning>('resourcePlanning', ResourcePlanning, this)
+  asDbObject(): DbObjectCreate<ResourcePlanning> {
+    return new DbObjectCreate<ResourcePlanning>('resourcePlanning', ResourcePlanning, this)
   }
 
   clone(): ResourcePlanning {

@@ -56,7 +56,7 @@ export class OrderByProperty {
 
 export class PrismaWhere {
   AND?: any[]
-  OR?: any[] 
+  OR?: any[]
 }
 
 
@@ -67,7 +67,7 @@ export class DbQuery {
   //     and: new AndQuery()
   // }
 
-  
+
 
   where = {
     or: new Array<QueryCondition>(),
@@ -79,39 +79,39 @@ export class DbQuery {
   order = new Array<OrderByProperty>()
   selects = new Array<string>()
 
-  
+
   includes = new Array<string>()
 
-  and(field: string, operator: QueryOperator, value?: any) : DbQuery {
+  and(field: string, operator: QueryOperator, value?: any): DbQuery {
     const condition = new QueryCondition(field, operator, value)
     this.where.and.push(condition)
     return this
   }
 
-  or(field: string, operator: QueryOperator, value?: any) : DbQuery {
+  or(field: string, operator: QueryOperator, value?: any): DbQuery {
     const condition = new QueryCondition(field, operator, value)
     this.where.or.push(condition)
     return this
   }
 
-  orderBy(field?: string, order: SortOrder = SortOrder.asc) : DbQuery {
+  orderBy(field?: string, order: SortOrder = SortOrder.asc): DbQuery {
     const newOrder = new OrderByProperty(field, order)
     this.order.push(newOrder)
     return this
   }
 
-  orderByDesc(field?: string) : DbQuery {
+  orderByDesc(field?: string): DbQuery {
     const newOrder = new OrderByProperty(field, SortOrder.desc)
     this.order.push(newOrder)
     return this
   }
 
-  select(...fields: string[]) : DbQuery {
+  select(...fields: string[]): DbQuery {
     this.selects.push(...fields)
     return this
   }
 
-  include(...includes: string[]) : DbQuery {
+  include(...includes: string[]): DbQuery {
     this.includes.push(...includes)
     return this
   }
@@ -185,8 +185,25 @@ export class DbQueryTyped<T> extends DbQuery {
 
 }
 
+/**
+ *  Typically used for updating object:
+ *  Inp: partial object having an id and only those properties to update {id: 'abc', propToUpodate: 'update' }
+ *  Out: the full object type to return
+ */
+export class DbObject<Inp, Out> {
+  /**
+   * 
+   * @param typeName 
+   * @param type 
+   * @param object 
+   * 
+   */
+  constructor(public typeName: string, public type: { new(): Out; }, public object: Inp) {
+  }
+}
 
-export class DbObject<T> {
+
+export class DbObjectCreate<T> {
   /**
    * 
    * @param typeName 
@@ -197,8 +214,23 @@ export class DbObject<T> {
   constructor(public typeName: string, public type: { new(): T; }, public object: T) {
   }
 }
+``
+/**
+ *  Typically used for updating objects:
+ *  Inp: partial objects having an id and only those properties to update {id: 'abc', propToUpodate: 'update' }
+ *  Out: the full object type to return
+ */
+export class DbObjectMulti<Inp, Out> {
+  constructor(public typeName: string, public type: { new(): Out; }, public objects: Inp[]) {
+  }
+}
 
-export class DbObjectMulti<T> {
-  constructor(public typeName: string, public type: { new(): T; }, public objects: (T | ObjectWithId)[]) {
+
+/**
+ *  Typically used for inserting
+ */
+export class DbObjectMultiCreate<T> extends DbObjectMulti<T, T>{
+  constructor(typeName: string, type: { new(): T; }, objects: T[]) {
+    super(typeName, type, objects)
   }
 }

@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { Contact, User } from 'ts-altea-model';
 import { SearchContactComponent } from '../../contact/search-contact/search-contact.component';
-import { ObjectService, UserService } from 'ng-altea-common';
+import { BranchService, ObjectService, ResourceService, ScheduleService, TemplateService, UserService } from 'ng-altea-common';
 import { CheckDeposists } from 'ts-altea-logic';
 import { TranslationService } from 'ng-common'
 import { Country } from 'ts-altea-model'
@@ -32,7 +32,8 @@ export class DemoComponent {
 
   fileText: string;
 
-  constructor(private http: HttpClient, public dbSvc: ObjectService, protected translationSvc: TranslationService, protected backEndSvc: ObjectService, protected userSvc: UserService) {
+  constructor(private http: HttpClient, public dbSvc: ObjectService, protected translationSvc: TranslationService, protected backEndSvc: ObjectService
+    , protected userSvc: UserService, protected resourceSvc: ResourceService, protected anySvc: ScheduleService) {
 
     
 
@@ -116,6 +117,22 @@ export class DemoComponent {
   menuClicked(menuCode) {
 
     console.error(menuCode)
+
+  }
+
+
+
+  async export() {
+    let objects = await this.anySvc.export()
+    console.warn(objects)
+
+    const link = document.createElement("a");
+    const content = JSON.stringify(objects, null, 3)
+    const file = new Blob([content], { type: 'text/plain' });
+    link.href = URL.createObjectURL(file);
+    link.download = "schedule.json";
+    link.click();
+    URL.revokeObjectURL(link.href);
 
   }
 

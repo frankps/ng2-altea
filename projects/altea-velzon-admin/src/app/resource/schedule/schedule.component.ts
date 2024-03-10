@@ -1,5 +1,5 @@
 import { Component, Input, ViewChild, ViewChildren } from '@angular/core';
-import { Schedule, Scheduling, ScheduleTimeBlock, WeekSchedule } from 'ts-altea-model'
+import { Schedule, ScheduleTimeBlock, WeekSchedule } from 'ts-altea-model'
 import { SelectedDay } from '../schedule-day/schedule-day.component';
 import { EditResourceComponent } from '../edit-resource/edit-resource.component';
 import { ScheduleSchedulingComponent } from '../schedule-scheduling/schedule-scheduling.component';

@@ -19,8 +19,6 @@ export class ResourceService extends BackendHttpServiceBase<Resource> {
 
     const query = new DbQuery()
 
-
-
     query.and('type', QueryOperator.equals, type)
     query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
     query.and('active', QueryOperator.equals, true)
@@ -45,6 +43,17 @@ export class ResourceService extends BackendHttpServiceBase<Resource> {
 
   async getHumanResources(includes?: string[]): Promise<Resource[]> {
     return this.getByType(ResourceType.human, includes)
+  }
+
+  override async export(): Promise<Resource[]> {
+
+    const query = new DbQuery()
+    query.includes = 'children,products,schedules'.split(',')
+    query.take = 1000
+
+    const objects = await this.query$(query)
+
+    return objects
   }
 
 }

@@ -377,4 +377,17 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
   }
 
 
+
+  async export(): Promise<T[]> {
+
+    const query = new DbQuery()
+   // query.includes = ''.split(',')
+    query.take = 1000
+
+    const objects = await this.query$(query)
+
+    return objects
+  }
+
+
 }

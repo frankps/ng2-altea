@@ -1,8 +1,8 @@
 import { Component, Input, AfterViewInit, AfterViewChecked, OnInit, OnDestroy } from '@angular/core';
-import { ResourcePlanning, Schedule, Scheduling, ScheduleTimeBlock, WeekSchedule, PlanningType } from 'ts-altea-model'
+import { ResourcePlanning, Schedule, ScheduleTimeBlock, WeekSchedule, PlanningType } from 'ts-altea-model'
 import { SelectedDay } from '../schedule-day/schedule-day.component';
 import { BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, Translation, ObjectHelper, CollectionChangeTracker, ObjectWithId, DateHelper, ConnectTo } from 'ts-common'
-import { ResourcePlanningService, SchedulingService, SessionService } from 'ng-altea-common'
+import { ResourcePlanningService, SessionService } from 'ng-altea-common'
 import { BsLocaleService } from 'ngx-bootstrap/datepicker';
 import * as dateFns from 'date-fns'
 import { EditResourceComponent } from '../edit-resource/edit-resource.component';
@@ -235,7 +235,7 @@ export class ScheduleSchedulingComponent implements OnDestroy {
   }
 
 
-  update(scheduling: Scheduling) {
+  update(scheduling: any) {
 
     if (scheduling) {
       this.changes.updateId(scheduling.id)

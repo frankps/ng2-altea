@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Scheduling, Template, User } from 'ts-altea-model'
+import {  Template, User } from 'ts-altea-model'
 import { BackendHttpServiceBase } from 'ng-common';
 import { HttpClient } from '@angular/common/http';
 import { SessionService } from './session.service';

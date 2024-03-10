@@ -1,0 +1,310 @@
+[
+    {
+       "m": {},
+       "id": "1cb6d333-7de3-496f-9689-3c59e251521f",
+       "idx": 0,
+       "to": [
+          "client"
+       ],
+       "channels": [
+          "email"
+       ],
+       "remind": 60,
+       "active": true,
+       "deleted": false,
+       "orgId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "cat": "order",
+       "code": "reminder",
+       "name": "Herinnering afspraak-",
+       "language": null,
+       "subject": "Herinnering afspraak",
+       "body": "Beste {{voornaam}},\n\nDit is een herinnering van uw afspraak bij Aquasense.\n\nMet vriendelijke groeten, Het Aquasense team",
+       "short": null,
+       "createdAt": "2023-12-20T21:29:12.717Z",
+       "updatedAt": null,
+       "deletedAt": null
+    },
+    {
+       "m": {},
+       "id": "2ff5e4a9-7014-4875-9e26-1ed3f25eefae",
+       "idx": 0,
+       "to": [
+          "client"
+       ],
+       "channels": [
+          "email"
+       ],
+       "remind": 60,
+       "active": true,
+       "deleted": false,
+       "orgId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "cat": "order",
+       "code": "inTimeCancel",
+       "name": "Annulatie boeking-",
+       "language": null,
+       "subject": "Annulatie boeking",
+       "body": "Beste {{voornaam}},\n\nUw boeking bij Aquasense werd tijdig geannuleerd!\n\nMet vriendelijke groeten, Het Aquasense team\n",
+       "short": null,
+       "createdAt": "2023-12-20T21:27:13.814Z",
+       "updatedAt": "2023-12-20T21:28:20.848Z",
+       "deletedAt": null
+    },
+    {
+       "m": {},
+       "id": "44d921a5-f74f-48e1-97ee-617e6b955b35",
+       "idx": 0,
+       "to": [
+          "client"
+       ],
+       "channels": [
+          "sms"
+       ],
+       "remind": 60,
+       "active": false,
+       "deleted": false,
+       "orgId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "cat": "order",
+       "code": "waitDeposit",
+       "name": null,
+       "language": null,
+       "subject": null,
+       "body": "Dag {{name}}",
+       "short": null,
+       "createdAt": "2023-12-23T20:21:10.702Z",
+       "updatedAt": "2023-12-23T20:25:07.681Z",
+       "deletedAt": null
+    },
+    {
+       "m": {},
+       "id": "6042dcd7-ad05-49b2-a8ad-1c812a9601e3",
+       "idx": 0,
+       "to": [
+          "client"
+       ],
+       "channels": [
+          "email"
+       ],
+       "remind": 60,
+       "active": true,
+       "deleted": false,
+       "orgId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "cat": "order",
+       "code": "satisfaction",
+       "name": "Dank voor uw bezoek aan Aquasense",
+       "language": null,
+       "subject": "Dank voor uw bezoek aan Aquasense",
+       "body": "Beste {{voornaam}},\n\nWij danken u voor uw bezoek aan Aquasense!\n\nMet vriendelijke groeten, Het Aquasense team",
+       "short": null,
+       "createdAt": "2023-12-20T21:30:17.413Z",
+       "updatedAt": null,
+       "deletedAt": null
+    },
+    {
+       "m": {},
+       "id": "74dad0fb-99d4-4760-af6f-3de4652258d9",
+       "idx": 0,
+       "to": [
+          "client"
+       ],
+       "channels": [
+          "email"
+       ],
+       "remind": 60,
+       "active": true,
+       "deleted": false,
+       "orgId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "cat": "order",
+       "code": "waitDeposit",
+       "name": "Gelieve voorschot te betalen-",
+       "language": null,
+       "subject": "Gelieve voorschot te betalen",
+       "body": "Beste {{name}},\n{{info}}\nMvg",
+       "short": null,
+       "createdAt": "2023-12-20T21:13:37.529Z",
+       "updatedAt": "2023-12-23T20:24:56.417Z",
+       "deletedAt": null
+    },
+    {
+       "m": {},
+       "id": "786d9aad-cb78-4952-8f17-d5481f1b26a6",
+       "idx": 0,
+       "to": [
+          "provider"
+       ],
+       "channels": [
+          "sms"
+       ],
+       "remind": 60,
+       "active": true,
+       "deleted": false,
+       "orgId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "cat": "order",
+       "code": null,
+       "name": null,
+       "language": null,
+       "subject": null,
+       "body": "HELLO",
+       "short": null,
+       "createdAt": "2023-12-15T19:46:41.009Z",
+       "updatedAt": "2023-12-20T17:29:24.847Z",
+       "deletedAt": null
+    },
+    {
+       "m": {},
+       "id": "821c0cfc-431f-486a-9bb5-09aabd4872e4",
+       "idx": 0,
+       "to": [
+          "client"
+       ],
+       "channels": [
+          "email"
+       ],
+       "remind": 60,
+       "active": true,
+       "deleted": false,
+       "orgId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "cat": "order",
+       "code": "noShow",
+       "name": "U bent niet komen opdagen-",
+       "language": null,
+       "subject": "U bent niet komen opdagen",
+       "body": "Beste {{voornaam}},\n\nU bent niet komen opdagen!\n\nMet vriendelijke groeten, Het Aquasense team\n\n",
+       "short": null,
+       "createdAt": "2023-12-20T21:21:03.880Z",
+       "updatedAt": "2023-12-20T21:23:35.135Z",
+       "deletedAt": null
+    },
+    {
+       "m": {},
+       "id": "9cd17829-d678-401e-b7fe-1d3cbef307c8",
+       "idx": 0,
+       "to": [
+          "client"
+       ],
+       "channels": [
+          "email"
+       ],
+       "remind": 60,
+       "active": true,
+       "deleted": false,
+       "orgId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "cat": "order",
+       "code": "lateCancel",
+       "name": "Late annulatie",
+       "language": null,
+       "subject": "Late annulatie",
+       "body": "Beste {{voornaam}},\n\nUw boeking bij Aquasense werd laattijdig geannuleerd!\n\nMet vriendelijke groeten, Het Aquasense team",
+       "short": null,
+       "createdAt": "2023-12-20T21:27:13.840Z",
+       "updatedAt": "2023-12-20T21:28:20.879Z",
+       "deletedAt": null
+    },
+    {
+       "m": {},
+       "id": "bc5ec28e-fa0e-4a7a-a01e-72d72b146ad6",
+       "idx": 0,
+       "to": [
+          "client"
+       ],
+       "channels": [
+          "email"
+       ],
+       "remind": 60,
+       "active": true,
+       "deleted": false,
+       "orgId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "cat": "order",
+       "code": "confirmed",
+       "name": "Boeking geconfirmeerd",
+       "language": null,
+       "subject": "Boeking geconfirmeerd",
+       "body": "Beste {{voornaam}},\n\nUw boeking bij Aquasense is geconfirmeerd!\n\nMet vriendelijke groeten, Het Aquasense team",
+       "short": null,
+       "createdAt": "2023-12-20T21:22:01.769Z",
+       "updatedAt": "2023-12-20T21:24:59.483Z",
+       "deletedAt": null
+    },
+    {
+       "m": {},
+       "id": "c74da2ff-b5a3-4296-b37a-27c576223e0e",
+       "idx": 0,
+       "to": [],
+       "channels": [],
+       "remind": 60,
+       "active": true,
+       "deleted": false,
+       "orgId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "cat": "order",
+       "code": null,
+       "name": "Aquasense openingsuren",
+       "language": "NL",
+       "subject": "Aquasense openingsuren",
+       "body": "Beste [name],\n\nHierbij confirmeren we uw reservatie.\n\nMet vriendelijke groeten,\n\n    Het Aquasense Team ",
+       "short": "Confirmatie van uw reservatie!",
+       "createdAt": "2023-10-14T14:18:52.332Z",
+       "updatedAt": null,
+       "deletedAt": null
+    },
+    {
+       "m": {},
+       "id": "e84fb865-059f-4910-a7ee-c90b6299e1e5",
+       "idx": 0,
+       "to": [
+          "provider"
+       ],
+       "channels": [
+          "email"
+       ],
+       "remind": 60,
+       "active": false,
+       "deleted": false,
+       "orgId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "cat": "order",
+       "code": null,
+       "name": null,
+       "language": null,
+       "subject": null,
+       "body": null,
+       "short": null,
+       "createdAt": "2023-12-15T19:46:40.936Z",
+       "updatedAt": null,
+       "deletedAt": null
+    },
+    {
+       "m": {},
+       "id": "f3002076-a524-4d0f-80f5-6e0f9a700c7a",
+       "idx": 0,
+       "to": [
+          "client"
+       ],
+       "channels": [
+          "email"
+       ],
+       "remind": 60,
+       "active": true,
+       "deleted": false,
+       "orgId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "cat": "order",
+       "code": "noDepositCancel",
+       "name": "Annulatie boeking: geen voorschot",
+       "language": null,
+       "subject": "Annulatie boeking: geen voorschot",
+       "body": "Beste {{voornaam}},\n\nUw boeking bij Aquasense werd geannuleerd omdat er geen voorschot ontvangen werd!\n\nMet vriendelijke groeten, Het Aquasense team",
+       "short": null,
+       "createdAt": "2023-12-20T21:24:59.545Z",
+       "updatedAt": "2023-12-20T21:28:20.783Z",
+       "deletedAt": null
+    }
+ ]

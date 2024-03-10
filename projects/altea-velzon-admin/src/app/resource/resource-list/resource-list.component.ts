@@ -108,6 +108,8 @@ export class ResourceListComponent extends NgBaseListComponent<Resource> impleme
     this.newModal.show(this.resourceType)
   }
 
+
+
   // select(object: Resource) {
 
   //   const mobileMod = this.dashboardSvc.isMobile ? 'mobile/' : ''

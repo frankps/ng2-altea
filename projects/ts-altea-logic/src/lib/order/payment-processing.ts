@@ -1,7 +1,7 @@
 
 
 //import { PrismaClient, Organisation as OrganisationModel, Prisma } from '@prisma/client'
-import { ApiBatchItemResult, ApiBatchProcess, ApiBatchResult, ApiListResult, ApiResult, ApiStatus, DbObject, DbObjectMulti, DbQueryTyped, ManagedObject, ObjectHelper, ObjectWithId, QueryOperator } from 'ts-common';
+import { ApiBatchItemResult, ApiBatchProcess, ApiBatchResult, ApiListResult, ApiResult, ApiStatus, DbObjectCreate, DbObjectMulti, DbQueryTyped, ManagedObject, ObjectHelper, ObjectWithId, QueryOperator } from 'ts-common';
 import { plainToClass, instanceToPlain, plainToInstance } from "class-transformer"
 import { CanUseGift, Gift, Message, MsgType, Order, OrderLine, Payment, PaymentType, Subscription } from 'ts-altea-model';
 import { AlteaDb } from '../general/altea-db';

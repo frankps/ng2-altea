@@ -1,6 +1,6 @@
 
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { ApiListResult, ApiResult, ApiStatus, DateHelper, DbObjectMulti, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
+import { ApiListResult, ApiResult, ApiStatus, DateHelper, DbObjectMulti, DbObjectMultiCreate, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
 import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, Reminder, OrderLine, Subscription, TaskSchedule, Task, TaskStatus } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { AlteaDb } from '../general/altea-db'
@@ -24,7 +24,7 @@ export class TaskSchedulingService {
     }
 
 
-    async instantiateRecurringTasks(includeLessFrequentTasks: boolean = true) {
+    async instantiateRecurringTasks(includeLessFrequentTasks: boolean = true) : Promise<ApiListResult<Task>> {
 
         try {
 
@@ -54,12 +54,12 @@ export class TaskSchedulingService {
 
             if (newRecurTaskInstances.length == 0) {
                 console.log(`No new tasks!`)
-                return new ApiResult<any>({}, ApiStatus.ok, 'No new tasks!')
+                return new ApiListResult<Task>([], ApiStatus.ok, 'No new tasks!')
             }
 
             const newTasks = this.makeConcreteTasks(newRecurTaskInstances)
 
-            let dbNewTasks = new DbObjectMulti<Task>('task', Task, newTasks)
+            let dbNewTasks = new DbObjectMultiCreate<Task>('task', Task, newTasks)
             let res = await this.alteaDb.db.createMany$<Task>(dbNewTasks)
 
             console.error(res)

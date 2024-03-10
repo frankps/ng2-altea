@@ -1,0 +1,852 @@
+[
+    {
+       "m": {},
+       "id": "01871d8b-298b-4d54-b62b-46673c98f833",
+       "idx": 100,
+       "default": true,
+       "weeks": [
+          {
+             "idx": 1,
+             "days": [
+                {
+                   "idx": 1,
+                   "on": true,
+                   "day": "mo",
+                   "blocks": [
+                      {
+                         "from": "09:00",
+                         "to": "11:00"
+                      }
+                   ]
+                },
+                {
+                   "idx": 2,
+                   "on": true,
+                   "day": "tu",
+                   "blocks": [
+                      {
+                         "from": "08:00",
+                         "to": "22:00"
+                      }
+                   ]
+                },
+                {
+                   "idx": 3,
+                   "on": true,
+                   "day": "we",
+                   "blocks": [
+                      {
+                         "from": "08:00",
+                         "to": "22:00"
+                      }
+                   ]
+                },
+                {
+                   "idx": 4,
+                   "on": true,
+                   "day": "th",
+                   "blocks": [
+                      {
+                         "from": "08:00",
+                         "to": "22:00"
+                      }
+                   ]
+                },
+                {
+                   "idx": 5,
+                   "on": true,
+                   "day": "fr",
+                   "blocks": [
+                      {
+                         "from": "08:00",
+                         "to": "22:00"
+                      }
+                   ]
+                },
+                {
+                   "idx": 6,
+                   "on": true,
+                   "day": "sa",
+                   "blocks": [
+                      {
+                         "from": "08:00",
+                         "to": "22:00"
+                      }
+                   ]
+                },
+                {
+                   "idx": 7,
+                   "on": false,
+                   "day": "su",
+                   "blocks": []
+                }
+             ]
+          }
+       ],
+       "prepIncl": true,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2024-03-02T09:33:13.383Z",
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "resourceId": "4664aeee-d787-459e-9842-49ffc3cf0540",
+       "name": "Bodyslimming",
+       "start": null,
+       "updatedAt": "2024-03-03T17:24:04.575Z",
+       "deletedAt": null
+    },
+    {
+       "m": {},
+       "id": "12f3246b-7b4d-4bf7-b7ae-cecda486708c",
+       "idx": 100,
+       "default": true,
+       "weeks": [
+          {
+             "idx": 1,
+             "days": [
+                {
+                   "idx": 1,
+                   "on": true,
+                   "day": "mo",
+                   "blocks": [
+                      {
+                         "from": "09:00",
+                         "to": "17:00"
+                      }
+                   ]
+                },
+                {
+                   "idx": 2,
+                   "on": true,
+                   "day": "tu",
+                   "blocks": [
+                      {
+                         "from": "09:00",
+                         "to": "17:00"
+                      }
+                   ]
+                },
+                {
+                   "idx": 3,
+                   "on": true,
+                   "day": "we",
+                   "blocks": [
+                      {
+                         "from": "09:00",
+                         "to": "17:00"
+                      }
+                   ]
+                },
+                {
+                   "idx": 4,
+                   "on": true,
+                   "day": "th",
+                   "blocks": [
+                      {
+                         "from": "09:00",
+                         "to": "17:00"
+                      }
+                   ]
+                },
+                {
+                   "idx": 5,
+                   "on": true,
+                   "day": "fr",
+                   "blocks": [
+                      {
+                         "from": "09:00",
+                         "to": "17:00"
+                      }
+                   ]
+                },
+                {
+                   "idx": 6,
+                   "on": false,
+                   "day": "sa",
+                   "blocks": []
+                },
+                {
+                   "idx": 7,
+                   "on": false,
+                   "day": "su",
+                   "blocks": []
+                }
+             ]
+          }
+       ],
+       "prepIncl": true,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-11-16T11:05:31.034Z",
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "resourceId": "cc241d0c-b650-429c-86d6-f3cbd5c32e88",
+       "name": null,
+       "start": null,
+       "updatedAt": "2024-02-14T13:58:10.142Z",
+       "deletedAt": null
+    },
+    {
+       "m": {},
+       "id": "19ed31fb-fc91-4e2e-8c73-23a7fad05341",
+       "idx": 100,
+       "default": true,
+       "weeks": [
+          {
+             "idx": 1,
+             "days": [
+                {
+                   "idx": 1,
+                   "on": true,
+                   "day": "mo",
+                   "blocks": [
+                      {
+                         "from": "09:00",
+                         "to": "17:00"
+                      }
+                   ]
+                },
+                {
+                   "idx": 2,
+                   "on": true,
+                   "day": "tu",
+                   "blocks": [
+                      {
+                         "from": "09:00",
+                         "to": "17:00"
+                      }
+                   ]
+                },
+                {
+                   "idx": 3,
+                   "on": true,
+                   "day": "we",
+                   "blocks": [
+                      {
+                         "from": "09:00",
+                         "to": "17:00"
+                      }
+                   ]
+                },
+                {
+                   "idx": 4,
+                   "on": true,
+                   "day": "th",
+                   "blocks": [
+                      {
+                         "from": "09:00",
+                         "to": "17:00"
+                      }
+                   ]
+                },
+                {
+                   "idx": 5,
+                   "on": true,
+                   "day": "fr",
+                   "blocks": [
+                      {
+                         "from": "09:00",
+                         "to": "17:00"
+                      }
+                   ]
+                },
+                {
+                   "idx": 6,
+                   "on": false,
+                   "day": "sa",
+                   "blocks": []
+                },
+                {
+                   "idx": 7,
+                   "on": false,
+                   "day": "su",
+                   "blocks": []
+                }
+             ]
+          }
+       ],
+       "prepIncl": true,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T16:23:56.838Z",
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "resourceId": "cc241d0c-b650-429c-86d6-f3cbd5c32e89",
+       "name": "Uurrooster",
+       "start": null,
+       "updatedAt": "2024-02-14T13:58:37.755Z",
+       "deletedAt": null
+    },
+    {
+       "m": {},
+       "id": "335c9500-67ad-41a0-b725-0aa76d5b6d75",
+       "idx": 100,
+       "default": true,
+       "weeks": [
+          {
+             "idx": 1,
+             "days": [
+                {
+                   "idx": 1,
+                   "on": true,
+                   "day": "mo",
+                   "blocks": [
+                      {
+                         "from": "08:00",
+                         "to": "23:50"
+                      }
+                   ]
+                },
+                {
+                   "idx": 2,
+                   "on": true,
+                   "day": "tu",
+                   "blocks": [
+                      {
+                         "from": "08:00",
+                         "to": "23:50"
+                      }
+                   ]
+                },
+                {
+                   "idx": 3,
+                   "on": true,
+                   "day": "we",
+                   "blocks": [
+                      {
+                         "from": "08:00",
+                         "to": "23:50"
+                      }
+                   ]
+                },
+                {
+                   "idx": 4,
+                   "on": true,
+                   "day": "th",
+                   "blocks": [
+                      {
+                         "from": "08:00",
+                         "to": "23:50"
+                      }
+                   ]
+                },
+                {
+                   "idx": 5,
+                   "on": true,
+                   "day": "fr",
+                   "blocks": [
+                      {
+                         "from": "08:00",
+                         "to": "23:50"
+                      }
+                   ]
+                },
+                {
+                   "idx": 6,
+                   "on": true,
+                   "day": "sa",
+                   "blocks": [
+                      {
+                         "from": "08:00",
+                         "to": "23:50"
+                      }
+                   ]
+                },
+                {
+                   "idx": 7,
+                   "on": true,
+                   "day": "su",
+                   "blocks": [
+                      {
+                         "from": "08:00",
+                         "to": "23:50"
+                      }
+                   ]
+                }
+             ]
+          }
+       ],
+       "prepIncl": false,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2024-02-09T17:13:25.044Z",
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "resourceId": "e738d496-a66d-414e-a098-d5ca84403e9d",
+       "name": null,
+       "start": null,
+       "updatedAt": null,
+       "deletedAt": null
+    },
+    {
+       "m": {},
+       "id": "85bc260c-7ef5-4434-80ba-3606add6fdc4",
+       "idx": 200,
+       "default": false,
+       "weeks": [
+          {
+             "idx": 1,
+             "days": [
+                {
+                   "idx": 1,
+                   "on": true,
+                   "day": "mo",
+                   "blocks": [
+                      {
+                         "from": "11:00",
+                         "to": "15:00"
+                      }
+                   ]
+                },
+                {
+                   "idx": 2,
+                   "on": true,
+                   "day": "tu",
+                   "blocks": [
+                      {
+                         "from": "11:00",
+                         "to": "16:00"
+                      }
+                   ]
+                },
+                {
+                   "idx": 3,
+                   "on": true,
+                   "day": "we",
+                   "blocks": [
+                      {
+                         "from": "11:00",
+                         "to": "16:00"
+                      }
+                   ]
+                },
+                {
+                   "idx": 4,
+                   "on": true,
+                   "day": "th",
+                   "blocks": [
+                      {
+                         "from": "11:00",
+                         "to": "15:00"
+                      }
+                   ]
+                },
+                {
+                   "idx": 5,
+                   "on": true,
+                   "day": "fr",
+                   "blocks": [
+                      {
+                         "from": "11:00",
+                         "to": "15:00"
+                      }
+                   ]
+                },
+                {
+                   "idx": 6,
+                   "on": false,
+                   "day": "sa",
+                   "blocks": []
+                },
+                {
+                   "idx": 7,
+                   "on": false,
+                   "day": "su",
+                   "blocks": []
+                }
+             ]
+          }
+       ],
+       "prepIncl": false,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-16T09:30:21.695Z",
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "resourceId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "HiFr Afwezig",
+       "start": null,
+       "updatedAt": null,
+       "deletedAt": null
+    },
+    {
+       "m": {},
+       "id": "a227f5c3-5da7-4a3d-9342-515319e76849",
+       "idx": 100,
+       "default": true,
+       "weeks": [
+          {
+             "idx": 1,
+             "days": [
+                {
+                   "idx": 1,
+                   "on": true,
+                   "day": "mo",
+                   "blocks": [
+                      {
+                         "from": "09:00",
+                         "to": "18:00"
+                      }
+                   ]
+                },
+                {
+                   "idx": 2,
+                   "on": true,
+                   "day": "tu",
+                   "blocks": [
+                      {
+                         "from": "09:00",
+                         "to": "21:00"
+                      }
+                   ]
+                },
+                {
+                   "idx": 3,
+                   "on": true,
+                   "day": "we",
+                   "blocks": [
+                      {
+                         "from": "09:00",
+                         "to": "21:00"
+                      }
+                   ]
+                },
+                {
+                   "idx": 4,
+                   "on": true,
+                   "day": "th",
+                   "blocks": [
+                      {
+                         "from": "09:00",
+                         "to": "21:00"
+                      }
+                   ]
+                },
+                {
+                   "idx": 5,
+                   "on": true,
+                   "day": "fr",
+                   "blocks": [
+                      {
+                         "from": "09:00",
+                         "to": "21:00"
+                      }
+                   ]
+                },
+                {
+                   "idx": 6,
+                   "on": true,
+                   "day": "sa",
+                   "blocks": [
+                      {
+                         "from": "09:00",
+                         "to": "18:00"
+                      }
+                   ]
+                },
+                {
+                   "idx": 7,
+                   "on": false,
+                   "day": "su",
+                   "blocks": []
+                }
+             ]
+          }
+       ],
+       "prepIncl": false,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T16:25:16.275Z",
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "resourceId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "name": "Standaard planning",
+       "start": null,
+       "updatedAt": "2024-02-09T16:02:48.165Z",
+       "deletedAt": null
+    },
+    {
+       "m": {},
+       "id": "d5b4ac1e-83b7-453f-b881-7f0570bf274c",
+       "idx": 100,
+       "default": true,
+       "weeks": [
+          {
+             "idx": 1,
+             "days": [
+                {
+                   "idx": 1,
+                   "on": true,
+                   "day": "mo",
+                   "blocks": [
+                      {
+                         "from": "08:00",
+                         "to": "23:50"
+                      }
+                   ]
+                },
+                {
+                   "idx": 2,
+                   "on": true,
+                   "day": "tu",
+                   "blocks": [
+                      {
+                         "from": "08:00",
+                         "to": "23:50"
+                      }
+                   ]
+                },
+                {
+                   "idx": 3,
+                   "on": true,
+                   "day": "we",
+                   "blocks": [
+                      {
+                         "from": "08:00",
+                         "to": "23:50"
+                      }
+                   ]
+                },
+                {
+                   "idx": 4,
+                   "on": true,
+                   "day": "th",
+                   "blocks": [
+                      {
+                         "from": "08:00",
+                         "to": "23:50"
+                      }
+                   ]
+                },
+                {
+                   "idx": 5,
+                   "on": true,
+                   "day": "fr",
+                   "blocks": [
+                      {
+                         "from": "08:00",
+                         "to": "23:50"
+                      }
+                   ]
+                },
+                {
+                   "idx": 6,
+                   "on": true,
+                   "day": "sa",
+                   "blocks": [
+                      {
+                         "from": "08:00",
+                         "to": "23:50"
+                      }
+                   ]
+                },
+                {
+                   "idx": 7,
+                   "on": true,
+                   "day": "su",
+                   "blocks": [
+                      {
+                         "from": "08:00",
+                         "to": "23:50"
+                      }
+                   ]
+                }
+             ]
+          }
+       ],
+       "prepIncl": false,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2024-02-10T09:31:00.467Z",
+       "branchId": "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c",
+       "resourceId": "348bfc74-04bd-4e49-8064-2f3b43dbd76e",
+       "name": null,
+       "start": null,
+       "updatedAt": null,
+       "deletedAt": null
+    },
+    {
+       "m": {},
+       "id": "eee8fc6b-37cc-4744-a9f2-b617edf669ab",
+       "idx": 0,
+       "default": true,
+       "weeks": [
+          {
+             "idx": 1,
+             "days": [
+                {
+                   "idx": 1,
+                   "on": true,
+                   "day": "mo",
+                   "blocks": [
+                      {
+                         "from": "09:00",
+                         "to": "23:15"
+                      }
+                   ]
+                },
+                {
+                   "idx": 2,
+                   "on": true,
+                   "day": "tu",
+                   "blocks": [
+                      {
+                         "from": "09:00",
+                         "to": "23:15"
+                      }
+                   ]
+                },
+                {
+                   "idx": 3,
+                   "on": true,
+                   "day": "we",
+                   "blocks": [
+                      {
+                         "from": "09:00",
+                         "to": "23:15"
+                      }
+                   ]
+                },
+                {
+                   "idx": 4,
+                   "on": true,
+                   "day": "th",
+                   "blocks": [
+                      {
+                         "from": "09:00",
+                         "to": "23:15"
+                      }
+                   ]
+                },
+                {
+                   "idx": 5,
+                   "on": true,
+                   "day": "fr",
+                   "blocks": [
+                      {
+                         "from": "09:00",
+                         "to": "23:15"
+                      }
+                   ]
+                },
+                {
+                   "idx": 6,
+                   "on": true,
+                   "day": "sa",
+                   "blocks": [
+                      {
+                         "from": "09:00",
+                         "to": "23:15"
+                      }
+                   ]
+                },
+                {
+                   "idx": 7,
+                   "on": true,
+                   "day": "su",
+                   "blocks": [
+                      {
+                         "from": "09:00",
+                         "to": "23:15"
+                      }
+                   ]
+                }
+             ]
+          }
+       ],
+       "prepIncl": false,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.889Z",
+       "branchId": null,
+       "resourceId": "b39b2d8a-9a06-46b8-8334-4fc400cfc2c5",
+       "name": "Aquasense openingsuren",
+       "start": null,
+       "updatedAt": "2024-02-11T21:23:37.720Z",
+       "deletedAt": null
+    },
+    {
+       "m": {},
+       "id": "eee8fc6b-37cc-4744-a9f2-b617edf669ac",
+       "idx": 0,
+       "default": false,
+       "weeks": [
+          {
+             "idx": 1,
+             "days": [
+                {
+                   "idx": 1,
+                   "on": true,
+                   "day": "mo",
+                   "blocks": [
+                      {
+                         "from": "09:00",
+                         "to": "17:00"
+                      }
+                   ]
+                },
+                {
+                   "idx": 2,
+                   "on": true,
+                   "day": "tu",
+                   "blocks": [
+                      {
+                         "from": "09:00",
+                         "to": "23:15"
+                      }
+                   ]
+                },
+                {
+                   "idx": 3,
+                   "on": true,
+                   "day": "we",
+                   "blocks": [
+                      {
+                         "from": "09:00",
+                         "to": "17:00"
+                      }
+                   ]
+                },
+                {
+                   "idx": 4,
+                   "on": true,
+                   "day": "th",
+                   "blocks": [
+                      {
+                         "from": "09:00",
+                         "to": "17:00"
+                      }
+                   ]
+                },
+                {
+                   "idx": 5,
+                   "on": true,
+                   "day": "fr",
+                   "blocks": [
+                      {
+                         "from": "09:00",
+                         "to": "17:00"
+                      }
+                   ]
+                },
+                {
+                   "idx": 6,
+                   "on": false,
+                   "day": "sa",
+                   "blocks": []
+                },
+                {
+                   "idx": 7,
+                   "on": false,
+                   "day": "su",
+                   "blocks": []
+                }
+             ]
+          }
+       ],
+       "prepIncl": true,
+       "active": true,
+       "deleted": false,
+       "createdAt": "2023-10-14T14:18:52.889Z",
+       "branchId": null,
+       "resourceId": "b39b2d8a-9a06-46b8-8334-4fc400cfc2c5",
+       "name": "Aquasense openingsuren verlof",
+       "start": null,
+       "updatedAt": "2024-02-11T21:59:22.567Z",
+       "deletedAt": null
+    }
+ ]

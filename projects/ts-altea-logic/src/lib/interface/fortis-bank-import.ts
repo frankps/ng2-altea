@@ -61,10 +61,10 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
 
         this.lines = this.lines.map(line => this.customProcessing(line))
 
+        let uploadResult = await this.alteaDb.createBankTransactions(this.lines)
 
-        const dbUpload = new DbObjectMulti<BankTransaction>('bankTransaction', BankTransaction, this.lines)
-
-        let uploadResult = await this.alteaDb.db.createMany$<BankTransaction>(dbUpload)
+/*         const dbUpload = new DbObjectMulti<BankTransaction>('bankTransaction', BankTransaction, this.lines)
+        let uploadResult = await this.alteaDb.db.createMany$<BankTransaction>(dbUpload) */
 
         console.error(uploadResult)
 

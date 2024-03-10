@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { ObjectWithId, BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, ApiBatchResult, DbQuery, ObjectHelper, ApiStatus, ConnectTo, DbQueryTyped, DbObject, DbObjectMulti } from 'ts-common'
+import { ObjectWithId, BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, ApiBatchResult, DbQuery, ObjectHelper, ApiStatus, ConnectTo, DbQueryTyped, DbObjectCreate, DbObjectMulti, DbObject, DbObjectMultiCreate } from 'ts-common'
 import { plainToInstance } from "class-transformer";
 import { Observable, map, Subject, take } from "rxjs";
 import { SessionService } from './session.service';
@@ -23,7 +23,7 @@ export class ObjectService implements IDb {
 
     return new Promise<any>(function (resolve, reject) {
 
-      const fullUrl = `${httpServer}/${pageUrl}` 
+      const fullUrl = `${httpServer}/${pageUrl}`
 
       me.http.post<any>(fullUrl, body).pipe(take(1)).subscribe(res => {
         resolve(res)
@@ -39,7 +39,7 @@ export class ObjectService implements IDb {
 
     return new Promise<any>(function (resolve, reject) {
 
-      const fullUrl = `${httpServer}/${pageUrl}` 
+      const fullUrl = `${httpServer}/${pageUrl}`
 
       me.http.put<any>(fullUrl, body).pipe(take(1)).subscribe(res => {
         resolve(res)
@@ -52,30 +52,33 @@ export class ObjectService implements IDb {
 
 
 
-  update<T extends ObjectWithId>(dbObject: DbObject<T>): Observable<ApiResult<T>> {
+  update<Inp, Out>(dbObject: DbObject<Inp, Out>): Observable<ApiResult<Out>> {
 
-    return this.http.put<ApiResult<T>>(`${this.sessionSvc.backend}/${this.sessionSvc.branchUnique}/objects/update`, dbObject).pipe(map(res => {
+    return this.http.put<ApiResult<Out>>(`${this.sessionSvc.backend}/${this.sessionSvc.branchUnique}/objects/update`, dbObject).pipe(map(res => {
+
+      let typedRes: ApiResult<Out> = plainToInstance(ApiResult<Out>, res)
 
       if (res && res.object) {
 
-        res.object = plainToInstance(dbObject.type, res.object)
+        typedRes.object = plainToInstance(dbObject.type, res.object)
       }
 
-      return res
+      return typedRes
 
     }
     ))
   }
 
+  // update$<Inp, Out>(dbObject: DbObject<Inp, Out>): Promise<ApiResult<Out>>
 
+  //  async update$<T extends ObjectWithId>(dbObject: DbObjectCreate<T>): Promise<ApiResult<T>> {
 
-  async update$<T extends ObjectWithId>(dbObject: DbObject<T>): Promise<ApiResult<T>> {
-
+  async update$<Inp, Out>(dbObject: DbObject<Inp, Out>): Promise<ApiResult<Out>> {
     const me = this
 
-    return new Promise<ApiResult<T>>(function (resolve, reject) {
+    return new Promise<ApiResult<Out>>(function (resolve, reject) {
 
-      me.update<T>(dbObject).pipe(take(1)).subscribe(res => {
+      me.update<Inp, Out>(dbObject).pipe(take(1)).subscribe(res => {
         resolve(res)
       })
 
@@ -84,11 +87,11 @@ export class ObjectService implements IDb {
   }
 
 
-  async updateMany$<Inp extends ObjectWithId, Out>(dbObject: DbObjectMulti<Out>): Promise<ApiListResult<Out>> {
+  async updateMany$<Inp, Out>(dbObject: DbObjectMulti<Inp, Out>): Promise<ApiListResult<Out>> {
 
-    let res = await this.put$(this.sessionSvc.backend,`${this.sessionSvc.branchUnique}/objects/updateMany`, dbObject)
+    let res = await this.put$(this.sessionSvc.backend, `${this.sessionSvc.branchUnique}/objects/updateMany`, dbObject)
 
-    let typedRes : ApiListResult<Out> = plainToInstance(ApiListResult<Out>, res)
+    let typedRes: ApiListResult<Out> = plainToInstance(ApiListResult<Out>, res)
 
     typedRes.data = plainToInstance(dbObject.type, typedRes.data)
 
@@ -103,7 +106,7 @@ export class ObjectService implements IDb {
   }
 */
 
-  create<T>(dbObject: DbObject<T>): Observable<ApiResult<T>> {
+  create<T>(dbObject: DbObjectCreate<T>): Observable<ApiResult<T>> {
 
     return this.http.post<ApiResult<T>>(`${this.sessionSvc.backend}/${this.sessionSvc.branchUnique}/objects/create`, dbObject).pipe(map(res => {
 
@@ -120,7 +123,7 @@ export class ObjectService implements IDb {
 
 
 
-  async create$<T>(dbObject: DbObject<T>): Promise<ApiResult<T>> {
+  async create$<T>(dbObject: DbObjectCreate<T>): Promise<ApiResult<T>> {
 
     const me = this
 
@@ -136,16 +139,14 @@ export class ObjectService implements IDb {
 
 
 
-  createMany<T>(dbObjects: DbObjectMulti<T>): Observable<ApiResult<T[]>> {
+  createMany<T>(dbObjects: DbObjectMultiCreate<T>): Observable<ApiListResult<T>> {
 
 
+    return this.http.post<ApiListResult<T>>(`${this.sessionSvc.backend}/${this.sessionSvc.branchUnique}/objects/createMany`, dbObjects).pipe(map(res => {
 
+      if (res && res.data) {
 
-    return this.http.post<ApiResult<T[]>>(`${this.sessionSvc.backend}/${this.sessionSvc.branchUnique}/objects/createMany`, dbObjects).pipe(map(res => {
-
-      if (res && res.object) {
-
-        res.object = plainToInstance(dbObjects.type, res.object)
+        res.data = plainToInstance(dbObjects.type, res.data)
 
       }
 
@@ -156,11 +157,11 @@ export class ObjectService implements IDb {
   }
 
 
-  async createMany$<T>(dbObjects: DbObjectMulti<T>): Promise<ApiResult<T[]>> {
+  async createMany$<T>(dbObjects: DbObjectMultiCreate<T>): Promise<ApiListResult<T>> {
 
     const me = this
 
-    return new Promise<ApiResult<T[]>>(function (resolve, reject) {
+    return new Promise<ApiListResult<T>>(function (resolve, reject) {
 
       me.createMany<T>(dbObjects).pipe(take(1)).subscribe(res => {
         resolve(res)
