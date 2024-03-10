@@ -1,7 +1,8 @@
-import { ApiListResult, ApiResult, DateHelper, DbObjectMulti, DbQuery, DbQueryTyped, ObjectHelper, QueryOperator } from 'ts-common'
-import { Branch, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template } from 'ts-altea-model'
+import { ApiListResult, ApiResult, ApiStatus, DateHelper, DbObjectMulti, DbQuery, DbQueryTyped, ObjectHelper, ObjectWithId, QueryOperator } from 'ts-common'
+import { Branch, Gift, Subscription, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { IDb } from '../interfaces/i-db'
+
 
 
 export class AlteaDb {
@@ -261,6 +262,67 @@ export class AlteaDb {
         return tasks
     }
 
+    /** Generic */
+
+    async getObjectsByIds<T>(typeName: string, type: { new(): T; }, ids: string[]): Promise<T[]> {
+
+        if (!Array.isArray(ids) || ids.length == 0)
+            return []
+
+        const qry = new DbQueryTyped<T>('subscription', type)
+        qry.and('id', QueryOperator.in, ids)
+
+        let objects: T[] = await this.db.query$<T>(qry)
+
+        return objects
+    }
+
+    async updateObjects<T>(typeName: string, type: { new(): T; }, objects: T[], propertiesToUpdate: string[]): Promise<ApiListResult<T>> {
+
+        if (!Array.isArray(objects) || objects.length == 0)
+            return new ApiListResult([], ApiStatus.ok)
+
+        let objectsToUpdate = ObjectHelper.extractArrayProperties(objects, ['id', ...propertiesToUpdate])
+
+        let dbObjectMany = new DbObjectMulti(typeName, type, objectsToUpdate)
+
+        let updateResult = await this.db.updateMany$<ObjectWithId, T>(dbObjectMany)
+
+        return updateResult
+    }
+
+    /** Gifts */
+
+    async getGiftsByIds(ids: string[]): Promise<Gift[]> {
+
+        const gifts = this.getObjectsByIds('gift', Gift, ids)
+        return gifts
+    }
+
+    async updateGifts(gifts: Gift[], propertiesToUpdate: string[]): Promise<ApiListResult<Gift>> {
+
+        let updateResult = await this.updateObjects('gift', Gift, gifts, propertiesToUpdate)
+        return updateResult
+
+    }
+
+
+    /** Subscriptions */
+
+    async getSubscriptionsByIds(ids: string[]): Promise<Subscription[]> {
+
+        const gifts = this.getObjectsByIds('subscription', Subscription, ids)
+
+        return gifts
+
+    }
+
+    async updateSubscriptions(subscriptions: Subscription[], propertiesToUpdate: string[]): Promise<ApiListResult<Subscription>> {
+
+        let updateResult = await this.updateObjects('subscription', Subscription, subscriptions, propertiesToUpdate)
+        return updateResult
+
+    }
 
 
 }

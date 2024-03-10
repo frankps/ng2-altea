@@ -6,7 +6,9 @@ export interface IDb {
 
     // Generic methods
     update$<T extends ObjectWithId>(dbObject: DbObject<T>): Promise<ApiResult<T>>
-    updateMany$<T extends ObjectWithId>(dbObject: DbObjectMulti<T>): Promise<ApiListResult<any>>
+
+    // async updateMany$<Inp extends ObjectWithId, Out>(dbObject: DbObjectMulti<Out>): Promise<ApiListResult<Out>> 
+    updateMany$<Inp extends ObjectWithId, Out>(dbObject: DbObjectMulti<Out>): Promise<ApiListResult<Out>>
     
     create$<T>(dbObject: DbObject<T>): Promise<ApiResult<T>>
     createMany$<T>(dbObject: DbObjectMulti<T>): Promise<ApiResult<T[]>>

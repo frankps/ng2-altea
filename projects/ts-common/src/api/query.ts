@@ -1,3 +1,4 @@
+import { ObjectWithId } from "../lib"
 
 
 
@@ -198,6 +199,6 @@ export class DbObject<T> {
 }
 
 export class DbObjectMulti<T> {
-  constructor(public typeName: string, public type: { new(): T; }, public objects: T[]) {
+  constructor(public typeName: string, public type: { new(): T; }, public objects: (T | ObjectWithId)[]) {
   }
 }

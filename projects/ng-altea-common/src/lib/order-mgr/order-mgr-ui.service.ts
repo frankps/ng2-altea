@@ -95,9 +95,13 @@ export class OrderMgrUiService {
 
     const payProcessing = new PaymentProcessing(this.alteaSvc.db)
 
-    const res = await payProcessing.doSubscriptionPayments(this.order.payments)
+    const resSub = await payProcessing.doSubscriptionPayments(this.order.payments)
+    console.warn(resSub)
 
-    return res
+    const resGift = await payProcessing.doGiftPayments(this.order.payments)
+    console.warn(resGift)
+    
+    //return res
   }
 
 

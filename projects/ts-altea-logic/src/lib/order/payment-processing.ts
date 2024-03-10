@@ -21,6 +21,62 @@ export class PaymentProcessing {
     }
 
 
+    async doGiftPayments(payments: Payment[]): Promise<ApiListResult<Gift | CanUseGift>> {
+
+        let newPayments: Payment[] = []
+
+        newPayments = payments.filter(pay => pay?.m?.n === true)
+
+        const newGiftPayments = newPayments.filter(pay => pay.type == PaymentType.gift)
+
+        if (newGiftPayments.length == 0)
+            return new ApiListResult([], ApiStatus.ok, 'No gift payments to process!')
+
+        const giftIds = newGiftPayments.map(pay => pay.giftId)
+
+        let gifts: Gift[] = await this.alteaDb.getGiftsByIds(giftIds)   
+
+        console.info('gifts', gifts)
+
+        let allOk = true
+
+        let result: ApiListResult<CanUseGift> = new ApiListResult<CanUseGift>()
+        result.status = ApiStatus.ok
+        let giftsToUpdate = []
+
+        if (newGiftPayments.length > 0) {
+
+            for (let giftPayment of newGiftPayments) {
+
+                let gift = gifts.find(g => g.id == giftPayment.giftId)
+
+                let canUse = gift.canUse(giftPayment.amount)
+                result.data.push(canUse)
+
+                if (canUse.valid && canUse.amount > 0) {
+                    gift.use(canUse.amount)
+                    giftsToUpdate.push(gift)
+                }
+                else {
+                    result.status = ApiStatus.error
+                }
+            }
+        }
+
+        if (!result.isOk || giftsToUpdate.length == 0) {
+            return result
+        }
+
+        let updateGiftResult = await this.alteaDb.updateGifts(giftsToUpdate, ['used', 'isConsumed'])
+
+        return updateGiftResult
+
+    }
+
+
+
+
+
     async doSubscriptionPayments(payments: Payment[]): Promise<ApiListResult<Subscription>> {
         let newPayments: Payment[] = []
 
@@ -33,14 +89,10 @@ export class PaymentProcessing {
 
         const subsIds = newSubscriptionPayments.map(pay => pay.subsId)
 
-        const subsQry = new DbQueryTyped<Subscription>('subscription', Subscription)
-        subsQry.and('id', QueryOperator.in, subsIds)
-
-        let subs: Subscription[] = await this.alteaDb.db.query$<Subscription>(subsQry)
+        let subs: Subscription[] = await this.alteaDb.getSubscriptionsByIds(subsIds)
 
         let subscriptionsToUpdate = []
 
-        //return new ApiResult({}, ApiStatus.ok)
 
         for (let subsPayment of newSubscriptionPayments) {
 
@@ -60,10 +112,7 @@ export class PaymentProcessing {
             }
         }
 
-        let dbObjectMany = new DbObjectMulti('subscription', Subscription, subs)
-        dbObjectMany.objects = ObjectHelper.extractArrayProperties(subscriptionsToUpdate, ['id', 'usedQty', 'active'])
-
-        let updateGiftResult = await this.alteaDb.db.updateMany$(dbObjectMany)
+        let updateGiftResult = await this.alteaDb.updateSubscriptions(subscriptionsToUpdate, ['usedQty', 'active'])
 
         return updateGiftResult
     }

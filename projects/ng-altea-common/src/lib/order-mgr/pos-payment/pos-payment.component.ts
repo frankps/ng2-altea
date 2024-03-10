@@ -91,13 +91,18 @@ export class PosPaymentComponent {
     console.warn(this.gifts)
   }
 
-  useGift(gift: Gift) {
+  async useGift(gift: Gift) {
 
     let canUse = gift.canUse(this.amount)
+
+    console.warn(canUse)
 
     if (canUse.valid && canUse.amount > 0) {
       const payment = this.mgrUiSvc.addPayment(canUse.amount, 'gift', 'pos')
       payment.giftId = gift.id
+
+      let res = await this.mgrUiSvc.testPaymentProcessing()
+      console.warn(res)
     }
 
   }
@@ -116,8 +121,8 @@ export class PosPaymentComponent {
       const payment = this.mgrUiSvc.addPayment(orderLine.product.salesPrice, 'subs', 'pos')
       payment.subsId = subs.id
 
-/*       let res = await this.mgrUiSvc.testPaymentProcessing()
-      console.warn(res) */
+      let res = await this.mgrUiSvc.testPaymentProcessing()
+      console.warn(res)
     }
 
   }

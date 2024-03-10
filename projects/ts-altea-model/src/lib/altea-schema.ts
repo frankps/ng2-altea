@@ -3838,8 +3838,8 @@ export class Gift extends ObjectWithId {
     if (!this.active)
       return new CanUseGift(false, 0, CanUseGiftMsg.notActive)
 
-    if (this.isConsumed)
-      return new CanUseGift(false, 0, CanUseGiftMsg.alreadyConsumed, `isConsumed=true`)
+/*     if (this.isConsumed)
+      return new CanUseGift(false, 0, CanUseGiftMsg.alreadyConsumed, `isConsumed=true`) */
 
     let available = this.availableAmount()
 
