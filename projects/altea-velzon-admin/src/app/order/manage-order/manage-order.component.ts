@@ -3,8 +3,15 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { OrderMgrUiService, BrowseCatalogComponent } from 'ng-altea-common';
 import { DashboardService, NgBaseComponent } from 'ng-common';
 import { Observable, take, takeUntil } from 'rxjs';
+import { Gift } from 'ts-altea-model';
+
+
+
+
 
 export enum PosOrderMenuItem {
+  start = 'start',
+  buyGift = 'buyGift',
   compose = 'compose',
   plan = 'plan',
   contact = 'contact',
@@ -18,8 +25,25 @@ export enum PosOrderMenuItem {
 })
 export class ManageOrderComponent extends NgBaseComponent {
 
+  menu = [
 
-  menu: PosOrderMenuItem = PosOrderMenuItem.plan
+    {
+      code: 'new-reserv'
+    },
+    
+    {
+      code: 'buy-gift'
+    }
+    /*,
+    {
+      code: 'use-gift'
+    },
+    {
+      code: 'demo-orders'
+    }*/
+  ]
+
+  mode: PosOrderMenuItem = PosOrderMenuItem.plan
 
   showPersonSelect = false
 
@@ -43,6 +67,48 @@ export class ManageOrderComponent extends NgBaseComponent {
     this.dashboardSvc.search$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(searchString => {
       this.orderMgrSvc.searchProductsOld(searchString)
     })
+
+  }
+
+  newGift(gift: Gift) {
+
+    console.error(gift)
+
+  }
+
+
+  menuClicked(menuItem) {
+
+    console.error(menuItem)
+
+    if (!menuItem)
+      return
+
+
+    switch (menuItem.code) {
+
+      case 'new-reserv':
+
+        this.orderMgrSvc.newOrder()
+        this.mode = PosOrderMenuItem.compose
+
+
+        break
+
+
+      case 'buy-gift':
+        this.mode = PosOrderMenuItem.buyGift
+        
+        break
+
+      default:
+        
+
+    }
+
+
+
+
 
   }
 

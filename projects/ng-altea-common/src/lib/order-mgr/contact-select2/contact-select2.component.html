@@ -50,7 +50,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row {{css_cls_row}}">
+                <div class="row {{css_cls_row}}" *ngIf="isNew">
                     <div class="col">
                         <div class="d-grid gap-2">
                             <button class="btn btn-primary" translate (click)="searchContact()"
@@ -58,6 +58,17 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="row {{css_cls_row}}" *ngIf="!isNew">
+                    <div class="col">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary" translate (click)="updateContact()"
+                                [disabled]="contactForm.form.pristine || !contactForm.form.valid">msg.save</button>
+                        </div>
+                    </div>
+                </div>
+
+
             </form>
 
 
@@ -78,27 +89,32 @@
         </div>
         <div class="card-body">
 
-            <div translate>ui.order-mgr.contact-select2.select</div>
+            <ng-container *ngIf="contactsFound()">
 
-            <ul class="list-group mt-3 mb-4">
-                <li class="list-group-item list-group-item-success" (click)="selectContact(contact)"
-                    *ngFor="let contact of contacts">
+                <div translate>ui.order-mgr.contact-select2.select</div>
 
-                    <div class="row">
-                        <div class="col-6">{{contact.name}}</div>
-                        <div class="col-6"><span class="float-end">{{contact.mobile}}</span></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12">{{contact.email}}</div>
-                    </div>
+                <ul class="list-group mt-3 mb-4">
+                    <li class="list-group-item list-group-item-success" (click)="selectContact(contact)"
+                        *ngFor="let contact of contacts">
+    
+                        <div class="row">
+                            <div class="col-6">{{contact.name}}</div>
+                            <div class="col-6"><span class="float-end">{{contact.mobile}}</span></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">{{contact.email}}</div>
+                        </div>
+    
+                    </li>
+                </ul>
 
-                </li>
-            </ul>
+            </ng-container>
+
 
             <div translate>ui.order-mgr.contact-select2.new</div>
 
             <ul class="list-group mt-3">
-                <li class="list-group-item list-group-item-primary py-3" (click)="createAsNew()">
+                <li class="list-group-item list-group-item-primary py-3" *ngIf="isNew" (click)="createAsNew()">
                     Maak nieuw profiel:
 
                     <div class="ms-3">

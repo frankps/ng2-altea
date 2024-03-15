@@ -5,7 +5,7 @@ import { BranchService, ObjectService, ResourceService, ScheduleService, Templat
 import { CheckDeposists } from 'ts-altea-logic';
 import { TranslationService } from 'ng-common'
 import { Country } from 'ts-altea-model'
-import { Translation } from 'ts-common';
+import { ObjectHelper, Translation } from 'ts-common';
 import { HttpClient } from '@angular/common/http'; 
 
 // Volgnummer;Uitvoeringsdatum;Valutadatum;Bedrag;Valuta rekening;Rekeningnummer;Type verrichting;Tegenpartij;Naam van de tegenpartij;
@@ -31,6 +31,9 @@ export class DemoComponent {
 
 
   fileText: string;
+
+
+  giftCode: string
 
   constructor(private http: HttpClient, public dbSvc: ObjectService, protected translationSvc: TranslationService, protected backEndSvc: ObjectService
     , protected userSvc: UserService, protected resourceSvc: ResourceService, protected anySvc: ScheduleService) {
@@ -60,6 +63,12 @@ export class DemoComponent {
     this.http.get('\Macintosh HD/Users/frankpaepens/code/altea/interface files/fortis download.csv', { responseType: 'text' }).subscribe(data => { 
       console.log(data); 
     }); 
+
+  }
+
+  createGiftCode() {
+
+    this.giftCode = ObjectHelper.createRandomString(6, "ABCDEFGHJKLMNPQRSTUVWXYZ23456789")
 
   }
 

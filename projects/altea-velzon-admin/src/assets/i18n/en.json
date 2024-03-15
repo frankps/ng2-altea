@@ -206,7 +206,7 @@
     },
     "resource-type": {
       "human": "Personeel",
-      "room": "Ruimte",
+      "location": "Locatie",
       "device": "Toestel",
       "group": "Groep",
       "branch": "Branch"
@@ -338,6 +338,7 @@
     "order-mgr": {
       "pos": {
         "menu": {
+          "start": "Start",
           "compose": "Samenstellen",
           "plan": "Plannen",
           "contact": "Klant",
@@ -863,7 +864,7 @@
       "sub": {
         "human": "Personeel",
         "device": "Toestellen",
-        "room": "Ruimtes",
+        "location": "Locaties",
         "group": "Groepen",
         "branch": "Afdelingen"
       }

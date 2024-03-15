@@ -28,8 +28,6 @@ export class ObjectChange<T extends ObjectWithId> {
   obj(): T {
     return this.object as T
   }
-
-
 }
 
 
@@ -65,7 +63,7 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
           resolve(res)
 
         })
-        
+
       } catch (error) {
         throw error
       }
@@ -186,8 +184,6 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
     }
   }
 
-
-
   update$(object: any): Promise<ApiResult<T>> {
 
     const me = this
@@ -200,9 +196,6 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
 
     })
   }
-
-
-
 
   replaceIdWithConnectTo(object: any) {
 
@@ -381,13 +374,125 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
   async export(): Promise<T[]> {
 
     const query = new DbQuery()
-   // query.includes = ''.split(',')
+    // query.includes = ''.split(',')
     query.take = 1000
 
     const objects = await this.query$(query)
 
     return objects
   }
+
+  /**  Generic caching algorithm
+   * 
+   */
+
+  cache: T[]
+  cacheQuery: DbQuery
+
+  async initCache() {
+
+    //this.cacheQuery = cacheQuery
+
+    console.error('Start init cache')
+
+
+    if (!this.loadCacheFromDisk())
+      this.refreshCacheFromServer(this.cacheQuery)
+
+
+  }
+
+  loadCacheFromDisk(): boolean {
+
+    let cacheString = localStorage.getItem(this.urlDifferentiator)
+
+    if (!cacheString)
+      return false
+
+    try {
+
+      //   const byteArray = this.str2ab(cacheString)
+      //   const json = '' // this.decompress(byteArray)
+      const json = cacheString
+      const objects = JSON.parse(json)
+      const typedData = objects.map(obj => plainToInstance(this.type, obj))
+
+      this.cache = typedData
+
+      return true
+    } catch (error) {
+
+      console.error(error)
+      return false
+
+    }
+
+
+
+  }
+
+
+  async refreshCacheFromServer(dbQuery: DbQuery) {
+
+    this.cache = await this.query$(dbQuery)
+
+    let json = JSON.stringify(this.cache)
+
+    let cacheString = json  // await this.compressToString(json)
+    localStorage.setItem(this.urlDifferentiator, cacheString)
+
+  }
+
+  async compressToString(
+    str: string,
+    encoding = 'gzip' as CompressionFormat
+  ): Promise<String> {
+
+    let res = await this.compress(str, encoding)
+
+    return this.ab2str(res)
+  }
+
+  async compress(
+    str: string,
+    encoding = 'gzip' as CompressionFormat
+  ): Promise<ArrayBuffer> {
+    const byteArray = new TextEncoder().encode(str)
+    const cs = new CompressionStream(encoding)
+    const writer = cs.writable.getWriter()
+    writer.write(byteArray)
+    writer.close()
+    return new Response(cs.readable).arrayBuffer()
+  }
+
+  async decompress(
+    byteArray: string[],
+    encoding = 'gzip' as CompressionFormat
+  ): Promise<string> {
+    const cs = new DecompressionStream(encoding)
+    const writer = cs.writable.getWriter()
+    writer.write(byteArray)
+    writer.close()
+    const arrayBuffer = await new Response(cs.readable).arrayBuffer()
+    //return arrayBuffer
+    return new TextDecoder().decode(arrayBuffer)
+  }
+
+  ab2str(buf): string {
+
+    return String.fromCharCode.apply(null, new Uint16Array(buf));
+  }
+  str2ab(str) {
+    var buf = new ArrayBuffer(str.length * 2); // 2 bytes for each char
+    var bufView = new Uint16Array(buf);
+    for (var i = 0, strLen = str.length; i < strLen; i++) {
+      bufView[i] = str.charCodeAt(i);
+    }
+    return buf;
+  }
+
+
+
 
 
 }

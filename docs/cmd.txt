@@ -3,6 +3,7 @@ Serve:
 
     ng serve altea-velzon-admin
     ng serve altea-pub-app --port 4300
+    ng serve altea-pub-app2 --port 4350
     ng serve dvit-gen --port 4400
 
 Deploy:
@@ -74,7 +75,9 @@ ng generate service messaging --project ng-altea-common
 ng generate component resource/resourceUserLink --project altea-velzon-admin
 
 
-ng generate application dvitGen --style=scss --routing=true
+ng generate application altea-pub-app2 --style=scss --routing=true
+
+
 ng generate component ngbs5 --project dvit-gen
 
 App project

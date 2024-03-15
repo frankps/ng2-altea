@@ -23,6 +23,16 @@ export class ProductService extends BackendHttpServiceBase<Product> {
   }
 
 
+  /*
+options:orderBy=idx.values:orderBy=idx
+options:orderBy=idx.values:orderBy=idx,resources.resource
+options:orderBy=idx.values:orderBy=idx', 'resources.resource', 'items'
+options:orderBy=idx.values:orderBy=idx
+  */
+
+
+
+
 
   getAllCategories(type?: ProductType, categoryId: string | null = null): Observable<Product[]> {
 

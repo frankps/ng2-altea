@@ -20,6 +20,11 @@
                    ]
                 },
                 {
+                    "idx": 2,
+                    "name": "name",
+                    "to": ""
+                },
+                {
                    "idx": 2,
                    "on": true,
                    "day": "tu",

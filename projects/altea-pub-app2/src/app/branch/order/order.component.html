@@ -1,0 +1,97 @@
+<!-- Mode: {{mode}} -->
+<!-- <div class="row">
+    <div class="col-4">{{orderMgrSvc.uiMode}}</div>
+    <div class="col-4"></div>
+    <div class="col-4"></div>
+</div> -->
+
+
+
+
+<ng-container [ngSwitch]="mode">
+
+    <ng-container *ngSwitchCase="'demo-orders'">
+
+        <order-mgr-demo-orders (new)="newDemoOrder()"></order-mgr-demo-orders>
+
+    </ng-container>
+
+    <ng-container *ngSwitchCase="'browse-catalog'">
+
+        <ngx-altea-browse-catalog></ngx-altea-browse-catalog>
+
+        <order-mgr-product-list (productSelected)="productSelected()"></order-mgr-product-list>
+
+    </ng-container>
+
+
+    <ng-container *ngSwitchCase="'order-line'">
+
+        <order-mgr-order-line (new)="newOrderLine()" (confirm)="closeOrderLine()"
+            (delete)="deleteOrderLine()" (back)="showCatalog()"></order-mgr-order-line>
+
+    </ng-container>
+
+    <ng-container *ngSwitchCase="'order'">
+
+        <order-mgr-order [showVat]="false" (orderLineSelected)="orderLineSelected($event)" (addProduct)="browseCatalog()" (continue)="orderFinished()"></order-mgr-order>
+
+    </ng-container>
+
+    <ng-container *ngSwitchCase="'staff-select'">
+
+        <order-mgr-staff-select (selected)="staffSelected($event)"></order-mgr-staff-select>
+
+    </ng-container>
+
+
+    <ng-container *ngSwitchCase="'person-select'">
+
+        <order-mgr-person-select (selected)="personsSelected()"></order-mgr-person-select>
+
+    </ng-container>  
+
+
+    <ng-container *ngSwitchCase="'select-date'">
+
+
+        <order-mgr-select-date (selected)="dateSelected($event)"></order-mgr-select-date>
+
+    </ng-container>
+
+    
+
+    <ng-container *ngSwitchCase="'select-time-slot'">
+<!--          -->
+        <order-mgr-select-time-slot (changeDate)="selectDate()" (selected)="timeSlotSelected($event)"></order-mgr-select-time-slot>
+
+    </ng-container>
+
+    <ng-container *ngSwitchCase="'contact-select'">
+        <order-mgr-contact-select2 (selected)="contactSelected($event)"></order-mgr-contact-select2>
+    </ng-container>
+    
+
+    <ng-container *ngSwitchCase="'pay-online'">
+
+        <app-pay-online></app-pay-online>
+
+    </ng-container>
+
+
+    <ng-container *ngSwitchCase="'request-invoice'">
+
+        <altea-lib-request-invoice></altea-lib-request-invoice>
+
+    </ng-container>
+
+
+    
+
+    <ng-container *ngSwitchCase="'default'">
+    </ng-container>
+
+
+    <ng-container *ngSwitchDefault>
+    </ng-container>
+</ng-container>

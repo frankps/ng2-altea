@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import { AppMode, AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, ConfirmOrderResponse, Contact, CreateCheckoutSession, DateBorder, Gift, GiftType, Order, OrderLine, OrderLineOption, OrderState, Payment, PaymentType, Product, ProductType, ProductTypeIcons, RedeemGift, ReservationOption, ReservationOptionSet, Resource, ResourcePlanning, ResourceType } from 'ts-altea-model'
 import { ApiListResult, ApiStatus, DateHelper, DbQuery, QueryOperator, Translation } from 'ts-common'
-import { AlteaService, ObjectService, OrderMgrService, OrderService, ProductService, ResourceService, SessionService } from 'ng-altea-common'
+import { AlteaService, GiftService, ObjectService, OrderMgrService, OrderService, ProductService, ResourceService, SessionService } from 'ng-altea-common'
 import * as _ from "lodash";
 import { NgxSpinnerService } from "ngx-spinner"
 import { DashboardService, ToastType } from 'ng-common';
@@ -81,7 +81,7 @@ export class OrderMgrUiService {
 
   constructor(private productSvc: ProductService, private orderSvc: OrderService, private orderMgrSvc: OrderMgrService
     , protected spinner: NgxSpinnerService, public dbSvc: ObjectService, protected alteaSvc: AlteaService, protected sessionSvc: SessionService,
-    public dashboardSvc: DashboardService, protected stripeSvc: StripeService, protected resourceSvc: ResourceService) {
+    public dashboardSvc: DashboardService, protected stripeSvc: StripeService, protected resourceSvc: ResourceService, protected giftSvc: GiftService ) {
 
     // this.alteaDb = new AlteaDb(dbSvc)
     // this.getAllCategories()
@@ -100,7 +100,7 @@ export class OrderMgrUiService {
 
     const resGift = await payProcessing.doGiftPayments(this.order.payments)
     console.warn(resGift)
-    
+
     //return res
   }
 
@@ -150,13 +150,24 @@ export class OrderMgrUiService {
     this.uiMode = uiMode
   }
 
-  newOrder(uiMode: OrderUiMode = OrderUiMode.newOrder) {
+  newOrder(uiMode: OrderUiMode = OrderUiMode.newOrder, gift?: Gift) {
 
     this.order = new Order(true)
     this.orderDirty = false
 
     this.order.branchId = this.sessionSvc.branchId
     this.uiMode = uiMode
+
+    if (gift) {
+      this.order.giftCode = gift.code
+      this.gift = gift
+    }
+
+
+    if (uiMode == OrderUiMode.newGift) {
+      this.order.gift = true
+    }
+      
 
   }
 
@@ -197,7 +208,6 @@ export class OrderMgrUiService {
     this.spinner.show()
 
     return new Promise<any>(function (resolve, reject) {
-
 
       me.productSvc.get(productId, 'options:orderBy=idx.values:orderBy=idx,resources.resource').subscribe(product => {
         // 
@@ -464,6 +474,8 @@ export class OrderMgrUiService {
 
     console.warn(this.order)
 
+    const newOrder = this.order.isNew()
+
     const res = await this.alteaSvc.orderMgmtService.saveOrder(this.order)
 
     console.error(res.object)
@@ -472,6 +484,24 @@ export class OrderMgrUiService {
     if (res.isOk) {
       this.refreshOrder(res.object)
       this.orderDirty = false
+
+      if (this.order.gift) {
+        
+        if (this.gift?.isNew()) {
+
+          this.gift.orderId = this.order.id
+          let giftRes = await this.giftSvc.create$(this.gift)
+
+          console.warn(giftRes)
+
+          if (giftRes.isOk) {
+            this.gift = giftRes.object
+          }
+
+        }
+      }
+
+
       this.dashboardSvc.showToastType(ToastType.saveSuccess)
     } else {
       this.dashboardSvc.showToastType(ToastType.saveError)
@@ -637,9 +667,9 @@ export class OrderMgrUiService {
     this.addOrderLine(orderLine)
   }
 
-  addOrderLine(orderLine: OrderLine, qty = 1) {
+  addOrderLine(orderLine: OrderLine, qty = 1, setUnitPrice = true) {
     // orderLine.orderId = this.order.id
-    this.order.addLine(orderLine)
+    this.order.addLine(orderLine, setUnitPrice)
     this.orderDirty = true
     this.orderLineIsNew = false
   }

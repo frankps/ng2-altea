@@ -27,8 +27,8 @@ export const MENU: MenuItem[] = [
       },
       {
         id: 23,
-        label: 'menu.resources.sub.room',
-        link: '/aqua/resources/room',
+        label: 'menu.resources.sub.location',
+        link: '/aqua/resources/location',
         parentId: 2
       },
       {

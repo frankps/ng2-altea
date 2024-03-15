@@ -61,19 +61,7 @@ export class AppComponent implements OnInit {
 
   async subscribeToNotifications() {
 
-    /*     
-        let customJson = new CustomJson()
-    
-        customJson.objId = this.authSvc.userId
-        customJson.type = 'user'
-        customJson.label = 'web-push-subscr'
-        customJson.json = { a: 'aaaa', b: 1 }
-        
-        const res = await this.customJsonSvc.create$(customJson)
-        console.warn(res)
-    
-        return 
-    */
+
 
     // https://blog.angular-university.io/angular-push-notifications/
 

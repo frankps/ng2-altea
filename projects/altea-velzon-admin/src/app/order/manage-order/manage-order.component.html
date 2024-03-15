@@ -2,16 +2,20 @@
     <div class="col d-flex justify-content-center">
 
         <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
-            <input type="radio" class="btn-check" name="menu" id="compose" value="compose" autocomplete="off" [(ngModel)]="menu">
+
+            <input type="radio" class="btn-check" name="menu" id="start" value="start" autocomplete="off" [(ngModel)]="mode">
+            <label class="btn btn-outline-primary" for="start" translate>ui.order-mgr.pos.menu.start</label>
+
+            <input type="radio" class="btn-check" name="menu" id="compose" value="compose" autocomplete="off" [(ngModel)]="mode">
             <label class="btn btn-outline-primary" for="compose" translate>ui.order-mgr.pos.menu.compose</label>
 
-            <input type="radio" class="btn-check" name="menu" id="plan" value="plan" autocomplete="off" [(ngModel)]="menu">
+            <input type="radio" class="btn-check" name="menu" id="plan" value="plan" autocomplete="off" [(ngModel)]="mode">
             <label class="btn btn-outline-primary" for="plan" translate>ui.order-mgr.pos.menu.plan</label>
 
-            <input type="radio" class="btn-check" name="menu" id="contact" value="contact" autocomplete="off" [(ngModel)]="menu">
+            <input type="radio" class="btn-check" name="menu" id="contact" value="contact" autocomplete="off" [(ngModel)]="mode">
             <label class="btn btn-outline-primary" for="contact" translate>ui.order-mgr.pos.menu.contact</label>
 
-            <input type="radio" class="btn-check" name="menu" id="pay" value="pay" autocomplete="off" [(ngModel)]="menu">
+            <input type="radio" class="btn-check" name="menu" id="pay" value="pay" autocomplete="off" [(ngModel)]="mode">
             <label class="btn btn-outline-primary" for="pay" translate>ui.order-mgr.pos.menu.pay</label>
 
         </div>
@@ -24,10 +28,42 @@
 
     <div class="col-8">
 
-        
+        <ng-container *ngIf="mode == 'start'">
+
+            <div class="row">
+
+                <div class="col-6">
+                    <altea-lib-main-menu [menu]="menu" (select)="menuClicked($event)"></altea-lib-main-menu>
+              
+                </div>
+                <div class="col-6">
 
 
-        <ng-container *ngIf="menu == 'compose'">
+                </div>
+            </div>
+
+        </ng-container> 
+
+        <ng-container *ngIf="mode == 'buyGift'">
+
+            <div class="row">
+
+                <div class="col-6">
+                    <altea-lib-request-gift (request)="newGift($event)"></altea-lib-request-gift>
+              
+                </div>
+                <div class="col-6">
+
+                    <order-mgr-contact-select></order-mgr-contact-select>
+                    <order-mgr-contact-select2></order-mgr-contact-select2>
+            
+                </div>
+            </div>
+
+        </ng-container> 
+
+
+        <ng-container *ngIf="mode == 'compose'">
 
             <div class="row">
 
@@ -39,6 +75,8 @@
               
                 </div>
                 <div class="col-6">
+
+                    
             
                     <order-mgr-order-line></order-mgr-order-line>
             
@@ -47,7 +85,7 @@
 
         </ng-container>
 
-        <ng-container *ngIf="menu == 'plan'">
+        <ng-container *ngIf="mode == 'plan'">
         
             <div class="row" *ngIf="orderMgrSvc.order.hasPlanningLines()">
 
@@ -64,24 +102,25 @@
         
         </ng-container>
 
-        <ng-container *ngIf="menu == 'contact'">
+        <ng-container *ngIf="mode == 'contact'">
         
             <div class="row">
 
                 <div class="col-6">
-                   
+                    <order-mgr-contact-select></order-mgr-contact-select>
               
                 </div>
                 <div class="col-6">
 
-                    <order-mgr-contact-select></order-mgr-contact-select>
+                    
+                    <order-mgr-contact-select2></order-mgr-contact-select2>
 
                 </div>
             </div>
         
         </ng-container>
 
-        <ng-container *ngIf="menu == 'pay'">
+        <ng-container *ngIf="mode == 'pay'">
         
             <div class="row">
 

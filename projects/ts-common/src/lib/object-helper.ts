@@ -66,6 +66,18 @@ export class ObjectHelper {
         });
     }
 
+    static createRandomString(length, chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789") {
+
+       // const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"  // "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        let result = "";
+        const randomArray = new Uint8Array(length);
+        crypto.getRandomValues(randomArray);
+        randomArray.forEach((number) => {
+            result += chars[number % chars.length];
+        });
+        return result;
+    }
+
 
     /**
      * Firestore can't save objects with properties that have the value undefined. This method will replace undefined by null.

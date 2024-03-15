@@ -16,6 +16,11 @@ export class ContactSelect2Component {
   @Output() selected: EventEmitter<Contact> = new EventEmitter<Contact>();
 
 	contact: Contact= new Contact()
+
+
+
+  isNew = true
+
 	css_cls_row= 'mt-3'
 	initialized= false
 	@ViewChild('contactForm')
@@ -70,16 +75,34 @@ sandra enghien
 
   async searchContact() {
 
-    this.contact.setName()  // to show correctly for new contact
+    let me = this
 
-    this.contacts = await this.contactSvc.search$(this.contact.first)
+    me.contact.setName()  // to show correctly for new contact
 
-    this.showContacts = true
+    me.contacts = await me.contactSvc.searchContacts$(me.contact)
 
+    console.log(me.contacts)
+
+    me.showContacts = true
+
+  }
+
+  async updateContact() {
+    let me = this
+
+    let res = await me.contactSvc.update$(me.contact)
+  }
+
+
+  contactsFound() {
+    return Array.isArray(this.contacts) && this.contacts.length > 0
   }
 
   selectContact(contact: Contact) {
 
+    this.contact = contact
+    this.isNew = false
+    this.showContacts = false
     console.log(contact)
 
     this.orderMgrSvc.setContact(contact)

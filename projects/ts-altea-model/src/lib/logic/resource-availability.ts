@@ -187,7 +187,7 @@ export class ResourceAvailability {
             then check if resource is available
             */
 
-            if (isPrepTime && resource.type == ResourceType.room) {   // 
+            if (isPrepTime && resource.type == ResourceType.location) {   // 
 
 
                 let activeSchedule = this.ctx.getScheduleOnDate(resource.id, dateRange.from)

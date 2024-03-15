@@ -13,7 +13,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { TimepickerModule } from 'ngx-bootstrap/timepicker';
 import { NgxSpinnerModule } from 'ngx-spinner';
-import { OrderMgrModule } from 'ng-altea-common';
+import { NgAlteaCommonModule, OrderMgrModule } from 'ng-altea-common';
 import { ManageOrderComponent } from './manage-order/manage-order.component';
 
 @NgModule({
@@ -31,6 +31,7 @@ import { ManageOrderComponent } from './manage-order/manage-order.component';
     ModalModule,
     TimepickerModule,
     NgxSpinnerModule,
+    NgAlteaCommonModule
    
   ],
 })

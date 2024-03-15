@@ -6,8 +6,7 @@ import { authGuard } from './auth/auth.guard';
 // import { SignInComponent } from './auth/sign-in/sign-in.component';
 
 const routes: Routes = [
- // { path: "", component: MenuComponent, canActivate: [ authGuard] },   // , canActivate: [ authGuard]
- // { path: "signIn", component: SignInComponent },
+
   { path: '', redirectTo: '/staff/dashboard', pathMatch: 'full' },
   { path: 'branch', loadChildren: () => import('./branch/branch.module').then(m => m.BranchModule)  },   // , canActivate: [ authGuard]
   { path: 'staff', loadChildren: () => import('./staff/staff.module').then(m => m.StaffModule), canActivate: [ authGuard]  },

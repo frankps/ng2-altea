@@ -220,14 +220,14 @@ export class ResourceAvailability2 {
                 availableResources.push(resource)
 
                 continue
-            }
+            }  
 
             /*
             If the schedule of the resource allows planning preparation blocks (not actual treatments) outside the schedule,
             then check if resource is available
             */
 
-            if (isPrepTime && resource.type == ResourceType.room) {   // 
+            if (isPrepTime && resource.type == ResourceType.location) {   // 
 
 
                 let activeSchedule = this.ctx.getScheduleOnDate(resource.id, dateRange.from)

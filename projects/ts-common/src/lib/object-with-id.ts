@@ -51,6 +51,9 @@ export abstract class ManagedObject {
   @Type(() => ObjectMgmt)
   m = new ObjectMgmt()
 
+  isNew() {
+    return (this.m?.n == true)
+  }
 
   markAsNew() {
     if (!this.m)

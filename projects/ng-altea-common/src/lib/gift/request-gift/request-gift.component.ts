@@ -1,8 +1,9 @@
 import { Component, Output, EventEmitter, OnInit } from '@angular/core';
-import { Branch, Gift, GiftVatPct } from 'ts-altea-model';
+import { Branch, Gift, GiftType, GiftVatPct, OrderLine } from 'ts-altea-model';
 import { TranslationService } from 'ng-common'
 import { SessionService } from '../../session.service';
 import * as _ from "lodash";
+import { OrderMgrUiService, OrderUiMode, OrderUiState } from '../../order-mgr';
 
 
 export class AppSettings {
@@ -19,7 +20,7 @@ export class RequestGiftComponent implements OnInit {
   @Output() request: EventEmitter<Gift> = new EventEmitter<Gift>()
 
   // branch: Branch
-  gift = new Gift()
+  gift 
 
   branch: Branch
 
@@ -31,10 +32,10 @@ export class RequestGiftComponent implements OnInit {
   /** translated labels */
   lbl = {} 
 
-  constructor(protected translationSvc: TranslationService, protected sessionSvc: SessionService) {
+  constructor(protected translationSvc: TranslationService, protected sessionSvc: SessionService, protected orderMgrSvc: OrderMgrUiService,) {
    
    
-    this.setTestData()
+    
 
   }
 
@@ -57,6 +58,12 @@ export class RequestGiftComponent implements OnInit {
   async ngOnInit() {
 
     this.branch = await this.sessionSvc.branch$()
+
+
+    this.gift = new Gift(true)
+    this.gift.branchId = this.branch.id
+
+    this.setTestData()
 
     // retrieve possible vat percentages for gifts (in case amount + invoice)
     if (Array.isArray(this.branch.gift.invoice.vatPcts) && this.branch.gift.invoice.vatPcts.length > 0) {
@@ -94,8 +101,27 @@ export class RequestGiftComponent implements OnInit {
 
   buttonNext() {
 
+    this.initGift(this.gift)
+
     this.request.emit(this.gift)
     console.warn(this.gift)
+  }
+
+  initGift(gift: Gift) {
+
+    gift.newCode()
+
+    this.orderMgrSvc.newOrder(OrderUiMode.newGift,gift)
+
+
+
+    if (gift.type == GiftType.amount) {
+
+      const orderLine = OrderLine.custom('Cadeaubon', gift.value, gift.vatPct)
+      let setUnitPrice = false // because this is a custom price
+      this.orderMgrSvc.addOrderLine(orderLine, 1, setUnitPrice)
+    }
+
   }
 
 

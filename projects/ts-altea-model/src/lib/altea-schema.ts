@@ -1491,12 +1491,7 @@ export class Branch extends ObjectWithId {
 
     console.error(term)
     console.warn(this?.depositTerms)
-
-
   }
-
-
-
 
 }
 
@@ -1505,7 +1500,7 @@ export enum ResourceType {
   human = 'human',
 
   // do NOT use anymore, use location instead!
-  room = 'room',
+  //room = 'room',
   location = 'location',
   device = 'device',
   //  group = 'group',
@@ -1536,8 +1531,8 @@ export class Resource extends ObjectWithId {
   @Type(() => ProductResource)
   products?: ProductResource[];
 
-/*   @Type(() => Scheduling)
-  scheduling?: Scheduling[]; */
+  /*   @Type(() => Scheduling)
+    scheduling?: Scheduling[]; */
 
   @Type(() => Schedule)
   schedules?: Schedule[];
@@ -1596,7 +1591,7 @@ export class Resource extends ObjectWithId {
   }
 
   canChangeQty(): boolean {
-    return (this.type == ResourceType.device || this.type == ResourceType.room)
+    return (this.type == ResourceType.device || this.type == ResourceType.location)
   }
 
 
@@ -2196,6 +2191,7 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
     return DateHelper.parse(this.start)
   }
 
+
   depositByDate(): Date {
     return dateFns.addMinutes(this.createdAt, this.depositMins)
   }
@@ -2288,12 +2284,14 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
 
   }
 
-  addLine(orderLine: OrderLine) {
+  addLine(orderLine: OrderLine, setUnitPrice = true) {
 
     if (!this.lines)
       this.lines = []
 
-    orderLine.setUnitPrice()
+    if (setUnitPrice)
+      orderLine.setUnitPrice()
+
     this.lines.push(orderLine)
 
     orderLine.markAsNew()
@@ -3683,8 +3681,8 @@ export enum GiftType {
   // none = 'none', // when nothing is selected yet
   amount = 'amount',
   specific = 'specific',
-  prod = 'prod',
-  svc = 'svc'
+  /*   prod = 'prod',
+    svc = 'svc' */
 }
 
 export enum GiftCertificate {
@@ -3825,6 +3823,13 @@ export class Gift extends ObjectWithId {
   updatedAt?: Date
   deletedAt?: Date
 
+  constructor(markAsNew = false) {
+    super()
+
+    if (markAsNew)
+      this.m.n = true
+  }
+
   isAmount() {
     return this.type == GiftType.amount
   }
@@ -3838,8 +3843,8 @@ export class Gift extends ObjectWithId {
     if (!this.active)
       return new CanUseGift(false, 0, CanUseGiftMsg.notActive)
 
-/*     if (this.isConsumed)
-      return new CanUseGift(false, 0, CanUseGiftMsg.alreadyConsumed, `isConsumed=true`) */
+    /*     if (this.isConsumed)
+          return new CanUseGift(false, 0, CanUseGiftMsg.alreadyConsumed, `isConsumed=true`) */
 
     let available = this.availableAmount()
 
@@ -3853,6 +3858,10 @@ export class Gift extends ObjectWithId {
       return new CanUseGift(true, amount, CanUseGiftMsg.partialAmount)
     }
 
+  }
+
+  newCode() {
+    this.code = ObjectHelper.createRandomString(6, "ABCDEFGHJKLMNPQRSTUVWXYZ23456789")
   }
 
   use(amount: number) {
