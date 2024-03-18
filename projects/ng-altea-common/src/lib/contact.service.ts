@@ -14,6 +14,21 @@ export class ContactService extends BackendHttpServiceBase<Contact> {
     super(Contact, sessionSvc.backend, sessionSvc.branchUnique + '/contacts', http)
   }
 
+  async searchByString$(searchFor: string): Promise<Contact[]> {
+
+    let query = new DbQuery()
+
+    
+      query.and('name', QueryOperator.contains, searchFor)
+
+  /*   if (contact.last)
+      query.and('last', QueryOperator.contains, contact.last)
+ */
+
+    return this.query$(query)
+
+
+  }
 
   async searchContacts$(contact: Contact): Promise<Contact[]> {
 

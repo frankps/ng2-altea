@@ -20,4 +20,4 @@ export interface IDb {
     saveOrder$(order: Order): Promise<ApiResult<Order>>
     sendMessage$(message: Message): Promise<ApiResult<Message>>
 
-}
+}  

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter, OnInit } from '@angular/core';
 import { ContactService } from 'ng-altea-common';
 import { Contact } from 'ts-altea-model';
 import { OrderMgrUiService } from '../order-mgr-ui.service';
@@ -14,6 +14,8 @@ export class ContactSelectComponent {
   search: string = ''
   contacts: Contact[]
 
+  @Output() select: EventEmitter<Contact> = new EventEmitter<Contact>();
+
   constructor(private contactSvc: ContactService, protected orderMgrSvc: OrderMgrUiService) {
 
   }
@@ -22,7 +24,7 @@ export class ContactSelectComponent {
 
     console.error(this.search)
 
-    this.contacts = await this.contactSvc.search$(this.search)
+    this.contacts = await this.contactSvc.searchByString$(this.search)
 
     console.log(this.contacts)
   }
@@ -32,6 +34,7 @@ export class ContactSelectComponent {
     console.log(contact)
 
     this.orderMgrSvc.setContact(contact)
+    this.select.emit(contact)
 
   }
 

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core'
+import { Component, OnInit, ViewChild, Output, EventEmitter, Input } from '@angular/core'
 import { NgForm } from '@angular/forms'
 import { Branch, Contact, Country } from 'ts-altea-model'
 import { TranslationService } from 'ng-common'
@@ -15,8 +15,17 @@ export class ContactSelect2Component {
 
   @Output() selected: EventEmitter<Contact> = new EventEmitter<Contact>();
 
-	contact: Contact= new Contact()
+  _contact: Contact= new Contact()
 
+
+	@Input() set contact(value: Contact) {
+    this._contact = value
+    this.isNew = false
+  }
+
+  get contact() {
+    return this._contact
+  }
 
 
   isNew = true

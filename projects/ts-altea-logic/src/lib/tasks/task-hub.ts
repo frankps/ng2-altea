@@ -1,13 +1,13 @@
 import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, OrderTemplate, Branch } from 'ts-altea-model'
 import { AlteaDb } from '../general/altea-db'
 import { IDb } from '../interfaces/i-db'
-import { OrderMessaging } from '../order/messaging/order-messaging'
+import { OrderMessagingBase } from '../order/messaging/order-messaging-base'
 
 
 export class TaskHub {
 
     alteaDb: AlteaDb
-    private messagingTasks: OrderMessaging
+    private messagingTasks: OrderMessagingBase
 
     constructor(db: IDb | AlteaDb) {
 
@@ -18,10 +18,10 @@ export class TaskHub {
     }
 
 
-    get MessagingTasks(): OrderMessaging {
+    get MessagingTasks(): OrderMessagingBase {
 
         if (!this.messagingTasks)
-            this.messagingTasks = new OrderMessaging(this.alteaDb)
+            this.messagingTasks = new OrderMessagingBase(this.alteaDb)
 
         return this.messagingTasks
     }

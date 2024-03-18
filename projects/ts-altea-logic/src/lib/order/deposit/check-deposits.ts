@@ -7,7 +7,7 @@ import { IDb } from '../../interfaces/i-db'
 import * as dateFns from 'date-fns'
 import * as Handlebars from "handlebars"
 import * as _ from "lodash"
-import { OrderMessaging } from '../messaging/order-messaging'
+import { OrderMessagingBase } from '../messaging/order-messaging-base'
 import { TaskHub } from '../../tasks/task-hub'
 
 export class CheckDeposists {

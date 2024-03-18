@@ -1,7 +1,7 @@
 import { AfterContentChecked, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { AvailabilityContext, AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Order, PossibleSlots, ReservationOptionSet, ResourceAvailability, ResourceAvailability2, ResourcePlanning, ResourceRequest, Schedule, SlotInfo, Solution, SolutionSet } from 'ts-altea-model';
 import * as _ from "lodash"
-import { AlteaService, OrderService, ResourcePlanningService } from 'ng-altea-common';
+import { AlteaService, OrderMgrUiService, OrderService, ResourcePlanningService } from 'ng-altea-common';
 import { DbQuery, QueryOperator } from 'ts-common';
 import * as dateFns from 'date-fns'
 
@@ -77,7 +77,8 @@ export class DebugAvailabilityComponent implements OnInit {
 
   }
 
-  constructor(protected alteaSvc: AlteaService, protected planSvc: ResourcePlanningService, protected orderSvc: OrderService) {
+  constructor(protected alteaSvc: AlteaService, protected planSvc: ResourcePlanningService, protected orderSvc: OrderService,
+    protected mgrUiSvc: OrderMgrUiService) {
 
   }
   /* 
@@ -94,6 +95,15 @@ export class DebugAvailabilityComponent implements OnInit {
     console.error(this.branchSchedules)
   }
 
+  async testMessaging() {
+
+    console.warn('testMessaging')
+    //return
+
+    const res = await this.alteaSvc.orderMessaging.doMessaging(this.mgrUiSvc.order)
+
+    console.warn(res)
+  }
 
   async deleteTestData() {
 

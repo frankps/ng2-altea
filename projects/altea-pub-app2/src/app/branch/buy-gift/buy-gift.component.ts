@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Gift, GiftType, OrderLine } from 'ts-altea-model';
+import { Gift, GiftType, Order, OrderLine } from 'ts-altea-model';
 import { OrderMgrUiService, OrderUiMode, OrderUiState } from 'ng-altea-common';
 import { SessionService } from 'ng-altea-common';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -39,7 +39,9 @@ export class BuyGiftComponent {
       this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'order'])
     } */
 
-    ObjectHelper.newGuid
+    let o: Order
+    o.paid
+  
   }
 
 

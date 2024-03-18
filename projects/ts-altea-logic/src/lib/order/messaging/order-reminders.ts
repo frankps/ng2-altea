@@ -1,20 +1,20 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ApiListResult, ApiResult, ApiStatus, DateHelper, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
-import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, Reminder } from 'ts-altea-model'
+import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import * as dateFns from 'date-fns'
 import * as Handlebars from "handlebars"
 import * as _ from "lodash"
 import { AlteaDb } from '../../general/altea-db'
 import { IDb } from '../../interfaces/i-db'
-import { OrderMessaging } from './order-messaging'
+import { OrderMessagingBase } from './order-messaging-base'
 
 
 export class OrderReminders {
 
 
     alteaDb: AlteaDb
-    orderMessaging: OrderMessaging
+    orderMessaging: OrderMessagingBase
 
     constructor(db: IDb | AlteaDb) {
 
@@ -23,10 +23,10 @@ export class OrderReminders {
         else
             this.alteaDb = new AlteaDb(db)
 
-        this.orderMessaging = new OrderMessaging(this.alteaDb)
+        this.orderMessaging = new OrderMessagingBase(this.alteaDb)
     }
 
-
+/*
     doReminders(order: Order, branch: Branch, reminderTemplates: Template[]) {
 
         if (!order.start || !Array.isArray(branch.reminders) || branch.reminders.length == 0) {
@@ -42,7 +42,7 @@ export class OrderReminders {
 
         const now = new Date()
 
-        let reminders = branch.reminders.map(reminderConfig => reminderConfig.toReminder(startDate))
+        let reminders = branch.reminders.map(reminderConfig => reminderConfig.toMsgInfo(startDate))
         reminders = _.orderBy(reminders, 'date')
 
         let remindersToSent = reminders.filter(r => r.date < now)
@@ -62,7 +62,6 @@ export class OrderReminders {
 
                 if (template)
                     this.orderMessaging.createMessage(reminder.type, template, order, branch)
-
 
                 order.remindLog.push(reminder)
             }
@@ -89,7 +88,7 @@ export class OrderReminders {
         this.alteaDb.saveOrder(order)
     }
 
-    remindersNotYetSent(reminders: Reminder[], alreadySent: Reminder[]): Reminder[] {
+    remindersNotYetSent(reminders: MsgInfo[], alreadySent: MsgInfo[]): MsgInfo[] {
 
         if (!Array.isArray(reminders) || reminders.length == 0)
             return []
@@ -101,5 +100,6 @@ export class OrderReminders {
 
         return notYetSent
     }
+    */
 
 }

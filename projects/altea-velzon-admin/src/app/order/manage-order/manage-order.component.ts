@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrderMgrUiService, BrowseCatalogComponent } from 'ng-altea-common';
 import { DashboardService, NgBaseComponent } from 'ng-common';
+import { ContactSelect2Component } from 'projects/ng-altea-common/src/lib/order-mgr/contact-select2/contact-select2.component';
 import { Observable, take, takeUntil } from 'rxjs';
-import { Gift } from 'ts-altea-model';
+import { Contact, Gift } from 'ts-altea-model';
 
 
 
@@ -24,6 +25,8 @@ export enum PosOrderMenuItem {
   styleUrls: ['./manage-order.component.scss'],
 })
 export class ManageOrderComponent extends NgBaseComponent {
+
+  @ViewChild('editContact') public editContact: ContactSelect2Component;
 
   menu = [
 
@@ -109,6 +112,13 @@ export class ManageOrderComponent extends NgBaseComponent {
 
 
 
+
+  }
+
+  contactSelected(contact: Contact) {
+    console.warn(contact)
+
+    this.editContact.contact = contact
 
   }
 

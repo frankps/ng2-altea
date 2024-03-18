@@ -1,5 +1,5 @@
 import { ApiListResult, ApiResult, ApiStatus, DateHelper, DbObject, DbObjectCreate, DbObjectMulti, DbObjectMultiCreate, DbQuery, DbQueryTyped, ObjectHelper, ObjectWithId, QueryOperator } from 'ts-common'
-import { Branch, Gift, Subscription, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template, OrderLine, BankTransaction } from 'ts-altea-model'
+import { Branch, Gift, Subscription, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template, OrderLine, BankTransaction, Message } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { IDb } from '../interfaces/i-db'
 
@@ -67,6 +67,20 @@ export class AlteaDb {
         return res
     }
 
+    async getBranch(branchId: string): Promise<Branch> {
+
+        if (!branchId)
+            return undefined
+
+        const qry = new DbQueryTyped<Branch>('branch', Branch)
+
+        qry.and('id', QueryOperator.equals, branchId)
+
+        const branch = await this.db.queryFirst$<Branch>(qry)
+
+        return branch
+    }
+
     async getBranches(branchIds: string[]): Promise<Branch[]> {
 
         if (!Array.isArray(branchIds) || branchIds.length == 0)
@@ -127,6 +141,23 @@ export class AlteaDb {
         const templates = await this.db.query$<Template>(qry)
 
         return templates
+    }
+
+
+    async getMessages(branchId: string, orderId: string, code: string, fields?: string[]): Promise<Message[]> {
+
+        const qry = new DbQueryTyped<Message>('message', Message)
+
+        if (fields)
+            qry.select(...fields)
+        
+        qry.and('branchId', QueryOperator.equals, branchId)
+        qry.and('orderId', QueryOperator.equals, orderId)
+        qry.and('code', QueryOperator.equals, code)
+
+        const messages = await this.db.query$<Message>(qry)
+
+        return messages
     }
 
 

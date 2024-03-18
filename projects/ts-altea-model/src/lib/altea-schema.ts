@@ -1233,12 +1233,23 @@ export class IEmail {
   body?: string
 }
 
+export enum MessageState {
+  notSent,
+  error,
+  sent
+} 
+
 export class Message extends ObjectWithId implements IEmail {
 
   branchId?: string
   orderId?: string
 
   type: MsgType = MsgType.email
+
+//  tags: string[] = []
+  code?: string
+
+  sent?: number  // yyyyMMddhhmmss
 
   from?: string
   to: string[] = []
@@ -1247,6 +1258,25 @@ export class Message extends ObjectWithId implements IEmail {
 
   subject?: string
   body?: string
+
+  log?: string
+  state?: MessageState.notSent
+
+  
+  sentDate(): Date | null {
+
+    if (!this.sent)
+      return null
+
+    const date = DateHelper.parse(this.sent)
+    return date
+  }
+
+  sentAt(value: Date) {
+    this.sent = DateHelper.yyyyMMddhhmmss(value)
+  } 
+
+
 
 }
 
@@ -1261,16 +1291,16 @@ export class ReminderConfig {
     return TimeUnitHelper.numberOfSeconds(this.unit) * this.dur
   }
 
-  toReminder(appointmentDate: Date): Reminder {
+  toMsgInfo(appointmentDate: Date): MsgInfo {
     const seconds = this.seconds()
     const remindeOn = dateFns.addSeconds(appointmentDate, -seconds)
 
-    const reminder = new Reminder(remindeOn, this.type)
+    const reminder = new MsgInfo(remindeOn, this.type, 'reminder')
     return reminder
   }
 }
 
-export class Reminder {
+export class MsgInfo {
 
   @Exclude()
   date: Date
@@ -1278,12 +1308,16 @@ export class Reminder {
   on: number
 
   type: MsgType
+  code?: string
 
-  constructor(date: Date, type: MsgType = MsgType.email) {
+  //tags: string[]
+
+  constructor(date: Date, type: MsgType = MsgType.email, code?: string) {  // ...tags: string[]
 
     this.date = date
     this.on = DateHelper.yyyyMMddhhmmss(date)
     this.type = type
+    this.code = code
 
   }
 }
@@ -1412,8 +1446,10 @@ export class Branch extends ObjectWithId {
   /** default deposit percentage, can be overruled on product & contact level */
   depositPct?: number
 
+  @Type(() => DepositTerm)
   depositTerms?: DepositTerm[]
 
+  @Type(() => ReminderConfig)
   reminders?: ReminderConfig[]
 
   /** this branch uses the gift functionality */
@@ -2160,9 +2196,17 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
   /** messaging (email,sms) to customer enabled */
   msg = true
 
-  remindOn?: number  // format: yyyyMMddHHmmss
+  msgOn?: number
+  msgCode?: string 
 
-  remindLog?: Reminder[]
+  //msgLog: MsgInfo[] = []
+
+  // to remove: use msgOn, msgLog
+  /*
+  remindOn?: number  // format: yyyyMMddHHmmss
+  remindLog?: MsgInfo[]
+*/
+
 
   active = true;
   deleted = false;
@@ -2225,7 +2269,8 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
     if (!this.hasLines())
       return false
 
-    return this.lines.findIndex(l => l.product.type == ProductType.svc) >= 0
+
+    return this.lines.findIndex(l => l.product?.type == ProductType.svc) >= 0
   }
 
   nrOfLines(): number {
@@ -2301,6 +2346,9 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
   }
 
   calculateAll() {
+
+    console.warn('calculateAll')
+
     this.makeLineTotals()
     this.calculateVat()
   }
@@ -2365,23 +2413,24 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
     if (!this.lines)
       return 0
 
-    let incl = 0
+    let incl = 0, excl = 0
 
     for (const line of this.lines) {
 
-      const lineIncl = line.qty * line.unit
-
-      if (lineIncl != line.incl) {
-        line.incl = lineIncl
-        line.markAsUpdated('incl')
-      }
+      line.calculateInclThenExcl()
 
       incl += line.incl
+      excl += line.excl
     }
 
     if (incl != this.incl) {
       this.incl = incl
       this.markAsUpdated('incl')
+    }
+
+    if (excl != this.excl) {
+      this.excl = excl
+      this.markAsUpdated('excl')
     }
 
     return this.incl
@@ -2853,6 +2902,7 @@ export class OrderLine extends ObjectWithId {
   order?: Order;
   orderId?: string;
 
+  /** custom orderlines (such as gifts) may have no associated products */
   @Type(() => Product)
   product?: Product;
   productId?: string
@@ -2965,7 +3015,7 @@ export class OrderLine extends ObjectWithId {
     line.unit = unit
     line.vatPct = vatPct
 
-    line.calculateInclExcl()
+    line.calculateInclThenExcl()
 
     return line
 
@@ -3005,11 +3055,31 @@ export class OrderLine extends ObjectWithId {
 
   calculateAll() {
     this.setUnitPrice()
-    this.calculateInclExcl()
+    this.calculateInclThenExcl()
   }
 
-  calculateInclExcl() {
+  /**
+   * 
+   * @returns this.incl
+   */
+  calculateInclThenExcl(): number {
+
+    const previousIncl = this.incl
+    const previousExcl = this.excl
+
     this.incl = this.unit * this.qty
+
+    if (this.vatPct) {
+      const vatFactor = (1 + this.vatPct / 100)
+      this.excl = this.incl / vatFactor
+    } else
+      this.excl = this.incl
+
+
+    if (previousIncl != this.incl) this.markAsUpdated('incl')
+    if (previousExcl != this.excl) this.markAsUpdated('excl')
+
+    return this.incl
   }
 
   setUnitPrice() {
@@ -3656,6 +3726,7 @@ export class Template extends ObjectWithId {
 
     message.branchId = order.branchId
     message.orderId = order.id
+    message.code = this.code
 
     const replacements = { name: "Nils", info: "baby giraffe" }
 
@@ -3713,7 +3784,7 @@ export class GiftLine {
   pId?: string
 
   /** options */
-  @Type(() => GiftLineOption)
+  @Type(() => GiftLineOption)  
   opts: GiftLineOption[] = []
 
   descr?: string

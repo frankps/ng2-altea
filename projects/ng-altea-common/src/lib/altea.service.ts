@@ -3,6 +3,7 @@ import { AlteaDb, AvailabilityService, OrderMgmtService } from 'ts-altea-logic';
 import { ObjectService } from './object.service';
 import { SessionService } from './session.service';
 import { SubscriptionMgmtService } from 'projects/ts-altea-logic/src/lib/subscription/subscription-mgmt-service';
+import { OrderMessaging } from 'projects/ts-altea-logic/src/lib/order/messaging/order-messaging';
 
 @Injectable({
   providedIn: 'root'
@@ -50,5 +51,13 @@ export class AlteaService {
     return this._subscriptionMgmtService
   }
 
+  _orderMessaging?: OrderMessaging
 
+  get orderMessaging(): OrderMessaging {
+
+    if (!this._orderMessaging)
+      this._orderMessaging = new OrderMessaging(this.objSvc)
+
+    return this._orderMessaging
+  }
 }

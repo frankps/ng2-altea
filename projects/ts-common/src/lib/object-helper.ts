@@ -1,5 +1,12 @@
 import { plainToClass, instanceToPlain } from "class-transformer"
 
+
+export class ArrayHelper {
+    static ContainsAtLeastOneItem(array: any): boolean {
+        return (Array.isArray(array) && array.length > 0)
+    }
+}
+
 export class ObjectHelper {
 
     /**
@@ -68,7 +75,7 @@ export class ObjectHelper {
 
     static createRandomString(length, chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789") {
 
-       // const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"  // "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        // const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"  // "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         let result = "";
         const randomArray = new Uint8Array(length);
         crypto.getRandomValues(randomArray);
