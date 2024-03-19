@@ -727,7 +727,7 @@ export class Product extends ObjectWithId {
   vatPct = 0
   branches?: string[];
 
-  depositPct = 0
+  depositPct?
 
   personSelect = true  // if order is for multiple persons, then customer can specify for each orderLine the person
   staffSelect = true  // customer can specify which staffmember 
@@ -741,6 +741,8 @@ export class Product extends ObjectWithId {
   salesPrice = 0
 
   advPricing = false
+
+
 
 
   getIcon(): string {
@@ -1237,7 +1239,7 @@ export enum MessageState {
   notSent,
   error,
   sent
-} 
+}
 
 export class Message extends ObjectWithId implements IEmail {
 
@@ -1246,7 +1248,7 @@ export class Message extends ObjectWithId implements IEmail {
 
   type: MsgType = MsgType.email
 
-//  tags: string[] = []
+  //  tags: string[] = []
   code?: string
 
   sent?: number  // yyyyMMddhhmmss
@@ -1262,7 +1264,7 @@ export class Message extends ObjectWithId implements IEmail {
   log?: string
   state?: MessageState.notSent
 
-  
+
   sentDate(): Date | null {
 
     if (!this.sent)
@@ -1274,7 +1276,7 @@ export class Message extends ObjectWithId implements IEmail {
 
   sentAt(value: Date) {
     this.sent = DateHelper.yyyyMMddhhmmss(value)
-  } 
+  }
 
 
 
@@ -2197,7 +2199,7 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
   msg = true
 
   msgOn?: number
-  msgCode?: string 
+  msgCode?: string
 
   //msgLog: MsgInfo[] = []
 
@@ -2236,6 +2238,7 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
   }
 
 
+
   depositByDate(): Date {
     return dateFns.addMinutes(this.createdAt, this.depositMins)
   }
@@ -2255,6 +2258,15 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
 
   isEmpty(): boolean {
     return !this.hasLines()
+  }
+
+  hasServices(): boolean {
+    if (!this.hasLines())
+      return false
+
+    const firstSvc = this.lines.findIndex(l => l.product?.type == ProductType.svc)
+
+    return firstSvc >= 0
   }
 
   hasPersons(): boolean {
@@ -2351,9 +2363,52 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
 
     this.makeLineTotals()
     this.calculateVat()
+    this.calculateDeposit()
+
   }
 
 
+  calculateDeposit(): number {
+
+    if (!this.hasLines())
+      return 0
+
+    if (!this.branch)
+      throw new Error('branch not found on order (order.branch missing)!')
+
+    if (this.gift)
+      return this.incl
+
+    const defaultDepositPct = this.branch.depositPct ?? 0
+
+    let deposit = 0
+
+    for (let line of this.lines) {
+
+      let depositPct = 100
+
+      if (line?.product?.type == ProductType.svc)
+        depositPct = line?.product?.depositPct ?? defaultDepositPct
+
+      if (depositPct == 0)
+        continue
+
+      depositPct = depositPct / 100
+
+      let depositValue = line.incl * depositPct
+      deposit += depositValue
+    }
+
+    deposit = Math.round(deposit)
+
+
+    if (deposit != this.deposit) {
+      this.deposit = deposit
+      this.markAsUpdated('deposit')
+    }
+
+    return deposit
+  }
 
 
   hasVatLines(): boolean {
@@ -2392,9 +2447,10 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
       this.vatLines = calculatedVatLines
       this.markAsUpdated('vatLines')
     }
-
-
   }
+
+
+
 
   vatLinesSame(vatLinesA: VatLine[], vatLinesB: VatLine[]) {
 
@@ -2651,7 +2707,7 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
     if (this.gift || !this.hasLines())
       return false
 
-    const personSelectLines = this.lines?.filter(ol => ol.product?.personSelect)
+    const personSelectLines = this.lines?.filter(ol => ol.product?.type == ProductType.svc && ol.product?.personSelect)
 
     // ol.qty
     const total = _.sumBy(personSelectLines, 'qty')
@@ -3784,7 +3840,7 @@ export class GiftLine {
   pId?: string
 
   /** options */
-  @Type(() => GiftLineOption)  
+  @Type(() => GiftLineOption)
   opts: GiftLineOption[] = []
 
   descr?: string

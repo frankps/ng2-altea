@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
-import { Injectable } from '@angular/core';
+import { Injectable, OnInit } from '@angular/core';
 import { AppMode, AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, ConfirmOrderResponse, Contact, CreateCheckoutSession, DateBorder, Gift, GiftType, Order, OrderLine, OrderLineOption, OrderState, Payment, PaymentType, Product, ProductType, ProductTypeIcons, RedeemGift, ReservationOption, ReservationOptionSet, Resource, ResourcePlanning, ResourceType } from 'ts-altea-model'
 import { ApiListResult, ApiStatus, DateHelper, DbQuery, QueryOperator, Translation } from 'ts-common'
 import { AlteaService, GiftService, ObjectService, OrderMgrService, OrderService, ProductService, ResourceService, SessionService } from 'ng-altea-common'
@@ -27,7 +27,7 @@ export enum OrderUiMode {
 @Injectable({
   providedIn: 'root'
 })
-export class OrderMgrUiService {
+export class OrderMgrUiService  {   // implements OnInit
 
   //allCategories?: Product[] = []
 
@@ -56,7 +56,7 @@ export class OrderMgrUiService {
   orderLineIsNew = false
 
   orderDirty = false
-  order: Order = new Order(true)
+  order: Order
 
   /** when user is creating a new gift  */
   gift: Gift
@@ -81,7 +81,7 @@ export class OrderMgrUiService {
 
   constructor(private productSvc: ProductService, private orderSvc: OrderService, private orderMgrSvc: OrderMgrService
     , protected spinner: NgxSpinnerService, public dbSvc: ObjectService, protected alteaSvc: AlteaService, protected sessionSvc: SessionService,
-    public dashboardSvc: DashboardService, protected stripeSvc: StripeService, protected resourceSvc: ResourceService, protected giftSvc: GiftService ) {
+    public dashboardSvc: DashboardService, protected stripeSvc: StripeService, protected resourceSvc: ResourceService, protected giftSvc: GiftService) {
 
     // this.alteaDb = new AlteaDb(dbSvc)
     // this.getAllCategories()
@@ -89,6 +89,10 @@ export class OrderMgrUiService {
     this.autoCreateOrder()
 
   }
+/* 
+  async ngOnInit() {
+
+  } */
 
   async testPaymentProcessing() {
     // normally server side
@@ -150,12 +154,14 @@ export class OrderMgrUiService {
     this.uiMode = uiMode
   }
 
-  newOrder(uiMode: OrderUiMode = OrderUiMode.newOrder, gift?: Gift) {
+  async newOrder(uiMode: OrderUiMode = OrderUiMode.newOrder, gift?: Gift) {
 
     this.order = new Order(true)
     this.orderDirty = false
 
     this.order.branchId = this.sessionSvc.branchId
+    this.order.branch = await this.sessionSvc.branch$()
+
     this.uiMode = uiMode
 
     if (gift) {
@@ -167,7 +173,7 @@ export class OrderMgrUiService {
     if (uiMode == OrderUiMode.newGift) {
       this.order.gift = true
     }
-      
+
 
   }
 
@@ -187,7 +193,7 @@ export class OrderMgrUiService {
     // const pedicureId = "678f7000-5865-4d58-9d92-9a64193b48c4"
 
 
-    this.newOrder()
+    await this.newOrder()
 
 
 
@@ -328,6 +334,11 @@ export class OrderMgrUiService {
     this.orderSvc.get(orderId, "lines.planning.resource,lines.product,contact,payments").subscribe(order => {
 
       this.order = order
+
+      this.order.branch = this.sessionSvc.branch
+
+      if (!this.order.branch || order.branchId != order.branch.id)
+        throw new Error('Wrong branch on order!')
 
       this.orderLineOptions = null
       this.orderLine = null
@@ -486,7 +497,7 @@ export class OrderMgrUiService {
       this.orderDirty = false
 
       if (this.order.gift) {
-        
+
         if (this.gift?.isNew()) {
 
           this.gift.orderId = this.order.id

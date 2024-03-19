@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { ApiListResult, ApiResult, ApiStatus, DateHelper, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
+import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
 import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, ConfirmOrderResponse } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { AlteaDb } from '../general/altea-db'
@@ -62,23 +62,6 @@ export class OrderMgmtService {
         const result = await this.alteaDb.saveOrder(order)
 
         return result
-        /*
-        const templates = await this.alteaDb.getTemplates(order.branchId, newState)
-
-        console.warn(templates)
-
-        for (let template of templates) {
-
-            const msg = template.mergeWithOrder(order)
-            msg.from = 'info@aquasense.be'
-            msg.to = ['frank@dvit.eu']
-
-            console.error(msg)
-
-            const sendRes = await this.alteaDb.db.sendMessage$(msg)
-            console.warn(sendRes)
-
-        }*/
 
     }
 
@@ -191,6 +174,48 @@ export class OrderMgmtService {
 
         return plannings
     }
+
+
+    async calculateDeposit(order: Order): Promise<number> {
+
+        if (!order || !order.hasLines())
+            return 0
+
+
+        let branch = order.branch
+
+        if (!branch) {
+
+            if (!order.branchId)
+                throw new Error('order.branchId not specified')
+
+            branch = await this.alteaDb.getBranch(order.branchId)
+        }
+
+        if (!branch)
+            throw new Error('branch not found for order!')
+
+        const defaultDepositPct = branch.depositPct ?? 0
+
+        let deposit = 0
+
+        for (let line of order.lines) {
+
+            let depositPct = line?.product?.depositPct ?? defaultDepositPct
+
+            if (depositPct == 0)
+                continue
+
+            depositPct = depositPct / 100
+
+            let depositValue = line.incl * depositPct
+            deposit += depositValue
+        }
+
+        return deposit
+
+    }
+
 
 
 }

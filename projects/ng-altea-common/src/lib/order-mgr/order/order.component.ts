@@ -39,6 +39,7 @@ export class OrderComponent implements OnInit {
 
   humanResourcesChanged() {
 
+    this.order.m.setDirty('resPrefs')
     this.orderMgrSvc.orderDirty = true
 
   }

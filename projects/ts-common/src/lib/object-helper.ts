@@ -5,6 +5,10 @@ export class ArrayHelper {
     static ContainsAtLeastOneItem(array: any): boolean {
         return (Array.isArray(array) && array.length > 0)
     }
+
+    static IsEmpty(array: any): boolean {
+        return (!Array.isArray(array) || array.length == 0)
+    }
 }
 
 export class ObjectHelper {
