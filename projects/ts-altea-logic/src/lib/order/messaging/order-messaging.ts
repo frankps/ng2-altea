@@ -92,7 +92,7 @@ export class OrderMessaging extends OrderMessagingBase {
         /** first configure the next reminder (order.msgOn)  */
 
         const futureReminders = reminders.filter(r => r.date > now)
-        const futureRemindersExist = ArrayHelper.ContainsAtLeastOneItem(futureReminders)
+        const futureRemindersExist = ArrayHelper.AtLeastOneItem(futureReminders)
 
         if (futureRemindersExist) {
 
@@ -108,14 +108,14 @@ export class OrderMessaging extends OrderMessagingBase {
 
         let remindersToSent = reminders.filter(r => r.date < now)
 
-        if (!ArrayHelper.ContainsAtLeastOneItem(remindersToSent))
+        if (!ArrayHelper.AtLeastOneItem(remindersToSent))
             return new ApiResult<Order>(order, ApiStatus.ok, 'No reminders to sent!')
 
         const alreadySent = await this.alteaDb.getMessages(order.branchId, order.id, 'reminder')
 
         remindersToSent = this.messagesToSent(remindersToSent, alreadySent, 'reminder')
 
-        const remindersToSentExist = ArrayHelper.ContainsAtLeastOneItem(remindersToSent)
+        const remindersToSentExist = ArrayHelper.AtLeastOneItem(remindersToSent)
 
         if (!remindersToSentExist) {
 
@@ -177,7 +177,7 @@ export class OrderMessaging extends OrderMessagingBase {
             let toSendForType = relevantMessages.filter(m => m.type == type && m.date > lastSentOn)
 
 
-            if (ArrayHelper.ContainsAtLeastOneItem(toSendForType)) {
+            if (ArrayHelper.AtLeastOneItem(toSendForType)) {
                 const ordered = _.orderBy(toSendForType, 'date', 'desc')
                 toSend.push(ordered[0])
             }
@@ -195,7 +195,7 @@ export class OrderMessaging extends OrderMessagingBase {
         let alreadySentForType = alreadySent.filter(m => m.code == code && m.type == type)
         let lastSentOn = new Date(1900,0,1)
 
-       if (ArrayHelper.ContainsAtLeastOneItem(alreadySentForType)) {
+       if (ArrayHelper.AtLeastOneItem(alreadySentForType)) {
           alreadySentForType = _.orderBy(alreadySentForType, 'sent', 'desc')
           lastSentOn = alreadySentForType[0].sentDate()
        }

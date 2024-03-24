@@ -232,7 +232,7 @@ export class AlteaDb {
 
         qry.and('end', QueryOperator.greaterThanOrEqual, from)
         qry.and('start', QueryOperator.lessThanOrEqual, to)
-        qry.and('active', QueryOperator.equals, true)
+        qry.and('act', QueryOperator.equals, true)
         qry.and('resourceId', QueryOperator.in, resourceIds)
 
         const resourcePlannings = await this.db.query$<ResourcePlanning>(qry)
@@ -246,7 +246,7 @@ export class AlteaDb {
 
         const qry = new DbQueryTyped<Schedule>('schedule', Schedule)
 
-        qry.and('active', QueryOperator.equals, true)
+        qry.and('act', QueryOperator.equals, true)
 
         qry.or('resourceId', QueryOperator.in, resourceIds)
         // qry.or('default', QueryOperator.equals, true)
@@ -265,7 +265,7 @@ export class AlteaDb {
         const qry = new DbQueryTyped<Task>('task', Task)
 
         qry.and('schedule', QueryOperator.not, TaskSchedule.once)
-        qry.and('active', QueryOperator.equals, true)
+        qry.and('act', QueryOperator.equals, true)
 
 
         console.error(qry)

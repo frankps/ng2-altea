@@ -1,11 +1,11 @@
 import { Component, ViewChild } from '@angular/core';
 import { Contact, User } from 'ts-altea-model';
 import { SearchContactComponent } from '../../contact/search-contact/search-contact.component';
-import { BranchService, ObjectService, ResourceService, ScheduleService, TemplateService, UserService } from 'ng-altea-common';
+import { BranchService, ObjectService, ProductService, ResourceService, ScheduleService, TemplateService, UserService } from 'ng-altea-common';
 import { CheckDeposists } from 'ts-altea-logic';
 import { TranslationService } from 'ng-common'
 import { Country } from 'ts-altea-model'
-import { ObjectHelper, Translation } from 'ts-common';
+import { DbQuery, ObjectHelper, QueryOperator, Translation } from 'ts-common';
 import { HttpClient } from '@angular/common/http'; 
 
 // Volgnummer;Uitvoeringsdatum;Valutadatum;Bedrag;Valuta rekening;Rekeningnummer;Type verrichting;Tegenpartij;Naam van de tegenpartij;
@@ -36,12 +36,26 @@ export class DemoComponent {
   giftCode: string
 
   constructor(private http: HttpClient, public dbSvc: ObjectService, protected translationSvc: TranslationService, protected backEndSvc: ObjectService
-    , protected userSvc: UserService, protected resourceSvc: ResourceService, protected anySvc: ScheduleService) {
+    , protected userSvc: UserService, protected resourceSvc: ResourceService, protected anySvc: ScheduleService, protected productSvc: ProductService) {
 
     
 
   }
 
+  async filterProducts() {
+
+    console.error('filterProducts')
+
+   // await this.productSvc.refreshCacheFromServer(this.productSvc.cacheQuery)
+
+    let qry = new DbQuery()
+    qry.and('catId', QueryOperator.equals, null)  // '83c7a2b4-83b8-49af-adbb-cc107649f0c2'
+
+    let products = await this.productSvc.query$(qry)
+
+    console.error(products)
+
+  }
 
   async createUser() {
 
@@ -129,6 +143,9 @@ export class DemoComponent {
 
   }
 
+  async refreshCaches() {
+    await this.productSvc.loadFullCacheFromBackend()
+  }
 
 
   async export() {

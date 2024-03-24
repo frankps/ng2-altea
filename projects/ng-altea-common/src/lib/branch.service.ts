@@ -11,7 +11,7 @@ import { DbQuery } from 'ts-common';
 export class BranchService extends BackendHttpServiceBase<Branch> {
 
   constructor(http: HttpClient, protected sessionSvc: SessionService) {
-    super(Branch, sessionSvc.backend, sessionSvc.branchUnique + '/branches', http)
+    super(Branch, 'Branch', sessionSvc.backend, sessionSvc.branchUnique + '/branches', http)
   }
 
 

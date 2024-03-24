@@ -11,7 +11,7 @@ import { DbQuery, QueryOperator } from 'ts-common';
 export class ResourceService extends BackendHttpServiceBase<Resource> {
 
   constructor(http: HttpClient, protected sessionSvc: SessionService) {
-    super(Resource, sessionSvc.backend, sessionSvc.branchUnique + '/resources', http)
+    super(Resource, 'Resource', sessionSvc.backend, sessionSvc.branchUnique + '/resources', http)
   }
 
 
@@ -21,7 +21,7 @@ export class ResourceService extends BackendHttpServiceBase<Resource> {
 
     query.and('type', QueryOperator.equals, type)
     query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
-    query.and('active', QueryOperator.equals, true)
+    query.and('act', QueryOperator.equals, true)
 
     query.and('isGroup', QueryOperator.equals, isGroup)
 

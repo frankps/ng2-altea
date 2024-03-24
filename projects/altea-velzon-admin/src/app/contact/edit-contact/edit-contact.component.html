@@ -264,7 +264,7 @@
                         <a [routerLink]="['/', sessionSvc.branch.unique,'subscriptions',sub.id]">{{sub.name}} </a>
                     </div>
                     <div class="col-2 d-flex justify-content-center">{{sub.usedQty}}/{{sub.totalQty}}</div>
-                    <div class="col-2 d-flex justify-content-center">{{sub.createdAt | date: sessionSvc.formats.date}}
+                    <div class="col-2 d-flex justify-content-center">{{sub.crea | date: sessionSvc.formats.date}}
                     </div>
                     <div class="col-2 d-flex justify-content-center">{{sub.firstUsedOn | date: sessionSvc.formats.date}}
                     </div>

@@ -17,7 +17,7 @@ export class ObjectMgmt {
   u?: boolean
 
   /** removed ids from collections */
-  r?: { [collection: string] : string[] }
+  r?: { [collection: string]: string[] }
 
   /** updated fields=properties */
   f?: string[]
@@ -136,6 +136,20 @@ export abstract class ObjectWithId extends ManagedObject {
   }
 
   //   @Type(() => ObjectMgmt)
+
+}
+
+export abstract class ObjectWithIdPlus extends ObjectWithId {
+
+  /** object is active */
+  public act: boolean = true
+
+  /** object is deleted */
+  public del: boolean = false
+
+  /** last update performed on object (starting with creation and ending with soft delete => del=true) */
+  @Type(() => Date)
+  public upd: Date = new Date()
 
 }
 

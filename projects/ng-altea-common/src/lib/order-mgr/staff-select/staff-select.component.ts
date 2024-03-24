@@ -31,7 +31,7 @@ export class StaffSelectComponent implements OnInit {
     query.and('type', QueryOperator.equals, ResourceType.human)
     query.and('isGroup', QueryOperator.equals, false)
     query.and('online', QueryOperator.equals, true)
-    query.and('active', QueryOperator.equals, true)
+    query.and('act', QueryOperator.equals, true)
     query.orderBy('name')
 
     query.take = 20

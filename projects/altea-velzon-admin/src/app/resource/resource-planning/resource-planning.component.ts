@@ -75,8 +75,8 @@ export class ResourcePlanningComponent implements OnInit {
   //   this.start
   // }
 
-  constructor(public planningSvc: ResourcePlanningService, protected translationSvc: TranslationService, protected sessionSvc: SessionService, protected dashboardSvc: DashboardService) {
-
+  constructor(public planningSvc: ResourcePlanningService, protected translationSvc: TranslationService, protected sessionSvc: SessionService, protected dashboardSvc: DashboardService,
+    protected resourceSvc: ResourceService) {
 
 
   }
@@ -112,7 +112,7 @@ export class ResourcePlanningComponent implements OnInit {
     const query = new DbQuery()
     query.and('resourceId', QueryOperator.equals, resource.id)
     // query.and('type', QueryOperator.in, this.types)
-    // query.and('active', QueryOperator.equals, true)
+    // query.and('act', QueryOperator.equals, true)
     query.take = 200
     //query.select('id', 'catId', 'name', 'type')
 
@@ -179,18 +179,22 @@ export class ResourcePlanningComponent implements OnInit {
     */
   }
 
-  savePlanningChanges() {
+  async savePlanningChanges() {
     const batch = this.planningChanges?.getApiBatch()
 
-    this.planningSvc.batchProcess(batch).subscribe(res => {
+    const res = await this.planningSvc.batchProcess$(batch)
 
-      if (res.status == ApiStatus.ok) {
+    if (res.status == ApiStatus.ok) {
 
-        this.dashboardSvc.showToastType(ToastType.saveSuccess)
-      }
-      //console.warn(res)
+      this.dashboardSvc.showToastType(ToastType.saveSuccess)
+      await this.resourceSvc.refreshCachedObjectFromBackend(this.resource.id)
 
-    })
+    } else {
+
+      this.dashboardSvc.showToastType(ToastType.saveError)
+
+    }
+
 
   }
 

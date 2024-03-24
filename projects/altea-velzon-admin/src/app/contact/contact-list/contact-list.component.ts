@@ -52,7 +52,7 @@ export class ContactListComponent extends NgBaseListComponent<Contact> implement
   override getInitDbQuery(): DbQuery | null {
 
     const query = new DbQuery()
-    query.and('deleted', QueryOperator.equals, false)
+    query.and('del', QueryOperator.equals, false)
 
     query.take = 100
     query.orderBy('name')
@@ -65,7 +65,7 @@ export class ContactListComponent extends NgBaseListComponent<Contact> implement
     const query = new DbQuery()
 
     query.and('name', QueryOperator.contains, searchFor)
-    query.and('deleted', QueryOperator.equals, false)
+    query.and('del', QueryOperator.equals, false)
 
     return query
   }

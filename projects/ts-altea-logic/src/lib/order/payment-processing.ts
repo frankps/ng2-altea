@@ -99,12 +99,12 @@ export class PaymentProcessing {
             let subscription = subs.find(s => s.id == subsPayment.subsId)
 
 
-            if (subscription.active && subscription.usedQty < subscription.totalQty) {
+            if (subscription.act && subscription.usedQty < subscription.totalQty) {
 
                 subscription.usedQty++
 
                 if (subscription.usedQty >= subscription.totalQty) {
-                    subscription.active = false
+                    subscription.act = false
                 }
 
                 subscriptionsToUpdate.push(subscription)

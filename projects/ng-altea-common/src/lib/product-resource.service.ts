@@ -15,7 +15,7 @@ export class ProductResourceService extends BackendHttpServiceBase<ProductResour
      * http://192.168.5.202:8080
      * 
      */
-    super(ProductResource, sessionSvc.backend, sessionSvc.branchUnique + '/product-resources', http)
+    super(ProductResource, 'ProductResource', sessionSvc.backend, sessionSvc.branchUnique + '/product-resources', http)
   }
 
 }

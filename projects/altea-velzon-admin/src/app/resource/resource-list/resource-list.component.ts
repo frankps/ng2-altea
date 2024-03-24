@@ -73,7 +73,7 @@ export class ResourceListComponent extends NgBaseListComponent<Resource> impleme
   override getInitDbQuery(): DbQuery | null {
 
     const query = new DbQuery()
-    query.and('deleted', QueryOperator.equals, false)
+    query.and('del', QueryOperator.equals, false)
     query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
 
     if (this.resourceType)
@@ -92,7 +92,7 @@ export class ResourceListComponent extends NgBaseListComponent<Resource> impleme
 
     const query = new DbQuery()
     query.and('name', QueryOperator.contains, searchFor)
-    query.and('deleted', QueryOperator.equals, false)
+    query.and('del', QueryOperator.equals, false)
     query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
 
     if (this.resourceType)

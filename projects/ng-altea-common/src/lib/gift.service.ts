@@ -11,7 +11,7 @@ import { DbQuery, QueryOperator } from 'ts-common';
 export class GiftService extends BackendHttpServiceBase<Gift> {
 
   constructor(http: HttpClient, protected sessionSvc: SessionService) {
-    super(Gift, sessionSvc.backend, sessionSvc.branchUnique + '/gifts', http)
+    super(Gift, 'Gift', sessionSvc.backend, sessionSvc.branchUnique + '/gifts', http)
   }
 
 

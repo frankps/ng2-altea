@@ -2,7 +2,7 @@ import { plainToClass, instanceToPlain } from "class-transformer"
 
 
 export class ArrayHelper {
-    static ContainsAtLeastOneItem(array: any): boolean {
+    static AtLeastOneItem(array: any): boolean {
         return (Array.isArray(array) && array.length > 0)
     }
 

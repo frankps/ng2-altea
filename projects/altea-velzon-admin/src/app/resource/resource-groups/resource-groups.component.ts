@@ -162,7 +162,7 @@ export class ResourceGroupsComponent {
     this.parent.cancel()
   }
 
-  save() {
+  async save() {
 
     const batch = this.changes.getApiBatch()
 
@@ -174,20 +174,20 @@ export class ResourceGroupsComponent {
       return
     }
 
-    this.resourceLinkSvc.batchProcess(batch).subscribe(res => {
+    const res = await this.resourceLinkSvc.batchProcess$(batch)
 
-      if (res.status == ApiStatus.error) {
-        this.parent.dashboardSvc.showToastType(ToastType.saveError)
-      } else {
-        this.parent.dashboardSvc.showToastType(ToastType.saveSuccess)
-        this.changes.reset()
-      }
+    if (res.status == ApiStatus.error) {
+      this.parent.dashboardSvc.showToastType(ToastType.saveError)
+    } else {
+      this.parent.dashboardSvc.showToastType(ToastType.saveSuccess)
+      await this.resourceSvc.refreshCachedObjectFromBackend(this.resource.id)
+      this.changes.reset()
+    }
 
-      console.error(res)
-      this.changes?.reset()
-      this.parent.editSectionId = ''
+    console.error(res)
+    this.changes?.reset()
+    this.parent.editSectionId = ''
 
-    })
 
 
   }

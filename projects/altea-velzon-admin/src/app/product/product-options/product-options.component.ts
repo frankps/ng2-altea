@@ -66,7 +66,7 @@ export class ProductOptionsComponent implements OnInit {
 
   constructor(protected productOptionSvc: ProductOptionService
     , protected productOptionValueSvc: ProductOptionValueService
-    , protected sessionSvc: SessionService) {
+    , protected sessionSvc: SessionService, protected productSvc: ProductService) {
 
   }
 
@@ -336,6 +336,7 @@ export class ProductOptionsComponent implements OnInit {
     } else {
       this.parent.dashboardSvc.showToastType(ToastType.saveSuccess)
       this.optionChanges.reset()
+      await this.productSvc.refreshCachedObjectFromBackend(this._product.id)
     }
 
     this.optionChanges?.reset()

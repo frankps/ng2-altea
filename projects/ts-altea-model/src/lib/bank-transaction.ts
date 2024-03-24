@@ -1,4 +1,4 @@
-import { ObjectWithId } from "ts-common";
+import { ObjectWithId, ObjectWithIdPlus } from "ts-common";
 
 export enum BankTxType {
     unknown = 'unknown',

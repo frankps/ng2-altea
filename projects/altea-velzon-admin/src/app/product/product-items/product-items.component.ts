@@ -28,7 +28,7 @@ export class ProductItemsComponent {
   Array = Array
 
   thisSection = 'items'
-  
+
   ProductType = ProductType
   ProductSubType = ProductSubType
 
@@ -117,7 +117,7 @@ export class ProductItemsComponent {
     })
   }
 
-  
+
   convertProductOptionsToItemOptions(products: Product[]) {
 
     this.itemOptionValues.clear()
@@ -135,7 +135,7 @@ export class ProductItemsComponent {
         let productItemOptionValues = option.toProductItemOptionValues()
         this.itemOptionValues.set(option.id, productItemOptionValues)
 
-       // this.itemOptionValues.get(option.id)
+        // this.itemOptionValues.get(option.id)
       }
 
 
@@ -298,7 +298,7 @@ export class ProductItemsComponent {
 
   }
 
-  save() {
+  async save() {
 
     const batch = this.itemChanges.getApiBatch()
 
@@ -306,34 +306,21 @@ export class ProductItemsComponent {
       return
 
 
-    this.productItemSvc.batchProcess(batch).subscribe(res => {
+    const res = await this.productItemSvc.batchProcess$(batch)
 
-      if (res.status == ApiStatus.ok) {
-        this.itemChanges.reset()
-        this.parent.dashboardSvc.showToastType(ToastType.saveSuccess)
-        this.stopEditMode()
-      } else {
-        this.parent.dashboardSvc.showToastType(ToastType.saveError)
-      }
+    if (res.status == ApiStatus.ok) {
+      this.itemChanges.reset()
+      this.parent.dashboardSvc.showToastType(ToastType.saveSuccess)
 
-      //resolve(res)
-
-      /*
-      this.mode = ListSectionMode.readOnly
-
-      if (res.status == ApiStatus.error) {
-        this.parent.dashboardSvc.showToastType(ToastType.saveError)
-      } else {
-        this.parent.dashboardSvc.showToastType(ToastType.saveSuccess)
-        this.optionChanges.reset()
-      }
-
-      console.error(res)
-      this.optionChanges?.reset()
+      
+      await this.productSvc.refreshCachedObjectFromBackend(this._product.id)
+      
       this.stopEditMode()
-      */
+    } else {
+      this.parent.dashboardSvc.showToastType(ToastType.saveError)
+    }
 
-    })
+
 
 
   }

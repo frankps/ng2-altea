@@ -108,7 +108,7 @@ export abstract class NgBaseListComponent<T extends ObjectWithId> extends NgBase
         return null
         /*
         const query = new DbQuery()
-        query.and('deleted', QueryOperator.equals, false)
+        query.and('del', QueryOperator.equals, false)
     
         query.take = 20
         query.orderBy('code')

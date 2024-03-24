@@ -43,7 +43,7 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
   onlineMode: Translation[] = []
   daysOfWeekShort: Translation[] = []
   productType: Translation[] = []
-  productSubType: Translation[]= []
+  productSubType: Translation[] = []
 
   staff = 2
 
@@ -121,7 +121,7 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
     await this.translationSvc.translateEnum(Gender, 'enums.gender.', this.gender)
     await this.translationSvc.translateEnum(OnlineMode, 'enums.online-mode.', this.onlineMode, false, true)
     await this.translationSvc.translateEnum(ProductType, 'enums.product-type.', this.productType)
-		await this.translationSvc.translateEnum(ProductSubType, 'enums.product-sub-type.', this.productSubType)
+    await this.translationSvc.translateEnum(ProductSubType, 'enums.product-sub-type.', this.productSubType)
     this.initialized = true
   }
 
@@ -350,7 +350,7 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
   }
 
 
-  saveResources() {
+  async saveResources() {
     const batch = this.resourceChanges?.getApiBatch()
 
     console.error(batch)
@@ -362,15 +362,24 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
     console.error('Price changes')
     console.error(batch)
 
-    this.productResourceSvc.batchProcess(batch).subscribe(res => {
+    const res = await this.productResourceSvc.batchProcess$(batch)
 
-      this.resetOrigObject()
+    this.resetOrigObject()
 
-      console.error(res)
-      this.editSectionId = ''
+    console.error(res)
+    this.editSectionId = ''
 
-      this.priceChanges?.reset()
-    })
+
+    if (res.status == ApiStatus.ok) {
+      this.resourceChanges?.reset()
+      this.dashboardSvc.showToastType(ToastType.saveSuccess)
+      await this.productSvc.refreshCachedObjectFromBackend(this.object.id)
+    } else {
+      this.dashboardSvc.showToastType(ToastType.saveError)
+    }
+      
+    
+
 
     console.error(batch)
   }

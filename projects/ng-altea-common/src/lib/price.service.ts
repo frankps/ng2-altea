@@ -10,7 +10,7 @@ import { SessionService } from './session.service';
 export class PriceService extends BackendHttpServiceBase<Price> {
 
   constructor(http: HttpClient, protected sessionSvc: SessionService) {
-    super(Price, sessionSvc.backend, sessionSvc.branchUnique + '/prices', http)
+    super(Price, 'Price', sessionSvc.backend, sessionSvc.branchUnique + '/prices', http)
   }
 
 }

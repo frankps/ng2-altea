@@ -59,7 +59,7 @@ export class PosPaymentComponent {
     let query = new DbQuery()
     query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
     query.and('unitProductId', QueryOperator.in, productIds)
-    query.and('active', QueryOperator.equals, true)
+    query.and('act', QueryOperator.equals, true)
     query.and('contactId', QueryOperator.equals, contactId)
 
     this.subscriptions = await this.subSvc.query$(query)

@@ -16,7 +16,7 @@ export class ResourcePlanningService extends BackendHttpServiceBase<ResourcePlan
      * http://192.168.5.202:8080
      * 
      */
-    super(ResourcePlanning, sessionSvc.backend, sessionSvc.branchUnique + '/resource-plannings', http)
+    super(ResourcePlanning, 'ResourcePlanning', sessionSvc.backend, sessionSvc.branchUnique + '/resource-plannings', http)
   }
 
 

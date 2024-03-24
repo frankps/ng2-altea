@@ -122,8 +122,8 @@ export class DebugAvailabilityComponent implements OnInit {
 
     const deleteOrderQuery = new DbQuery()
 
-    deleteOrderQuery.and('createdAt', QueryOperator.greaterThanOrEqual, startDate)
-    deleteOrderQuery.and('createdAt', QueryOperator.lessThan, endDate)
+    deleteOrderQuery.and('crea', QueryOperator.greaterThanOrEqual, startDate)
+    deleteOrderQuery.and('crea', QueryOperator.lessThan, endDate)
 
     let april = new Date(2024, 3, 1)
 

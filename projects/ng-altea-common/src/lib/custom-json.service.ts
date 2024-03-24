@@ -10,6 +10,6 @@ import { SessionService } from './session.service';
 export class CustomJsonService extends BackendHttpServiceBase<CustomJson> {
 
   constructor(http: HttpClient, protected sessionSvc: SessionService) {
-    super(CustomJson, sessionSvc.backend, 'custom-json', http)
+    super(CustomJson, 'CustomJson', sessionSvc.backend, 'custom-json', http)
   }
 }

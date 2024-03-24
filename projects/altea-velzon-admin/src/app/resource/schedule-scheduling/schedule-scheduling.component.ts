@@ -1,13 +1,14 @@
 import { Component, Input, AfterViewInit, AfterViewChecked, OnInit, OnDestroy } from '@angular/core';
 import { ResourcePlanning, Schedule, ScheduleTimeBlock, WeekSchedule, PlanningType } from 'ts-altea-model'
 import { SelectedDay } from '../schedule-day/schedule-day.component';
-import { BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, Translation, ObjectHelper, CollectionChangeTracker, ObjectWithId, DateHelper, ConnectTo } from 'ts-common'
-import { ResourcePlanningService, SessionService } from 'ng-altea-common'
+import { BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, Translation, ObjectHelper, CollectionChangeTracker, ObjectWithId, DateHelper, ConnectTo, ApiStatus } from 'ts-common'
+import { ResourcePlanningService, ResourceService, SessionService } from 'ng-altea-common'
 import { BsLocaleService } from 'ngx-bootstrap/datepicker';
 import * as dateFns from 'date-fns'
 import { EditResourceComponent } from '../edit-resource/edit-resource.component';
 //import { tr } from 'date-fns/locale';
 import { Subscription } from "rxjs";
+import { DashboardService, ToastType } from 'ng-common';
 
 enum FormMode {
   readonly = 'readonly',
@@ -76,7 +77,8 @@ export class ScheduleSchedulingComponent implements OnDestroy {
     console.warn(schedule)
   }
 
-  constructor(protected planningSvc: ResourcePlanningService, private localeService: BsLocaleService, protected sessionSvc: SessionService) {
+  constructor(protected planningSvc: ResourcePlanningService, private localeService: BsLocaleService, protected sessionSvc: SessionService,
+    protected resourceSvc: ResourceService, protected dashboardSvc: DashboardService) {
 
     const now = new Date()
     const utcNow = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()))
@@ -171,7 +173,7 @@ export class ScheduleSchedulingComponent implements OnDestroy {
     this.new.resourceId = this._schedule.resourceId
     this.new.scheduleId = this._schedule.id
     this.new.type = PlanningType.sch
-    
+
   }
 
   rangePickerChanged(event: any) {
@@ -209,7 +211,7 @@ export class ScheduleSchedulingComponent implements OnDestroy {
     }
   */
 
-  save() {
+  async save() {
 
     console.error("Saving scheduling ................ =================================")
 
@@ -220,14 +222,20 @@ export class ScheduleSchedulingComponent implements OnDestroy {
 
     console.warn(batch)
 
-    this.planningSvc.batchProcess(batch).subscribe(res => {
+    const res = await this.planningSvc.batchProcess$(batch)
 
-      console.error(res)
+    if (res.status == ApiStatus.ok) {
 
+    //  this.dashboardSvc.showToastType(ToastType.saveSuccess)
+      //await this.resourceSvc.refreshCachedObjectFromBackend(this.resource.id)
       this.mode = FormMode.editall
       this.changes?.reset()
+    } else {
 
-    })
+    }
+
+    console.error(res)
+
 
 
 

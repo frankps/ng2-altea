@@ -11,7 +11,7 @@ import { ApiResult, DbQuery, QueryOperator } from 'ts-common';
 export class ContactService extends BackendHttpServiceBase<Contact> {
 
   constructor(http: HttpClient, protected sessionSvc: SessionService) {
-    super(Contact, sessionSvc.backend, sessionSvc.branchUnique + '/contacts', http)
+    super(Contact, 'Contact', sessionSvc.backend, sessionSvc.branchUnique + '/contacts', http)
   }
 
   async searchByString$(searchFor: string): Promise<Contact[]> {

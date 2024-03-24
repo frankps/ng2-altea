@@ -125,7 +125,7 @@ export class OrderMgrUiService  {   // implements OnInit
     const query = new DbQuery()
     query.and('type', QueryOperator.equals, ResourceType.human)
     query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
-    query.and('active', QueryOperator.equals, true)
+    query.and('act', QueryOperator.equals, true)
 
     this.allHumanResources = await this.resourceSvc.query$(query)
 
@@ -266,7 +266,7 @@ export class OrderMgrUiService  {   // implements OnInit
       const query = new DbQuery()
       query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
       query.and('name', QueryOperator.contains, searchFor)
-      query.and('deleted', QueryOperator.equals, false)
+      query.and('del', QueryOperator.equals, false)
   
   
   
@@ -449,12 +449,19 @@ export class OrderMgrUiService  {   // implements OnInit
 
   /** when an order is saved, we need to refresh all associated objects */
   refreshOrder(bdOrder: Order) {
+
+    // attach branch again to order (needed for deposit calculations)
+    if (!bdOrder.branch) {
+      bdOrder.branch = this.sessionSvc.branch
+    }
+
     this.order = bdOrder
 
     if (this.orderLine?.id)
       this.orderLine = this.order.getLine(this.orderLine?.id)
   }
 
+  async 
 
   async changeState() {
 
@@ -638,7 +645,7 @@ export class OrderMgrUiService  {   // implements OnInit
     query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
 
     query.and('name', QueryOperator.contains, searchFor)
-    query.and('deleted', QueryOperator.equals, false)
+    query.and('del', QueryOperator.equals, false)
     query.include('options:orderBy=idx.values:orderBy=idx')
     query.take = 20
 

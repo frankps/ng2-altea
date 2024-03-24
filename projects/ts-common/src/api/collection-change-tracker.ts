@@ -35,14 +35,16 @@ export class CollectionChangeTracker<T extends ObjectWithId> {
   constructor(public col: T[], protected type: { new(): T; }
     , protected params: CollectionChangeTrackerParams = new CollectionChangeTrackerParams()) {
 
+    if (!col)
+      col = []
 
-    this.colOrig = this.col.map(obj => ObjectHelper.clone(obj, this.type))
+    this.colOrig = col.map(obj => ObjectHelper.clone(obj, this.type))
 
 
 
 
     console.log(col)
-      // if (params.enableCancel) {
+    // if (params.enableCancel) {
     // }
 
   }

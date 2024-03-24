@@ -181,7 +181,7 @@ export class EditResourceComponent extends NgEditBaseComponent<Resource> impleme
   }
 
 
-  saveSchedule(scheduleId: string) {
+  async saveSchedule(scheduleId: string) {
 
     // this.scheduleComponent.save()
 
@@ -201,21 +201,21 @@ export class EditResourceComponent extends NgEditBaseComponent<Resource> impleme
       return
     }
 
-    this.scheduleSvc.batchProcess(batch).subscribe(res => {
-      console.error('batchProcess')
-      console.error(res)
+    const res = await this.scheduleSvc.batchProcess$(batch)
+    console.error('batchProcess')
+    console.error(res)
 
-      if (res.status === ApiStatus.ok) {
-        this.editSectionId = ''
-        this.dashboardSvc.showToastType(ToastType.saveSuccess)
-        this.scheduleChanges.reset()
-      } else {
-        this.dashboardSvc.showToastType(ToastType.saveError)
-      }
+    if (res.status === ApiStatus.ok) {
+      this.editSectionId = ''
+      this.dashboardSvc.showToastType(ToastType.saveSuccess)
+      this.scheduleChanges.reset()
+      await this.resourceSvc.refreshCachedObjectFromBackend(this.object.id)
+    } else {
+      this.dashboardSvc.showToastType(ToastType.saveError)
+    }
 
-      this.saveScheduling$.next(currentSchedule)
+    this.saveScheduling$.next(currentSchedule)
 
-    })
   }
 
   save() {

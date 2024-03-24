@@ -241,7 +241,7 @@ export class ProductListComponent extends NgBaseListComponent<Product> implement
     const query = new DbQuery()
     query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
     // query.and('catId', QueryOperator.equals, this.categoryId)
-    query.and('deleted', QueryOperator.equals, false)
+    query.and('del', QueryOperator.equals, false)
 
     if (this.categoryId)
       query.and('catId', QueryOperator.equals, this.categoryId)
@@ -255,7 +255,7 @@ export class ProductListComponent extends NgBaseListComponent<Product> implement
     query.orderBy('name')
 
     if (this.productType) {
-      query.or('type', QueryOperator.equals, this.productType)
+      query.and('type', QueryOperator.equals, this.productType)
       // query.or('type', QueryOperator.equals, ProductType.category)
     }
 
@@ -267,7 +267,7 @@ export class ProductListComponent extends NgBaseListComponent<Product> implement
     const query = new DbQuery()
     query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
     query.and('name', QueryOperator.contains, searchFor)
-    query.and('deleted', QueryOperator.equals, false)
+    query.and('del', QueryOperator.equals, false)
     // query.and('online', QueryOperator.not, OnlineMode.invisible)
 
     if (this.productType)

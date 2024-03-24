@@ -95,7 +95,7 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
 
     // _.includes(t.channels, variant.channel) && _.includes(t.to, variant.recipient)
 
-    for (let template of templates.filter(t => t.active)) {
+    for (let template of templates.filter(t => t.act)) {
 
       if (!_.includes(this.templateCodes, template.code))
         continue
@@ -180,7 +180,7 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
     if (!selected) {
 
       if (template) {
-        template.active = false
+        template.act = false
         this.changes.update(template)
       }
 
@@ -190,8 +190,8 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
 
       if (template) {
 
-        if (!template.active) {
-          template.active = true
+        if (!template.act) {
+          template.act = true
           this.changes.update(template)
         }
 

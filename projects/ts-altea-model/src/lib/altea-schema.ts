@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { Exclude, Type, Transform } from "class-transformer";
 import 'reflect-metadata';
-import { ConnectTo, DateHelper, DbObjectCreate, IAsDbObject, ManagedObject, ObjectHelper, ObjectMgmt, ObjectReference, ObjectWithId, QueryOperator, TimeHelper } from 'ts-common'
+import { ConnectTo, DateHelper, DbObjectCreate, IAsDbObject, ManagedObject, ObjectHelper, ObjectMgmt, ObjectReference, ObjectWithId, ObjectWithIdPlus, QueryOperator, TimeHelper } from 'ts-common'
 import * as _ from "lodash";
 import { PersonLine } from "./person-line";
 import { DateRange, DateRangeSet, TimeBlock, TimeBlockSet, TimeSpan } from "./logic";
@@ -282,7 +282,7 @@ export class WeekSchedule {
 }
 
 
-export class User extends ObjectWithId {
+export class User extends ObjectWithIdPlus {
 
   uid?: string
 
@@ -376,7 +376,7 @@ export class Contact extends ObjectWithId {
 //   to?: Date;
 // }
 
-export class Schedule extends ObjectWithId {
+export class Schedule extends ObjectWithIdPlus {
 
   idx = 0
   default = false
@@ -406,11 +406,7 @@ export class Schedule extends ObjectWithId {
    */
   prepIncl: boolean = true
 
-  active = true;
-  deleted = false;
-  createdAt = new Date()
-  updatedAt?: Date
-  deletedAt?: Date
+
 
 
   isInsideSchedule(dateRange: DateRange) {
@@ -648,7 +644,7 @@ export class PlanningBlockSeries {
 
 
 
-export class Product extends ObjectWithId {
+export class Product extends ObjectWithIdPlus {
   // new
   customers?: number
   staff?: number
@@ -734,6 +730,8 @@ export class Product extends ObjectWithId {
 
   active?: boolean;
   deleted?: boolean;
+
+  @Type(() => Date)
   deletedAt?: Date;
 
   //@TransformToNumber()
@@ -879,7 +877,7 @@ export class ProductItemOption {
   }
 }
 
-export class ProductItem extends ObjectWithId {
+export class ProductItem extends ObjectWithIdPlus {
   parentId?: string;
   parent?: Product;
   productId?: string;
@@ -988,7 +986,7 @@ title   String?
 descr   String?
 */
 
-export class Price extends ObjectWithId {
+export class Price extends ObjectWithIdPlus {
 
   productId?: string;
   product?: Product;
@@ -1142,7 +1140,7 @@ export class Price extends ObjectWithId {
 
 }
 
-export class Organisation extends ObjectWithId {
+export class Organisation extends ObjectWithIdPlus {
 
   idx = 0
   name?: string;
@@ -1175,12 +1173,6 @@ export class Organisation extends ObjectWithId {
 
   //@Type(() => Order)
   orders?: Order[];
-
-  active = true;
-  deleted = false;
-  createdAt = new Date()
-  updatedAt?: Date
-  deletedAt?: Date
 
   asDbObject(): DbObjectCreate<Organisation> {
     return new DbObjectCreate<Organisation>('organisation', Organisation, this)
@@ -1241,7 +1233,7 @@ export enum MessageState {
   sent
 }
 
-export class Message extends ObjectWithId implements IEmail {
+export class Message extends ObjectWithIdPlus implements IEmail {
 
   branchId?: string
   orderId?: string
@@ -1407,7 +1399,7 @@ export class GiftConfig {
   invoice: GiftInvoicing = new GiftInvoicing()
 }
 
-export class Branch extends ObjectWithId {
+export class Branch extends ObjectWithIdPlus {
 
   orders?: Order[];
   idx = 0
@@ -1460,11 +1452,6 @@ export class Branch extends ObjectWithId {
   @Type(() => GiftConfig)
   gift?: GiftConfig
 
-  active = true;
-  deleted = false;
-  createdAt = new Date()
-  updatedAt?: Date
-  deletedAt?: Date
 
   get sameDayTerm(): number { return this.getDepositTerm(0) }
   set sameDayTerm(value: number) { this.setDepositTerm(0, value) }
@@ -1558,7 +1545,7 @@ export enum ResourceTypeCircleIcons {
   group = 'fa-duotone fa-user-group',
 }
 
-export class Resource extends ObjectWithId {
+export class Resource extends ObjectWithIdPlus {
 
   @Type(() => ResourceLink)
   groups?: ResourceLink[];
@@ -1767,6 +1754,17 @@ export class ResourceLink extends ManagedObject {
   pref = 0
 
 
+  /** object is active */
+  public act: boolean = true
+
+  /** object is deleted */
+  public del: boolean = true
+
+  /** last update performed on object (starting with creation and ending with soft delete => del=true) */
+  @Type(() => Date)
+  public upd: Date = new Date()
+
+
 }
 
 
@@ -1785,7 +1783,7 @@ export interface ProductCategory {
 }
 
 
-export class ProductResource extends ObjectWithId {
+export class ProductResource extends ObjectWithIdPlus {
 
   constructor() {
     super()
@@ -1837,7 +1835,7 @@ export class FormulaTerm {
   optionId?: string
 }
 
-export class ProductOption extends ObjectWithId {
+export class ProductOption extends ObjectWithIdPlus {
   productId?: string;
   product?: Product;
 
@@ -1869,9 +1867,6 @@ export class ProductOption extends ObjectWithId {
   /** the property providing the value*/
   //factorOptionProp?: string
 
-  active = true
-  deleted = false
-  deletedAt?: Date;
 
 
   hasValues(): boolean {
@@ -1907,7 +1902,7 @@ export class ProductOption extends ObjectWithId {
 
 }
 
-export class ProductOptionValue extends ObjectWithId {
+export class ProductOptionValue extends ObjectWithIdPlus {
 
   optionId?: string;
   option?: ProductOption;
@@ -1934,9 +1929,8 @@ export class ProductOptionValue extends ObjectWithId {
   pvt = false
 
   default = false
-  active = true
-  deleted = false
-  deletedAt?: Date;
+
+
 
 
   get namePrice() {
@@ -1955,7 +1949,7 @@ export enum InvoiceState {
   onHold = 'onHold'
 }
 
-export class Invoice extends ObjectWithId {
+export class Invoice extends ObjectWithIdPlus {
 
   orders?: Order[];
 
@@ -1975,15 +1969,11 @@ export class Invoice extends ObjectWithId {
   /** alternative message for on invoice */
   alter?: string
 
-  active = true;
-  deleted = false;
-  createdAt?: Date;
-  updatedAt?: Date;
-  deletedAt?: Date;
+
 }
 
 
-export class Subscription extends ObjectWithId {
+export class Subscription extends ObjectWithIdPlus {
 
   orgId?: string;
   branchId?: string;
@@ -2011,11 +2001,10 @@ export class Subscription extends ObjectWithId {
   expiresOn?: Date;
   totalQty = 0;
   usedQty = 0;
-  active = true;
-  deleted = false;
-  createdAt?: Date;
-  updatedAt?: Date;
-  deletedAt?: Date;
+
+  /** created at */
+  @Type(() => Date)
+  crea = new Date();
 }
 
 export class OrderPerson extends ObjectWithId {
@@ -2106,7 +2095,7 @@ export class ResourcePreferences {
   locIds: string[] = []
 }
 
-export class Order extends ObjectWithId implements IAsDbObject<Order> {
+export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {
 
   static jsonProps = ['vatLines', 'persons', 'info']
 
@@ -2210,13 +2199,12 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
 */
 
 
-  active = true;
-  deleted = false;
 
+
+  /** created at */
   @Type(() => Date)
-  createdAt = new Date();
-  updatedAt?: Date;
-  deletedAt?: Date;
+  crea = new Date();
+
 
   /** resource preferences for order */
   @Type(() => ResourcePreferences)
@@ -2240,7 +2228,7 @@ export class Order extends ObjectWithId implements IAsDbObject<Order> {
 
 
   depositByDate(): Date {
-    return dateFns.addMinutes(this.createdAt, this.depositMins)
+    return dateFns.addMinutes(this.crea, this.depositMins)
   }
 
   setDepositBy() {
@@ -2950,7 +2938,7 @@ export class OrderLineOptionValue extends ObjectWithId {
 
 
 
-export class OrderLine extends ObjectWithId {
+export class OrderLine extends ObjectWithIdPlus {
 
   idx = 0;
 
@@ -3007,11 +2995,7 @@ export class OrderLine extends ObjectWithId {
 
   persons?: string[];
   tag?: string;
-  active = true;
-  deleted = false;
-  createdAt = new Date()
-  updatedAt?: Date
-  deletedAt?: Date
+
 
 
   constructor(product?: Product, qty = 1, initOptionValues?: Map<String, String[]>) {
@@ -3403,7 +3387,7 @@ export class ResourcePlannings {
   }
 
   isFullAvailable(): boolean {
-    const unavailable = this.plannings.find(rp => rp.active && !rp.available && !rp.scheduleId)
+    const unavailable = this.plannings.find(rp => rp.act && !rp.available && !rp.scheduleId)
 
     return unavailable ? false : true
   }
@@ -3411,7 +3395,7 @@ export class ResourcePlannings {
   isPrepTimeOnly(): boolean {
 
     // try to find a planning that is NOT a preparation
-    const nonPrep = this.plannings.find(rp => rp.active && !rp.prep)
+    const nonPrep = this.plannings.find(rp => rp.act && !rp.prep)
 
     return nonPrep ? false : true
   }
@@ -3533,7 +3517,7 @@ export class PlanningInfo {
 
 }
 
-export class ResourcePlanning extends ObjectWithId implements IAsDbObject<ResourcePlanning> {
+export class ResourcePlanning extends ObjectWithIdPlus implements IAsDbObject<ResourcePlanning> {
   branchId?: string;
 
   @Type(() => Resource)
@@ -3581,11 +3565,7 @@ export class ResourcePlanning extends ObjectWithId implements IAsDbObject<Resour
   // customer?: string;
   pre = 0
   post = 0
-  active = true;
-  deleted = false;
-  createdAt = new Date()
-  updatedAt?: Date
-  deletedAt?: Date
+
 
 
   asDbObject(): DbObjectCreate<ResourcePlanning> {
@@ -3734,7 +3714,7 @@ export enum TemplateChannel {
   sms = 'sms'
 }
 
-export class Template extends ObjectWithId {
+export class Template extends ObjectWithIdPlus {
   orgId?: string
   branchId?: string
   idx = 0
@@ -3752,9 +3732,9 @@ export class Template extends ObjectWithId {
   body?: string | null
   short?: string | null
   remind = 60
-  active = true
-  deleted = false
-  deletedAt?: Date | null
+
+
+
 
   //fruit = 'pomme'
 
@@ -3890,7 +3870,7 @@ export class CanUseGift {
  *   invoice = false
  */
 
-export class Gift extends ObjectWithId {
+export class Gift extends ObjectWithIdPlus {
   orgId?: string;
   branchId?: string;
 
@@ -3922,6 +3902,8 @@ export class Gift extends ObjectWithId {
 
   code?: string;
   descr?: string;
+
+  @Type(() => Date)
   expiresOn?: Date;
 
   @Type(() => Number)
@@ -3943,12 +3925,13 @@ export class Gift extends ObjectWithId {
   @Type(() => GiftMethods)
   methods: GiftMethods = new GiftMethods()
 
+
+  /** created at */
+  @Type(() => Date)
+  crea = new Date()
+
   //certificate: GiftCertificate = GiftCertificate.inStore
-  active = true
-  deleted = false
-  createdAt = new Date()
-  updatedAt?: Date
-  deletedAt?: Date
+
 
   constructor(markAsNew = false) {
     super()
@@ -3967,7 +3950,7 @@ export class Gift extends ObjectWithId {
     if (!amount || amount <= 0)
       return new CanUseGift(false, 0, CanUseGiftMsg.invalidAmount, `amount=${amount}`)
 
-    if (!this.active)
+    if (!this.act)
       return new CanUseGift(false, 0, CanUseGiftMsg.notActive)
 
     /*     if (this.isConsumed)
@@ -4048,7 +4031,7 @@ export enum PaymentType {
 
 
 
-export class Payment extends ObjectWithId {
+export class Payment extends ObjectWithIdPlus {
 
   idx = 0
 
@@ -4109,7 +4092,7 @@ export enum TaskPriority {
   urgent = 30
 }
 
-export class Task extends ObjectWithId {
+export class Task extends ObjectWithIdPlus {
   branchId?: string
 
   name: string
@@ -4238,7 +4221,7 @@ export class Task extends ObjectWithId {
 /**
  *  Introduced to store web push subscriptions for users, but any extra JSON can be stored here for any object
  */
-export class CustomJson extends ObjectWithId {
+export class CustomJson extends ObjectWithIdPlus {
   objId?: string
 
   type?: string
@@ -4247,7 +4230,6 @@ export class CustomJson extends ObjectWithId {
 
   json?: any
 
-  createdAt = new Date()
 }
 
 export enum ObjectLogAction {
@@ -4262,7 +4244,7 @@ export enum ObjectLogAction {
   sftDel = 'sftDel',
 
   /** hard delete */
-  hrdDel = 'sftDel'
+  hrdDel = 'hrdDel'
 }
 
 export class ObjectLog extends ObjectWithId {
@@ -4277,6 +4259,8 @@ export class ObjectLog extends ObjectWithId {
   userId?: string
 
   action?: ObjectLogAction
+
+  type?: string
 
   data?: any
 
@@ -4297,18 +4281,34 @@ export class ObjectLog extends ObjectWithId {
 }
 
 
+export class TypeInfo extends ObjectWithId {
+
+  branchId?: string
+  name: string
+
+  @Type(() => Date)
+  lastCreated?: Date
+
+  @Type(() => Date)
+  lastUpdated?: Date
+
+  @Type(() => Date)
+  lastDeleted?: Date
+}
+
+
 /*
-model CustomJson {
+model TypeInfo {
   id String @id(map: "newtable_pk") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
-  objId String? @db.Uuid
-  type String?   // the object type
+  branchId String?
+  name     String
 
-  label String?  // specifies what the json is about
+  lastCreated DateTime?
+  lastUpdated DateTime?
+  lastDeleted DateTime?
 
-  json Json?
-
-  createdAt DateTime @default(now())
+  @@unique([branchId, name])
 }
 
 

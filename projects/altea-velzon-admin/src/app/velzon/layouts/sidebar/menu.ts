@@ -45,17 +45,18 @@ export const MENU: MenuItem[] = [
     icon: 'home',
     subItems: [
       {
-        id: 31,
-        label: 'menu.catalog.sub.prod',
-        link: '/aqua/catalog/product',
-        parentId: 3
-      },
-      {
         id: 32,
         label: 'menu.catalog.sub.svc',
         link: '/aqua/catalog/service',
         parentId: 3
+      },
+      {
+        id: 31,
+        label: 'menu.catalog.sub.prod',
+        link: '/aqua/catalog/product',
+        parentId: 3
       }
+
     ]
   },
   {

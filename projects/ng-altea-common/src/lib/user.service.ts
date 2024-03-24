@@ -12,7 +12,7 @@ export class UserService extends BackendHttpServiceBase<User> {
 
   constructor(http: HttpClient, protected sessionSvc: SessionService) {
 
-    super(User, sessionSvc.backend, 'users', http)
+    super(User, 'User', sessionSvc.backend, 'users', http)
   }
 
 

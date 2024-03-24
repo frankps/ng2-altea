@@ -46,11 +46,11 @@ export class SubscriptionListComponent extends NgBaseListComponent<Subscription>
   override getInitDbQuery(): DbQuery | null {
 
     const query = new DbQuery()
-    query.and('deleted', QueryOperator.equals, false)
+    query.and('del', QueryOperator.equals, false)
     query.include('contact')
 
     query.take = 20
-    query.orderBy('createdAt', SortOrder.desc)
+    query.orderBy('crea', SortOrder.desc)
 
     return query
 
@@ -61,7 +61,7 @@ export class SubscriptionListComponent extends NgBaseListComponent<Subscription>
     const query = new DbQuery()
     query.or('name', QueryOperator.contains, searchFor)
     query.or('contact.name', QueryOperator.contains, searchFor)
-    query.and('deleted', QueryOperator.equals, false)
+    query.and('del', QueryOperator.equals, false)
 
     query.include('contact')
     return query

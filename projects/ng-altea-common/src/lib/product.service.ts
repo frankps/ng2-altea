@@ -19,7 +19,9 @@ export class ProductService extends BackendHttpServiceBase<Product> {
      * 
      * 
      */
-    super(Product, sessionSvc.backend, sessionSvc.branchUnique + '/products', http)
+    super(Product, 'Product', sessionSvc.backend, sessionSvc.branchUnique + '/products', http)
+
+    this.softDelete = true
   }
 
 
@@ -42,7 +44,7 @@ options:orderBy=idx.values:orderBy=idx
       query.and('type', QueryOperator.equals, type)
 
     query.and('sub', QueryOperator.equals, ProductSubType.cat)
-    query.and('deleted', QueryOperator.equals, false)
+    query.and('del', QueryOperator.equals, false)
     query.and('catId', QueryOperator.equals, categoryId)
     query.and('online', QueryOperator.not, OnlineMode.invisible)
     query.take = 200
@@ -55,7 +57,7 @@ options:orderBy=idx.values:orderBy=idx
     const query = new DbQuery()
     // query.and('type', QueryOperator.equals, type)
     // query.and('isCategory', QueryOperator.equals, true)
-    query.and('deleted', QueryOperator.equals, false)
+    query.and('del', QueryOperator.equals, false)
     query.and('catId', QueryOperator.equals, categoryId)
     query.and('online', QueryOperator.not, OnlineMode.invisible)
     query.include('options:orderBy=idx.values:orderBy=idx')

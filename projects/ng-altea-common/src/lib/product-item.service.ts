@@ -11,7 +11,7 @@ export class ProductItemService extends BackendHttpServiceBase<ProductItem> {
 
   constructor(http: HttpClient, protected sessionSvc: SessionService) {
 
-    super(ProductItem, sessionSvc.backend, sessionSvc.branchUnique + '/product-items', http)
+    super(ProductItem, 'ProductItem', sessionSvc.backend, sessionSvc.branchUnique + '/product-items', http)
   }
 
 }

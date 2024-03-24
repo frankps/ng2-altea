@@ -60,7 +60,7 @@ export class TaskListComponent extends NgBaseListComponent<Task> implements OnIn
   override getInitDbQuery(): DbQuery | null {
 
     const query = new DbQuery()
-    query.and('active', QueryOperator.equals, true)
+    query.and('act', QueryOperator.equals, true)
 
     if (this.searchFor.schedule)
       query.and('schedule', QueryOperator.equals, this.searchFor.schedule)
@@ -84,7 +84,7 @@ export class TaskListComponent extends NgBaseListComponent<Task> implements OnIn
     if (this.searchFor.status)
       query.and('status', QueryOperator.equals, this.searchFor.status)
 
-    query.and('active', QueryOperator.equals, true)
+    query.and('act', QueryOperator.equals, true)
 
     query.orderBy('loc').orderBy('name')
 

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ProductOptionValue } from 'ts-altea-model'
+import { Template, TypeInfo } from 'ts-altea-model'
 import { BackendHttpServiceBase } from 'ng-common';
 import { HttpClient } from '@angular/common/http';
 import { SessionService } from './session.service';
@@ -7,11 +7,11 @@ import { SessionService } from './session.service';
 @Injectable({
   providedIn: 'root'
 })
-export class ProductOptionValueService extends BackendHttpServiceBase<ProductOptionValue> {
+export class TypeInfoService extends BackendHttpServiceBase<TypeInfo> {
 
   constructor(http: HttpClient, protected sessionSvc: SessionService) {
 
-    super(ProductOptionValue, 'ProductOptionValue', sessionSvc.backend, sessionSvc.branchUnique + '/product-option-values', http)
+    super(TypeInfo, 'TypeInfo', sessionSvc.backend, sessionSvc.branchUnique + '/type-infos', http)
   }
 
 }

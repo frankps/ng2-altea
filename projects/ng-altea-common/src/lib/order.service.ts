@@ -11,7 +11,7 @@ import { DbQuery } from 'ts-common';
 export class OrderService extends BackendHttpServiceBase<Order> {
 
   constructor(http: HttpClient, protected sessionSvc: SessionService) {
-    super(Order, sessionSvc.backend, sessionSvc.branchUnique + '/orders', http)
+    super(Order, 'Order', sessionSvc.backend, sessionSvc.branchUnique + '/orders', http)
   }
 
 

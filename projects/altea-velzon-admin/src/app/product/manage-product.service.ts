@@ -40,7 +40,7 @@ export class ManageProductService {
 
     const query = new DbQuery()
     query.and('sub', QueryOperator.equals, ProductSubType.cat)
-    query.and('deleted', QueryOperator.equals, false)
+    query.and('del', QueryOperator.equals, false)
     query.take = 200
     query.select('id', 'catId', 'name', 'type')
 
@@ -106,7 +106,7 @@ export class ManageProductService {
     const temp = []
     let cat: Product = this.allCategories.find(c => c.id == id)
 
-    await this.setRootPathName(cat.type)
+    await this.setRootPathName(cat?.type)
 
 
     let count = 0

@@ -56,7 +56,7 @@ export class SearchProductComponent extends NgBaseComponent implements OnDestroy
 
     const query = new DbQuery()
     query.and('name', QueryOperator.contains, searchFor)
-    query.and('deleted', QueryOperator.equals, false)
+    query.and('del', QueryOperator.equals, false)
 
 /*     query.or('type', QueryOperator.equals, ProductType.prod)
     query.or('type', QueryOperator.equals, ProductType.svc) */

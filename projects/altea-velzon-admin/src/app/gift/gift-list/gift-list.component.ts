@@ -49,7 +49,7 @@ export class GiftListComponent extends NgBaseListComponent<Gift> implements OnIn
   override getInitDbQuery(): DbQuery | null {
 
     const query = new DbQuery()
-    query.and('deleted', QueryOperator.equals, false)
+    query.and('del', QueryOperator.equals, false)
 
     query.take = 20
     query.orderBy('code')
@@ -64,7 +64,7 @@ export class GiftListComponent extends NgBaseListComponent<Gift> implements OnIn
     query.or('code', QueryOperator.contains, searchFor)
     query.or('fromName', QueryOperator.contains, searchFor)
 
-    query.and('deleted', QueryOperator.equals, false)
+    query.and('del', QueryOperator.equals, false)
 
     return query
 

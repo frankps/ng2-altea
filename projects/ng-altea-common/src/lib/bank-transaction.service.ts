@@ -10,6 +10,6 @@ import { SessionService } from './session.service';
 export class BankTransactionService extends BackendHttpServiceBase<BankTransaction> {
 
   constructor(http: HttpClient, protected sessionSvc: SessionService) {
-    super(BankTransaction, sessionSvc.backend, sessionSvc.branchUnique + '/bank-transactions', http)
+    super(BankTransaction, 'BankTransaction', sessionSvc.backend, sessionSvc.branchUnique + '/bank-transactions', http)
   }
 }
