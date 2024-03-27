@@ -53,13 +53,13 @@ export enum Currency {
 }
 
 export enum DaysOfWeekShort {
-  mo = 'mo',
-  tu = 'tu',
-  we = 'we',
-  th = 'th',
-  fr = 'fr',
-  sa = 'sa',
-  su = 'su'
+  mo = 1,
+  tu = 2,
+  we = 3,
+  th = 4,
+  fr = 5,
+  sa = 6,
+  su = 7
 }
 
 export enum TimeUnit {
@@ -221,9 +221,9 @@ export class WeekSchedule {
     let dayIdx = startAtDayIdx
     let active = true
 
-    days.forEach((day) => {   // , index
+    // monday=1, sunday=7
+    for (let day = 1; day <= 7; day++) {
 
-      //console.log(key);
       if (day == DaysOfWeekShort.sa)
         active = false
 
@@ -234,8 +234,9 @@ export class WeekSchedule {
 
       this.days.push(daySchedule)
       dayIdx++
+    }
 
-    });
+
 
   }
 
@@ -395,7 +396,7 @@ export class Schedule extends ObjectWithIdPlus {
   planning?: ResourcePlanning[]
   //scheduling?: Scheduling[];
 
-  // the start of the week schedule
+  // the start of the week schedules (if weeks.length > 1), format: yyyymmdd
   start?: number;
 
   @Type(() => WeekSchedule)
@@ -406,6 +407,17 @@ export class Schedule extends ObjectWithIdPlus {
    */
   prepIncl: boolean = true
 
+
+  /*
+  set startDate(value: Date) {
+    this.start = DateHelper.yyyyMMdd(value)
+    console.warn(this.start)
+  }
+*/
+  startDate() {
+    return DateHelper.parse(this.start)
+  }
+  
 
 
 
@@ -448,6 +460,7 @@ export class Schedule extends ObjectWithIdPlus {
 
   toDateRangeSet(from: Date | number, to: Date | number, fromLabel?: string, toLabel?: string): DateRangeSet {
 
+    // 
     const dateRangeSet = new DateRangeSet()
 
 
@@ -468,7 +481,22 @@ export class Schedule extends ObjectWithIdPlus {
 
     const days = dateFns.eachDayOfInterval({ start: fromDate, end: toDate })
 
-    const weekSchedule = this.weeks[0]
+    let currentWeekIdx = 0
+    let nrOfWeeks = this.weeks.length
+    /**
+     * if only 1 week in this.weeks -> then 
+     */
+    if (this.weeks.length > 1) {
+
+      let weekDif = dateFns.differenceInWeeks(fromDate, this.startDate())
+
+      console.warn(weekDif)
+
+      currentWeekIdx = weekDif % nrOfWeeks
+      // => we are in the dif+1 week
+    }
+
+
     const toDateMillis = toDate.getTime()
 
     for (const dayDate of days) {
@@ -476,11 +504,13 @@ export class Schedule extends ObjectWithIdPlus {
       if (dayDate.getTime() == toDateMillis) // if toDate is start of new day, then we're not interested in that day
         break
 
+      const weekSchedule = this.weeks[currentWeekIdx]
       const dayOfWeek = dayDate.getDay()
       const daySchedule = weekSchedule.getDaySchedule(dayOfWeek)
 
-      if (daySchedule && Array.isArray(daySchedule.blocks)) {
+      if (daySchedule?.on && Array.isArray(daySchedule.blocks)) {
 
+        
         for (const block of daySchedule.blocks) {
 
           const from: HourMinute = block.fromParse()
@@ -496,6 +526,11 @@ export class Schedule extends ObjectWithIdPlus {
         }
 
 
+      }
+
+      // if sunday
+      if (nrOfWeeks > 1 && (dayOfWeek % 7) == 0) {
+        currentWeekIdx = (currentWeekIdx + 1) % nrOfWeeks
       }
 
       // daySchedule?.blocks
@@ -614,6 +649,9 @@ export class PlanningBlockSeries {
 
   /** apply this series definition within given date range (inRange) */
   makeBlocks(inRange: DateRange): DateRangeSet {
+
+
+    console.error('makeBlocks', inRange, this)
 
     const start = dateFns.parse(this.start, 'HH:mm', inRange.from)
 

@@ -159,22 +159,22 @@
       "USD": "US Dollar"
     },
     "days-of-week-short": {
-      "mo": "Ma",
-      "tu": "Di",
-      "we": "Wo",
-      "th": "Do",
-      "fr": "Vr",
-      "sa": "Za",
-      "su": "Zo"
+      "1": "Ma",
+      "2": "Di",
+      "3": "Wo",
+      "4": "Do",
+      "5": "Vr",
+      "6": "Za",
+      "7": "Zo"
     },
     "days-of-week": {
-      "mo": "Maandag",
-      "tu": "Dinsdag",
-      "we": "Woensdag",
-      "th": "Donderdag",
-      "fr": "Vrijdag",
-      "sa": "Zaterdag",
-      "su": "Zondag"
+      "1": "Maandag",
+      "2": "Dinsdag",
+      "3": "Woensdag",
+      "4": "Donderdag",
+      "5": "Vrijdag",
+      "6": "Zaterdag",
+      "7": "Zondag"
     },
     "product-type": {
       "prod": "Product",

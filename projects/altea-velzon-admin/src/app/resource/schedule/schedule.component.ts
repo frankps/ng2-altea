@@ -3,6 +3,7 @@ import { Schedule, ScheduleTimeBlock, WeekSchedule } from 'ts-altea-model'
 import { SelectedDay } from '../schedule-day/schedule-day.component';
 import { EditResourceComponent } from '../edit-resource/edit-resource.component';
 import { ScheduleSchedulingComponent } from '../schedule-scheduling/schedule-scheduling.component';
+import { DateHelper } from 'ts-common';
 
 @Component({
   selector: 'ngx-altea-schedule',
@@ -24,6 +25,7 @@ export class ScheduleComponent {
 
   @Input() parent: EditResourceComponent
 
+  //startDate: Date
 
   constructor() {
     //this.schedule.scheduling
@@ -31,6 +33,25 @@ export class ScheduleComponent {
 
     //this.createDemoScheduling()
   }
+
+
+  set startDate(value: Date) {
+    this.schedule.start = DateHelper.yyyyMMdd(value)
+    console.warn(this.schedule)
+  }
+
+
+  _startDate: Date
+  get startDate() {
+    let date = DateHelper.parse(this.schedule.start)
+
+    if (date && this._startDate && date.getTime() == this._startDate.getTime())
+      return this._startDate
+
+    this._startDate = date
+    return date
+  }
+
 
 
   save() {

@@ -98,9 +98,9 @@ export class ProductListComponent extends NgBaseListComponent<Product> implement
   }
 
 
-  startMoveSelected() {
+  async startMoveSelected() {
 
-    this.categories = this.manageProductSvc.allCategories
+    this.categories = await this.productSvc.getCategories$(this.productType)
 
     this.categories = _.orderBy(this.categories, 'name')
     this.modalService.open(this.moveModal)

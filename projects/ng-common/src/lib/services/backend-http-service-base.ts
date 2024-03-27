@@ -305,8 +305,8 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
 
       let softDelete = {
         id: objectId,
-        deleted: true,
-        deletedAt: new Date()
+        del: true,
+        upd: new Date()
       }
 
       return this.update(softDelete, true)
@@ -413,6 +413,9 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
     }
     ))
   }
+
+
+
 
   query$(query: DbQuery, useCache: boolean = true): Promise<T[]> {
 

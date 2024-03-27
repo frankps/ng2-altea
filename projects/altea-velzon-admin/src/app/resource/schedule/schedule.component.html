@@ -2,172 +2,180 @@
     Read only mode !!
 </ng-container> -->
 
-
-<ng-container *ngIf="!readonly">
-    <div class="row">
-        <div class="col-6">
-
-            <ngx-altea-label-control label="objects.schedule.name" for="name">
-                <input type="text" id="name" name="name" class="form-control" [(ngModel)]="schedule.name" />
-            </ngx-altea-label-control>
+<ng-container *ngIf="schedule">
 
 
-        </div>
-        <div class="col-6">
 
-            <!-- <ngx-altea-label-control label="objects.schedule.default" for="default">
-            </ngx-altea-label-control>
-             -->
+    <ng-container *ngIf="!readonly">
+        <div class="row">
+            <div class="col-4">
+
+                <ngx-altea-label-control label="objects.schedule.name" for="name">
+                    <input type="text" id="name" name="name" class="form-control" [(ngModel)]="schedule.name" />
+                </ngx-altea-label-control>
+
+
+            </div>
+            <div class="col-4">
+
+
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="default" [(ngModel)]="schedule.default" />
                     <label class="form-check-label" for="default" translate="objects.schedule.default"></label>
                 </div>
 
-            
 
-        </div>
-    
-    </div>
 
-    <div class="row mt-3">
-        <div class="col">
-            <div class="form-check form-switch">
-                <input type="checkbox" class="form-check-input" id="prepIncl" name="prepIncl"
-                    [(ngModel)]="schedule.prepIncl">
-                <label class="form-check-label" for="prep" translate="objects.schedule.prepIncl"></label>
             </div>
-        </div>
-
-
-    </div>
-
-
-</ng-container>
-
-
-
-<ng-container *ngFor="let week of schedule.weeks; let weekArrayIdx = index">
-
-
-    <div class="row mb-2 mt-2">
-
-        <div class="col ps-2 pe-1" *ngFor="let day of week.days">
-
-            <ngx-altea-schedule-day [readonly]="readonly" [week]="week" [day]="day"
-                (daySelected)="daySelected($event)"></ngx-altea-schedule-day>
+            <div class="col-4">
+                <input type="text" placeholder="Datepicker" class="form-control" bsDatepicker [(ngModel)]="startDate" [daysDisabled]="[0,2,3,4,5,6]">
+            </div>
 
         </div>
 
-    </div>
+        <div class="row mt-3">
+            <div class="col">
+                <div class="form-check form-switch">
+                    <input type="checkbox" class="form-check-input" id="prepIncl" name="prepIncl"
+                        [(ngModel)]="schedule.prepIncl">
+                    <label class="form-check-label" for="prep" translate="objects.schedule.prepIncl"></label>
+                </div>
+            </div>
 
-    <div class="row mb-2" *ngIf="!readonly && selectedDay && selectedDay.week.idx === week.idx">
-        <div class="col ps-2 pe-1">
 
-            <div class="card">
-                <div class="card-body">
+        </div>
 
 
+    </ng-container>
 
 
-                    <div class="row">
-                        <div class="col-3">
-                            <div class="row mb-2">
-                                <div class="col d-flex justify-content-center">
-                                    {{'enums.days-of-week.' + selectedDay.day.day | translate}}
-                                </div>
-                            </div>
 
-                            <ng-container *ngIf="!selectedDay.day.on">
-                                <div class="row">
+    <ng-container *ngFor="let week of schedule.weeks; let weekArrayIdx = index">
+
+
+        <div class="row mb-2 mt-2">
+
+            <div class="col ps-2 pe-1" *ngFor="let day of week.days">
+
+                <ngx-altea-schedule-day [readonly]="readonly" [week]="week" [day]="day"
+                    (daySelected)="daySelected($event)"></ngx-altea-schedule-day>
+
+            </div>
+
+        </div>
+
+        <div class="row mb-2" *ngIf="!readonly && selectedDay && selectedDay.week.idx === week.idx">
+            <div class="col ps-2 pe-1">
+
+                <div class="card">
+                    <div class="card-body">
+
+
+
+
+                        <div class="row">
+                            <div class="col-3">
+                                <div class="row mb-2">
                                     <div class="col d-flex justify-content-center">
-                                        Niet actief
+                                        {{'enums.days-of-week.' + selectedDay.day.day | translate}}
                                     </div>
                                 </div>
-                            </ng-container>
 
-
-                            <ng-container *ngIf="selectedDay.day.on">
-                                <div class="row" *ngFor="let block of selectedDay.day.blocks">
-                                    <div class="col d-flex justify-content-center">
-                                        <small>{{block.from}}-{{block.to}} &nbsp;<i class="fa-duotone fa-trash"
-                                                (click)="deleteBlock(block)"></i></small>
+                                <ng-container *ngIf="!selectedDay.day.on">
+                                    <div class="row">
+                                        <div class="col d-flex justify-content-center">
+                                            Niet actief
+                                        </div>
                                     </div>
-                                </div>
-                            </ng-container>
+                                </ng-container>
 
 
-
-
-                        </div>
-                        <div class="col-9">
-
-                            <div class="row mb-3">
-                                <div class="col" *ngIf="selectedDay.day.on">
-                                    Voeg een slot toe:
-                                </div>
-
-                                <div class="col float-end">
-                                    <button type="button" class="btn btn-outline-primary btn-sm float-end"
-                                        (click)="removeWeek(weekArrayIdx)">Verwijder week</button>
-                                </div>
-                            </div>
-
-                            <div class="row">
                                 <ng-container *ngIf="selectedDay.day.on">
-                                    <div class="col-auto">
-                                        Van
+                                    <div class="row" *ngFor="let block of selectedDay.day.blocks">
+                                        <div class="col d-flex justify-content-center">
+                                            <small>{{block.from}}-{{block.to}} &nbsp;<i class="fa-duotone fa-trash"
+                                                    (click)="deleteBlock(block)"></i></small>
+                                        </div>
                                     </div>
-                                    <div class="col-auto">
-                                        <input type="time" id="from" name="from" required
-                                            class="form-control form-control-sm" [(ngModel)]="newBlock.from" />
-                                    </div>
-                                    <div class="col-auto">tot</div>
-                                    <div class="col-auto">
-                                        <input type="time" id="to" name="to" required
-                                            class="form-control form-control-sm" [(ngModel)]="newBlock.to" />
-                                    </div>
-                                    <div class="col-auto">
-                                        <button type="button" class="btn btn-primary btn-sm"
-                                            (click)="addTimeBlock()">Toevoegen</button>
-                                    </div>
-
-
                                 </ng-container>
 
 
 
 
-                                <div class="col">
-                                    <button type="button" class="btn btn-outline-primary btn-sm float-end"
-                                        (click)="close()">Sluiten</button>
+                            </div>
+                            <div class="col-9">
+
+                                <div class="row mb-3">
+                                    <div class="col" *ngIf="selectedDay.day.on">
+                                        Voeg een slot toe:
+                                    </div>
+
+                                    <div class="col float-end">
+                                        <button type="button" class="btn btn-outline-primary btn-sm float-end"
+                                            (click)="removeWeek(weekArrayIdx)">Verwijder week</button>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <ng-container *ngIf="selectedDay.day.on">
+                                        <div class="col-auto">
+                                            Van
+                                        </div>
+                                        <div class="col-auto">
+                                            <input type="time" id="from" name="from" required
+                                                class="form-control form-control-sm" [(ngModel)]="newBlock.from" />
+                                        </div>
+                                        <div class="col-auto">tot</div>
+                                        <div class="col-auto">
+                                            <input type="time" id="to" name="to" required
+                                                class="form-control form-control-sm" [(ngModel)]="newBlock.to" />
+                                        </div>
+                                        <div class="col-auto">
+                                            <button type="button" class="btn btn-primary btn-sm"
+                                                (click)="addTimeBlock()">Toevoegen</button>
+                                        </div>
+
+
+                                    </ng-container>
+
+
+
+
+                                    <div class="col">
+                                        <button type="button" class="btn btn-outline-primary btn-sm float-end"
+                                            (click)="close()">Sluiten</button>
+                                    </div>
+
                                 </div>
 
                             </div>
 
                         </div>
 
+
+
+
+
+                        <!-- {{selectedDay.week.idx}}-{{selectedDay.day.idx}} -->
                     </div>
-
-
-
-
-
-                    <!-- {{selectedDay.week.idx}}-{{selectedDay.day.idx}} -->
                 </div>
-            </div>
 
+            </div>
+        </div>
+
+    </ng-container>
+
+    <div class="row" *ngIf="!readonly">
+        <div class="col d-flex justify-content-center">
+            <button type="button" class="btn btn-primary btn-sm" (click)="addWeek()">Week toevoegen</button>
         </div>
     </div>
 
+    <ngx-altea-schedule-scheduling #schedulingComponent [readonly]="readonly"
+        [schedule]="schedule"></ngx-altea-schedule-scheduling>
+
+    <!-- [editResourceParent]="parent" -->
+
+
+
 </ng-container>
-
-<div class="row" *ngIf="!readonly">
-    <div class="col d-flex justify-content-center">
-        <button type="button" class="btn btn-primary btn-sm" (click)="addWeek()">Week toevoegen</button>
-    </div>
-</div>
-
-<ngx-altea-schedule-scheduling #schedulingComponent [readonly]="readonly"
-    [schedule]="schedule"></ngx-altea-schedule-scheduling>
-
-<!-- [editResourceParent]="parent" -->

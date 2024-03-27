@@ -24,7 +24,7 @@ export class AppComponent implements OnInit {
 
   async ngOnInit() {
 
-    
+
 
     await this.configureCaches()
 
@@ -34,7 +34,7 @@ export class AppComponent implements OnInit {
     console.error(branch)
 
     this.appReady = true
-    
+
   }
 
 
@@ -47,6 +47,13 @@ export class AppComponent implements OnInit {
 
     const typeInfos = await this.typeInfoSvc.query$(typeInfoQry)
     console.warn(typeInfos)
+
+    const branchQry = new DbQuery()
+    branchQry.and('id', QueryOperator.equals, this.sessionSvc.branchId)
+    branchQry.take = 1000
+    this.branchSvc.cacheQuery = branchQry
+    //this.branchSvc.linkedTypes = ['ProductItem', 'ProductResource']
+    await this.branchSvc.initCache(typeInfos)
 
     const productQry = new DbQuery()
     productQry.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)

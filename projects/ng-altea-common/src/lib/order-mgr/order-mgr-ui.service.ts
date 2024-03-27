@@ -576,7 +576,7 @@ export class OrderMgrUiService  {   // implements OnInit
 
 
 
-      me.productSvc.getAllCategories().pipe(take(1)).subscribe(categories => {
+      me.productSvc.getCategories().pipe(take(1)).subscribe(categories => {
         me.products = categories
 
         me.rootCategories = categories

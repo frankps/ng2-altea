@@ -89,22 +89,21 @@ export class ResourceGroupsComponent {
 
   }
 
-  getResources(resourceGroups: boolean = false) {
+  async getResources(resourceGroups: boolean = false) {
 
 
 
-    this.resourceSvc.getMany().subscribe(res => {
-      this.allResources = res.data
+    this.allResources = await this.resourceSvc.getAllForBranch$()
 
-      var names = this.allResources.map(r => r.name)
-      console.error(names)
+    var names = this.allResources.map(r => r.name)
+    console.error(names)
 
-      if (resourceGroups)
-        this.resources = this.allResources.filter(r => r.isGroup)
-      else
-        this.resources = this.allResources.filter(r => !r.isGroup)
+    if (resourceGroups)
+      this.resources = this.allResources.filter(r => r.isGroup)
+    else
+      this.resources = this.allResources.filter(r => !r.isGroup)
 
-    })
+
 
   }
 

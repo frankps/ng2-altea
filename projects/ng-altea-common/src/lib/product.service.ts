@@ -36,7 +36,18 @@ options:orderBy=idx.values:orderBy=idx
 
 
 
-  getAllCategories(type?: ProductType, categoryId: string | null = null): Observable<Product[]> {
+  getCategories(type?: ProductType, categoryId: string | null = null): Observable<Product[]> {
+    const query = this.getCategoriesQuery(type, categoryId)
+    return this.query(query).pipe(map(obj => obj.data ? obj.data : []))
+  }
+
+  getCategories$(type?: ProductType, categoryId: string | null = null): Promise<Product[]> {
+    const query = this.getCategoriesQuery(type, categoryId)
+    return this.query$(query)
+  }
+
+
+  getCategoriesQuery(type?: ProductType, categoryId: string | null = null): DbQuery {
 
     const query = new DbQuery()
 
@@ -50,8 +61,10 @@ options:orderBy=idx.values:orderBy=idx
     query.take = 200
     query.select('id', 'catId', 'name', 'type', 'sub')
 
-    return this.query(query).pipe(map(obj => obj.data ? obj.data : []))
+    return query
   }
+
+
 
   getProductsInCategory(categoryId: string): Observable<Product[]> {
     const query = new DbQuery()

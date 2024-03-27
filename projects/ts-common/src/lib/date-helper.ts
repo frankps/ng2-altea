@@ -196,7 +196,7 @@ export class DateHelper {
     static parse(input: any): Date {
 
         if (!input)
-            throw `Input is null or undefined`
+            return undefined //throw `Input is null or undefined`
 
         let stringDate = input
 

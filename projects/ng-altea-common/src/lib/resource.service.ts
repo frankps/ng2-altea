@@ -14,6 +14,14 @@ export class ResourceService extends BackendHttpServiceBase<Resource> {
     super(Resource, 'Resource', sessionSvc.backend, sessionSvc.branchUnique + '/resources', http)
   }
 
+  async getAllForBranch$(): Promise<Resource[]> {
+
+    const query = new DbQuery()
+    query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
+    query.take = 1000
+    return await this.query$(query)
+
+  }
 
   async getByType$(type: ResourceType, isGroup: boolean = false): Promise<Resource[]> {
 

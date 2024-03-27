@@ -73,24 +73,6 @@ export class DeleteModalComponent {
       me.postDelete(modal, res)
     })
 
-    return
-
-    const update = {
-      id: this.object.id,
-      deleted: true,
-      deletedAt: new Date()
-    }
-
-    this.objectSvc?.update(update, true).subscribe(res => {
-
-      me.postDelete(modal, res)
-
-
-
-    })
-
-    console.error('Delete confirmed!')
-
 
   }
 
