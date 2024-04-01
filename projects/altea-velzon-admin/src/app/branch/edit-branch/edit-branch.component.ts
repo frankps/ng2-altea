@@ -28,6 +28,8 @@ export class EditBranchComponent extends NgEditBaseComponent<Branch> implements 
   vatPctgs = [...Array(30).keys()].map(i => { return { pct: i, label: `${i} %` } })
   depositPctgs = [...Array(21).keys()].map(i => { return { pct: (i * 5), label: `${i * 5} %` } })
 
+  cancelTimes = [...Array(5).keys()].map(i => { return { hours: (i * 24), label: `${i}` } })
+
   nrOfMonths = [...Array(60).keys()].map(i => i * 3)
 
   @ViewChild('generalForm') generalForm: NgForm;
@@ -60,7 +62,7 @@ export class EditBranchComponent extends NgEditBaseComponent<Branch> implements 
       , contactSvc
       , router, route, spinner, dashboardSvc)
 
-    this.sectionProps.set('general', ['name', 'descr', 'street', 'streetNr', 'postal', 'country', 'city', 'language', 'vatPcts', 'vatPct', 'vatNr', 'vatIncl', 'phone', 'mobile', 'email', 'cur'])
+    this.sectionProps.set('general', ['name', 'descr', 'street', 'streetNr', 'postal', 'country', 'city', 'language', 'vatPcts', 'vatPct', 'vatNr', 'vatIncl', 'phone', 'mobile', 'email', 'cur', 'cancel'])
     this.sectionProps.set('communication', ['emailFrom', 'emailBcc', 'smsOn'])
     this.sectionProps.set('reminders', ['reminders'])
     this.sectionProps.set('deposit', ['depositPct', 'depositTerms', 'reminders'])

@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { Contact, User } from 'ts-altea-model';
+import { Contact, SmsMessage, User } from 'ts-altea-model';
 import { SearchContactComponent } from '../../contact/search-contact/search-contact.component';
 import { BranchService, ObjectService, ProductService, ResourceService, ScheduleService, TemplateService, UserService } from 'ng-altea-common';
 import { CheckDeposists } from 'ts-altea-logic';
@@ -8,6 +8,7 @@ import { Country } from 'ts-altea-model'
 import { DbQuery, ObjectHelper, QueryOperator, Translation } from 'ts-common';
 import { HttpClient } from '@angular/common/http';
 import * as dateFns from 'date-fns'
+import { MessagingService } from 'projects/ng-altea-common/src/lib/messaging.service';
 
 // Volgnummer;Uitvoeringsdatum;Valutadatum;Bedrag;Valuta rekening;Rekeningnummer;Type verrichting;Tegenpartij;Naam van de tegenpartij;
 // Mededeling;Details;Status;Reden van weigering
@@ -37,7 +38,8 @@ export class DemoComponent {
   giftCode: string
 
   constructor(private http: HttpClient, public dbSvc: ObjectService, protected translationSvc: TranslationService, protected backEndSvc: ObjectService
-    , protected userSvc: UserService, protected resourceSvc: ResourceService, protected anySvc: ScheduleService, protected productSvc: ProductService) {
+    , protected userSvc: UserService, protected resourceSvc: ResourceService, protected anySvc: ScheduleService, protected productSvc: ProductService,
+    protected messagingSvc: MessagingService) {
 
 
 
@@ -82,6 +84,20 @@ export class DemoComponent {
     user.email = 'frank@dvit.eu'
 
     let res = await this.userSvc.create$(user)
+
+    console.error(res)
+  }
+
+
+  async sendSms() {
+
+    const sms = new SmsMessage('Aquasense', '32478336034', `Dit bericht is een
+herinnering aan uw reservatie bij Aquasense!
+
+Datum: 1 april 2024 om 19h00
+    `)
+
+    const res = await this.messagingSvc.sendSms$(sms)
 
     console.error(res)
   }

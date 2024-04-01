@@ -34,7 +34,7 @@
         </div>
 
         <div class="row mt-3">
-            <div class="col">
+            <div class="col-8">
                 <div class="form-check form-switch">
                     <input type="checkbox" class="form-check-input" id="prepIncl" name="prepIncl"
                         [(ngModel)]="schedule.prepIncl">
@@ -42,6 +42,15 @@
                 </div>
             </div>
 
+            <div class="col-4">
+
+                <ngx-altea-label-control label="objects.schedule.scheduleIds" for="vatPcts">
+                    <ng-select id="branchSchedules" name="branchSchedules" [items]="branchSchedules" bindLabel="name" bindValue="id"
+                        [clearable]="false" [multiple]="true" [(ngModel)]="schedule.scheduleIds">
+                    </ng-select>
+                </ngx-altea-label-control>
+
+            </div>
 
         </div>
 

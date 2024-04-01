@@ -4,7 +4,7 @@ import { OrderMgrUiService, BrowseCatalogComponent } from 'ng-altea-common';
 import { DashboardService, NgBaseComponent } from 'ng-common';
 import { ContactSelect2Component } from 'projects/ng-altea-common/src/lib/order-mgr/contact-select2/contact-select2.component';
 import { Observable, take, takeUntil } from 'rxjs';
-import { Contact, Gift, OrderLine } from 'ts-altea-model';
+import { Contact, Gift, Order, OrderLine } from 'ts-altea-model';
 
 
 
@@ -16,7 +16,8 @@ export enum PosOrderMenuItem {
   compose = 'compose',
   plan = 'plan',
   contact = 'contact',
-  pay = 'pay'
+  pay = 'pay',
+  cancel = 'cancel'
 }
 
 @Component({
@@ -79,6 +80,11 @@ export class ManageOrderComponent extends NgBaseComponent {
 
   }
 
+  cancelOrder(order: Order) {
+
+    this.mode = PosOrderMenuItem.cancel
+
+  }
 
   newGift(gift: Gift) {
 

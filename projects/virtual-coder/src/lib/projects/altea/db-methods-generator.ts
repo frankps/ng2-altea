@@ -51,6 +51,10 @@ export interface DbMethodsSpec {
 }
 
 let dmMethodTemplate = `
+async get%pascal_singular%ById(id: string): Promise<%pascal_singular%> {
+    const object = await this.getObjectById$('%camel_singular%', %pascal_singular%, id)
+    return object
+}
 async get%pascal_plural%ByIds(ids: string[]): Promise<%pascal_singular%[]> {
     const objects = await this.getObjectsByIds('%camel_singular%', %pascal_singular% , ids)
     return objects

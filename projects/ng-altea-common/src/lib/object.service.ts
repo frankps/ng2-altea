@@ -112,7 +112,9 @@ export class ObjectService implements IDb {
 
       if (res && res.object) {
 
-        res.object = plainToInstance(dbObject.type, res.object)
+        const object = res.object
+        res = plainToInstance(ApiResult, res)
+        res.object = plainToInstance(dbObject.type, object)
       }
 
       return res
@@ -146,7 +148,9 @@ export class ObjectService implements IDb {
 
       if (res && res.data) {
 
-        res.data = plainToInstance(dbObjects.type, res.data)
+        const data = res.data
+        res = plainToInstance(ApiListResult<T>, res)
+        res.data = plainToInstance(dbObjects.type, data)
 
       }
 

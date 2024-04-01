@@ -256,6 +256,19 @@
                         </div>
 
 
+                        <div class="row mt-3">
+                            <div class="col-6">
+        
+                                <ngx-altea-label-control label="objects.branch.cancel" for="cancelTime">
+                                    <ng-select id="cancelTime" name="cancelTime" [items]="cancelTimes" bindLabel="label" bindValue="hours"
+                                        [clearable]="false" [multiple]="false" [(ngModel)]="object.cancel">
+                                    </ng-select>
+                                </ngx-altea-label-control>
+        
+        
+                            </div>
+                        </div>
+
                     </div>      
 
                 </div>

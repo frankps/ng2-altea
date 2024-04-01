@@ -7,7 +7,7 @@ import * as _ from "lodash";
 import { NgxSpinnerService } from "ngx-spinner"
 import { DashboardService, ToastType } from 'ng-common';
 import { BehaviorSubject, Observable, take, takeUntil } from 'rxjs';
-import { AlteaDb, PaymentProcessing } from 'ts-altea-logic';
+import { AlteaDb, CancelOrder, PaymentProcessing } from 'ts-altea-logic';
 import * as dateFns from 'date-fns'
 import { StripeService } from '../stripe.service';
 
@@ -27,7 +27,7 @@ export enum OrderUiMode {
 @Injectable({
   providedIn: 'root'
 })
-export class OrderMgrUiService  {   // implements OnInit
+export class OrderMgrUiService {   // implements OnInit
 
   //allCategories?: Product[] = []
 
@@ -89,10 +89,10 @@ export class OrderMgrUiService  {   // implements OnInit
     this.autoCreateOrder()
 
   }
-/* 
-  async ngOnInit() {
-
-  } */
+  /* 
+    async ngOnInit() {
+  
+    } */
 
   async testPaymentProcessing() {
     // normally server side
@@ -107,6 +107,14 @@ export class OrderMgrUiService  {   // implements OnInit
 
     //return res
   }
+
+  /*
+  async cancelOrder() {
+
+    const cancelOrderResult = await this.alteaSvc.cancelOrder.cancelOrder(this.order)
+
+    console.error(cancelOrderResult)
+  }*/
 
 
   dirtyColor() {
@@ -211,9 +219,18 @@ export class OrderMgrUiService  {   // implements OnInit
   loadProduct$(productId: string): Promise<any> {
     const me = this
 
+
+      
+
     this.spinner.show()
 
     return new Promise<any>(function (resolve, reject) {
+
+      if (!productId) {
+        me.prepareProduct(undefined)
+        resolve(undefined)
+        return
+      }
 
       me.productSvc.get(productId, 'options:orderBy=idx.values:orderBy=idx,resources.resource').subscribe(product => {
         // 
@@ -319,6 +336,7 @@ export class OrderMgrUiService  {   // implements OnInit
 
     this.spinner.show()
 
+
     await this.loadProduct$(line.productId)
     this.orderLine = line
     this.orderLineIsNew = false
@@ -331,7 +349,7 @@ export class OrderMgrUiService  {   // implements OnInit
     this.spinner.show()
 
     // .resources.resource
-    this.orderSvc.get(orderId, "lines.planning.resource,lines.product,contact,payments").subscribe(order => {
+    this.orderSvc.get(orderId, "lines.planning.resource,lines:orderBy=idx.product,contact,payments:orderBy=idx").subscribe(order => {
 
       this.order = order
 
@@ -433,6 +451,8 @@ export class OrderMgrUiService  {   // implements OnInit
     if (confirmOrderResponse?.order) {
 
       this.refreshOrder(confirmOrderResponse?.order)
+
+      this.orderDirty = false
       this.dashboardSvc.showToastType(ToastType.saveSuccess)
     }
     else
@@ -461,7 +481,7 @@ export class OrderMgrUiService  {   // implements OnInit
       this.orderLine = this.order.getLine(this.orderLine?.id)
   }
 
-  async 
+  async
 
   async changeState() {
 
@@ -541,6 +561,14 @@ export class OrderMgrUiService  {   // implements OnInit
   }
 
   prepareProduct(product: Product) {
+
+    if (!product) {
+      this.product = undefined
+      this.orderLineOptions = []
+      this.orderLine = new OrderLine()
+      return
+    }
+
     this.product = product
 
     this.orderLineOptions = []

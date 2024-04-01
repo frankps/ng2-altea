@@ -32,6 +32,7 @@ import { SendOfferComponent } from './send-offer/send-offer.component';
 import { SearchContactComponent } from './search-contact/search-contact.component';
 import { ContactSelect2Component } from './contact-select2/contact-select2.component';
 import { DebugPlanningsComponent } from './debug-plannings/debug-plannings.component';
+import { CancelOrderComponent } from './cancel-order/cancel-order.component';
 
 @NgModule({
   declarations: [
@@ -53,6 +54,7 @@ import { DebugPlanningsComponent } from './debug-plannings/debug-plannings.compo
     SearchContactComponent,
     ContactSelect2Component,
     DebugPlanningsComponent,
+    CancelOrderComponent,
   ],
   imports: [
     CommonModule,
@@ -66,7 +68,8 @@ import { DebugPlanningsComponent } from './debug-plannings/debug-plannings.compo
     ModalModule,
     BsDatepickerModule,
     TimepickerModule,
-    NgxSpinnerModule,
+    NgxSpinnerModule
+    
   ],
   exports: [
     BrowseCatalogComponent,
@@ -86,7 +89,8 @@ import { DebugPlanningsComponent } from './debug-plannings/debug-plannings.compo
     StaffSelectComponent,
     SendOfferComponent,
     SearchContactComponent,
-    DebugPlanningsComponent
+    DebugPlanningsComponent,
+    CancelOrderComponent
   ]
 })
 export class OrderMgrModule {}

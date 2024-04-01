@@ -1,16 +1,17 @@
-import { Component, Input, ViewChild, ViewChildren } from '@angular/core';
+import { Component, Input, OnInit, ViewChild, ViewChildren } from '@angular/core';
 import { Schedule, ScheduleTimeBlock, WeekSchedule } from 'ts-altea-model'
 import { SelectedDay } from '../schedule-day/schedule-day.component';
 import { EditResourceComponent } from '../edit-resource/edit-resource.component';
 import { ScheduleSchedulingComponent } from '../schedule-scheduling/schedule-scheduling.component';
 import { DateHelper } from 'ts-common';
+import { ScheduleService, SessionService } from 'ng-altea-common';
 
 @Component({
   selector: 'ngx-altea-schedule',
   templateUrl: './schedule.component.html',
   styleUrls: ['./schedule.component.scss'],
 })
-export class ScheduleComponent {
+export class ScheduleComponent implements OnInit {
 
   @ViewChild('schedulingComponent') schedulingComponent: ScheduleSchedulingComponent;
 
@@ -25,15 +26,28 @@ export class ScheduleComponent {
 
   @Input() parent: EditResourceComponent
 
+  branchSchedules: Schedule[]
   //startDate: Date
 
-  constructor() {
+  constructor(protected scheduleSvc: ScheduleService, protected sessionSvc: SessionService) {
     //this.schedule.scheduling
     // this.createDemoSchedule1()
 
     //this.createDemoScheduling()
   }
 
+  async ngOnInit() {
+    await this.getBranchSchedules()
+
+  }
+
+  async getBranchSchedules() {
+
+    this.branchSchedules = await this.scheduleSvc.getForBranch$()
+
+    console.warn(this.branchSchedules)
+
+  }
 
   set startDate(value: Date) {
     this.schedule.start = DateHelper.yyyyMMdd(value)
@@ -61,6 +75,8 @@ export class ScheduleComponent {
     if (this.schedulingComponent)
       this.schedulingComponent.save()
   }
+
+
 
 
   createDemoSchedule1() {

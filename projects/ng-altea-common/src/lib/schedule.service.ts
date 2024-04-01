@@ -12,10 +12,16 @@ export class ScheduleService extends BackendHttpServiceBase<Schedule> {
 
   constructor(http: HttpClient, protected sessionSvc: SessionService) {
 
-    super(Schedule, 'Schedule',sessionSvc.backend, sessionSvc.branchUnique + '/schedules', http)
+    super(Schedule, 'Schedule', sessionSvc.backend, sessionSvc.branchUnique + '/schedules', http)
   }
 
-  async getForBranch$(branchId: string): Promise<Schedule[]> {
+  async getForBranch$(branchId?: string): Promise<Schedule[]> {
+
+    if (!branchId)
+      branchId = this.sessionSvc.branchId
+
+    if (!branchId)
+      throw new Error(`No branchId available in session service`)
 
     const scheduleQry = new DbQuery()
 

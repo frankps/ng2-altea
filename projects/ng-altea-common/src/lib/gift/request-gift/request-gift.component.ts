@@ -60,7 +60,7 @@ export class RequestGiftComponent implements OnInit {
     this.branch = await this.sessionSvc.branch$()
 
 
-    this.gift = new Gift(true)
+    this.gift = new Gift(true, true)
     this.gift.branchId = this.branch.id
 
     this.setTestData()

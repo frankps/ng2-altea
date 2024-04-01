@@ -1,4 +1,4 @@
-<div class="card" *ngIf="product && orderLine">
+<div class="card" *ngIf="orderLine">
 
     <ng-container>
 
@@ -13,7 +13,10 @@
 
                     &nbsp;&nbsp;x&nbsp;
 
-                    {{product.name}}<br>
+<!--                     {{product?.name}}
+
+                    <span *ngIf="!product"></span> -->
+                    {{orderLine.descr}}
                     
                 </div>
                 <div class="col-3">
@@ -30,7 +33,7 @@
         </div>
         <div class="card-body">
 
-            {{product.descr}}
+            {{product?.descr}}
 
             <ng-container *ngIf="orderLineOptions">
                 <div class="mt-4">

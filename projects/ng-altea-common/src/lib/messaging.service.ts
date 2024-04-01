@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, map, Subject, take } from "rxjs";
-import { WebPushToUsers } from 'ts-altea-model';
+import { SmsMessage, WebPushToUsers } from 'ts-altea-model';
 import { ApiListResult } from 'ts-common';
 import { SessionService } from './session.service';
 
@@ -38,6 +38,13 @@ export class MessagingService {
 
   }
 
+  async sendSms$(msg: SmsMessage): Promise<any> {
+
+    let res = await this.post$<any>(`${this.sessionSvc.backend}/messaging/sendSms`, msg)
+
+    return res
+
+  }
 
   async webPushToUsers$(msg: WebPushToUsers): Promise<ApiListResult<any>> {
 

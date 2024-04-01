@@ -226,7 +226,7 @@ export class ScheduleSchedulingComponent implements OnDestroy {
 
     if (res.status == ApiStatus.ok) {
 
-    //  this.dashboardSvc.showToastType(ToastType.saveSuccess)
+      this.dashboardSvc.showToastType(ToastType.saveSuccess)
       //await this.resourceSvc.refreshCachedObjectFromBackend(this.resource.id)
       this.mode = FormMode.editall
       this.changes?.reset()

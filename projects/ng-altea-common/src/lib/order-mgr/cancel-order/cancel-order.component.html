@@ -1,0 +1,145 @@
+<form #cancelOrderForm="ngForm">
+
+    <ng-container *ngIf="checks">
+
+        <div class="alert alert-danger" role="alert" *ngIf="checks.message != CancelOrderMessage.success" translate>
+            enums.cancel-order-message.{{checks.message}}
+        </div>
+
+    </ng-container>
+
+
+
+    <!-- 
+        If order is a gift & gift is already used, that cancel is not possible
+     -->
+    <ng-container *ngIf="cancelIsPossible">
+
+
+
+        <div class="row mt-3">
+            <div class="col d-flex justify-content-center"><span translate>objects.orderCancel.by</span>:
+
+            </div>
+        </div>
+
+
+
+
+
+
+        <div class="row mt-3">
+            <div class="col d-flex justify-content-center">
+
+                <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                    <input type="radio" class="btn-check" name="btnBy" id="btnCust" value="cust"
+                        [(ngModel)]="orderCancel.by" autocomplete="off" (click)="bySelected(OrderCancelBy.cust)">
+                    <label class="btn btn-outline-primary" for="btnCust" translate>enums.cancel-by.cust</label>
+
+                    <input type="radio" (click)="bySelected(OrderCancelBy.int)" class="btn-check" name="btnBy"
+                        id="btnInt" value="int" [(ngModel)]="orderCancel.by" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="btnInt" translate>enums.cancel-by.int</label>
+                </div>
+
+            </div>
+        </div>
+
+        <ng-container *ngIf="orderCancel.by">
+
+
+
+            <div class="alert alert-danger" role="alert"
+                *ngIf="orderCancel.by == 'cust' && checks?.message == CancelOrderMessage.noMoreFreeCancel" translate>
+                enums.cancel-order-message.noMoreFreeCancel
+            </div>
+
+
+            <div class="row {{css_cls_row}}" *ngIf="orderCancel.by == 'cust'">
+                <div class="col">
+                    <ngx-altea-label-control label="objects.orderCancel.reason" for="reasonCustomer">
+                        <ng-select required id="reasonCustomer" name="reasonCustomer" *ngIf="initialized"
+                            [items]="customerCancelReasons" bindLabel="trans" bindValue="key" [clearable]="false"
+                            [multiple]="false" [(ngModel)]="orderCancel.reason"></ng-select>
+                    </ngx-altea-label-control>
+                </div>
+            </div>
+
+            <div class="row {{css_cls_row}}" *ngIf="orderCancel.by == 'int'">
+                <div class="col">
+                    <ngx-altea-label-control label="objects.orderCancel.reason" for="reasonInternal">
+                        <ng-select required id="reasonInternal" name="reasonInternal" *ngIf="initialized"
+                            [items]="internalCancelReasons" bindLabel="trans" bindValue="key" [clearable]="false"
+                            [multiple]="false" [(ngModel)]="orderCancel.reason"></ng-select>
+                    </ngx-altea-label-control>
+                </div>
+            </div>
+
+            <ng-container *ngIf="orderCancel.reason">
+                <div class="row {{css_cls_row}}">
+                    <div class="col">
+                        <ngx-altea-label-control label="objects.orderCancel.remark" for="remark">
+                            <textarea style="height: 120px;" id="remark" name="remark" class="form-control"
+                                [(ngModel)]="orderCancel.remark"></textarea>
+                        </ngx-altea-label-control>
+                    </div>
+                </div>
+                <div class="row {{css_cls_row}}">
+                    <div class="col">
+                        <div class="form-check form-switch">
+                            <input type="checkbox" class="form-check-input" id="gift" name="gift"
+                                [(ngModel)]="orderCancel.gift">
+                            <label class="form-check-label" for="gift" translate="objects.orderCancel.gift"></label>
+                        </div>
+                    </div>
+                </div>
+
+
+                <ng-container *ngIf="orderCancel.hasCompensation()">
+
+                    <div class="row {{css_cls_row}}">
+                        <div class="col-8 d-flex justify-content-end">
+                            <span translate>ui.order-cancel.deposit</span>:
+                        </div>
+                        <div class="col-4">
+                            € {{order.deposit}}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-8 d-flex justify-content-end">
+                            <span translate>ui.order-cancel.paid</span>:
+                        </div>
+                        <div class="col-4">
+                            € {{order.paid}}
+                        </div>
+                    </div>
+
+
+                    <div class="row {{css_cls_row}}">
+                        <div class="col">
+                            <ngx-altea-label-control label="objects.orderCancel.compensation" for="compensation">
+                                <input type="number" id="compensation" name="compensation" class="form-control"
+                                    [(ngModel)]="orderCancel.compensation">
+                            </ngx-altea-label-control>
+                        </div>
+                    </div>
+
+
+                </ng-container>
+
+
+
+                <div class="row {{css_cls_row}}">
+                    <div class="col">
+                        <div class="d-grid gap-2">
+
+
+                            <button class="btn btn-primary" translate (click)="confirmCancel($event)"
+                                [disabled]="!orderCancel.by || !orderCancel.reason">ui.order-cancel.cancelBtn</button>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </ng-container>  <!--   *ngIf="orderCancel.by"  -->
+    </ng-container>    <!-- *ngIf="cancelIsPossible"   -->
+</form>

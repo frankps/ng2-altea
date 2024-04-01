@@ -1,5 +1,5 @@
 import { AfterContentChecked, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { BranchService, ProductService, ResourceService, SessionService, TypeInfoService } from 'ng-altea-common';
+import { BranchService, ProductService, ResourceService, ScheduleService, SessionService, TypeInfoService } from 'ng-altea-common';
 import { BsLocaleService } from 'ngx-bootstrap/datepicker';
 import { TypeInfo } from 'ts-altea-model';
 import { DbQuery, QueryOperator } from 'ts-common';
@@ -14,7 +14,8 @@ export class AppComponent implements OnInit {
   appReady = false
 
   constructor(private localeService: BsLocaleService, private branchSvc: BranchService, private sessionSvc: SessionService
-    , private productSvc: ProductService, private resourceSvc: ResourceService, private typeInfoSvc: TypeInfoService) {
+    , private productSvc: ProductService, private resourceSvc: ResourceService, private typeInfoSvc: TypeInfoService,
+    private scheduleSvc: ScheduleService) {
     this.localeService.use('nl-be');
 
 
@@ -49,7 +50,7 @@ export class AppComponent implements OnInit {
     console.warn(typeInfos)
 
     const branchQry = new DbQuery()
-    branchQry.and('id', QueryOperator.equals, this.sessionSvc.branchId)
+    branchQry.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
     branchQry.take = 1000
     this.branchSvc.cacheQuery = branchQry
     //this.branchSvc.linkedTypes = ['ProductItem', 'ProductResource']
@@ -65,11 +66,19 @@ export class AppComponent implements OnInit {
 
     const resourceQry = new DbQuery()
     resourceQry.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
-    // 'groups.group,schedules:orderBy=idx.planning,children.child,user'
     resourceQry.include('groups.group', 'schedules:orderBy=idx.planning', 'children.child', 'user')
     resourceQry.take = 1000
     this.resourceSvc.cacheQuery = resourceQry
     await this.resourceSvc.initCache(typeInfos)
+
+    /* 
+    const scheduleQry = new DbQuery()
+    scheduleQry.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
+    scheduleQry.include('planning')
+    scheduleQry.take = 1000
+    this.scheduleSvc.cacheQuery = scheduleQry
+    await this.scheduleSvc.initCache(typeInfos) */
+
 
     this.appReady = true
 

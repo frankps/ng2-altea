@@ -1,5 +1,5 @@
 import { plainToClass, instanceToPlain } from "class-transformer"
-
+import * as _ from "lodash";
 
 export class ArrayHelper {
     static AtLeastOneItem(array: any): boolean {
@@ -188,5 +188,15 @@ export class ObjectHelper {
 
         return obj
     }
+
+
+    static nextIdx(collection: any[], idxProperty: string = 'idx', idxStep = 100) {
+        if (ArrayHelper.IsEmpty(collection))
+          return idxStep
+    
+        const maxObject = _.maxBy(collection, idxProperty)
+    
+        return maxObject[idxProperty] + idxStep
+      }
 
 }

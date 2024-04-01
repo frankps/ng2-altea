@@ -54,19 +54,7 @@ export class AlteaDb {
     }
 
 
-    async saveResourcePlannings(plannings: ResourcePlanning[]): Promise<ApiListResult<ResourcePlanning>> {
 
-
-        console.error('saveResourcePlannings', plannings)
-
-        let planningsForDb = ObjectHelper.unType(plannings, ['resource', 'resourceGroup', 'schedule', 'orderLine'])
-
-        const dbPlannings = new DbObjectMultiCreate<ResourcePlanning>('resourcePlanning', ResourcePlanning, planningsForDb)
-
-        const res = await this.db.createMany$<ResourcePlanning>(dbPlannings)
-
-        return res
-    }
 
     async getBranch(branchId: string): Promise<Branch> {
 
@@ -151,7 +139,7 @@ export class AlteaDb {
 
         if (fields)
             qry.select(...fields)
-        
+
         qry.and('branchId', QueryOperator.equals, branchId)
         qry.and('orderId', QueryOperator.equals, orderId)
         qry.and('code', QueryOperator.equals, code)
@@ -305,6 +293,15 @@ export class AlteaDb {
         }
 
     */
+    async getObjectById$<T>(typeName: string, type: { new(): T; }, id: string): Promise<T> {
+
+        const qry = new DbQueryTyped<T>(typeName, type)
+        qry.and('id', QueryOperator.equals, id)
+
+        let object = await this.db.queryFirst$<T>(qry)
+
+        return object
+    }
 
     async getObjectsByIds<T>(typeName: string, type: { new(): T; }, ids: string[]): Promise<T[]> {
 
@@ -347,6 +344,15 @@ export class AlteaDb {
         return updateResult
     }
 
+    async createObject<T>(typeName: string, type: { new(): T; }, object: T): Promise<ApiResult<T>> {
+
+
+        let dbObject = new DbObjectCreate<T>(typeName, type, object)
+        let createResult = await this.db.create$(dbObject)
+
+        return createResult
+    }
+
     async createObjects<T>(typeName: string, type: { new(): T; }, objects: T[]): Promise<ApiListResult<T>> {
 
         if (!Array.isArray(objects) || objects.length == 0)
@@ -362,9 +368,30 @@ export class AlteaDb {
 
     /** Gifts */
 
+    async getGiftByOrderId(orderId: string): Promise<Gift> {
+        //const object = await this.getObjectById$('gift', Gift, id)
+
+        const qry = new DbQueryTyped<Gift>('gift', Gift)
+        qry.and('orderId', QueryOperator.equals, orderId)
+
+        let object = await this.db.queryFirst$<Gift>(qry)
+
+        return object
+    }
+
+    async getGiftById(id: string): Promise<Gift> {
+        const object = await this.getObjectById$('gift', Gift, id)
+        return object
+    }
+
     async getGiftsByIds(ids: string[]): Promise<Gift[]> {
         const objects = await this.getObjectsByIds('gift', Gift, ids)
         return objects
+    }
+
+    async createGift(gift: Gift): Promise<ApiResult<Gift>> {
+        let createResult = await this.createObject('gift', Gift, gift)
+        return createResult
     }
 
     async createGifts(gifts: Gift[]): Promise<ApiListResult<Gift>> {
@@ -385,6 +412,19 @@ export class AlteaDb {
 
 
     /** Subscriptions */
+
+    async getSubscriptionsByOrderId(orderId: string): Promise<Subscription[]> {
+
+        const qry = new DbQueryTyped<Subscription>('subscription', Subscription)
+        qry.and('orderId', QueryOperator.equals, orderId)
+
+        qry.and('act', QueryOperator.equals, true)
+        qry.and('usedQty', QueryOperator.greaterThan, 0)
+
+        let objects = await this.db.query$<Subscription>(qry)
+
+        return objects
+    }
 
     async getSubscriptionsByIds(ids: string[]): Promise<Subscription[]> {
 
@@ -453,6 +493,62 @@ export class AlteaDb {
 
     async updateBankTransactions(bankTransactions: BankTransaction[], propertiesToUpdate: string[]): Promise<ApiListResult<BankTransaction>> {
         let updateResult = await this.updateObjects('bankTransaction', BankTransaction, bankTransactions, propertiesToUpdate)
+        return updateResult
+    }
+
+    /** ResourcePlanning */
+
+    /** original (not-generated) method */
+    async saveResourcePlannings(plannings: ResourcePlanning[]): Promise<ApiListResult<ResourcePlanning>> {
+
+
+        console.error('saveResourcePlannings', plannings)
+
+        let planningsForDb = ObjectHelper.unType(plannings, ['resource', 'resourceGroup', 'schedule', 'orderLine'])
+
+        const dbPlannings = new DbObjectMultiCreate<ResourcePlanning>('resourcePlanning', ResourcePlanning, planningsForDb)
+
+        const res = await this.db.createMany$<ResourcePlanning>(dbPlannings)
+
+        return res
+    }
+
+
+    async getResourcePlanningsByOrderId(orderId: string): Promise<ResourcePlanning[]> {
+
+        const qry = new DbQueryTyped<ResourcePlanning>('resourcePlanning', ResourcePlanning)
+        qry.and('orderId', QueryOperator.equals, orderId)
+
+        let objects = await this.db.query$<ResourcePlanning>(qry)
+
+        return objects
+    }
+
+
+
+
+
+    async getResourcePlanningById(id: string): Promise<ResourcePlanning> {
+        const object = await this.getObjectById$('resourcePlanning', ResourcePlanning, id)
+        return object
+    }
+    async getResourcePlanningsByIds(ids: string[]): Promise<ResourcePlanning[]> {
+        const objects = await this.getObjectsByIds('resourcePlanning', ResourcePlanning, ids)
+        return objects
+    }
+
+    async createResourcePlannings(resourcePlannings: ResourcePlanning[]): Promise<ApiListResult<ResourcePlanning>> {
+        let createResult = await this.createObjects('resourcePlanning', ResourcePlanning, resourcePlannings)
+        return createResult
+    }
+
+    async updateResourcePlanning(resourcePlanning: ResourcePlanning, propertiesToUpdate: string[]): Promise<ApiResult<ResourcePlanning>> {
+        let updateResult = await this.updateObject('resourcePlanning', ResourcePlanning, resourcePlanning, propertiesToUpdate)
+        return updateResult
+    }
+
+    async updateResourcePlannings(resourcePlannings: ResourcePlanning[], propertiesToUpdate: string[]): Promise<ApiListResult<ResourcePlanning>> {
+        let updateResult = await this.updateObjects('resourcePlanning', ResourcePlanning, resourcePlannings, propertiesToUpdate)
         return updateResult
     }
 

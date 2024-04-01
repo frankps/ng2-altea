@@ -17,6 +17,9 @@ export class OrderComponent implements OnInit {
   @Output() addProduct: EventEmitter<void> = new EventEmitter<void>();
   @Output() continue: EventEmitter<Order> = new EventEmitter<Order>();
 
+  /** used to cancel an existing order */
+  @Output() cancel: EventEmitter<Order> = new EventEmitter<Order>();
+
   @Input() showVat = false
 
   ResourceTypeIcons = ResourceType
@@ -32,7 +35,10 @@ export class OrderComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
 
+  }
 
+  cancelOrder() {
+    this.cancel.emit(this.order)
 
   }
 

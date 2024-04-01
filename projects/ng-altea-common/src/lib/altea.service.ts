@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AlteaDb, AvailabilityService, OrderMgmtService } from 'ts-altea-logic';
+import { AlteaDb, AvailabilityService, CancelOrder, OrderMgmtService } from 'ts-altea-logic';
 import { ObjectService } from './object.service';
 import { SessionService } from './session.service';
 import { SubscriptionMgmtService } from 'projects/ts-altea-logic/src/lib/subscription/subscription-mgmt-service';
@@ -60,4 +60,14 @@ export class AlteaService {
 
     return this._orderMessaging
   }
+
+  _cancelOrder?: CancelOrder
+
+get cancelOrder(): CancelOrder {
+
+  if (!this._cancelOrder)
+    this._cancelOrder = new CancelOrder(this.objSvc)
+
+  return this._cancelOrder
+}
 }

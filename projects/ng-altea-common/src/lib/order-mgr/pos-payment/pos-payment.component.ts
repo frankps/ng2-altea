@@ -79,14 +79,16 @@ export class PosPaymentComponent {
 
     this.gifts = await this.giftSvc.searchGift(this.giftCode)
 
-    if (this.gifts.length > 1) {
+    if (this.gifts.length >= 1) {
       this.showGifts = true
-    } else if (this.gifts.length == 1) {
+    } 
+    /*
+    else if (this.gifts.length == 1) {
 
       let gift = this.gifts[0]
 
       this.useGift(gift)
-    }
+    } */
 
     console.warn(this.gifts)
   }

@@ -44,6 +44,30 @@
     "end": "einde"
   },
   "enums": {
+    "cancel-order-message": {
+      "alreadyCancelled": "Order reeds geannuleerd!",
+      "giftAlreadyUsed": "Cadeaubon reeds gebruikt",
+      "subscriptionAlreadyUsed": "Abonnement reeds gebruikt",
+      "noMoreFreeCancel": "Annulatie zonder vergoeding niet meer mogelijk!"
+    },
+    "cancel-by": {
+      "cust": "Klant",
+      "int": "Intern"
+    },
+    "customer-cancel-reason": {
+      "sick": "Ziekte",
+      "decease": "Overlijden",
+      "traffic": "Verkeer",
+      "work": "Werk",
+      "noShow": "No show",
+      "other": "Ander"
+    },
+    "internal-cancel-reason": {
+      "absence": "Afwezig/ziekte",
+      "techProblem": "Technisch probleem",
+      "planProblem": "Planningsprobleem",
+      "other": "Ander"
+    },
     "task-priority": {
       "0": "Niet dringend",
       "10": "Normaal",
@@ -248,6 +272,11 @@
     }
   },
   "ui": {
+    "order-cancel": {
+      "deposit": "Gevraagde voorschot",
+      "paid": "Reeds betaald",
+      "cancelBtn": "Annuleer order" 
+    },
     "search-user": {
       "search": "Zoek gebruiker",
       "link": "Link"
@@ -257,7 +286,6 @@
         "sections": {
           "general": {
             "title": "Algemeen"
-           
           }
         }
       }
@@ -321,10 +349,13 @@
           },
           "subscriptions": {
             "title": "Abonnementen"
+          },
+          "giftsIn": {
+            "title": "Ontvangen cadeaubonnen"
           }
         }
       }
-    },   
+    },
     "order": {
       "search-type-select": {
         "appointmentsOn": "Afspraken op",
@@ -333,7 +364,7 @@
         "invoiced": "Gefactureerd",
         "gifts": "Cadeaubonnen",
         "nonAppointments": "Enkel producten"
-      } 
+      }
     },
     "order-mgr": {
       "pos": {
@@ -344,7 +375,6 @@
           "contact": "Klant",
           "pay": "Betalen"
         }
-
       },
       "order": {
         "add-product": "Dienst of product toevoegen",
@@ -352,7 +382,6 @@
       },
       "order-line": {
         "confirm": ""
-
       },
       "persons": {
         "title": "Personen selectie behandelingen",
@@ -607,6 +636,7 @@
       "vatIncl": "Prijzen zijn BTW inclusief",
       "vatNr": "BTW nummer",
       "smsOn": "Verstuur SMS berichten naar klanten",
+      "cancel": "Minimum tijd voor kosteloze annulatie",
       "gift": {
         "on": "Gebruik cadeaubonnen",
         "methods": {
@@ -645,6 +675,13 @@
     },
     "reminder": {
       "dur": "Versturen voor aanvang"
+    },
+    "orderCancel": {
+      "by": "Annulatie door",
+      "reason": "Reden",
+      "remark": "Opmerking",
+      "compensation": "Teruggave",
+      "gift": "Maak cadeaubon"
     },
     "order": {
       "start": "Start",
@@ -827,6 +864,7 @@
     "schedule": {
       "name": "Naam",
       "default": "Standaard",
+      "scheduleIds": "Gebruik plannings gedefinieerd op",
       "prepIncl": "Voorbereidings- en opkuistijden vallen altijd binnen deze planning"
     },
     "scheduling": {

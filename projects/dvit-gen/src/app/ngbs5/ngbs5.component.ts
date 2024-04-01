@@ -9,13 +9,13 @@ import { DbMethodsGenerator } from 'virtual-coder';
 })
 export class Ngbs5Component {
 
-    input = `    {
+/*     input = `    {
         "type": "dbMethods",
         "typeName": "bankTransaction",
         "plural": null
-    }`
+    }` */
     
-    inputOld = `{
+    input = `{
     "type": "form",
     "name": "searchUser",
     "form": {
@@ -84,6 +84,73 @@ export class Ngbs5Component {
 }
   `
 
+  test= {
+    "type": "form",
+    "name": "searchUser",
+    "form": {
+        "tag": true
+    },
+    "bind": {
+        "mode": "ngModel",
+        "to": "object",
+        "type": "",
+        "import": ""
+    },
+    "label": {
+        "mode": "ngx-altea-label-control",
+        "translate": "objects.product"
+    },
+    "rows": {
+        "generate": true,
+        "cols": 1
+    },
+    "elements": {
+        "type": {
+            "type": "ng-select",
+            "source": {
+                "mode": "enum",
+                "name": "ProductType",
+                "import": "ts-altea-model",
+                "translate": "enums.product-type"
+            },
+            "required": true,
+            "clearable": false,
+            "multiple": false
+        },
+        "sub": {
+            "type": "ng-select",
+            "source": {
+                "mode": "enum",
+                "name": "ProductSubType",
+                "import": "ts-altea-model",
+                "translate": "enums.product-sub-type"
+            },
+            "required": true,
+            "clearable": false,
+            "multiple": false
+        },
+        "search": {
+            "type": "text",
+            "required": true
+        },       
+        "request": {
+            "type": "button",
+            "translate": "dic.search",
+            "click": "search($event)",
+            "class": {
+                "style": "primary",
+                "outline": false,
+                "size": "",
+                "block": false
+            },
+            "disabled": {
+                "enable": true,
+                "pristine": true,
+                "valid": false
+            }
+        }
+    }
+}
     /*
   
     {

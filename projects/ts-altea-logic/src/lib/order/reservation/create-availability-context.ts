@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { ApiListResult, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
+import { ApiListResult, ArrayHelper, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
 import { AvailabilityRequest, Order, AvailabilityContext, Resource, ResourcePlanning, ResourceType, Schedule, SchedulingType, DateRangeSet, ResourcePlannings } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { AlteaDb } from '../../general/altea-db'
@@ -176,7 +176,12 @@ export class CreateAvailabilityContext {
                 console.warn('OTHER SCHEDULE')
 
                 // check if other schedule is active during period
-                let otherSchedulePlannings = resourcePlannings.filterByScheduleDateRange(otherSchedule.id, from, to)
+                let otherSchedulePlannings: ResourcePlannings
+
+                if (ArrayHelper.AtLeastOneItem(otherSchedule.scheduleIds))
+                    otherSchedulePlannings = resourcePlannings.filterBySchedulesDateRange2(otherSchedule.scheduleIds, from, to)
+                else
+                    otherSchedulePlannings = resourcePlannings.filterByScheduleDateRange(otherSchedule.id, from, to)
 
                 if (otherSchedulePlannings.isEmpty())
                     continue

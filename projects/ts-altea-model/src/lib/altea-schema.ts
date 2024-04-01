@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { Exclude, Type, Transform } from "class-transformer";
 import 'reflect-metadata';
-import { ConnectTo, DateHelper, DbObjectCreate, IAsDbObject, ManagedObject, ObjectHelper, ObjectMgmt, ObjectReference, ObjectWithId, ObjectWithIdPlus, QueryOperator, TimeHelper } from 'ts-common'
+import { ArrayHelper, ConnectTo, DateHelper, DbObjectCreate, IAsDbObject, ManagedObject, ObjectHelper, ObjectMgmt, ObjectReference, ObjectWithId, ObjectWithIdPlus, QueryOperator, TimeHelper } from 'ts-common'
 import * as _ from "lodash";
 import { PersonLine } from "./person-line";
 import { DateRange, DateRangeSet, TimeBlock, TimeBlockSet, TimeSpan } from "./logic";
@@ -344,7 +344,16 @@ export class Contact extends ObjectWithId {
   deleted = false
   deletedAt?: Date;
 
+  @Type(() => Subscription)
   subscriptions?: Subscription[]
+
+  /** gifts given by this contact to others */
+  @Type(() => Gift)
+  giftsOut?: Gift[]
+
+  /** received gifts (can also be gifts created by system for cancellations) */
+  @Type(() => Gift)
+  giftsIn?: Gift[]
 
   setName() {
 
@@ -394,6 +403,12 @@ export class Schedule extends ObjectWithIdPlus {
 
   @Type(() => ResourcePlanning)
   planning?: ResourcePlanning[]
+
+
+  /** re-use the plannings from these branch schedule ids  */
+  scheduleIds: string[] = []
+
+
   //scheduling?: Scheduling[];
 
   // the start of the week schedules (if weeks.length > 1), format: yyyymmdd
@@ -417,7 +432,7 @@ export class Schedule extends ObjectWithIdPlus {
   startDate() {
     return DateHelper.parse(this.start)
   }
-  
+
 
 
 
@@ -483,17 +498,22 @@ export class Schedule extends ObjectWithIdPlus {
 
     let currentWeekIdx = 0
     let nrOfWeeks = this.weeks.length
+
     /**
-     * if only 1 week in this.weeks -> then 
+     * if a multi week schedule, then calculate the current week inside this multi-week schedule (currentWeekIdx)
      */
     if (this.weeks.length > 1) {
-
-      let weekDif = dateFns.differenceInWeeks(fromDate, this.startDate())
+      let startOfWeekSchedule = this.startDate()
+      let weekDif = dateFns.differenceInWeeks(fromDate, startOfWeekSchedule)
 
       console.warn(weekDif)
 
-      currentWeekIdx = weekDif % nrOfWeeks
-      // => we are in the dif+1 week
+      if (fromDate >= startOfWeekSchedule && weekDif >= 0)
+        currentWeekIdx = weekDif % nrOfWeeks
+      else {  // if fromDate is before startOfWeekSchedule
+        weekDif = Math.abs(weekDif) % nrOfWeeks
+        currentWeekIdx = nrOfWeeks - 1 - weekDif
+      }
     }
 
 
@@ -510,7 +530,7 @@ export class Schedule extends ObjectWithIdPlus {
 
       if (daySchedule?.on && Array.isArray(daySchedule.blocks)) {
 
-        
+
         for (const block of daySchedule.blocks) {
 
           const from: HourMinute = block.fromParse()
@@ -744,6 +764,9 @@ export class Product extends ObjectWithIdPlus {
 
   @Type(() => ProductRule)
   rules?: ProductRule[]
+
+  /** min number of hours before reservation for free cancel (undefined/null = take setting from Branch, 0 = always free cancel, 24 = 1 day upfront for free cancel, ...) */
+  cancel?: number
 
   duration = 0
 
@@ -1472,8 +1495,10 @@ export class Branch extends ObjectWithIdPlus {
   vatPcts?: number[];
   vatNr?: string
 
-
   smsOn = false
+
+  /** min number of hours before reservation for free cancel (0 = always free cancel, 24 = 1 day upfront for free cancel, ...) */
+  cancel: number = 0
 
   /** default deposit percentage, can be overruled on product & contact level */
   depositPct?: number
@@ -2022,6 +2047,8 @@ export class Subscription extends ObjectWithIdPlus {
 
   // @Type(() => Order)
   order?: Order;
+
+  /** the purchase order id */
   orderId?: string;
   name?: string;
   remark?: string;
@@ -2101,7 +2128,7 @@ export enum OrderState {
   waitDeposit = 'waitDeposit',
   confirmed = 'confirmed',
 
-  canceled = 'canceled',
+  cancelled = 'cancelled',
   noDepositCancel = 'noDepositCancel',
   inTimeCancel = 'inTimeCancel',
   lateCancel = 'lateCancel',
@@ -2131,6 +2158,66 @@ export class ResourcePreferences {
 
   /** list of preferred location resource ids */
   locIds: string[] = []
+}
+
+/*
+    "cancel-by": {
+      "cust": "Klant",
+      "int": "Intern"
+    }, */
+
+export enum CancelBy {
+  /** Booking cancelled by customer */
+  cust = "cust",
+
+  /** Booking cancelled internally */
+  int = "int"
+}
+
+export enum CustomerCancelReasons {
+  sick = "sick",
+  decease = "decease",
+  traffic = "traffic",
+  work = "work",
+  noShow = "noShow",
+  other = "other"
+}
+
+export enum InternalCancelReasons {
+  absence = "absence",
+  techProblem = "techProblem",
+  planProblem = "planProblem",
+  other = "other"
+}
+
+export enum OrderCancelBy {
+  /** customer cancelled order */
+  cust = "cust",
+
+  /** order cancelled internally*/
+  int = "int"
+}
+
+export enum OrderCancelCompensate {
+  none = "none",
+  gift = "gift"
+}
+export class OrderCancel {
+  by?: OrderCancelBy
+  reason?: string
+  remark?: string
+  date?: Date
+  compensate = OrderCancelCompensate.none
+  compensation = 0
+
+  set gift(value: boolean) {
+    this.compensate = value ? OrderCancelCompensate.gift : OrderCancelCompensate.none
+  }
+
+  hasCompensation() {
+    return this.compensate != OrderCancelCompensate.none
+  }
+
 }
 
 export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {
@@ -2167,7 +2254,6 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {
   appointment = false;
 
   start?: number; // format: yyyyMMddHHmmss
-
 
   end?: number; // format: yyyyMMddHHmmss
   descr?: string;
@@ -2219,6 +2305,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {
   /** unique public code visible to customer */
   code?: string = undefined
 
+  /** this order is a gift purchase (gift voucher) */
   gift = false;
   giftCode?: string;
 
@@ -2227,6 +2314,9 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {
 
   msgOn?: number
   msgCode?: string
+
+  @Type(() => OrderCancel)
+  cancel?: OrderCancel
 
   //msgLog: MsgInfo[] = []
 
@@ -2329,6 +2419,27 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {
     return this.lines?.find(l => l.productId == productId)
   }
 
+  /**
+   * The default cancel time is defined on branch (branch.cancel in hours = number of hours before start of booking where free cancellation is not allowed anymore)
+   * Products can optionally specify another minimum interval
+   * 
+   * @returns 
+   */
+  cancelMinHours(): number {
+    const products = this.getProducts()
+
+    if (ArrayHelper.IsEmpty(products))
+      return 0
+
+    const defaultBranchCancel = this.branch.cancel ?? 0
+
+    const allCancelHours = products.map(p => p?.cancel ?? defaultBranchCancel)
+
+    const cancelHours = _.max(allCancelHours)
+
+    return cancelHours
+  }
+
   addPayment(payment: Payment) {
 
     if (!payment)
@@ -2337,6 +2448,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {
     if (!this.payments)
       this.payments = []
 
+    payment.idx = this.nextPaymentIdx()
     this.payments.push(payment)
     payment.markAsNew()
 
@@ -2367,7 +2479,17 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {
 
   }
 
+  nextPaymentIdx() {
+    return ObjectHelper.nextIdx(this.payments)
+  }
+
+  nextOrderLineIdx() {
+    return ObjectHelper.nextIdx(this.lines)
+  }
+
   addLine(orderLine: OrderLine, setUnitPrice = true) {
+
+    orderLine.idx = this.nextOrderLineIdx()
 
     if (!this.lines)
       this.lines = []
@@ -2396,7 +2518,9 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {
 
   calculateDeposit(): number {
 
-    if (!this.hasLines())
+    console.error('calculateDeposit')
+
+    if (!this.hasLines() || this.incl == 0)
       return 0
 
     if (!this.branch)
@@ -3144,18 +3268,21 @@ export class OrderLine extends ObjectWithIdPlus {
 
     const previousIncl = this.incl
     const previousExcl = this.excl
+    const previousVat = this.vat
 
     this.incl = this.unit * this.qty
 
     if (this.vatPct) {
       const vatFactor = (1 + this.vatPct / 100)
       this.excl = this.incl / vatFactor
+      this.vat = this.incl - this.excl
     } else
       this.excl = this.incl
 
 
     if (previousIncl != this.incl) this.markAsUpdated('incl')
     if (previousExcl != this.excl) this.markAsUpdated('excl')
+    if (previousVat != this.vat) this.markAsUpdated('vat')
 
     return this.incl
   }
@@ -3284,7 +3411,7 @@ export class OrderLine extends ObjectWithIdPlus {
 
 export enum PlanningType {
   /** occupied */
-  occ = 'occ',   // occupied
+  occ = 'occ',   // occupied, typically used for order planning
   hol = 'hol',   // holidays 
   bnk = 'bnk',   // bank holiday
   ill = 'ill',
@@ -3921,9 +4048,14 @@ export class Gift extends ObjectWithIdPlus {
 */
 
   fromId?: string;
+
+  @Type(() => Contact)
   from?: Contact
 
+
   toId?: string;
+
+  @Type(() => Contact)
   to?: Contact
 
   orderId?: string;
@@ -3944,9 +4076,11 @@ export class Gift extends ObjectWithIdPlus {
   @Type(() => Date)
   expiresOn?: Date;
 
+  /** the value of the gift in local currency */
   @Type(() => Number)
   value?: number
 
+  /** the amount already used in local currency */
   @Type(() => Number)
   used = 0
 
@@ -3971,8 +4105,11 @@ export class Gift extends ObjectWithIdPlus {
   //certificate: GiftCertificate = GiftCertificate.inStore
 
 
-  constructor(markAsNew = false) {
+  constructor(createNewCode: boolean = false, markAsNew = false) {
     super()
+
+    if (createNewCode)
+      this.newCode()
 
     if (markAsNew)
       this.m.n = true
@@ -4003,7 +4140,7 @@ export class Gift extends ObjectWithIdPlus {
     if (amount <= available)
       return new CanUseGift(true, amount)
     else {
-      return new CanUseGift(true, amount, CanUseGiftMsg.partialAmount)
+      return new CanUseGift(true, available, CanUseGiftMsg.partialAmount)
     }
 
   }
@@ -4026,7 +4163,9 @@ export class Gift extends ObjectWithIdPlus {
 
     this.used -= amount
 
-    if (this.used < this.value)
+    if (this.used >= this.value)
+      this.isConsumed = true
+    else
       this.isConsumed = false
 
   }
@@ -4063,6 +4202,7 @@ export enum PaymentType {
   credit = 'credit',
   debit = 'debit',
   gift = 'gift',
+  stripe = 'stripe',
   /** subscription */
   subs = 'subs',
 }

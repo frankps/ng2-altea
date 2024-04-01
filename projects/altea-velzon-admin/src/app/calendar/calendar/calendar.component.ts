@@ -164,8 +164,9 @@ export class CalendarComponent implements OnInit {
     query.include('resource')
     query.and('start', QueryOperator.greaterThanOrEqual, DateHelper.yyyyMMddhhmmss(start))
     query.and('start', QueryOperator.lessThan, DateHelper.yyyyMMddhhmmss(end))
-    query.and('prep', QueryOperator.equals, false)
+    query.and('prep', QueryOperator.equals, false)  // no need to show preparation times
     query.and('scheduleId', QueryOperator.equals, null)
+    query.and('act', QueryOperator.equals, true)  // only the active plannings
 
     query.orderBy('start')
     query.take = 50
