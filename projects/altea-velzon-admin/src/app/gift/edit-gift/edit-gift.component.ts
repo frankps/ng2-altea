@@ -72,7 +72,7 @@ export class EditGiftComponent extends NgEditBaseComponent<Gift> {
     console.error('objectRetrieved')
     console.error(object)
 
-   // this.editSectionId = 'general'
+    // this.editSectionId = 'general'
   }
 
   startEditSection(sectionId: string, sectionParam: string) {
@@ -86,10 +86,18 @@ export class EditGiftComponent extends NgEditBaseComponent<Gift> {
 
     }
   }
+
   save() {
+
+    if (!this.object)
+      return
 
     console.error(this.editSectionId)
     console.error(this.object)
+
+    if (this.object.used < this.object.value)
+      this.object.isConsumed = false
+
 
     switch (this.editSectionId) {
 
@@ -97,15 +105,12 @@ export class EditGiftComponent extends NgEditBaseComponent<Gift> {
         this.saveSection(this.sectionProps, this.editSectionId)
     }
 
-
-    
-
   }
 
 
 
   searchContact() {
-    this.searchContactModal.show()    
+    this.searchContactModal.show()
   }
 
 

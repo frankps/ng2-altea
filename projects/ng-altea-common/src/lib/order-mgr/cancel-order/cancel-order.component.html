@@ -2,7 +2,10 @@
 
     <ng-container *ngIf="checks">
 
-        <div class="alert alert-danger" role="alert" *ngIf="checks.message != CancelOrderMessage.success" translate>
+
+        <div class="alert alert-danger" role="alert"
+            *ngIf="checks.message != CancelOrderMessage.success && checks.message != CancelOrderMessage.noMoreFreeCancel"
+            translate>
             enums.cancel-order-message.{{checks.message}}
         </div>
 
@@ -23,7 +26,7 @@
             </div>
         </div>
 
-
+  
 
 
 
@@ -93,6 +96,7 @@
                     </div>
                 </div>
 
+                {{orderCancel.compensate}}
 
                 <ng-container *ngIf="orderCancel.hasCompensation()">
 
@@ -114,6 +118,7 @@
                         </div>
                     </div>
 
+                    
 
                     <div class="row {{css_cls_row}}">
                         <div class="col">
@@ -140,6 +145,6 @@
                     </div>
                 </div>
             </ng-container>
-        </ng-container>  <!--   *ngIf="orderCancel.by"  -->
-    </ng-container>    <!-- *ngIf="cancelIsPossible"   -->
+        </ng-container> <!--   *ngIf="orderCancel.by"  -->
+    </ng-container> <!-- *ngIf="cancelIsPossible"   -->
 </form>

@@ -2097,26 +2097,7 @@ export class OrderPerson extends ObjectWithId {
   // }
 }
 
-/*
-enum OrderState {
 
-  creation
-  waitDeposit
-  confirmed
-  
-  canceled
-  noDepositCancel
-  inTimeCancel
-  lateCancel
-
-  arrived
-  noShow
-  finished
-
-  inProgress
-  timedOut
-}
-*/
 
 
 // export const orderTemplates = ['wait-deposit', 'confirmation', 'no-deposit-cancel', 'in-time-cancel', 'late-cancel', 'reminder', 'no-show', 'satisfaction']
@@ -2142,6 +2123,9 @@ export enum OrderState {
   //  canceled = 'canceled',
   timedOut = 'timedOut'
 }
+
+
+
 
 export class VatLine {
 
@@ -2324,6 +2308,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {
   /*
   remindOn?: number  // format: yyyyMMddHHmmss
   remindLog?: MsgInfo[]
+<i class="fa-solid fa-circle-plus"></i>
 */
 
 
@@ -2353,7 +2338,21 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {
     return DateHelper.parse(this.start)
   }
 
+  stateIcon() {
+    switch (this?.state) {
+      case OrderState.cancelled: return "fa-solid fa-circle-xmark"
+      case OrderState.creation: return "fa-solid fa-circle-plus"
+      default: return undefined
+    }
+  }
 
+  stateColor() {
+    switch (this?.state) {
+      case OrderState.cancelled: return "lightred"
+      case OrderState.creation: return "lightblue"
+      default: return "lightgreen"
+    }
+  }
 
   depositByDate(): Date {
     return dateFns.addMinutes(this.crea, this.depositMins)

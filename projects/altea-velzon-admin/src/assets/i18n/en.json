@@ -44,11 +44,20 @@
     "end": "einde"
   },
   "enums": {
+    "order-state": {
+      "creation": "Creatie",
+      "waitDeposit": "Afwachting voorschot",
+      "confirmed": "Geconfirmeerd",
+      "cancelled": "Geannuleerd",
+      "noShow": "Niet opgedaagd",
+      "timedOut": "Timed out",
+      "finished": "Afgerond"
+    },
     "cancel-order-message": {
       "alreadyCancelled": "Order reeds geannuleerd!",
       "giftAlreadyUsed": "Cadeaubon reeds gebruikt",
       "subscriptionAlreadyUsed": "Abonnement reeds gebruikt",
-      "noMoreFreeCancel": "Annulatie zonder vergoeding niet meer mogelijk!"
+      "noMoreFreeCancel": "Laattijdige annulatie! Annulatie zonder vergoeding niet meer mogelijk!"
     },
     "cancel-by": {
       "cust": "Klant",
@@ -697,7 +706,8 @@
       "invoiced": "Gefactureerd",
       "invoiceNum": "Factuur nr",
       "gift": "Is cadeaubon",
-      "giftCode": "Cadeaubon code"
+      "giftCode": "Cadeaubon code",
+      "state": "Status"
     },
     "contact": {
       "name": "Naam",

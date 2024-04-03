@@ -124,6 +124,13 @@ export class CancelOrder {
 
         if (orderCancel.hasCompensation()) {
 
+            const compensateResult = await this.compensateOrder(order, orderCancel.compensation)
+
+            if (!compensateResult) {
+                console.warn(compensateResult)
+            }
+
+
         }
 
         order.state = OrderState.cancelled
@@ -210,8 +217,10 @@ export class CancelOrder {
                     break
             }
 
-            if (ArrayHelper.AtLeastOneItem(giftsToUpdate))
-                this.alteaDb.updateGifts(giftsToUpdate, ['used', 'isConsumed'])
+            if (ArrayHelper.AtLeastOneItem(giftsToUpdate)) {
+                const updateGiftResult = this.alteaDb.updateGifts(giftsToUpdate, ['used', 'isConsumed'])
+            }
+                
         }
 
         // above we tried to undo existing gift payments

@@ -50,7 +50,7 @@ export class CancelOrderComponent {
     await this.doChecks()
 
     if (this.checks) {
-      if (this.checks.message == CancelOrderMessage.success)
+      if (this.checks.message == CancelOrderMessage.success || this.checks.message == CancelOrderMessage.noMoreFreeCancel)
         this.cancelIsPossible = true
     }
     //cancelPossible ook in UI
@@ -85,12 +85,20 @@ export class CancelOrderComponent {
       this.orderCancel.compensation = this.order.paid
     }
 
+    if (this.orderCancel.compensation < 0)
+      this.orderCancel.compensation = 0
+
+
+
+
   }
 
 
   async confirmCancel($event) {
     console.warn("Button 'request' clicked: 'confirmCancel' method triggered!")
     console.warn(this.orderCancel, this.order)
+
+   // return
 
     //  return
     const result = await this.alteaSvc.cancelOrder.cancelOrder(this.order, this.orderCancel)
