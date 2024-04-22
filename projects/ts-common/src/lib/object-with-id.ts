@@ -139,6 +139,12 @@ export abstract class ObjectWithId extends ManagedObject {
 
 }
 
+
+const dateToClass = () => v => {
+  console.error('dateToClass', v)
+  return v.value ? new Date(v.value) : v.value
+};
+
 export abstract class ObjectWithIdPlus extends ObjectWithId {
 
   /** object is active */
@@ -147,10 +153,12 @@ export abstract class ObjectWithIdPlus extends ObjectWithId {
   /** object is deleted */
   public del: boolean = false
 
-  /** last update performed on object (starting with creation and ending with soft delete => del=true) */
+
   @Type(() => Date)
   public upd: Date = new Date()
 
+  @Type(() => Date)
+  public cre: Date = new Date()
 }
 
 

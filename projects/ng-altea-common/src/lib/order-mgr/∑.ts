@@ -353,7 +353,8 @@ export class OrderMgrUiService {   // implements OnInit
 
       this.order = order
 
-      let depoDate = order.depositByDate()
+      // debug test
+      let depoDate = this.order.depositByDate()
 
       this.order.branch = this.sessionSvc.branch
 

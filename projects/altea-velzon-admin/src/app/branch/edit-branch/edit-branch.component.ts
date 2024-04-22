@@ -46,6 +46,8 @@ export class EditBranchComponent extends NgEditBaseComponent<Branch> implements 
 
   newReminder = new ReminderConfig()
 
+  initialized = false
+
 
   get timeUnits(): Translation[] {
     if (this.newReminder?.dur == 1)
@@ -62,7 +64,7 @@ export class EditBranchComponent extends NgEditBaseComponent<Branch> implements 
       , contactSvc
       , router, route, spinner, dashboardSvc)
 
-    this.sectionProps.set('general', ['name', 'descr', 'street', 'streetNr', 'postal', 'country', 'city', 'language', 'vatPcts', 'vatPct', 'vatNr', 'vatIncl', 'phone', 'mobile', 'email', 'cur', 'cancel'])
+    this.sectionProps.set('general', ['name', 'descr', 'str', 'strNr', 'postal', 'country', 'city', 'lang', 'vatPcts', 'vatPct', 'vatNr', 'vatIncl', 'phone', 'mobile', 'email', 'cur', 'cancel'])
     this.sectionProps.set('communication', ['emailFrom', 'emailBcc', 'smsOn'])
     this.sectionProps.set('reminders', ['reminders'])
     this.sectionProps.set('deposit', ['depositPct', 'depositTerms', 'reminders'])
@@ -75,17 +77,23 @@ export class EditBranchComponent extends NgEditBaseComponent<Branch> implements 
     if (branchId)
       this.getObject(branchId)
 
-    this.translationSvc.translateEnum(Language, 'enums.language.', this.languages)
-    this.translationSvc.translateEnum(Currency, 'enums.currency.', this.currencies)
-    this.translationSvc.translateEnum(Country, 'enums.country.', this.countries)
-    this.translationSvc.translateEnum(MsgType, 'enums.msg-type.', this.msgTypes)
-    this.translationSvc.translateEnum(TimeUnit, 'enums.time-units-plur.', this.timeUnitsPlural)
-    this.translationSvc.translateEnum(TimeUnit, 'enums.time-units-sing.', this.timeUnitsSingular)
+
 
   }
 
-  override ngOnInit() {
+  override async  ngOnInit() {
     super.ngOnInit()
+
+    await this.translationSvc.translateEnum(Language, 'enums.language.', this.languages)
+    await this.translationSvc.translateEnum(Currency, 'enums.currency.', this.currencies)
+    await this.translationSvc.translateEnum(Country, 'enums.country.', this.countries)
+    await this.translationSvc.translateEnum(MsgType, 'enums.msg-type.', this.msgTypes)
+    await this.translationSvc.translateEnum(TimeUnit, 'enums.time-units-plur.', this.timeUnitsPlural)
+    await this.translationSvc.translateEnum(TimeUnit, 'enums.time-units-sing.', this.timeUnitsSingular)
+
+    console.log(this.languages)
+
+    this.initialized = true
   }
 
   override objectRetrieved(object: Branch): void {

@@ -109,7 +109,7 @@ export class DebugAvailabilityComponent implements OnInit {
 
     /*     const startNum = 20240201000000
         const endNum = 20240401000000
-    
+       
         const deleteOrderQuery = new DbQuery()
     
         deleteOrderQuery.and('start', QueryOperator.greaterThanOrEqual, startNum)
@@ -117,15 +117,15 @@ export class DebugAvailabilityComponent implements OnInit {
 
     const today = new Date()
 
-    const startDate = dateFns.startOfMonth(today)
-    const endDate = dateFns.endOfMonth(today)
+    const startDate = new Date(2024,0,1) //dateFns.startOfMonth(today)
+    const endDate = dateFns.addMonths(startDate, 5) // dateFns.endOfMonth(today)
 
     const deleteOrderQuery = new DbQuery()
 
-    deleteOrderQuery.and('crea', QueryOperator.greaterThanOrEqual, startDate)
-    deleteOrderQuery.and('crea', QueryOperator.lessThan, endDate)
+    deleteOrderQuery.and('cre', QueryOperator.greaterThanOrEqual, startDate)
+    deleteOrderQuery.and('cre', QueryOperator.lessThan, endDate)
 
-    let april = new Date(2024, 3, 1)
+    let april = new Date(2024, 4, 1)
 
     if (today > april)
       throw 'Are you sure?';

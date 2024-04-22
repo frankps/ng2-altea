@@ -52,14 +52,14 @@
                     <div class="subSection" translate>dic.language</div>
 
                     <ngx-altea-label-value label="objects.branch.language"
-                        [value]="object.language"></ngx-altea-label-value>
+                        [value]="object.lang"></ngx-altea-label-value>
                 </div>
             </div>
 
             <div class="row mt-3">
                 <div class="col-4">
                     <div class="subSection" translate>dic.address</div>
-                    {{object.street}}, {{object.streetNr}}<br>
+                    {{object.str}}, {{object.strNr}}<br>
                     {{object.postal}} {{object.city}} - {{object.country}}
 
 
@@ -88,7 +88,7 @@
 
         <ng-container edit>
 
-            <form #generalForm="ngForm">
+            <form #generalForm="ngForm" *ngIf="initialized">
 
                 <div class="subSectionEdit" translate>dic.name</div>
 
@@ -116,7 +116,7 @@
                     <div class="col-3">
                         <ngx-altea-label-control label="dic.language" [trans]="true" for="language">
                             <ng-select id="language" name="language" [items]="languages" bindLabel="trans"
-                                bindValue="key" [clearable]="false" [multiple]="false" [(ngModel)]="object.language">
+                                bindValue="key" [clearable]="false" [multiple]="false" [(ngModel)]="object.lang">
                             </ng-select>
                         </ngx-altea-label-control>
                     </div>
@@ -154,13 +154,13 @@
                     <div class="col-3">
                         <ngx-altea-label-control label="objects.address.street" for="street">
                             <input type="text" id="street" name="street" class="form-control"
-                                [(ngModel)]="object.street" />
+                                [(ngModel)]="object.str" />
                         </ngx-altea-label-control>
                     </div>
                     <div class="col-2">
                         <ngx-altea-label-control label="objects.address.streetNr" for="streetNr">
                             <input type="text" id="streetNr" name="streetNr" class="form-control"
-                                [(ngModel)]="object.streetNr" />
+                                [(ngModel)]="object.strNr" />
                         </ngx-altea-label-control>
                     </div>
                 </div>

@@ -191,7 +191,9 @@ export class ObjectService implements IDb {
         const object = res.object
 
         typedRes = plainToInstance(ApiResult<Order>, res)
-        typedRes.object = plainToInstance(Order, object)
+
+        if (typedRes.isOk)
+          typedRes.object = plainToInstance(Order, object)
       }
 
       return typedRes

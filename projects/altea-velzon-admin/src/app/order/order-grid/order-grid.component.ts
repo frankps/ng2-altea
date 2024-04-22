@@ -144,10 +144,10 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
 
     if (this.orderSearch.typeSelect == SearchTypeSelect.appointmentsMadeOn || this.orderSearch.typeSelect == SearchTypeSelect.nonAppointments) {
       if (orderSearch.start)
-        query.and('crea', QueryOperator.greaterThanOrEqual, DateHelper.parse(orderSearch.start))
+        query.and('cre', QueryOperator.greaterThanOrEqual, DateHelper.parse(orderSearch.start))
 
       if (orderSearch.end)
-        query.and('crea', QueryOperator.lessThan, DateHelper.parse(orderSearch.end))
+        query.and('cre', QueryOperator.lessThan, DateHelper.parse(orderSearch.end))
 
     } else {
       if (orderSearch.start)
@@ -181,7 +181,7 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
 
     query.take = 10
     query.include('lines.planning.resource', 'contact')
-    query.orderBy('crea', SortOrder.desc)
+    query.orderBy('cre', SortOrder.desc)
 
     this.objects$ = this.orderSvc.query(query)
 

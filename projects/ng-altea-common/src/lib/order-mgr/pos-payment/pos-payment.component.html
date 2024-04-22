@@ -1,8 +1,12 @@
 <div class="card">
     <!--     <div class="card-header" translate>
-        ui.order-mgr.pays.title
+        ui.order-mgr.pays.title  
     </div> -->
     <div class="card-body">
+
+        <div *ngIf="message != PosPaymentMessage.none" class="alert alert-danger" role="alert" >
+            {{'enums.pos-payment-message.' + message | translate}}
+        </div>
 
 
         <form #payForm="ngForm">
@@ -22,37 +26,37 @@
             <div class="row">
                 <div class="col-4 d-grid mt-2">
                     <button type="button" [disabled]="!payForm.form.valid" class="btn btn-primary"
-                        (click)="addPayment('cash')" translate>enums.pay-type.cash</button>
+                        (click)="addPayment(PaymentType.cash)" translate>enums.pay-type.cash</button>
                 </div>
                 <div class="col-4 d-grid mt-2">
                     <button type="button" [disabled]="!payForm.form.valid" class="btn btn-primary"
-                        (click)="addPayment('transfer')" translate>enums.pay-type.transfer</button>
+                        (click)="addPayment(PaymentType.transfer)" translate>enums.pay-type.transfer</button>
                 </div>
                 <div class="col-4 d-grid mt-2">
                     <button type="button" [disabled]="!payForm.form.valid" class="btn btn-primary"
-                        (click)="addPayment('credit')" translate>enums.pay-type.credit</button>
+                        (click)="addPayment(PaymentType.credit)" translate>enums.pay-type.credit</button>
                 </div>
                 <div class="col-4 d-grid mt-2">
                     <button type="button" [disabled]="!payForm.form.valid" class="btn btn-primary"
-                        (click)="addPayment('debit')" translate>enums.pay-type.debit</button>
+                        (click)="addPayment(PaymentType.debit)" translate>enums.pay-type.debit</button>
                 </div>
                 <div class="col-4 d-grid mt-2">
-                    <button type="button" class="btn btn-primary"
-                        (click)="addPayment('subs')" translate>enums.pay-type.subs</button>
+                    <button type="button" [disabled]="!canDoSubscription()" class="btn btn-primary" (click)="addPayment(PaymentType.subs)"
+                        translate>enums.pay-type.subs</button>
                 </div>
             </div>
 
             <div class="row">
                 <div class="col-4 d-grid mt-2">
-                   <!--  [disabled]="!payForm.form.valid" -->
-                    <input type="text"  id="giftCode" name="giftCode"
-                        class="form-control" placeholder="Cadeaubon" [(ngModel)]="giftCode" />
+                    <!--  [disabled]="!payForm.form.valid" -->
+                    <input type="text" id="giftCode" name="giftCode" class="form-control" placeholder="Cadeaubon"
+                        [(ngModel)]="giftCode" />
 
                 </div>
 
                 <div class="col-4 d-grid mt-2">
-                    <button type="button" class="btn btn-primary"
-                        (click)="addPayment('gift')" translate>enums.pay-type.gift</button>
+                    <button type="button" class="btn btn-primary" (click)="addPayment(PaymentType.gift)"
+                        translate>enums.pay-type.gift</button>
                 </div>
             </div>
 
@@ -81,9 +85,9 @@
                     <div class="col-8"><small>{{sub.name}}</small></div>
                     <div class="col-4">{{sub.usedQty}}/{{sub.totalQty}}
 
-                        <button type="button" class="btn btn-primary btn-sm float-end"
-                            (click)="useSubscription(sub)"><i class="fa-duotone fa-stamp"></i></button>
-                    
+                        <button type="button" class="btn btn-primary btn-sm float-end" (click)="useSubscription(sub)"><i
+                                class="fa-duotone fa-stamp"></i></button>
+
                     </div>
 
 

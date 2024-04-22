@@ -59,6 +59,7 @@ export class PaymentProcessing {
                 }
                 else {
                     result.status = ApiStatus.error
+                    result.message += canUse.msg + " "
                 }
             }
         }

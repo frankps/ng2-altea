@@ -44,6 +44,11 @@
     "end": "einde"
   },
   "enums": {
+    "pos-payment-message": {
+      "noContact": "Geen klant geselecteerd!",
+      "noProduct": "Geen product geselecteerd!",
+      "noSubscription": "Klant heeft geen abonnement!"
+    },
     "order-state": {
       "creation": "Creatie",
       "waitDeposit": "Afwachting voorschot",
@@ -110,7 +115,8 @@
       "credit": "VISA",
       "debit": "Bancontact",
       "gift": "Cadeaubon",
-      "subs": "Abonnement"
+      "subs": "Abonnement",
+      "stripe": "Stripe"
     },
     "msg-type": {
       "sms": "SMS",
@@ -690,7 +696,8 @@
       "reason": "Reden",
       "remark": "Opmerking",
       "compensation": "Teruggave",
-      "gift": "Maak cadeaubon"
+      "gift": "Maak cadeaubon",
+      "returnSubsPayments": "Geef abonnementbeurten terug"
     },
     "order": {
       "start": "Start",

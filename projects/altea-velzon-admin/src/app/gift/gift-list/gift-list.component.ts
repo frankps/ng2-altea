@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Product, ProductType, ProductTypeIcons, ResourceTypeIcons, Resource, ResourceType, Contact, Gift } from 'ts-altea-model'
-import { ApiListResult, DbQuery, QueryOperator, Translation, ApiResult, ApiStatus, ObjectWithId } from 'ts-common'
+import { ApiListResult, DbQuery, QueryOperator, Translation, ApiResult, ApiStatus, ObjectWithId, SortOrder } from 'ts-common'
 import { ContactService, GiftService, ProductService, ResourceService, SessionService } from 'ng-altea-common'
 import { Observable, take, takeUntil } from 'rxjs';
 import { NgBaseComponent, DashboardService, TranslationService, BackendHttpServiceBase, NgBaseListComponent } from 'ng-common'
@@ -50,9 +50,10 @@ export class GiftListComponent extends NgBaseListComponent<Gift> implements OnIn
 
     const query = new DbQuery()
     query.and('del', QueryOperator.equals, false)
+    query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
 
     query.take = 20
-    query.orderBy('code')
+    query.orderBy('upd', SortOrder.desc)
 
     return query
 
@@ -60,8 +61,20 @@ export class GiftListComponent extends NgBaseListComponent<Gift> implements OnIn
 
   override getSearchDbQuery(searchFor: string): DbQuery | null {
 
+
+    if (!searchFor)
+      return null
+
+    searchFor = searchFor.trim()
+
     const query = new DbQuery()
-    query.or('code', QueryOperator.contains, searchFor)
+    
+    if (searchFor.length == 36) {
+      query.or('id', QueryOperator.equals, searchFor)
+    } else {
+      query.or('code', QueryOperator.contains, searchFor)
+    }
+    
     query.or('fromName', QueryOperator.contains, searchFor)
 
     query.and('del', QueryOperator.equals, false)

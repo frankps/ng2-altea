@@ -325,8 +325,8 @@ export class Contact extends ObjectWithId {
   phone?: string;
   language?: string;
 
-  street?: string;
-  streetNr?: string;
+  str?: string;
+  strNr?: string;
   postal?: string;
   city?: string;
   country?: string;
@@ -1473,8 +1473,8 @@ export class Branch extends ObjectWithIdPlus {
   unique?: string;
   short?: string;
   descr?: string;
-  street?: string;
-  streetNr?: string;
+  str?: string;
+  strNr?: string;
   postal?: string;
   country?: string;
 
@@ -1486,7 +1486,7 @@ export class Branch extends ObjectWithIdPlus {
   cur?: string = 'EUR'
 
   city?: string;
-  language?: string;
+  lang?: string;
   emailFrom?: string;
   emailBcc?: string;
 
@@ -2018,6 +2018,10 @@ export class Invoice extends ObjectWithIdPlus {
 
   state: InvoiceState = InvoiceState.toInvoice
 
+  @Type(() => Contact)
+  to?: Contact;
+  toId?: string;
+
   num?: string;
 
   company?: string
@@ -2194,6 +2198,10 @@ export class OrderCancel {
   compensate = OrderCancelCompensate.none
   compensation = 0
 
+
+  /** return the subscription turns/payments back to customer (if there are any)  */
+  returnSubsPayments = false
+
   set gift(value: boolean) {
     this.compensate = value ? OrderCancelCompensate.gift : OrderCancelCompensate.none
   }
@@ -2204,7 +2212,9 @@ export class OrderCancel {
 
 }
 
-export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {
+export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  // 
+
+
 
   static jsonProps = ['vatLines', 'persons', 'info']
 
@@ -2309,22 +2319,30 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {
   remindOn?: number  // format: yyyyMMddHHmmss
   remindLog?: MsgInfo[]
 <i class="fa-solid fa-circle-plus"></i>
+<i class="fa-solid fa-credit-card"></i>
+<i class="fa-solid fa-circle-check"></i>
+<i class="fa-solid fa-pen-circle"></i>
 */
 
-
-
-
-  /** created at */
-  @Type(() => Date)
-  crea = new Date();
 
 
   /** resource preferences for order */
   @Type(() => ResourcePreferences)
   resPrefs?: ResourcePreferences
 
-  constructor(markAsNew = false) {
+  constructor(codePrefix?: string, markAsNew = false) {
     super()
+
+    let date = dateFns.format(new Date(), 'yyMMdd')
+
+    if (codePrefix?.length >= 2) {
+      codePrefix = codePrefix.substring(0, 2).toUpperCase()
+    } else
+      codePrefix = ''
+
+
+    let subId = this.id.substring(this.id.length - 5).toUpperCase()
+    this.code = `${codePrefix}-${date}-${subId}`
 
     if (markAsNew)
       this.m.n = true
@@ -2341,21 +2359,30 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {
   stateIcon() {
     switch (this?.state) {
       case OrderState.cancelled: return "fa-solid fa-circle-xmark"
-      case OrderState.creation: return "fa-solid fa-circle-plus"
+      case OrderState.creation: return "fa-solid fa-pen-circle"
+      case OrderState.waitDeposit: return "fa-solid fa-credit-card"
+      case OrderState.confirmed: return "fa-solid fa-circle-check"
       default: return undefined
     }
   }
 
   stateColor() {
     switch (this?.state) {
-      case OrderState.cancelled: return "lightred"
-      case OrderState.creation: return "lightblue"
-      default: return "lightgreen"
+      case OrderState.cancelled: return "red"
+      case OrderState.creation: return "blue"
+      default: return "green"
     }
   }
 
   depositByDate(): Date {
-    return dateFns.addMinutes(this.crea, this.depositMins)
+
+    // Thu Apr 18 2024 10:10:46 GMT+0200 (Central European Summer Time)
+    // Thu Apr 18 2024 10:19:21 GMT+0200 (Central European Summer Time)
+
+    if (_.isNumber(this.depositMins))
+      return dateFns.addMinutes(this.cre, this.depositMins)
+
+    return this.cre
   }
 
   setDepositBy() {
@@ -2373,6 +2400,33 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {
 
   isEmpty(): boolean {
     return !this.hasLines()
+  }
+
+  totalPaidNotOfType(...exclusive: PaymentType[]): number {
+
+    if (ArrayHelper.IsEmpty(this.payments))
+      return 0
+
+    // we do not return on gift payments or subscriptions
+    let actualPayments = this.payments.filter(p => exclusive.indexOf(p.type) == -1)
+
+    if (ArrayHelper.IsEmpty(actualPayments))
+      return 0
+
+    const totalPaid = _.sum(actualPayments.map(p => p.amount))
+
+    return totalPaid
+  }
+
+  paymentsOfType(...types: PaymentType[]): Payment[] {
+
+    if (ArrayHelper.IsEmpty(this.payments))
+      return []
+
+    let payments = this.payments.filter(p => types.indexOf(p.type) >= 0)
+
+    return payments
+
   }
 
   hasServices(): boolean {
@@ -3891,7 +3945,7 @@ export class Template extends ObjectWithIdPlus {
 
   code?: string | null
   name?: string | null
-  language?: string | null
+  lang?: string | null
   subject?: string | null
   body?: string | null
   short?: string | null
@@ -4219,7 +4273,7 @@ export class Payment extends ObjectWithIdPlus {
   @Type(() => Number)
   amount = 0
 
-  type: string
+  type: PaymentType
   loc: string
 
 

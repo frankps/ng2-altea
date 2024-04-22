@@ -50,7 +50,7 @@ export class SubscriptionListComponent extends NgBaseListComponent<Subscription>
     query.include('contact')
 
     query.take = 20
-    query.orderBy('crea', SortOrder.desc)
+    query.orderBy('cre', SortOrder.desc)
 
     return query
 
@@ -58,7 +58,16 @@ export class SubscriptionListComponent extends NgBaseListComponent<Subscription>
 
   override getSearchDbQuery(searchFor: string): DbQuery | null {
 
+    if (!searchFor)
+      return null
+
+    searchFor = searchFor.trim()
+
     const query = new DbQuery()
+
+    if (searchFor.length == 36)
+      query.or('id', QueryOperator.equals, searchFor)
+
     query.or('name', QueryOperator.contains, searchFor)
     query.or('contact.name', QueryOperator.contains, searchFor)
     query.and('del', QueryOperator.equals, false)

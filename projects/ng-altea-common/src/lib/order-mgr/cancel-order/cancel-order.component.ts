@@ -1,14 +1,14 @@
 import { Component, OnInit, ViewChild, Input } from '@angular/core'
 import { NgForm } from '@angular/forms'
 import { TranslationService } from 'ng-common'
-import { Translation } from 'ts-common'
-import { CustomerCancelReasons, InternalCancelReasons, Order, OrderCancel, OrderCancelBy, OrderCancelCompensate } from 'ts-altea-model'
+import { ArrayHelper, Translation } from 'ts-common'
+import { CustomerCancelReasons, InternalCancelReasons, Order, OrderCancel, OrderCancelBy, OrderCancelCompensate, PaymentType } from 'ts-altea-model'
 import { OrderMgrUiService } from '../order-mgr-ui.service'
 import { AlteaService } from '../../altea.service'
 import { th } from 'date-fns/locale'
-import { CancelOrderMessage, CancelOrderResponse } from 'ts-altea-logic'
+import { CancelOrderMessage, CancelOrderChecks } from 'ts-altea-logic'
 import { DashboardService, ToastType } from 'ng-common'
-
+import * as _ from "lodash";
 
 @Component({
   selector: 'order-mgr-cancel-order',
@@ -17,6 +17,7 @@ import { DashboardService, ToastType } from 'ng-common'
 })
 export class CancelOrderComponent {
   //by: any
+
 
   @Input() order: Order
 
@@ -30,7 +31,7 @@ export class CancelOrderComponent {
 
   CancelOrderMessage = CancelOrderMessage
   OrderCancelBy = OrderCancelBy
-  checks: CancelOrderResponse
+  checks: CancelOrderChecks
 
 
   cancelIsPossible = false
@@ -71,6 +72,10 @@ export class CancelOrderComponent {
 
     this.checks = await this.alteaSvc.cancelOrder.checks(this.order)
 
+    /** if there are subscription payments, then we return them (by default) */
+    if (this.checks.hasSubsPayments)
+      this.orderCancel.returnSubsPayments = true
+
     console.error(this.checks)
 
   }
@@ -79,10 +84,17 @@ export class CancelOrderComponent {
 
     //   console.error(this.orderCancel.by)
 
+    if (ArrayHelper.IsEmpty(this.order.payments)) {
+      this.orderCancel.compensation = 0
+      return
+    }
+
+    let totalActualPaid = this.order.totalPaidNotOfType(PaymentType.gift, PaymentType.subs)
+
     if (cancelBy == OrderCancelBy.cust && this.checks.message == CancelOrderMessage.noMoreFreeCancel) {  // then we keep the deposit amount
-      this.orderCancel.compensation = this.order.paid - this.order.deposit
+      this.orderCancel.compensation = totalActualPaid - this.order.deposit
     } else {
-      this.orderCancel.compensation = this.order.paid
+      this.orderCancel.compensation = totalActualPaid
     }
 
     if (this.orderCancel.compensation < 0)
@@ -98,7 +110,7 @@ export class CancelOrderComponent {
     console.warn("Button 'request' clicked: 'confirmCancel' method triggered!")
     console.warn(this.orderCancel, this.order)
 
-   // return
+    // return
 
     //  return
     const result = await this.alteaSvc.cancelOrder.cancelOrder(this.order, this.orderCancel)

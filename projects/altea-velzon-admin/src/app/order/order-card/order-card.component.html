@@ -54,10 +54,15 @@
 
     </div>
     <div class="card-footer p-2">
-        <div class="row text-muted" style="font-size: 80%;">
-            <div class="col-6">Gemaakt op {{order.crea | date: sessionSvc.formats.dateShort}}</div>
+        <div class="row text-muted" style="font-size: 90%;">
+            <div class="col-4">Gemaakt op {{order.cre | date: sessionSvc.formats.dateShort}}</div>
+
+            <div class="col-4 d-flex justify-content-center align-items-center">{{'objects.order.state' | translate}}: {{'enums.order-state.' + order.state | translate}} &nbsp; 
+                <i *ngIf="order.stateIcon()" [style.color]="order.stateColor()" [class]="order.stateIcon()"></i> </div>
+
+
             <!-- <div class="col-4"> </div> -->
-            <div class="col-6 d-flex justify-content-end">€{{order.deposit}} / €{{order.paid}} / €{{order.incl}}</div>
+            <div class="col-4 d-flex justify-content-end">€{{order.deposit}} / €{{order.paid}} / €{{order.incl}}</div>
         </div>
     </div>
 </div>

@@ -86,6 +86,23 @@
                         </ngx-altea-label-control>
                     </div>
                 </div>
+
+                <ng-container *ngIf="checks.hasSubsPayments">
+
+                    <div class="row {{css_cls_row}}">
+                        <div class="col">
+                            <div class="form-check form-switch">
+                                <input type="checkbox" class="form-check-input" id="returnSubsPayments" name="returnSubsPayments"
+                                    [(ngModel)]="orderCancel.returnSubsPayments">
+                                <label class="form-check-label" for="returnSubsPayments" translate="objects.orderCancel.returnSubsPayments"></label>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </ng-container>
+
+
                 <div class="row {{css_cls_row}}">
                     <div class="col">
                         <div class="form-check form-switch">
@@ -96,7 +113,12 @@
                     </div>
                 </div>
 
-                {{orderCancel.compensate}}
+                
+
+
+
+
+
 
                 <ng-container *ngIf="orderCancel.hasCompensation()">
 

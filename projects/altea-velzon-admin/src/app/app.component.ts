@@ -1,7 +1,7 @@
 import { AfterContentChecked, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { BranchService, ProductService, ResourceService, ScheduleService, SessionService, TypeInfoService } from 'ng-altea-common';
 import { BsLocaleService } from 'ngx-bootstrap/datepicker';
-import { TypeInfo } from 'ts-altea-model';
+import { Product, TypeInfo } from 'ts-altea-model';
 import { DbQuery, QueryOperator } from 'ts-common';
 
 @Component({
@@ -50,7 +50,7 @@ export class AppComponent implements OnInit {
     console.warn(typeInfos)
 
     const branchQry = new DbQuery()
-    branchQry.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
+    branchQry.and('id', QueryOperator.equals, this.sessionSvc.branchId)
     branchQry.take = 1000
     this.branchSvc.cacheQuery = branchQry
     //this.branchSvc.linkedTypes = ['ProductItem', 'ProductResource']
@@ -58,11 +58,12 @@ export class AppComponent implements OnInit {
 
     const productQry = new DbQuery()
     productQry.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
-    productQry.include('options:orderBy=idx.values:orderBy=idx', 'resources:orderBy=idx.resource', 'items:orderBy=idx')
+    productQry.include('options:orderBy=idx.values:orderBy=idx', 'resources:orderBy=idx.resource', 'items:orderBy=idx', 'prices')
     productQry.take = 1000
     this.productSvc.cacheQuery = productQry
     this.productSvc.linkedTypes = ['ProductItem', 'ProductResource']
     await this.productSvc.initCache(typeInfos)
+
 
     const resourceQry = new DbQuery()
     resourceQry.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)

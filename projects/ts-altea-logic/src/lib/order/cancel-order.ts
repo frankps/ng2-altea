@@ -26,15 +26,25 @@ export class CancelOrderRequest {
 
 }
 
-export class CancelOrderResponse {
+export class CancelOrderChecks {
 
+    /** if order was a gift, we return the gift */
     gift: Gift
 
+    /** if order was the purchase of 1 or more subscriptions, we return the subscriptions */
     subscriptions: Subscription[]
 
 
     freeCancelBefore: Date
     freeCancelMinHours: number
+
+
+    //totalActualPaid: number = 0
+
+    hasSubsPayments = false
+
+
+    subsPayments = []
 
     constructor(public message: CancelOrderMessage = CancelOrderMessage.success) {
 
@@ -44,8 +54,63 @@ export class CancelOrderResponse {
         return (this.message != CancelOrderMessage.success)
     }
 
-    static get success(): CancelOrderResponse {
-        return new CancelOrderResponse(CancelOrderMessage.success)
+    static get success(): CancelOrderChecks {
+        return new CancelOrderChecks(CancelOrderMessage.success)
+    }
+
+}
+
+/** CancelOrderActions: keep track of actions performed by cancelling an order.
+ *  
+ * Examples:
+ *  - create a compensation gift
+ *  - re-increment existing gift that were used as payments
+ * 
+ */
+
+
+export enum CancelOrderActionType {
+    newGiftOrder,
+    incrementUsedGift,
+    createCompensationGift
+}
+
+export class CancelOrderAction {
+    constructor(public type: CancelOrderActionType, public objectId: string, public ok = false) {
+    }
+
+}
+
+export class CancelOrderGiftAction extends CancelOrderAction {
+
+
+    constructor(type: CancelOrderActionType, public giftId: string, public giftCode: string, public value: number, ok: boolean, public origUsed: number = 0, public newUsed: number = 0) {
+        super(type, giftId, ok)
+    }
+}
+
+
+/** The various actions performed  */
+export class CancelOrderActions {
+    actions: CancelOrderAction[] = []
+    
+
+    add(action: CancelOrderAction) {
+        this.actions.push(action)
+    }
+
+    getById(objectId: string) : CancelOrderAction {
+
+        const action = this.actions.find(a => a.objectId == objectId)
+
+        return action
+    }
+
+    isOk() : boolean {
+
+        const notOkIdx = this.actions.findIndex(a => !a.ok)
+    
+        return (notOkIdx == -1)
     }
 
 }
@@ -62,17 +127,17 @@ export class CancelOrder {
             this.alteaDb = new AlteaDb(db)
     }
 
-    async checks(order: Order): Promise<CancelOrderResponse> {
+    async checks(order: Order): Promise<CancelOrderChecks> {
 
         /*         order.branch.cancel
                 order.startDate */
 
-        const response = new CancelOrderResponse()
+        const checkResponse = new CancelOrderChecks()
 
-        /*         if (order.state == OrderState.cancelled) {
-                    response.message = CancelOrderMessage.alreadyCancelled
-                    return response
-                } */
+        if (order.state == OrderState.cancelled) {
+            checkResponse.message = CancelOrderMessage.alreadyCancelled
+            return checkResponse
+        }
 
         if (order.start && order.branch.cancel) {
 
@@ -82,39 +147,62 @@ export class CancelOrder {
 
             let now = new Date()
             if (now > freeCancelBefore) {
-                response.message = CancelOrderMessage.noMoreFreeCancel
-                response.freeCancelBefore = freeCancelBefore
-                response.freeCancelMinHours = cancelMinHours
-                return response
+                checkResponse.message = CancelOrderMessage.noMoreFreeCancel
+                checkResponse.freeCancelBefore = freeCancelBefore
+                checkResponse.freeCancelMinHours = cancelMinHours
+                return checkResponse
             }
 
         }
 
+
+
+
+        /** Check if order was a gift (order) */
 
         if (order.gift) {
             let gift = await this.alteaDb.getGiftByOrderId(order.id)
-            response.gift = gift
+            checkResponse.gift = gift
 
             if (gift?.used > 0) {
                 //  const response = new CancelOrderResponse(CancelOrderMessage.giftAlreadyUsed)
-                response.message = CancelOrderMessage.giftAlreadyUsed
-                return response
+                checkResponse.message = CancelOrderMessage.giftAlreadyUsed
+                return checkResponse
             }
         }
 
+        /** Order was a purchase of subscriptions */
+
         let subscriptions = await this.alteaDb.getSubscriptionsByOrderId(order.id)
 
-        response.subscriptions = subscriptions
+        checkResponse.subscriptions = subscriptions
 
         if (ArrayHelper.AtLeastOneItem(subscriptions)) {
-            //const response = new CancelOrderResponse(CancelOrderMessage.subscriptionAlreadyUsed)
-            response.message = CancelOrderMessage.subscriptionAlreadyUsed
 
-            return response
+            checkResponse.message = CancelOrderMessage.subscriptionAlreadyUsed
+
+            return checkResponse
         }
 
 
-        return CancelOrderResponse.success
+        if (ArrayHelper.AtLeastOneItem(order.payments)) {
+
+            /** Use of a subscription */
+            checkResponse.subsPayments = order.payments.filter(p => p.type == PaymentType.subs)
+
+            if (ArrayHelper.AtLeastOneItem(checkResponse.subsPayments)) {
+                checkResponse.hasSubsPayments = true
+
+
+            }
+
+
+        }
+
+
+
+
+        return checkResponse
 
     }
 
@@ -129,6 +217,30 @@ export class CancelOrder {
             if (!compensateResult) {
                 console.warn(compensateResult)
             }
+        }
+
+        if (orderCancel.returnSubsPayments) {
+
+            const subscriptionPayments = order.paymentsOfType(PaymentType.subs)
+
+            const subscriptionIds = subscriptionPayments.map(pay => pay.subsId)
+            const subscriptions = await this.alteaDb.getSubscriptionsByIds(subscriptionIds)
+
+            subscriptions.forEach(subscription => {
+
+                if (subscription.usedQty <= 0)
+                    return
+
+                subscription.usedQty = subscription.usedQty - 1
+
+                // re-activate again if previously inactive (because it might have been completly used)
+                subscription.act = true
+
+
+            })
+
+
+            const updateSubscriptionResult = this.alteaDb.updateSubscriptions(subscriptions, ['usedQty', 'act'])
 
 
         }
@@ -183,7 +295,9 @@ export class CancelOrder {
     }
 
 
-    async compensateOrder(order: Order, amountToCompensate: number): Promise<any> {
+    async compensateOrder(order: Order, amountToCompensate: number): Promise<CancelOrderActions> {
+
+        const cancelOrderActions = new CancelOrderActions()
 
         let amountStillToCompensate = amountToCompensate
 
@@ -206,10 +320,16 @@ export class CancelOrder {
                 if (!gift)
                     continue
 
+                const origUsed = gift.used
+
                 const freeGiftAmount = Math.min(giftPay.amount, amountStillToCompensate)
                 gift.free(freeGiftAmount)
 
                 giftsToUpdate.push(gift)
+
+                // keep track of this action
+                let giftAction = new CancelOrderGiftAction(CancelOrderActionType.incrementUsedGift, gift.id, gift.code, gift.value, false, origUsed, gift.used)
+                cancelOrderActions.add(giftAction)
 
                 amountStillToCompensate -= freeGiftAmount
 
@@ -218,9 +338,22 @@ export class CancelOrder {
             }
 
             if (ArrayHelper.AtLeastOneItem(giftsToUpdate)) {
-                const updateGiftResult = this.alteaDb.updateGifts(giftsToUpdate, ['used', 'isConsumed'])
+                const updateGiftResult = await this.alteaDb.updateGifts(giftsToUpdate, ['used', 'isConsumed'])
+                console.warn(updateGiftResult)
+
+                if (updateGiftResult.isOk && ArrayHelper.AtLeastOneItem(updateGiftResult.data)) {
+
+                    updateGiftResult.data.forEach(gift => {
+                        let cancelAction = cancelOrderActions.getById(gift.id)
+                        cancelAction.ok = true
+                    })
+                    
+
+
+                }
+
             }
-                
+
         }
 
         // above we tried to undo existing gift payments
@@ -228,6 +361,8 @@ export class CancelOrder {
         if (amountStillToCompensate > 0) {
             const res = await this.createCompensationGiftOrder(amountStillToCompensate, order)
         }
+
+        return cancelOrderActions
 
     }
 
@@ -290,23 +425,17 @@ export class CancelOrder {
 
         if (amountToCompensate > 0) {
 
-            const giftResult = await this.createCompensationGiftOrder(amountToCompensate, order)
-            console.error(giftResult)
+            const cancelActions = await this.createCompensationGiftOrder(amountToCompensate, order)
+            console.error(cancelActions)
 
-            if (!giftResult.isOk)
-                return giftResult
-
-            const newGift = giftResult.object as Gift
+            if (!cancelActions.isOk())
+                return cancelActions
 
             let line = new OrderLine()
             line.unit = -amountToCompensate
             line.descr = 'Move value to new order/gift'
             line.vatPct = 0
-            line.json = {
-                orderId: newGift.orderId,
-                giftId: newGift.code,
-                giftCode: newGift.code
-            }
+            line.json = cancelActions
 
             order.addLine(line, false)
 
@@ -326,9 +455,13 @@ export class CancelOrder {
         }
     }
 
-    async createCompensationGiftOrder(amount: number, origOrder: Order): Promise<ApiResult<Gift | Order>> {
+    async createCompensationGiftOrder(amount: number, origOrder: Order): Promise<CancelOrderActions> {
 
-        let order = new Order(true)
+        const cancelOrderActions = new CancelOrderActions()
+
+        let branch = origOrder.branch
+
+        let order = new Order(branch.unique, true)
         order.branchId = origOrder.branchId
         order.branch = origOrder.branch
         order.contactId = origOrder.contactId
@@ -350,9 +483,14 @@ export class CancelOrder {
         order.payments.push(pay)
 
         const saveOrderResult = await this.alteaDb.saveOrder(order)
+        const savedOrder = saveOrderResult.object
+
+        let cancelAction = new CancelOrderAction(CancelOrderActionType.newGiftOrder, savedOrder.id, saveOrderResult.isOk)
+        cancelOrderActions.add(cancelAction)
+
 
         if (!saveOrderResult.isOk)
-            return saveOrderResult
+            return cancelOrderActions
 
         const newOrder = saveOrderResult.object
 
@@ -372,7 +510,10 @@ export class CancelOrder {
 
         const createGiftResult = await this.alteaDb.createGift(gift)
 
-        return createGiftResult
+        let giftAction = new CancelOrderGiftAction(CancelOrderActionType.createCompensationGift, gift.id, gift.code, gift.value, createGiftResult.isOk)
+        cancelOrderActions.add(giftAction)
+
+        return cancelOrderActions
     }
 
 }
