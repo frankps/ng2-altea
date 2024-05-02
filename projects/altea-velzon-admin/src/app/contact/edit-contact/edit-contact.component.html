@@ -285,19 +285,9 @@
 
                 <div class="row" *ngFor="let gift of object.giftsIn">
 
-
                     <div class="col-3 d-flex justify-content-center">{{gift.code}}</div>
                     <div class="col-3 d-flex justify-content-center">{{gift.used}}/{{gift.value}}</div>
                     <div class="col-3 d-flex justify-content-center">{{gift.crea  | date:"dd/MM/yyyy"}}</div>
-
-<!--                     <div class="col-6">
-                        <a [routerLink]="['/', sessionSvc.branch.unique,'subscriptions',sub.id]">{{sub.name}} </a>
-                    </div>
-                    <div class="col-2 d-flex justify-content-center">{{sub.usedQty}}/{{sub.totalQty}}</div>
-                    <div class="col-2 d-flex justify-content-center">{{sub.crea | date: sessionSvc.formats.date}}
-                    </div>
-                    <div class="col-2 d-flex justify-content-center">{{sub.firstUsedOn | date: sessionSvc.formats.date}}
-                    </div> -->
 
                 </div>
 
@@ -310,6 +300,40 @@
 
     </ngx-altea-form-card-section>
 
+
+
+    <ngx-altea-form-card-section sectionName="ui.contact.edit.sections.loyalty.title" sectionId="loyalty"
+    [editSectionId]="editSectionId" [showButtons]="false">
+
+    <ng-container always>  
+
+        <ng-container *ngIf="object.cards">
+
+            <div class="row">
+                <div class="col-3 d-flex justify-content-center">Kaartnaam</div>
+                <div class="col-3 d-flex justify-content-center">Waarde</div>
+                <div class="col-3 d-flex justify-content-center">Gemaakt op</div>
+
+                <!-- <div class="col-2 d-flex justify-content-center">Eerste gebruik</div> -->
+            </div>
+
+
+            <div class="row" *ngFor="let card of object.cards">
+
+                <div class="col-3 d-flex justify-content-center">{{card.name}}</div>
+                <div class="col-3 d-flex justify-content-center">{{card.value}}</div>
+                <div class="col-3 d-flex justify-content-center">{{card.cre  | date:"dd/MM/yyyy"}}</div>
+
+            </div>
+
+
+        </ng-container>
+
+
+
+    </ng-container>
+
+</ngx-altea-form-card-section>
 
 
 </ng-container>

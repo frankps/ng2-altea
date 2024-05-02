@@ -53,5 +53,8 @@ import { ProductPlanningComponent } from './product-planning/product-planning.co
     NgxSpinnerModule,
     NgCommonModule,
   ],
+  exports: [
+    SearchProductComponent
+  ]
 })
 export class ProductModule {}

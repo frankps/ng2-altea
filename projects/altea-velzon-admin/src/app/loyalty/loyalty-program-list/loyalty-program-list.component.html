@@ -1,0 +1,56 @@
+<div class="row mb-4">
+    <div class="col-12">
+        <h3>{{ 'menu.loyalty.label' | translate }}</h3>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-12 d-flex justify-content-center">
+        <ul class="list-group" style="width: 100%;" *ngIf="objects">
+            <li class="list-group-item" *ngFor="let loyaltyProgram of objects" (click)="select(loyaltyProgram)">
+
+                <div class="row">
+                    <div class="col-4"><b>{{ loyaltyProgram.name }}</b></div>
+
+
+<!--                     <div class="col-4">{{ loyaltyProgram.used }}/{{ loyaltyProgram.value }}</div>
+                    <div class="col-4"><span class="badge rounded-pill text-bg-primary float-end"
+                            translate>enums.gift-type.{{loyaltyProgram.type}}</span></div> -->
+
+                </div>
+
+
+
+
+                <!-- <i class="{{ResourceTypeIcons[contact.type]}}"></i> &nbsp;  -->
+
+<!--     
+
+                <div class="row mt-2" >
+                    <div class="col-6"><span style="font-size: small">{{gift.fromName}}</span></div>
+                    <div class="col-6"><span class="float-end" style="font-size: small">{{gift.fromEmail}}</span></div>      
+                  </div>
+              
+
+
+
+                <div class="row">
+                    <div class="col-4"></div>
+                    <div class="col-4"></div>
+                    <div class="col-4"><span class="float-end" style="font-size: small">{{ gift.crea | date: sessionSvc.formats.date }}</span></div>
+                </div>
+
+
+ -->
+
+
+
+
+                <!-- <i class="fa-solid fa-circle float-end" [style.color]="contact.color"></i> -->
+
+            </li>
+        </ul>
+    </div>
+
+</div>

@@ -355,6 +355,9 @@ export class Contact extends ObjectWithId {
   @Type(() => Gift)
   giftsIn?: Gift[]
 
+  @Type(() => LoyaltyCard)
+  cards?: LoyaltyCard[]
+
   setName() {
 
     let components = []
@@ -802,7 +805,39 @@ export class Product extends ObjectWithIdPlus {
   advPricing = false
 
 
+  salesPricing(onDate: Date = new Date()): number {
 
+    if (ArrayHelper.IsEmpty(this.prices))
+      return this.salesPrice
+
+
+    const onDateNum = DateHelper.yyyyMMddhhmmss(onDate)
+
+    var specialPrice = this.prices.find(p => p.start <= onDateNum && onDateNum < p.end)
+
+     if (!specialPrice)
+      specialPrice = this.prices.find(p => p.start <= onDateNum && !p.end) 
+
+
+    if (!specialPrice)
+      return this.salesPrice
+
+    console.warn(``)
+
+    switch (specialPrice.mode) {
+      case PriceMode.abs:
+        return specialPrice.value
+
+      case PriceMode.pct: {
+        var newPrice = this.salesPrice * (1 - specialPrice.value / 100)
+        return newPrice
+      }
+    }
+
+
+    return this.salesPrice
+
+  }
 
   getIcon(): string {
 
@@ -3224,7 +3259,7 @@ export class OrderLine extends ObjectWithIdPlus {
 
 
     this.descr = product.name
-    this.base = product.salesPrice
+    this.base = product.salesPricing()
     //this.incl = product.salesPrice
     this.vatPct = product.vatPct
     this.productId = product.id
@@ -3318,6 +3353,9 @@ export class OrderLine extends ObjectWithIdPlus {
    * @returns this.incl
    */
   calculateInclThenExcl(): number {
+
+
+    // this.product.prices
 
     const previousIncl = this.incl
     const previousExcl = this.excl
@@ -4296,6 +4334,132 @@ export class Payment extends ObjectWithIdPlus {
   decl: boolean = false
 
 }
+
+/** Products can be included/excluded to a program based on id or on a search string (to be applied to product name) */
+export enum LoyaltyProductMode {
+  id = 'id',
+  search = 'search'
+}
+
+/** Loyalty programs are configured for certain products/services. These can be included or excluded from the program (program.incl or program.excl)
+ * using the LoyaltyProduct class
+ */
+export class LoyaltyProduct {
+ // id: string
+ // name: string
+ // mode: LoyaltyProductMode.id
+
+  constructor(public mode = LoyaltyProductMode.id, public name?: string, public id?: string) {
+
+  }
+
+  static fromProduct(product: Product) {
+
+    return new LoyaltyProduct(LoyaltyProductMode.id, product.name, product.id)
+
+  }
+}
+
+export class LoyaltyReward {
+
+}
+
+export enum LoyaltyUnit {
+  price,
+  productQty
+}
+export class LoyaltyProgram extends ObjectWithIdPlus {
+
+  orgId?: string
+  branchId?: string
+
+  cards?: LoyaltyCard[]
+
+  name?: string
+  descr?: string
+  maxValue: number = -1
+  maxDaysValid: number = -1
+
+  track: LoyaltyUnit = LoyaltyUnit.productQty
+
+  @Type(() => LoyaltyProduct)
+  incl: LoyaltyProduct[] = []
+
+  @Type(() => LoyaltyProduct)
+  excl: LoyaltyProduct[] = []
+
+  rewards: LoyaltyReward[] = []
+
+  hasIncl() : boolean {
+    return ArrayHelper.AtLeastOneItem(this.incl)
+  }
+
+  hasExcl() : boolean {
+    return ArrayHelper.AtLeastOneItem(this.excl)
+  }
+
+  hasRewards() : boolean {
+    return ArrayHelper.AtLeastOneItem(this.rewards)
+  }
+  
+  /** products included?  */
+  prod = true
+
+  /** basic services included?  */
+  svc_basic = true  
+
+  /** bundled services included?  */
+  svc_bundle = true
+
+  /** subscription services included? */
+  svc_subs = true
+
+  /** promotions included in program? */
+  promo = false
+
+
+}
+
+
+
+
+
+
+
+export class LoyaltyCardChange {
+  public id?: string;
+  
+  card?: LoyaltyCard
+  cardId?: string
+  
+  value: number = 0
+
+  isReward: boolean = false
+  reward: any
+
+  orderId?: string
+
+  @Type(() => Date)
+  public date: Date = new Date()
+}
+
+export class LoyaltyCard extends ObjectWithIdPlus {
+
+
+
+  contact?: Contact
+  contactId?: string
+
+  program?: LoyaltyProgram
+  programId?: string
+  
+  changes?: LoyaltyCardChange[]
+
+  name?: string
+  value: number = 0
+
+}
+
 
 export enum TaskSchedule {
   once = 'once',

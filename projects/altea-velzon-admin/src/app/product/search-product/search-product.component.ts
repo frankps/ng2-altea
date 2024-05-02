@@ -25,11 +25,15 @@ export class SearchProductComponent extends NgBaseComponent implements OnDestroy
 
   @ViewChild('searchProductModal') public searchProductModal?: NgbModal; // NgTemplateOutlet | null = null
 
+  @Input() multi: boolean = false
   @Output() select: EventEmitter<Product> = new EventEmitter();
+  @Output() selectMulti: EventEmitter<Product[]> = new EventEmitter();
 
   searchFor: string
   products$
-  products: Product[]
+  products: Product[] = []
+
+  selected = {}
 
   constructor(protected router: Router, protected spinner: NgxSpinnerService, private translationSvc: TranslationService
     , private modalService: NgbModal, private dashboardSvc: DashboardService, private productSvc: ProductService) {
@@ -43,11 +47,37 @@ export class SearchProductComponent extends NgBaseComponent implements OnDestroy
   show() {
     this.searchFor = ''
     this.products = null
+
+    this.selected = {}
+
     this.modalService.open(this.searchProductModal)
   }
 
+  selectProducts(modal: any) {
+
+    console.warn(this.selected)
+
+    const selectedProducts: Product[] = []
+
+    Object.keys(this.selected).forEach(productId => {
+
+      const product = this.products.find(p => p.id == productId)
+
+      if (product)
+        selectedProducts.push(product)
+      
+    })
+
+    this.selectMulti.emit(selectedProducts)
+    modal.close()
+  }
 
   selectProduct(product: Product, modal: any) {
+
+    // in case of multi select we work with checkboxes
+    if (this.multi)
+      return
+
     this.select.emit(product)
     modal.close()
   }
@@ -58,8 +88,8 @@ export class SearchProductComponent extends NgBaseComponent implements OnDestroy
     query.and('name', QueryOperator.contains, searchFor)
     query.and('del', QueryOperator.equals, false)
 
-/*     query.or('type', QueryOperator.equals, ProductType.prod)
-    query.or('type', QueryOperator.equals, ProductType.svc) */
+    /*     query.or('type', QueryOperator.equals, ProductType.prod)
+        query.or('type', QueryOperator.equals, ProductType.svc) */
     query.take = 10
 
     return query

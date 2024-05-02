@@ -8,12 +8,15 @@
 
 
         <div class="row">
-            <div class="col-8">
+            <div class="col-6">
                 <input type="text" id="searchFor" name="searchFor" required class="form-control"
                     [(ngModel)]="searchFor" />
             </div>
-            <div class="col-4">
+            <div class="col-3">
                 <button type="button" class="btn btn-primary" (click)="search()" translate>dic.search</button>
+            </div>
+            <div class="col-3" *ngIf="multi">
+                <button type="button" class="btn btn-primary" (click)="selectProducts(modal)" translate>dic.select</button>
             </div>
         </div>
 
@@ -23,12 +26,12 @@
                 <ul class="list-group" style="width: 100%;">
                     <li class="list-group-item" *ngFor="let product of products"
                         (click)="selectProduct(product, modal)">
-
-
+<!-- 
+                        [value]="product"
+ -->
+                        <input class="form-check-input" type="checkbox"  [id]="product.id" [(ngModel)]="selected[product.id]">
+                        &nbsp;
                         <i class="{{ProductTypeIcons[product.type]}}"></i> &nbsp; {{ product.name }}
-
-
-
                     </li>
                 </ul>
             </div>

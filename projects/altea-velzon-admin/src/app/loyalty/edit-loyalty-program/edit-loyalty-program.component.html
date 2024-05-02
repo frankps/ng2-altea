@@ -1,0 +1,174 @@
+<ngx-altea-search-product [multi]="true" #searchProductModal (selectMulti)="productsSelected($event)"></ngx-altea-search-product>
+<!-- (select)="addNewProductItem($event)"
+-->
+
+<ng-container *ngIf="object">
+
+    <ngx-altea-delete-modal #deleteModal objectType="resource" [object]="object" [objectSvc]="loyaltyProgramSvc"
+        [config]="deleteConfig"></ngx-altea-delete-modal>
+
+    <div class="row">
+        <div class="col-9">
+            <h4>{{'objects.loyalty.program._single' | translate}} {{object.name}}</h4>
+        </div>
+        <div class="col-3">
+
+            <div class="d-inline-block float-end" ngbDropdown #myDrop="ngbDropdown">
+                <button type="button" class="btn btn-outline-primary me-2" id="dropdownManual" ngbDropdownAnchor
+                    (focus)="myDrop.open()">
+                    Acties
+                </button>
+                <div ngbDropdownMenu aria-labelledby="dropdownManual">
+                    <button ngbDropdownItem (click)="delete()"><i class="fa-duotone fa-trash me-1"></i>
+                        Verwijderen</button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <ngx-altea-form-card-section sectionName="{{'objects.loyalty.program._single' | translate}} {{object.name}}"
+        sectionId="general" [editSectionId]="editSectionId" (save)="save()" (cancel)="cancel()"
+        (editModeChanged)="editModeChanged($event)"
+        [enableSave]="!generalForm?.form.pristine && generalForm?.form.valid">
+        <ng-container readonly>
+            <!-- <div>{{ object.descr }}</div> -->
+
+            <div class="row">
+                <div class="col-3"> <ngx-altea-label-value label="objects.loyalty.program.name"
+                        [value]="object.name"></ngx-altea-label-value> </div>
+
+            </div>
+
+
+
+
+
+
+
+        </ng-container>
+        <ng-container edit>
+
+            <form #generalForm="ngForm">
+
+
+
+                <div class="row">
+                    <div class="col-4">
+                        <ngx-altea-label-control label="objects.loyalty.program.name" for="name">
+                            <input id="name" name="name" required class="form-control" [(ngModel)]="object.name" />
+                        </ngx-altea-label-control>
+                    </div>
+
+                </div>
+                <!--  -->
+
+
+
+
+
+
+
+            </form>
+
+            <form #editLoayltyProgramForm="ngForm">
+                <div class="row {{css_cls_row}}">
+                    <div class="col">
+                        <div class="form-check form-switch">
+                            <input type="checkbox" class="form-check-input" id="prod" name="prod"
+                                [(ngModel)]="object.prod">
+                            <label class="form-check-label" for="prod" translate="objects.loyalty.program.prod"></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row {{css_cls_row}}">
+                    <div class="col">
+                        <div class="form-check form-switch">
+                            <input type="checkbox" class="form-check-input" id="svc_basic" name="svc_basic"
+                                [(ngModel)]="object.svc_basic">
+                            <label class="form-check-label" for="svc_basic"
+                                translate="objects.loyalty.program.svc_basic"></label>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="row {{css_cls_row}}">
+                    <div class="col">
+                        <div class="form-check form-switch">
+                            <input type="checkbox" class="form-check-input" id="svc_bundle" name="svc_bundle"
+                                [(ngModel)]="object.svc_bundle">
+                            <label class="form-check-label" for="svc_bundle"
+                                translate="objects.loyalty.program.svc_bundle"></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row {{css_cls_row}}">
+                    <div class="col">
+                        <div class="form-check form-switch">
+                            <input type="checkbox" class="form-check-input" id="svc_subs" name="svc_subs"
+                                [(ngModel)]="object.svc_subs">
+                            <label class="form-check-label" for="svc_subs"
+                                translate="objects.loyalty.program.svc_subs"></label>
+                        </div>
+                    </div>
+                </div>  
+
+                <div class="row {{css_cls_row}}">
+                    <div class="col">
+                        <div class="form-check form-switch">
+                            <input type="checkbox" class="form-check-input" id="promo" name="promo"
+                                [(ngModel)]="object.promo">
+                            <label class="form-check-label" for="promo"
+                                translate="objects.loyalty.program.promo"></label>
+                        </div>
+                    </div>
+                </div>
+
+
+            </form>
+
+
+            <div class="row">
+
+                <div class="col-6">
+
+
+                    <ul class="list-group">
+
+                        <ng-container *ngIf="object.hasIncl()">
+                            <li class="list-group-item" *ngFor="let loyaltyProduct of object.incl; let idx = index">
+                                {{loyaltyProduct.name}}
+                            </li>
+                        </ng-container>
+
+                      <!--   *ngIf="sectionInEdit(ListSectionMode.readOnly)" -->
+
+                        <li  class="list-group-item"
+                        style="text-align: center; cursor: pointer;" (click)="addProducts('incl')">
+                        <i class="fa-duotone fa-circle-plus fa-xl"></i> &nbsp; {{ 'ui.product.edit.sections.options.add-btn' |
+                        translate
+                        }}
+                    </li>
+
+
+                    </ul>
+
+
+                </div>
+
+            </div>
+
+
+        </ng-container>
+
+    </ngx-altea-form-card-section>
+
+
+
+
+</ng-container>

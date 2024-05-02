@@ -14,6 +14,19 @@ import * as sc from 'stringcase'
 import { ConnectTo } from 'ts-common'
 
 
+/*
+
+ng generate service loyaltyCard --project=ng-altea-common
+
+ng generate module loyalty --routing --project=altea-velzon-admin
+
+ng generate component loyalty/manage-loyalty-programs --project=altea-velzon-admin
+ng generate component loyalty/edit-loyalty-program --project=altea-velzon-admin
+ng generate component loyalty/loyalty-program-list --project=altea-velzon-admin
+
+
+
+*/
 
 @Component({
   selector: 'ngx-altea-edit-product',

@@ -17,7 +17,7 @@ export enum OrderUiState {
   demoOrders = 'demo-orders',
   browseCatalog = 'browse-catalog',
   requestInvoice = 'request-invoice'
-}
+}  
 
 export enum OrderUiMode {
   newOrder = 'new-order',

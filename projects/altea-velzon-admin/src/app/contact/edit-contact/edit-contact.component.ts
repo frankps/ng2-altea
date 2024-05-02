@@ -48,7 +48,7 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> {
   constructor(protected contactSvc: ContactService, protected translationSvc: TranslationService, route: ActivatedRoute, router: Router,
     spinner: NgxSpinnerService, private modalService: NgbModal, dashboardSvc: DashboardService,
     protected scheduleSvc: ScheduleService, protected sessionSvc: SessionService) {
-    super('contact', Contact, 'subscriptions,giftsIn,giftsOut'
+    super('contact', Contact, 'subscriptions,giftsIn,giftsOut,cards'
       , contactSvc
       , router, route, spinner, dashboardSvc)
 

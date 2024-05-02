@@ -367,6 +367,9 @@
           },
           "giftsIn": {
             "title": "Ontvangen cadeaubonnen"
+          },
+          "loyalty": {
+            "title": "Klantenkaarten"
           }
         }
       }
@@ -615,6 +618,18 @@
       "email": "Email",
       "country": "Land",
       "needed": "Wenst u een factuur?"
+    },
+    "loyalty": {
+      "program": {
+        "_single": "Klantenkaart",
+        "name": "Kaartnaam",
+        "prod": "Producten",
+        "svc_basic": "Basisdiensten",
+        "svc_bundle": "Arrangementen",
+        "svc_subs": "Abonnementen",
+        "promo": "Promoties"
+      }
+
     },
     "gift": {
       "_single": "Cadeaubon",
@@ -962,6 +977,9 @@
     },
     "branch": {
       "label": "Instellingen"
+    },
+    "loyalty": {
+      "label": "Klantenkaarten"
     },
     "tasks": {
       "label": "Taken",

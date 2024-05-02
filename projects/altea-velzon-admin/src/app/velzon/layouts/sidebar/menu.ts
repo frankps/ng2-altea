@@ -129,6 +129,12 @@ export const MENU: MenuItem[] = [
   },
   {
     id: 13,
+    label: 'menu.loyalty.label',
+    icon: 'home',
+    link: '/aqua/loyalty',
+  },
+  {
+    id: 14,
     label: 'menu.demo.label',
     icon: 'home',
     link: '/aqua/demo',

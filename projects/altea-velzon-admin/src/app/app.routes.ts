@@ -18,6 +18,7 @@ export const appRoutes: Route[] = [
     { path: "branch", loadChildren: () => import(`./branch/branch.module`).then(m => m.BranchModule) },
     { path: "gifts", loadChildren: () => import(`./gift/gift.module`).then(m => m.GiftModule) },
     { path: "tasks", loadChildren: () => import(`./task/task.module`).then(m => m.TaskModule) },
+    { path: "loyalty", loadChildren: () => import(`./loyalty/loyalty.module`).then(m => m.LoyaltyModule) },
     { path: "subscriptions", loadChildren: () => import(`./subscription/subscription.module`).then(m => m.SubscriptionModule) },
    // { path: "order", loadChildren: () => import(`./order-mgr/order-mgr.module`).then(m => m.OrderMgrModule) },
     { path: "demo", component: DemoComponent },

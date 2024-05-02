@@ -271,8 +271,7 @@ export class ObjectService implements IDb {
         }
       }
 
-      // if (res.object)
-      //   res.object = plainToInstance(this.type, res.object)
+
       return res
 
     }
