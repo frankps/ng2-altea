@@ -7,7 +7,7 @@
     "bind": {
         "mode": "ngModel",
         "to": "object",
-        "type": "",
+        "type": "LoyaltyProgram",
         "import": ""
     },
     "label": {
@@ -19,9 +19,24 @@
         "cols": 1
     },
     "elements": {
+
+        "type": {
+            "type": "ng-select",
+            "source": {
+                "mode": "enum",
+                "name": "LoyaltyUnit",
+                "import": "ts-altea-model",
+                "translate": "enums.loyalty-unit"
+            },
+            "required": true,
+            "clearable": false,
+            "multiple": false
+        },
         "prod": {
             "type": "switch",
             "translate": ""
         }
+
     }
 }
+  

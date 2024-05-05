@@ -1,5 +1,5 @@
 import { ApiListResult, ApiResult, ApiStatus, DateHelper, DbObject, DbObjectCreate, DbObjectMulti, DbObjectMultiCreate, DbQuery, DbQueryTyped, ObjectHelper, ObjectWithId, QueryOperator } from 'ts-common'
-import { Branch, Gift, Subscription, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template, OrderLine, BankTransaction, Message } from 'ts-altea-model'
+import { Branch, Gift, Subscription, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template, OrderLine, BankTransaction, Message, LoyaltyProgram } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { IDb } from '../interfaces/i-db'
 
@@ -247,6 +247,22 @@ export class AlteaDb {
         return schedules
 
     }
+
+    async getLoyaltyPrograms(branchId?: string): Promise<LoyaltyProgram[]> {
+
+        if (!branchId)
+            branchId = this.branchId
+
+        const qry = new DbQueryTyped<LoyaltyProgram>('loyaltyProgram', LoyaltyProgram)
+
+        qry.and('branchId', QueryOperator.equals, branchId)
+        qry.orderBy('idx')
+
+        const progs = await this.db.query$<LoyaltyProgram>(qry)
+
+        return progs
+    }
+
 
     async getRecurringTasks() {
 

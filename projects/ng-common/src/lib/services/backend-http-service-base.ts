@@ -478,6 +478,24 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
     return objects
   }
 
+  async getAllForBranch$(branchId: string): Promise<T[]> {
+
+    const qry = new DbQuery()
+    qry.and('branchId', QueryOperator.equals, branchId)
+
+    const objects = await this.query$(qry)
+
+    return objects
+  }
+
+
+/*
+  const loyaltyProgramQry = new DbQuery()
+  loyaltyProgramQry.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
+  //loyaltyProgramQry.include('groups.group', 'schedules:orderBy=idx.planning', 'children.child', 'user')
+  loyaltyProgramQry.take = 1000
+*/
+
   /**  Generic caching algorithm
    * 
    */

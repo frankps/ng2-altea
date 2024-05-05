@@ -7,7 +7,7 @@ import * as _ from "lodash";
 import { NgxSpinnerService } from "ngx-spinner"
 import { DashboardService, ToastType } from 'ng-common';
 import { BehaviorSubject, Observable, take, takeUntil } from 'rxjs';
-import { AlteaDb, CancelOrder, PaymentProcessing } from 'ts-altea-logic';
+import { AlteaDb, CancelOrder, LoyaltyCardUi, PaymentProcessing } from 'ts-altea-logic';
 import * as dateFns from 'date-fns'
 import { StripeService } from '../stripe.service';
 
@@ -79,6 +79,8 @@ export class OrderMgrUiService {   // implements OnInit
   plannings: ResourcePlanning[]
 
 
+  loyalty: LoyaltyCardUi[]
+
   constructor(private productSvc: ProductService, private orderSvc: OrderService, private orderMgrSvc: OrderMgrService
     , protected spinner: NgxSpinnerService, public dbSvc: ObjectService, protected alteaSvc: AlteaService, protected sessionSvc: SessionService,
     public dashboardSvc: DashboardService, protected stripeSvc: StripeService, protected resourceSvc: ResourceService, protected giftSvc: GiftService) {
@@ -115,6 +117,23 @@ export class OrderMgrUiService {   // implements OnInit
 
     console.error(cancelOrderResult)
   }*/
+
+  calculateAll() {
+    this.order.calculateAll()
+
+
+    //this.addPayment(100)
+    this.calculateLoyalty()
+
+
+  }
+
+  async calculateLoyalty() {
+
+    this.loyalty = await this.alteaSvc.loyaltyCalculator.getOverview(this.order)
+    console.error(this.loyalty)
+
+  }
 
 
   dirtyColor() {
@@ -349,7 +368,7 @@ export class OrderMgrUiService {   // implements OnInit
     this.spinner.show()
 
     // .resources.resource
-    this.orderSvc.get(orderId, "lines.planning.resource,lines:orderBy=idx.product,contact,payments:orderBy=idx").subscribe(order => {
+    this.orderSvc.get(orderId, "lines.planning.resource,lines:orderBy=idx.product,contact.cards,payments:orderBy=idx").subscribe(order => {
 
       this.order = order
 

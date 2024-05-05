@@ -168,6 +168,9 @@ export class DemoOrdersComponent implements OnInit {
     if (contact)
       this.orderMgrSvc.setContact(contact)
 
+
+    await this.orderMgrSvc.calculateLoyalty()
+
     console.error(this.orderMgrSvc.order)
 
     this.new.emit(this.orderMgrSvc.order)

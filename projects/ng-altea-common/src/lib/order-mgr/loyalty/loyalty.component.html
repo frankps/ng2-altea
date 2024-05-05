@@ -1,0 +1,16 @@
+
+<!-- <div class="row" *ngFor="let prog of programs">
+    <div class="col-6">{{prog.name}}</div>
+    <div class="col-6"></div>      
+</div> -->
+
+
+<ng-container *ngIf="loyalty">
+
+    <div class="row" *ngFor="let uiCard of loyalty">
+        <div class="col-6">{{uiCard.program.name}}</div>
+        <div class="col-3">{{uiCard.current}}</div>      
+        <div class="col-3">{{uiCard.extra}}</div>      
+    </div>
+
+</ng-container>

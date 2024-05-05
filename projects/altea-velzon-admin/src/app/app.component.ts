@@ -1,5 +1,5 @@
 import { AfterContentChecked, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { BranchService, ProductService, ResourceService, ScheduleService, SessionService, TypeInfoService } from 'ng-altea-common';
+import { BranchService, LoyaltyProgramService, ProductService, ResourceService, ScheduleService, SessionService, TypeInfoService } from 'ng-altea-common';
 import { BsLocaleService } from 'ngx-bootstrap/datepicker';
 import { Product, TypeInfo } from 'ts-altea-model';
 import { DbQuery, QueryOperator } from 'ts-common';
@@ -15,7 +15,7 @@ export class AppComponent implements OnInit {
 
   constructor(private localeService: BsLocaleService, private branchSvc: BranchService, private sessionSvc: SessionService
     , private productSvc: ProductService, private resourceSvc: ResourceService, private typeInfoSvc: TypeInfoService,
-    private scheduleSvc: ScheduleService) {
+    private scheduleSvc: ScheduleService, private loyaltyProgramSvc: LoyaltyProgramService) {
     this.localeService.use('nl-be');
 
 
@@ -71,6 +71,13 @@ export class AppComponent implements OnInit {
     resourceQry.take = 1000
     this.resourceSvc.cacheQuery = resourceQry
     await this.resourceSvc.initCache(typeInfos)
+
+    const loyaltyProgramQry = new DbQuery()
+    loyaltyProgramQry.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
+    //loyaltyProgramQry.include('groups.group', 'schedules:orderBy=idx.planning', 'children.child', 'user')
+    loyaltyProgramQry.take = 1000
+    this.loyaltyProgramSvc.cacheQuery = loyaltyProgramQry
+    await this.loyaltyProgramSvc.initCache(typeInfos)
 
     /* 
     const scheduleQry = new DbQuery()

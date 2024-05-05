@@ -815,8 +815,8 @@ export class Product extends ObjectWithIdPlus {
 
     var specialPrice = this.prices.find(p => p.start <= onDateNum && onDateNum < p.end)
 
-     if (!specialPrice)
-      specialPrice = this.prices.find(p => p.start <= onDateNum && !p.end) 
+    if (!specialPrice)
+      specialPrice = this.prices.find(p => p.start <= onDateNum && !p.end)
 
 
     if (!specialPrice)
@@ -4345,9 +4345,9 @@ export enum LoyaltyProductMode {
  * using the LoyaltyProduct class
  */
 export class LoyaltyProduct {
- // id: string
- // name: string
- // mode: LoyaltyProductMode.id
+  // id: string
+  // name: string
+  // mode: LoyaltyProductMode.id
 
   constructor(public mode = LoyaltyProductMode.id, public name?: string, public id?: string) {
 
@@ -4360,14 +4360,36 @@ export class LoyaltyProduct {
   }
 }
 
+export enum LoyaltyRewardType {
+  /** general discount, can be applied to any order */
+  discount = 'discount',
+  /** discount for certain products only */
+  productDiscount = 'productDiscount',
+
+  freeProduct = 'freeProduct',
+}
+
 export class LoyaltyReward {
+  type: LoyaltyRewardType = LoyaltyRewardType.discount
+
+  /** min amount on card to receive this reward */
+  amount: number = 0
+
+  info: string = ''
+
+  /** value received if amount  */
+  discount: number = 0
+
+  product: { id: string, name: string }
+
 
 }
 
 export enum LoyaltyUnit {
-  price,
-  productQty
+  priceIncl = 'priceIncl',
+  qty = 'qty'
 }
+
 export class LoyaltyProgram extends ObjectWithIdPlus {
 
   orgId?: string
@@ -4380,33 +4402,13 @@ export class LoyaltyProgram extends ObjectWithIdPlus {
   maxValue: number = -1
   maxDaysValid: number = -1
 
-  track: LoyaltyUnit = LoyaltyUnit.productQty
+  track: LoyaltyUnit = LoyaltyUnit.qty
 
-  @Type(() => LoyaltyProduct)
-  incl: LoyaltyProduct[] = []
-
-  @Type(() => LoyaltyProduct)
-  excl: LoyaltyProduct[] = []
-
-  rewards: LoyaltyReward[] = []
-
-  hasIncl() : boolean {
-    return ArrayHelper.AtLeastOneItem(this.incl)
-  }
-
-  hasExcl() : boolean {
-    return ArrayHelper.AtLeastOneItem(this.excl)
-  }
-
-  hasRewards() : boolean {
-    return ArrayHelper.AtLeastOneItem(this.rewards)
-  }
-  
   /** products included?  */
   prod = true
 
   /** basic services included?  */
-  svc_basic = true  
+  svc_basic = true
 
   /** bundled services included?  */
   svc_bundle = true
@@ -4416,6 +4418,81 @@ export class LoyaltyProgram extends ObjectWithIdPlus {
 
   /** promotions included in program? */
   promo = false
+
+
+  @Type(() => LoyaltyProduct)
+  incl: LoyaltyProduct[] = []
+
+  @Type(() => LoyaltyProduct)
+  excl: LoyaltyProduct[] = []
+
+  @Type(() => LoyaltyReward)
+  rewards: LoyaltyReward[] = []
+
+  idx = 0
+
+  hasIncl(): boolean {
+    return ArrayHelper.AtLeastOneItem(this.incl)
+  }
+
+  includesProduct(productId: string) {
+
+    if (!this.hasIncl())
+      return false
+
+    const idx = this.incl.findIndex(p => p.id == productId)
+
+    return (idx >= 0)
+  }
+
+  hasExcl(): boolean {
+    return ArrayHelper.AtLeastOneItem(this.excl)
+  }
+
+  excludesProduct(productId: string) {
+
+    if (!this.hasExcl())
+      return false
+
+    const idx = this.excl.findIndex(p => p.id == productId)
+
+    return (idx >= 0)
+  }
+
+  hasRewards(): boolean {
+    return ArrayHelper.AtLeastOneItem(this.rewards)
+  }
+
+
+  hasProduct(product: Product): boolean {
+    let inProgram = false
+
+    if (!product)
+      return false
+
+    if (this.prod && product.type == ProductType.prod) // if loyalty program is enabled for products
+      inProgram = true
+    else if (product.type == ProductType.svc) {  // in case of a service product
+
+      if (this.svc_basic && product.sub == ProductSubType.basic) // if loyalty program is enabled for basic services
+        inProgram = true
+      else if (this.svc_bundle && product.sub == ProductSubType.bundle) // if loyalty program is enabled for bundled services 
+        inProgram = true
+      else if (this.svc_bundle && product.sub == ProductSubType.subs) // if loyalty program is enabled for subscription services 
+        inProgram = true
+    }
+
+    if (!inProgram && this.includesProduct(product.id)) {
+      inProgram = true
+    }
+
+    if (inProgram && this.excludesProduct(product.id)) {
+      inProgram = false
+    }
+
+    return inProgram
+
+  }
 
 
 }
@@ -4428,10 +4505,10 @@ export class LoyaltyProgram extends ObjectWithIdPlus {
 
 export class LoyaltyCardChange {
   public id?: string;
-  
+
   card?: LoyaltyCard
   cardId?: string
-  
+
   value: number = 0
 
   isReward: boolean = false
@@ -4452,7 +4529,7 @@ export class LoyaltyCard extends ObjectWithIdPlus {
 
   program?: LoyaltyProgram
   programId?: string
-  
+
   changes?: LoyaltyCardChange[]
 
   name?: string

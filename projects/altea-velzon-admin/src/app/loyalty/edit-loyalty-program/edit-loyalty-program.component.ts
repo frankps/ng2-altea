@@ -1,7 +1,7 @@
 
 import { Component, ViewChild, OnInit } from '@angular/core';
 import { ProductService, PriceService, ProductResourceService, ResourceService, ScheduleService, ContactService, SessionService, GiftService, LoyaltyProgramService } from 'ng-altea-common'
-import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ResourceType, ResourceTypeIcons, Resource, Schedule, Contact, Language, Gift, LoyaltyProgram, LoyaltyProduct, LoyaltyProductMode } from 'ts-altea-model'
+import { LoyaltyUnit, Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ResourceType, ResourceTypeIcons, Resource, Schedule, Contact, Language, Gift, LoyaltyProgram, LoyaltyProduct, LoyaltyProductMode, LoyaltyReward } from 'ts-altea-model'
 import { BackendHttpServiceBase, DashboardService, FormCardSectionEventData, NgEditBaseComponent, ToastType, TranslationService } from 'ng-common'
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxModalComponent, DeleteModalComponent } from 'ng-common';
@@ -21,7 +21,7 @@ import { SearchProductComponent } from '../../product/search-product/search-prod
   templateUrl: './edit-loyalty-program.component.html',
   styleUrls: ['./edit-loyalty-program.component.scss']
 })
-export class EditLoyaltyProgramComponent extends NgEditBaseComponent<LoyaltyProgram> {
+export class EditLoyaltyProgramComponent extends NgEditBaseComponent<LoyaltyProgram> implements OnInit {
 
   css_cls_row = 'mt-3'
 
@@ -42,6 +42,13 @@ export class EditLoyaltyProgramComponent extends NgEditBaseComponent<LoyaltyProg
 
   Array = Array
 
+  newReward = new LoyaltyReward()
+
+	initialized= false
+  loyaltyUnit: Translation[]= []
+
+
+
   // gender: Translation[] = []
   // language: Translation[] = []
 
@@ -55,13 +62,22 @@ export class EditLoyaltyProgramComponent extends NgEditBaseComponent<LoyaltyProg
       , loyaltyProgramSvc
       , router, route, spinner, dashboardSvc)
 
-    this.sectionProps.set('general', ['name'])
+    this.sectionProps.set('general', ['name', 'track', 'incl', 'excl', 'rewards', 'prod', 'svc_basic', 'svc_bundle', 'svc_subs', 'promo'])  // , 'prod', 'svc_basic', 'svc_bundle', 'svc_subs', 'promo'
     // this.translationSvc.translateEnum(Gender, 'enums.gender.', this.gender)
     // this.translationSvc.translateEnum(Language, 'enums.language.', this.language)
 
   }
 
+	override async ngOnInit() {
 
+    super.ngOnInit()
+    
+
+		await this.translationSvc.translateEnum(LoyaltyUnit, 'enums.loyalty-unit.', this.loyaltyUnit)
+		
+    this.initialized = true
+
+	}
 
 
   delete() {
@@ -77,16 +93,22 @@ export class EditLoyaltyProgramComponent extends NgEditBaseComponent<LoyaltyProg
     console.error('objectRetrieved')
     console.error(object)
 
+    /*
     object.incl = []
     object.incl.push(new LoyaltyProduct(LoyaltyProductMode.id, 'Wellness', 'abc'))
+*/
 
 
 
 
-  
 
     // this.editSectionId = 'general'
   }
+
+  isDirty() {
+    return (!this.generalForm?.form.pristine || this.productListsChanged) && this.generalForm?.form.valid
+  }
+
 
   startEditSection(sectionId: string, sectionParam: string) {
     console.log('Start edit section', sectionId, sectionParam)
@@ -119,6 +141,7 @@ export class EditLoyaltyProgramComponent extends NgEditBaseComponent<LoyaltyProg
         this.saveSection(this.sectionProps, this.editSectionId)
     }
 
+    this.productListsChanged = false
   }
 
   target: 'incl' | 'excl' = 'incl'
@@ -128,6 +151,8 @@ export class EditLoyaltyProgramComponent extends NgEditBaseComponent<LoyaltyProg
     this.searchProductModal.show()
   }
 
+  productListsChanged = false
+
   productsSelected(products: Product[]) {
 
     console.warn(products)
@@ -136,8 +161,58 @@ export class EditLoyaltyProgramComponent extends NgEditBaseComponent<LoyaltyProg
       return
 
     const loyaltyProducts = products.map(p => LoyaltyProduct.fromProduct(p))
+
+    if (!this.object[this.target])
+      this.object[this.target] = []
+
     this.object[this.target].push(...loyaltyProducts)
-    
+
+    this.productListsChanged = true
+  }
+
+
+  deleteProduct(target: 'incl' | 'excl', loyaltyProduct: LoyaltyProduct, idx: number) {
+
+    if (!this.object[target])
+      return
+
+    // 
+
+    this.object[target].splice(idx, 1)
+    this.productListsChanged = true
+
+  }
+
+  deleteReward(reward, idx) {
+    if (!this.object.rewards)
+      return
+
+    this.object.rewards.splice(idx, 1)
+    this.productListsChanged = true
+  }
+
+  saveReward(reward: LoyaltyReward) {
+
+    console.error(reward)
+
+    if (!reward)
+      return
+
+    if (!this.object.rewards)
+      this.object.rewards = []
+
+    this.object.rewards.push(reward)
+    this.newReward = new LoyaltyReward()
+
+    this.productListsChanged = true
+  }
+
+
+  editRewardIdx = -1
+
+  editReward(reward: LoyaltyReward, idx: number) {
+    this.editRewardIdx = idx
+
   }
 
   /*

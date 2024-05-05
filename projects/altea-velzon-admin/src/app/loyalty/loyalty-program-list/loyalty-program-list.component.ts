@@ -52,7 +52,7 @@ export class LoyaltyProgramListComponent extends NgBaseListComponent<LoyaltyProg
     query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
 
     query.take = 20
-    query.orderBy('upd', SortOrder.desc)
+    query.orderBy('idx', SortOrder.asc)
 
     return query
 

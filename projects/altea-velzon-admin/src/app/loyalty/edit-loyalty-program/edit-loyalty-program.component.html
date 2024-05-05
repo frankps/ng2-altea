@@ -1,4 +1,5 @@
-<ngx-altea-search-product [multi]="true" #searchProductModal (selectMulti)="productsSelected($event)"></ngx-altea-search-product>
+<ngx-altea-search-product [multi]="true" #searchProductModal
+    (selectMulti)="productsSelected($event)"></ngx-altea-search-product>
 <!-- (select)="addNewProductItem($event)"
 -->
 
@@ -31,8 +32,7 @@
 
     <ngx-altea-form-card-section sectionName="{{'objects.loyalty.program._single' | translate}} {{object.name}}"
         sectionId="general" [editSectionId]="editSectionId" (save)="save()" (cancel)="cancel()"
-        (editModeChanged)="editModeChanged($event)"
-        [enableSave]="!generalForm?.form.pristine && generalForm?.form.valid">
+        (editModeChanged)="editModeChanged($event)" [enableSave]="isDirty()">
         <ng-container readonly>
             <!-- <div>{{ object.descr }}</div> -->
 
@@ -62,6 +62,20 @@
                         </ngx-altea-label-control>
                     </div>
 
+                    <div class="col-4">
+                        <ngx-altea-label-control label="objects.loyalty.program.track" for="track">
+                            <ng-select id="track" name="track" *ngIf="initialized" [items]="loyaltyUnit"
+                                bindLabel="trans" bindValue="key" [clearable]="false" [multiple]="false"
+                                [(ngModel)]="object.track"></ng-select>
+                        </ngx-altea-label-control>
+                    </div>
+
+                    <div class="col-2">
+                        <ngx-altea-label-control label="objects.loyalty.program.idx" for="idx">
+                            <input id="idx" name="idx" type="number" required class="form-control" [(ngModel)]="object.idx" />
+                        </ngx-altea-label-control>
+                    </div>
+
                 </div>
                 <!--  -->
 
@@ -70,10 +84,16 @@
 
 
 
-
+                <!-- 
             </form>
 
             <form #editLoayltyProgramForm="ngForm">
+ -->
+                <div class="row {{css_cls_row}}">
+
+                </div>
+
+
                 <div class="row {{css_cls_row}}">
                     <div class="col">
                         <div class="form-check form-switch">
@@ -116,7 +136,7 @@
                                 translate="objects.loyalty.program.svc_subs"></label>
                         </div>
                     </div>
-                </div>  
+                </div>
 
                 <div class="row {{css_cls_row}}">
                     <div class="col">
@@ -132,34 +152,114 @@
 
             </form>
 
+            <div class="row mt-5">
 
-            <div class="row">
+                <div class="col-12">
+                    Rewards:
+
+                    <ng-container *ngIf="object.rewards">
+
+                        <ng-container *ngFor="let reward of object.rewards; let idx = index">
+
+                            <div class="row mt-2">
+                                <div class="col-3">
+                                    {{'enums.loyalty-reward-type.' + reward.type | translate}}
+                                </div>
+                                <div class="col-1">
+                                    {{reward.amount}}
+                                </div>
+                                <div class="col-3">
+                                    {{reward.info}}
+                                </div>
+                                <div class="col-3">
+                                    <span *ngIf="reward.type == 'discount'">{{reward.discount}}</span>
+                                    <span
+                                        *ngIf="(reward.type == 'productDiscount' || reward.type == 'freeProduct') && reward.product">{{reward.product.name}}</span>
+                                </div>
+                                <div class="col">
+                                    <i class="fas fa-pen float-end" (click)="editReward(reward, idx)"></i>
+                                    <i class="fas fa-trash float-end me-2" (click)="deleteReward(reward, idx)"></i>
+                                </div>
+                            </div>
+
+
+
+                        </ng-container>
+
+                    </ng-container>
+
+
+                    <app-loyalty-reward [reward]="newReward" (save)="saveReward($event)"></app-loyalty-reward>
+
+
+
+
+                </div>
+            </div>
+
+
+
+            <div class="row mt-5">
 
                 <div class="col-6">
-
+                    Inclusief:
 
                     <ul class="list-group">
 
                         <ng-container *ngIf="object.hasIncl()">
                             <li class="list-group-item" *ngFor="let loyaltyProduct of object.incl; let idx = index">
                                 {{loyaltyProduct.name}}
+
+                                <i class="fas fa-trash float-end"
+                                    (click)="deleteProduct('incl', loyaltyProduct, idx)"></i>
                             </li>
                         </ng-container>
 
-                      <!--   *ngIf="sectionInEdit(ListSectionMode.readOnly)" -->
-
-                        <li  class="list-group-item"
-                        style="text-align: center; cursor: pointer;" (click)="addProducts('incl')">
-                        <i class="fa-duotone fa-circle-plus fa-xl"></i> &nbsp; {{ 'ui.product.edit.sections.options.add-btn' |
-                        translate
-                        }}
-                    </li>
+                        <li class="list-group-item" style="text-align: center; cursor: pointer;"
+                            (click)="addProducts('incl')">
+                            <i class="fa-duotone fa-circle-plus fa-xl"></i> &nbsp; {{
+                            'ui.product.edit.sections.options.add-btn' |
+                            translate
+                            }}
+                        </li>
 
 
                     </ul>
 
 
                 </div>
+
+
+
+                <div class="col-6">
+                    Exclusief:
+
+                    <ul class="list-group">
+
+                        <ng-container *ngIf="object.hasExcl()">
+                            <li class="list-group-item" *ngFor="let loyaltyProduct of object.excl; let idx = index">
+                                {{loyaltyProduct.name}}
+
+                                <i class="fas fa-trash float-end"
+                                    (click)="deleteProduct('excl', loyaltyProduct, idx)"></i>
+                            </li>
+                        </ng-container>
+
+                        <li class="list-group-item" style="text-align: center; cursor: pointer;"
+                            (click)="addProducts('excl')">
+                            <i class="fa-duotone fa-circle-plus fa-xl"></i> &nbsp; {{
+                            'ui.product.edit.sections.options.add-btn' |
+                            translate
+                            }}
+                        </li>
+
+
+                    </ul>
+
+
+                </div>
+
+
 
             </div>
 

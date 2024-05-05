@@ -17,13 +17,15 @@ import { ManageLoyaltyProgramsComponent } from './manage-loyalty-programs/manage
 import { EditLoyaltyProgramComponent } from './edit-loyalty-program/edit-loyalty-program.component';
 import { LoyaltyProgramListComponent } from './loyalty-program-list/loyalty-program-list.component';
 import { ProductModule } from '../product/product.module';
+import { LoyaltyRewardComponent } from './loyalty-reward/loyalty-reward.component';
 
 
 @NgModule({
   declarations: [
     ManageLoyaltyProgramsComponent,
     EditLoyaltyProgramComponent,
-    LoyaltyProgramListComponent
+    LoyaltyProgramListComponent,
+    LoyaltyRewardComponent
   ],
   imports: [
     CommonModule,

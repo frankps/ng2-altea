@@ -41,6 +41,8 @@ Test:
 
 New component:
 
+ng generate component loyalty/loyalty-reward --project=altea-velzon-admin
+
 ng generate component task/manage-tasks --project=altea-velzon-admin
 ng generate component task/editTask --project altea-velzon-admin
 ng generate component task/task-list --project=altea-velzon-admin

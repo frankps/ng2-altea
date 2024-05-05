@@ -43,7 +43,7 @@ export class OrderLineComponent {
 
     this.orderMgrSvc.orderDirty = true
     this.orderMgrSvc.orderLine.markAsUpdated('qty')
-    this.orderMgrSvc.order.calculateAll()
+    this.orderMgrSvc.calculateAll()
   }
 
   // orderMgrSvc.addOrderLine(orderLine)
@@ -86,7 +86,7 @@ export class OrderLineComponent {
     console.error('has price!!')
 
     this.orderLine.calculateAll()
-    this.orderMgrSvc.order.calculateAll()
+    this.orderMgrSvc.calculateAll()
     this.orderMgrSvc.orderDirty = true
 
 

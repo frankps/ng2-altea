@@ -33,6 +33,7 @@ import { SearchContactComponent } from './search-contact/search-contact.componen
 import { ContactSelect2Component } from './contact-select2/contact-select2.component';
 import { DebugPlanningsComponent } from './debug-plannings/debug-plannings.component';
 import { CancelOrderComponent } from './cancel-order/cancel-order.component';
+import { LoyaltyComponent } from './loyalty/loyalty.component';
 
 @NgModule({
   declarations: [
@@ -55,6 +56,7 @@ import { CancelOrderComponent } from './cancel-order/cancel-order.component';
     ContactSelect2Component,
     DebugPlanningsComponent,
     CancelOrderComponent,
+    LoyaltyComponent,
   ],
   imports: [
     CommonModule,

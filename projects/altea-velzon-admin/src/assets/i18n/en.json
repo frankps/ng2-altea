@@ -44,6 +44,15 @@
     "end": "einde"
   },
   "enums": {
+    "loyalty-unit": {
+      "priceIncl": "Aangekocht bedrag",
+      "qty": "Aantal gekocht"
+    },
+    "loyalty-reward-type": {
+      "discount": "Korting",
+      "productDiscount": "Korting op product/dienst",
+      "freeProduct": "Gratis dienst/product"
+    },
     "pos-payment-message": {
       "noContact": "Geen klant geselecteerd!",
       "noProduct": "Geen product geselecteerd!",
@@ -623,11 +632,19 @@
       "program": {
         "_single": "Klantenkaart",
         "name": "Kaartnaam",
+        "track": "Bijhouden van",
         "prod": "Producten",
         "svc_basic": "Basisdiensten",
         "svc_bundle": "Arrangementen",
         "svc_subs": "Abonnementen",
-        "promo": "Promoties"
+        "promo": "Promoties",
+        "idx": "Volgorde"
+      },
+      "reward": {
+        "type": "Soort beloning",
+        "amount": "Vanaf",
+        "info": "Info",
+        "discount": "Korting"
       }
 
     },

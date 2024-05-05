@@ -58,7 +58,7 @@ export class OrderMgmtService {
             case OrderState.waitDeposit:
                 order.depositBy = DateHelper.yyyyMMddhhmmss()
                 order.m.setDirty('depositBy')
-        }
+        }  
 
         console.warn(order)
 
@@ -67,7 +67,7 @@ export class OrderMgmtService {
         return result
 
     }
-
+  
 
 
 
