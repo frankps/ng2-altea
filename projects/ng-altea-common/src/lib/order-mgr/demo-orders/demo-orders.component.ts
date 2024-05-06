@@ -163,7 +163,7 @@ export class DemoOrdersComponent implements OnInit {
 
     }
 
-    const contact = await this.contactSvc.get$('ebdb691e-e2ca-4f14-aa63-8eb4c7d6e621')
+    const contact = await this.contactSvc.get$('8fdbf31f-1c6d-459a-b997-963dcd0740d8', 'cards')
 
     if (contact)
       this.orderMgrSvc.setContact(contact)

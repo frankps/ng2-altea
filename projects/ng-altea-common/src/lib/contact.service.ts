@@ -14,20 +14,27 @@ export class ContactService extends BackendHttpServiceBase<Contact> {
     super(Contact, 'Contact', sessionSvc.backend, sessionSvc.branchUnique + '/contacts', http)
   }
 
+  async getById$(id: string, ...includes: string[]): Promise<Contact> {
+
+    let query = new DbQuery()
+    query.and('id', QueryOperator.equals, id)
+    query.include(...includes)
+
+    return this.queryFirst$(query)
+  }
+
   async searchByString$(searchFor: string): Promise<Contact[]> {
 
     let query = new DbQuery()
 
-    
-      query.and('name', QueryOperator.contains, searchFor)
 
-  /*   if (contact.last)
-      query.and('last', QueryOperator.contains, contact.last)
- */
+    query.and('name', QueryOperator.contains, searchFor)
+
+    /*   if (contact.last)
+        query.and('last', QueryOperator.contains, contact.last)
+   */
 
     return this.query$(query)
-
-
   }
 
   async searchContacts$(contact: Contact): Promise<Contact[]> {
@@ -53,9 +60,9 @@ export class ContactService extends BackendHttpServiceBase<Contact> {
 
 
     return super.update$(object)
-  
-  
-  
+
+
+
   }
 
 

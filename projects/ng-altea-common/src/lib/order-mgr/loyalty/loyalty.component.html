@@ -7,10 +7,40 @@
 
 <ng-container *ngIf="loyalty">
 
-    <div class="row" *ngFor="let uiCard of loyalty">
-        <div class="col-6">{{uiCard.program.name}}</div>
-        <div class="col-3">{{uiCard.current}}</div>      
-        <div class="col-3">{{uiCard.extra}}</div>      
+    <ng-container  *ngFor="let uiCard of loyalty.cards">
+        <div class="row">
+            <div class="col-6">{{uiCard.program.name}}</div>
+            <div class="col-3">{{uiCard.current}}</div>      
+            <div class="col-3">{{uiCard.extra}}</div>      
+        </div> 
+
+        <div class="row" *ngIf="uiCard.hasOpenRewards()">
+
+
+            <div class="col-6 d-grid mt-2" *ngFor="let reward of uiCard.openRewards">
+
+                <button type="button" class="btn btn-primary btn-sm" (click)="addLoyalty()">{{reward.label()}}</button>
+    
+            </div>
+    
+        </div>
+
+    </ng-container>
+
+
+
+
+
+    <div *ngIf="loyalty.newLoyalty">
+        <div class="col d-grid">
+            <button type="button" [disabled]="!loyalty?.newLoyalty || !order?.contactId" class="btn btn-primary btn-sm" (click)="addLoyalty()" translate>dic.add</button>
+
+        </div>
     </div>
 
+
+
+
 </ng-container>
+
+

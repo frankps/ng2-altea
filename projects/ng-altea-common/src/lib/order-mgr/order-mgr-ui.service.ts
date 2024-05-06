@@ -7,7 +7,7 @@ import * as _ from "lodash";
 import { NgxSpinnerService } from "ngx-spinner"
 import { DashboardService, ToastType } from 'ng-common';
 import { BehaviorSubject, Observable, take, takeUntil } from 'rxjs';
-import { AlteaDb, CancelOrder, LoyaltyCardUi, PaymentProcessing } from 'ts-altea-logic';
+import { AlteaDb, CancelOrder, LoyaltyUi, LoyaltyUiCard, PaymentProcessing } from 'ts-altea-logic';
 import * as dateFns from 'date-fns'
 import { StripeService } from '../stripe.service';
 
@@ -79,7 +79,7 @@ export class OrderMgrUiService {   // implements OnInit
   plannings: ResourcePlanning[]
 
 
-  loyalty: LoyaltyCardUi[]
+  loyalty: LoyaltyUi
 
   constructor(private productSvc: ProductService, private orderSvc: OrderService, private orderMgrSvc: OrderMgrService
     , protected spinner: NgxSpinnerService, public dbSvc: ObjectService, protected alteaSvc: AlteaService, protected sessionSvc: SessionService,
@@ -118,19 +118,21 @@ export class OrderMgrUiService {   // implements OnInit
     console.error(cancelOrderResult)
   }*/
 
-  calculateAll() {
+  async calculateAll() {
     this.order.calculateAll()
 
 
     //this.addPayment(100)
-    this.calculateLoyalty()
+    await this.calculateLoyalty()
 
 
   }
 
   async calculateLoyalty() {
 
-    this.loyalty = await this.alteaSvc.loyaltyCalculator.getOverview(this.order)
+    console.warn('-- calculateLoyalty --')
+
+    this.loyalty = await this.alteaSvc.loyaltyMgmtService.getOverview(this.order)
     console.error(this.loyalty)
 
   }
@@ -338,7 +340,7 @@ export class OrderMgrUiService {   // implements OnInit
 
         if (product) {
           const optionValues = line.getOptionValuesAsMap()
-          this.addOrderLineFromProduct(product, line.qty, optionValues)
+          await this.addOrderLineFromProduct(product, line.qty, optionValues)
         }
       }
     }
@@ -729,16 +731,18 @@ export class OrderMgrUiService {   // implements OnInit
     return this.orderLine
   }
 
-  addOrderLineFromProduct(product: Product, qty = 1, initOptionValues?: Map<String, String[]>) {
+  async addOrderLineFromProduct(product: Product, qty = 1, initOptionValues?: Map<String, String[]>) {
     let orderLine = this.newOrderLine(product, qty, initOptionValues)
-    this.addOrderLine(orderLine)
+    await this.addOrderLine(orderLine)
   }
 
-  addOrderLine(orderLine: OrderLine, qty = 1, setUnitPrice = true) {
+  async addOrderLine(orderLine: OrderLine, qty = 1, setUnitPrice = true) {
     // orderLine.orderId = this.order.id
     this.order.addLine(orderLine, setUnitPrice)
     this.orderDirty = true
     this.orderLineIsNew = false
+
+    await this.calculateLoyalty()
   }
 
   deleteCurrentOrderLine() {
@@ -775,13 +779,15 @@ export class OrderMgrUiService {   // implements OnInit
     return payment
   }
 
-  setContact(contact: Contact) {
+  async setContact(contact: Contact) {
 
     this.order.contactId = contact.id
     this.order.m.setDirty('contactId')
     this.orderDirty = true
 
     this.order.contact = contact
+
+    await this.calculateLoyalty()
 
   }
 

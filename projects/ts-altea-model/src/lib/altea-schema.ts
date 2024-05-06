@@ -4383,6 +4383,16 @@ export class LoyaltyReward {
   product: { id: string, name: string }
 
 
+  label() : string {
+
+    if (this.info)
+      return this.info
+    else if (this.product?.name)
+      return this.product?.name
+
+    return ''
+  }
+
 }
 
 export enum LoyaltyUnit {
@@ -4493,14 +4503,38 @@ export class LoyaltyProgram extends ObjectWithIdPlus {
     return inProgram
 
   }
-
-
 }
 
 
+export class RegisterLoyalty {
+  contactId: string
+
+  lines: LoyaltyLine[] = []
+
+  constructor(contactId: string) {
+    this.contactId = contactId
+  }
 
 
+  getLinesForPrograms(programIds: string[]) {
 
+    const lines = this.lines.filter(line => programIds.indexOf(line.programId) >= 0)
+
+    return lines
+  }
+
+  getLinesForOtherPrograms(programIds: string[]) {
+
+    const lines = this.lines.filter(line => programIds.indexOf(line.programId) == -1)
+
+    return lines
+  }
+}
+
+export class LoyaltyLine {
+
+  constructor(public programId: string, public name: string, public extra: number) { }
+}
 
 
 export class LoyaltyCardChange {

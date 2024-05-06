@@ -1,4 +1,4 @@
 
 export * from './cancel-order'
-export * from './loyalty-calculator'
+export * from './loyalty-mgmt-service'
 export * from './payment-processing'

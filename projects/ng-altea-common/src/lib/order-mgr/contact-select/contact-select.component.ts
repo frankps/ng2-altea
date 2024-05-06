@@ -29,7 +29,12 @@ export class ContactSelectComponent {
     console.log(this.contacts)
   }
 
-  selectContact(contact: Contact) {
+  async selectContact(contact: Contact) {
+
+    if (!contact?.id)
+      return
+
+    contact = await this.contactSvc.getById$(contact.id, 'cards')
 
     console.log(contact)
 

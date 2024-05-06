@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AlteaDb, AvailabilityService, CancelOrder, LoyaltyCalculator, OrderMgmtService } from 'ts-altea-logic';
+import { AlteaDb, AvailabilityService, CancelOrder, LoyaltyMgmtService, OrderMgmtService } from 'ts-altea-logic';
 import { ObjectService } from './object.service';
 import { SessionService } from './session.service';
 import { SubscriptionMgmtService } from 'projects/ts-altea-logic/src/lib/subscription/subscription-mgmt-service';
@@ -71,14 +71,14 @@ export class AlteaService {
     return this._cancelOrder
   }
 
-  _loyaltyCalculator?: LoyaltyCalculator
+  _loyaltyMgmtService?: LoyaltyMgmtService
 
-  get loyaltyCalculator(): LoyaltyCalculator {
+  get loyaltyMgmtService(): LoyaltyMgmtService {
 
-    if (!this._loyaltyCalculator)
-      this._loyaltyCalculator = new LoyaltyCalculator(this.objSvc)
+    if (!this._loyaltyMgmtService)
+      this._loyaltyMgmtService = new LoyaltyMgmtService(this.objSvc)
 
-    return this._loyaltyCalculator
+    return this._loyaltyMgmtService
   }
 
 

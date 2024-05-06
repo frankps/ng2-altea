@@ -1,5 +1,5 @@
 import { ApiListResult, ApiResult, ApiStatus, DateHelper, DbObject, DbObjectCreate, DbObjectMulti, DbObjectMultiCreate, DbQuery, DbQueryTyped, ObjectHelper, ObjectWithId, QueryOperator } from 'ts-common'
-import { Branch, Gift, Subscription, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template, OrderLine, BankTransaction, Message, LoyaltyProgram } from 'ts-altea-model'
+import { Branch, Gift, Subscription, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template, OrderLine, BankTransaction, Message, LoyaltyProgram, LoyaltyCard } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { IDb } from '../interfaces/i-db'
 
@@ -248,20 +248,7 @@ export class AlteaDb {
 
     }
 
-    async getLoyaltyPrograms(branchId?: string): Promise<LoyaltyProgram[]> {
 
-        if (!branchId)
-            branchId = this.branchId
-
-        const qry = new DbQueryTyped<LoyaltyProgram>('loyaltyProgram', LoyaltyProgram)
-
-        qry.and('branchId', QueryOperator.equals, branchId)
-        qry.orderBy('idx')
-
-        const progs = await this.db.query$<LoyaltyProgram>(qry)
-
-        return progs
-    }
 
 
     async getRecurringTasks() {
@@ -569,6 +556,87 @@ export class AlteaDb {
     }
 
 
+
+    async getLoyaltyCards(contactId?: string): Promise<LoyaltyCard[]> {
+
+        if (!contactId)
+            contactId = this.branchId
+
+        const qry = new DbQueryTyped<LoyaltyCard>('loyaltyCard', LoyaltyCard)
+
+        qry.and('contactId', QueryOperator.equals, contactId)
+
+        const cards = await this.db.query$<LoyaltyCard>(qry)
+
+        return cards
+    }
+
+    async getLoyaltyCardById(id: string): Promise<LoyaltyCard> {
+        const object = await this.getObjectById$('loyaltyCard', LoyaltyCard, id)
+        return object
+    }
+    async getLoyaltyCardsByIds(ids: string[]): Promise<LoyaltyCard[]> {
+        const objects = await this.getObjectsByIds('loyaltyCard', LoyaltyCard, ids)
+        return objects
+    }
+
+    async createLoyaltyCards(loyaltyCards: LoyaltyCard[]): Promise<ApiListResult<LoyaltyCard>> {
+        let createResult = await this.createObjects('loyaltyCard', LoyaltyCard, loyaltyCards)
+        return createResult
+    }
+
+    async updateLoyaltyCard(loyaltyCard: LoyaltyCard, propertiesToUpdate: string[]): Promise<ApiResult<LoyaltyCard>> {
+        let updateResult = await this.updateObject('loyaltyCard', LoyaltyCard, loyaltyCard, propertiesToUpdate)
+        return updateResult
+    }
+
+    async updateLoyaltyCards(loyaltyCards: LoyaltyCard[], propertiesToUpdate: string[]): Promise<ApiListResult<LoyaltyCard>> {
+        let updateResult = await this.updateObjects('loyaltyCard', LoyaltyCard, loyaltyCards, propertiesToUpdate)
+        return updateResult
+    }
+
+
+
+
+    async getLoyaltyPrograms(branchId?: string): Promise<LoyaltyProgram[]> {
+
+        if (!branchId)
+            branchId = this.branchId
+
+        const qry = new DbQueryTyped<LoyaltyProgram>('loyaltyProgram', LoyaltyProgram)
+
+        qry.and('branchId', QueryOperator.equals, branchId)
+        qry.orderBy('idx')
+
+        const progs = await this.db.query$<LoyaltyProgram>(qry)
+
+        return progs
+    }
+
+
+    async getLoyaltyProgramById(id: string): Promise<LoyaltyProgram> {
+        const object = await this.getObjectById$('loyaltyProgram', LoyaltyProgram, id)
+        return object
+    }
+    async getLoyaltyProgramsByIds(ids: string[]): Promise<LoyaltyProgram[]> {
+        const objects = await this.getObjectsByIds('loyaltyProgram', LoyaltyProgram, ids)
+        return objects
+    }
+
+    async createLoyaltyPrograms(loyaltyPrograms: LoyaltyProgram[]): Promise<ApiListResult<LoyaltyProgram>> {
+        let createResult = await this.createObjects('loyaltyProgram', LoyaltyProgram, loyaltyPrograms)
+        return createResult
+    }
+
+    async updateLoyaltyProgram(loyaltyProgram: LoyaltyProgram, propertiesToUpdate: string[]): Promise<ApiResult<LoyaltyProgram>> {
+        let updateResult = await this.updateObject('loyaltyProgram', LoyaltyProgram, loyaltyProgram, propertiesToUpdate)
+        return updateResult
+    }
+
+    async updateLoyaltyPrograms(loyaltyPrograms: LoyaltyProgram[], propertiesToUpdate: string[]): Promise<ApiListResult<LoyaltyProgram>> {
+        let updateResult = await this.updateObjects('loyaltyProgram', LoyaltyProgram, loyaltyPrograms, propertiesToUpdate)
+        return updateResult
+    }
 
 
 
