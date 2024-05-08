@@ -296,7 +296,7 @@ export class AlteaDb {
         }
 
     */
-    async getObjectById$<T>(typeName: string, type: { new(): T; }, id: string): Promise<T> {
+    async getObjectById$<T  extends ObjectWithId>(typeName: string, type: { new(): T; }, id: string): Promise<T> {
 
         const qry = new DbQueryTyped<T>(typeName, type)
         qry.and('id', QueryOperator.equals, id)
@@ -306,7 +306,7 @@ export class AlteaDb {
         return object
     }
 
-    async getObjectsByIds<T>(typeName: string, type: { new(): T; }, ids: string[]): Promise<T[]> {
+    async getObjectsByIds<T  extends ObjectWithId>(typeName: string, type: { new(): T; }, ids: string[]): Promise<T[]> {
 
         if (!Array.isArray(ids) || ids.length == 0)
             return []

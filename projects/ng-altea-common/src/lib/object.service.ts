@@ -7,12 +7,16 @@ import { Observable, map, Subject, take } from "rxjs";
 import { SessionService } from './session.service';
 import { IDb } from 'ts-altea-logic';
 import { CreateCheckoutSession, Message, Order } from 'ts-altea-model';
+import { BackendHttpServiceBase } from 'ng-common';
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class ObjectService implements IDb {
+
+  typeCaches = new Map<any, BackendHttpServiceBase<any>>()
+
 
   constructor(protected http: HttpClient, protected sessionSvc: SessionService) { }
 
@@ -280,9 +284,23 @@ export class ObjectService implements IDb {
 
 
 
-  async query$<T>(query: DbQueryTyped<T>): Promise<T[]> {
+  async query$<T extends ObjectWithId>(query: DbQueryTyped<T>): Promise<T[]> {
 
     const me = this
+
+    console.warn('============== query$ ')
+
+    // if there is a cache available for the requested type => use cache
+    if (me.typeCaches.has(query.type)) {
+
+      const cacheSvc = me.typeCaches.get(query.type) as BackendHttpServiceBase<T>
+      const objects = cacheSvc.queryFromCache(query)
+
+      console.warn('From cache: ', objects)
+
+      return objects
+    }
+
 
     return new Promise<T[]>(function (resolve, reject) {
 
@@ -300,7 +318,7 @@ export class ObjectService implements IDb {
   }
 
 
-  async queryFirst$<T>(query: DbQueryTyped<T>): Promise<T | null> {
+  async queryFirst$<T extends ObjectWithId>(query: DbQueryTyped<T>): Promise<T | null> {
 
 
     const objects = await this.query$<T>(query)

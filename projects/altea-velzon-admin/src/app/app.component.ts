@@ -1,7 +1,7 @@
 import { AfterContentChecked, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { BranchService, LoyaltyProgramService, ProductService, ResourceService, ScheduleService, SessionService, TypeInfoService } from 'ng-altea-common';
+import { BranchService, LoyaltyProgramService, ObjectService, ProductService, ResourceService, ScheduleService, SessionService, TypeInfoService } from 'ng-altea-common';
 import { BsLocaleService } from 'ngx-bootstrap/datepicker';
-import { Product, TypeInfo } from 'ts-altea-model';
+import { Branch, LoyaltyProgram, Product, Resource, TypeInfo } from 'ts-altea-model';
 import { DbQuery, QueryOperator } from 'ts-common';
 
 @Component({
@@ -15,7 +15,7 @@ export class AppComponent implements OnInit {
 
   constructor(private localeService: BsLocaleService, private branchSvc: BranchService, private sessionSvc: SessionService
     , private productSvc: ProductService, private resourceSvc: ResourceService, private typeInfoSvc: TypeInfoService,
-    private scheduleSvc: ScheduleService, private loyaltyProgramSvc: LoyaltyProgramService) {
+    private scheduleSvc: ScheduleService, private loyaltyProgramSvc: LoyaltyProgramService, private objectSvc: ObjectService) {
     this.localeService.use('nl-be');
 
 
@@ -55,6 +55,7 @@ export class AppComponent implements OnInit {
     this.branchSvc.cacheQuery = branchQry
     //this.branchSvc.linkedTypes = ['ProductItem', 'ProductResource']
     await this.branchSvc.initCache(typeInfos)
+    this.objectSvc.typeCaches.set(Branch, this.branchSvc)
 
     const productQry = new DbQuery()
     productQry.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
@@ -63,7 +64,7 @@ export class AppComponent implements OnInit {
     this.productSvc.cacheQuery = productQry
     this.productSvc.linkedTypes = ['ProductItem', 'ProductResource']
     await this.productSvc.initCache(typeInfos)
-
+    this.objectSvc.typeCaches.set(Product, this.productSvc)
 
     const resourceQry = new DbQuery()
     resourceQry.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
@@ -71,6 +72,7 @@ export class AppComponent implements OnInit {
     resourceQry.take = 1000
     this.resourceSvc.cacheQuery = resourceQry
     await this.resourceSvc.initCache(typeInfos)
+    this.objectSvc.typeCaches.set(Resource, this.resourceSvc)
 
     const loyaltyProgramQry = new DbQuery()
     loyaltyProgramQry.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
@@ -78,6 +80,7 @@ export class AppComponent implements OnInit {
     loyaltyProgramQry.take = 1000
     this.loyaltyProgramSvc.cacheQuery = loyaltyProgramQry
     await this.loyaltyProgramSvc.initCache(typeInfos)
+    this.objectSvc.typeCaches.set(LoyaltyProgram, this.loyaltyProgramSvc)
 
     /* 
     const scheduleQry = new DbQuery()

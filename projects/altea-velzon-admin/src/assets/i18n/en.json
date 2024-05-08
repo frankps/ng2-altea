@@ -44,6 +44,10 @@
     "end": "einde"
   },
   "enums": {
+    "loyalty-option-compare": {
+      "eql": "=",
+      "min": ">="
+    },
     "loyalty-unit": {
       "priceIncl": "Aangekocht bedrag",
       "qty": "Aantal gekocht"
@@ -633,18 +637,31 @@
         "_single": "Klantenkaart",
         "name": "Kaartnaam",
         "track": "Bijhouden van",
-        "prod": "Producten",
-        "svc_basic": "Basisdiensten",
-        "svc_bundle": "Arrangementen",
-        "svc_subs": "Abonnementen",
+        "prod": "Alle producten",
+        "svc_basic": "Alle basisdiensten",
+        "svc_bundle": "Alle arrangementen",
+        "svc_subs": "Alle abonnementen",
         "promo": "Promoties",
-        "idx": "Volgorde"
+        "idx": "Volgorde",
+        "help": {
+          "cat": "Selecteer de algemene categorieën waarvoor deze klantenkaart geldig is:",
+          "catx": "Uitzonderingen? Geen nood: onderaan kan je bij de lijsten inclusief & exclusief individuele producten/diensten toevoegen of verwijderen.",
+          "incl-excl": "Selecteer hieronder individuele producten/diensten die je wil toevoegen of verwijderen:"
+        }
       },
       "reward": {
+        "_single": "Beloning",
+        "_plural": "Beloningen",
         "type": "Soort beloning",
-        "amount": "Vanaf",
-        "info": "Info",
-        "discount": "Korting"
+        "amount": "Vanaf gespaard bedrag",
+        "name": "Naam",
+        "discount": "Korting",
+        "ui": {
+          "new": "Nieuwe beloning"
+        }
+      },
+      "card": {
+        "amount": ""
       }
 
     },

@@ -13,8 +13,8 @@ export interface IDb {
     create$<T>(dbObject: DbObjectCreate<T>): Promise<ApiResult<T>>
     createMany$<T>(dbObject: DbObjectMultiCreate<T>): Promise<ApiListResult<T>>
 
-    query$<T>(query: DbQueryTyped<T>): Promise<T[]>
-    queryFirst$<T>(query: DbQueryTyped<T>): Promise<T | null>
+    query$<T  extends ObjectWithId>(query: DbQueryTyped<T>): Promise<T[]>
+    queryFirst$<T  extends ObjectWithId>(query: DbQueryTyped<T>): Promise<T | null>
 
     // Specialized methods
     saveOrder$(order: Order): Promise<ApiResult<Order>>

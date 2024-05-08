@@ -15,6 +15,7 @@ import { scheduled } from 'rxjs';
 import * as Rx from "rxjs";
 import { NgForm } from '@angular/forms';
 import { SearchProductComponent } from '../../product/search-product/search-product.component';
+import { LoyaltyRewardComponent } from '../loyalty-reward/loyalty-reward.component';
 
 @Component({
   selector: 'app-edit-loyalty-program',
@@ -34,6 +35,9 @@ export class EditLoyaltyProgramComponent extends NgEditBaseComponent<LoyaltyProg
   @ViewChild('searchProductModal') public searchProductModal: SearchProductComponent;
 
 
+  @ViewChild('rewardModal') public rewardModal?: LoyaltyRewardComponent;
+
+
   deleteConfig = {
     successUrl: '',
     successUrlMobile: ''
@@ -42,10 +46,11 @@ export class EditLoyaltyProgramComponent extends NgEditBaseComponent<LoyaltyProg
 
   Array = Array
 
-  newReward = new LoyaltyReward()
+  newReward = true
+  reward = new LoyaltyReward()
 
-	initialized= false
-  loyaltyUnit: Translation[]= []
+  initialized = false
+  loyaltyUnit: Translation[] = []
 
 
 
@@ -62,22 +67,24 @@ export class EditLoyaltyProgramComponent extends NgEditBaseComponent<LoyaltyProg
       , loyaltyProgramSvc
       , router, route, spinner, dashboardSvc)
 
-    this.sectionProps.set('general', ['name', 'track', 'incl', 'excl', 'rewards', 'prod', 'svc_basic', 'svc_bundle', 'svc_subs', 'promo'])  // , 'prod', 'svc_basic', 'svc_bundle', 'svc_subs', 'promo'
+    this.sectionProps.set('general', ['name', 'track', 'incl', 'excl', 'prod', 'svc_basic', 'svc_bundle', 'svc_subs', 'promo', 'idx'])  // , 'prod', 'svc_basic', 'svc_bundle', 'svc_subs', 'promo'
+    this.sectionProps.set('rewards', ['rewards'])  // , 'prod', 'svc_basic', 'svc_bundle', 'svc_subs', 'promo'
+
     // this.translationSvc.translateEnum(Gender, 'enums.gender.', this.gender)
     // this.translationSvc.translateEnum(Language, 'enums.language.', this.language)
 
   }
 
-	override async ngOnInit() {
+  override async ngOnInit() {
 
     super.ngOnInit()
-    
 
-		await this.translationSvc.translateEnum(LoyaltyUnit, 'enums.loyalty-unit.', this.loyaltyUnit)
-		
+
+    await this.translationSvc.translateEnum(LoyaltyUnit, 'enums.loyalty-unit.', this.loyaltyUnit)
+
     this.initialized = true
 
-	}
+  }
 
 
   delete() {
@@ -201,8 +208,12 @@ export class EditLoyaltyProgramComponent extends NgEditBaseComponent<LoyaltyProg
     if (!this.object.rewards)
       this.object.rewards = []
 
-    this.object.rewards.push(reward)
-    this.newReward = new LoyaltyReward()
+    if (this.newReward)
+      this.object.rewards.push(reward)
+    //    this.reward = new LoyaltyReward()
+
+    this.object.rewards = _.orderBy(this.object.rewards, 'amount')
+
 
     this.productListsChanged = true
   }
@@ -210,10 +221,29 @@ export class EditLoyaltyProgramComponent extends NgEditBaseComponent<LoyaltyProg
 
   editRewardIdx = -1
 
-  editReward(reward: LoyaltyReward, idx: number) {
+  async editReward(reward: LoyaltyReward, idx: number) {
+
+    if (!this.sectionInEditIs('rewards'))
+      return
+
     this.editRewardIdx = idx
 
+    this.newReward = false
+    this.reward = reward
+
+    console.warn('EDIT REWARD', this.reward)
+
+    await this.rewardModal.show(reward)
+
   }
+
+
+  startNewReward() {
+    this.newReward = true
+    this.reward = new LoyaltyReward()
+    this.rewardModal.show(this.reward)
+  }
+
 
   /*
     searchContact() {

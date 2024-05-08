@@ -3,6 +3,9 @@
 <!-- (select)="addNewProductItem($event)"
 -->
 
+
+<app-loyalty-reward #rewardModal (save)="saveReward($event)"></app-loyalty-reward>
+
 <ng-container *ngIf="object">
 
     <ngx-altea-delete-modal #deleteModal objectType="resource" [object]="object" [objectSvc]="loyaltyProgramSvc"
@@ -72,25 +75,17 @@
 
                     <div class="col-2">
                         <ngx-altea-label-control label="objects.loyalty.program.idx" for="idx">
-                            <input id="idx" name="idx" type="number" required class="form-control" [(ngModel)]="object.idx" />
+                            <input id="idx" name="idx" type="number" required class="form-control"
+                                [(ngModel)]="object.idx" />
                         </ngx-altea-label-control>
                     </div>
 
                 </div>
-                <!--  -->
 
+                <div class="row mt-5">
 
-
-
-
-
-                <!-- 
-            </form>
-
-            <form #editLoayltyProgramForm="ngForm">
- -->
-                <div class="row {{css_cls_row}}">
-
+                    <b translate>objects.loyalty.program.help.cat</b>
+                    <i translate>objects.loyalty.program.help.catx</i>
                 </div>
 
 
@@ -150,9 +145,81 @@
                 </div>
 
 
+                <div class="row mt-5">
+
+                    <b translate>objects.loyalty.program.help.incl-excl</b>
+
+                </div>
+
+                <div class="row mt-3">
+
+                    <div class="col-6">
+                        Inclusief:
+
+                        <ul class="list-group">
+
+                            <ng-container *ngIf="object.hasIncl()">
+                                <li class="list-group-item" *ngFor="let loyaltyProduct of object.incl; let idx = index">
+                                    {{loyaltyProduct.name}}
+
+                                    <i class="fas fa-trash float-end"
+                                        (click)="deleteProduct('incl', loyaltyProduct, idx)"></i>
+                                </li>
+                            </ng-container>
+
+                            <li class="list-group-item" style="text-align: center; cursor: pointer;"
+                                (click)="addProducts('incl')">
+                                <i class="fa-duotone fa-circle-plus fa-xl"></i> &nbsp; {{
+                                'dic.add' |
+                                translate
+                                }}
+                            </li>
+
+
+                        </ul>
+
+
+                    </div>
+
+
+
+                    <div class="col-6">
+                        Exclusief:
+
+                        <ul class="list-group">
+
+                            <ng-container *ngIf="object.hasExcl()">
+                                <li class="list-group-item" *ngFor="let loyaltyProduct of object.excl; let idx = index">
+                                    {{loyaltyProduct.name}}
+
+                                    <i class="fas fa-trash float-end"
+                                        (click)="deleteProduct('excl', loyaltyProduct, idx)"></i>
+                                </li>
+                            </ng-container>
+
+                            <li class="list-group-item" style="text-align: center; cursor: pointer;"
+                                (click)="addProducts('excl')">
+                                <i class="fa-duotone fa-circle-plus fa-xl"></i> &nbsp; {{
+                                'dic.add' |
+                                translate
+                                }}
+                            </li>
+
+
+                        </ul>
+
+
+                    </div>
+
+
+
+                </div>
+
+
+
             </form>
 
-            <div class="row mt-5">
+            <!--             <div class="row mt-5">
 
                 <div class="col-12">
                     Rewards:
@@ -169,7 +236,7 @@
                                     {{reward.amount}}
                                 </div>
                                 <div class="col-3">
-                                    {{reward.info}}
+                                    {{reward.name}}
                                 </div>
                                 <div class="col-3">
                                     <span *ngIf="reward.type == 'discount'">{{reward.discount}}</span>
@@ -189,84 +256,123 @@
                     </ng-container>
 
 
-                    <app-loyalty-reward [reward]="newReward" (save)="saveReward($event)"></app-loyalty-reward>
+
+
+                    <button type="button" class="btn btn-primary btn-sm" (click)="startNewReward()">New reward</button>
 
 
 
 
+                </div>
+            </div> -->
+
+
+
+
+
+        </ng-container>
+
+    </ngx-altea-form-card-section>
+
+
+    <!--     [icon]="ResourceTypeIcons[object.type]"
+    [enableSave]="!resourceGeneralForm.form.pristine && resourceGeneralForm.form.valid"
+ -->
+    <ngx-altea-form-card-section sectionName="objects.loyalty.reward._plural" sectionId="rewards"
+        [editSectionId]="editSectionId" (save)="save()" (cancel)="cancel()" (editModeChanged)="editModeChanged($event)">
+
+        <ng-container readonly>
+
+        </ng-container>
+
+
+        <ng-container always>
+
+            <div class="row row-cols-1 row-cols-md-2 g-4">
+                <div class="col" *ngFor="let reward of object.rewards; let idx = index">
+                    <div class="card text-bg-success" (click)="editReward(reward, idx)">
+                        <div class="card-header text-bg-success" style="font-size: 1.0rem;"><b>{{reward.name}}</b>
+                            <b class="float-end">{{reward.amount}}</b>
+                        </div>
+                        <div class="card-body">
+
+                            <div class="row mt-2">
+                                <div class="col">
+                                    {{'enums.loyalty-reward-type.' + reward.type | translate}}
+                                </div>
+                            </div>
+
+                            <div class="row mt-2" *ngIf="reward.hasDiscount()">
+                                <div class="col">
+                                    <span translate>objects.loyalty.reward.discount</span>: € {{reward.discount}}
+                                </div>
+                            </div>
+
+                            <ng-container *ngIf="reward.product">
+                                <div class="row mt-2">
+                                    <div class="col">
+                                        {{reward.product.name}}
+                                    </div>
+                                </div>
+
+
+
+                                <ng-container *ngIf="reward.hasProductOptions()">
+
+                                    <ul>
+                                        <li *ngFor="let option of reward.product.options; let idx = index">
+                                            {{option.name}}: {{option.valueNames()}}
+                                        </li>
+                                    </ul>
+
+                                    <!--                                     <ng-container *ngFor="let option of reward.product.options; let idx = index">
+
+                                        <div class="row mt-2">
+                                            
+                                            <div class="col ms-3">
+                                                
+                                            </div>
+                                        </div>
+
+                                    </ng-container> -->
+                                </ng-container>
+
+                            </ng-container>
+
+
+
+                            <!-- 
+                            <h5 class="card-title"></h5>
+                            <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                            <a href="#" class="btn btn-primary">Go somewhere</a> -->
+                        </div>
+                    </div>
                 </div>
             </div>
 
 
 
-            <div class="row mt-5">
-
-                <div class="col-6">
-                    Inclusief:
-
-                    <ul class="list-group">
-
-                        <ng-container *ngIf="object.hasIncl()">
-                            <li class="list-group-item" *ngFor="let loyaltyProduct of object.incl; let idx = index">
-                                {{loyaltyProduct.name}}
-
-                                <i class="fas fa-trash float-end"
-                                    (click)="deleteProduct('incl', loyaltyProduct, idx)"></i>
-                            </li>
-                        </ng-container>
-
-                        <li class="list-group-item" style="text-align: center; cursor: pointer;"
-                            (click)="addProducts('incl')">
-                            <i class="fa-duotone fa-circle-plus fa-xl"></i> &nbsp; {{
-                            'ui.product.edit.sections.options.add-btn' |
-                            translate
-                            }}
-                        </li>
 
 
-                    </ul>
 
+        </ng-container>
 
+        <ng-container edit>
+
+            <div class="row mt-2">
+
+                <div class="col">
+
+                    <button type="button" class="btn btn-primary float-end" (click)="startNewReward()"
+                        translate>objects.loyalty.reward.ui.new</button>
                 </div>
-
-
-
-                <div class="col-6">
-                    Exclusief:
-
-                    <ul class="list-group">
-
-                        <ng-container *ngIf="object.hasExcl()">
-                            <li class="list-group-item" *ngFor="let loyaltyProduct of object.excl; let idx = index">
-                                {{loyaltyProduct.name}}
-
-                                <i class="fas fa-trash float-end"
-                                    (click)="deleteProduct('excl', loyaltyProduct, idx)"></i>
-                            </li>
-                        </ng-container>
-
-                        <li class="list-group-item" style="text-align: center; cursor: pointer;"
-                            (click)="addProducts('excl')">
-                            <i class="fa-duotone fa-circle-plus fa-xl"></i> &nbsp; {{
-                            'ui.product.edit.sections.options.add-btn' |
-                            translate
-                            }}
-                        </li>
-
-
-                    </ul>
-
-
-                </div>
-
-
-
             </div>
 
 
         </ng-container>
 
     </ngx-altea-form-card-section>
+
 
 
 

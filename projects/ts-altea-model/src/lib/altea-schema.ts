@@ -3387,24 +3387,29 @@ export class OrderLine extends ObjectWithIdPlus {
     let unitPrice = this.base
     //let totalDuration = 0
 
-    if (!Array.isArray(this.options) || this.options.length == 0) {
-      for (const option of this.options) {
-        if (!option.values)
-          continue
-
-        // let factorOption = null
-
-        // if (option.factorOptionId) {
-        //   factorOption = this.options.find(o => o.id == option.factorOptionId)
-        // }
+    if (ArrayHelper.IsEmpty(this.options)) {
+      this.unit = unitPrice
+      return
+    }
 
 
-        for (const orderLineOptionValue of option.values) {
-          unitPrice += orderLineOptionValue.getPrice(option.formula, this.options)
-          // totalDuration += value.duration
-        }
+    for (const option of this.options) {
+      if (!option.values)
+        continue
+
+      // let factorOption = null
+
+      // if (option.factorOptionId) {
+      //   factorOption = this.options.find(o => o.id == option.factorOptionId)
+      // }
+
+
+      for (const orderLineOptionValue of option.values) {
+        unitPrice += orderLineOptionValue.getPrice(option.formula, this.options)
+        // totalDuration += value.duration
       }
     }
+
 
 
     this.unit = unitPrice
@@ -4369,28 +4374,88 @@ export enum LoyaltyRewardType {
   freeProduct = 'freeProduct',
 }
 
+/** introduced for use case: 3rd hour of wellness free
+ *  Since duration is a product option, we need to express that this option should be minimum 3
+ */
+export enum LoyaltyOptionCondition {
+  /** equal */
+  eql = 'eql',
+  /** minimum, value should be >= */
+  min = 'min'
+}
+
+export class LoyaltyRewardOptionValue {
+
+  constructor(public id: string, public name: string, public idx: number) {}
+}
+
+export class LoyaltyRewardOption {
+  id: string
+  name: string
+  idx: number
+
+  @Type(() => LoyaltyRewardOptionValue)
+  values: LoyaltyRewardOptionValue[] = []
+  cond: LoyaltyOptionCondition 
+
+  valueNames(separator = ', '): string {
+
+    if (!this.values)
+      return ''
+
+    return this.values.map(v => v.name).join(separator)
+  }
+
+}
+
+export class LoyaltyRewardProduct {
+  id: string
+  name: string
+
+  @Type(() => LoyaltyRewardOption)
+  options: LoyaltyRewardOption[] 
+}
 export class LoyaltyReward {
+
+  id: string
+
+
+  name: string = ''
+
   type: LoyaltyRewardType = LoyaltyRewardType.discount
 
   /** min amount on card to receive this reward */
   amount: number = 0
 
-  info: string = ''
 
   /** value received if amount  */
   discount: number = 0
 
-  product: { id: string, name: string }
+  @Type(() => LoyaltyRewardProduct)
+  product: LoyaltyRewardProduct
 
+  constructor() {
+    this.id = ObjectHelper.newGuid()
+  }
 
-  label() : string {
+  label(): string {
 
-    if (this.info)
-      return this.info
+    if (this.name)
+      return this.name
     else if (this.product?.name)
       return this.product?.name
 
     return ''
+  }
+
+  hasDiscount() {
+
+    return (this.type == LoyaltyRewardType.discount || this.type == LoyaltyRewardType.productDiscount) && this.discount
+  }
+
+  hasProductOptions() {
+
+    return (ArrayHelper.AtLeastOneItem(this.product?.options))
   }
 
 }
@@ -4405,6 +4470,7 @@ export class LoyaltyProgram extends ObjectWithIdPlus {
   orgId?: string
   branchId?: string
 
+  @Type(() => LoyaltyCard)
   cards?: LoyaltyCard[]
 
   name?: string
