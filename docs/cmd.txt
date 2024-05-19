@@ -134,3 +134,7 @@ ng generate component <TYPE>/manage-<TYPES> --project=altea-velzon-admin
 ng generate component <TYPE>/edit-<TYPE> --project=altea-velzon-admin
 ng generate component <TYPE>/<TYPE>-list --project=altea-velzon-admin
 
+ng generate module local --routing --project=altea-velzon-admin
+ng generate component local/domotica --project=altea-velzon-admin
+
+ng generate service local --project=ng-altea-common

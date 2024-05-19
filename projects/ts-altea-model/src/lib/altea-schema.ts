@@ -4386,7 +4386,7 @@ export enum LoyaltyOptionCondition {
 
 export class LoyaltyRewardOptionValue {
 
-  constructor(public id: string, public name: string, public idx: number) {}
+  constructor(public id: string, public name: string, public idx: number) { }
 }
 
 export class LoyaltyRewardOption {
@@ -4396,7 +4396,7 @@ export class LoyaltyRewardOption {
 
   @Type(() => LoyaltyRewardOptionValue)
   values: LoyaltyRewardOptionValue[] = []
-  cond: LoyaltyOptionCondition 
+  cond: LoyaltyOptionCondition
 
   valueNames(separator = ', '): string {
 
@@ -4413,7 +4413,7 @@ export class LoyaltyRewardProduct {
   name: string
 
   @Type(() => LoyaltyRewardOption)
-  options: LoyaltyRewardOption[] 
+  options: LoyaltyRewardOption[]
 }
 export class LoyaltyReward {
 
@@ -4506,6 +4506,39 @@ export class LoyaltyProgram extends ObjectWithIdPlus {
   rewards: LoyaltyReward[] = []
 
   idx = 0
+
+
+  hasIncludedCategories(): boolean {
+    return (this.prod || this.svc_basic || this.svc_bundle || this.svc_subs || this.promo)
+  }
+
+  includedCategories(): string[] {
+
+    const cats = []
+    if (this.prod) cats.push('prod')
+    if (this.svc_basic) cats.push('svc_basic')
+    if (this.svc_bundle) cats.push('svc_bundle')
+    if (this.svc_subs) cats.push('svc_subs')
+    if (this.promo) cats.push('promo')
+
+      return cats
+  }
+
+  hasExcludedCategories(): boolean {
+    return (!this.prod || !this.svc_basic || !this.svc_bundle || !this.svc_subs || !this.promo)
+  }
+
+  excludedCategories(): string[] {
+
+    const cats = []
+    if (!this.prod) cats.push('prod')
+    if (!this.svc_basic) cats.push('svc_basic')
+    if (!this.svc_bundle) cats.push('svc_bundle')
+    if (!this.svc_subs) cats.push('svc_subs')
+    if (!this.promo) cats.push('promo')
+
+      return cats
+  }
 
   hasIncl(): boolean {
     return ArrayHelper.AtLeastOneItem(this.incl)

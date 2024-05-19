@@ -15,6 +15,11 @@ export class SessionService implements OnInit {
     dateShort: 'dd/MM'
   }
 
+  colors = {
+    green: 'green',
+    red: 'red'
+  }
+
   public currency = 'EUR'
   public currencySymbol = ' €'
   public idxStep = 100
@@ -38,6 +43,7 @@ export class SessionService implements OnInit {
 
   // public backend = "https://dvit-477c9.uc.r.appspot.com"
   public backend = "http://localhost:8080"
+  public localServer = "http://localhost:3000"
 
 
   ngOnInit() {

@@ -20,6 +20,7 @@ export const appRoutes: Route[] = [
     { path: "tasks", loadChildren: () => import(`./task/task.module`).then(m => m.TaskModule) },
     { path: "loyalty", loadChildren: () => import(`./loyalty/loyalty.module`).then(m => m.LoyaltyModule) },
     { path: "subscriptions", loadChildren: () => import(`./subscription/subscription.module`).then(m => m.SubscriptionModule) },
+    { path: "local", loadChildren: () => import(`./local/local.module`).then(m => m.LocalModule) },
    // { path: "order", loadChildren: () => import(`./order-mgr/order-mgr.module`).then(m => m.OrderMgrModule) },
     { path: "demo", component: DemoComponent },
     { path: "", component: DemoComponent },  

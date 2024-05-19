@@ -40,16 +40,141 @@
             <!-- <div>{{ object.descr }}</div> -->
 
             <div class="row">
-                <div class="col-3"> <ngx-altea-label-value label="objects.loyalty.program.name"
+                <div class="col-6"> <ngx-altea-label-value label="objects.loyalty.program.name"
                         [value]="object.name"></ngx-altea-label-value> </div>
+
+                <div class="col-6"> <ngx-altea-label-value label="objects.loyalty.program.track" valueFormat="translate"
+                        prefix="enums.loyalty-unit." [value]="object.track"></ngx-altea-label-value> </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-6">
+
+                    <b translate [style.color]="sessionSvc.colors.green">objects.loyalty.program.ui.inclusive</b>
+
+
+                    <div class="mt-2" [style.color]="sessionSvc.colors.green" translate>objects.loyalty.program.ui.cats
+                    </div>
+
+                    <div class="mt-2 ms-2">
+
+
+                        <span *ngIf="!object.hasIncludedCategories()" translate>objects.loyalty.program.ui.no-cat</span>
+                        <div *ngFor="let cat of object.includedCategories()"><i class="fa-duotone fa-square-check"
+                                [style.color]="sessionSvc.colors.green"></i> &nbsp;<span
+                                translate>{{'objects.loyalty.program.' +
+                                cat}}</span>
+                        </div>
+
+                    </div>
+
+                    <div class="mt-2" [style.color]="sessionSvc.colors.green" translate>objects.loyalty.program.ui.prods
+                    </div>
+                    <div class="mt-2 ms-2">
+
+                        <span *ngIf="!object.hasIncl()" translate>objects.loyalty.program.ui.no-prod</span>
+                        <div *ngFor="let prodIncl of object.incl; let idx = index"><i class="fa-duotone fa-square-check"
+                                [style.color]="sessionSvc.colors.green"></i> &nbsp;{{prodIncl.name}}
+                        </div>
+
+                    </div>
+
+
+
+
+                </div>
+
+                <div class="col-6">
+
+                    <b translate [style.color]="sessionSvc.colors.red">objects.loyalty.program.ui.exclusive</b>
+
+
+                    <div class="mt-2" [style.color]="sessionSvc.colors.red" translate>objects.loyalty.program.ui.cats
+                    </div>
+
+                    <div class="mt-2 ms-2">
+
+                        <span *ngIf="!object.hasExcludedCategories()" translate>objects.loyalty.program.ui.no-cat</span>
+                        <div *ngFor="let cat of object.excludedCategories()"><i class="fa-duotone fa-square-xmark"
+                                [style.color]="sessionSvc.colors.red"></i> &nbsp;<span
+                                translate>{{'objects.loyalty.program.' +
+                                cat}}</span>
+                        </div>
+                    </div>
+
+
+                    <div class="mt-2" [style.color]="sessionSvc.colors.red" translate>objects.loyalty.program.ui.prods
+                    </div>
+                    <div class="mt-2 ms-2">
+
+                        <span *ngIf="!object.hasExcl()" translate>objects.loyalty.program.ui.no-prod</span>
+                        <div *ngFor="let prodExcl of object.excl; let idx = index"><i class="fa-duotone fa-square-check"
+                                [style.color]="sessionSvc.colors.red"></i> &nbsp;{{prodExcl.name}}
+                        </div>
+
+                    </div>
+
+
+
+
+
+                </div>
 
             </div>
 
 
 
+            <!-- 
+            <div class="row mt-3">
+                <div class="col-6">
+
+                    <b translate>objects.loyalty.program.ui.cat</b>
+
+                    <div class="mt-2 ms-2">
+
+
+                        <div *ngFor="let cat of object.includedCategories()"><i class="fa-duotone fa-square-check"
+                                style="color: green;"></i> &nbsp;<span translate>{{'objects.loyalty.program.' +
+                                cat}}</span>
+                        </div>
+                        <div *ngFor="let cat of object.excludedCategories()"><i class="fa-duotone fa-square-xmark"
+                                style="color: red;"></i> &nbsp;<span translate>{{'objects.loyalty.program.' +
+                                cat}}</span>
+                        </div>
+                    </div>
 
 
 
+                </div>
+            </div> -->
+
+            <!-- 
+            <div class="row mt-3">
+                <div class="col-6">
+                    <b translate>objects.loyalty.program.ui.incl</b>
+                    <div class="mt-2 ms-2">
+
+                        <span *ngIf="!object.hasIncl()" translate>objects.loyalty.program.ui.no-prod</span>
+                        <div *ngFor="let prodIncl of object.incl; let idx = index"><i class="fa-duotone fa-square-check"
+                                style="color: green;"></i> &nbsp;{{prodIncl.name}}
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="col-6">
+                    <b translate>objects.loyalty.program.ui.excl</b>
+                    <div class="mt-2 ms-2">
+
+                        <span *ngIf="!object.hasExcl()" translate>objects.loyalty.program.ui.no-prod</span>
+                        <div *ngFor="let prodExcl of object.excl; let idx = index"><i class="fa-duotone fa-square-check"
+                                style="color: red;"></i> &nbsp;{{prodExcl.name}}
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+ -->
 
         </ng-container>
         <ng-container edit>
@@ -290,7 +415,7 @@
 
             <div class="row row-cols-1 row-cols-md-2 g-4">
                 <div class="col" *ngFor="let reward of object.rewards; let idx = index">
-                    <div class="card text-bg-success" (click)="editReward(reward, idx)">
+                    <div class="card text-bg-success">
                         <div class="card-header text-bg-success" style="font-size: 1.0rem;"><b>{{reward.name}}</b>
                             <b class="float-end">{{reward.amount}}</b>
                         </div>
@@ -338,6 +463,19 @@
                                 </ng-container>
 
                             </ng-container>
+
+
+
+
+                            <div class="row mt-2" *ngIf="this.sectionInEditIs('rewards')">
+                                <div class="col">
+
+                                    <button type="button" class="btn btn-light float-end"
+                                        (click)="editReward(reward, idx)" translate>dic.edit</button>
+
+
+                                </div>
+                            </div>
 
 
 

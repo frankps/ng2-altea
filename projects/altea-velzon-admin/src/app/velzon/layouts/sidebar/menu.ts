@@ -138,6 +138,26 @@ export const MENU: MenuItem[] = [
     label: 'menu.demo.label',
     icon: 'home',
     link: '/aqua/demo',
+  },
+  {
+    id: 15,
+    label: 'menu.local.label',
+    icon: 'home',
+    subItems: [
+      {
+        id: 151,
+        label: 'menu.local.sub.domo',
+        link: '/aqua/local/domo',
+        parentId: 15
+      },
+      {
+        id: 152,
+        label: 'menu.catalog.sub.prod',
+        link: '/aqua/local/jobs',
+        parentId: 15
+      }
+
+    ]
   }
   /*
   {

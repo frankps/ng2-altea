@@ -36,7 +36,7 @@ export class LoyaltyUi {
         for (let card of cards) {
 
             const uiCard = this.cards.find(c => c.program.id == card.programId)
-            
+
             if (uiCard) {
                 uiCard.current = card.value
 
@@ -44,10 +44,16 @@ export class LoyaltyUi {
                     uiCard.extra = 0
             }
         }
-
-
     }
 
+    availableRewards(): LoyaltyReward[] {
+
+        if (ArrayHelper.IsEmpty(this.cards))
+            return []
+
+        const rewards = this.cards.flatMap(c => c.openRewards)
+        return rewards
+    }
 
 }
 
@@ -70,7 +76,7 @@ export class LoyaltyUiCard {
         this.card = card
     }
 
-    hasOpenRewards() : boolean {
+    hasOpenRewards(): boolean {
         return ArrayHelper.AtLeastOneItem(this.openRewards)
     }
 
@@ -174,16 +180,16 @@ export class LoyaltyMgmtService {
             const createResult = await this.alteaDb.createLoyaltyCards(cardsToCreate)
             console.log(createResult)
         }
-            
 
-        return [... existingCards, ... cardsToCreate ]
+
+        return [...existingCards, ...cardsToCreate]
 
 
     }
 
     async getOverview(order: Order): Promise<LoyaltyUi> {
 
-console.error('-- getOverview --')
+        console.error('-- getOverview --')
 
         const result = await this.calculateLoyalty(order)
 
@@ -208,7 +214,7 @@ console.error('-- getOverview --')
             const uiCard = new LoyaltyUiCard(loyaltyProgram, existingCard)
             loyalty.cards.push(uiCard)
 
-             uiCard.extra = result.getValue(loyaltyProgram.id)
+            uiCard.extra = result.getValue(loyaltyProgram.id)
 
             if (uiCard.extra > 0)
                 loyalty.newLoyalty = true
@@ -220,11 +226,11 @@ console.error('-- getOverview --')
                 if (existingCard.value > 0 && loyaltyProgram.hasRewards()) {
                     uiCard.openRewards = loyaltyProgram.rewards.filter(r => r.amount <= existingCard.value)
                 }
-                
+
 
 
             }
-                
+
 
         }
 
@@ -269,7 +275,7 @@ console.error('-- getOverview --')
                             break
                     }
 
-            
+
                     break  // every orderline can only be allocated to 1 loyalty program 
                 }
 

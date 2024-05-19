@@ -21,6 +21,8 @@ export class LoyaltyRewardComponent implements OnInit {
   @ViewChild('rewardModal') public rewardModal?: NgbModal;
   @ViewChild('searchProductModal') public searchProductModal: SearchProductComponent;
   loyaltyRewardType: Translation[] = []
+
+  condition = LoyaltyOptionCondition.eql   // selected condition
   loyaltyOptionCondition: Translation[] = []
 
   initialized = false
@@ -34,7 +36,7 @@ export class LoyaltyRewardComponent implements OnInit {
 
   async ngOnInit() {
     await this.translationSvc.translateEnum(LoyaltyRewardType, 'enums.loyalty-reward-type.', this.loyaltyRewardType)
-    await this.translationSvc.translateEnum(LoyaltyOptionCondition, 'enums.loyalty-option-compare.', this.loyaltyOptionCondition)
+    await this.translationSvc.translateEnum(LoyaltyOptionCondition, 'enums.loyalty-option-condition.', this.loyaltyOptionCondition)
     this.initialized = true
   }
 
@@ -50,6 +52,7 @@ export class LoyaltyRewardComponent implements OnInit {
 
 
   /** currently selected option */
+  selectedOption
   option: ProductOption
   optionValues = undefined
 
@@ -110,6 +113,10 @@ export class LoyaltyRewardComponent implements OnInit {
     rewardOption.id = this.option.id
     rewardOption.name = this.option.name
     rewardOption.idx = this.option.idx
+    
+    if (this.reward.type == LoyaltyRewardType.productDiscount)
+      rewardOption.cond = this.condition
+
     rewardOption.values.push(new LoyaltyRewardOptionValue(value.id, value.name, value.idx))
 
 
@@ -123,10 +130,15 @@ export class LoyaltyRewardComponent implements OnInit {
 
     this.reward.product.options = _.sortBy(this.reward.product.options, 'idx')
 
+    this.clear()
+
+  }
+
+  clear() {
+    this.selectedOption = undefined
     this.option = undefined
     this.optionValues = undefined
   }
-
 
   deleteOption(option: LoyaltyRewardOption, idx: number) {
 
@@ -140,6 +152,8 @@ export class LoyaltyRewardComponent implements OnInit {
     this.product = undefined
     this.reward = reward
 
+    this.clear()
+
     console.error('SHOW REWARD', this.reward)
 
     if (this.reward?.product?.id) {
@@ -149,5 +163,15 @@ export class LoyaltyRewardComponent implements OnInit {
     }
 
     this.modalService.open(this.rewardModal)
+  }
+
+
+  hasProductSelection() {
+
+    if (!this.reward)
+      return false
+
+    return [LoyaltyRewardType.freeProduct, LoyaltyRewardType.productDiscount].indexOf(this.reward.type) >= 0
+
   }
 }

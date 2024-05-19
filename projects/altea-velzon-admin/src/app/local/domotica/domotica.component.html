@@ -1,0 +1,26 @@
+<ng-container *ngIf="luxomStates">
+    <button type="button" class="btn btn-{{state.style()}} me-2 mt-2" *ngFor="let state of luxomStates"
+        (click)="clickLuxom(state.addr)">{{state.addr.info}} <sup *ngIf="state.hex" style="color: black;">{{state.getPct()}}%</sup></button>
+</ng-container>
+
+
+<button type="button" class="btn btn-primary me-2 mt-2" 
+        (click)="getLuxomState()">Refresh status</button>
+
+
+<ng-container *ngIf="events">
+
+    <ul class="list-group">
+        <li class="list-group-item" *ngFor="let event of events" (click)="toggleEvent(event)">
+
+            <div class="row">
+                <div class="col-3">{{event.type}}</div>
+                <div class="col-3">{{event.jsDate() | date:"dd/MM/yyyy HH:mm"}} </div>
+                <div class="col-3"></div>
+            </div>
+
+
+        </li>
+    </ul>
+
+</ng-container>

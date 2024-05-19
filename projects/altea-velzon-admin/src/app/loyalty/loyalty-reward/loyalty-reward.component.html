@@ -48,65 +48,80 @@
             </ng-container>
         </div>
 
-        <div class="row mt-2">
-            <div class="col">
-                <button type="button" class="btn btn-primary btn-sm" (click)="selectProduct()">Product</button>
-            </div>
-        </div>
+        <ng-container *ngIf="hasProductSelection()">
 
-
-        <div class="row mt-2">
-            <div class="col">
-                <span *ngIf="reward?.product">{{reward.product.name}}</span>
-            </div>
-        </div>
-
-        <ng-container *ngIf="reward.hasProductOptions()">
-            <ng-container *ngFor="let option of reward.product.options; let idx = index">
-
-                <div class="row mt-2">
-                    <div class="col">
-                        {{option.name}}: {{option.valueNames()}}
-
-                        <i class="fas fa-trash float-end me-2" (click)="deleteOption(option, idx)"></i>
-                    </div>
+            <div class="row mt-2">
+                <div class="col">
+                    <button type="button" class="btn btn-primary btn-sm" (click)="selectProduct()">Product</button>
                 </div>
-
-            </ng-container>
-        </ng-container>
-
-
-        <ng-container *ngIf="product?.hasOptions()">
+            </div>
 
 
             <div class="row mt-2">
                 <div class="col">
-                    <ngx-altea-label-control label="" for="">
-                        <ng-select id="option" name="option" [items]="product.options" bindLabel="name" bindValue="id"
-                            [clearable]="false" [multiple]="false" (change)="optionSelected($event)"></ng-select>
-
-                        <!--     [(ngModel)]="reward.product.options[option.id].cond" -->
-
-                    </ngx-altea-label-control>
+                    <span *ngIf="reward?.product">{{reward.product.name}}</span>
                 </div>
             </div>
 
+            <ng-container *ngIf="reward.hasProductOptions()">
+                <ng-container *ngFor="let option of reward.product.options; let idx = index">
 
-            <div class="row mt-2" *ngIf="option?.hasValues()">
-                <div class="col">
-                    <ngx-altea-label-control label="" for="">
-                        <ng-select id="option" name="option" [items]="option.values" bindLabel="name"
-                            [clearable]="false" [multiple]="false" (change)="optionValueSelected($event)"></ng-select>
+                    <div class="row mt-2">
+                        <div class="col">
 
-                        <!-- (change)="optionSelected($event)"    [(ngModel)]="reward.product.options[option.id].cond" -->
+                            {{option.name}}: <span *ngIf="option.cond">{{'enums.loyalty-option-condition.' + option.cond | translate}}</span> {{option.valueNames()}}
 
-                    </ngx-altea-label-control>
+                            <i class="fas fa-trash float-end me-2" (click)="deleteOption(option, idx)"></i>
+                        </div>
+                    </div>
+
+                </ng-container>
+            </ng-container>
+
+
+            <ng-container *ngIf="product?.hasOptions()">
+
+
+                <div class="row mt-2">
+                    <div class="col">
+                        <ngx-altea-label-control label="objects.loyalty.reward.ui.select-option" for="option">
+                            <ng-select id="option" name="option" [items]="product.options" bindLabel="name"
+                                bindValue="id" [clearable]="false" [multiple]="false"
+                                (change)="optionSelected($event)" [(ngModel)]="selectedOption"></ng-select>
+
+                            <!--     [(ngModel)]="reward.product.options[option.id].cond" -->
+
+                        </ngx-altea-label-control>
+                    </div>
                 </div>
-            </div>
+
+
+                <div class="row mt-2" *ngIf="option?.hasValues()">
+
+                    <div class="col-4" *ngIf="reward.type == 'productDiscount'">
+
+                        <ngx-altea-label-control label="" for="" >
+                            <ng-select id="condition" name="condition" [items]="loyaltyOptionCondition" bindLabel="trans"
+                                bindValue="key" [clearable]="false" [multiple]="false"
+                                [(ngModel)]="condition"></ng-select>
+                        </ngx-altea-label-control>
+                    </div>
+
+                    <div class="col">
+                        <ngx-altea-label-control label="" for="">
+                            <ng-select id="option" name="option" [items]="option.values" bindLabel="name"
+                                [clearable]="false" [multiple]="false"
+                                (change)="optionValueSelected($event)" ></ng-select>
+
+                            <!-- (change)="optionSelected($event)"    [(ngModel)]="reward.product.options[option.id].cond" -->
+
+                        </ngx-altea-label-control>
+                    </div>
+                </div>
 
 
 
-            <!-- 
+                <!-- 
             <div class="row mt-2" *ngFor="let option of product.options">
                 <div class="col-4">
 
@@ -130,8 +145,10 @@
 
 
 
-        </ng-container>
+            </ng-container>
 
+
+        </ng-container>
 
         <div class="row mt-2">
 

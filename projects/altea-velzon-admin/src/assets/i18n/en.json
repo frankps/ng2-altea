@@ -44,7 +44,7 @@
     "end": "einde"
   },
   "enums": {
-    "loyalty-option-compare": {
+    "loyalty-option-condition": {
       "eql": "=",
       "min": ">="
     },
@@ -647,6 +647,17 @@
           "cat": "Selecteer de algemene categorieën waarvoor deze klantenkaart geldig is:",
           "catx": "Uitzonderingen? Geen nood: onderaan kan je bij de lijsten inclusief & exclusief individuele producten/diensten toevoegen of verwijderen.",
           "incl-excl": "Selecteer hieronder individuele producten/diensten die je wil toevoegen of verwijderen:"
+        },
+        "ui": {
+          "cat": "Algemene categorieën waarvoor deze klantenkaart geldig is:",
+          "incl": "Inclusief",
+          "excl": "Exclusief",
+          "no-cat": "Geen categorieën geselecteerd",
+          "no-prod": "Geen specifieke producten geselecteerd",
+          "inclusive": "Van toepassing op:",
+          "exclusive": "Niet Van toepassing op:",
+          "cats": "Algemene categorieën:",
+          "prods": "Specifieke producten/diensten:"
         }
       },
       "reward": {
@@ -657,7 +668,8 @@
         "name": "Naam",
         "discount": "Korting",
         "ui": {
-          "new": "Nieuwe beloning"
+          "new": "Nieuwe beloning",
+          "select-option": "Selecteer een optie"
         }
       },
       "card": {
@@ -963,7 +975,13 @@
     }
   },
   "menu": {
-    "resources": {
+    "local": {
+      "label": "Lokaal",
+      "sub": {
+        "domo": "Domotica",
+        "jobs": "Jobs"
+      }
+    },"resources": {
       "label": "Resources",
       "sub": {
         "human": "Personeel",

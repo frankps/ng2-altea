@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { OrderMgrUiService } from '../order-mgr-ui.service';
-import { Gift, Payment, PaymentType, Subscription } from 'ts-altea-model';
+import { Gift, LoyaltyReward, Payment, PaymentType, Subscription } from 'ts-altea-model';
 import { GiftService } from '../../gift.service';
 import { SessionService } from '../../session.service';
 import { SubscriptionService } from '../../subscription.service';
 import { ArrayHelper, DbQuery, QueryOperator } from 'ts-common';
+import { AlteaService } from '../../altea.service';
 
 export enum PosPaymentMessage {
   none = 'none',
@@ -18,7 +19,7 @@ export enum PosPaymentMessage {
   templateUrl: './pos-payment.component.html',
   styleUrls: ['./pos-payment.component.scss']
 })
-export class PosPaymentComponent {
+export class PosPaymentComponent implements OnInit {
 
   amount: number
 
@@ -34,7 +35,15 @@ export class PosPaymentComponent {
   PosPaymentMessage = PosPaymentMessage
   message: PosPaymentMessage = PosPaymentMessage.none
 
-  constructor(protected mgrUiSvc: OrderMgrUiService, protected giftSvc: GiftService, protected sessionSvc: SessionService, protected subSvc: SubscriptionService) {
+  constructor(protected mgrUiSvc: OrderMgrUiService, protected giftSvc: GiftService, protected sessionSvc: SessionService, 
+    protected subSvc: SubscriptionService, protected alteaSvc: AlteaService) {
+  }
+
+  async ngOnInit() {
+    
+    console.warn('ngOnInit')
+
+    await this.getRewards()
   }
 
   async addPayment(type: PaymentType) {
@@ -182,5 +191,40 @@ export class PosPaymentComponent {
   setAmountTotal() {
     this.amount = this.totalToPay
   }
+
+
+  async getRewards() {
+
+    const order = this.mgrUiSvc.order
+
+    if (!order)
+      return  
+
+    const loyalty = await this.alteaSvc.loyaltyMgmtService.getOverview(order)
+
+    const rewards = loyalty.availableRewards()
+
+    console.error('REWARDS', rewards)
+  }
+
+  /*
+  rewards: LoyaltyReward[] = []
+
+  availableRewards() {
+
+    const order = this.mgrUiSvc.order
+
+    const cards = order.contact.cards
+
+    for (let card of cards) {
+
+      const program = card.program
+
+      program.rewards.filter(r => )
+    }
+
+
+  }
+  */
 
 }
