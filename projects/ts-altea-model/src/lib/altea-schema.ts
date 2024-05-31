@@ -2168,7 +2168,7 @@ export enum OrderState {
 
 export class VatLine {
 
-  constructor(public pct: number, public excl: number, public incl: number) {
+  constructor(public pct: number, public vat: number, public excl: number, public incl: number) {
 
   }
 
@@ -2670,10 +2670,11 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
       if (vatMap.has(orderLine.vatPct))
         vatLine = vatMap.get(orderLine.vatPct)
       else {
-        vatLine = new VatLine(orderLine.vatPct, 0, 0)
+        vatLine = new VatLine(orderLine.vatPct, 0, 0, 0)
         vatMap.set(orderLine.vatPct, vatLine)
       }
 
+      vatLine.vat += orderLine.vat
       vatLine.excl += orderLine.excl
       vatLine.incl += orderLine.incl
     }
@@ -2707,12 +2708,13 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     if (!this.lines)
       return 0
 
-    let incl = 0, excl = 0
+    let incl = 0, excl = 0, vat = 0
 
     for (const line of this.lines) {
 
       line.calculateInclThenExcl()
 
+      vat += line.vat
       incl += line.incl
       excl += line.excl
     }
@@ -2720,6 +2722,11 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     if (incl != this.incl) {
       this.incl = incl
       this.markAsUpdated('incl')
+    }
+
+    if (vat != this.vat) {
+      this.vat = vat
+      this.markAsUpdated('vat')
     }
 
     if (excl != this.excl) {

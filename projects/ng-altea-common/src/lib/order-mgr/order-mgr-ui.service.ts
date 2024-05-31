@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import { Injectable, OnInit } from '@angular/core';
-import { AppMode, AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, ConfirmOrderResponse, Contact, CreateCheckoutSession, DateBorder, Gift, GiftType, Order, OrderLine, OrderLineOption, OrderState, Payment, PaymentType, Product, ProductType, ProductTypeIcons, RedeemGift, ReservationOption, ReservationOptionSet, Resource, ResourcePlanning, ResourceType } from 'ts-altea-model'
+import { AppMode, AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Branch, ConfirmOrderResponse, Contact, CreateCheckoutSession, DateBorder, Gift, GiftType, Order, OrderLine, OrderLineOption, OrderState, Payment, PaymentType, Product, ProductType, ProductTypeIcons, RedeemGift, ReservationOption, ReservationOptionSet, Resource, ResourcePlanning, ResourceType } from 'ts-altea-model'
 import { ApiListResult, ApiStatus, DateHelper, DbQuery, QueryOperator, Translation } from 'ts-common'
 import { AlteaService, GiftService, ObjectService, OrderMgrService, OrderService, ProductService, ResourceService, SessionService } from 'ng-altea-common'
 import * as _ from "lodash";
@@ -81,12 +81,21 @@ export class OrderMgrUiService {   // implements OnInit
 
   loyalty: LoyaltyUi
 
+  branch: Branch
+
   constructor(private productSvc: ProductService, private orderSvc: OrderService, private orderMgrSvc: OrderMgrService
     , protected spinner: NgxSpinnerService, public dbSvc: ObjectService, public alteaSvc: AlteaService, protected sessionSvc: SessionService,
     public dashboardSvc: DashboardService, protected stripeSvc: StripeService, protected resourceSvc: ResourceService, protected giftSvc: GiftService) {
 
     // this.alteaDb = new AlteaDb(dbSvc)
     // this.getAllCategories()
+
+    
+    this.sessionSvc.branch$().then(branch => {
+      this.branch = branch
+
+      console.error('--- BRANCH ---', branch)
+    })
 
     this.autoCreateOrder()
 
@@ -151,9 +160,13 @@ export class OrderMgrUiService {   // implements OnInit
     const gifts = await this.giftSvc.query$(query)
     */
 
+    if (!this.branch) {
+      console.error(`Can't load resources: branch not specified!`)
+    }
+
     const query = new DbQuery()
     query.and('type', QueryOperator.equals, ResourceType.human)
-    query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
+    query.and('branchId', QueryOperator.equals, this.branch.id)
     query.and('act', QueryOperator.equals, true)
 
     this.allHumanResources = await this.resourceSvc.query$(query)
@@ -438,7 +451,7 @@ export class OrderMgrUiService {   // implements OnInit
 
     switch (appMode) {
 
-      case AppMode.consumerApp:
+      case AppMode.consum:
         return 15
         break
 

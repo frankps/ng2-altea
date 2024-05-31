@@ -144,8 +144,8 @@ export class AuthService {
 
 
           console.error('forwarding user!')
-          //   this.router.navigate(['branch', 'aqua', 'menu'])
-          this.router.navigate(['staff', 'dashboard'])
+          this.router.navigate(['branch', 'aqua', 'menu'])
+          // this.router.navigate(['staff', 'dashboard'])
 
         } finally {
 

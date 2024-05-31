@@ -37,7 +37,7 @@
 
         
         <div class="d-grid mt-3">
-            <button *ngIf="preferredStaff" type="button" class="btn btn-outline-secondary float-end" (click)="continue()" translate>msg.continue</button>
+            <button *ngIf="preferredStaff" type="button" class="btn btn-outline-secondary float-end" [disabled]="!canContinue()" (click)="continue()" translate>msg.continue</button>
         </div>
         
 

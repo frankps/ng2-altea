@@ -34,7 +34,7 @@
 
     <ng-container *ngSwitchCase="'order'">
 
-        <order-mgr-order [showVat]="false" (orderLineSelected)="orderLineSelected($event)" (addProduct)="browseCatalog()" (continue)="orderFinished()"></order-mgr-order>
+        <order-mgr-order (orderLineSelected)="orderLineSelected($event)" (addProduct)="browseCatalog()" (continue)="orderFinished()"></order-mgr-order>
 
     </ng-container>
 

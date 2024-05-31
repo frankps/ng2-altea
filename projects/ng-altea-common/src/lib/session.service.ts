@@ -36,13 +36,13 @@ export class SessionService implements OnInit {
   branchSub: Rx.BehaviorSubject<Branch> = new Rx.BehaviorSubject<Branch>(null)
   public _branch?: Branch
   
-  public appMode = AppMode.consumerApp
+  public appMode = AppMode.consum
 
   //public backend = "http://192.168.5.202:8080"
   //public backend = "https://altea-1.ew.r.appspot.com"
 
-  // public backend = "https://dvit-477c9.uc.r.appspot.com"
-  public backend = "http://localhost:8080"
+  public backend = "https://dvit-477c9.uc.r.appspot.com"
+  // public backend = "http://localhost:8080"
   public localServer = "http://localhost:3000"
 
 

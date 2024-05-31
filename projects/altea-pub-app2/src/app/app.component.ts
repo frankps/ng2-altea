@@ -3,7 +3,7 @@ import { BsLocaleService } from 'ngx-bootstrap/datepicker';
 import { Firestore } from '@angular/fire/firestore';
 import { AuthService } from './auth/auth.service';
 import { SwPush } from '@angular/service-worker';
-import { CustomJson } from 'ts-altea-model';
+import { AppMode, CustomJson } from 'ts-altea-model';
 import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 
@@ -21,6 +21,8 @@ export class AppComponent {
   constructor(private localeService: BsLocaleService, private branchSvc: BranchService, private sessionSvc: SessionService,
     protected authSvc: AuthService, private customJsonSvc: CustomJsonService, private router: Router) {
     this.localeService.use('nl-be');
+
+    this.sessionSvc.appMode = AppMode.consum
 
     this.authSvc.init()
 

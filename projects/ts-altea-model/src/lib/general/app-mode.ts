@@ -2,6 +2,6 @@
 /** Application mode, has impact on deposit */
 export enum AppMode {
     
-    consumerApp = 'consumerApp',
+    consum = 'consum',   // consumer app 
     pos = 'pos'   // point of sale
 }

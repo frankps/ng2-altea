@@ -122,11 +122,19 @@ export class OrderComponent implements OnInit {
 
     let nexMode = 'pay-online'
 
-    if (currentIdx < personSelect && order.needsPersonSelect()) {
+    const needsPersonSelect = order.needsPersonSelect()
+
+    console.warn('needsPersonSelect', needsPersonSelect)
+
+    if (currentIdx < personSelect && needsPersonSelect) {
       nexMode = 'person-select'
     }
     else if (currentIdx < selectDate && order.needsPlanning()) {
-      if (currentIdx < staffSelect && order.needsStaffSelect() && order.nrOfPersons == 1) {
+
+      const needsStaffSelect = order.needsStaffSelect()
+      console.warn('needsStaffSelect', needsStaffSelect)
+
+      if (currentIdx < staffSelect && needsStaffSelect && order.nrOfPersons == 1) {
         nexMode = 'staff-select'
       } else {
         nexMode = 'select-date'

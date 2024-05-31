@@ -44,6 +44,57 @@
     "end": "einde"
   },
   "enums": {
+    "loyalty-option-condition": {
+      "eql": "=",
+      "min": ">="
+    },
+    "loyalty-unit": {
+      "priceIncl": "Aangekocht bedrag",
+      "qty": "Aantal gekocht"
+    },
+    "loyalty-reward-type": {
+      "discount": "Korting",
+      "productDiscount": "Korting op product/dienst",
+      "freeProduct": "Gratis dienst/product"
+    },
+    "pos-payment-message": {
+      "noContact": "Geen klant geselecteerd!",
+      "noProduct": "Geen product geselecteerd!",
+      "noSubscription": "Klant heeft geen abonnement!"
+    },
+    "order-state": {
+      "creation": "Creatie",
+      "waitDeposit": "Afwachting voorschot",
+      "confirmed": "Geconfirmeerd",
+      "cancelled": "Geannuleerd",
+      "noShow": "Niet opgedaagd",
+      "timedOut": "Timed out",
+      "finished": "Afgerond"
+    },
+    "cancel-order-message": {
+      "alreadyCancelled": "Order reeds geannuleerd!",
+      "giftAlreadyUsed": "Cadeaubon reeds gebruikt",
+      "subscriptionAlreadyUsed": "Abonnement reeds gebruikt",
+      "noMoreFreeCancel": "Laattijdige annulatie! Annulatie zonder vergoeding niet meer mogelijk!"
+    },
+    "cancel-by": {
+      "cust": "Klant",
+      "int": "Intern"
+    },
+    "customer-cancel-reason": {
+      "sick": "Ziekte",
+      "decease": "Overlijden",
+      "traffic": "Verkeer",
+      "work": "Werk",
+      "noShow": "No show",
+      "other": "Ander"
+    },
+    "internal-cancel-reason": {
+      "absence": "Afwezig/ziekte",
+      "techProblem": "Technisch probleem",
+      "planProblem": "Planningsprobleem",
+      "other": "Ander"
+    },
     "task-priority": {
       "0": "Niet dringend",
       "10": "Normaal",
@@ -77,7 +128,8 @@
       "credit": "VISA",
       "debit": "Bancontact",
       "gift": "Cadeaubon",
-      "subs": "Abonnement"
+      "subs": "Abonnement",
+      "stripe": "Stripe"
     },
     "msg-type": {
       "sms": "SMS",
@@ -159,22 +211,22 @@
       "USD": "US Dollar"
     },
     "days-of-week-short": {
-      "mo": "Ma",
-      "tu": "Di",
-      "we": "Wo",
-      "th": "Do",
-      "fr": "Vr",
-      "sa": "Za",
-      "su": "Zo"
+      "1": "Ma",
+      "2": "Di",
+      "3": "Wo",
+      "4": "Do",
+      "5": "Vr",
+      "6": "Za",
+      "7": "Zo"
     },
     "days-of-week": {
-      "mo": "Maandag",
-      "tu": "Dinsdag",
-      "we": "Woensdag",
-      "th": "Donderdag",
-      "fr": "Vrijdag",
-      "sa": "Zaterdag",
-      "su": "Zondag"
+      "1": "Maandag",
+      "2": "Dinsdag",
+      "3": "Woensdag",
+      "4": "Donderdag",
+      "5": "Vrijdag",
+      "6": "Zaterdag",
+      "7": "Zondag"
     },
     "product-type": {
       "prod": "Product",
@@ -184,6 +236,12 @@
       "category": "Categorie",
       "bundle": "Arrangement",
       "subscription": "Abonnement"
+    },
+    "product-sub-type": {
+      "basic": "Basis",
+      "cat": "Categorie",
+      "bundle": "Arrangement",
+      "subs": "Abonnement"
     },
     "planning-type": {
       "occ": "Bezet",
@@ -200,7 +258,7 @@
     },
     "resource-type": {
       "human": "Personeel",
-      "room": "Ruimte",
+      "location": "Locatie",
       "device": "Toestel",
       "group": "Groep",
       "branch": "Branch"
@@ -242,6 +300,11 @@
     }
   },
   "ui": {
+    "order-cancel": {
+      "deposit": "Gevraagde voorschot",
+      "paid": "Reeds betaald",
+      "cancelBtn": "Annuleer order" 
+    },
     "search-user": {
       "search": "Zoek gebruiker",
       "link": "Link"
@@ -251,7 +314,6 @@
         "sections": {
           "general": {
             "title": "Algemeen"
-           
           }
         }
       }
@@ -315,10 +377,16 @@
           },
           "subscriptions": {
             "title": "Abonnementen"
+          },
+          "giftsIn": {
+            "title": "Ontvangen cadeaubonnen"
+          },
+          "loyalty": {
+            "title": "Klantenkaarten"
           }
         }
       }
-    },   
+    },
     "order": {
       "search-type-select": {
         "appointmentsOn": "Afspraken op",
@@ -327,17 +395,17 @@
         "invoiced": "Gefactureerd",
         "gifts": "Cadeaubonnen",
         "nonAppointments": "Enkel producten"
-      } 
+      }
     },
     "order-mgr": {
       "pos": {
         "menu": {
+          "start": "Start",
           "compose": "Samenstellen",
           "plan": "Plannen",
           "contact": "Klant",
           "pay": "Betalen"
         }
-
       },
       "order": {
         "add-product": "Dienst of product toevoegen",
@@ -345,7 +413,6 @@
       },
       "order-line": {
         "confirm": ""
-
       },
       "persons": {
         "title": "Personen selectie behandelingen",
@@ -565,6 +632,51 @@
       "country": "Land",
       "needed": "Wenst u een factuur?"
     },
+    "loyalty": {
+      "program": {
+        "_single": "Klantenkaart",
+        "name": "Kaartnaam",
+        "track": "Bijhouden van",
+        "prod": "Alle producten",
+        "svc_basic": "Alle basisdiensten",
+        "svc_bundle": "Alle arrangementen",
+        "svc_subs": "Alle abonnementen",
+        "promo": "Promoties",
+        "idx": "Volgorde",
+        "help": {
+          "cat": "Selecteer de algemene categorieën waarvoor deze klantenkaart geldig is:",
+          "catx": "Uitzonderingen? Geen nood: onderaan kan je bij de lijsten inclusief & exclusief individuele producten/diensten toevoegen of verwijderen.",
+          "incl-excl": "Selecteer hieronder individuele producten/diensten die je wil toevoegen of verwijderen:"
+        },
+        "ui": {
+          "cat": "Algemene categorieën waarvoor deze klantenkaart geldig is:",
+          "incl": "Inclusief",
+          "excl": "Exclusief",
+          "no-cat": "Geen categorieën geselecteerd",
+          "no-prod": "Geen specifieke producten geselecteerd",
+          "inclusive": "Van toepassing op:",
+          "exclusive": "Niet Van toepassing op:",
+          "cats": "Algemene categorieën:",
+          "prods": "Specifieke producten/diensten:"
+        }
+      },
+      "reward": {
+        "_single": "Beloning",
+        "_plural": "Beloningen",
+        "type": "Soort beloning",
+        "amount": "Vanaf gespaard bedrag",
+        "name": "Naam",
+        "discount": "Korting",
+        "ui": {
+          "new": "Nieuwe beloning",
+          "select-option": "Selecteer een optie"
+        }
+      },
+      "card": {
+        "amount": ""
+      }
+
+    },
     "gift": {
       "_single": "Cadeaubon",
       "code": "Code",
@@ -600,6 +712,7 @@
       "vatIncl": "Prijzen zijn BTW inclusief",
       "vatNr": "BTW nummer",
       "smsOn": "Verstuur SMS berichten naar klanten",
+      "cancel": "Minimum tijd voor kosteloze annulatie",
       "gift": {
         "on": "Gebruik cadeaubonnen",
         "methods": {
@@ -639,6 +752,14 @@
     "reminder": {
       "dur": "Versturen voor aanvang"
     },
+    "orderCancel": {
+      "by": "Annulatie door",
+      "reason": "Reden",
+      "remark": "Opmerking",
+      "compensation": "Teruggave",
+      "gift": "Maak cadeaubon",
+      "returnSubsPayments": "Geef abonnementbeurten terug"
+    },
     "order": {
       "start": "Start",
       "end": "Einde",
@@ -653,7 +774,8 @@
       "invoiced": "Gefactureerd",
       "invoiceNum": "Factuur nr",
       "gift": "Is cadeaubon",
-      "giftCode": "Cadeaubon code"
+      "giftCode": "Cadeaubon code",
+      "state": "Status"
     },
     "contact": {
       "name": "Naam",
@@ -722,6 +844,8 @@
       "personSelect": "Selecteer personen",
       "staffSelect": "Selecteer specialistes",
       "planMode": "Planning mode",
+      "type": "Type",
+      "sub": "Sub type",
       "types": {
         "product": {
           "bundle": "Bevat andere producten"
@@ -818,6 +942,7 @@
     "schedule": {
       "name": "Naam",
       "default": "Standaard",
+      "scheduleIds": "Gebruik plannings gedefinieerd op",
       "prepIncl": "Voorbereidings- en opkuistijden vallen altijd binnen deze planning"
     },
     "scheduling": {
@@ -850,12 +975,18 @@
     }
   },
   "menu": {
-    "resources": {
+    "local": {
+      "label": "Lokaal",
+      "sub": {
+        "domo": "Domotica",
+        "jobs": "Jobs"
+      }
+    },"resources": {
       "label": "Resources",
       "sub": {
         "human": "Personeel",
         "device": "Toestellen",
-        "room": "Ruimtes",
+        "location": "Locaties",
         "group": "Groepen",
         "branch": "Afdelingen"
       }
@@ -898,6 +1029,9 @@
     },
     "branch": {
       "label": "Instellingen"
+    },
+    "loyalty": {
+      "label": "Klantenkaarten"
     },
     "tasks": {
       "label": "Taken",

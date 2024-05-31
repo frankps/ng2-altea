@@ -27,6 +27,20 @@
       "frameworksBackend": {
         "region": "europe-west1"
       }
+    },
+    {
+      "target": "altea-pub-app2",
+      "public": "dist/altea-pub-app2",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ],
+      "frameworksBackend": {
+        "region": "europe-west1"
+      }
     }
   ]
 }

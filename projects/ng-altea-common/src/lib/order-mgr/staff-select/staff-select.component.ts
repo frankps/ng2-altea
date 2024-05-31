@@ -1,7 +1,7 @@
 import { Component, Output, EventEmitter, OnInit } from '@angular/core';
 import { OrderMgrUiService } from '../order-mgr-ui.service';
 import { ResourceService } from '../../resource.service';
-import { DbQuery, QueryOperator } from 'ts-common';
+import { ArrayHelper, DbQuery, QueryOperator } from 'ts-common';
 import { Resource, ResourceType } from 'ts-altea-model';
 
 @Component({
@@ -11,7 +11,7 @@ import { Resource, ResourceType } from 'ts-altea-model';
 })
 export class StaffSelectComponent implements OnInit {
 
-  preferredStaff
+  preferredStaff: 'noPreference' | 'preference' = 'noPreference'
   staff: Resource[] = []
   @Output() selected: EventEmitter<string[]> = new EventEmitter<string[]>();
 
@@ -24,10 +24,16 @@ export class StaffSelectComponent implements OnInit {
   async ngOnInit() {
     await this.loadStaff()
   }
-  
+
   async loadStaff() {
+
+    if (!this.mgrUiSvc.branch) {
+      console.error(`Can't load resources: branch not specified!`)
+    }
+
     const query = new DbQuery()
 
+    query.and('branchId', QueryOperator.equals, this.mgrUiSvc.branch.id)
     query.and('type', QueryOperator.equals, ResourceType.human)
     query.and('isGroup', QueryOperator.equals, false)
     query.and('online', QueryOperator.equals, true)
@@ -41,8 +47,7 @@ export class StaffSelectComponent implements OnInit {
     console.error(this.staff)
   }
 
-  continue() {
-
+  selectedResourceIds(): string[] {
     const ids = []
 
     if (this.selection) {
@@ -53,6 +58,23 @@ export class StaffSelectComponent implements OnInit {
       })
     }
 
+    return ids
+  }
+
+  hasSelectedResourceIds(): boolean {
+    const ids = this.selectedResourceIds()
+    return ArrayHelper.AtLeastOneItem(ids)
+  }
+
+  canContinue(): boolean {
+
+    return this.preferredStaff == 'noPreference' || (this.preferredStaff == 'preference' && this.hasSelectedResourceIds())
+  }
+
+
+  continue() {
+
+    const ids = this.selectedResourceIds()
     this.selected.emit(ids)
 
   }

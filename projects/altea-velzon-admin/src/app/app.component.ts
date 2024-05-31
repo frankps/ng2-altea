@@ -1,7 +1,7 @@
 import { AfterContentChecked, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { BranchService, LoyaltyProgramService, ObjectService, ProductService, ResourceService, ScheduleService, SessionService, TypeInfoService } from 'ng-altea-common';
 import { BsLocaleService } from 'ngx-bootstrap/datepicker';
-import { Branch, LoyaltyProgram, Product, Resource, TypeInfo } from 'ts-altea-model';
+import { AppMode, Branch, LoyaltyProgram, Product, Resource, TypeInfo } from 'ts-altea-model';
 import { DbQuery, QueryOperator } from 'ts-common';
 
 @Component({
@@ -25,7 +25,7 @@ export class AppComponent implements OnInit {
 
   async ngOnInit() {
 
-
+    this.sessionSvc.appMode = AppMode.pos
 
     await this.configureCaches()
 

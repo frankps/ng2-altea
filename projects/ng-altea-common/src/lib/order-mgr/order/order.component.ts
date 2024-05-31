@@ -1,7 +1,7 @@
 import { Component, Output, EventEmitter, Input, OnInit } from '@angular/core';
 import { OrderMgrUiService } from '../order-mgr-ui.service';
 import { ObjectService, ResourceService, SessionService } from 'ng-altea-common';
-import { CreateCheckoutSession, Order, OrderLine, OrderPerson, Resource, ResourcePreferences, ResourceType } from 'ts-altea-model';
+import { AppMode, CreateCheckoutSession, Order, OrderLine, OrderPerson, Resource, ResourcePreferences, ResourceType } from 'ts-altea-model';
 
 @Component({
   selector: 'order-mgr-order',
@@ -20,7 +20,7 @@ export class OrderComponent implements OnInit {
   /** used to cancel an existing order */
   @Output() cancel: EventEmitter<Order> = new EventEmitter<Order>();
 
-  @Input() showVat = false
+  //  @Input() showVat = false
 
   ResourceTypeIcons = ResourceType
 
@@ -29,11 +29,43 @@ export class OrderComponent implements OnInit {
   showHumanResources = false
   humanResources: Resource[]
 
+  appMode: AppMode
+
+  show = {
+    posOnly: false,
+    contact: false, // show detailed contact info
+    deposit: false, // show deposit terms (pay period)
+    resources: false, // resource (personnel selection)
+    vat: false,
+    loyalty: false,
+    next: false,   // show the next button (in consumer app)
+    save: false    // show the save button 
+  }
 
   constructor(protected orderMgrSvc: OrderMgrUiService, protected sessionSvc: SessionService, protected stripeSvc: ObjectService, protected resourceSvc: ResourceService) {
+
   }
 
   async ngOnInit(): Promise<void> {
+
+    this.appMode = this.sessionSvc.appMode
+
+    switch (this.appMode) {
+      case AppMode.consum: // consumer app
+        this.show.next = true
+        break
+
+      case AppMode.pos: // point of sale
+        this.show.posOnly = true
+        this.show.deposit = true
+        this.show.contact = true
+        this.show.resources = true
+        this.show.vat = true
+        this.show.loyalty = true
+        break
+
+    }
+
 
   }
 

@@ -39,7 +39,7 @@
 
         <!--               
         <h5 class="card-title">{{order.contact.name}}</h5> -->
-        <ng-container *ngIf="order.contact">
+        <ng-container *ngIf="show.contact && order.contact">
 
             <div class="row">
                 <div class="col-6">{{order.contact.name}}</div>
@@ -181,7 +181,7 @@
 
 
 
-        <ng-container *ngIf="showVat && order.hasVatLines()">
+        <ng-container *ngIf="show.vat && order.hasVatLines()">
 
             BTW
 
@@ -196,7 +196,7 @@
         </ng-container>
 
 
-        <div class="row mt-3">
+        <div class="row mt-3" *ngIf="show.deposit">
             <div class="col-4 d-flex align-items-center">Betaaltermijn</div>
             <div class="col-4">
 
@@ -212,7 +212,7 @@
 
         </div>
 
-        <div class="row  my-2">
+        <div class="row  my-2" *ngIf="show.resources">
             <div class="col">
                 <ng-select id="humanResources" name="humanResources" *ngIf="showHumanResources" [items]="humanResources"
                     placeholder="Personeel" bindLabel="name" bindValue="id" [clearable]="true" [multiple]="true"
@@ -227,7 +227,7 @@
 
 
 
-        <div class="row mt-2 mb-3">
+        <div class="row mt-2 mb-3" *ngIf="show.posOnly">
 
 
             <div class="col">
@@ -253,7 +253,7 @@
         </div>
 
 
-        <order-mgr-loyalty [order]="order" [loyalty]="orderMgrSvc.loyalty"></order-mgr-loyalty>
+        <order-mgr-loyalty *ngIf="show.loyalty" [order]="order" [loyalty]="orderMgrSvc.loyalty"></order-mgr-loyalty>
 
 
     </div>
@@ -262,14 +262,14 @@
             <div class="col-6">Gemaakt op {{order.cre | date: sessionSvc.formats.dateShort}}</div>
 
 
-            <div class="d-grid mt-3">
+            <div class="d-grid mt-3" *ngIf="show.save">
                 <button type="button" class="btn btn-outline-secondary float-end" (click)="save()"
                     translate>msg.save</button>
             </div>
 
 
 
-            <div class="d-grid mt-3" *ngIf="!order.isEmpty()">
+            <div class="d-grid mt-3" *ngIf="show.next && !order.isEmpty()">
                 <button type="button" class="btn btn-outline-secondary float-end" (click)="next()"
                     translate>msg.continue</button>
             </div>
