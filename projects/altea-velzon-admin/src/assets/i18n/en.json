@@ -132,8 +132,9 @@
       "stripe": "Stripe"
     },
     "msg-type": {
-      "sms": "SMS",
-      "email": "E-mail"
+      "email": "E-mail",
+      "wa": "WhatsApp",
+      "sms": "SMS"
     },
     "time-units-plur": {
       "s": "Seconden",

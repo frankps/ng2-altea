@@ -1,5 +1,5 @@
 
-import { Component, ViewChild, OnInit } from '@angular/core';
+import { Component, ViewChild, OnInit, inject } from '@angular/core';
 import { ProductService, PriceService, ProductResourceService, ResourceService, ScheduleService, ContactService, SessionService } from 'ng-altea-common'
 import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ResourceType, ResourceTypeIcons, Resource, Schedule, Contact, Language } from 'ts-altea-model'
 import { BackendHttpServiceBase, DashboardService, FormCardSectionEventData, NgEditBaseComponent, ToastType, TranslationService } from 'ng-common'
@@ -14,13 +14,18 @@ import * as sc from 'stringcase'
 import { scheduled } from 'rxjs';
 import * as Rx from "rxjs";
 import { NgForm } from '@angular/forms';
+import { Firestore, collection, collectionData, addDoc, CollectionReference, updateDoc, serverTimestamp, doc, docData, DocumentChange, DocumentData } from '@angular/fire/firestore';
+import { Observable } from 'rxjs';
+import { getDocs, limit, or, orderBy, query, where } from 'firebase/firestore';
+
 
 @Component({
   selector: 'app-edit-contact',
   templateUrl: './edit-contact.component.html',
   styleUrls: ['./edit-contact.component.scss'],
 })
-export class EditContactComponent extends NgEditBaseComponent<Contact> {
+export class EditContactComponent extends NgEditBaseComponent<Contact> implements OnInit {
+  private firestore: Firestore = inject(Firestore)
 
   @ViewChild('deleteModal') public deleteModal: DeleteModalComponent;
 
@@ -39,7 +44,7 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> {
 
   // scheduleChanges?: CollectionChangeTracker<Schedule>
 
-  depositPctgs = [...Array(21).keys()].map(i => { return { pct: (i * 5), label: `${i * 5} %` }})
+  depositPctgs = [...Array(21).keys()].map(i => { return { pct: (i * 5), label: `${i * 5} %` } })
   depositMode = "default"   // default or custom
 
 
@@ -59,6 +64,31 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> {
   }
 
 
+
+  async getMessages(contact: Contact) {
+
+    console.error('getMessages =============',contact)
+
+    if (!contact)
+      return
+
+
+    // `branches/${branchId}/msg`
+
+    const msgCol = collection(this.firestore, "branches", this.sessionSvc.branchId, "msg");
+
+    const qry = query(msgCol, or(where("from", "==", contact.mobile), where("to", "array-contains", contact.mobile)), orderBy('cre', 'desc'), limit(10))
+
+    const querySnapshot = await getDocs(qry);
+
+    querySnapshot.forEach((doc) => {
+      // doc.data() is never undefined for query doc snapshots
+      console.log(doc.id, " => ", doc.data());
+    });
+  }
+
+
+
   delete() {
     console.error('new delete')
 
@@ -67,14 +97,15 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> {
     this.deleteModal?.delete()
   }
 
-  override objectRetrieved(object: Contact): void {
+  override async objectRetrieved(contact: Contact) {
 
     console.error('objectRetrieved')
-    console.error(object)
+    console.error(contact)
 
-    if (object?.depositPct)
-    this.depositMode = "custom"
+    if (contact?.depositPct)
+      this.depositMode = "custom"
 
+    await this.getMessages(contact)
 
 
   }

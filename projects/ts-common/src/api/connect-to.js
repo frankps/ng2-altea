@@ -1,13 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ConnectTo = void 0;
-class ConnectTo {
-    constructor(id) {
+var ConnectTo = /** @class */ (function () {
+    function ConnectTo(id) {
         this.connect = {
             id: ''
         };
         this.connect.id = id;
     }
-}
+    return ConnectTo;
+}());
 exports.ConnectTo = ConnectTo;
-//# sourceMappingURL=connect-to.js.map

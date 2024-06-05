@@ -5,7 +5,7 @@ export class SmsMessage {
     
     
 
-    constructor(public  from: string, public to: string, public body: string) {
+    constructor(public from: string, public to: string, public body: string) {
 
     }
 

@@ -1,4 +1,4 @@
-import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, OrderTemplate, Branch } from 'ts-altea-model'
+import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, OrderTemplate, Branch, MessageAddress } from 'ts-altea-model'
 import { AlteaDb } from '../../general/altea-db'
 import { IDb } from '../../interfaces/i-db'
 
@@ -32,13 +32,13 @@ export class OrderMessagingBase {
 
         const msg = template.mergeWithOrder(order)
 
-        msg.from = branch.emailFrom
+        msg.from = new MessageAddress(branch.emailFrom, branch.name)
 
         if (branch.emailBcc)
-            msg.bcc.push(branch.emailBcc)
+            msg.addBcc(branch.emailBcc)
 
         //msg.to.push(order.contact.email)
-        msg.to.push('frank@dvit.eu')
+        msg.addTo('frank@dvit.eu', 'Frank Paepens')
         msg.type = MsgType.email
 
         if (send) {
@@ -55,7 +55,7 @@ export class OrderMessagingBase {
 
         const msg = template.mergeWithOrder(order)
 
-        msg.to.push(order.contact.mobile)
+        msg.addTo(order.contact.mobile, order.contact.getName(), order.contact.id)
         msg.type = MsgType.sms
 
         if (send) {

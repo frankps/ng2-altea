@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
-import { Order, Gift, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, ConfirmOrderResponse } from 'ts-altea-model'
+import { Order, Gift, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, ConfirmOrderResponse, OrderSource } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { AlteaDb } from '../general/altea-db'
 import { IDb } from '../interfaces/i-db'
@@ -13,6 +13,7 @@ import { DetermineReservationOptions } from './reservation/determine-reservation
 import * as dateFns from 'date-fns'
 import * as Handlebars from "handlebars"
 import * as _ from "lodash"
+import { OrderMessaging } from './messaging/order-messaging'
 
 
 
@@ -51,14 +52,37 @@ export class OrderMgmtService {
 
     async changeState(order: Order, newState: OrderState): Promise<ApiResult<Order>> {  //  : Promise<ApiResult<Order>>
 
+        const msgSvc = new OrderMessaging(this.alteaDb)
+
+
         order.state = newState
         order.m.setDirty('state')
 
         switch (newState) {
+            case OrderState.created:
+
+                /** if order was created internally (Point Of Sale) and still a deposit to pay */
+                if (order.src == OrderSource.pos && order.deposit > 0 && order.paid < order.deposit) {
+                    await msgSvc.depositMessaging(order)
+                    order.state = OrderState.waitDeposit
+                    order.m.setDirty('state')
+                }
+
+                break
+
+            case OrderState.confirmed:
+
+                await msgSvc.confirmationMessaging(order)
+                order.state = OrderState.waitDeposit
+                order.m.setDirty('state')
+                break
+
+
             case OrderState.waitDeposit:
                 order.depositBy = DateHelper.yyyyMMddhhmmss()
                 order.m.setDirty('depositBy')
-        }  
+                break
+        }
 
         console.warn(order)
 
@@ -67,7 +91,7 @@ export class OrderMgmtService {
         return result
 
     }
-  
+
 
 
 

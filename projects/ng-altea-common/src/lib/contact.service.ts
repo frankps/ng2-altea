@@ -47,6 +47,13 @@ export class ContactService extends BackendHttpServiceBase<Contact> {
     if (contact.last)
       query.and('last', QueryOperator.contains, contact.last)
 
+    if (contact.mobile)
+      query.and('mobile', QueryOperator.contains, contact.mobile)
+
+    if (contact.email)
+      query.and('email', QueryOperator.contains, contact.email)
+
+    console.error(contact.mobile)
 
     return this.query$(query)
 

@@ -54,19 +54,13 @@
             <div class="row">
                 <div class="col-6"><ngx-altea-label-value label="objects.contact.email"
                         [value]="object.email"></ngx-altea-label-value></div>
-                <div class="col-6">
-                    <ngx-altea-label-value label="objects.contact.emailRemind" valueFormat="yesNo"
-                        [value]="object.emailRemind"></ngx-altea-label-value>
-                </div>
+             
             </div>
 
             <div class="row">
                 <div class="col-6"><ngx-altea-label-value label="objects.contact.mobile"
                         [value]="object.mobile"></ngx-altea-label-value></div>
-                <div class="col-6">
-                    <ngx-altea-label-value label="objects.contact.smsRemind" valueFormat="yesNo"
-                        [value]="object.smsRemind"></ngx-altea-label-value>
-                </div>
+
             </div>
 
             <div class="row" *ngIf="object.depositPct">
@@ -135,14 +129,7 @@
                                 [(ngModel)]="object.email" />
                         </ngx-altea-label-control>
                     </div>
-                    <div class="col-6 d-flex align-items-center">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="emailRemind" name="emailRemind"
-                                [(ngModel)]="object.emailRemind" />
-                            <label class="form-check-label" for="emailRemind"
-                                translate="objects.contact.emailRemind"></label>
-                        </div>
-                    </div>
+                  
                 </div>
 
                 <div class="row mt-3">
@@ -152,14 +139,7 @@
                                 [(ngModel)]="object.mobile" />
                         </ngx-altea-label-control>
                     </div>
-                    <div class="col-6 d-flex align-items-center">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="smsRemind" name="smsRemind"
-                                [(ngModel)]="object.smsRemind" />
-                            <label class="form-check-label" for="smsRemind"
-                                translate="objects.contact.smsRemind"></label>
-                        </div>
-                    </div>
+                   
                 </div>
 
                 <div class="row mt-3">

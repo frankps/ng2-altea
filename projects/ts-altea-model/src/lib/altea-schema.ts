@@ -301,6 +301,7 @@ export class User extends ObjectWithIdPlus {
 }
 
 export class Contact extends ObjectWithId {
+
   //@Type(() => Organisation)
   organisation?: Organisation;
 
@@ -315,12 +316,16 @@ export class Contact extends ObjectWithId {
   gender: Gender = Gender.unknown
   birth?: number;  // format: yyyyMMdd
   email?: string;
-  emailRemind = true
+  /** Email address confirmed */
   emailConf = false
 
   mobile?: string;
+  /** Mobile number confirmed */
   mobileConf = false
-  smsRemind = true
+
+
+  /** Allowed messaging for communication (valid strings: see enum MsgTyp) */
+  msg: string[] = ['email', 'wa']
 
   phone?: string;
   language?: string;
@@ -340,9 +345,9 @@ export class Contact extends ObjectWithId {
   news: boolean = false
   rules: boolean = false
 
-  active = true
-  deleted = false
-  deletedAt?: Date;
+  /*   active = true
+    deleted = false
+    deletedAt?: Date; */
 
   @Type(() => Subscription)
   subscriptions?: Subscription[]
@@ -357,6 +362,38 @@ export class Contact extends ObjectWithId {
 
   @Type(() => LoyaltyCard)
   cards?: LoyaltyCard[]
+
+  /** Is the given message type selected? */
+  msgTypeSelected(type: any): boolean {
+    if (!type || ArrayHelper.IsEmpty(this.msg))
+      return false
+
+    return this.msg.indexOf(type) >= 0
+  }
+
+  selectMsgType(msgType: any, selected: boolean) {
+
+    console.log(msgType, selected)
+
+    if (!this.msg)
+      this.msg = []
+
+    if (selected) {
+
+      if (!this.msgTypeSelected(msgType))
+        this.msg.push(msgType)
+
+    } else {
+
+      const idx = this.msg.indexOf(msgType)
+
+      if (idx >= 0)
+        this.msg.splice(idx, 1)
+
+    }
+
+
+  }
 
   setName() {
 
@@ -377,6 +414,27 @@ export class Contact extends ObjectWithId {
 
     this.name = components.join(' ')
   }
+
+  getName() : string {
+    let components = []
+
+    if (this.first) {
+      this.first = sc.capitalcase(this.first)
+      components.push(this.first)
+    }
+
+    if (this.last) {
+      this.last = sc.capitalcase(this.last)
+      components.push(this.last)
+    }
+
+    const name = components.join(' ')
+
+    return name
+
+  }
+
+
 }
 
 // export class ScheduleLine extends ObjectWithId {
@@ -792,8 +850,8 @@ export class Product extends ObjectWithIdPlus {
   personSelect = true  // if order is for multiple persons, then customer can specify for each orderLine the person
   staffSelect = true  // customer can specify which staffmember 
 
-  active?: boolean;
-  deleted?: boolean;
+  /*   active?: boolean;
+    deleted?: boolean; */
 
   @Type(() => Date)
   deletedAt?: Date;
@@ -1293,10 +1351,16 @@ export class DepositTerm {
   ptu: string = 'h'
 }
 
+/** Message Types */
 export enum MsgType {
-  unknown = 'unknown',
-  sms = 'sms',
-  email = 'email'
+  //unknown = 'unknown',
+
+  email = 'email',
+
+  /** WhatsApp */
+  wa = 'wa',
+
+  sms = 'sms'
 }
 
 /*
@@ -1315,19 +1379,65 @@ model Message {
 }
 */
 
+export class MessageAddress {
+  /** the (best) contact id associated with this address */
+  conId?: string
+
+  /** the name of the contact */
+  name?: string
+
+  /** address */
+  addr: string
+
+
+  constructor(addr: string, name?: string, conId?: string) {
+    this.addr = addr
+    this.name = name
+    this.conId = conId
+  }
+}
+
 export class IEmail {
-  from?: string
-  to: string[]
-  cc: string[]
+  from?: MessageAddress
+  to: MessageAddress[]
+  cc: MessageAddress[]
   subject?: string
   body?: string
 }
 
 export enum MessageState {
-  notSent,
-  error,
-  sent
+  notSent = 'notSent',
+  error = 'err',
+  sent = 'sent',
+  received = 'rec',
+  archived = 'arch',
+  spam = 'spam',
+  deleted = 'del'
 }
+
+export enum MessageDirection {
+  in = 'in',   // incoming message
+  out = 'out',  // outgoing message
+  int = 'int'   // internal message
+}
+
+export class MessageProviderInfo {
+
+  /** id of this message assigned by provider (ex: whatsapp id) */
+  id: string
+
+}
+
+export class WhatsAppProviderInfo extends MessageProviderInfo {
+
+  /** name of user in provider network/app (ex. whatsapp user name) */
+  name: string
+
+  /** the whatsapp phone id used to send/receive this message */
+  phoneId: string
+}
+
+
 
 export class Message extends ObjectWithIdPlus implements IEmail {
 
@@ -1336,22 +1446,49 @@ export class Message extends ObjectWithIdPlus implements IEmail {
 
   type: MsgType = MsgType.email
 
+  dir: MessageDirection = MessageDirection.in
+
+  /** extra info about message received from provider (ex. whatsapp user name, phoneId, ...) */
+  prov: MessageProviderInfo
+
+  /** contact ids: if message related to certain contacts */
+  conIds: string[] = []
+
+  first: string
+
+  last: string
+
   //  tags: string[] = []
   code?: string
 
   sent?: number  // yyyyMMddhhmmss
 
-  from?: string
-  to: string[] = []
-  cc: string[] = []
-  bcc: string[] = []
+  from?: MessageAddress
+
+  to: MessageAddress[] = []
+  cc: MessageAddress[] = []
+  bcc: MessageAddress[] = []
 
   subject?: string
   body?: string
 
   log?: string
-  state?: MessageState.notSent
+  state?: MessageState
 
+  addTo(addr: string, name?: string, conId?: string) {
+    const msgAddr = new MessageAddress(addr, name, conId)
+    this.to.push(msgAddr)
+  }
+
+  addCc(addr: string, name?: string, conId?: string) {
+    const msgAddr = new MessageAddress(addr, name, conId)
+    this.cc.push(msgAddr)
+  }
+
+  addBcc(addr: string, name?: string, conId?: string) {
+    const msgAddr = new MessageAddress(addr, name, conId)
+    this.bcc.push(msgAddr)
+  }
 
   sentDate(): Date | null {
 
@@ -1695,9 +1832,9 @@ export class Resource extends ObjectWithIdPlus {
   user?: User
 
   branches?: string[];
-  active?: boolean;
-  deleted?: boolean;
-  deletedAt?: Date;
+  /*   active?: boolean;
+    deleted?: boolean;
+    deletedAt?: Date; */
 
   /** Most resources use the schedule (opening hours) of the branch, but a custom schedule can be specified per resource  */
   customSchedule = false
@@ -2144,7 +2281,12 @@ export class OrderPerson extends ObjectWithId {
 
 export enum OrderState {
 
+  /** during creation: products/services are added, linked to contact, ... */
   creation = 'creation',
+
+  /** when creation has finished */
+  created = 'created',
+
   waitDeposit = 'waitDeposit',
   confirmed = 'confirmed',
 
@@ -2225,6 +2367,13 @@ export enum OrderCancelCompensate {
   none = "none",
   gift = "gift"
 }
+
+/** The device/location where app was created (needed for deposit handling) */
+export enum OrderSource {
+  pos = "pos",
+  ngApp = "ngApp"
+}
+
 export class OrderCancel {
   by?: OrderCancelBy
   reason?: string
@@ -2248,8 +2397,6 @@ export class OrderCancel {
 }
 
 export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  // 
-
-
 
   static jsonProps = ['vatLines', 'persons', 'info']
 
@@ -2346,6 +2493,10 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
   @Type(() => OrderCancel)
   cancel?: OrderCancel
+
+  /** The device/location where app was created (needed for deposit handling) */
+  src?: OrderSource = OrderSource.pos
+
 
   //msgLog: MsgInfo[] = []
 
@@ -4528,7 +4679,7 @@ export class LoyaltyProgram extends ObjectWithIdPlus {
     if (this.svc_subs) cats.push('svc_subs')
     if (this.promo) cats.push('promo')
 
-      return cats
+    return cats
   }
 
   hasExcludedCategories(): boolean {
@@ -4544,7 +4695,7 @@ export class LoyaltyProgram extends ObjectWithIdPlus {
     if (!this.svc_subs) cats.push('svc_subs')
     if (!this.promo) cats.push('promo')
 
-      return cats
+    return cats
   }
 
   hasIncl(): boolean {

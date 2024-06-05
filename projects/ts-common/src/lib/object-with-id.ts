@@ -153,10 +153,11 @@ export abstract class ObjectWithIdPlus extends ObjectWithId {
   /** object is deleted */
   public del: boolean = false
 
-
+  /** object last updated at */
   @Type(() => Date)
   public upd: Date = new Date()
 
+  /** object created at */
   @Type(() => Date)
   public cre: Date = new Date()
 }

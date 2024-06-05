@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, Output, EventEmitter, Input } from '@angular/core'
 import { NgForm } from '@angular/forms'
-import { Branch, Contact, Country } from 'ts-altea-model'
+import { Branch, Contact, Country, MsgType } from 'ts-altea-model'
 import { TranslationService } from 'ng-common'
 import { Translation } from 'ts-common'
 import { ContactService, SessionService } from 'ng-altea-common';
@@ -15,10 +15,10 @@ export class ContactSelect2Component {
 
   @Output() selected: EventEmitter<Contact> = new EventEmitter<Contact>();
 
-  _contact: Contact= new Contact()
+  _contact: Contact = new Contact()
 
 
-	@Input() set contact(value: Contact) {
+  @Input() set contact(value: Contact) {
     this._contact = value
     this.isNew = false
   }
@@ -30,11 +30,12 @@ export class ContactSelect2Component {
 
   isNew = true
 
-	css_cls_row= 'mt-3'
-	initialized= false
-	@ViewChild('contactForm')
-	contactForm: NgForm
-	country: Translation[]= []
+  css_cls_row = 'mt-3'
+  initialized = false
+  @ViewChild('contactForm')
+  contactForm: NgForm
+  country: Translation[] = []
+  msgTypes: Translation[] = []
 
   contacts: Contact[]
   branch: Branch
@@ -43,44 +44,45 @@ export class ContactSelect2Component {
 
   showContacts = false
 
-	constructor(protected translationSvc: TranslationService, private contactSvc: ContactService
+  constructor(protected translationSvc: TranslationService, private contactSvc: ContactService
     , protected orderMgrSvc: OrderMgrUiService, private sessionSvc: SessionService) {
 
-      
 
-	}
-  
+
+  }
+
   demoData() {
-/*
-sandra.enghien@gmail.com
-0493152231
-sandra enghien
-*/
+    /*
+    sandra.enghien@gmail.com
+    0493152231
+    sandra enghien
+    */
     this.contact.first = 'sandra'
     this.contact.last = 'enghien2'
     this.contact.mobile = '0493152231'
     this.contact.email = 'sandra.enghien@gmail.com'
   }
-   
-	async ngOnInit() {
-		await this.translationSvc.translateEnum(Country, 'enums.country.', this.country)
+
+  async ngOnInit() {
+    await this.translationSvc.translateEnum(Country, 'enums.country.', this.country)
+    await this.translationSvc.translateEnum(MsgType, 'enums.msg-type.', this.msgTypes)
 
     this.branch = await this.sessionSvc.branch$()
 
-    this.translateParam = { company: this.branch.name} 
+    this.translateParam = { company: this.branch.name }
     console.log(this.translateParam)
 
-    this.demoData()
+    // this.demoData()
 
-		this.initialized = true
-	}
+    this.initialized = true
+  }
 
 
 
-	confirm($event) {
-		console.warn("Button 'request' clicked: 'confirm' method triggered!")
-		console.warn(this.contact)
-	}
+  confirm($event) {
+    console.warn("Button 'request' clicked: 'confirm' method triggered!")
+    console.warn(this.contact)
+  }
 
   async searchContact() {
 
@@ -101,6 +103,31 @@ sandra enghien
 
     let res = await me.contactSvc.update$(me.contact)
   }
+
+  canSelectMsgType(msgType: any) {
+
+    const contact = this.contact
+
+    if (!contact || !msgType)
+      return false
+
+    switch (msgType) {
+      case MsgType.email:
+        return contact.email
+
+      case MsgType.sms:
+      case MsgType.wa:
+        return contact.mobile
+
+      default:
+        return false
+    }
+
+    
+
+  }
+
+
 
 
   contactsFound() {

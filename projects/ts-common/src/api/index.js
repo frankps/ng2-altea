@@ -1,12 +1,24 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const tslib_1 = require("tslib");
-tslib_1.__exportStar(require("./api-list-result"), exports);
-tslib_1.__exportStar(require("./api-result"), exports);
-tslib_1.__exportStar(require("./api-status"), exports);
-tslib_1.__exportStar(require("./api-batch"), exports);
-tslib_1.__exportStar(require("./backend-service-base"), exports);
-tslib_1.__exportStar(require("./collection-change-tracker"), exports);
-tslib_1.__exportStar(require("./connect-to"), exports);
-tslib_1.__exportStar(require("./query"), exports);
-//# sourceMappingURL=index.js.map
+__exportStar(require("./api-list-result"), exports);
+__exportStar(require("./api-result"), exports);
+__exportStar(require("./api-status"), exports);
+__exportStar(require("./api-batch"), exports);
+__exportStar(require("./backend-service-base"), exports);
+__exportStar(require("./collection-change-tracker"), exports);
+__exportStar(require("./connect-to"), exports);
+__exportStar(require("./query"), exports);
