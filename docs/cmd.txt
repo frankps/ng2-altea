@@ -45,6 +45,8 @@ Test:
 
 New component:
 
+ng generate component calendar/syncFusScheduler --project=altea-velzon-admin
+
 ng generate component loyalty/loyalty-reward --project=altea-velzon-admin
 
 ng generate component task/manage-tasks --project=altea-velzon-admin

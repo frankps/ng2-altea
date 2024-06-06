@@ -1019,7 +1019,11 @@
       "label": "Orders"
     },
     "calendar": {
-      "label": "Kalender"
+      "label": "Kalender",
+      "sub": {
+        "fullcalendar": "fullcalendar",
+        "syncfusion": "syncfusion"
+      }
     },
     "gifts": {
       "label": "Cadeaubonnen"

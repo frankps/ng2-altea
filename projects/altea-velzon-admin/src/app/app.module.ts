@@ -30,6 +30,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
+import { ScheduleModule } from '@syncfusion/ej2-angular-schedule';
 
 defineLocale('nl-be', nlBeLocale);
 
@@ -69,7 +70,8 @@ if (environment.defaultauth === 'firebase') {
     }),
     ContactModule,
     NgAlteaCommonModule,
-    InterfaceModule
+    InterfaceModule,
+    ScheduleModule
   
     
   ],

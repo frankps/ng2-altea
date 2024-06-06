@@ -84,6 +84,26 @@ export const MENU: MenuItem[] = [
     link: '/aqua/calendar',
   },
   {
+    id: 7,
+    label: 'menu.calendar.label',
+    icon: 'home',
+    link: '/aqua/calendar/syncfusion',
+    subItems: [
+      {
+        id: 71,
+        label: 'menu.calendar.sub.fullcalendar',
+        link: '/aqua/calendar/fullcalendar',
+        parentId: 7
+      },
+      {
+        id: 72,
+        label: 'menu.calendar.sub.syncfusion',
+        link: '/aqua/calendar/syncfusion',
+        parentId: 7
+      }
+    ]
+  },
+  {
     id: 8,
     label: 'menu.gifts.label',
     icon: 'home',
