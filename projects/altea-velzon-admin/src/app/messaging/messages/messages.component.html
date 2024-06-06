@@ -1,0 +1,25 @@
+<h2>Messages</h2>
+
+
+<ul class="list-group">
+
+    <li class="list-group-item" *ngFor="let message of messages$ | async">
+        <h5 *ngIf="message.from">{{message.from.name}} {{message.from.addr}}</h5>
+
+        <button type="button" class="btn btn-primary btn-sm float-end" (click)="toggle(message)" translate>dic.reply</button>
+
+        {{message.body}}
+
+        <ng-container *ngIf="msgId == message.id">EDIT
+        
+            <ngx-altea-label-control label="objects.gift.toMessage" for="body">
+                <textarea rows="2" class="form-control" id="body" name="body" style="height: 80px"
+                    [(ngModel)]="body"></textarea>
+            </ngx-altea-label-control>
+        
+            <button type="button" class="btn btn-primary btn-sm float-end" (click)="sendReply(message, body)" translate>dic.send</button>
+        
+        </ng-container>
+
+    </li>
+</ul>

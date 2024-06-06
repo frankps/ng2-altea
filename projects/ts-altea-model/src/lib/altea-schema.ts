@@ -1380,14 +1380,17 @@ model Message {
 */
 
 export class MessageAddress {
+
+  /** address: can be email address, phone number (sms or whatsapp), ... */
+  addr: string
+
   /** the (best) contact id associated with this address */
   conId?: string
 
   /** the name of the contact */
   name?: string
 
-  /** address */
-  addr: string
+  
 
 
   constructor(addr: string, name?: string, conId?: string) {

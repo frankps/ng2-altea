@@ -109,15 +109,11 @@ ng generate component interface/upload --project ng-altea-common
 
 ng generate service user --project=ng-altea-common
 
-
-
-
-
-
 ng generate service custom-json --project=ng-altea-common
 
 
-ng generate module branch --routing --project=altea-velzon-admin
+ng generate module messaging --routing --project=altea-velzon-admin
+ng generate component messaging/messages --project=altea-velzon-admin
 
 ng generate component <TYPE>/manage-<TYPES> --project=altea-velzon-admin
 ng generate component <TYPE>/edit-<TYPE> --project=altea-velzon-admin

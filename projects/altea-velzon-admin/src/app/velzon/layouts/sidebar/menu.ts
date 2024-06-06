@@ -158,6 +158,12 @@ export const MENU: MenuItem[] = [
       }
 
     ]
+  },
+  {
+    id: 16,
+    label: 'menu.messaging.label',
+    icon: 'home',
+    link: '/aqua/messaging',
   }
   /*
   {

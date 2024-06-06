@@ -36,9 +36,11 @@
     "phone": "Tel",
     "price": "Prijs",
     "qty": "Aantal",
+    "reply": "Antwoorden",
     "timeUnit": "Tijdseenheid",
     "save": "Opslaan",
     "search": "Zoeken",
+    "send": "Versturen",
     "spacingAfter": "Kuistijd in minuten",
     "start": "begin",
     "end": "einde"
@@ -1033,6 +1035,9 @@
     },
     "loyalty": {
       "label": "Klantenkaarten"
+    },
+    "messaging": {
+      "label": "Berichten"
     },
     "tasks": {
       "label": "Taken",
