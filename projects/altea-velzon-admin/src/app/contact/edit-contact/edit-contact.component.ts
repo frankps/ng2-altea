@@ -17,6 +17,7 @@ import { NgForm } from '@angular/forms';
 import { Firestore, collection, collectionData, addDoc, CollectionReference, updateDoc, serverTimestamp, doc, docData, DocumentChange, DocumentData } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { getDocs, limit, or, orderBy, query, where } from 'firebase/firestore';
+import * as countryLib from 'country-list-js';
 
 
 @Component({
@@ -42,11 +43,20 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
   gender: Translation[] = []
   language: Translation[] = []
 
+  countries: any[] = []
   // scheduleChanges?: CollectionChangeTracker<Schedule>
 
   depositPctgs = [...Array(21).keys()].map(i => { return { pct: (i * 5), label: `${i * 5} %` } })
-  depositMode = "default"   // default or custom
+  depositMode: 'default' | 'custom' = "default"   // default or custom
 
+  mobilePhoneCss = {
+    row: 'row mt-3',
+    colPrefix: 'col-2',
+    colLocalNum: 'col-4'
+  }
+
+
+  test = "31478336034"
 
   public saveScheduling$: Rx.Subject<any> = new Rx.Subject<any>()
 
@@ -61,13 +71,31 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
     this.translationSvc.translateEnum(Gender, 'enums.gender.', this.gender)
     this.translationSvc.translateEnum(Language, 'enums.language.', this.language)
 
+    this.loadCountries()
   }
 
+
+  countryPrefix: any
+
+  loadCountries() {
+
+    this.countries = Object.values(countryLib.all)
+
+    this.countries = this.countries.map(ctr => ({ prefix: ctr['dialing_code'], label: `${ctr['iso2']}: +${ctr['dialing_code']}` }))
+
+    console.log("    COUNTRIES ---->", this.countries)
+    /*
+    var cty = country.findByIso2('BE')
+    console.error(cty)
+
+    console.error(country.all)
+*/
+  }
 
 
   async getMessages(contact: Contact) {
 
-    console.error('getMessages =============',contact)
+    console.error('getMessages =============', contact)
 
     if (!contact)
       return
@@ -104,10 +132,25 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
 
     if (contact?.depositPct)
       this.depositMode = "custom"
+    else
+      this.depositMode = "default"
 
     await this.getMessages(contact)
 
 
+  }
+
+  formChanged(sectionId: string) {
+
+    console.log(`Form changed: ${sectionId}`)
+
+    switch (sectionId) {
+
+      case "general":
+        this.generalForm.form.markAsDirty()
+        break
+
+    }
   }
 
   startEditSection(sectionId: string, sectionParam: string) {

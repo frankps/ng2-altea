@@ -297,7 +297,30 @@ export class User extends ObjectWithIdPlus {
   email?: string
   mobile?: string
 
+  @Type(() => Contact)
+  contacts: Contact[]
+
+  @Type(() => Resource)
   resources: Resource[]
+}
+
+export enum PhoneCountryPrefix {
+  be = "32"
+}
+
+
+export class ContactMetrics {
+
+  /** Life time value */
+  ltv: number = 0
+
+  /** Last visit (format: yyyymmdd) */
+  lv: number = 0
+
+  /** */
+  v: number = 0
+
+
 }
 
 export class Contact extends ObjectWithId {
@@ -328,7 +351,9 @@ export class Contact extends ObjectWithId {
   msg: string[] = ['email', 'wa']
 
   phone?: string;
-  language?: string;
+
+  /** language: iso2, lower case */
+  lang?: string;
 
   str?: string;
   strNr?: string;
@@ -348,6 +373,9 @@ export class Contact extends ObjectWithId {
   /*   active = true
     deleted = false
     deletedAt?: Date; */
+
+  @Type(() => User)
+  user?: User
 
   @Type(() => Subscription)
   subscriptions?: Subscription[]
@@ -2247,8 +2275,10 @@ export class Subscription extends ObjectWithIdPlus {
   usedQty = 0;
 
   /** created at */
+  /*
   @Type(() => Date)
   crea = new Date();
+  */
 }
 
 export class OrderPerson extends ObjectWithId {
@@ -4828,7 +4858,7 @@ export class LoyaltyCard extends ObjectWithIdPlus {
 
   name?: string
   value: number = 0
-
+  
 }
 
 

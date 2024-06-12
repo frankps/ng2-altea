@@ -4,6 +4,8 @@ import { BsLocaleService } from 'ngx-bootstrap/datepicker';
 import { AppMode, Branch, LoyaltyProgram, Product, Resource, TypeInfo } from 'ts-altea-model';
 import { DbQuery, QueryOperator } from 'ts-common';
 
+
+
 @Component({
   selector: 'ngx-altea-root',
   templateUrl: './app.component.html',
@@ -24,6 +26,8 @@ export class AppComponent implements OnInit {
   }
 
   async ngOnInit() {
+
+
 
     this.sessionSvc.appMode = AppMode.pos
 

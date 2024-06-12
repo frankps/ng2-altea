@@ -165,6 +165,7 @@
     },
     "gender": {
       "undefined": "",
+      "unknown": "Niet gekend",
       "female": "Vrouw",
       "male": "Man",
       "unisex": "Unisex"
@@ -196,6 +197,7 @@
       "USA": "Verenigde Staten"
     },
     "language": {
+      "undefined": "Niet gekend",
       "nl": "Nederlands",
       "en": "English",
       "fr": "French",
@@ -789,9 +791,10 @@
       "email": "E-mail",
       "emailRemind": "Stuur e-mail herinneringen",
       "mobile": "GSM nummer",
+      "mobilePrefix": "Land",
       "smsRemind": "Stuur sms herinneringen",
       "phone": "Telefoon",
-      "language": "Taal",
+      "lang": "Taal",
       "company": "Bedrijf",
       "vatNum": "BTW nummer",
       "deposit": "Voorschot",

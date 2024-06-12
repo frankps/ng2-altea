@@ -34,6 +34,9 @@
         <ng-container readonly>
             <!-- <div>{{ object.descr }}</div> -->
 
+
+
+
             <div class="row">
                 <div class="col-6"> <ngx-altea-label-value label="objects.contact.first"
                         [value]="object.first"></ngx-altea-label-value> </div>
@@ -45,8 +48,8 @@
                 <div class="col-6"> <ngx-altea-label-value label="objects.contact.gender"
                         value="{{ 'enums.gender.' + object.gender | translate }}"></ngx-altea-label-value> </div>
 
-                <div class="col-6"> <ngx-altea-label-value label="objects.contact.language"
-                        value="{{ 'enums.language.' + object.language | translate }}"></ngx-altea-label-value> </div>
+                <div class="col-6"> <ngx-altea-label-value label="objects.contact.lang"
+                        value="{{ 'enums.language.' + object.lang | translate }}"></ngx-altea-label-value> </div>
                 <div class="col-6"> </div>
             </div>
 
@@ -54,18 +57,30 @@
             <div class="row">
                 <div class="col-6"><ngx-altea-label-value label="objects.contact.email"
                         [value]="object.email"></ngx-altea-label-value></div>
-             
+
             </div>
 
             <div class="row">
-                <div class="col-6"><ngx-altea-label-value label="objects.contact.mobile"
-                        [value]="object.mobile"></ngx-altea-label-value></div>
+
+                <div class="col-6">
+
+                    <ngx-altea-label-value label="objects.contact.mobile"
+                        [value]="object.mobile"></ngx-altea-label-value>
+
+
+
+
+
+                </div>
+
+
+
 
             </div>
 
             <div class="row" *ngIf="object.depositPct">
                 <div class="col-6"><ngx-altea-label-value label="ui.deposit.request"
-                        [value]="'' + Math.round(object.depositPct) + '%'" unit="%"></ngx-altea-label-value></div>
+                        [value]="'' + Math.round(object.depositPct)" unit="%"></ngx-altea-label-value></div>
 
             </div>
 
@@ -111,9 +126,9 @@
 
                     <div class="col-6">
 
-                        <ngx-altea-label-control label="objects.contact.language" [trans]="true" for="language">
+                        <ngx-altea-label-control label="objects.contact.lang" [trans]="true" for="language">
                             <ng-select id="language" name="language" [items]="language" bindLabel="trans"
-                                bindValue="key" [clearable]="false" [multiple]="false" [(ngModel)]="object.language">
+                                bindValue="key" [clearable]="false" [multiple]="false" [(ngModel)]="object.lang">
                             </ng-select>
                         </ngx-altea-label-control>
 
@@ -129,18 +144,33 @@
                                 [(ngModel)]="object.email" />
                         </ngx-altea-label-control>
                     </div>
-                  
+
                 </div>
 
+
+                <int-phone-edit [css]="mobilePhoneCss" [(phone)]="object.mobile" (phoneChange)="formChanged('general')"></int-phone-edit>
+
+<!--
+                
                 <div class="row mt-3">
-                    <div class="col-6">
+
+                    <div class="col-2">
+                        <ngx-altea-label-control label="objects.contact.mobilePrefix" for="mobile">
+                            <ng-select id="countryPrefix" name="countryPrefix" [items]="countries" bindLabel="label"
+                                bindValue="prefix" [clearable]="false" [multiple]="false" [(ngModel)]="countryPrefix">
+                            </ng-select>
+                        </ngx-altea-label-control>
+                    </div>
+
+                    <div class="col-4">
                         <ngx-altea-label-control label="objects.contact.mobile" for="mobile">
                             <input type="text" id="mobile" name="mobile" required class="form-control"
                                 [(ngModel)]="object.mobile" />
                         </ngx-altea-label-control>
                     </div>
-                   
+
                 </div>
+                -->
 
                 <div class="row mt-3">
 
@@ -169,14 +199,15 @@
                                 </div>
                                 <div class="row" *ngIf="object.depositPct">
                                     <div class="col ps-5 mt-2">
-                                        <ng-select id="qty" name="qty" style="width: 80px; height: 0.5%;" [items]="depositPctgs" 
-                                        bindLabel="label" bindValue="pct" [clearable]="false" [multiple]="false" [(ngModel)]="object.depositPct">
+                                        <ng-select id="qty" name="qty" style="width: 80px; height: 0.5%;"
+                                            [items]="depositPctgs" bindLabel="label" bindValue="pct" [clearable]="false"
+                                            [multiple]="false" [(ngModel)]="object.depositPct">
                                         </ng-select>
                                     </div>
-                                 
+
                                 </div>
 
-<!--                                 <div class="row">
+                                <!--                                 <div class="row">
                                     <div class="col">
                                         {{depositMode}} -  {{object.depositPct}}
                                     </div>
@@ -230,7 +261,7 @@
                         <a [routerLink]="['/', sessionSvc.branch.unique,'subscriptions',sub.id]">{{sub.name}} </a>
                     </div>
                     <div class="col-2 d-flex justify-content-center">{{sub.usedQty}}/{{sub.totalQty}}</div>
-                    <div class="col-2 d-flex justify-content-center">{{sub.crea | date: sessionSvc.formats.date}}
+                    <div class="col-2 d-flex justify-content-center">{{sub.cre | date: sessionSvc.formats.date}}
                     </div>
                     <div class="col-2 d-flex justify-content-center">{{sub.firstUsedOn | date: sessionSvc.formats.date}}
                     </div>
@@ -267,7 +298,7 @@
 
                     <div class="col-3 d-flex justify-content-center">{{gift.code}}</div>
                     <div class="col-3 d-flex justify-content-center">{{gift.used}}/{{gift.value}}</div>
-                    <div class="col-3 d-flex justify-content-center">{{gift.crea  | date:"dd/MM/yyyy"}}</div>
+                    <div class="col-3 d-flex justify-content-center">{{gift.crea | date:"dd/MM/yyyy"}}</div>
 
                 </div>
 
@@ -283,37 +314,37 @@
 
 
     <ngx-altea-form-card-section sectionName="ui.contact.edit.sections.loyalty.title" sectionId="loyalty"
-    [editSectionId]="editSectionId" [showButtons]="false">
+        [editSectionId]="editSectionId" [showButtons]="false">
 
-    <ng-container always>  
+        <ng-container always>
 
-        <ng-container *ngIf="object.cards">
+            <ng-container *ngIf="object.cards">
 
-            <div class="row">
-                <div class="col-3 d-flex justify-content-center">Kaartnaam</div>
-                <div class="col-3 d-flex justify-content-center">Waarde</div>
-                <div class="col-3 d-flex justify-content-center">Gemaakt op</div>
+                <div class="row">
+                    <div class="col-3 d-flex justify-content-center">Kaartnaam</div>
+                    <div class="col-3 d-flex justify-content-center">Waarde</div>
+                    <div class="col-3 d-flex justify-content-center">Gemaakt op</div>
 
-                <!-- <div class="col-2 d-flex justify-content-center">Eerste gebruik</div> -->
-            </div>
+                    <!-- <div class="col-2 d-flex justify-content-center">Eerste gebruik</div> -->
+                </div>
 
 
-            <div class="row" *ngFor="let card of object.cards">
+                <div class="row" *ngFor="let card of object.cards">
 
-                <div class="col-3 d-flex justify-content-center">{{card.name}}</div>
-                <div class="col-3 d-flex justify-content-center">{{card.value}}</div>
-                <div class="col-3 d-flex justify-content-center">{{card.cre  | date:"dd/MM/yyyy"}}</div>
+                    <div class="col-3 d-flex justify-content-center">{{card.name}}</div>
+                    <div class="col-3 d-flex justify-content-center">{{card.value}}</div>
+                    <div class="col-3 d-flex justify-content-center">{{card.cre | date:"dd/MM/yyyy"}}</div>
 
-            </div>
+                </div>
+
+
+            </ng-container>
+
 
 
         </ng-container>
 
-
-
-    </ng-container>
-
-</ngx-altea-form-card-section>
+    </ngx-altea-form-card-section>
 
 
 </ng-container>

@@ -27,7 +27,7 @@ export class MessagingService {
           resolve(res)
 
         })
-        
+
       } catch (error) {
         throw error
       }
@@ -37,15 +37,15 @@ export class MessagingService {
     })
 
   }
-// sendWhatsApp
+  // sendWhatsApp
 
-async sendWhatsApp$(msg: WhatsAppMessage): Promise<any> {
+  async sendWhatsApp$(msg: WhatsAppMessage): Promise<any> {
 
-  let res = await this.post$<any>(`${this.sessionSvc.backend}/messaging/sendWhatsApp`, msg)
+    let res = await this.post$<any>(`${this.sessionSvc.backend}/messaging/sendWhatsApp`, msg)
 
-  return res
+    return res
 
-}
+  }
 
   async sendSms$(msg: SmsMessage): Promise<any> {
 

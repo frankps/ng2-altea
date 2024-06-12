@@ -16,6 +16,7 @@ import { DeleteModalComponent } from './delete-modal/delete-modal.component';
 import { ToastsComponent } from './toasts/toasts.component';
 import { NgbModule, NgbToastModule  } from '@ng-bootstrap/ng-bootstrap';
 import { YesNoModalComponent } from './yes-no-modal/yes-no-modal.component';
+import { IntPhoneEditComponent } from './int-phone-edit/int-phone-edit.component';
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import { YesNoModalComponent } from './yes-no-modal/yes-no-modal.component';
     DeleteModalComponent,
     ToastsComponent,
     YesNoModalComponent,
+    IntPhoneEditComponent,
   ],
   imports: [
     CommonModule,
@@ -46,7 +48,8 @@ import { YesNoModalComponent } from './yes-no-modal/yes-no-modal.component';
     RadioListComponent,
     NgxModalComponent,
     DeleteModalComponent,
-    ToastsComponent
+    ToastsComponent,
+    IntPhoneEditComponent
   ],
 })
 export class Bootstrap5Module {}

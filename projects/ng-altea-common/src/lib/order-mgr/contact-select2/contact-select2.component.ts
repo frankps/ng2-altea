@@ -77,6 +77,18 @@ export class ContactSelect2Component {
     this.initialized = true
   }
 
+  formChanged(sectionId: string) {
+
+    console.log(`Form changed: ${sectionId}`)
+
+    switch (sectionId) {
+
+      case "contact":
+        this.contactForm.form.markAsDirty()
+        break
+
+    }
+  }
 
 
   confirm($event) {
