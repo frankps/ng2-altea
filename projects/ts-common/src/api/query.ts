@@ -178,7 +178,7 @@ export class DbQuery {
 
 export class DbQueryTyped<T> extends DbQuery {
 
-  constructor(public typeName: string, public type: { new(): T; }) {
+  constructor(public typeName: string, public type?: { new(): T; }) {
     super()
   }
 

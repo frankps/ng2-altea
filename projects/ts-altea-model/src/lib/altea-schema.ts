@@ -2462,8 +2462,10 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
   appointment = false;
 
+  @Type(() => Number)
   start?: number; // format: yyyyMMddHHmmss
 
+  @Type(() => Number)
   end?: number; // format: yyyyMMddHHmmss
   descr?: string;
   type = OrderType.sales
@@ -2484,13 +2486,16 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
   deposit = 0;
 
   /** number of minutes within deposit needs to be paid */
+  @Type(() => Number)
   depositMins?: number = 60
 
+  @Type(() => Number)
   depositBy?: number  // format: yyyyMMddHHmmss
 
   @Type(() => Number)
   paid = 0;
 
+  @Type(() => Number)
   nrOfPersons = 1;
 
   @Type(() => OrderPerson)

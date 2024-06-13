@@ -46,6 +46,10 @@ export class OrderMgmtService {
     }
 
 
+    async test() {
+        this.alteaDb.getOrders()
+    }
+
 
 
 

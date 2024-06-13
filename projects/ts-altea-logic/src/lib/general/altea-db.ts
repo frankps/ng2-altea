@@ -2,6 +2,7 @@ import { ApiListResult, ApiResult, ApiStatus, DateHelper, DbObject, DbObjectCrea
 import { Branch, Gift, Subscription, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template, OrderLine, BankTransaction, Message, LoyaltyProgram, LoyaltyCard } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { IDb } from '../interfaces/i-db'
+import { stat } from 'fs'
 
 
 
@@ -98,15 +99,19 @@ export class AlteaDb {
         return templates
     }
 
-    async getOrders(state: OrderState): Promise<Order[]> {
+    async getOrders(state?: OrderState, take: number = 10): Promise<Order[]> {
 
         const qry = new DbQueryTyped<Order>('order', Order)
         // qry.and('branchId', QueryOperator.equals, branchId)
-        qry.and('state', QueryOperator.equals, state)
 
-        const templates = await this.db.query$<Order>(qry)
+        if (state)
+            qry.and('state', QueryOperator.equals, state)
 
-        return templates
+        qry.take = take
+
+        const orders = await this.db.query$<Order>(qry)
+
+        return orders
     }
 
 
@@ -296,7 +301,7 @@ export class AlteaDb {
         }
 
     */
-    async getObjectById$<T  extends ObjectWithId>(typeName: string, type: { new(): T; }, id: string): Promise<T> {
+    async getObjectById$<T extends ObjectWithId>(typeName: string, type: { new(): T; }, id: string): Promise<T> {
 
         const qry = new DbQueryTyped<T>(typeName, type)
         qry.and('id', QueryOperator.equals, id)
@@ -306,7 +311,7 @@ export class AlteaDb {
         return object
     }
 
-    async getObjectsByIds<T  extends ObjectWithId>(typeName: string, type: { new(): T; }, ids: string[]): Promise<T[]> {
+    async getObjectsByIds<T extends ObjectWithId>(typeName: string, type: { new(): T; }, ids: string[]): Promise<T[]> {
 
         if (!Array.isArray(ids) || ids.length == 0)
             return []
