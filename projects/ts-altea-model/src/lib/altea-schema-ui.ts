@@ -8,7 +8,7 @@
  */
 
 import { Type } from "class-transformer"
-import { Contact, Order, OrderLine, OrderLineOption, OrderLineOptionValue } from "./altea-schema"
+import { Contact, Order, OrderLine, OrderLineOption, OrderLineOptionValue, PlanningType, Resource, ResourcePlanning } from "./altea-schema"
 import { ArrayHelper } from "ts-common"
 
 export class ObjectUi {
@@ -16,7 +16,7 @@ export class ObjectUi {
 }
 
 export class ContactUi extends ObjectUi {
-    
+
     name: string
     mobile?: string;
     email?: string;
@@ -32,6 +32,51 @@ export class ContactUi extends ObjectUi {
         contactUi.email = contact.email
 
         return contactUi
+    }
+}
+
+export class ResourceUi extends ObjectUi {
+    name: string
+    color?: string
+
+    static fromResource(resource: Resource) {
+
+        if (!resource)
+            return null
+
+        const resourceUi = new ResourceUi()
+        resourceUi.id = resource.id
+        resourceUi.name = resource.name
+        resourceUi.color = resource.color
+    }
+}
+
+
+export class ResourcePlanningUi extends ObjectUi {
+    start?: number
+    end?: number
+    prep: boolean = false
+    type: PlanningType
+
+    @Type(() => ResourceUi)
+    resource: ResourceUi
+
+    static fromResourcePlanning(planning: ResourcePlanning): ResourcePlanningUi {
+
+        if (!planning)
+            return null
+
+        const planningUi = new ResourcePlanningUi()
+        planningUi.start = planning.start
+        planningUi.end = planning.end
+        planningUi.prep = planning.prep
+        planningUi.type = planning.type
+
+        if (planning.resource)
+            planningUi.resource = ResourceUi.fromResource(planning.resource)
+
+        return planningUi
+
     }
 }
 
@@ -110,6 +155,9 @@ export class OrderUi extends ObjectUi {
     @Type(() => OrderLineUi)
     lines: OrderLineUi[] = []
 
+    @Type(() => ResourcePlanningUi)
+    planning: ResourcePlanningUi[] = []
+
     start?: number; // format: yyyyMMddHHmmss
     end?: number; // format: yyyyMMddHHmmss
 
@@ -136,6 +184,8 @@ export class OrderUi extends ObjectUi {
         if (ArrayHelper.NotEmpty(order.lines))
             orderUi.lines = order.lines.map(line => OrderLineUi.fromOrderLine(line))
 
+        if (ArrayHelper.NotEmpty(order.planning))
+            orderUi.planning = order.planning.map(plan => ResourcePlanningUi.fromResourcePlanning(plan))
 
         return orderUi
     }

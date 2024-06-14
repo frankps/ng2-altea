@@ -1,17 +1,17 @@
 import { Injectable } from '@angular/core';
-import { LoyaltyProgram, Order } from 'ts-altea-model'
+import { LoyaltyCard, Order } from 'ts-altea-model'
 import { BackendHttpServiceBase } from 'ng-common';
 import { HttpClient } from '@angular/common/http';
-import { SessionService } from './session.service';
+import { SessionService } from '../session.service';
 import { DbQuery } from 'ts-common';
 
 @Injectable({
   providedIn: 'root'
 })
-export class LoyaltyProgramService extends BackendHttpServiceBase<LoyaltyProgram> {
+export class LoyaltyCardService extends BackendHttpServiceBase<LoyaltyCard> {
 
   constructor(http: HttpClient, protected sessionSvc: SessionService) {
-    super(LoyaltyProgram, 'LoyaltyProgram', sessionSvc.backend, sessionSvc.branchUnique + '/loyalty-programs', http)
+    super(LoyaltyCard, 'LoyaltyCard', sessionSvc.backend, sessionSvc.branchUnique + '/loyalty-cards', http)
   }
 
 
@@ -20,3 +20,4 @@ export class LoyaltyProgramService extends BackendHttpServiceBase<LoyaltyProgram
 
 
 }
+

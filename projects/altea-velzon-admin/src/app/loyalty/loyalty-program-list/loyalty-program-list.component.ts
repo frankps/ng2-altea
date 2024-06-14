@@ -11,7 +11,7 @@ import { NgxSpinnerService } from "ngx-spinner"
 import * as _ from "lodash";
 
 import { tr } from 'date-fns/locale';
-import { LoyaltyProgramService } from 'projects/ng-altea-common/src/lib/loyalty-program.service';
+import { LoyaltyProgramService } from 'projects/ng-altea-common/src/lib/sql-object-svc/loyalty-program.service';
 
 @Component({
   selector: 'ngx-altea-loyalty-program-list',

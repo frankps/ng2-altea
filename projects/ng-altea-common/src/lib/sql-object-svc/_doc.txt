@@ -1,0 +1,8 @@
+The services in this directory all map to a specific table in the SQL database, 
+they all inherit from the BackendHttpServiceBase base class:
+
+    export class T extends BackendHttpServiceBase<T>
+
+These services are mainly used by the management UI, in order to configure each of these objects.
+
+

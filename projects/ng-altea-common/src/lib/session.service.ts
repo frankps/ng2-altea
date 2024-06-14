@@ -1,5 +1,5 @@
 import { Injectable, OnInit } from '@angular/core';
-import { ScheduleService } from './schedule.service';
+import { ScheduleService } from './sql-object-svc/schedule.service';
 import { DbQuery, QueryOperator } from 'ts-common';
 import { AppMode, Branch } from 'ts-altea-model';
 import * as Rx from "rxjs";

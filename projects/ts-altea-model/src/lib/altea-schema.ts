@@ -443,7 +443,7 @@ export class Contact extends ObjectWithId {
     this.name = components.join(' ')
   }
 
-  getName() : string {
+  getName(): string {
     let components = []
 
     if (this.first) {
@@ -1418,7 +1418,7 @@ export class MessageAddress {
   /** the name of the contact */
   name?: string
 
-  
+
 
 
   constructor(addr: string, name?: string, conId?: string) {
@@ -2431,6 +2431,7 @@ export class OrderCancel {
 
 export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  // 
 
+  static defaultInclude = ['lines:orderBy=idx.product.items', 'contact', 'payments:orderBy=idx']
   static jsonProps = ['vatLines', 'persons', 'info']
 
   organisation?: Organisation;
@@ -4863,7 +4864,7 @@ export class LoyaltyCard extends ObjectWithIdPlus {
 
   name?: string
   value: number = 0
-  
+
 }
 
 

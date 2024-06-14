@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { OrderMgrUiService } from '../order-mgr-ui.service';
 import { Gift, LoyaltyReward, Payment, PaymentType, Subscription } from 'ts-altea-model';
-import { GiftService } from '../../gift.service';
+import { GiftService } from '../../sql-object-svc/gift.service';
 import { SessionService } from '../../session.service';
-import { SubscriptionService } from '../../subscription.service';
+import { SubscriptionService } from '../../sql-object-svc/subscription.service';
 import { ArrayHelper, DbQuery, QueryOperator } from 'ts-common';
 import { AlteaService } from '../../altea.service';
 

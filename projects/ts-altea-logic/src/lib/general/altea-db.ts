@@ -2,8 +2,6 @@ import { ApiListResult, ApiResult, ApiStatus, DateHelper, DbObject, DbObjectCrea
 import { Branch, Gift, Subscription, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template, OrderLine, BankTransaction, Message, LoyaltyProgram, LoyaltyCard } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { IDb } from '../interfaces/i-db'
-import { stat } from 'fs'
-
 
 
 export class AlteaDb {

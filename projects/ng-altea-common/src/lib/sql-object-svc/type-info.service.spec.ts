@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
-
 import { TypeInfoService } from './type-info.service';
+
+//import { TypeInfoService } from '../type-info.service';
 
 describe('TypeInfoService', () => {
   let service: TypeInfoService;
