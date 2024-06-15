@@ -1,8 +1,10 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { DayService, WeekService, WorkWeekService, MonthService, AgendaService, MonthAgendaService, TimelineViewsService, TimelineMonthService, EventSettingsModel, Schedule, EventRenderedArgs } from '@syncfusion/ej2-angular-schedule';
 import { DataManager, ODataV4Adaptor, Query } from '@syncfusion/ej2-data';
 import * as dateFns from 'date-fns'
-import { OrderService, ResourcePlanningService } from 'ng-altea-common';
+import { Unsubscribe } from 'firebase/firestore';
+import { OrderFirestoreService, OrderService, ResourcePlanningService } from 'ng-altea-common';
+import { OrderUi, Resource, ResourcePlanningUi } from 'ts-altea-model';
 import { ApiListResult, DbQuery, QueryOperator, Translation, ApiResult, ApiStatus, DateHelper, ArrayHelper } from 'ts-common'
 /*
 https://ej2.syncfusion.com/angular/documentation/schedule/getting-started
@@ -18,9 +20,19 @@ Colors:
 
 
 
+Implement custom:
+https://www.syncfusion.com/forums/152013/using-a-custom-modal-onclick-in-scheduler-component
 
 
 */
+
+export class SyncFusSchedulerEvent {
+  action: "date" | "view"
+  currentDate: Date
+
+  currentView: "Day" | "Week" | "Month" | "WorkWeek" | "Agenda"
+
+}
 
 @Component({
   selector: 'app-sync-fus-scheduler',
@@ -28,149 +40,198 @@ Colors:
   styleUrls: ['./sync-fus-scheduler.component.scss'],
   providers: [DayService, WeekService, WorkWeekService, MonthService, AgendaService, MonthAgendaService, TimelineViewsService, TimelineMonthService]
 })
-export class SyncFusSchedulerComponent {
+export class SyncFusSchedulerComponent implements OnInit {
 
   i = 0
   @ViewChild('schedule') schedule: Schedule
 
-  public data: object[] = [{
-    Id: 1,
-    Subject: 'Meeting',
-    StartTime: new Date(2024, 5, 6, 10, 0),
-    EndTime: new Date(2024, 5, 6, 12, 30),
-    CategoryColor: 'red'
-  }];
+  public data: object[] = [];
 
+  currentView: "Day" | "Week" | "Month" | "WorkWeek" | "Agenda" = "Week"
+  startOfVisible: Date
+  endOfVisible: Date
 
   public eventSettings: EventSettingsModel = {
     dataSource: this.data
   }
 
-  constructor(private planningSvc: ResourcePlanningService) {
+  constructor(private planningSvc: ResourcePlanningService, private orderFirestore: OrderFirestoreService) {
 
     console.log(this.data)
+
+    //this.orderFirestore.getOrders()
+
   }
+
+  async ngOnInit() {
+    await this.showPlanningWeek() 
+    // await this.showOrderWeek()
+  }
+
+  /** event triggered by grid when changing dates */
+  async navigating(event: SyncFusSchedulerEvent) {
+
+    if (event.action == "view")
+      this.currentView = event.currentView
+
+    console.warn(event)
+
+
+    switch (this.currentView) {
+
+      case "Day":
+        this.startOfVisible = dateFns.startOfDay(event.currentDate)
+        this.endOfVisible = dateFns.endOfDay(event.currentDate)
+        break
+
+      case "Week":
+        this.startOfVisible = dateFns.startOfWeek(event.currentDate)
+        this.endOfVisible = dateFns.endOfWeek(event.currentDate)
+        break
+
+      case "Month":
+        this.startOfVisible = dateFns.startOfMonth(event.currentDate)
+        this.endOfVisible = dateFns.endOfMonth(event.currentDate)
+        break
+
+    }
+
+
+
+  //  await this.showOrdersBetween(this.startOfVisible, this.endOfVisible)
+    await this.showPlanningBetween(this.startOfVisible, this.endOfVisible)
+
+
+
+  }
+
 
   oneventRendered(args: any): void {
     let categoryColor: string = args.data["CategoryColor"] as string;
     if (!args.element || !categoryColor) {
-        return;
+      return;
     }
     if (this.schedule.currentView === 'Agenda') {
-        (args.element.firstChild as HTMLElement).style.borderLeftColor = categoryColor;
+      (args.element.firstChild as HTMLElement).style.borderLeftColor = categoryColor;
     } else {
-        args.element.style.backgroundColor = categoryColor;
+      args.element.style.backgroundColor = categoryColor;
     }
-}
+  }
 
 
-  /** event triggered by grid when changing dates */
-  async navigating(event) {
 
-    console.warn(event)
+  /** ----------------- For order view -------------------------- */
+  /*  =========================================================== */
 
-    const startOfVisible = dateFns.startOfWeek(event.currentDate)
-    const endOfVisible = dateFns.endOfWeek(event.currentDate)
+  orderUiToEvent(orderUi: OrderUi) {
 
-    let plannings = await this.getPlanningEvents(startOfVisible, endOfVisible)
-
-    let events = plannings.map(planning => ({
-      Id: planning.id,
-      Subject: planning.info ? planning.info.toString() + (planning.prep ? ' PREP' : '') : '',
-      StartTime: planning.startDate,
-      EndTime: planning.endDate,
+    return {
+      Id: orderUi.id,
+      Subject: orderUi.shortInfo(),
+      StartTime: orderUi.startDate,
+      EndTime: orderUi.endDate,
       CategoryColor: 'green'
-    }))
+    }
+
+  }
+
+  async showOrderWeek(date: Date = new Date()) {
+
+    const startOfVisible = dateFns.startOfWeek(date)
+    const endOfVisible = dateFns.endOfWeek(date)
+
+    await this.showOrdersBetween(startOfVisible, endOfVisible)
+  }
+
+  unsubscribe: Unsubscribe
+
+  async showOrdersBetween(start: Date, end: Date) {
+
+    if (this.unsubscribe)  // we unsubscribe from previous changes
+      this.unsubscribe()
+
+    this.unsubscribe = await this.orderFirestore.getOrderUisBetween(start, end, this.showOrderUis, this)
+
+  }
+
+  /** This is a callback function that is called by the OrderFirestoreService whenever there are changes to the visible orders 
+   *  Important: this.* will not work (because it's coming from callback context), instead use context.*
+  */
+  showOrderUis(context: SyncFusSchedulerComponent, orderUis: OrderUi[]) {
+    let events = []
+
+    if (ArrayHelper.AtLeastOneItem(orderUis)) {
+      console.warn(orderUis)
+      events = orderUis.map(orderUi => context.orderUiToEvent(orderUi))
+    }
 
     console.log(events)
 
-/*     if (ArrayHelper.AtLeastOneItem(this.data))
-      this.data.splice(0, this.data.length) */
+    context.data.splice(0, context.data.length)
+    context.data.push(...events)
 
-    this.data.push(...events)
-
-    this.schedule.refresh()
-
-    console.error(this.data)
-
-    /*
-    let start = dateFns.startOfDay(event.currentDate)
-    start = dateFns.addHours(start, 8 + this.i)
-
-    let end = dateFns.addHours(start, 1)
-
-    this.data.splice(0)
-
-    this.data.push({
-      Id: this.i++,
-      Subject: `Meeting ${this.i}`,
-      StartTime: start,
-      EndTime: end
-    })
-
-    console.log(this.data)
-*/
+    context.schedule.refresh()
   }
 
+  /** ----------------- For planning view ----------------------- */
+  /*  =========================================================== */
 
+  planningUiToEvent(planningUi: ResourcePlanningUi) {
 
-  async getPlanningEvents(start: Date, end: Date) {
-
-    const query = new DbQuery()
-    //query.and('appointment', QueryOperator.equals, true)
-    query.include('resource')
-    query.and('start', QueryOperator.greaterThanOrEqual, DateHelper.yyyyMMddhhmmss(start))
-    query.and('start', QueryOperator.lessThan, DateHelper.yyyyMMddhhmmss(end))
-    query.and('prep', QueryOperator.equals, false)  // no need to show preparation times
-    query.and('scheduleId', QueryOperator.equals, null)
-    query.and('act', QueryOperator.equals, true)  // only the active plannings
-
-    query.orderBy('start')
-    query.take = 50
-
-    var plannings = await this.planningSvc.query$(query)
-
-    return plannings
-
-    /*
-    result$.subscribe(res => {
-      if (res?.data) {
-        var plannings = res.data
-
-        console.error(plannings)
-
-        var events = plannings.map(planning => ({
-          id: planning.id,
-          title: planning.info ? planning.info.toString() + (planning.prep ? ' PREP' : '') : '',
-          start: this.fullCalendarDate(planning.start),
-          end: this.fullCalendarDate(planning.end),
-          source: planning,
-         // color: 'green',
-          backgroundColor: planning.resource?.color
-        }))
-
-        console.warn(events)
-
-        this.calendarOptions.events = events
-
-      }
-    }) */
+    return {
+      Id: planningUi.id,
+      Subject: planningUi.order?.shortInfo(),
+      StartTime: planningUi.startDate,
+      EndTime: planningUi.endDate,
+      CategoryColor: (planningUi.resource as Resource)?.color
+    }
 
   }
 
 
+  async showPlanningWeek(date: Date = new Date()) {
+
+    const startOfVisible = dateFns.startOfWeek(date)
+    const endOfVisible = dateFns.endOfWeek(date)
+
+    await this.showPlanningBetween(startOfVisible, endOfVisible)
+  }
 
 
-  /*
-      public readonly: boolean = false;
-      public selectedDate: Date = new Date(2020, 9, 20);
-      private dataManager: DataManager = new DataManager({
-         url: 'https://ej2services.syncfusion.com/production/web-services/api/Schedule',
-         adaptor: new ODataV4Adaptor,
-         crossDomain: true
-      });
-      public eventSettings: EventSettingsModel = { dataSource: this.dataManager };
+  async showPlanningBetween(start: Date, end: Date) {
+
+    if (this.unsubscribe)  // we unsubscribe from previous changes
+      this.unsubscribe()
+
+    this.unsubscribe = await this.orderFirestore.getPlanningUisBetween(start, end, this.showPlanningUis, this)
+
+  }
+
+  /** This is a callback function that is called by the OrderFirestoreService whenever there are changes to the visible orders 
+   *  Important: this.* will not work (because it's coming from callback context), instead use context.*
   */
+  showPlanningUis(context: SyncFusSchedulerComponent, planningUis: ResourcePlanningUi[]) {
+    let events = []
+
+    if (ArrayHelper.AtLeastOneItem(planningUis)) {
+      console.warn(planningUis)
+      events = planningUis.map(planningUi => context.planningUiToEvent(planningUi))
+    }
+
+    console.log(events)
+
+    context.data.splice(0, context.data.length)
+    context.data.push(...events)
+
+    context.schedule.refresh()
+  }
+
+
+
+
+
+
+
 
 
 }

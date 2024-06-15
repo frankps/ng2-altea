@@ -1,6 +1,6 @@
 import { Component, Output, EventEmitter, OnInit } from '@angular/core';
 import { OrderMgrUiService } from '../order-mgr-ui.service';
-import { ResourceService } from '../../sql-object-svc/resource.service';
+import { ResourceService } from '../../data-services/sql/resource.service';
 import { ArrayHelper, DbQuery, QueryOperator } from 'ts-common';
 import { Resource, ResourceType } from 'ts-altea-model';
 

@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { LoyaltyProgram, Order } from 'ts-altea-model';
-import { LoyaltyProgramService } from '../../sql-object-svc/loyalty-program.service';
+import { LoyaltyProgramService } from '../../data-services/sql/loyalty-program.service';
 import { SessionService } from '../../session.service';
 import { LoyaltyUi, LoyaltyUiCard } from 'ts-altea-logic';
 import { OrderMgrUiService } from '../order-mgr-ui.service';

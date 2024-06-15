@@ -8,11 +8,16 @@
  */
 
 import { Type } from "class-transformer"
-import { Contact, Order, OrderLine, OrderLineOption, OrderLineOptionValue, PlanningType, Resource, ResourcePlanning } from "./altea-schema"
-import { ArrayHelper } from "ts-common"
+import { Contact, Order, OrderLine, OrderLineOption, OrderLineOptionValue, OrderState, PlanningType, Resource, ResourcePlanning, ResourceType } from "./altea-schema"
+import { ArrayHelper, DateHelper, ObjectWithId } from "ts-common"
 
 export class ObjectUi {
     id: string
+
+    constructor(id?: string) {
+        if (id)
+            this.id = id
+    }
 }
 
 export class ContactUi extends ObjectUi {
@@ -38,6 +43,7 @@ export class ContactUi extends ObjectUi {
 export class ResourceUi extends ObjectUi {
     name: string
     color?: string
+    type?: ResourceType
 
     static fromResource(resource: Resource) {
 
@@ -48,6 +54,9 @@ export class ResourceUi extends ObjectUi {
         resourceUi.id = resource.id
         resourceUi.name = resource.name
         resourceUi.color = resource.color
+        resourceUi.type = resource.type
+
+        return resourceUi
     }
 }
 
@@ -59,7 +68,17 @@ export class ResourcePlanningUi extends ObjectUi {
     type: PlanningType
 
     @Type(() => ResourceUi)
-    resource: ResourceUi
+    resource: ResourceUi | ObjectUi | Resource
+
+    order?: OrderUi
+
+    get startDate() {
+        return DateHelper.parse(this.start)
+    }
+
+    get endDate() {
+        return DateHelper.parse(this.end)
+    }
 
     static fromResourcePlanning(planning: ResourcePlanning): ResourcePlanningUi {
 
@@ -74,6 +93,8 @@ export class ResourcePlanningUi extends ObjectUi {
 
         if (planning.resource)
             planningUi.resource = ResourceUi.fromResource(planning.resource)
+        else
+            planningUi.resource = new ObjectUi(planning.resourceId)
 
         return planningUi
 
@@ -127,6 +148,18 @@ export class OrderLineUi extends ObjectUi {
     @Type(() => OrderLineOptionUi)
     options: OrderLineOptionUi[] = []
 
+    shortInfo() : string {
+        let info = ''
+
+        if (this.qty && this.qty > 1)
+            info += '' + this.qty + 'x'
+
+        if (this.descr)
+            info += this.descr
+
+        return info
+    }
+
     static fromOrderLine(line: OrderLine): OrderLineUi {
 
         if (!line)
@@ -164,6 +197,34 @@ export class OrderUi extends ObjectUi {
     paid = 0
     deposit = 0
     incl = 0
+    state?: OrderState
+
+    get startDate() {
+        return DateHelper.parse(this.start)
+    }
+
+    get endDate() {
+        return DateHelper.parse(this.end)
+    }
+
+    shortInfo() : string {
+        
+        let info = ''
+        
+        if (this.contact)
+            info += this.contact.name
+
+        if (ArrayHelper.NotEmpty(this.lines)) {
+
+            let lineInfos = this.lines.map(line => line.shortInfo())
+            let lineInfo = lineInfos.join(' ')
+            info += ` ${lineInfo}`
+        }
+
+
+        return info
+
+    }
 
     static fromOrder(order: Order): OrderUi {
 
@@ -177,6 +238,7 @@ export class OrderUi extends ObjectUi {
         orderUi.paid = order.paid
         orderUi.deposit = order.deposit
         orderUi.incl = order.incl
+        orderUi.state = order.state
 
         if (order.contact)
             orderUi.contact = ContactUi.fromContact(order.contact)

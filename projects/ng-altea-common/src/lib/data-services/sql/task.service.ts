@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Task } from 'ts-altea-model'
 import { BackendHttpServiceBase } from'ng-common';
 import { HttpClient } from '@angular/common/http';
-import { SessionService } from '../session.service';
+import { SessionService } from '../../session.service';
 
 import { Firestore, collection, collectionData, addDoc, CollectionReference, updateDoc, serverTimestamp, doc, docData, DocumentChange, DocumentData } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';

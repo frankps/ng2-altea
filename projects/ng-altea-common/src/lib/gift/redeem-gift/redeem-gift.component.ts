@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/cor
 import { TranslationService } from 'ng-common'
 import { SessionService } from '../../session.service';
 import { Branch, Gift, GiftType, RedeemGift } from 'ts-altea-model';
-import { GiftService } from '../../sql-object-svc/gift.service';
+import { GiftService } from '../../data-services/sql/gift.service';
 import { DbQuery, QueryOperator } from 'ts-common';
 
 

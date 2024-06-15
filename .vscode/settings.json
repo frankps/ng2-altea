@@ -27,6 +27,10 @@
         {
             "filePath": "projects/altea-pub-app/src/assets/ui.json",
             "group": "Default"
+        },
+        {
+            "filePath": "projects/ts-altea-model/src/lib/altea-schema-ui.ts",
+            "group": "Default"
         }
     ]
 }

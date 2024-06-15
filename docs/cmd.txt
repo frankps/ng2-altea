@@ -43,6 +43,10 @@ Test:
 
 
 
+New firestore service:
+    ng generate service data-services/firestore/orderFirestore --project=ng-altea-common
+
+
 New component:
 
 ng generate component calendar/syncFusScheduler --project=altea-velzon-admin
