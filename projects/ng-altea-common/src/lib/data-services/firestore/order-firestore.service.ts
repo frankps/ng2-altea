@@ -114,16 +114,18 @@ export class OrderFirestoreService {
     if (planningUis.length == 1)
       return first
 
+    // since there is a circular reference order.plannings.order, we need to cut the circle temporarly before cloning
     let tempOrder = first.order
     first.order = null
 
     let clone = ObjectHelper.clone(first, ResourcePlanningUi)
+
+    // put back the orders
     first.order = tempOrder
     clone.order = tempOrder
 
-
-    clone.start = _.minBy(planningUis.filter(plan => plan.start > 0), 'start').start
-    clone.end = _.maxBy(planningUis.filter(plan => plan.end > 0), 'end').end
+    clone.start = _.minBy(planningUis.filter(plan => plan.start && plan.start > 0), 'start').start
+    clone.end = _.maxBy(planningUis.filter(plan => plan.end && plan.end > 0), 'end').end
 
     return clone
   }
