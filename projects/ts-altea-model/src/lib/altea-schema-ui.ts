@@ -10,6 +10,7 @@
 import { Type } from "class-transformer"
 import { Contact, Order, OrderLine, OrderLineOption, OrderLineOptionValue, OrderState, PlanningType, Resource, ResourcePlanning, ResourceType } from "./altea-schema"
 import { ArrayHelper, DateHelper, ObjectWithId } from "ts-common"
+import * as _ from "lodash";
 
 export class ObjectUi {
     id: string
@@ -86,6 +87,7 @@ export class ResourcePlanningUi extends ObjectUi {
             return null
 
         const planningUi = new ResourcePlanningUi()
+        planningUi.id = planning.id
         planningUi.start = planning.start
         planningUi.end = planning.end
         planningUi.prep = planning.prep
@@ -217,10 +219,12 @@ export class OrderUi extends ObjectUi {
         if (ArrayHelper.NotEmpty(this.lines)) {
 
             let lineInfos = this.lines.map(line => line.shortInfo())
+            lineInfos = _.uniq(lineInfos)
             let lineInfo = lineInfos.join(' ')
             info += ` ${lineInfo}`
         }
 
+        info += ` €${this.paid}/${this.incl}`
 
         return info
 

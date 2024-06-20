@@ -42,6 +42,7 @@ export class FormCardSectionComponent {  //  implements OnInit
   @Input() showAddButton = false
 
   @Input() enableSave = true
+  @Input() enableDelete = false
 
   @Input() help: string | undefined
   
@@ -53,6 +54,7 @@ export class FormCardSectionComponent {  //  implements OnInit
   @Output() cancel: EventEmitter<string> = new EventEmitter()
   @Output() save: EventEmitter<string> = new EventEmitter()
   @Output() add: EventEmitter<string> = new EventEmitter()
+  @Output() delete: EventEmitter<string> = new EventEmitter()
 
   @Output() editModeChanged: EventEmitter<FormCardSectionEventData> = new EventEmitter()
 
@@ -71,6 +73,12 @@ export class FormCardSectionComponent {  //  implements OnInit
   triggerSave() {
     //  this.editMode = false
     this.save.emit(this.sectionId)
+  }
+
+  triggerDelete() {
+    //  this.editMode = false
+    this.delete.emit(this.sectionId)
+    this.stopEdit()
   }
 
   triggerCancel() {

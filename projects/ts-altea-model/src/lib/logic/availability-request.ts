@@ -30,6 +30,12 @@ export class AvailabilityRequest {
         this.to = order!.start!
 
     }
+
+    getDateRange() : DateRange {
+
+        return DateRange.fromNumbers(this.from, this.to)
+
+    }
 }
 
 export class AvailabilityDebugInfo {

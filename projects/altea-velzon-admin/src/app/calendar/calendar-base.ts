@@ -4,38 +4,38 @@ import { Unsubscribe } from 'firebase/firestore';
 import { OrderFirestoreService } from "ng-altea-common";
 import { ArrayHelper } from "ts-common";
 
-export abstract class CalendarBase {   // <T extends CalendarBase<any>>
 
-    public data: object[] = [];
+/**
+ *  We want to separate calendar specific functionality (by specific providers: full calendar/syncfusion)
+ *  from general functionality (fetching data from back-end)
+ * 
+ *  A calendar can show:
+ *    orders
+ * 
+ *    resource plannings 
+ */
+export abstract class CalendarBase { 
 
+    public events: object[] = []
+
+    unsubscribe: Unsubscribe
 
     constructor(protected orderFirestore: OrderFirestoreService,) {
-
     }
 
     abstract refreshSchedule() 
     
-    /*{
-        console.log('test')
+    abstract orderUiToEvent(orderUi: OrderUi) 
 
-    }*/
+    abstract planningUiToEvent(planningUi: ResourcePlanningUi)
 
-    unsubscribe: Unsubscribe
+
+    
 
     /** ----------------- For order view -------------------------- */
     /*  =========================================================== */
 
-    static orderUiToEvent(orderUi: OrderUi) {
 
-        return {
-            Id: orderUi.id,
-            Subject: orderUi.shortInfo(),
-            StartTime: orderUi.startDate,
-            EndTime: orderUi.endDate,
-            CategoryColor: 'green'
-        }
-
-    }
 
     async showOrderWeek(date: Date = new Date()) {
 
@@ -64,13 +64,13 @@ export abstract class CalendarBase {   // <T extends CalendarBase<any>>
 
         if (ArrayHelper.AtLeastOneItem(orderUis)) {
             console.warn(orderUis)
-            events = orderUis.map(orderUi => CalendarBase.orderUiToEvent(orderUi))
+            events = orderUis.map(orderUi => context.orderUiToEvent(orderUi))
         }
 
         console.log(events)
 
-        context.data.splice(0, context.data.length)
-        context.data.push(...events)
+        context.events.splice(0, context.events.length)
+        context.events.push(...events)
 
         this.refreshSchedule()
     }
@@ -78,18 +78,13 @@ export abstract class CalendarBase {   // <T extends CalendarBase<any>>
     /** ----------------- For planning view ----------------------- */
     /*  =========================================================== */
 
-    planningUiToEvent(planningUi: ResourcePlanningUi) {
+    async showPlanningDay(date: Date = new Date()) {
 
-        return {
-            Id: planningUi.id,
-            Subject: planningUi.order?.shortInfo(),
-            StartTime: planningUi.startDate,
-            EndTime: planningUi.endDate,
-            CategoryColor: (planningUi.resource as Resource)?.color
-        }
+        const startOfVisible = dateFns.startOfDay(date)
+        const endOfVisible = dateFns.endOfDay(date)
 
+        await this.showPlanningBetween(startOfVisible, endOfVisible)
     }
-
 
     async showPlanningWeek(date: Date = new Date()) {
 
@@ -122,8 +117,8 @@ export abstract class CalendarBase {   // <T extends CalendarBase<any>>
 
         console.log(events)
 
-        context.data.splice(0, context.data.length)
-        context.data.push(...events)
+        context.events.splice(0, context.events.length)
+        context.events.push(...events)
 
         context.refreshSchedule()
     }

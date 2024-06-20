@@ -46,30 +46,42 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
   i = 0
   @ViewChild('schedule') schedule: Schedule
 
+  public timeFormat: string = "HH:mm";
   currentView: "Day" | "Week" | "Month" | "WorkWeek" | "Agenda" = "Week"
   startOfVisible: Date
   endOfVisible: Date
 
   public eventSettings: EventSettingsModel = {
-    dataSource: this.data
+    dataSource: this.events
   }
 
   constructor(private planningSvc: ResourcePlanningService, orderFirestore: OrderFirestoreService) {
     super(orderFirestore)
 
     //this.implementation = this
-    console.log(this.data)
+    console.log(this.events)
 
     //this.orderFirestore.getOrders()
 
   }
 
   async ngOnInit() {
-    await this.showPlanningWeek()
+
+    const refDate = new Date(2024,5, 17)
+
+    await this.showPlanningWeek(refDate)
+    this.currentView = "Week"
+    this.schedule.currentView = "Week"  //changeView("Day")
+    this.schedule.selectedDate = refDate // dateFns.addHours(refDate, 12)
+
+
+    
+
+    // await this.showPlanningWeek()
     // await this.showOrderWeek()
   }
 
-  override refreshSchedule() {
+  refreshSchedule() {
     this.schedule.refresh()
   }
 
@@ -118,6 +130,28 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
     }
   }
 
+  orderUiToEvent(orderUi: OrderUi) {
+
+    return {
+      Id: orderUi.id,
+      Subject: orderUi.shortInfo(),
+      StartTime: orderUi.startDate,
+      EndTime: orderUi.endDate,
+      CategoryColor: 'green'
+    }
+  }
+
+  planningUiToEvent(planningUi: ResourcePlanningUi) {
+
+    return {
+      Id: planningUi.id,
+      Subject: planningUi.order?.shortInfo(),
+      StartTime: planningUi.startDate,
+      EndTime: planningUi.endDate,
+      CategoryColor: (planningUi.resource as Resource)?.color
+    }
+
+  }
 
 
 

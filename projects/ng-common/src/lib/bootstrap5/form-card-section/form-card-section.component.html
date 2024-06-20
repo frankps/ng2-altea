@@ -22,6 +22,11 @@
           <i class="fas fa-save"></i> {{ 'dic.save' | translate }}
         </button>
 
+        <button class="btn btn-light btn-sm float-end me-2" [hidden]="!enableDelete" [disabled]="!enableDelete" (click)="triggerDelete()">
+          <i class="fas fa-trash"></i> {{ 'dic.delete' | translate }}
+        </button>
+
+
         <button class="btn btn-outline-light btn-sm float-end me-2" (click)="triggerCancel()">
           <i class="far fa-times"></i> {{ 'dic.cancel' | translate }}
         </button>

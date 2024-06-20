@@ -66,6 +66,22 @@ export class ObjectCache<T extends ObjectWithId> {
 
   }
 
+  deleteObject(id: string): boolean {
+
+    if (ArrayHelper.IsEmpty(this.objects) || !id)
+      return false
+
+    const idx = this.objects.findIndex(obj => obj.id == id)
+
+    if (idx == -1)
+      return false
+
+    this.objects.splice(idx, 1)
+
+    console.warn(`Object with id ${id} removed from cache`)
+    return true
+  }
+
 
 
 }
@@ -121,14 +137,14 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
 
     if (this.caching) {
 
-      
+
       let cachedObject = this.cache.objects.find(obj => obj.id == id)
 
       if (cachedObject) {
         console.warn('From cache:', cachedObject)
         return of(cachedObject)
       }
-        
+
 
     }
 
@@ -489,12 +505,12 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
   }
 
 
-/*
-  const loyaltyProgramQry = new DbQuery()
-  loyaltyProgramQry.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
-  //loyaltyProgramQry.include('groups.group', 'schedules:orderBy=idx.planning', 'children.child', 'user')
-  loyaltyProgramQry.take = 1000
-*/
+  /*
+    const loyaltyProgramQry = new DbQuery()
+    loyaltyProgramQry.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
+    //loyaltyProgramQry.include('groups.group', 'schedules:orderBy=idx.planning', 'children.child', 'user')
+    loyaltyProgramQry.take = 1000
+  */
 
   /**  Generic caching algorithm
    * 
@@ -652,6 +668,12 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
 
         break
 
+      case ObjectChangeType.delete:
+
+        if (this.cache.deleteObject(objectChange.objectId()))
+          this.writeCacheToStorage()
+        break
+
       case ObjectChangeType.update:
       case ObjectChangeType.softDelete:
         {
@@ -707,6 +729,58 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
     this.writeCacheToStorage()
 
     return obj
+
+  }
+
+  /** refresh objects in the cache & saves cache to storage */
+  async refreshCachedObjectsFromBackend(ids: string[]): Promise<T[]> {
+
+    console.warn(' ---- refreshCachedObjectsFromBackend ----- ')
+    if (ArrayHelper.IsEmpty(ids))
+      return []
+
+    let qry = new DbQuery()
+    qry.and('id', QueryOperator.in, ids)
+    qry.includes = this.cacheQuery.includes  // include all necessary linked objects
+
+    const dbObjects = await this.query$(qry, false)
+    let existingDbIds = []
+
+    if (ArrayHelper.NotEmpty(dbObjects)) {
+      existingDbIds = dbObjects.map(dbObj => dbObj.id)
+
+      for (let dbObject of dbObjects) {
+        console.error(dbObjects)
+
+        let idx = _.findIndex(this.cache.objects, obj => obj.id == dbObject.id)
+
+
+        if (idx >= 0) // remove & replace item in cache
+          this.cache.objects.splice(idx, 1, dbObject)
+        else
+          this.cache.objects.push(dbObject)
+
+      }
+    }
+
+    let nonExistingDbIds = ids.filter(id => existingDbIds.indexOf(id) == -1)
+
+    if (ArrayHelper.NotEmpty(nonExistingDbIds)) {
+
+      for (let id of nonExistingDbIds) {
+        let idx = _.findIndex(this.cache.objects, obj => obj.id == id)
+
+        if (idx >= 0) // remove & replace item in cache
+          this.cache.objects.splice(idx, 1)
+      }
+
+    }
+
+
+
+    this.writeCacheToStorage()
+
+    return dbObjects
 
   }
 

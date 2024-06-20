@@ -108,9 +108,10 @@ export class AvailabilityService {
 
 
         /** If an order contains multiple treatments for the same customer, then we will try to allocate same resources (staff & room) for this customer.  */
+/*
         const optimizedRequests = ResourceRequestOptimizer.I.optimize(...initialResourceRequests)
         if (availabilityRequest.debug) response.debug.resourceRequests.push(...optimizedRequests)
-
+*/
 
 
         /** Look for possibilities: first we try to find solutions for the optimized resource request,

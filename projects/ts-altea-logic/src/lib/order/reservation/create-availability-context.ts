@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ApiListResult, ArrayHelper, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
-import { AvailabilityRequest, Order, AvailabilityContext, Resource, ResourcePlanning, ResourceType, Schedule, SchedulingType, DateRangeSet, ResourcePlannings } from 'ts-altea-model'
+import { AvailabilityRequest, Order, AvailabilityContext, Resource, ResourcePlanning, ResourceType, Schedule, SchedulingType, DateRangeSet, ResourcePlannings, BranchModeRange, DateRange } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { AlteaDb } from '../../general/altea-db'
 import { IDb } from '../../interfaces/i-db'
@@ -57,7 +57,7 @@ export class CreateAvailabilityContext {
 
         ctx.resourcePlannings = await this.loadResourcePlannings(ctx.allResourceIds, availabilityRequest)
 
-        /* Load schedules of resources that have custom scheduling*/
+        /* Load schedules of resources that have custom scheduling */
         const resourcesWithCustomSchedules = ctx.allResources.filter(r => r.customSchedule)
         const resourceIdsWithCustomSchedules = resourcesWithCustomSchedules.map(r => r.id!)
         //resourceIdsWithCustomSchedules.push(ctx.branchId)
@@ -65,8 +65,13 @@ export class CreateAvailabilityContext {
 
         ctx.scheduleDateRanges = this.createScheduleDateRanges(resourceIdsWithCustomSchedules, ctx.schedules, availabilityRequest.from, availabilityRequest.to, ctx.resourcePlannings)
 
+
+        
+
         return ctx
     }
+
+    
 
 
 
@@ -160,9 +165,14 @@ export class CreateAvailabilityContext {
                 }
                 */
 
+        const wellnessId = 'b39b2d8a-9a06-46b8-8334-4fc400cfc2c5'
+
         for (const resourceId of resourceIds) {
 
             // start with the default schedule
+
+            if (resourceId == wellnessId)  // for debugging
+                console.warn('Handling wellness!!')
 
             const resourceSchedules = schedules.filter(s => s.resourceId == resourceId)
 

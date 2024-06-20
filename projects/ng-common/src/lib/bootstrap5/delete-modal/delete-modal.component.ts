@@ -70,6 +70,7 @@ export class DeleteModalComponent {
     this.objectSvc?.delete(this.object.id).subscribe(res => {
       console.error(res)
 
+
       me.postDelete(modal, res)
     })
 

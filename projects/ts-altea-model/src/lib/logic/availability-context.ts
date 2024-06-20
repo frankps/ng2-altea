@@ -4,6 +4,7 @@ import * as _ from "lodash";
 import { TimeSpan } from "./dates/time-span";
 import { AvailabilityRequest } from "./availability-request";
 import { ResourceOccupationSets, DateRange, DateRangeSet } from "./dates";
+import { BranchModeRange } from "./branch-mode";
 
 
 export class BranchSchedule {
@@ -42,6 +43,9 @@ export class AvailabilityContext {
 
     /** Schedules converted to specific dates monday 09:00 till 17:00 -> [04/12/2022 09:00, 04/12/2022 17:00]. Map is indexed by resourceId.   */
     scheduleDateRanges = new Map<string, DateRangeSet>()
+
+    /** Other configs can be dependent upon the branch-mode (example: resource plannings) */
+    branchModes: BranchModeRange[]
 
     timeUnite = TimeUnit.minutes
 
@@ -153,6 +157,27 @@ export class AvailabilityContext {
         return this.getDefaultSchedule(this.branchId)
 
     }
+
+
+    getBranchModeRanges(dateRange: DateRange): BranchModeRange[] {
+
+        const branchSchedules = this.getBranchSchedules(dateRange)
+
+        const modes = []
+
+        for (var i = 0; i < branchSchedules.byDate.length - 1; i++) {
+
+            const branchSchedule = branchSchedules.byDate[i]
+            const nextSchedule = branchSchedules.byDate[i + 1]
+
+            const branchMode = new BranchModeRange(branchSchedule.start, nextSchedule.start, branchSchedule.schedule)
+            modes.push(branchMode)
+        }
+
+        return modes
+
+    }
+
 
     /** returns all the schedules ordered per date within requested dateRange, starting with the schedule on dateRange.from, and ending with the schedule on dateRange.to.
      * So the array contains at least 2 items.
@@ -299,25 +324,44 @@ export class AvailabilityContext {
         if (!Array.isArray(this.schedules) || this.schedules.length == 0)
             return undefined
 
-        let schedules = this.schedules.filter(s => s.resourceId === resourceId)
-        let scheduleIds = schedules.map(s => s.id)
+        let resourceSchedules = this.schedules.filter(s => s.resourceId === resourceId)
+        let scheduleIds = resourceSchedules.map(s => s.id)
 
         // look for schedules active on given date
         let plannings = this.resourcePlannings.filterBySchedulesDateRange2(scheduleIds, date, date)
 
-        // if not found, return default schedule
-        if (plannings.isEmpty()) {
-            let defaultSchedule = schedules.find(s => s.default)
-            return defaultSchedule
+        
+        if (plannings.notEmpty()) {
+            // planning is found for a schedule => then return that schedule
+            let planning = plannings.plannings[0]
+            let scheduleId = planning.scheduleId
+
+            let schedule = this.schedules.find(s => s.id == scheduleId)
+
+            return schedule
         }
 
-        // planning is found for a schedule => then return that schedule
-        let planning = plannings.plannings[0]
-        let scheduleId = planning.scheduleId
+        // if not found, check if plannings are inherited from branch
 
-        let schedule = this.schedules.find(s => s.id == scheduleId)
+        let branchScheduleIds = resourceSchedules.flatMap(schedule => schedule.scheduleIds)
+        let branchPlannings = this.resourcePlannings.filterBySchedulesDateRange2(branchScheduleIds, date, date)
 
-        return schedule
+        if (branchPlannings.notEmpty()) {
+            let branchPlanning = branchPlannings.plannings[0]
+            let branchScheduleId = branchPlanning.scheduleId
+
+            let schedule = this.schedules.find(schedule => schedule.scheduleIds.indexOf(branchScheduleId) >= 0)
+            return schedule
+        }
+
+
+        // if not found, return default schedule
+
+        let defaultSchedule = resourceSchedules.find(s => s.default)
+        return defaultSchedule
+
+
+
     }
 
     getResourceOccupation(resourceId: string): ResourceOccupationSets {

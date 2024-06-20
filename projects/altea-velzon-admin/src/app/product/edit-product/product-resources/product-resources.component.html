@@ -60,9 +60,10 @@
                             </div>
                         </ng-container>
 
-                        <div class="row" *ngIf="obj.resource.type == 'group' && obj.groupAlloc">
+                        <div class="row" *ngIf="obj.resource.isGroup && obj.groupAlloc">
                             <div class="col">
                                 <span style="color: purple;">{{ 'objects.prodRes.help.groupAlloc' | translate }}</span>
+                                &nbsp; <span style="color: red;" *ngIf="obj.groupQty > 1">Aantal resources: {{obj.groupQty}}!</span>
                             </div>
                         </div>
 

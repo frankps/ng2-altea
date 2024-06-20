@@ -25,7 +25,7 @@
 
   </div>
 
-<!--   Pristine:{{resourceGeneralForm.form.pristine}}   Valid:{{resourceGeneralForm.form.valid}} -->
+  <!--   Pristine:{{resourceGeneralForm.form.pristine}}   Valid:{{resourceGeneralForm.form.valid}} -->
 
   <ngx-altea-form-card-section sectionName="ui.resource.edit.sections.general.title" sectionId="general"
     [editSectionId]="editSectionId" [icon]="ResourceTypeIcons[object.type]" (save)="save()" (cancel)="cancel()"
@@ -34,7 +34,7 @@
     <ng-container readonly>
       <!-- <div>{{ object.descr }}</div> -->
 
-      
+
 
       <ngx-altea-label-value label="objects.product.descr" [value]="object.descr"
         empty="objects.product.no-descr"></ngx-altea-label-value>
@@ -249,11 +249,10 @@
   <ng-container *ngIf="object.customSchedule && object.schedules?.length > 0">
 
 
-    <ngx-altea-form-card-section
-      sectionName="{{'ui.resource.edit.sections.schedule.title' | translate}}  {{schedule.name}}"
-      *ngFor="let schedule of object.schedules; let idx = index" sectionId="schedule" [sectionParam]="schedule.id"
-      [editSectionId]="editSectionId" [editSectionParam]="editSectionParam" icon="fa-duotone fa-clock" (save)="save()"
-      (cancel)="cancel()" (editModeChanged)="editModeChanged($event)">
+    <ngx-altea-form-card-section *ngFor="let schedule of object.schedules; let idx = index"
+      sectionName="{{'ui.resource.edit.sections.schedule.title' | translate}}  {{schedule.name}}" sectionId="schedule"
+      [sectionParam]="schedule.id" [editSectionId]="editSectionId" [editSectionParam]="editSectionParam" [enableDelete]="true"
+      icon="fa-duotone fa-clock" (save)="save()" (cancel)="cancel()" (delete)="deleteSchedule(schedule, idx)" (editModeChanged)="editModeChanged($event)">
 
       <ng-container readonly>
 

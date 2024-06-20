@@ -154,6 +154,16 @@ export class EditResourceComponent extends NgEditBaseComponent<Resource> impleme
   }
 
 
+  async deleteSchedule(schedule: Schedule, idx: number) {
+
+    console.warn('deleteSchedule')
+    this.object.schedules.splice(idx, 1)
+
+    var res = await this.scheduleSvc.delete$(schedule.id)
+
+    console.log(res)
+
+  }
 
 
   createSchedule() {

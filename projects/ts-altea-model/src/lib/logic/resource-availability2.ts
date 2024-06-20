@@ -26,6 +26,10 @@ export class ResourceAvailability2 {
 
             const resourceId = resource.id!
 
+            let frankId = 'cc682b80-6243-4ac5-92a9-5ceed36111a4'
+            if (resourceId == frankId)
+                console.error(' FRANK FOUND ----')
+
             /** get the outer boundaries for this resource */
             let normalScheduleRanges: DateRangeSet //= ctx.scheduleDateRanges.get(resourceId)
 
@@ -162,6 +166,9 @@ export class ResourceAvailability2 {
 
     getAvailabilitiesForResource(resource: Resource, minTime?: TimeSpan): DateRangeSet {
 
+       // console.warn(`getAvailabilitiesForResource(${resource})`)
+
+
         if (!resource?.id || !this.availability)  //  || !this.availability.has(resource.id)
             return DateRangeSet.empty
 
@@ -251,7 +258,15 @@ export class ResourceAvailability2 {
                             availableResources.push(resource)
 
                             result.addNote(`Preparation time outside schedule for ${resource.name} at ${dateFns.format(dateRange.from, 'dd/MM HH:mm')} allowed!`)
+                            
+                            // for debugging
+                            activeSchedule = this.ctx.getScheduleOnDate(resource.id, dateRange.from)
+                            insideSchedule = activeSchedule.isInsideSchedule(dateRange)
+                            outsideSchedule = !insideSchedule
+                            preparationsOutsideScheduleOk = !activeSchedule.prepIncl
+
                             continue
+
                         }
 
                     } else {

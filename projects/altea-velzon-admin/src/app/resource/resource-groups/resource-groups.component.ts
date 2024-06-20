@@ -4,7 +4,7 @@ import { Gender, OnlineMode, Product, Price, DaysOfWeekShort, ProductTypeIcons, 
 import { FormCardSectionEventData, ToastType, TranslationService } from 'ng-common'
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxModalComponent } from 'ng-common';
-import { ListSectionMode, BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, Translation, ObjectHelper, DbQuery, QueryOperator, CollectionChangeTracker, ObjectWithId, ApiStatus } from 'ts-common'
+import { ListSectionMode, BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, Translation, ObjectHelper, DbQuery, QueryOperator, CollectionChangeTracker, ObjectWithId, ApiStatus, ArrayHelper } from 'ts-common'
 import * as _ from "lodash";
 import { NgxSpinnerService } from "ngx-spinner"
 
@@ -161,6 +161,38 @@ export class ResourceGroupsComponent {
     this.parent.cancel()
   }
 
+
+  impactedResourceIds(batch: ApiBatchProcess<ResourceLink>): string[] {
+
+    if (!batch.hasChanges())
+      return []
+
+    let resourceIds = []
+
+
+    if (ArrayHelper.NotEmpty(batch.create)) {
+      for (let resourceLink of batch.create)
+        resourceIds.push(resourceLink.childId, resourceLink.groupId)
+    }
+
+    if (ArrayHelper.NotEmpty(batch.update)) {
+      for (let obj of batch.update) {
+        let resourceLink = obj as ResourceLink
+        resourceIds.push(resourceLink.childId, resourceLink.groupId)
+      }
+    }
+
+    if (ArrayHelper.NotEmpty(batch.delete)) {
+      for (let obj of batch.delete) {
+        let resourceLink = obj as ResourceLink
+        resourceIds.push(resourceLink.childId, resourceLink.groupId)
+      }
+    }
+
+    return resourceIds
+
+  }
+
   async save() {
 
     const batch = this.changes.getApiBatch()
@@ -179,7 +211,26 @@ export class ResourceGroupsComponent {
       this.parent.dashboardSvc.showToastType(ToastType.saveError)
     } else {
       this.parent.dashboardSvc.showToastType(ToastType.saveSuccess)
-      await this.resourceSvc.refreshCachedObjectFromBackend(this.resource.id)
+
+      let resourceIds = this.impactedResourceIds(batch)
+
+     // await this.resourceSvc.refreshCachedObjectFromBackend
+
+      await this.resourceSvc.refreshCachedObjectsFromBackend(resourceIds)
+      /*
+        
+      if (ArrayHelper.NotEmpty(batch.create)) {
+
+        for (let resourceLink of batch.create) {
+          await this.resourceSvc.refreshCachedObjectFromBackend(resourceLink.childId)
+          await this.resourceSvc.refreshCachedObjectFromBackend(resourceLink.groupId)
+        }
+      }
+        */
+
+
+
+
       this.changes.reset()
     }
 

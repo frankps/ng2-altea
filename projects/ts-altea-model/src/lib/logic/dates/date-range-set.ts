@@ -7,7 +7,7 @@ import { ResourceRequest, ResourceRequestItem } from "../resource-request"
 import { Solution, SolutionItem, SolutionSet } from "../solution"
 import { Resource, ResourcePlanning } from "../../altea-schema"
 import { TimeSpan } from "./time-span"
-import { DateHelper } from "ts-common"
+import { ArrayHelper, DateHelper } from "ts-common"
 
 /**
  * This class focuses on pure DB data for a resource (coming from ResourcePlanning)
@@ -109,7 +109,11 @@ export class DateRangeSet {
 
         // console.error(dates)
 
-        dates = _.uniq(dates)
+        
+        dates = _.uniqBy(dates, DateHelper.yyyyMMdd)
+
+/*         if (ArrayHelper.NotEmpty(dates) && dates.length > 1)
+            console.warn(`fromDays()`, dates) */
 
         //  console.error(dates)
 
@@ -205,7 +209,7 @@ export class DateRangeSet {
 
         let allBorders = [...allFroms, ...allTos]
 
-        
+
 
         //   hier probleem !!! ...DateBorder  _.uniqBy(dates, 'getTime()')
 

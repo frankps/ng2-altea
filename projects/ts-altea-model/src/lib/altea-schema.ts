@@ -2431,7 +2431,7 @@ export class OrderCancel {
 
 export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  // 
 
-  static defaultInclude = ['lines:orderBy=idx.product.items', 'contact', 'payments:orderBy=idx']
+  static defaultInclude = ['lines:orderBy=idx.product.items', 'contact', 'payments:orderBy=idx', 'planning']
   static jsonProps = ['vatLines', 'persons', 'info']
 
   organisation?: Organisation;
@@ -3743,7 +3743,11 @@ export class ResourcePlannings {
   }
 
   isEmpty(): boolean {
-    return (!Array.isArray(this.plannings) || this.plannings.length === 0)
+    return ArrayHelper.IsEmpty(this.plannings)
+  }
+
+  notEmpty(): boolean {
+    return ArrayHelper.NotEmpty(this.plannings)
   }
 
   filterByResource(resourceId: string): ResourcePlannings {

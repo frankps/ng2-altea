@@ -7,6 +7,7 @@ import * as dateFns from 'date-fns'
 import { SlotFinderBlocks } from "./slot-finder-blocks";
 import { SolutionSet } from "ts-altea-model";
 import { SlotFinderContinuous } from "./slot-finder-continuous";
+import { ArrayHelper } from "ts-common";
 
 // (resourceRequest: ResourceRequest, availability: ResourceAvailability):
 export class SlotFinder {
@@ -24,18 +25,47 @@ export class SlotFinder {
      */
     findSlots(availability2: ResourceAvailability2, ctx: AvailabilityContext, ...resourceRequests: ResourceRequest[]): SolutionSet {
 
-        const resourceRequest = resourceRequests[0]
+        
 
-        // availability,
-        const solutions = this.findSlotsInternal(availability2, ctx, resourceRequest)
+        const branchModeRanges = ctx.getBranchModeRanges(ctx.request.getDateRange())
+        console.warn(branchModeRanges)
 
+        const allSolutions = new SolutionSet()
 
-        const exactSolutions = solutions //.toExactSolutions()
+        for (let branchModeRange of branchModeRanges) {
+
+            let brancheScheduleId = branchModeRange.schedule.id
+
+            let resourceRequest = resourceRequests.find(req => req.schedule.id == brancheScheduleId)
+
+            if (!resourceRequest) {
+                console.error('No specific resourceRequest found for branch schedule!')
+                resourceRequest = resourceRequests[0]
+            }
+
+            const result = this.findSlotsInternal(availability2, ctx, resourceRequest)
+            allSolutions.add(...result.solutions)
+        } 
+
+        const exactSolutions = allSolutions //.toExactSolutions()
 
         return exactSolutions
     }
 
 
+    private orderSolutionSet(solutionSet: SolutionSet) {
+
+        if (!solutionSet || ArrayHelper.IsEmpty(solutionSet.solutions))
+            return
+
+
+        for (let solution of solutionSet.solutions) {
+            // solution.items
+
+            solution.items = _.sortBy(solution.items, item => item.dateRange.from)
+        }
+
+    }
 
     // availability: ResourceAvailability,
     private findSlotsInternal(availability2: ResourceAvailability2, ctx: AvailabilityContext, resourceRequest: ResourceRequest): SolutionSet {
@@ -65,6 +95,8 @@ export class SlotFinder {
 
             solutionSet = this.handleResourceRequestItem(requestItem, solutionSet, availability2)
         }
+
+        this.orderSolutionSet(solutionSet)
 
         return solutionSet
     }

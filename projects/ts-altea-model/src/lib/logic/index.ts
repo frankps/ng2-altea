@@ -1,5 +1,6 @@
 export * from './availability-context'
 export * from './availability-request'
+export * from './branch-mode'
 export * from './confirm-order-response'
 export * from './reservation-option'
 export * from './resource-availability'
