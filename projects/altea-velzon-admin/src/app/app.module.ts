@@ -24,7 +24,7 @@ import { environment } from '../environments/environment';
 
 import { FakeBackendInterceptor } from './velzon/core/helpers/fake-backend';
 import { initFirebaseBackend } from './velzon/authUtils';
-import { InterfaceModule, NgAlteaCommonModule } from 'ng-altea-common';
+import { InterfaceModule, NgAlteaCommonModule, SessionService } from 'ng-altea-common';
 import { OrderMgrModule } from 'ng-altea-common';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
@@ -80,6 +80,10 @@ if (environment.defaultauth === 'firebase') {
 })
 export class AppModule {
 
+  constructor(protected sessionSvc: SessionService) {
+
+    sessionSvc.init(environment)
+  }
 
   
 }

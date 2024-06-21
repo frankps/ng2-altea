@@ -85,6 +85,8 @@ export class DemoOrdersComponent implements OnInit {
     ['Manicure', DemoOrder.fromProducts(this.manicureId)],
     ['Pedicure', DemoOrder.fromProducts(this.pedicureId)],
     ['Wellness 2h/2p', DemoOrder.fromProducts(this.wellnessId)],
+    ['Massage', DemoOrder.new(this.massageId, 1)],
+    ['Duo massage', DemoOrder.new(this.massageId, 2)],
     ['Massage & Manicure', DemoOrder.new(this.massageId, 1).add(this.manicureId, 1)],  // .fromProducts(this.massageId, this.manicureId)
     ['BodySculptor 12x30min', DemoOrder.fromProducts(this.bodysculptor12x30)],
     ['BodySculptor Reveal 30min', DemoOrder.fromProducts(this.bodysculptorReveal30min)]

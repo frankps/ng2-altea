@@ -111,7 +111,7 @@ export class ResourcePlanningComponent implements OnInit {
 
     const query = new DbQuery()
     query.and('resourceId', QueryOperator.equals, resource.id)
-    query.and('type', QueryOperator.in, ['hol', 'ill', 'abs', 'edu', 'avl'])
+    query.and('type', QueryOperator.in, ['hol', 'bnk', 'ill', 'abs', 'edu', 'avl'])
     // query.and('type', QueryOperator.in, this.types)
     // query.and('act', QueryOperator.equals, true)
     query.take = 200

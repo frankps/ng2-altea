@@ -36,7 +36,7 @@ export class SlotFinder {
 
             let brancheScheduleId = branchModeRange.schedule.id
 
-            let resourceRequest = resourceRequests.find(req => req.schedule.id == brancheScheduleId)
+            let resourceRequest = resourceRequests.find(req => req?.schedule?.id && req.schedule.id == brancheScheduleId)
 
             if (!resourceRequest) {
                 console.error('No specific resourceRequest found for branch schedule!')

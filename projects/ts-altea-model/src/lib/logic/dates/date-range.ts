@@ -241,7 +241,7 @@ export class DateRange {
         if (this.from < other.from && this.to > other.to)
             return OverlapMode.otherFullWithin
 
-        if (this.from > other.from && this.to < other.to)
+        if (this.from >= other.from && this.to <= other.to)
             return OverlapMode.otherOverlapsFull
 
         if (other.from <= this.from && other.to > this.from && other.to < this.to)

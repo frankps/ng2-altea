@@ -597,11 +597,18 @@ export class Schedule extends ObjectWithIdPlus {
 
       console.warn(weekDif)
 
-      if (fromDate >= startOfWeekSchedule && weekDif >= 0)
+      if (fromDate >= startOfWeekSchedule && weekDif >= 0) {
         currentWeekIdx = weekDif % nrOfWeeks
+
+        if (Number.isNaN(currentWeekIdx))
+          console.log('currentWeekIdx is NaN')
+      } 
       else {  // if fromDate is before startOfWeekSchedule
         weekDif = Math.abs(weekDif) % nrOfWeeks
         currentWeekIdx = nrOfWeeks - 1 - weekDif
+
+        if (Number.isNaN(currentWeekIdx))
+          console.log('currentWeekIdx is NaN')
       }
     }
 
@@ -615,6 +622,12 @@ export class Schedule extends ObjectWithIdPlus {
 
       const weekSchedule = this.weeks[currentWeekIdx]
       const dayOfWeek = dayDate.getDay()
+
+      if (!weekSchedule) {
+        console.warn('No week schedule!')
+      }
+
+
       const daySchedule = weekSchedule.getDaySchedule(dayOfWeek)
 
       if (daySchedule?.on && Array.isArray(daySchedule.blocks)) {

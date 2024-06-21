@@ -13,10 +13,13 @@ export const environment = {
     messagingSenderId: "75363142531",
     appId: "1:75363142531:web:3019579db680c76a4bc4b6",
     measurementId: "G-2VD4P10F7W"
-  }
+  },
+  backend: 'http://localhost:8080'
+  
 };
 
-/*
+/*  https://dvit-477c9.uc.r.appspot.com
+
  * For easier debugging in development mode, you can import the following file
  * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.
  *
