@@ -4,6 +4,7 @@
 
 export * from './lib/ts-altea-logic'
 export * from './lib/general/altea-db'
+export * from './lib/general/altea-queries'
 export * from './lib/interface'
 export * from './lib/interfaces/i-db'
 export * from './lib/order/reservation/availability-service'

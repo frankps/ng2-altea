@@ -1,7 +1,8 @@
 import { ApiListResult, ApiResult, ApiStatus, DateHelper, DbObject, DbObjectCreate, DbObjectMulti, DbObjectMultiCreate, DbQuery, DbQueryTyped, ObjectHelper, ObjectWithId, QueryOperator } from 'ts-common'
-import { Branch, Gift, Subscription, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template, OrderLine, BankTransaction, Message, LoyaltyProgram, LoyaltyCard } from 'ts-altea-model'
+import { Branch, Gift, Subscription, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template, OrderLine, BankTransaction, Message, LoyaltyProgram, LoyaltyCard, PlanningType, ResourcePlannings } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { IDb } from '../interfaces/i-db'
+import { AlteaPlanningQueries } from './altea-queries'
 
 
 export class AlteaDb {
@@ -530,6 +531,14 @@ export class AlteaDb {
         return objects
     }
 
+    async getPlanningsByTypes(resourceIds: string[], from: Date, to: Date, types: PlanningType[], branchId?: string): Promise<ResourcePlannings> {
+
+        var qry = AlteaPlanningQueries.getByTypes(resourceIds, from, to, types, branchId)
+        console.warn(qry)
+        const result = await this.db.query$<ResourcePlanning>(qry)
+
+        return new ResourcePlannings(result)
+    }
 
 
 

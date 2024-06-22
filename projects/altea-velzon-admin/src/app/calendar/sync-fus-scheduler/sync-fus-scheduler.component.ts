@@ -3,10 +3,11 @@ import { DayService, WeekService, WorkWeekService, MonthService, AgendaService, 
 import { DataManager, ODataV4Adaptor, Query } from '@syncfusion/ej2-data';
 import * as dateFns from 'date-fns'
 import { Unsubscribe } from 'firebase/firestore';
-import { OrderFirestoreService, OrderService, ResourcePlanningService } from 'ng-altea-common';
+import { ObjectService, OrderFirestoreService, OrderService, ResourcePlanningService, ResourceService, SessionService } from 'ng-altea-common';
 import { OrderUi, Resource, ResourcePlanningUi } from 'ts-altea-model';
 import { ApiListResult, DbQuery, QueryOperator, Translation, ApiResult, ApiStatus, DateHelper, ArrayHelper } from 'ts-common'
-import { CalendarBase } from '../calendar-base';
+import { CalendarBase, BaseEvent } from '../calendar-base';
+import { AlteaDb } from 'ts-altea-logic';
 /*
 https://ej2.syncfusion.com/angular/documentation/schedule/getting-started
 
@@ -48,15 +49,32 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
 
   public timeFormat: string = "HH:mm";
   currentView: "Day" | "Week" | "Month" | "WorkWeek" | "Agenda" = "Week"
-  startOfVisible: Date
-  endOfVisible: Date
+
 
   public eventSettings: EventSettingsModel = {
     dataSource: this.events
+    /*,
+    fields: {
+        id: 'id',
+        subject: { name: 'subject' },
+        startTime: { name: 'from' },
+        endTime: { name: 'to' },
+        categoryColor: { name: 'to' }
+
+      
+        isAllDay: { name: 'FullDay' },
+        location: { name: 'Source' },
+        description: { name: 'Comments' },
+        startTime: { name: 'DepartureTime' },
+        endTime: { name: 'ArrivalTime' },
+        startTimezone: { name: 'Origin' },
+        endTimezone: { name: 'Destination' }
+        
+    }*/
   }
 
-  constructor(private planningSvc: ResourcePlanningService, orderFirestore: OrderFirestoreService) {
-    super(orderFirestore)
+  constructor(sessionSvc: SessionService, private planningSvc: ResourcePlanningService, orderFirestore: OrderFirestoreService, resourceSvc: ResourceService, protected objSvc: ObjectService) {
+    super(sessionSvc, orderFirestore, resourceSvc, new AlteaDb(objSvc))
 
     //this.implementation = this
     console.log(this.events)
@@ -69,13 +87,10 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
 
     const refDate = new Date(2024,5, 17)
 
-    await this.showPlanningWeek(refDate)
+    await this.showWeekEvents(refDate)
     this.currentView = "Week"
     this.schedule.currentView = "Week"  //changeView("Day")
     this.schedule.selectedDate = refDate // dateFns.addHours(refDate, 12)
-
-
-    
 
     // await this.showPlanningWeek()
     // await this.showOrderWeek()
@@ -114,7 +129,7 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
     }
 
     //  await this.showOrdersBetween(this.startOfVisible, this.endOfVisible)
-    await this.showPlanningBetween(this.startOfVisible, this.endOfVisible)
+    await this.showEventsBetween(this.startOfVisible, this.endOfVisible)
   }
 
 
@@ -130,28 +145,17 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
     }
   }
 
-  orderUiToEvent(orderUi: OrderUi) {
-
+  baseEventToEvent(eventBase: BaseEvent) {
     return {
-      Id: orderUi.id,
-      Subject: orderUi.shortInfo(),
-      StartTime: orderUi.startDate,
-      EndTime: orderUi.endDate,
-      CategoryColor: 'green'
+      Id: eventBase.id,
+      Subject: eventBase.subject,
+      StartTime: eventBase.from,
+      EndTime: eventBase.to,
+      CategoryColor: eventBase.color
     }
   }
 
-  planningUiToEvent(planningUi: ResourcePlanningUi) {
 
-    return {
-      Id: planningUi.id,
-      Subject: planningUi.order?.shortInfo(),
-      StartTime: planningUi.startDate,
-      EndTime: planningUi.endDate,
-      CategoryColor: (planningUi.resource as Resource)?.color
-    }
-
-  }
 
 
 
