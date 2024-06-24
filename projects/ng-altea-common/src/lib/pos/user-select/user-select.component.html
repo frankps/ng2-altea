@@ -1,0 +1,15 @@
+<ng-template #userSelectModal let-modal>
+
+    <div class="modal-header">
+        <h4>{{ 'ui.select-user-modal.title' | translate }}</h4>
+    </div>
+    <div class="modal-body">
+
+        <ul class="list-group" *ngIf="persons">
+            <li class="list-group-item py-3" *ngFor="let person of persons" (click)="selectUser(person, modal)">
+                <i class="fa-solid fa-circle" [style.color]="person.color"></i> &nbsp; {{person.name}}</li>
+            
+        </ul>
+
+    </div>
+</ng-template>

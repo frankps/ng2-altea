@@ -2,9 +2,13 @@
 
 <ngx-spinner type="ball-scale-multiple" [fullScreen]="false"></ngx-spinner>
 
+<user-select #userSelect (select)="userSelected($event)"></user-select>
 
 <ng-container *ngIf="appReady">
+    
     <ngx-altea-toasts></ngx-altea-toasts>
     <router-outlet></router-outlet>
 </ng-container>
+
+{{idleState}}
 

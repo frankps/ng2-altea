@@ -68,7 +68,7 @@ export class TaskDashboardComponent {
 
     await this.translationSvc.translateEnum(TaskPriority, 'enums.task-priority.', this.taskPriority, true)
 
-    this.humanResources = await this.resourceSvc.getHumanResources(['children'])
+    this.humanResources = await this.resourceSvc.getHumanResourcesInclGroups(['children'])
     this.indexHumanResources(this.humanResources)
 
     this.getTasks()
@@ -161,7 +161,7 @@ export class TaskDashboardComponent {
 
 
           // let newTask = this.manualTask.toInstance()
-          result = await this.taskSvc.create$(this.task)
+          result = await this.taskSvc.create$(this.task, this.dashboardSvc.resourceId)
           console.warn('New task:', result)
           this.manualTask = undefined
 
@@ -203,7 +203,7 @@ export class TaskDashboardComponent {
 
 
 
-          result = await this.taskSvc.update$(this.task)
+          result = await this.taskSvc.update$(this.task, this.dashboardSvc.resourceId)
           console.warn('Task updated:', result)
           break
 
@@ -291,7 +291,7 @@ export class TaskDashboardComponent {
 
         case ManageTaskMode.edit:
 
-          result = await this.taskSvc.delete$(this.task.id)
+          result = await this.taskSvc.delete$(this.task.id, this.dashboardSvc.resourceId)
           console.warn('Task deleted:', result)
           break
         default:

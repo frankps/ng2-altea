@@ -66,7 +66,8 @@ export class ProductOptionsComponent implements OnInit {
 
   constructor(protected productOptionSvc: ProductOptionService
     , protected productOptionValueSvc: ProductOptionValueService
-    , protected sessionSvc: SessionService, protected productSvc: ProductService) {
+    , protected sessionSvc: SessionService, protected productSvc: ProductService,
+    public dashboardSvc: DashboardService) {
 
   }
 
@@ -365,7 +366,7 @@ export class ProductOptionsComponent implements OnInit {
         return
       }
 
-      me.productOptionSvc.batchProcess(batch).subscribe(res => {
+      me.productOptionSvc.batchProcess(batch, me.dashboardSvc.resourceId).subscribe(res => {
 
         if (res.status == ApiStatus.ok)
           me.optionChanges.reset()
@@ -409,6 +410,7 @@ export class ProductOptionsComponent implements OnInit {
   async saveOptionValues(valueChanges: CollectionChangeTracker<ProductOptionValue>): Promise<any> {
 
     const me = this
+    const resourceId = me.dashboardSvc.resourceId
 
     return new Promise<any>(function (resolve, reject) {
 
@@ -422,7 +424,7 @@ export class ProductOptionsComponent implements OnInit {
 
       console.warn(batch)
 
-      me.productOptionValueSvc.batchProcess(batch).subscribe(res => {
+      me.productOptionValueSvc.batchProcess(batch, resourceId).subscribe(res => {
 
         console.error(res)
 
@@ -439,35 +441,6 @@ export class ProductOptionsComponent implements OnInit {
 
   }
 
-
-  saveOptionsOld() {
-
-    const batch = this.optionChanges.getApiBatch()
-
-    if (!batch.hasChanges()) {
-      this.parent.dashboardSvc.showToastType(ToastType.saveNoChanges)
-      this.stopEditMode()
-      return
-    }
-
-    this.productOptionSvc.batchProcess(batch).subscribe(res => {
-
-      this.mode = ListSectionMode.readOnly
-
-      if (res.status == ApiStatus.error) {
-        this.parent.dashboardSvc.showToastType(ToastType.saveError)
-      } else {
-        this.parent.dashboardSvc.showToastType(ToastType.saveSuccess)
-        this.optionChanges.reset()
-      }
-
-      console.error(res)
-      this.optionChanges?.reset()
-      this.stopEditMode()
-
-    })
-
-  }
 
 
 

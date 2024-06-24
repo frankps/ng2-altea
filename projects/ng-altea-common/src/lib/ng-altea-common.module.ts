@@ -10,6 +10,7 @@ import { RedeemGiftComponent } from './gift/redeem-gift/redeem-gift.component';
 import { OrderMgrModule } from './order-mgr/order-mgr.module';
 import { RequestInvoiceComponent } from './invoice/request-invoice/request-invoice.component';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { UserSelectComponent } from './pos/user-select/user-select.component';
 @NgModule({
   imports: [CommonModule,
   HttpClientModule,
@@ -22,14 +23,16 @@ import { NgSelectModule } from '@ng-select/ng-select';
     RequestGiftComponent,
     MainMenuComponent,
     RedeemGiftComponent,
-    RequestInvoiceComponent
+    RequestInvoiceComponent,
+    UserSelectComponent
   ],
   exports: [
     RequestGiftComponent,
     RedeemGiftComponent,
     RequestInvoiceComponent,
     MainMenuComponent,
-    OrderMgrModule
+    OrderMgrModule,
+    UserSelectComponent
   ]
 })
 export class NgAlteaCommonModule {}

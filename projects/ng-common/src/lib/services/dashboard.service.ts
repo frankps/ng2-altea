@@ -30,6 +30,9 @@ export class DashboardService {
 
   toasts: any[] = [];
 
+  /** the (human)-resource currently working with UI */
+  public resourceId?: string
+
   constructor(public breakpointObserver: BreakpointObserver, private translate: TranslateService) {
 
     this.breakpointObserver

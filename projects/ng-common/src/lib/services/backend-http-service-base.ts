@@ -223,10 +223,26 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
 
   }
 
+  appendQueryParams(url: string, ...queryParams: string[]) {
 
-  update(object: any, isSoftDelete: boolean = false): Observable<ApiResult<T>> {
+    if (ArrayHelper.IsEmpty(queryParams))
+      return url
+
+    const postfix = queryParams.join('&')
+
+    return `${url}?${postfix}`
+
+  }
+
+  update(object: any, resourceId?: string, isSoftDelete: boolean = false): Observable<ApiResult<T>> {
     console.log(object)
-    const observ = this.http.put<any>(`${this.host}/${this.urlDifferentiator}/${object.id}`, object).pipe(map(res => {
+
+    let url = `${this.host}/${this.urlDifferentiator}/${object.id}`
+
+    if (resourceId)
+      url = this.appendQueryParams(url, `resId=${resourceId}`)
+
+    const observ = this.http.put<any>(url, object).pipe(map(res => {
 
       res = this.makeApiResultTyped(res)
 
@@ -257,13 +273,13 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
     }
   }
 
-  update$(object: any): Promise<ApiResult<T>> {
+  update$(object: any, resourceId?: string): Promise<ApiResult<T>> {
 
     const me = this
 
     return new Promise<any>(function (resolve, reject) {
 
-      me.update(object).pipe(take(1)).subscribe(res => {
+      me.update(object, resourceId).pipe(take(1)).subscribe(res => {
         resolve(res)
       })
 
@@ -293,19 +309,27 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
   }
 
 
-  batchProcess(batch: ApiBatchProcess<T>): Observable<ApiBatchResult<T>> {
+  batchProcess(batch: ApiBatchProcess<T>, resourceId?: string): Observable<ApiBatchResult<T>> {
 
-    return this.http.put<any>(`${this.host}/${this.urlDifferentiator}/batch`, batch)
+    const me = this
+
+    let url = `${this.host}/${this.urlDifferentiator}/batch`
+
+      if (resourceId)
+        url = this.appendQueryParams(url, `resId=${resourceId}`)
+
+    return this.http.put<any>(url, batch)
   }
 
 
-  batchProcess$(batch: ApiBatchProcess<T>): Promise<ApiBatchResult<T>> {
+  batchProcess$(batch: ApiBatchProcess<T>, resourceId?: string): Promise<ApiBatchResult<T>> {
+
 
     const me = this
 
     return new Promise<any>(function (resolve, reject) {
 
-      me.batchProcess(batch).pipe(take(1)).subscribe(res => {
+      me.batchProcess(batch, resourceId).pipe(take(1)).subscribe(res => {
         resolve(res)
       })
 
@@ -315,7 +339,7 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
   }
 
 
-  delete(objectId: string): Observable<ApiResult<any>> {
+  delete(objectId: string, resourceId?: string): Observable<ApiResult<any>> {
 
     if (this.softDelete) {
 
@@ -325,12 +349,17 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
         upd: new Date()
       }
 
-      return this.update(softDelete, true)
+      return this.update(softDelete, resourceId, true)
 
 
     } else {
 
-      const res = this.http.delete<any>(`${this.host}/${this.urlDifferentiator}/${objectId}`).pipe(map(res => {
+      let url = `${this.host}/${this.urlDifferentiator}/${objectId}`
+
+      if (resourceId)
+        url = this.appendQueryParams(url, `resId=${resourceId}`)
+
+      const res = this.http.delete<any>(url).pipe(map(res => {
 
         res = this.makeApiResultTyped(res)
 
@@ -351,13 +380,13 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
     }
   }
 
-  delete$(objectId: string): Promise<ApiResult<T>> {
+  delete$(objectId: string, resourceId?: string): Promise<ApiResult<T>> {
 
     const me = this
 
     return new Promise<any>(function (resolve, reject) {
 
-      me.delete(objectId).pipe(take(1)).subscribe(res => {
+      me.delete(objectId, resourceId).pipe(take(1)).subscribe(res => {
 
         //res = this.makeApiResultTyped(res)
 
@@ -371,8 +400,14 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
 
 
 
-  create(object: any): Observable<ApiResult<T>> {
-    return this.http.post<any>(`${this.host}/${this.urlDifferentiator}`, object).pipe(map(res => {
+  create(object: any, resourceId?: string): Observable<ApiResult<T>> {
+
+    let url = `${this.host}/${this.urlDifferentiator}`
+
+    if (resourceId)
+      url = this.appendQueryParams(url, `resId=${resourceId}`)
+
+    return this.http.post<any>(url, object).pipe(map(res => {
 
       res = this.makeApiResultTyped(res)
 
@@ -386,13 +421,13 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
     ))
   }
 
-  create$(object: any): Promise<ApiResult<T>> {
+  create$(object: any, resourceId?: string): Promise<ApiResult<T>> {
 
     const me = this
 
     return new Promise<any>(function (resolve, reject) {
 
-      me.create(object).pipe(take(1)).subscribe(res => {
+      me.create(object, resourceId).pipe(take(1)).subscribe(res => {
 
         resolve(res)
 

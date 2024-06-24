@@ -1,7 +1,7 @@
 import { Component, Input, ViewChild, OnInit } from '@angular/core';
 import { ProductService, PriceService, ResourceService, ResourceLinkService } from 'ng-altea-common'
 import { Gender, OnlineMode, Product, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, Resource, DurationMode, DurationReference, ResourceLink, ResourceType } from 'ts-altea-model'
-import { FormCardSectionEventData, ToastType, TranslationService } from 'ng-common'
+import { DashboardService, FormCardSectionEventData, ToastType, TranslationService } from 'ng-common'
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxModalComponent } from 'ng-common';
 import { ListSectionMode, BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, Translation, ObjectHelper, DbQuery, QueryOperator, CollectionChangeTracker, ObjectWithId, ApiStatus, ArrayHelper } from 'ts-common'
@@ -85,7 +85,8 @@ export class ResourceGroupsComponent {
   selectedResource: Resource
 
 
-  constructor(protected resourceLinkSvc: ResourceLinkService, protected route: ActivatedRoute, protected router: Router, protected resourceSvc: ResourceService) {
+  constructor(protected resourceLinkSvc: ResourceLinkService, protected route: ActivatedRoute, protected router: Router
+    , protected resourceSvc: ResourceService, protected dashboardSvc: DashboardService) {
 
   }
 
@@ -205,7 +206,7 @@ export class ResourceGroupsComponent {
       return
     }
 
-    const res = await this.resourceLinkSvc.batchProcess$(batch)
+    const res = await this.resourceLinkSvc.batchProcess$(batch, this.dashboardSvc.resourceId)
 
     if (res.status == ApiStatus.error) {
       this.parent.dashboardSvc.showToastType(ToastType.saveError)

@@ -76,7 +76,7 @@ export class NewProductComponent implements OnInit {
       this.newProduct.sub = ProductSubType.basic
 
 
-    this.productSvc.create(this.newProduct).subscribe((res: ApiResult<Product>) => {
+    this.productSvc.create(this.newProduct, this.sessionSvc.humanResource?.id).subscribe((res: ApiResult<Product>) => {
 
       console.log('Object saved')
       console.error(res)

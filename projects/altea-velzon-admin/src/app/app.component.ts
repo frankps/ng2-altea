@@ -1,9 +1,11 @@
-import { AfterContentChecked, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { AfterContentChecked, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { BranchService, LoyaltyProgramService, ObjectService, ProductService, ResourceService, ScheduleService, SessionService, TypeInfoService } from 'ng-altea-common';
 import { BsLocaleService } from 'ngx-bootstrap/datepicker';
 import { AppMode, Branch, LoyaltyProgram, Product, Resource, TypeInfo } from 'ts-altea-model';
 import { DbQuery, QueryOperator } from 'ts-common';
-
+import {Idle, DEFAULT_INTERRUPTSOURCES} from '@ng-idle/core';
+import { UserSelectComponent } from 'projects/ng-altea-common/src/lib/pos/user-select/user-select.component';
+import { DashboardService } from 'ng-common';
 
 
 @Component({
@@ -15,15 +17,60 @@ export class AppComponent implements OnInit {
   title = 'altea-velzon-admin';
   appReady = false
 
-  constructor(private localeService: BsLocaleService, private branchSvc: BranchService, private sessionSvc: SessionService
+  // for the idle functionality
+  idleState = 'Not started.';
+  timedOut = false;
+
+  @ViewChild('userSelect') public userSelect: UserSelectComponent;
+
+  constructor(private idle: Idle, private localeService: BsLocaleService, private branchSvc: BranchService, private sessionSvc: SessionService, private dashboardSvc: DashboardService
     , private productSvc: ProductService, private resourceSvc: ResourceService, private typeInfoSvc: TypeInfoService,
     private scheduleSvc: ScheduleService, private loyaltyProgramSvc: LoyaltyProgramService, private objectSvc: ObjectService) {
     this.localeService.use('nl-be');
 
+    // sets an idle timeout of 5 seconds, for testing purposes.
+    idle.setIdle(5);
+    // sets the default interrupts, in this case, things like clicks, scrolls, touches to the document
+    idle.setInterrupts(DEFAULT_INTERRUPTSOURCES);
 
+    idle.onIdleEnd.subscribe(() => {
+      this.idleState = 'No longer idle.'
+      console.warn(this.idleState)
+    });
+    idle.onTimeout.subscribe(() => {
+      this.idleState = 'Timed out!';
+      this.timedOut = true;
+      console.warn(this.idleState)
+    });
+    idle.onIdleStart.subscribe(() => {
+      this.idleState = 'You\'ve gone idle!'
+      console.warn(this.idleState)
 
+      if (this.userSelect && !this.userSelect.open)
+        this.userSelect.show()
+    });
+
+    idle.onTimeoutWarning.subscribe((countdown) => this.idleState = 'You will time out in ' + countdown + ' seconds!');
+
+    this.resetIdle()
 
   }
+
+  resetIdle() {
+    this.idle.watch();
+    this.idleState = 'Started.';
+    this.timedOut = false;
+  }
+
+
+  userSelected(humanResource: Resource) {
+    console.warn(humanResource)
+    this.sessionSvc.humanResource = humanResource
+
+    this.dashboardSvc.resourceId = humanResource?.id
+  }
+
+
 
   async ngOnInit() {
 

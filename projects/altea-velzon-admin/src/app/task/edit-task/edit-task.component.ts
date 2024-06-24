@@ -79,7 +79,7 @@ export class EditTaskComponent extends NgEditBaseComponent<Task> {
 
     await this.translationSvc.translateEnum(TaskStatus, 'enums.task-status.', this.taskStatus)
 
-    this.resources = await this.resourceSvc.getHumanResources()
+    this.resources = await this.resourceSvc.getHumanResourcesInclGroups()
 
     /*     this.taskPriority.push(new Translation(0, "Nul"))
         this.taskPriority.push(new Translation(1, "Eén")) */

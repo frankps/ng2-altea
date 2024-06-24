@@ -127,7 +127,7 @@ export class ProductListComponent extends NgBaseListComponent<Product> implement
 
     const batch = changes.getApiBatch()
     console.warn(batch)
-    this.productSvc.batchProcess(batch).subscribe(res => {
+    this.productSvc.batchProcess(batch, this.dashboardSvc.resourceId).subscribe(res => {
 
       console.warn(res)
 

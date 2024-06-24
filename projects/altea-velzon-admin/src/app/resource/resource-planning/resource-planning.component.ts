@@ -183,7 +183,7 @@ export class ResourcePlanningComponent implements OnInit {
   async savePlanningChanges() {
     const batch = this.planningChanges?.getApiBatch()
 
-    const res = await this.planningSvc.batchProcess$(batch)
+    const res = await this.planningSvc.batchProcess$(batch, this.dashboardSvc.resourceId)
 
     if (res.status == ApiStatus.ok) {
 

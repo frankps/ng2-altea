@@ -75,7 +75,7 @@ export class ProductItemsComponent {
   // create array from 1 to 20 
   qtyArray = [...Array(20).keys()].map(i => i + 1)
 
-  constructor(protected productItemSvc: ProductItemService, protected productSvc: ProductService, protected spinner: NgxSpinnerService) {
+  constructor(protected productItemSvc: ProductItemService, protected productSvc: ProductService, protected spinner: NgxSpinnerService, protected dashboardSvc: DashboardService) {
 
   }
 
@@ -306,7 +306,7 @@ export class ProductItemsComponent {
       return
 
 
-    const res = await this.productItemSvc.batchProcess$(batch)
+    const res = await this.productItemSvc.batchProcess$(batch, this.dashboardSvc.resourceId)
 
     if (res.status == ApiStatus.ok) {
       this.itemChanges.reset()

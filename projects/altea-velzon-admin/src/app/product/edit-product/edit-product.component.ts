@@ -1,5 +1,5 @@
 import { Component, ViewChild, OnInit } from '@angular/core';
-import { ProductService, PriceService, ProductResourceService } from 'ng-altea-common'
+import { ProductService, PriceService, ProductResourceService, SessionService } from 'ng-altea-common'
 import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ProductSubType } from 'ts-altea-model'
 import { DashboardService, FormCardSectionEventData, NgEditBaseComponent, ToastType, TranslationService } from 'ng-common'
 import { ActivatedRoute, Router } from '@angular/router';
@@ -87,7 +87,7 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
 
   // deleteTransParams = { article: undefined, object_sc: '', object_lc: '', name: '' }
 
-  constructor(public manageProductSvc: ManageProductService, protected productSvc: ProductService, private priceSvc: PriceService,
+  constructor(public manageProductSvc: ManageProductService, protected sessionSvc: SessionService, protected productSvc: ProductService, private priceSvc: PriceService,
     private productResourceSvc: ProductResourceService,
     private translationSvc: TranslationService, route: ActivatedRoute, router: Router,
     spinner: NgxSpinnerService, private modalService: NgbModal,
@@ -313,7 +313,7 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
 
       const hasActivePrices = this.hasActivePrices()
 
-      const res = await this.priceSvc.batchProcess$(priceBatch)
+      const res = await this.priceSvc.batchProcess$(priceBatch, this.dashboardSvc.resourceId)
 
       if (res.status != ApiStatus.ok)
         allOk = false
@@ -333,7 +333,7 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
         update['id'] = this.object?.id
         update['advPricing'] = hasActivePrices
 
-        const prodUpdate = await this.objectSvc.update$(update)
+        const prodUpdate = await this.objectSvc.update$(update, this.dashboardSvc.resourceId)
 
         if (!prodUpdate.isOk)
           allOk = false
@@ -375,7 +375,7 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
     console.error('Price changes')
     console.error(batch)
 
-    const res = await this.productResourceSvc.batchProcess$(batch)
+    const res = await this.productResourceSvc.batchProcess$(batch, this.dashboardSvc.resourceId)
 
     this.resetOrigObject()
 
@@ -414,7 +414,7 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
     if (!this.object?.id) {
       // then this is a new object => we save instead of update!
 
-      this.productSvc.create(this.object).subscribe(res => {
+      this.productSvc.create(this.object, this.dashboardSvc.resourceId).subscribe(res => {
 
         console.log('Object saved')
         console.error(res)
@@ -461,7 +461,7 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
     console.error('Sending update:')
     console.warn(update)
 
-    this.productSvc.update(update).subscribe(res => {
+    this.productSvc.update(update, this.dashboardSvc.resourceId).subscribe(res => {
 
       this.resetOrigObject()
       console.error(res)

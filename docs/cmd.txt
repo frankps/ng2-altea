@@ -114,6 +114,9 @@ ng generate module interface --project ng-altea-common
 ng generate component interface/upload --project ng-altea-common
 
 
+ng generate component pos/userSelect --project ng-altea-common
+
+
 ng generate service user --project=ng-altea-common
 
 ng generate service custom-json --project=ng-altea-common

@@ -159,7 +159,7 @@ export class EditResourceComponent extends NgEditBaseComponent<Resource> impleme
     console.warn('deleteSchedule')
     this.object.schedules.splice(idx, 1)
 
-    var res = await this.scheduleSvc.delete$(schedule.id)
+    var res = await this.scheduleSvc.delete$(schedule.id, this.dashboardSvc.resourceId)
 
     console.log(res)
 
@@ -211,7 +211,7 @@ export class EditResourceComponent extends NgEditBaseComponent<Resource> impleme
       return
     }
 
-    const res = await this.scheduleSvc.batchProcess$(batch)
+    const res = await this.scheduleSvc.batchProcess$(batch, this.dashboardSvc.resourceId)
     console.error('batchProcess')
     console.error(res)
 

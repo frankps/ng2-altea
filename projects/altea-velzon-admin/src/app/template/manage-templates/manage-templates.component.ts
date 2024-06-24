@@ -224,7 +224,7 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
 
     console.error(batch)
 
-    this.templateSvc.batchProcess(batch).subscribe(res => {
+    this.templateSvc.batchProcess(batch, this.dashboardSvc.resourceId).subscribe(res => {
 
       if (res.status == ApiStatus.error) {
         this.dashboardSvc.showToastType(ToastType.saveError)

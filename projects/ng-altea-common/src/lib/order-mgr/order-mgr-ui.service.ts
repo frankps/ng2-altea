@@ -564,7 +564,7 @@ export class OrderMgrUiService {   // implements OnInit
         if (this.gift?.isNew()) {
 
           this.gift.orderId = this.order.id
-          let giftRes = await this.giftSvc.create$(this.gift)
+          let giftRes = await this.giftSvc.create$(this.gift, this.dashboardSvc.resourceId)
 
           console.warn(giftRes)
 

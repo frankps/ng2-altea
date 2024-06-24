@@ -5075,7 +5075,7 @@ export class ObjectLog extends ObjectWithId {
 
   objId?: string
 
-  userId?: string
+  
 
   action?: ObjectLogAction
 
@@ -5084,6 +5084,9 @@ export class ObjectLog extends ObjectWithId {
   data?: any
 
   date = new Date()
+
+  usrId?: string
+  resId?: string
 
 
   static update(objId?: string, data?: any): ObjectLog {

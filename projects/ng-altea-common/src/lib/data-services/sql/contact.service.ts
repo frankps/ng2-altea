@@ -61,12 +61,12 @@ export class ContactService extends BackendHttpServiceBase<Contact> {
   }
 
 
-  override async update$(object: Contact): Promise<ApiResult<Contact>> {
+  override async update$(object: Contact, resourceId?: string): Promise<ApiResult<Contact>> {
 
     object.setName()
 
 
-    return super.update$(object)
+    return super.update$(object, resourceId)
 
 
 

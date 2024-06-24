@@ -54,7 +54,7 @@ export class NewResourceComponent {
     delete this.newObject._startDate
  //   const object = ObjectHelper.clone(this.newObject, Resource)
     
-    this.objectSvc.create(this.newObject).subscribe((res: ApiResult<Resource>) => {
+    this.objectSvc.create(this.newObject, this.sessionSvc.humanResource?.id).subscribe((res: ApiResult<Resource>) => {
 
       console.log('Object saved')
       console.error(res)

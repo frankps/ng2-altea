@@ -67,7 +67,7 @@ export class DeleteModalComponent {
 
     this.spinner.show()
 
-    this.objectSvc?.delete(this.object.id).subscribe(res => {
+    this.objectSvc?.delete(this.object.id, this.dashboardSvc.resourceId).subscribe(res => {
       console.error(res)
 
 

@@ -1,7 +1,7 @@
 import { Injectable, OnInit } from '@angular/core';
 import { ScheduleService } from './data-services/sql/schedule.service';
 import { DbQuery, QueryOperator } from 'ts-common';
-import { AppMode, Branch } from 'ts-altea-model';
+import { AppMode, Branch, Resource } from 'ts-altea-model';
 import * as Rx from "rxjs";
 
 
@@ -45,6 +45,8 @@ export class SessionService implements OnInit {
   //public backend = "http://localhost:8080"
   public localServer = "http://localhost:3000"
 
+  /** for internal use (POS): the current user working with the app */
+  public humanResource: Resource
 
   ngOnInit() {
 

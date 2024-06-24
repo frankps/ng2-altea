@@ -305,6 +305,9 @@
     }
   },
   "ui": {
+    "select-user-modal": {
+      "title": "Kies profiel"
+    },
     "order-cancel": {
       "deposit": "Gevraagde voorschot",
       "paid": "Reeds betaald",

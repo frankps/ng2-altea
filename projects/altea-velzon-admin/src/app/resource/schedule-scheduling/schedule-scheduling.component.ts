@@ -222,7 +222,7 @@ export class ScheduleSchedulingComponent implements OnDestroy {
 
     console.warn(batch)
 
-    const res = await this.planningSvc.batchProcess$(batch)
+    const res = await this.planningSvc.batchProcess$(batch, this.dashboardSvc.resourceId)
 
     if (res.status == ApiStatus.ok) {
 

@@ -155,7 +155,7 @@ export abstract class CalendarBase {
 
     async getHrPlannings(start: Date, end: Date): Promise<BaseEvent[]> {
 
-        var humanResources = await this.resourceSvc.getHumanResources()
+        var humanResources = await this.resourceSvc.getHumanResourcesInclGroups()
         humanResources = humanResources.filter(hr => !hr.isGroup && hr.online)
 
 

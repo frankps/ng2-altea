@@ -183,7 +183,7 @@ export abstract class NgEditBaseComponent<T extends ObjectWithId> extends NgSect
         if (!this.object?.id || this.isNew) {
             // then this is a new object => we save instead of update!
 
-            this.objectSvc.create(this.object).subscribe((res: any) => {
+            this.objectSvc.create(this.object, this.dashboardSvc.resourceId).subscribe((res: any) => {
 
                 if (res.status == ApiStatus.ok) {
                     this.dashboardSvc.showToastType(ToastType.saveSuccess)
@@ -252,7 +252,7 @@ export abstract class NgEditBaseComponent<T extends ObjectWithId> extends NgSect
         console.error('Sending update:')
         console.warn(update)
 
-        const sub = this.objectSvc.update(update).subscribe((res: any) => {
+        const sub = this.objectSvc.update(update, this.dashboardSvc.resourceId).subscribe((res: any) => {
 
             sub.unsubscribe()
 

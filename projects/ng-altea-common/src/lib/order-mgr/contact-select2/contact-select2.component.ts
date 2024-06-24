@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, Output, EventEmitter, Input } from '@angular/core'
 import { NgForm } from '@angular/forms'
 import { Branch, Contact, Country, MsgType } from 'ts-altea-model'
-import { TranslationService } from 'ng-common'
+import { DashboardService, TranslationService } from 'ng-common'
 import { Translation } from 'ts-common'
 import { ContactService, SessionService } from 'ng-altea-common';
 import { OrderMgrUiService } from '../order-mgr-ui.service';
@@ -45,7 +45,7 @@ export class ContactSelect2Component {
   showContacts = false
 
   constructor(protected translationSvc: TranslationService, private contactSvc: ContactService
-    , protected orderMgrSvc: OrderMgrUiService, private sessionSvc: SessionService) {
+    , protected orderMgrSvc: OrderMgrUiService, private sessionSvc: SessionService, private dashboardSvc: DashboardService) {
 
 
 
@@ -113,7 +113,7 @@ export class ContactSelect2Component {
   async updateContact() {
     let me = this
 
-    let res = await me.contactSvc.update$(me.contact)
+    let res = await me.contactSvc.update$(me.contact, this.dashboardSvc.resourceId)
   }
 
   canSelectMsgType(msgType: any) {
@@ -162,7 +162,7 @@ export class ContactSelect2Component {
     this.contact.branchId = this.branch.id
     this.contact.setName()
 
-    const res = await this.contactSvc.create$(this.contact)
+    const res = await this.contactSvc.create$(this.contact, this.dashboardSvc.resourceId)
     console.warn(res)
 
     if (res.isOk) {

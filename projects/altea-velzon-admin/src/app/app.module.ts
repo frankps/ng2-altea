@@ -31,6 +31,8 @@ import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { ScheduleModule } from '@syncfusion/ej2-angular-schedule';
+import {NgIdleModule} from '@ng-idle/core'
+
 
 defineLocale('nl-be', nlBeLocale);
 
@@ -61,7 +63,7 @@ if (environment.defaultauth === 'firebase') {
     NgSelectModule,
     FullCalendarModule,
     TranslateModule.forRoot({
-      defaultLanguage: 'en',
+      defaultLanguage: 'en',  
       loader: {
         provide: TranslateLoader,
         useFactory: createTranslateLoader,
@@ -71,7 +73,8 @@ if (environment.defaultauth === 'firebase') {
     ContactModule,
     NgAlteaCommonModule,
     InterfaceModule,
-    ScheduleModule
+    ScheduleModule,
+    NgIdleModule.forRoot()
   
     
   ],
