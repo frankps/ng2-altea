@@ -5,6 +5,7 @@ import { TimeSpan } from "./dates/time-span";
 import { AvailabilityRequest } from "./availability-request";
 import { ResourceOccupationSets, DateRange, DateRangeSet } from "./dates";
 import { BranchModeRange } from "./branch-mode";
+import { ArrayHelper, DateHelper } from "ts-common";
 
 
 export class BranchSchedule {
@@ -304,8 +305,29 @@ export class AvailabilityContext {
         /**
          * needs more fine-tuning! 
          */
-        if (Array.isArray(blockSeries) && blockSeries.length > 0)
-            return blockSeries[0]
+
+
+        var time = `${("0" + onDate.getHours()).slice(-2)}:${("0" + onDate.getMinutes()).slice(-2)}`
+
+
+        if (ArrayHelper.NotEmpty(blockSeries)) {
+            blockSeries = _.orderBy(blockSeries, ['start'], ['asc'])
+
+            /*
+            let refSeries =blockSeries[0]
+            for (let series of blockSeries) {
+
+                if (series.start >= time)
+
+            }*/
+
+            var series = blockSeries.find(series => series.start >= time)
+
+            if (series)
+                return series
+            else
+                return blockSeries[blockSeries.length - 1]
+        }
 
         return undefined
 
@@ -330,7 +352,7 @@ export class AvailabilityContext {
         // look for schedules active on given date
         let plannings = this.resourcePlannings.filterBySchedulesDateRange2(scheduleIds, date, date)
 
-        
+
         if (plannings.notEmpty()) {
             // planning is found for a schedule => then return that schedule
             let planning = plannings.plannings[0]

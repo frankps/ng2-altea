@@ -3,9 +3,10 @@ import { BranchService, LoyaltyProgramService, ObjectService, ProductService, Re
 import { BsLocaleService } from 'ngx-bootstrap/datepicker';
 import { AppMode, Branch, LoyaltyProgram, Product, Resource, TypeInfo } from 'ts-altea-model';
 import { DbQuery, QueryOperator } from 'ts-common';
-import {Idle, DEFAULT_INTERRUPTSOURCES} from '@ng-idle/core';
+import { Idle, DEFAULT_INTERRUPTSOURCES } from '@ng-idle/core';
 import { UserSelectComponent } from 'projects/ng-altea-common/src/lib/pos/user-select/user-select.component';
 import { DashboardService } from 'ng-common';
+import { environment } from '../environments/environment';
 
 
 @Component({
@@ -28,31 +29,41 @@ export class AppComponent implements OnInit {
     private scheduleSvc: ScheduleService, private loyaltyProgramSvc: LoyaltyProgramService, private objectSvc: ObjectService) {
     this.localeService.use('nl-be');
 
-    // sets an idle timeout of 5 seconds, for testing purposes.
-    idle.setIdle(5);
-    // sets the default interrupts, in this case, things like clicks, scrolls, touches to the document
-    idle.setInterrupts(DEFAULT_INTERRUPTSOURCES);
+    this.configUserSelectOnIdle(idle)
 
-    idle.onIdleEnd.subscribe(() => {
-      this.idleState = 'No longer idle.'
-      console.warn(this.idleState)
-    });
-    idle.onTimeout.subscribe(() => {
-      this.idleState = 'Timed out!';
-      this.timedOut = true;
-      console.warn(this.idleState)
-    });
-    idle.onIdleStart.subscribe(() => {
-      this.idleState = 'You\'ve gone idle!'
-      console.warn(this.idleState)
+  }
 
-      if (this.userSelect && !this.userSelect.open)
-        this.userSelect.show()
-    });
+  
+  configUserSelectOnIdle(idle: Idle) {
 
-    idle.onTimeoutWarning.subscribe((countdown) => this.idleState = 'You will time out in ' + countdown + ' seconds!');
+    if (Number.isInteger(environment.userSelectIdleTime) && environment.userSelectIdleTime > 0) {
 
-    this.resetIdle()
+      // sets an idle timeout of 5 seconds, for testing purposes.
+      idle.setIdle(environment.userSelectIdleTime);
+      // sets the default interrupts, in this case, things like clicks, scrolls, touches to the document
+      idle.setInterrupts(DEFAULT_INTERRUPTSOURCES);
+
+      idle.onIdleEnd.subscribe(() => {
+        this.idleState = 'No longer idle.'
+        console.warn(this.idleState)
+      });
+      idle.onTimeout.subscribe(() => {
+        this.idleState = 'Timed out!';
+        this.timedOut = true;
+        console.warn(this.idleState)
+      });
+      idle.onIdleStart.subscribe(() => {
+        this.idleState = 'You\'ve gone idle!'
+        console.warn(this.idleState)
+
+        if (this.userSelect && !this.userSelect.open)
+          this.userSelect.show()
+      });
+
+      idle.onTimeoutWarning.subscribe((countdown) => this.idleState = 'You will time out in ' + countdown + ' seconds!');
+
+      this.resetIdle()
+    }
 
   }
 

@@ -117,12 +117,15 @@ export class SlotFinderBlocks {
 
         /** get the active schedule -> in order to know block size  */
 
-
+        var startLabelHandled = false
 
 
         // we try to find slots until we reach end of availableRange
         while ((searchForward && offsetRefDate < availableRange.to)
             || (!searchForward && offsetRefDate >= availableRange.from)) {
+
+
+                
 
             currentSolution = new Solution()
             currentSolution.offsetRefDate = offsetRefDate
@@ -170,8 +173,21 @@ export class SlotFinderBlocks {
 
             if (searchForward)
                 offsetRefDate = dateFns.addMinutes(offsetRefDate, durationEmptyBlock)
-            else
+            else {
                 offsetRefDate = dateFns.addMinutes(offsetRefDate, -durationEmptyBlock)
+
+                /**
+                 * We're searching backwards (example from 12h back to 9h)
+                 * At a certain moment offsetRefDate will be before 9h, example 8h
+                 * => we will also try 9h 
+                 */
+
+                if (!startLabelHandled && offsetRefDate < availableRange.from && availableRange.containsFromLabel('START')) {
+                    offsetRefDate = availableRange.from
+                    startLabelHandled = true
+                }
+
+            }
         }
 
         console.error(requestItemsSameResource)
@@ -243,18 +259,26 @@ export class SlotFinderBlocks {
         } else {
 
             // there is no existing preparation block where we can overlap with => create inside the available range
-            prepFrom = availableRange.from
 
-            if (availableRange.containsFromLabel('START')) {
-                // get the current schedule in order to see if preparations can be done outside schedule
-                let schedule = ctx.getScheduleOnDate(resource.id, prepFrom)
+            const prepTime = firstRequestItem.seconds()
 
-                if (!schedule)
-                    throw new Error(`No schedule found`)
+            if (searchForward) {
+                prepFrom = availableRange.from
 
-                // check if preparations can be done outside schedule
-                if (!schedule.prepIncl)
-                    prepFrom = dateFns.addSeconds(availableRange.from, -firstRequestItem.seconds())
+                if (availableRange.containsFromLabel('START')) {
+                    // get the current schedule in order to see if preparations can be done outside schedule
+                    let schedule = ctx.getScheduleOnDate(resource.id, prepFrom)
+
+                    if (!schedule)
+                        throw new Error(`No schedule found`)
+
+                    // check if preparations can be done outside schedule
+                    if (!schedule.prepIncl)
+                        prepFrom = dateFns.addSeconds(availableRange.from, -firstRequestItem.seconds())
+                }
+
+            } else {
+                prepFrom = dateFns.addSeconds(availableRange.to, -prepTime)
             }
 
             prepTo = dateFns.addSeconds(prepFrom, firstRequestItem.seconds())

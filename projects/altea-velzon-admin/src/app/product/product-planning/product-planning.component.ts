@@ -59,7 +59,7 @@ export class ProductPlanningComponent implements OnInit {
       return
 
 
-    this.product.plan.splice(idx)
+    this.product.plan.splice(idx, 1)
 
   }
 

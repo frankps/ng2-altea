@@ -2,7 +2,7 @@ import { AfterContentChecked, ChangeDetectorRef, Component, Input, OnInit } from
 import { AvailabilityContext, AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Order, PossibleSlots, ReservationOptionSet, ResourceAvailability, ResourceAvailability2, ResourcePlanning, ResourceRequest, Schedule, SlotInfo, Solution, SolutionSet } from 'ts-altea-model';
 import * as _ from "lodash"
 import { AlteaService, OrderMgrUiService, OrderService, ResourcePlanningService } from 'ng-altea-common';
-import { DbQuery, QueryOperator } from 'ts-common';
+import { ArrayHelper, DbQuery, QueryOperator } from 'ts-common';
 import * as dateFns from 'date-fns'
 
 @Component({
@@ -156,8 +156,8 @@ export class DebugAvailabilityComponent implements OnInit {
       return []
 
     const plannings = this.plannings[resourceId]
-    if (plannings && Array.isArray(plannings))
-      return plannings
+    if (ArrayHelper.NotEmpty(plannings))
+      return _.sortBy(plannings, planning => planning.start)
     else
       return []
 
