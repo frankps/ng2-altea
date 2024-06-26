@@ -56,7 +56,7 @@ export class DateRangeSets {
 }
 
 /** A set contains multiple date ranges */
-export class DateRangeSet {
+export class    DateRangeSet {
 
     /** optional: provide resourceId if date ranges are linked to specific resources */
     //resourceId?: string
@@ -71,7 +71,11 @@ export class DateRangeSet {
     }
 
     isEmpty(): boolean {
-        return (!Array.isArray(this.ranges) || this.ranges.length == 0)
+        return ArrayHelper.IsEmpty(this.ranges)
+    }
+
+    notEmpty(): boolean {
+        return ArrayHelper.NotEmpty(this.ranges)
     }
 
     clone(): DateRangeSet {

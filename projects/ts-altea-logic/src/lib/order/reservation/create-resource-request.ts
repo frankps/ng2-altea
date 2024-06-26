@@ -83,6 +83,10 @@ export class CreateResourceRequest {
 
             const product = orderLine.product!
 
+
+
+            //product.preTime
+
             let productResources: ProductResource[]
 
             if (schedule?.id)
@@ -116,10 +120,12 @@ export class CreateResourceRequest {
                     if (!resource)  // not sure if this is needed
                         resource = productResource.resource!
 
+                    resReqItem.qty = 1 // orderLine.qty 
+
                     if (resource.isGroup) {
                         resReqItem.resourceGroup = resource
                         resReqItem.addResources(resource.getChildResources())
-
+                        resReqItem.qty *= productResource.groupQty
                     } else
                         resReqItem.addResource(resource ? resource : productResource.resource!)
 
@@ -130,7 +136,7 @@ export class CreateResourceRequest {
                     const offset = personOffset.clone()
                     resReqItem.offset = offset.add(offsetDuration.offset)
 
-                    resReqItem.qty = productResource.groupQty
+
 
                     resReqItem.isPrepTime = productResource.prep
                     resReqItem.prepOverlap = productResource.prepOverlap
@@ -138,6 +144,12 @@ export class CreateResourceRequest {
 
 
                     resourceRequest.add(resReqItem)
+
+                    if (orderLine.qty > 1) {
+                        for (let i = 2; i <= orderLine.qty; i++) {
+                            resourceRequest.add(resReqItem.clone())
+                        }
+                    }
 
                     // at the end we will increment 
                     if (offsetDuration.duration.seconds > personOffsetToAdd.seconds)
@@ -197,6 +209,12 @@ export class CreateResourceRequest {
 
         const productDuration = TimeSpan.zero
         productDuration.addMinutes(product.duration)
+
+        if (product.hasPre)
+            productDuration.addMinutes(product.preTime)
+
+        if (product.hasPost)
+            productDuration.addMinutes(product.postTime)
 
         const optionValues = line.allOptionValues()
 

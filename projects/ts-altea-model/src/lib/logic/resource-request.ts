@@ -4,7 +4,7 @@ import { OffsetDuration } from "./offset-duration"
 import { TimeSpan } from "./dates/time-span"
 import { DateRangeSet } from "./dates"
 import * as _ from "lodash";
-
+  
 export class ResourceRequestItem {
     //person?: OrderPerson
 
@@ -35,6 +35,30 @@ export class ResourceRequestItem {
 
     constructor(public orderLine: OrderLine, public product: Product, public resourceType: ResourceType) {
 
+    }
+
+    clone(): ResourceRequestItem {
+        const clone = new ResourceRequestItem(this.orderLine, this.product, this.resourceType)
+
+        clone.resourceGroup = this.resourceGroup
+        clone.resources.push(...this.resources)
+        clone.personId = this.personId
+
+        clone.offset = this.offset.clone()
+        clone.duration = this.duration.clone()
+
+        clone.qty = this.qty
+
+        clone.isPrepTime = this.isPrepTime
+        clone.prepOverlap = this.prepOverlap
+
+        clone.productResource = this.productResource
+
+        clone.orderLine = this.orderLine
+        clone.product = this.product
+        clone.resourceType = this.resourceType
+
+        return clone
     }
 
     get endsAt(): TimeSpan {
@@ -75,21 +99,7 @@ export class ResourceRequestItem {
         return Array.isArray(this.resources) && this.resources.filter(r => r.isGroup).length > 0
     }
 
-    clone(): ResourceRequestItem {
-        const clone = new ResourceRequestItem(this.orderLine, this.product, this.resourceType)
 
-        clone.resourceGroup = this.resourceGroup
-        clone.resources.push(...this.resources)
-        clone.personId = this.personId
-
-        clone.orderLine = this.orderLine
-        clone.product = this.product
-
-        clone.offset = this.offset.clone()
-        clone.duration = this.duration.clone()
-
-        return clone
-    }
 }
 
 

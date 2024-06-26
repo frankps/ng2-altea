@@ -2,7 +2,8 @@ import { extend } from "lodash";
 import { Resource, ResourcePlanning, ResourcePlannings } from "../altea-schema";
 import { DateRange, DateRangeSet, TimeSpan } from "./dates";
 import { ResourceRequestItem } from "./resource-request";
-import { ObjectHelper, ObjectWithId } from "ts-common";
+import { ArrayHelper, ObjectHelper, ObjectWithId } from "ts-common";
+import * as dateFns from 'date-fns'
 
 export enum SolutionNoteLevel {
     info,
@@ -72,12 +73,63 @@ export class Solution extends ObjectWithId {
         this.items.push(...items)
     }
 
-    add(item: SolutionItem) {
+    getOccupationForResource(resource: Resource) : DateRangeSet {
+
+        if (this.isEmpty())
+            return DateRangeSet.empty
+
+        var itemsForResource = this.items.filter(item => item.resources.find(res => res.id == resource.id))
+
+        var dateRangesForResource = itemsForResource.map(item => { 
+            let dateRange = item.dateRange.clone()
+
+            /* the date range is the range with possible start dates
+            => possible occupation of this solution is this range extended by actual duration of service (that starts on latest possible date)
+            */
+
+            dateRange.increaseToWithSeconds(item.request.duration.seconds)
+            return dateRange
+        })
+
+        if (ArrayHelper.IsEmpty(dateRangesForResource))
+            return DateRangeSet.empty
+        
+        return new DateRangeSet(dateRangesForResource, resource)
+    }
+
+    add(item: SolutionItem, limitOtherItems = true) {
 
         if (!Array.isArray(this.items))
             this.items = []
+        else {
+            this.items.push(item)
 
-        this.items.push(item)
+            if (limitOtherItems) {
+                const offsetSeconds = item.request.offset.seconds
+
+                const refFrom = dateFns.addSeconds(item.dateRange.from, -offsetSeconds)
+                const refTo = dateFns.addSeconds(item.dateRange.to, -offsetSeconds)
+
+                this.limitOtherItems(refFrom, refTo)
+            }
+        }
+    }
+
+    limitOtherItems(refFrom: Date, refTo: Date) {
+
+        if (ArrayHelper.IsEmpty(this.items))
+            return
+
+
+        for (let item of this.items) {
+
+            const offsetSeconds = item.request.offset.seconds
+
+            item.dateRange.from = dateFns.addSeconds(refFrom, offsetSeconds)
+            item.dateRange.to = dateFns.addSeconds(refTo, offsetSeconds)
+        }
+
+
     }
 
     addNote(content: string, level: SolutionNoteLevel = SolutionNoteLevel.info) {
@@ -102,7 +154,7 @@ export class Solution extends ObjectWithId {
     }
 
     isEmpty(): boolean {
-        return (!Array.isArray(this.items) || this.items.length == 0)
+        return ArrayHelper.IsEmpty(this.items)
     }
 
     hasItems(): boolean {
@@ -163,15 +215,15 @@ export class Solution extends ObjectWithId {
         /** 
          
     findContinuousSlots(dateRange: DateRange, slots: SlotInfo[]) {
-
+ 
         const startDates = dateRange.getDatesEvery(TimeSpan.minutes(15))
-
+ 
         slots.push(...startDates.map(date => SlotInfo.fromDate(date)))
-
+ 
     }
-
-
-
+ 
+ 
+ 
         */
 
 

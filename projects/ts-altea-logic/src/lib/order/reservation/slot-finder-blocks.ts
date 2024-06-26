@@ -428,7 +428,7 @@ export class SlotFinderBlocks {
     }
 
 
-
+/*
     findSlots(resReqItem: ResourceRequestItem, inDateRange: DateRange, ctx: AvailabilityContext, availability: ResourceAvailability2): DateRangeSet {
 
         if (!Array.isArray(resReqItem.resources) || resReqItem.resources.length != 1) {
@@ -450,17 +450,11 @@ export class SlotFinderBlocks {
 
 
 
-        /*
-        if (this.isFullDay(inDateRange, ctx)) {   // this means there are no reservations yet 
-
-        } else {
-            throw new Error('Not implemented yet!')
-        }*/
-
         return dateRanges
 
 
-    }
+    }*/
+   
 
     getFullDayStartDates(product: Product, dateRange: DateRange, ctx: AvailabilityContext): DateRangeSet {
 

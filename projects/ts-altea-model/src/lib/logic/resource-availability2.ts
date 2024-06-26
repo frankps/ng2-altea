@@ -7,7 +7,7 @@ import { AvailabilityRequest } from "./availability-request";
 import { ResourceOccupationSets, DateRange, DateRangeSet, DateRangeSets, ResourceAvailabilitySets } from "./dates";
 import { AvailabilityContext } from "./availability-context";
 import { ObjectWithId } from 'ts-common'
-import { SolutionNote, SolutionNoteLevel } from "./solution";
+import { Solution, SolutionNote, SolutionNoteLevel } from "./solution";
 import * as dateFns from 'date-fns'
 import { ResourceRequestItem } from "./resource-request";
 import { ResultWithSolutionNotes } from "./resource-availability";
@@ -142,7 +142,7 @@ export class ResourceAvailability2 {
 
 
     /** check the availability of given resources inside range (insideRange), only return blocks > minTime */
-    getAvailabilityOfResourcesInRange(resources: Resource[], insideRange: DateRange, minTime: TimeSpan): DateRangeSets {
+    getAvailabilityOfResourcesInRange(resources: Resource[], insideRange: DateRange, minTime: TimeSpan, solution: Solution): DateRangeSets {
 
         if (!Array.isArray(resources) || resources.length == 0)
             return DateRangeSets.empty
@@ -153,9 +153,27 @@ export class ResourceAvailability2 {
 
             let availabilitiesForResource = this.getAvailabilitiesForResource(resource)
 
+            if (availabilitiesForResource.isEmpty())
+                continue
+
+            
+            if (solution) {
+                var resourceAlreadyOccupiedInSolution = solution.getOccupationForResource(resource)
+
+                if (resourceAlreadyOccupiedInSolution.notEmpty())
+                    availabilitiesForResource = availabilitiesForResource.subtract(resourceAlreadyOccupiedInSolution)
+            }
+
+
             availabilitiesForResource = availabilitiesForResource.clip(insideRange)
 
+            if (availabilitiesForResource.isEmpty())
+                continue
+
             availabilitiesForResource = availabilitiesForResource.minimum(minTime)
+
+            if (availabilitiesForResource.isEmpty())
+                continue
 
             allSets.addSet(availabilitiesForResource)
         }
@@ -166,7 +184,7 @@ export class ResourceAvailability2 {
 
     getAvailabilitiesForResource(resource: Resource, minTime?: TimeSpan): DateRangeSet {
 
-       // console.warn(`getAvailabilitiesForResource(${resource})`)
+        // console.warn(`getAvailabilitiesForResource(${resource})`)
 
 
         if (!resource?.id || !this.availability)  //  || !this.availability.has(resource.id)
@@ -176,7 +194,7 @@ export class ResourceAvailability2 {
 
         if (!this.availability.has(resource.id))
             return DateRangeSet.empty
-//        throw new Error(`resource ${resource.name} has NO availabilities!  ${resource.id}`)
+        //        throw new Error(`resource ${resource.name} has NO availabilities!  ${resource.id}`)
 
         let availability = this.availability.get(resource.id)
 
@@ -196,7 +214,7 @@ export class ResourceAvailability2 {
     }
 
 
-    getAvailableResourcesInRange(resources: Resource[], dateRange: DateRange, requestItem: ResourceRequestItem, stopWhenFound = true): ResultWithSolutionNotes<Resource[]> {
+    getAvailableResourcesInRange(resources: Resource[], dateRange: DateRange, requestItem: ResourceRequestItem, solution: Solution, stopWhenFound = true): ResultWithSolutionNotes<Resource[]> {
 
         let isPrepTime = requestItem.isPrepTime
 
@@ -216,18 +234,26 @@ export class ResourceAvailability2 {
             if (stopWhenFound && availableResources.length >= requestItem.qty)
                 break
 
+
             /**
              * getAvailabilitiesForResource: will only check inside the schedule of the resource
              * (sometimes we allow that preparations are done outside schedule -> this is covered later)
              * todo: sometimes preparations wan overlap (before/after)
              */
-            const set = this.getAvailabilitiesForResource(resource)
+            var resourceAvailabilities = this.getAvailabilitiesForResource(resource)
 
-            if (set.contains(dateRange)) {
+            if (solution) {
+                var resourceAlreadyOccupiedInSolution = solution.getOccupationForResource(resource)
+
+                if (resourceAlreadyOccupiedInSolution.notEmpty())
+                    resourceAvailabilities = resourceAvailabilities.subtract(resourceAlreadyOccupiedInSolution)
+            }
+
+            if (resourceAvailabilities.contains(dateRange)) {
                 availableResources.push(resource)
 
                 continue
-            }  
+            }
 
             /*
             If the schedule of the resource allows planning preparation blocks (not actual treatments) outside the schedule,
@@ -258,7 +284,7 @@ export class ResourceAvailability2 {
                             availableResources.push(resource)
 
                             result.addNote(`Preparation time outside schedule for ${resource.name} at ${dateFns.format(dateRange.from, 'dd/MM HH:mm')} allowed!`)
-                            
+
                             // for debugging
                             activeSchedule = this.ctx.getScheduleOnDate(resource.id, dateRange.from)
                             insideSchedule = activeSchedule.isInsideSchedule(dateRange)

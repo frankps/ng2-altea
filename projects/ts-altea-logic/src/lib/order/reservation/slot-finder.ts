@@ -195,14 +195,13 @@ export class SlotFinder {
                 if (!solution.offsetRefDate)
                     throw new Error(`solution.offsetRefDate not set!`)
 
-
                 const from = dateFns.addSeconds(solution.offsetRefDate, requestItem.offset.seconds)
                 const to = dateFns.addSeconds(from, requestItem.duration.seconds)
                 const range = new DateRange(from, to)
 
 
                 // the notes are for extra debug info
-                const resourcesWithNotes = availability.getAvailableResourcesInRange(requestItem.resources, range, requestItem)
+                const resourcesWithNotes = availability.getAvailableResourcesInRange(requestItem.resources, range, requestItem, solution)
                 const availableResources = resourcesWithNotes.result
                 solution.addNotes(resourcesWithNotes.notes)
 
@@ -268,7 +267,7 @@ export class SlotFinder {
                 // const startRange = new DateRange(startFrom, startTo)
                 const checkInRange = new DateRange(startFrom, endsOn)
 
-                const availableResources = availability.getAvailabilityOfResourcesInRange(requestItem.resources, checkInRange, requestItem.duration)
+                const availableResources = availability.getAvailabilityOfResourcesInRange(requestItem.resources, checkInRange, requestItem.duration, solution)
 
                 // if we have no availabilities for the new requestItem, then we are on a dead-end for this solution
                 if (availableResources.isEmpty()) {
