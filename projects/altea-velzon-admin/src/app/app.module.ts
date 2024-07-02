@@ -85,6 +85,8 @@ export class AppModule {
 
   constructor(protected sessionSvc: SessionService) {
 
+    console.log('AppModule Init')
+    console.warn(environment)
     sessionSvc.init(environment)
   }
 

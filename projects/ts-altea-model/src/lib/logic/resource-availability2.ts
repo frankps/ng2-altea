@@ -156,7 +156,7 @@ export class ResourceAvailability2 {
             if (availabilitiesForResource.isEmpty())
                 continue
 
-            
+
             if (solution) {
                 var resourceAlreadyOccupiedInSolution = solution.getOccupationForResource(resource)
 
@@ -214,7 +214,7 @@ export class ResourceAvailability2 {
     }
 
 
-    getAvailableResourcesInRange(resources: Resource[], dateRange: DateRange, requestItem: ResourceRequestItem, solution: Solution, stopWhenFound = true): ResultWithSolutionNotes<Resource[]> {
+    getAvailableResourcesInRange(resources: Resource[], dateRange: DateRange, requestItem: ResourceRequestItem, solution: Solution, stopWhenFound = false): ResultWithSolutionNotes<Resource[]> {
 
         let isPrepTime = requestItem.isPrepTime
 
@@ -242,6 +242,7 @@ export class ResourceAvailability2 {
              */
             var resourceAvailabilities = this.getAvailabilitiesForResource(resource)
 
+            /** The current solution might already occupie this resource */
             if (solution) {
                 var resourceAlreadyOccupiedInSolution = solution.getOccupationForResource(resource)
 

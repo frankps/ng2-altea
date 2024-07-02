@@ -148,9 +148,10 @@
                 </div>
 
 
-                <int-phone-edit [css]="mobilePhoneCss" [(phone)]="object.mobile" (phoneChange)="formChanged('general')"></int-phone-edit>
+                <int-phone-edit [css]="mobilePhoneCss" [(phone)]="object.mobile"
+                    (phoneChange)="formChanged('general')"></int-phone-edit>
 
-<!--
+                <!--
                 
                 <div class="row mt-3">
 
@@ -174,10 +175,28 @@
 
                 <div class="row mt-3">
 
-                    <div class="col-12">
+                    <div class="col-3">
 
-                        <!--          [help]="help"   -->
-                        <ngx-altea-label-control layout="list" for="online" label="ui.deposit.request">
+                        <ngx-altea-label-control label="objects.contact.deposit" [trans]="true" for="deposit">
+                            <ng-select id="deposit" name="deposit" [items]="depositMode" bindLabel="trans"
+                                bindValue="key" [clearable]="false" [multiple]="false" [(ngModel)]="object.deposit">
+                            </ng-select>
+                        </ngx-altea-label-control>
+
+
+                    </div>
+
+                    <div class="col-3" *ngIf="object.deposit == DepositMode.custom">
+                        <ngx-altea-label-control label="objects.contact.deposit" [trans]="true" for="depositPct">
+                            <ng-select id="depositPct" name="depositPct" [items]="depositPctgs" bindLabel="label"
+                                bindValue="pct" [clearable]="false" [multiple]="false" [(ngModel)]="object.depositPct">
+                            </ng-select>
+                        </ngx-altea-label-control>
+
+
+
+
+                        <!--                         <ngx-altea-label-control layout="list" for="online" label="ui.deposit.request">
 
                             <div class="form-check mt-2">
 
@@ -207,23 +226,8 @@
 
                                 </div>
 
-                                <!--                                 <div class="row">
-                                    <div class="col">
-                                        {{depositMode}} -  {{object.depositPct}}
-                                    </div>
-                                 
-                                </div> -->
-
-
-
-
-
                             </div>
-
-
-
-
-                        </ngx-altea-label-control>
+                        </ngx-altea-label-control> -->
 
 
                     </div>

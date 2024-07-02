@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { ObjectWithId, BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, ApiBatchResult, DbQuery, ObjectHelper, ApiStatus, ConnectTo, QueryCondition, QueryOperator, ArrayHelper } from 'ts-common'
+import { ObjectWithId, BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, ApiBatchResult, DbQuery, ObjectHelper, ApiStatus, ConnectTo, QueryCondition, QueryOperator, ArrayHelper, DbQueryBase, DbUpdateMany } from 'ts-common'
 import { Type, instanceToPlain, plainToInstance } from "class-transformer";
 import { Observable, map, Subject, take, of } from "rxjs";
 import { Firestore, collection, collectionData, addDoc, CollectionReference, updateDoc, serverTimestamp, doc, setDoc } from '@angular/fire/firestore';
@@ -111,20 +111,29 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
 
 
 
-  async post$<T>(url: string, body: any): Promise<T> {
+  async postOrPut$<T>(url: string, body: any, method : 'post' | 'put' = 'post'): Promise<T> {
     const me = this
 
     return new Promise<T>(function (resolve, reject) {
 
       try {
-        console.warn('post$', url, body)
+        console.warn(method, url, body)
 
-        // .pipe(take(1))
-        me.http.post<T>(url, body).pipe(take(1)).subscribe(res => {
-          console.log(res)
-          resolve(res)
+        if (method == 'post') {
+          me.http.post<T>(url, body).pipe(take(1)).subscribe(res => {
+            console.log(res)
+            resolve(res)
+          })
+        } else {
+          me.http.put<T>(url, body).pipe(take(1)).subscribe(res => {
+            console.log(res)
+            resolve(res)
+          })
+        }
 
-        })
+
+
+
 
       } catch (error) {
         throw error
@@ -315,8 +324,8 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
 
     let url = `${this.host}/${this.urlDifferentiator}/batch`
 
-      if (resourceId)
-        url = this.appendQueryParams(url, `resId=${resourceId}`)
+    if (resourceId)
+      url = this.appendQueryParams(url, `resId=${resourceId}`)
 
     return this.http.put<any>(url, batch)
   }
@@ -345,6 +354,7 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
 
       let softDelete = {
         id: objectId,
+        act: false,
         del: true,
         upd: new Date()
       }
@@ -497,7 +507,16 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
 
   async deleteMany$(query: DbQuery): Promise<ApiResult<any>> {
 
-    let res = await this.post$<ApiResult<any>>(`${this.host}/${this.urlDifferentiator}/deleteMany`, query)
+    let res = await this.postOrPut$<ApiResult<any>>(`${this.host}/${this.urlDifferentiator}/deleteMany`, query)
+
+    return res
+
+  }
+
+  /** currently not working: where clause to broad, should be specific properties */
+  async updateMany$(updateQry: DbUpdateMany<any>): Promise<ApiResult<any>> {
+
+    let res = await this.postOrPut$<ApiResult<any>>(`${this.host}/${this.urlDifferentiator}/updateMany`, updateQry, 'put')
 
     return res
 

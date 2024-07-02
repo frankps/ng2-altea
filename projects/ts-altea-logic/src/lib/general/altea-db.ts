@@ -98,6 +98,19 @@ export class AlteaDb {
         return templates
     }
 
+    async getOrdersNeedingCommunication(date: Date = new Date()) {
+
+        const qry = new DbQueryTyped<Order>('order', Order)
+
+        const dateNum = DateHelper.yyyyMMddhhmmss(date)
+
+        qry.and('msgOn', QueryOperator.lessThanOrEqual, dateNum)
+
+        const orders = await this.db.query$<Order>(qry)
+
+        return orders
+    }
+
     async getOrders(state?: OrderState, take: number = 10): Promise<Order[]> {
 
         const qry = new DbQueryTyped<Order>('order', Order)

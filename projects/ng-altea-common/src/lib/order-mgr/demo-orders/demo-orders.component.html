@@ -3,14 +3,27 @@
 
 
         <ng-container *ngFor="let demo of demoNames">
-           
-                <button type="button"  class="btn btn-primary btn-sm mr-2 mt-2"
+
+            <button type="button" class="btn btn-primary btn-sm mr-2 mt-2"
                 (click)="createDemoOrder(demos.get(demo))">{{demo}}</button>&nbsp;
-          
+
+        </ng-container>
+
+
+        <br>
+
+        <ng-container *ngIf="orderMgrSvc.order">
+
+            <ng-container *ngFor="let contact of contactNames">
+
+                <button type="button" class="btn btn-secondary btn-sm mr-2 mt-2"
+                    (click)="setContact(contact)">{{contact}}</button>&nbsp;
+            </ng-container>
+
 
         </ng-container>
 
 
 
     </div>
-</div>  
+</div>

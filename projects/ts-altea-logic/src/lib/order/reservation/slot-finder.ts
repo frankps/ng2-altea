@@ -172,6 +172,7 @@ export class SlotFinder {
          */
         const resultSolutions = new SolutionSet()
 
+        let resourceGroupName = requestItem.resourceGroup?.name
 
         /**
          * We continue to build further upon existing solutions (solutionSet)
@@ -201,7 +202,7 @@ export class SlotFinder {
 
 
                 // the notes are for extra debug info
-                const resourcesWithNotes = availability.getAvailableResourcesInRange(requestItem.resources, range, requestItem, solution)
+                const resourcesWithNotes = availability.getAvailableResourcesInRange(requestItem.resources, range, requestItem, solution, true)
                 const availableResources = resourcesWithNotes.result
                 solution.addNotes(resourcesWithNotes.notes)
 
@@ -224,9 +225,9 @@ export class SlotFinder {
                     }
 
                     if (requestItem.resourceGroup) {
-                        let resourceName = requestItem.resourceGroup.name
+                        
 
-                        solution.addNote(`Not enough recources for '${resourceName}': ${availableResources.length}/${requestItem.qty}, ${interval}, available: ${onlyAvailable}`)
+                        solution.addNote(`Not enough recources for '${resourceGroupName}': ${availableResources.length}/${requestItem.qty}, ${interval}, available: ${onlyAvailable}`)
 
                     } else if (requestItem.hasResources()) {
 

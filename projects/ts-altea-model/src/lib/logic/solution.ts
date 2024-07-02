@@ -73,14 +73,14 @@ export class Solution extends ObjectWithId {
         this.items.push(...items)
     }
 
-    getOccupationForResource(resource: Resource) : DateRangeSet {
+    getOccupationForResource(resource: Resource): DateRangeSet {
 
         if (this.isEmpty())
             return DateRangeSet.empty
 
         var itemsForResource = this.items.filter(item => item.resources.find(res => res.id == resource.id))
 
-        var dateRangesForResource = itemsForResource.map(item => { 
+        var dateRangesForResource = itemsForResource.map(item => {
             let dateRange = item.dateRange.clone()
 
             /* the date range is the range with possible start dates
@@ -93,9 +93,12 @@ export class Solution extends ObjectWithId {
 
         if (ArrayHelper.IsEmpty(dateRangesForResource))
             return DateRangeSet.empty
-        
+
         return new DateRangeSet(dateRangesForResource, resource)
     }
+
+
+
 
     add(item: SolutionItem, limitOtherItems = true) {
 
@@ -104,14 +107,15 @@ export class Solution extends ObjectWithId {
         else {
             this.items.push(item)
 
-            if (limitOtherItems) {
+            
+             if (!this.hasExactStart() && limitOtherItems) {
                 const offsetSeconds = item.request.offset.seconds
 
                 const refFrom = dateFns.addSeconds(item.dateRange.from, -offsetSeconds)
                 const refTo = dateFns.addSeconds(item.dateRange.to, -offsetSeconds)
 
                 this.limitOtherItems(refFrom, refTo)
-            }
+            } 
         }
     }
 

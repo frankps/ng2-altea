@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Template, TemplateChannel, TemplateRecipient, TemplateType, orderTemplates } from 'ts-altea-model' //'../../../../../../libs/ts-altea-common/src';
+import { Template, TemplateAction, TemplateChannel, TemplateRecipient, TemplateType, orderTemplates } from 'ts-altea-model' //'../../../../../../libs/ts-altea-common/src';
 import { DashboardService, NgSectionsComponent, ToastType } from 'ng-common';
 import { ApiStatus, CollectionChangeTracker, DbQuery, QueryOperator } from 'ts-common'
 import { SessionService, TemplateService } from 'ng-altea-common'
@@ -151,6 +151,15 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
     console.warn(this.selections)
   }
 
+  addTemplateAction(template: Template) {
+    if (!template.actions) {
+      template.actions = []
+    }
+
+    if (template.actions.length == 0)
+      template.actions.push(new TemplateAction())
+  }
+
   editTemplate(templateCode: string, variant: TemplateVariant) {
     // this.template = new Template()
 
@@ -164,6 +173,15 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
 
 
     this.changes.update(template)
+
+    if (!template.actions) {
+      template.actions = []
+    }
+
+    /*
+    if (template.actions.length == 0)
+      template.actions.push(new TemplateAction())
+*/
 
     this.template = template
 

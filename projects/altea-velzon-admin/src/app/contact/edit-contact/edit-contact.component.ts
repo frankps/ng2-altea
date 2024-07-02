@@ -1,7 +1,7 @@
 
 import { Component, ViewChild, OnInit, inject } from '@angular/core';
 import { ProductService, PriceService, ProductResourceService, ResourceService, ScheduleService, ContactService, SessionService } from 'ng-altea-common'
-import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ResourceType, ResourceTypeIcons, Resource, Schedule, Contact, Language } from 'ts-altea-model'
+import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ResourceType, ResourceTypeIcons, Resource, Schedule, Contact, Language, DepositMode } from 'ts-altea-model'
 import { BackendHttpServiceBase, DashboardService, FormCardSectionEventData, NgEditBaseComponent, ToastType, TranslationService } from 'ng-common'
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxModalComponent, DeleteModalComponent } from 'ng-common';
@@ -42,12 +42,14 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
 
   gender: Translation[] = []
   language: Translation[] = []
+  depositMode: Translation[] = []
+  DepositMode = DepositMode
 
   countries: any[] = []
   // scheduleChanges?: CollectionChangeTracker<Schedule>
 
   depositPctgs = [...Array(21).keys()].map(i => { return { pct: (i * 5), label: `${i * 5} %` } })
-  depositMode: 'default' | 'custom' = "default"   // default or custom
+  //depositMode: 'default' | 'custom' = "default"   // default or custom
 
   mobilePhoneCss = {
     row: 'row mt-3',
@@ -67,9 +69,10 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
       , contactSvc
       , router, route, spinner, dashboardSvc)
 
-    this.sectionProps.set('general', ['first', 'last', 'gender', 'birth', 'email', 'emailRemind', 'mobile', 'smsRemind', 'language', 'depositPct'])
+    this.sectionProps.set('general', ['first', 'last', 'gender', 'birth', 'email', 'emailRemind', 'mobile', 'smsRemind', 'language', 'deposit', 'depositPct'])
     this.translationSvc.translateEnum(Gender, 'enums.gender.', this.gender)
     this.translationSvc.translateEnum(Language, 'enums.language.', this.language)
+    this.translationSvc.translateEnum(DepositMode, 'enums.deposit-mode.', this.depositMode)
 
     this.loadCountries()
   }
@@ -130,10 +133,6 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
     console.error('objectRetrieved')
     console.error(contact)
 
-    if (contact?.depositPct)
-      this.depositMode = "custom"
-    else
-      this.depositMode = "default"
 
     await this.getMessages(contact)
 

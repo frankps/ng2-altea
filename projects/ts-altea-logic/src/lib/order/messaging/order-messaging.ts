@@ -44,13 +44,46 @@ export class OrderMessaging extends OrderMessagingBase {
         super(db)
     }
 
+    async doAllMessaging() {
+
+        console.info('Start messaging for ALL orders')
+
+        const orders = await this.alteaDb.getOrdersNeedingCommunication()
+
+        if (ArrayHelper.IsEmpty(orders)) {
+            console.info('No orders with communication')
+            return
+        }
+
+
+        for (let order of orders) {
+            const res = this.doMessaging(order)
+        }
+
+
+    }
+
     async doMessaging(order: Order): Promise<ApiResult<Order>> {
 
         if (!order)
             return new ApiResult<Order>(order, ApiStatus.error, 'No order supplied!')
 
+        /*
         if (order.deposit > 0 && order.paid < order.deposit)
             return await this.depositMessaging(order)
+*/
+
+        switch (order.state) {
+
+            case OrderState.waitDeposit:
+                console.info(`Deposit messaging for ${order.code}`)
+                return await this.depositMessaging(order)
+
+            case OrderState.confirmed:
+                console.info(`Reminder messaging for ${order.code}`)
+                return await this.reminderMessaging(order)
+
+        }
 
         // from here: deposit is OK => work on reminders, etc...
 
@@ -69,18 +102,51 @@ export class OrderMessaging extends OrderMessagingBase {
         if (order.deposit == 0 || order.paid >= order.deposit)
             return new ApiResult<Order>(order, ApiStatus.error, 'No deposit needed or deposit already paid!')
 
+        order.contact.selectMsgType
+
+
         return new ApiResult<Order>(order, ApiStatus.ok)
     }
 
-    async depositMessaging(order: Order): Promise<ApiResult<Order>> {
+
+
+
+    async depositMessaging(order: Order, isFirstDepositMessage = false): Promise<ApiResult<Order>> {
 
         if (order.deposit == 0 || order.paid >= order.deposit)
             return new ApiResult<Order>(order, ApiStatus.error, 'No deposit needed or deposit already paid!')
 
-        
+        if (isFirstDepositMessage) {
+            
+        }
 
+
+
+        this.setNextDepositReminder(order)
 
         return new ApiResult<Order>(order, ApiStatus.ok)
+    }
+
+
+    /**
+     * we want to send a new reminder in half the time from now till the deadline of the reminder
+     * @param order 
+     */
+    setNextDepositReminder(order: Order) {
+
+        var currentMsgOn = order.msgOnDate() ?? new Date()
+        var depositBy = order.depositByDate()
+
+        var minutesDiff = dateFns.differenceInMinutes(depositBy, currentMsgOn)
+        minutesDiff = Math.round(minutesDiff)
+
+        if (minutesDiff > 60) {
+
+            const nextMsgOn = dateFns.addMinutes(currentMsgOn, minutesDiff)
+            order.msgOn = DateHelper.yyyyMMddhhmmss(nextMsgOn)
+        }
+
+
     }
 
     async reminderMessaging(order: Order): Promise<ApiResult<Order>> {
@@ -112,7 +178,7 @@ export class OrderMessaging extends OrderMessagingBase {
             order.msgOn = DateHelper.yyyyMMddhhmmss(nextReminder.date)
             order.msgCode = 'reminder'
             order.m.setDirty('msgOn', 'msgCode')
-            
+
         }
 
         /** now check if we need to send a reminder */
@@ -196,22 +262,22 @@ export class OrderMessaging extends OrderMessagingBase {
 
         }
 
-       // messages.filter(m => alreadySent.findIndex(already => already.on == r.on && already.type == r.type) == -1)
+        // messages.filter(m => alreadySent.findIndex(already => already.on == r.on && already.type == r.type) == -1)
 
         return toSend
 
     }
 
-    lastSentDate(alreadySent: Message[], type: string, code: string) : Date {
+    lastSentDate(alreadySent: Message[], type: string, code: string): Date {
         let alreadySentForType = alreadySent.filter(m => m.code == code && m.type == type)
-        let lastSentOn = new Date(1900,0,1)
+        let lastSentOn = new Date(1900, 0, 1)
 
-       if (ArrayHelper.AtLeastOneItem(alreadySentForType)) {
-          alreadySentForType = _.orderBy(alreadySentForType, 'sent', 'desc')
-          lastSentOn = alreadySentForType[0].sentDate()
-       }
+        if (ArrayHelper.AtLeastOneItem(alreadySentForType)) {
+            alreadySentForType = _.orderBy(alreadySentForType, 'sent', 'desc')
+            lastSentOn = alreadySentForType[0].sentDate()
+        }
 
-       return lastSentOn
+        return lastSentOn
 
     }
 
@@ -233,3 +299,4 @@ export class OrderMessaging extends OrderMessagingBase {
 
 
 }
+

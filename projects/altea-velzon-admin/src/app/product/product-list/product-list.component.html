@@ -3,10 +3,10 @@
 
 <div class="row mb-4">
   <div class="col-9 d-flex justify-content-start">
-    <h3>{{ 'menu.catalog.sub.' + productType | translate }}&nbsp;</h3> 
+    <h3>{{ 'menu.catalog.sub.' + productType | translate }}&nbsp;</h3>
     <i *ngIf="objects?.length > 0" class="fas fa-pen float-end" style="color: gray;" (click)="toggleEditMode()"></i>
 
-<!--     <i class="fa-solid fa-file-export" (click)="export()"></i> -->
+    <!--     <i class="fa-solid fa-file-export" (click)="export()"></i> -->
   </div>
 
   <div class="col-3">
@@ -18,6 +18,9 @@
       <div ngbDropdownMenu aria-labelledby="dropdownManual">
         <button ngbDropdownItem (click)="startMoveSelected()"><i
             class="fa-duotone fa-arrow-up-right-from-square me-1"></i> {{ 'dic.move' | translate }} </button>
+
+        <button ngbDropdownItem (click)="deleteSelected()"><i
+            class="fa-duotone fa-arrow-up-right-from-square me-1"></i> {{ 'dic.delete' | translate }} </button>
       </div>
     </div>
   </div>

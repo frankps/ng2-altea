@@ -711,7 +711,7 @@
 
         <ng-container edit>
 
-            <form #remindersForm="ngForm">
+            <form #remindersForm="ngForm" *ngIf="initialized">
 
                 <ng-container *ngTemplateOutlet="reminders"></ng-container>
 

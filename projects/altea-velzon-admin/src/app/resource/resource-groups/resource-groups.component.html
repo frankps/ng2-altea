@@ -13,8 +13,22 @@
             <li class="list-group-item" *ngFor="let obj of collection; let idx = index">
                 <a [routerLink]="['/aqua/resources/any/',obj[linkProperty].id]">{{obj[linkProperty].name}} </a>
 
-                <i *ngIf="parent.editSectionId === thisSection && mode === ListSectionMode.readOnly"
-                    class="fas fa-trash float-end" (click)="delete(obj)"></i>
+
+
+
+
+
+                <ng-container *ngIf="parent.editSectionId === thisSection && mode === ListSectionMode.readOnly">
+                    <i class="fas fa-trash float-end" (click)="delete(obj)"></i>
+
+                    <span class="float-end me-3">
+                        <i class="fa-solid fa-circle-minus" (click)="decrement(obj)"></i>
+                        &nbsp; {{obj.pref}} &nbsp;
+                        <i class="fa-solid fa-circle-plus" (click)="increment(obj)"></i>
+                    </span>
+                </ng-container>
+
+
             </li>
 
 

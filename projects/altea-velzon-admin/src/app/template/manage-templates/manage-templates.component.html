@@ -35,7 +35,7 @@
         <ng-container *ngIf="selectionsAvailable">
             <div class="row mb-1  d-flex justify-content-center" *ngFor="let templateCode of templateCodes">
 
-                <div class="col-2">{{'templates.order.' + templateCode | translate}}</div>
+                <div class="col-2">{{'enums.template-code.' + templateCode | translate}}</div>
 
                 <ng-container *ngIf="selections[templateCode]">
 
@@ -90,7 +90,40 @@
                     </ngx-altea-label-control>
 
                 </div>
-            </div>  
+                <div class="col-10 mt-2">
+
+                    <h5>Acties &nbsp; <i class="fa-solid fa-circle-plus" (click)="addTemplateAction(template)"></i> </h5>
+                    <ng-container *ngIf="template.actions">
+                        <ng-container *ngFor="let action of template.actions">
+
+
+                            <div class="row mt-2">
+                                <div class="col-6">
+                                    <ngx-altea-label-control label="objects.template.action.label" for="actionLabel">
+                                        <input type="text" id="actionLabel" name="actionLabel" class="form-control"
+                                            [(ngModel)]="action.label" />
+                                    </ngx-altea-label-control>
+                                </div>
+                                <div class="col-6">
+                                    <ngx-altea-label-control label="objects.template.action.url" for="actionUrl">
+                                        <input type="text" id="actionUrl" name="actionUrl" class="form-control"
+                                            [(ngModel)]="action.url" />
+                                    </ngx-altea-label-control>
+
+                                </div>
+
+                            </div>
+
+                        </ng-container>
+                    </ng-container>
+
+                </div>
+            </div>
+
+
+
+
+
         </ng-container>
 
 

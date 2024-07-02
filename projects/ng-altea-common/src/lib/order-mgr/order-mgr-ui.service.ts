@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import { Injectable, OnInit } from '@angular/core';
-import { AppMode, AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Branch, ConfirmOrderResponse, Contact, CreateCheckoutSession, DateBorder, Gift, GiftType, Order, OrderLine, OrderLineOption, OrderState, Payment, PaymentType, Product, ProductType, ProductTypeIcons, RedeemGift, ReservationOption, ReservationOptionSet, Resource, ResourcePlanning, ResourceType } from 'ts-altea-model'
-import { ApiListResult, ApiStatus, DateHelper, DbQuery, QueryOperator, Translation } from 'ts-common'
+import { AppMode, AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Branch, ConfirmOrderResponse, Contact, CreateCheckoutSession, DateBorder, Gift, GiftType, Order, OrderLine, OrderLineOption, OrderState, Payment, PaymentType, Product, ProductSubType, ProductType, ProductTypeIcons, RedeemGift, ReservationOption, ReservationOptionSet, Resource, ResourcePlanning, ResourceType } from 'ts-altea-model'
+import { ApiListResult, ApiStatus, ArrayHelper, DateHelper, DbQuery, QueryOperator, Translation } from 'ts-common'
 import { AlteaService, GiftService, ObjectService, OrderMgrService, OrderService, ProductService, ResourceService, SessionService } from 'ng-altea-common'
 import * as _ from "lodash";
 import { NgxSpinnerService } from "ngx-spinner"
@@ -17,7 +17,7 @@ export enum OrderUiState {
   demoOrders = 'demo-orders',
   browseCatalog = 'browse-catalog',
   requestInvoice = 'request-invoice'
-}  
+}
 
 export enum OrderUiMode {
   newOrder = 'new-order',
@@ -90,7 +90,7 @@ export class OrderMgrUiService {   // implements OnInit
     // this.alteaDb = new AlteaDb(dbSvc)
     // this.getAllCategories()
 
-    
+
     this.sessionSvc.branch$().then(branch => {
       this.branch = branch
 
@@ -254,7 +254,7 @@ export class OrderMgrUiService {   // implements OnInit
     const me = this
 
 
-      
+
 
     this.spinner.show()
 
@@ -353,7 +353,7 @@ export class OrderMgrUiService {   // implements OnInit
 
         if (product) {
           const optionValues = line.getOptionValuesAsMap()
-          await this.addOrderLineFromProduct(product, line.qty, optionValues)
+          await this.addProduct(product, line.qty, optionValues)
         }
       }
     }
@@ -387,7 +387,7 @@ export class OrderMgrUiService {   // implements OnInit
 
       this.order = order
 
-      let depoDate = order.depositByDate()
+      let depoDate = order.calculateDepositByDate()
 
       this.order.branch = this.sessionSvc.branch
 
@@ -517,7 +517,6 @@ export class OrderMgrUiService {   // implements OnInit
       this.orderLine = this.order.getLine(this.orderLine?.id)
   }
 
-  async
 
   async changeState() {
 
@@ -733,6 +732,36 @@ export class OrderMgrUiService {   // implements OnInit
 
   }
 
+
+
+  async addProduct(product: Product, qty = 1, initOptionValues?: Map<String, String[]>) {
+
+    if (product.sub == ProductSubType.bundle) {
+
+      console.error(product.items)
+      if (ArrayHelper.IsEmpty(product.items))
+        return
+
+      for (let item of product.items) {
+
+        const product = await this.productSvc.get$(item.productId)
+
+        if (!product) {
+          console.warn(`Product not found!`)
+          continue
+        }
+
+        let orderLine = this.newOrderLine(product, item.qty, item.getOptionValuesAsMap())
+        await this.addOrderLine(orderLine)
+      }
+
+    } else {
+      let orderLine = this.newOrderLine(product, qty, initOptionValues)
+      await this.addOrderLine(orderLine)
+    }
+
+  }
+
   newOrderLine(product: Product, qty = 1, initOptionValues?: Map<String, String[]>): OrderLine {
 
     console.error(product)
@@ -744,10 +773,7 @@ export class OrderMgrUiService {   // implements OnInit
     return this.orderLine
   }
 
-  async addOrderLineFromProduct(product: Product, qty = 1, initOptionValues?: Map<String, String[]>) {
-    let orderLine = this.newOrderLine(product, qty, initOptionValues)
-    await this.addOrderLine(orderLine)
-  }
+
 
   async addOrderLine(orderLine: OrderLine, qty = 1, setUnitPrice = true) {
     // orderLine.orderId = this.order.id
@@ -800,6 +826,8 @@ export class OrderMgrUiService {   // implements OnInit
 
     this.order.contact = contact
 
+    this.order.calculateAll()
+    
     await this.calculateLoyalty()
 
   }

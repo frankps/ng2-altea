@@ -67,11 +67,15 @@ export class OrderMgmtService {
 
                 /** if order was created internally (Point Of Sale) and still a deposit to pay */
                 if (order.src == OrderSource.pos && order.deposit > 0 && order.paid < order.deposit) {
-                    await msgSvc.depositMessaging(order)
+                    await msgSvc.depositMessaging(order, true)
                     order.state = OrderState.waitDeposit
                     order.m.setDirty('state')
                 }
+                break
 
+            case OrderState.waitDeposit:
+                order.depositBy = DateHelper.yyyyMMddhhmmss()
+                order.m.setDirty('depositBy')
                 break
 
             case OrderState.confirmed:
@@ -82,10 +86,7 @@ export class OrderMgmtService {
                 break
 
 
-            case OrderState.waitDeposit:
-                order.depositBy = DateHelper.yyyyMMddhhmmss()
-                order.m.setDirty('depositBy')
-                break
+
         }
 
         console.warn(order)

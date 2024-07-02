@@ -323,6 +323,13 @@ export class ContactMetrics {
 
 }
 
+export enum DepositMode {
+  none = 'none',
+  full = 'full',
+  default = 'default',
+  custom = 'custom'
+}
+
 export class Contact extends ObjectWithId {
 
   //@Type(() => Organisation)
@@ -365,6 +372,7 @@ export class Contact extends ObjectWithId {
   vatNum?: string;
   branches?: string[];
 
+  deposit: DepositMode = DepositMode.default
   depositPct?: number
 
   news: boolean = false
@@ -602,7 +610,7 @@ export class Schedule extends ObjectWithIdPlus {
 
         if (Number.isNaN(currentWeekIdx))
           console.log('currentWeekIdx is NaN')
-      } 
+      }
       else {  // if fromDate is before startOfWeekSchedule
         weekDif = Math.abs(weekDif) % nrOfWeeks
         currentWeekIdx = nrOfWeeks - 1 - weekDif
@@ -886,7 +894,7 @@ export class Product extends ObjectWithIdPlus {
   vatPct = 0
   branches?: string[];
 
-  depositPct?
+  depositPct?: number
 
   personSelect = true  // if order is for multiple persons, then customer can specify for each orderLine the person
   staffSelect = true  // customer can specify which staffmember 
@@ -1089,6 +1097,25 @@ export class ProductItem extends ObjectWithIdPlus {
       return []
 
     return this.options?.filter(o => o.hasValue())
+  }
+
+  getOptionValuesAsMap(): Map<String, String[]> {
+
+    if (ArrayHelper.IsEmpty(this.options))
+      return null
+
+    const map = new Map<String, String[]>()
+
+    for (let option of this.options) {
+
+      if (!option.hasValue())
+        continue
+
+      let values = option.values.map(val => val.id)
+      map.set(option.id, values)
+    }
+
+    return map
   }
 
   getOption(productOption: ProductOption, createIfNotExisting = true): ProductItemOption {
@@ -1904,8 +1931,11 @@ export class Resource extends ObjectWithIdPlus {
     if (!Array.isArray(this.children))
       return []
 
+    let resourceLinks = this.children.filter(resourceLink => resourceLink?.child)
 
-    const childResources = this.children.filter(resourceLink => resourceLink?.child).map(resourceLink => resourceLink.child!)
+    resourceLinks = _.orderBy(resourceLinks, ['pref'], ['desc'])
+
+    const childResources = resourceLinks.map(resourceLink => resourceLink.child!)
 
     return childResources
     /*
@@ -2540,7 +2570,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
   /** messaging (email,sms) to customer enabled */
   msg = true
 
-  msgOn?: number
+  msgOn?: number   // format: yyyyMMddhhmmss
   msgCode?: string
 
   @Type(() => OrderCancel)
@@ -2549,6 +2579,24 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
   /** The device/location where app was created (needed for deposit handling) */
   src?: OrderSource = OrderSource.pos
 
+
+  msgOnDate(): Date | null {
+
+    if (this.msgOn && Number.isInteger(this.msgOn))
+      return DateHelper.parse(this.msgOn)
+    else
+      return null
+
+  }
+
+  depositByDate(): Date | null {
+
+    if (this.depositBy && Number.isInteger(this.depositBy))
+      return DateHelper.parse(this.depositBy)
+    else
+      return null
+
+  }
 
   //msgLog: MsgInfo[] = []
 
@@ -2571,6 +2619,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
   constructor(codePrefix?: string, markAsNew = false) {
     super()
 
+    /*
     let date = dateFns.format(new Date(), 'yyMMdd')
 
     if (codePrefix?.length >= 2) {
@@ -2581,11 +2630,52 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
     let subId = this.id.substring(this.id.length - 5).toUpperCase()
     this.code = `${codePrefix}-${date}-${subId}`
+    */
+
+    this.code = this.generateCode(this.cre)
 
     if (markAsNew)
       this.m.n = true
     //delete this.id //= undefined
   }
+
+  /** generate a unique numerical code (can be entered on keypad, phone) */
+  generateCode(date: Date = new Date()): string {
+
+    const year = dateFns.format(date, 'yy').substring(1)
+
+    let monthNum = date.getMonth() + 1
+
+    let dayIncrement = 0
+    switch (monthNum) {
+      case 10:
+        monthNum = 0
+        break
+
+      case 11:
+        dayIncrement = 30
+        monthNum = 1
+        break
+
+      case 12:
+        dayIncrement = 60
+        monthNum = 2
+        break
+    }
+
+
+    let dayNum = date.getDate()
+    dayNum += dayIncrement
+    const random = Math.floor(Math.random() * 100)
+
+    const hour = dateFns.format(date, 'HH')
+
+    var code = `${year}${monthNum}${dayNum}${hour}${random}`
+
+    return code
+
+  }
+
 
   get startDate(): Date | undefined {
     if (!this.start)
@@ -2612,7 +2702,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     }
   }
 
-  depositByDate(): Date {
+  calculateDepositByDate(): Date {
 
     // Thu Apr 18 2024 10:10:46 GMT+0200 (Central European Summer Time)
     // Thu Apr 18 2024 10:19:21 GMT+0200 (Central European Summer Time)
@@ -2624,7 +2714,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
   }
 
   setDepositBy() {
-    this.depositBy = DateHelper.yyyyMMddhhmmss(this.depositByDate())
+    this.depositBy = DateHelper.yyyyMMddhhmmss(this.calculateDepositByDate())
   }
 
   asDbObject(): DbObjectCreate<Order> {
@@ -2802,14 +2892,36 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
     this.makeLineTotals()
     this.calculateVat()
-    this.calculateDeposit()
 
+    const deposit = this.calculateDeposit()
+
+    if (deposit != this.deposit) {
+      this.deposit = deposit
+      this.markAsUpdated('deposit')
+    }
   }
 
 
   calculateDeposit(): number {
 
     console.error('calculateDeposit')
+
+    /** deposit behavior can be overruled on contact level */
+    if (this.contact) {
+
+      switch (this.contact.deposit) {
+        case undefined:
+        case DepositMode.default:
+          // just continue with normal calculation  
+          break
+
+        case DepositMode.none:
+          return 0
+
+        case DepositMode.full:
+          return this.incl
+      }
+    }
 
     if (!this.hasLines() || this.incl == 0)
       return 0
@@ -2843,10 +2955,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     deposit = Math.round(deposit)
 
 
-    if (deposit != this.deposit) {
-      this.deposit = deposit
-      this.markAsUpdated('deposit')
-    }
+
 
     return deposit
   }
@@ -4163,14 +4272,32 @@ export enum TemplateType {
   cancelClient = 'cancelClient',
   cancelProvider = 'cancelProvider',
   change = 'change',
-  reminder = 'reminder'
+  reminder = 'reminder',
+  waitDeposit = 'waitDeposit',
+
 }
 
 export enum OrderTemplate {
   noDepositCancel = 'noDepositCancel'
 }
 
-export const orderTemplates = ['waitDeposit', 'confirmed', 'noDepositCancel', 'inTimeCancel', 'lateCancel', 'reminder', 'noShow', 'satisfaction']
+export const orderTemplates = ['resv_wait_deposit', 'resv_remind_deposit', 'resv_confirmation',
+  'resv_no_deposit_cancel', 'resv_in_time_cancel', 'resv_late_cancel', 'resv_change_date',
+  'resv_reminder', 'resv_no_show', 'resv_satisfaction', 'resv_internal_cancel']
+
+export enum TemplateCode {
+  resv_wait_deposit = 'resv_wait_deposit',
+  resv_remind_deposit = 'resv_remind_deposit',
+  resv_confirmation = 'resv_confirmation',
+  resv_no_deposit_cancel = 'resv_no_deposit_cancel',
+  resv_in_time_cancel = 'resv_in_time_cancel',
+  resv_late_cancel = 'resv_late_cancel',
+  resv_change_date = 'resv_change_date',
+  resv_reminder = 'resv_reminder',
+  resv_no_show = 'resv_no_show',
+  resv_satisfaction = 'resv_satisfaction',
+  resv_internal_cancel = 'resv_internal_cancel'
+}
 
 /*
 cancel
@@ -4189,7 +4316,18 @@ export enum TemplateChannel {
   sms = 'sms'
 }
 
+export class TemplateAction {
+  label?: string
+  url?: string
+}
+
+export enum TemplateCode {
+
+}
+
+
 export class Template extends ObjectWithIdPlus {
+
   orgId?: string
   branchId?: string
   idx = 0
@@ -4208,8 +4346,8 @@ export class Template extends ObjectWithIdPlus {
   short?: string | null
   remind = 60
 
-
-
+  footer?: string | null
+  actions: TemplateAction[] = []
 
   //fruit = 'pomme'
 
@@ -5075,7 +5213,7 @@ export class ObjectLog extends ObjectWithId {
 
   objId?: string
 
-  
+
 
   action?: ObjectLogAction
 

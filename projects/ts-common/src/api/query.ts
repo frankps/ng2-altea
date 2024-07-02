@@ -59,8 +59,33 @@ export class PrismaWhere {
   OR?: any[]
 }
 
+export class DbQueryBase {
+  where = {
+    or: new Array<QueryCondition>(),
+    and: new Array<QueryCondition>()
+  }
 
-export class DbQuery {
+  and(field: string, operator: QueryOperator, value?: any): DbQueryBase {
+    const condition = new QueryCondition(field, operator, value)
+    this.where.and.push(condition)
+    return this
+  }
+
+  or(field: string, operator: QueryOperator, value?: any): DbQueryBase {
+    const condition = new QueryCondition(field, operator, value)
+    this.where.or.push(condition)
+    return this
+  }
+}
+
+export class DbUpdateMany<T> extends DbQueryBase {
+
+  update: T
+
+
+}
+
+export class DbQuery extends DbQueryBase {
 
   // where = {
   //     or:  new OrQuery(),
@@ -68,11 +93,6 @@ export class DbQuery {
   // }
 
 
-
-  where = {
-    or: new Array<QueryCondition>(),
-    and: new Array<QueryCondition>()
-  }
 
   take = 50
 
@@ -82,17 +102,7 @@ export class DbQuery {
 
   includes = new Array<string>()
 
-  and(field: string, operator: QueryOperator, value?: any): DbQuery {
-    const condition = new QueryCondition(field, operator, value)
-    this.where.and.push(condition)
-    return this
-  }
 
-  or(field: string, operator: QueryOperator, value?: any): DbQuery {
-    const condition = new QueryCondition(field, operator, value)
-    this.where.or.push(condition)
-    return this
-  }
 
   orderBy(field?: string, order: SortOrder = SortOrder.asc): DbQuery {
     const newOrder = new OrderByProperty(field, order)
@@ -229,7 +239,7 @@ export class DbObjectMulti<Inp, Out> {
 /**
  *  Typically used for inserting
  */
-export class DbObjectMultiCreate<T> extends DbObjectMulti<T, T>{
+export class DbObjectMultiCreate<T> extends DbObjectMulti<T, T> {
   constructor(typeName: string, type: { new(): T; }, objects: T[]) {
     super(typeName, type, objects)
   }

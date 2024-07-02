@@ -61,7 +61,7 @@ export class ResourceGroupsComponent {
 
     this.changes = new CollectionChangeTracker<ResourceLink>(value, ResourceLink, {
       idProperties: ['groupId', 'childId'],
-      propsToRemove: ['group', 'child', 'id']
+      propsToRemove: ['group', 'child']   // , 'id', , 'groupId', 'childId'
     })
 
   }
@@ -103,9 +103,16 @@ export class ResourceGroupsComponent {
       this.resources = this.allResources.filter(r => r.isGroup)
     else
       this.resources = this.allResources.filter(r => !r.isGroup)
+  }
 
+  decrement(link: ResourceLink) {
+    link.pref--
+    this.changes.update(link)
+  }
 
-
+  increment(link: ResourceLink) {
+    link.pref++
+    this.changes.update(link)
   }
 
 

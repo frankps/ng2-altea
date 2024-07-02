@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { OnlineMode, Product, ProductType, ProductTypeIcons } from 'ts-altea-model'
-import { ApiListResult, DbQuery, QueryOperator, Translation, ApiResult, ApiStatus, CollectionChangeTracker } from 'ts-common'
+import { ApiListResult, DbQuery, QueryOperator, Translation, ApiResult, ApiStatus, CollectionChangeTracker, DbQueryBase, DbUpdateMany } from 'ts-common'
 import { ProductService, SessionService } from 'ng-altea-common'
 import { DashboardService, TranslationService, NgBaseListComponent, ToastType } from 'ng-common'
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -97,6 +97,43 @@ export class ProductListComponent extends NgBaseListComponent<Product> implement
 
   }
 
+  async deleteSelected() {
+
+    this.spinner.show()
+
+    for (let id of this.selectedIds) {
+
+      var res = await this.productSvc.delete$(id, this.dashboardSvc.resourceId)
+
+      if (res.isOk) {
+
+        var idx = this.objects.findIndex(obj => obj.id == id)
+
+        if (idx >= 0)
+          this.objects.splice(idx, 1)
+      }
+
+      console.log(res)
+
+    }
+
+    this.spinner.hide()
+
+    /*
+    var qry = new DbUpdateMany<any>()
+
+    qry.and('id', QueryOperator.in, this.selectedIds)
+
+    
+    qry.update = {
+      act: false,
+      del: true,
+      upd: new Date()
+    }
+
+    const res = this.productSvc.updateMany$(qry)
+*/
+  }
 
   async startMoveSelected() {
 

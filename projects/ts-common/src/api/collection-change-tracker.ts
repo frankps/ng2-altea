@@ -3,6 +3,7 @@ import { ObjectHelper } from "../lib";
 import { ObjectWithId } from "../lib/object-with-id"
 import { ApiBatchProcess } from "./api-batch"
 import * as _ from "lodash";
+import { instanceToPlain } from "class-transformer";
 
 
 type EmptyObject = {
@@ -171,6 +172,11 @@ export class CollectionChangeTracker<T extends ObjectWithId> {
     // if object will be deleted, we can forget updates
     _.remove(this.updateIds, idUpdate => idUpdate === id)
 
+    const idOrIdObject = this.getId(removed)
+
+    this.deleteIds.push(idOrIdObject)
+
+    /*
     if (this.params.idProperties && this.params.idProperties.length > 0 && this.params.idProperties[0] != 'id') {
       let objToRemove: EmptyObject = {}
 
@@ -180,6 +186,24 @@ export class CollectionChangeTracker<T extends ObjectWithId> {
 
     } else
       this.deleteIds.push(id)
+    */
+  }
+
+
+  /** Most often, an id is just a string, but some link tables have a combined key instead of a string id.
+   * In that case an object is returned with all properties that make up the key
+   */
+  getId(obj: any): any {
+
+    if (this.params.idProperties && this.params.idProperties.length > 0 && this.params.idProperties[0] != 'id') {
+      let idObject: EmptyObject = {}
+
+      this.params.idProperties.forEach(idProp => idObject[idProp as keyof object] = obj[idProp as keyof object])
+
+      return idObject
+
+    } else
+      return obj.id
   }
 
 
@@ -190,6 +214,7 @@ export class CollectionChangeTracker<T extends ObjectWithId> {
 
     const sub: any = {}
     sub['id'] = obj.id
+
 
     const origObject = this.colOrig.find(orig => orig.id == obj.id)
 
@@ -211,16 +236,21 @@ export class CollectionChangeTracker<T extends ObjectWithId> {
   }
 
 
-  createPartialObjectByRemovingProps(obj: any, propsToRemove?: string[]): any {
+  createPartialObjectByRemovingProps(obj: any, isUpdate: boolean, propsToRemove?: string[]): any {
 
     if (!Array.isArray(propsToRemove) || propsToRemove.length == 0)
       return obj
 
-    const clone = ObjectHelper.clone(obj, this.type)
+    const clone = instanceToPlain(obj) //ObjectHelper.clone(obj, this.type)
+
+    if (isUpdate) {   // was needed for types without an id, but having instead combined keys 
+      clone['id'] = this.getId(obj)
+    }
 
     propsToRemove.forEach(prop => {
       delete clone[prop]
     })
+
 
     return clone
   }
@@ -254,7 +284,7 @@ export class CollectionChangeTracker<T extends ObjectWithId> {
     else {
       /* 
       */
-      batch.update = objectsToUpdate.map(obj => this.createPartialObjectByRemovingProps(obj, this.params.propsToRemove))
+      batch.update = objectsToUpdate.map(obj => this.createPartialObjectByRemovingProps(obj, true, this.params.propsToRemove))
     }
 
     // if (this.params.propsToRemove && this.params.propsToRemove.length > 0)
@@ -264,7 +294,7 @@ export class CollectionChangeTracker<T extends ObjectWithId> {
     batch.delete = this.deleteIds
 
     batch.create = this.col?.filter(i => i.id ? this.createIds.indexOf(i.id) >= 0 : false)
-    batch.create = batch.create.map(obj => this.createPartialObjectByRemovingProps(obj, this.params.propsToRemove))
+    batch.create = batch.create.map(obj => this.createPartialObjectByRemovingProps(obj, false, this.params.propsToRemove))
 
     return batch
 

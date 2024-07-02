@@ -76,6 +76,7 @@ export class DemoOrdersComponent implements OnInit {
   bodyslimmingId = "b910237f-09cf-4dff-a265-4e6013224c57"
   bodysculptor12x30 = "3667402e-2e5b-4655-b93e-a9e6955cbd4d"
   bodysculptorReveal30min = "578fd568-5560-473c-931b-1fb770ed85d6"
+  veryGoodMorningId = "00ae379f-ea9b-4ab4-a41e-c7e70e6308de"
 
   names = ['Wellness 2h/2p', 'Massage']
 
@@ -89,11 +90,22 @@ export class DemoOrdersComponent implements OnInit {
     ['Duo massage', DemoOrder.new(this.massageId, 2)],
     ['Massage & Manicure', DemoOrder.new(this.massageId, 1).add(this.manicureId, 1)],  // .fromProducts(this.massageId, this.manicureId)
     ['BodySculptor 12x30min', DemoOrder.fromProducts(this.bodysculptor12x30)],
-    ['BodySculptor Reveal 30min', DemoOrder.fromProducts(this.bodysculptorReveal30min)]
+    ['BodySculptor Reveal 30min', DemoOrder.fromProducts(this.bodysculptorReveal30min)],
+    ['A very good morning', DemoOrder.fromProducts(this.veryGoodMorningId)]
     //  
   ]);
 
+  /**    
+   * Some contacts (deposit mode between brackets)
+   */
+  contacts = new Map<string, string>([
+    ['Hilde Van Driessche (100%)', '44f16d0b-a5bc-4a49-9f6d-9805fae2004e'],   
+    ['Nele De Smet (0%)', '013af14a-3689-4c1d-8b7f-92a259f88540'],
+    ['Sarah Van Lierde (default)', '0a6d8058-008f-48ab-8576-375aa98cee22']
+  ])
+
   demoNames: string[] = []
+  contactNames: string[] = []
 
   preselect: string // = 'Bodyslimming sessie' // 'Wellness 2h/2p'
   onDate: number // = 20240315000000
@@ -102,6 +114,22 @@ export class DemoOrdersComponent implements OnInit {
   constructor(protected orderMgrSvc: OrderMgrUiService, protected sessionSvc: SessionService, protected spinner: NgxSpinnerService, protected contactSvc: ContactService) {
 
     this.demoNames = Array.from(this.demos.keys())
+    this.contactNames = Array.from(this.contacts.keys())
+
+  }
+
+  async setContact(entry) {
+
+    console.error(entry)
+    //var entries = this.contacts.entries()
+
+    var contactId = this.contacts.get(entry)
+
+    var contact = await this.contactSvc.get$(contactId)
+
+    console.error(contact)
+
+    await this.orderMgrSvc.setContact(contact)
 
   }
 
@@ -160,7 +188,7 @@ export class DemoOrdersComponent implements OnInit {
       const product = products.find(p => p.id == line.productId)
 
       if (product)
-        this.orderMgrSvc.addOrderLineFromProduct(product, line.qty)
+        this.orderMgrSvc.addProduct(product, line.qty)
       // line.productId
 
     }

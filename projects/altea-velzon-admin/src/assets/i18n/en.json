@@ -46,6 +46,12 @@
     "end": "einde"
   },
   "enums": {
+    "deposit-mode": {
+      "none": "Geen",
+      "full": "Volledig bedrag",
+      "default": "Standaard",
+      "custom": "Aangepast"
+    },
     "loyalty-option-condition": {
       "eql": "=",
       "min": ">="
@@ -290,18 +296,19 @@
       "cancel": "Annulatie",
       "change": "Aanpassing",
       "reminder": "Herinnering"
-    }
-  },
-  "templates": {
-    "order": {
-      "waitDeposit": "Wachten op voorschot",
-      "confirmed": "Confirmatie",
-      "noDepositCancel": "Annulatie - geen voorschot",
-      "inTimeCancel": "Annulatie - op tijd",
-      "lateCancel": "Late annulatie",
-      "reminder": "Herinnering",
-      "noShow": "No show",
-      "satisfaction": "Tevredenheid"
+    },
+    "template-code": {
+      "resv_wait_deposit": "Wachten op voorschot",
+      "resv_remind_deposit": "Herinnering voorschot",
+      "resv_confirmation": "Confirmatie",
+      "resv_no_deposit_cancel": "Annulatie - geen voorschot",
+      "resv_in_time_cancel": "Annulatie - op tijd",
+      "resv_late_cancel": "Late annulatie",
+      "resv_change_date": "Andere datum",
+      "resv_reminder": "Herinnering",
+      "resv_no_show": "No show",
+      "resv_satisfaction": "Tevredenheid",
+      "resv_internal_cancel": "Interne annulatie (ziekte, etc...)"
     }
   },
   "ui": {
@@ -311,7 +318,7 @@
     "order-cancel": {
       "deposit": "Gevraagde voorschot",
       "paid": "Reeds betaald",
-      "cancelBtn": "Annuleer order" 
+      "cancelBtn": "Annuleer order"
     },
     "search-user": {
       "search": "Zoek gebruiker",
@@ -683,7 +690,6 @@
       "card": {
         "amount": ""
       }
-
     },
     "gift": {
       "_single": "Cadeaubon",
@@ -801,6 +807,7 @@
       "company": "Bedrijf",
       "vatNum": "BTW nummer",
       "deposit": "Voorschot",
+      "depositPct": "Voorschot percentage",
       "news": "Ik ontvang graag de {{company}} nieuwsbrief"
     },
     "template": {
@@ -809,6 +816,10 @@
       "body": {
         "email": "E-mail",
         "sms": "SMS"
+      },
+      "action": {
+        "label": "Label",
+        "url": "Link"
       },
       "short": "SMS"
     },
@@ -990,7 +1001,8 @@
         "domo": "Domotica",
         "jobs": "Jobs"
       }
-    },"resources": {
+    },
+    "resources": {
       "label": "Resources",
       "sub": {
         "human": "Personeel",
