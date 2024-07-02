@@ -25,8 +25,10 @@
     <div class="card-body">
 
         <div class="row">
-            <div class="col d-flex justify-content-end align-items-center">{{'objects.order.state' | translate}}: {{'enums.order-state.' + order.state | translate}} &nbsp; 
-                <i *ngIf="order.stateIcon()" [style.color]="order.stateColor()" [class]="order.stateIcon()"></i> </div>
+            <div class="col d-flex justify-content-end align-items-center">{{'objects.order.state' | translate}}:
+                {{'enums.order-state.' + order.state | translate}} &nbsp;
+                <i *ngIf="order.stateIcon()" [style.color]="order.stateColor()" [class]="order.stateIcon()"></i>
+            </div>
 
 
         </div>
@@ -66,7 +68,7 @@
 
         </ng-container>
 
-        
+
 
         <ng-container *ngFor="let line of order.lines">
             <div (click)="selectOrderLine(line)">
@@ -110,7 +112,7 @@
             </div>
             <ng-container *ngIf="line.product?.isSubscription()">
 
-                <button type="button"  *ngIf="!line.subscriptionsCreated()" class="btn btn-secondary btn-sm float-end" 
+                <button type="button" *ngIf="!line.subscriptionsCreated()" class="btn btn-secondary btn-sm float-end"
                     [disabled]="!orderMgrSvc.order.contact || orderMgrSvc.orderDirty"
                     (click)="orderMgrSvc.createSubscriptions(line)">Maak abonnement</button>
 
@@ -240,13 +242,14 @@
                 </div>
 
 
-                <div class="ms-3 btn-group btn-group-sm float-end" role="group" *ngIf="order.hasServices()" aria-label="Basic example">
+                <div class="ms-3 btn-group btn-group-sm float-end" role="group" *ngIf="order.hasServices()"
+                    aria-label="Basic example">
                     <button type="button" class="btn btn-primary" (click)="toggleHumanResources()"><i
                             class="fa-solid fa-user"></i></button>
                 </div>
 
                 <button type="button" class="btn btn-primary btn-sm" (click)="cancelOrder()"><i
-                            class="fa-solid fa-trash-can"></i></button>
+                        class="fa-solid fa-trash-can"></i></button>
 
             </div>
         </div>
@@ -272,19 +275,23 @@
                 <button type="button" class="btn btn-outline-secondary float-end" (click)="next()"
                     translate>msg.continue</button>
             </div>
+        </div>
+        <div class="row mt-3">
+            <!-- <div class="col-4"> </div>
+             style="font-size: 80%;" 
+              d-flex justify-content-end
+            -->
+            <div class="col" *ngIf="sessionSvc.devMode">
 
-            <!-- <div class="col-4"> </div> -->
-            <div class="col-6 d-flex justify-content-end" *ngIf="sessionSvc.devMode">
-                <button type="button" class="btn btn-primary btn-sm"
+<!--                 <button type="button" class="btn btn-primary btn-sm"
                     (click)="orderMgrSvc.getAvailabilities()">Slots</button>
-
 
                 <button type="button" class="btn btn-primary btn-sm mx-2" (click)="next()"
                     translate>msg.continue</button>
 
 
                 <button type="button" class="btn btn-primary btn-sm mx-2" (click)="orderMgrSvc.saveOrder()"
-                    translate>dic.save</button>
+                    translate>dic.save</button> -->
 
 
                 <button type="button" class="btn btn-primary btn-sm mx-2" (click)="orderMgrSvc.changeState()">Change

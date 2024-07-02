@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbQuery, DbQueryTyped, ObjectHelper, QueryOperator } from 'ts-common'
-import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo } from 'ts-altea-model'
+import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, TemplateCode } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import * as dateFns from 'date-fns'
 import * as Handlebars from "handlebars"
@@ -104,11 +104,8 @@ export class OrderMessaging extends OrderMessagingBase {
 
         order.contact.selectMsgType
 
-
         return new ApiResult<Order>(order, ApiStatus.ok)
     }
-
-
 
 
     async depositMessaging(order: Order, isFirstDepositMessage = false): Promise<ApiResult<Order>> {
@@ -116,11 +113,14 @@ export class OrderMessaging extends OrderMessagingBase {
         if (order.deposit == 0 || order.paid >= order.deposit)
             return new ApiResult<Order>(order, ApiStatus.error, 'No deposit needed or deposit already paid!')
 
-        if (isFirstDepositMessage) {
-            
-        }
+        const branch = await this.alteaDb.getBranch(order.branchId)
 
+        let templateCode = TemplateCode.resv_remind_deposit
 
+        if (isFirstDepositMessage) 
+            templateCode = TemplateCode.resv_wait_deposit
+
+        const sendRes = await this.sendMessages([MsgType.email], templateCode, order, branch, true)
 
         this.setNextDepositReminder(order)
 
@@ -188,9 +188,9 @@ export class OrderMessaging extends OrderMessagingBase {
         if (!ArrayHelper.AtLeastOneItem(remindersToSent))
             return new ApiResult<Order>(order, ApiStatus.ok, 'No reminders to sent!')
 
-        const alreadySent = await this.alteaDb.getMessages(order.branchId, order.id, 'reminder')
+        const alreadySent = await this.alteaDb.getMessages(order.branchId, order.id, TemplateCode.resv_reminder)
 
-        remindersToSent = this.messagesToSent(remindersToSent, alreadySent, 'reminder')
+        remindersToSent = this.messagesToSent(remindersToSent, alreadySent, TemplateCode.resv_reminder)
 
         const remindersToSentExist = ArrayHelper.AtLeastOneItem(remindersToSent)
 
@@ -203,10 +203,10 @@ export class OrderMessaging extends OrderMessagingBase {
 
 
 
-        let reminderTemplates = await this.alteaDb.getTemplates(order.branchId, 'reminder')
+        let reminderTemplates = await this.alteaDb.getTemplates(order.branchId, TemplateCode.resv_reminder)
 
 
-        this.sendMessages(remindersToSent, 'reminder', reminderTemplates, order, branch)
+        this.sendMessagesForMsgInfos(remindersToSent, TemplateCode.resv_reminder, reminderTemplates, order, branch)
 
 
         // if (reminderTemplates)
@@ -237,7 +237,7 @@ export class OrderMessaging extends OrderMessagingBase {
 
 
 
-    messagesToSent(messages: MsgInfo[], alreadySent: Message[], code: string): MsgInfo[] {
+    messagesToSent(messages: MsgInfo[], alreadySent: Message[], code: TemplateCode): MsgInfo[] {
 
         let relevantMessages = messages.filter(m => m.code == code)
         let types = relevantMessages.map(m => m.type)
@@ -245,7 +245,7 @@ export class OrderMessaging extends OrderMessagingBase {
 
         const toSend: MsgInfo[] = []
 
-        // type can be email, sms, ...
+        // type can be email, sms, wa (WhatsApp)
         for (let type of types) {
 
             let lastSentOn = this.lastSentDate(alreadySent, type, code)
@@ -281,14 +281,14 @@ export class OrderMessaging extends OrderMessagingBase {
 
     }
 
-    async sendMessages(toSend: MsgInfo[], code: string, templates: Template[], order: Order, branch: Branch) {
+    async sendMessagesForMsgInfos(toSend: MsgInfo[], code: TemplateCode, templates: Template[], order: Order, branch: Branch) {
 
         for (let msg of toSend) {
 
             const template = templates.find(t => t.channels.indexOf(msg.type) >= 0 && t.code == code)
 
             if (template)
-                await this.createMessage(msg.type, template, order, branch)
+                await this.sendMessage(msg.type, template, order, branch)
 
 
         }

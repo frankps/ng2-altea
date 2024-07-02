@@ -4293,6 +4293,7 @@ export enum TemplateCode {
   resv_in_time_cancel = 'resv_in_time_cancel',
   resv_late_cancel = 'resv_late_cancel',
   resv_change_date = 'resv_change_date',
+  /** Reminder for reservation */
   resv_reminder = 'resv_reminder',
   resv_no_show = 'resv_no_show',
   resv_satisfaction = 'resv_satisfaction',

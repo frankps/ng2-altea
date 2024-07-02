@@ -52,7 +52,7 @@ export class CheckDeposists {
 
                 for (let template of branchTemplates) {
 
-                    const msg = await this.taskHub.MessagingTasks.createEmailMessage(template, order, branch, true)
+                    const msg = await this.taskHub.MessagingTasks.sendEmailMessage(template, order, branch, true)
 
                     console.warn(msg)
 

@@ -522,7 +522,7 @@ export class OrderMgrUiService {   // implements OnInit
 
     try {
 
-      const res = await this.alteaSvc.orderMgmtService.changeState(this.order, OrderState.waitDeposit)
+      const res = await this.alteaSvc.orderMgmtService.changeState(this.order, OrderState.created)
 
       if (res.isOk)
         this.dashboardSvc.showToastType(ToastType.saveSuccess)
@@ -827,7 +827,7 @@ export class OrderMgrUiService {   // implements OnInit
     this.order.contact = contact
 
     this.order.calculateAll()
-    
+
     await this.calculateLoyalty()
 
   }

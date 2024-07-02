@@ -67,9 +67,15 @@ export class OrderMgmtService {
 
                 /** if order was created internally (Point Of Sale) and still a deposit to pay */
                 if (order.src == OrderSource.pos && order.deposit > 0 && order.paid < order.deposit) {
+
                     await msgSvc.depositMessaging(order, true)
                     order.state = OrderState.waitDeposit
                     order.m.setDirty('state')
+                
+                } else {
+
+                    this.changeState(order, OrderState.confirmed)
+
                 }
                 break
 
