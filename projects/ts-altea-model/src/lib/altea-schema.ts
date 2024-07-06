@@ -120,7 +120,6 @@ export enum OnlineMode {
 }
 
 
-
 export enum ProductTypeIcons {
   prod = 'fa-duotone fa-box',
   svc = "fa-duotone fa-person-dress",
@@ -1472,7 +1471,7 @@ export class IEmail {
   from?: MessageAddress
   to: MessageAddress[]
   cc: MessageAddress[]
-  subject?: string
+  subj?: string
   body?: string
 }
 
@@ -1485,6 +1484,23 @@ export enum MessageState {
   spam = 'spam',
   deleted = 'del'
 }
+
+export enum MsgStateIcon {
+  notSent = 'fa-duotone fa-do-not-enter',
+  err = 'fa-duotone fa-circle-exclamation',
+  sent = 'fa-duotone fa-circle-check',
+  received = '',
+  archived = '',
+  spam = '',
+  deleted = 'fa-duotone fa-circle-trash'
+}
+
+/*
+<i class="fa-duotone fa-circle-exclamation"></i>
+<i class="fa-solid fa-do-not-enter"></i>
+<i class="fa-duotone fa-circle-check"></i>
+<i class="fa-solid fa-circle-trash"></i>
+*/
 
 export enum MessageDirection {
   in = 'in',   // incoming message
@@ -1509,6 +1525,22 @@ export class WhatsAppProviderInfo extends MessageProviderInfo {
 }
 
 
+export enum MsgDirIcon {
+  in = 'fa-solid fa-circle-arrow-down',
+  out = 'fa-solid fa-circle-arrow-up'
+}
+
+export enum MsgDirColor {
+  in = 'green',
+  out = 'orange'
+}
+
+export enum MsgTypeIcon {
+  email = 'fa-solid fa-envelope',
+  sms = 'fa-solid fa-comment-sms',
+  wa = 'fa-brands fa-whatsapp'
+}
+
 
 export class Message extends ObjectWithIdPlus implements IEmail {
 
@@ -1525,9 +1557,10 @@ export class Message extends ObjectWithIdPlus implements IEmail {
   /** contact ids: if message related to certain contacts */
   conIds: string[] = []
 
+  /*
   first: string
-
   last: string
+*/
 
   //  tags: string[] = []
   code?: string
@@ -1540,11 +1573,60 @@ export class Message extends ObjectWithIdPlus implements IEmail {
   cc: MessageAddress[] = []
   bcc: MessageAddress[] = []
 
-  subject?: string
+  /** automatic message: message send automatically by system (confirmation, etc) */
+  auto: boolean = false
+
+  subj?: string
   body?: string
 
   log?: string
-  state?: MessageState
+  state?: MessageState = MessageState.notSent
+
+  /** message format: text or html */
+  fmt: TemplateFormat = TemplateFormat.text
+
+  usrId?: string
+  /** resource id: internal human resource  */
+  resId?: string
+
+  stateColor(): string {
+    if (this.state == MessageState.sent)
+      return 'green'
+    else
+      return 'red'
+  }
+
+  createReply(): Message {
+    const msg = new Message()
+
+    msg.branchId = this.branchId
+    msg.orderId = this.orderId
+    msg.type = this.type
+    msg.dir = MessageDirection.out
+    msg.conIds = this.conIds
+    msg.fmt = this.fmt
+
+    switch (this.dir) {
+      /* if original was incoming => we repy to the original from */
+      case MessageDirection.in:
+        if (this.from)
+          msg.to.push(this.from)
+        break
+
+      /* if original was already outgoing => we repy to the same outgoing */
+      case MessageDirection.out:
+        if (ArrayHelper.NotEmpty(this.to))
+          this.to.forEach(t => msg.to.push(t))
+        break
+
+    }
+
+    if (this.subj)
+      msg.subj = `RE: ${this.subj}`
+
+    return msg
+  }
+
 
   addTo(addr: string, name?: string, conId?: string) {
     const msgAddr = new MessageAddress(addr, name, conId)
@@ -1680,6 +1762,7 @@ export class GiftInvoicing {
 
   /** when customer gifts an amount (no specific product) and requests an invoice, then he should select a VAT% (category). 
    * Here we specify which percentages can be selected and give them a name.  */
+  @Type(() => GiftVatPct)
   vatPcts: GiftVatPct[] = []
 }
 
@@ -1706,6 +1789,8 @@ export class GiftConfig {
 export class Branch extends ObjectWithIdPlus {
 
   orders?: Order[];
+
+  @Type(() => Number)
   idx = 0
 
   //@Type(() => Organisation)
@@ -1734,28 +1819,35 @@ export class Branch extends ObjectWithIdPlus {
   emailBcc?: string;
 
   vatIncl = true
+
+  @Type(() => Number)
   vatPct = 0
+
+  @Type(() => Number)
   vatPcts?: number[];
+
   vatNr?: string
 
   smsOn = false
 
   /** min number of hours before reservation for free cancel (0 = always free cancel, 24 = 1 day upfront for free cancel, ...) */
+  @Type(() => Number)
   cancel: number = 0
 
   /** default deposit percentage, can be overruled on product & contact level */
+  @Type(() => Number)
   depositPct?: number
 
-  @Type(() => DepositTerm)
+//  @Type(() => DepositTerm)
   depositTerms?: DepositTerm[]
 
-  @Type(() => ReminderConfig)
+//  @Type(() => ReminderConfig)
   reminders?: ReminderConfig[]
 
   /** this branch uses the gift functionality */
   giftOn = false
 
-  @Type(() => GiftConfig)
+//  @Type(() => GiftConfig)
   gift?: GiftConfig
 
 
@@ -2596,6 +2688,12 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     else
       return null
 
+  }
+
+  clearMsgCode() {
+    this.msgCode = null
+    this.msgOn = null
+    this.m.setDirty('msgCode', 'msgOn')
   }
 
   //msgLog: MsgInfo[] = []
@@ -4276,14 +4374,15 @@ export enum TemplateType {
   waitDeposit = 'waitDeposit',
 
 }
-
+/*
 export enum OrderTemplate {
   noDepositCancel = 'noDepositCancel'
 }
-
+*/
 export const orderTemplates = ['resv_wait_deposit', 'resv_remind_deposit', 'resv_confirmation',
   'resv_no_deposit_cancel', 'resv_in_time_cancel', 'resv_late_cancel', 'resv_change_date',
   'resv_reminder', 'resv_no_show', 'resv_satisfaction', 'resv_internal_cancel']
+
 
 export enum TemplateCode {
   resv_wait_deposit = 'resv_wait_deposit',
@@ -4322,10 +4421,11 @@ export class TemplateAction {
   url?: string
 }
 
-export enum TemplateCode {
 
+export enum TemplateFormat {
+  text = 'text',
+  html = 'html'
 }
-
 
 export class Template extends ObjectWithIdPlus {
 
@@ -4350,6 +4450,8 @@ export class Template extends ObjectWithIdPlus {
   footer?: string | null
   actions: TemplateAction[] = []
 
+  format: TemplateFormat = TemplateFormat.text
+
   //fruit = 'pomme'
 
   isEmail(): boolean {
@@ -4369,16 +4471,56 @@ export class Template extends ObjectWithIdPlus {
   }
 
 
+  getTerm(order: Order): string {
 
-  mergeWithOrder(order: Order): Message {
+    const trans = {
+      min: { si: 'minuut', pl: 'minuten' },
+      hou: { si: 'uur', pl: 'uren' },
+      day: { si: 'dag', pl: 'dagen' },
+    }
+
+    if (!order || !order.depositBy)
+      return ''
+
+    var depositByDate = DateHelper.parse(order.depositBy)
+    const now = new Date()
+
+    const minutes = dateFns.differenceInMinutes(depositByDate, now)
+
+    if (minutes < 60)
+      return `${minutes} ${minutes == 1 ? trans.min.si : trans.min.pl}`
+
+
+    const hours = Math.floor(minutes / 60)
+
+    if (hours < 24)
+      return `${hours} ${hours == 1 ? trans.hou.si : trans.hou.pl}`
+
+    var days = Math.floor(hours / 24)
+
+    return `${days} ${days == 1 ? trans.day.si : trans.day.pl}`
+
+  }
+
+
+  mergeWithOrder(order: Order, branch: Branch): Message {
 
     const message = new Message()
 
     message.branchId = order.branchId
     message.orderId = order.id
     message.code = this.code
+    message.dir = MessageDirection.out
+    message.auto = true   //this is automatic message
+    message.fmt = this.format
 
-    const replacements = { name: "Nils", info: "baby giraffe" }
+    const replacements = {
+      branch: branch.name,
+      deposit: `€${order.deposit}`,
+      term: this.getTerm(order),
+      first: order?.contact?.first,
+     // info: "baby giraffe"
+    }
 
     if (this.body) {
       const hbTemplate = Handlebars.compile(this.body)
@@ -4387,7 +4529,7 @@ export class Template extends ObjectWithIdPlus {
 
     if (this.subject) {
       const hbTemplate = Handlebars.compile(this.subject)
-      message.subject = hbTemplate(replacements)
+      message.subj = hbTemplate(replacements)
     }
 
     message.type = this.msgType()

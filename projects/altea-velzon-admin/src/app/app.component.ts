@@ -1,7 +1,7 @@
 import { AfterContentChecked, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
-import { BranchService, LoyaltyProgramService, ObjectService, ProductService, ResourceService, ScheduleService, SessionService, TypeInfoService } from 'ng-altea-common';
+import { BranchService, LoyaltyProgramService, ObjectService, ProductService, ResourceService, ScheduleService, SessionService, TemplateService, TypeInfoService } from 'ng-altea-common';
 import { BsLocaleService } from 'ngx-bootstrap/datepicker';
-import { AppMode, Branch, LoyaltyProgram, Product, Resource, TypeInfo } from 'ts-altea-model';
+import { AppMode, Branch, LoyaltyProgram, Product, Resource, Template, TypeInfo } from 'ts-altea-model';
 import { DbQuery, QueryOperator } from 'ts-common';
 import { Idle, DEFAULT_INTERRUPTSOURCES } from '@ng-idle/core';
 import { UserSelectComponent } from 'projects/ng-altea-common/src/lib/pos/user-select/user-select.component';
@@ -26,7 +26,7 @@ export class AppComponent implements OnInit {
 
   constructor(private idle: Idle, private localeService: BsLocaleService, private branchSvc: BranchService, private sessionSvc: SessionService, private dashboardSvc: DashboardService
     , private productSvc: ProductService, private resourceSvc: ResourceService, private typeInfoSvc: TypeInfoService,
-    private scheduleSvc: ScheduleService, private loyaltyProgramSvc: LoyaltyProgramService, private objectSvc: ObjectService) {
+    private scheduleSvc: ScheduleService, private loyaltyProgramSvc: LoyaltyProgramService, private templateSvc: TemplateService, private objectSvc: ObjectService) {
     this.localeService.use('nl-be');
 
     this.configUserSelectOnIdle(idle)
@@ -115,7 +115,6 @@ export class AppComponent implements OnInit {
     branchQry.and('id', QueryOperator.equals, this.sessionSvc.branchId)
     branchQry.take = 1000
     this.branchSvc.cacheQuery = branchQry
-    //this.branchSvc.linkedTypes = ['ProductItem', 'ProductResource']
     await this.branchSvc.initCache(typeInfos)
     this.objectSvc.typeCaches.set(Branch, this.branchSvc)
 
@@ -144,6 +143,14 @@ export class AppComponent implements OnInit {
     await this.loyaltyProgramSvc.initCache(typeInfos)
     this.objectSvc.typeCaches.set(LoyaltyProgram, this.loyaltyProgramSvc)
 
+    const templateQry = new DbQuery()
+    templateQry.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
+    templateQry.take = 1000
+    this.templateSvc.cacheQuery = templateQry
+    await this.templateSvc.initCache(typeInfos)
+    this.objectSvc.typeCaches.set(Template, this.templateSvc)
+
+
     /* 
     const scheduleQry = new DbQuery()
     scheduleQry.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
@@ -158,6 +165,11 @@ export class AppComponent implements OnInit {
   }
 
 
+  async test() {
+
+
+
+  }
 
 
   /*  

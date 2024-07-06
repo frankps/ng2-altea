@@ -14,6 +14,7 @@ import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { TimepickerModule } from 'ngx-bootstrap/timepicker';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerModule } from 'ngx-spinner';
+import { NgxEditorModule } from 'ngx-editor'
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import { NgxSpinnerModule } from 'ngx-spinner';
     ModalModule,
     BsDatepickerModule,
     TimepickerModule,
-    NgxSpinnerModule
+    NgxSpinnerModule,
+    NgxEditorModule
   ]
 })
 export class MessagingModule { }

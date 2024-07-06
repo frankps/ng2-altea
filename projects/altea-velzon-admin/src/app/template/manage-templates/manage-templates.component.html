@@ -76,23 +76,74 @@
             <div class="row mt-4  d-flex justify-content-center">
                 <div class="col-10">
                     {{'objects.template._name' | translate}}
+
+
+
+
+
+
                 </div>
                 <div class="col-10 mt-2" *ngIf="template.isEmail()">
-                    <ngx-altea-label-control label="objects.template.subject" for="subject">
-                        <input type="text" id="subject" name="subject" required class="form-control"
-                            [(ngModel)]="template.subject" />
-                    </ngx-altea-label-control>
-                </div>
-                <div class="col-10 mt-2">
-                    <ngx-altea-label-control [label]="'objects.template.body.' + template.channels[0]" for="body">
-                        <textarea rows="4" class="form-control" id="body" name="body" style="height: 120px"
-                            [(ngModel)]="template.body"></textarea>
-                    </ngx-altea-label-control>
+
+                    <div class="row">
+                        <div class="col-9">
+                            
+                            <ngx-altea-label-control label="objects.template.subject" for="subject">
+                                <input type="text" id="subject" name="subject" required class="form-control"
+                                    [(ngModel)]="template.subject" />
+                            </ngx-altea-label-control>
+
+                        </div>
+                        <div class="col-3" *ngIf="initialized">
+
+
+                            <ngx-altea-label-control label="objects.template.format" for="format">
+                                <ng-select id="format" name="format" [items]="format" bindLabel="trans" bindValue="key"
+                                    [clearable]="false" [multiple]="false" [(ngModel)]="template.format"></ng-select>
+                            </ngx-altea-label-control>
+
+
+                        </div>
+                    </div>
+
+
 
                 </div>
                 <div class="col-10 mt-2">
 
-                    <h5>Acties &nbsp; <i class="fa-solid fa-circle-plus" (click)="addTemplateAction(template)"></i> </h5>
+                    <ng-container [ngSwitch]="template.format">
+                        <ng-container *ngSwitchCase="TemplateFormat.text">
+
+                            <ngx-altea-label-control [label]="'objects.template.body.' + template.channels[0]"
+                                for="body">
+                                <textarea rows="4" class="form-control" id="body" name="body" style="height: 120px"
+                                    [(ngModel)]="template.body"></textarea>
+                            </ngx-altea-label-control>
+
+                        </ng-container>
+                        <ng-container *ngSwitchCase="TemplateFormat.html">
+
+                            <div class="NgxEditor__Wrapper">
+                                <ngx-editor-menu [editor]="editor"> </ngx-editor-menu>
+                                <ngx-editor [editor]="editor" [(ngModel)]="template.body" [disabled]="false"
+                                    [placeholder]="'Maak template'"></ngx-editor>
+                            </div>
+
+                        </ng-container>
+                    </ng-container>
+
+
+
+
+
+
+
+
+                </div>
+                <div class="col-10 mt-2">
+
+                    <h5>Acties &nbsp; <i class="fa-solid fa-circle-plus" (click)="addTemplateAction(template)"></i>
+                    </h5>
                     <ng-container *ngIf="template.actions">
                         <ng-container *ngFor="let action of template.actions">
 
@@ -127,26 +178,6 @@
         </ng-container>
 
 
-
-
-        <!-- <div class="row mt-4  d-flex justify-content-center">
-            <div class="col-10">
-                SMS
-            </div>
-            <div class="col-10 mt-2">
-                <ngx-altea-label-control label="objects.template.short" for="short">
-                    <textarea rows="4" class="form-control" id="short" name="short" style="height: 120px"
-                        [(ngModel)]="template.short"></textarea>
-                </ngx-altea-label-control>
-            </div>
-        </div> -->
-
-
-
-        <!-- <div class="col-6">
-
-
-            </div> -->
 
 
 

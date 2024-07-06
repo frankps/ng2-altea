@@ -1,11 +1,15 @@
-import { Component, OnInit } from '@angular/core';
-import { Template, TemplateAction, TemplateChannel, TemplateRecipient, TemplateType, orderTemplates } from 'ts-altea-model' //'../../../../../../libs/ts-altea-common/src';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Template, TemplateAction, TemplateChannel, TemplateFormat, TemplateRecipient, TemplateType, orderTemplates } from 'ts-altea-model' //'../../../../../../libs/ts-altea-common/src';
 import { DashboardService, NgSectionsComponent, ToastType } from 'ng-common';
 import { ApiStatus, CollectionChangeTracker, DbQuery, QueryOperator } from 'ts-common'
 import { SessionService, TemplateService } from 'ng-altea-common'
 import * as _ from "lodash";
 import { NgxSpinnerService } from "ngx-spinner"
 import { ToastService } from '../../velzon/dashboard/dashboard/toast-service';
+import { Editor } from 'ngx-editor'
+import { TranslationService } from 'ng-common'
+import { Translation } from 'ts-common'
+
 
 export class TemplateTypeSelections {
   email_provider = false
@@ -23,9 +27,20 @@ export class TemplateVariant {
   templateUrl: './manage-templates.component.html',
   styleUrls: ['./manage-templates.component.scss'],
 })
-export class ManageTemplatesComponent extends NgSectionsComponent implements OnInit {
+export class ManageTemplatesComponent extends NgSectionsComponent implements OnInit, OnDestroy {
+
+  // html editor 
+  editor: Editor;
+  html = '';
+
+
+  initialized = false
+
+  format: Translation[] = []
 
   selectionsAvailable = false
+
+  TemplateFormat = TemplateFormat
 
   //selectionProps = ['emailToProvider', 'msgToProvider', 'emailToClient', 'msgToClient']
 
@@ -53,7 +68,7 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
 
 
   constructor(protected spinner: NgxSpinnerService, protected sessionSvc: SessionService, protected templateSvc: TemplateService
-    , protected dashboardSvc: DashboardService, public toastService: ToastService) {
+    , protected dashboardSvc: DashboardService, public translationSvc: TranslationService, public toastService: ToastService) {
     super()
 
 
@@ -61,12 +76,23 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
     // 
   }
 
-  ngOnInit() {
+  async ngOnInit() {
+    this.editor = new Editor()
+
+    await this.translationSvc.translateEnum(TemplateFormat, 'enums.template-format.', this.format)
+    console.warn(this.format)
 
     this.initSelections()
 
     this.getTemplates()
 
+    this.initialized = true
+
+
+  }
+
+  ngOnDestroy(): void {
+    this.editor.destroy();
   }
 
   override cancel() {
@@ -229,7 +255,7 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
     }
   }
 
-  save() {
+  async save() {
 
 
 
@@ -242,16 +268,17 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
 
     console.error(batch)
 
-    this.templateSvc.batchProcess(batch, this.dashboardSvc.resourceId).subscribe(res => {
+    const res = await this.templateSvc.batchProcess$(batch, this.dashboardSvc.resourceId)
 
-      if (res.status == ApiStatus.error) {
-        this.dashboardSvc.showToastType(ToastType.saveError)
-      } else {
-        this.dashboardSvc.showToastType(ToastType.saveSuccess)
-        this.changes.reset()
-      }
+    console.warn(res)
 
-    })
+
+    if (res.status == ApiStatus.error) {
+      this.dashboardSvc.showToastType(ToastType.saveError)
+    } else {
+      this.dashboardSvc.showToastType(ToastType.saveSuccess)
+      this.changes.reset()
+    }
 
   }
 

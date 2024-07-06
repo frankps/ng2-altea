@@ -1,4 +1,4 @@
-import { ApiListResult, ApiResult, DbObject, DbObjectCreate, DbObjectMulti, DbObjectMultiCreate, DbQuery, DbQueryTyped, ObjectWithId, QueryOperator } from 'ts-common'
+import { ApiListResult, ApiResult, DbObject, DbObjectCreate, DbObjectMulti, DbObjectMultiCreate, DbQuery, DbQueryBase, DbQueryBaseTyped, DbQueryTyped, DbUpdateManyWhere, ObjectWithId, QueryOperator } from 'ts-common'
 import { Message, Order, Schedule, SchedulingType } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 
@@ -16,8 +16,19 @@ export interface IDb {
     query$<T  extends ObjectWithId>(query: DbQueryTyped<T>): Promise<T[]>
     queryFirst$<T  extends ObjectWithId>(query: DbQueryTyped<T>): Promise<T | null>
 
+    deleteMany$<T extends ObjectWithId>(query: DbQueryBaseTyped<T>): Promise<any> 
+
+    updateManyWhere$<T extends ObjectWithId>(update: DbUpdateManyWhere<T>): Promise<any> 
+
+
+    //  async deleteMany$<T extends ObjectWithId>(query: DbQueryBaseTyped<T>): Promise<any> 
+
+
     // Specialized methods
     saveOrder$(order: Order): Promise<ApiResult<Order>>
     sendMessage$(message: Message): Promise<ApiResult<Message>>
+
+
+
 
 }  

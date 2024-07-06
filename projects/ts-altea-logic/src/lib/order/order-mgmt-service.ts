@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
-import { Order, Gift, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, ConfirmOrderResponse, OrderSource } from 'ts-altea-model'
+import { Order, Gift, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, ConfirmOrderResponse, OrderSource, TemplateCode, OrderCancel, OrderCancelBy } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { AlteaDb } from '../general/altea-db'
 import { IDb } from '../interfaces/i-db'
@@ -35,7 +35,81 @@ export class OrderMgmtService {
             this.alteaDb = new AlteaDb(db)
     }
 
+    /** set state to noDepositCancel */
+    async cancelExpiredDeposistOrders(before: Date = new Date()) {
 
+        const beforeNum = DateHelper.yyyyMMddhhmmss(before)
+        const orders = await this.alteaDb.getExpiredDepositOrders(before)
+
+        const processed = []
+
+        for (let order of orders) {
+            order.state = OrderState.noDepositCancel
+            order.cancel = new OrderCancel()
+            order.cancel.date = new Date()
+            order.cancel.by = OrderCancelBy.int
+
+            order.msgCode = TemplateCode.resv_no_deposit_cancel
+            order.msgOn = beforeNum
+
+            order.m.setDirty('state', 'cancel', 'msgCode', 'msgOn')
+
+            const res = await this.alteaDb.saveOrder(order)
+
+            const del = this.alteaDb.deletePlanningsForOrder(order.id)
+
+            processed.push(res)
+        }
+
+        return processed
+    }
+
+
+
+    async cancelExpiredDeposistsOld() {
+
+        const orders = await this.alteaDb.getExpiredDepositOrders()
+
+        console.warn(orders)
+
+        const branchIds = _.uniqBy(orders, 'branchId').map(o => o.branchId)
+
+        const templates = await this.alteaDb.getTemplatesForBranches(branchIds, TemplateCode.resv_no_deposit_cancel)
+        const branches = await this.alteaDb.getBranches(branchIds)
+
+        for (let branch of branches) {
+
+            const branchOrders = orders.filter(o => o.branchId == branch.id)
+            const branchTemplates = templates.filter(t => t.branchId == branch.id)
+
+            if (!Array.isArray(branchTemplates) || branchTemplates.length == 0)
+                continue
+
+            for (let order of branchOrders) {
+
+
+                for (let template of branchTemplates) {
+
+                  //  const msg = await this.taskHub.MessagingTasks.sendEmailMessage(template, order, branch, true)
+
+                  //  console.warn(msg)
+
+                }
+
+
+
+                order.state = OrderState.noDepositCancel
+                order.m.setDirty('state')
+        
+                this.alteaDb.saveOrder(order)
+
+            }
+
+
+        }
+
+
+    }
 
 
     async saveOrder(order: Order): Promise<ApiResult<Order>> {
@@ -48,6 +122,14 @@ export class OrderMgmtService {
 
     async test() {
         this.alteaDb.getOrders()
+    }
+
+
+    async depositTimeOuts() {
+
+
+
+
     }
 
 
@@ -67,6 +149,12 @@ export class OrderMgmtService {
 
                 /** if order was created internally (Point Of Sale) and still a deposit to pay */
                 if (order.src == OrderSource.pos && order.deposit > 0 && order.paid < order.deposit) {
+
+                    // then we calculate depositBy date
+                    const now = new Date()
+                    const depositByDate = dateFns.addMinutes(now, order.depositMins)
+                    order.depositBy = DateHelper.yyyyMMddhhmmss(depositByDate)
+                    order.m.setDirty('depositBy')
 
                     await msgSvc.depositMessaging(order, true)
                     order.state = OrderState.waitDeposit

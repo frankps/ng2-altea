@@ -22,6 +22,7 @@
     "descr": "Omschrijving",
     "email": "Email",
     "edit": "Aanpassen",
+    "from": "Van",
     "language": "Taal",
     "mobile": "GSM",
     "move": "Verplaatsen",
@@ -38,6 +39,7 @@
     "qty": "Aantal",
     "reply": "Antwoorden",
     "timeUnit": "Tijdseenheid",
+    "to": "Aan",
     "save": "Opslaan",
     "search": "Zoeken",
     "send": "Versturen",
@@ -46,6 +48,10 @@
     "end": "einde"
   },
   "enums": {
+    "template-format": {
+      "text": "Tekst",
+      "html": "HTML"
+    },
     "deposit-mode": {
       "none": "Geen",
       "full": "Volledig bedrag",
@@ -639,6 +645,9 @@
     }
   },
   "objects": {
+    "message": {
+      "auto": "Automatisch bericht"
+    },
     "invoice": {
       "company": "Bedrijf",
       "vat": "BTW",
@@ -813,6 +822,7 @@
     "template": {
       "_name": "Template",
       "subject": "Onderwerp",
+      "format": "Formaat",
       "body": {
         "email": "E-mail",
         "sms": "SMS"

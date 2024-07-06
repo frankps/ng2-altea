@@ -1,3 +1,4 @@
+import { extend } from "lodash"
 import { ObjectWithId } from "../lib"
 
 
@@ -78,11 +79,36 @@ export class DbQueryBase {
   }
 }
 
+export class DbQueryBaseTyped<T> extends DbQueryBase {
+
+  constructor(public typeName: string, public type?: { new(): T; }) {
+    super()
+  }
+
+
+}
+
 export class DbUpdateMany<T> extends DbQueryBase {
 
   update: T
 
 
+}
+
+export class DbUpdateManyWhere<T> {
+  where = {}
+  data = {}
+
+  constructor(public typeName: string, public type?: { new(): T; }) {
+  }
+
+  addWhere(field: string, value: any) {
+    this.where[field] = value
+  }
+
+  set(field: string, value: any) {
+    this.data[field] = value
+  }
 }
 
 export class DbQuery extends DbQueryBase {

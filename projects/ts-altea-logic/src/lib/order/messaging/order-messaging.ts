@@ -44,11 +44,11 @@ export class OrderMessaging extends OrderMessagingBase {
         super(db)
     }
 
-    async doAllMessaging() {
+    async doAllMessaging(date: Date = new Date()) {
 
         console.info('Start messaging for ALL orders')
 
-        const orders = await this.alteaDb.getOrdersNeedingCommunication()
+        const orders = await this.alteaDb.getOrdersNeedingCommunication(date)
 
         if (ArrayHelper.IsEmpty(orders)) {
             console.info('No orders with communication')
@@ -71,17 +71,36 @@ export class OrderMessaging extends OrderMessagingBase {
         /*
         if (order.deposit > 0 && order.paid < order.deposit)
             return await this.depositMessaging(order)
-*/
+        */
+
+        switch (order.msgCode) {
+            case TemplateCode.resv_wait_deposit:
+
+
+            case TemplateCode.resv_no_deposit_cancel:
+                await this.noDepositCancel(order)
+
+
+        }
 
         switch (order.state) {
+
+            case OrderState.waitDeposit:
 
             case OrderState.waitDeposit:
                 console.info(`Deposit messaging for ${order.code}`)
                 return await this.depositMessaging(order)
 
+            case OrderState.noDepositCancel:
+                console.info(`No deposit cancel messaging for ${order.code}`)
+                return await this.depositMessaging(order)
+
             case OrderState.confirmed:
                 console.info(`Reminder messaging for ${order.code}`)
                 return await this.reminderMessaging(order)
+
+            default:
+                console.info(`No messaging necessary ${order.code}`)
 
         }
 
@@ -107,6 +126,25 @@ export class OrderMessaging extends OrderMessagingBase {
         return new ApiResult<Order>(order, ApiStatus.ok)
     }
 
+    async noDepositCancel(order: Order): Promise<ApiResult<Order>> {
+
+        try {
+            const sendRes = await this.sendMessages([MsgType.email], TemplateCode.resv_no_deposit_cancel, order, order.branch, true)
+
+            order.clearMsgCode()
+
+            const updateRes = await this.alteaDb.saveOrder(order)
+
+            return new ApiResult<Order>(order, ApiStatus.ok)
+        } catch (error) {
+
+            console.error(error)
+            return new ApiResult<Order>(order, ApiStatus.error, `Error sending noDepositCancel messaging`)
+
+        }
+        
+    }
+
 
     async depositMessaging(order: Order, isFirstDepositMessage = false): Promise<ApiResult<Order>> {
 
@@ -115,17 +153,23 @@ export class OrderMessaging extends OrderMessagingBase {
 
         const branch = await this.alteaDb.getBranch(order.branchId)
 
+        console.error(branch)
+
+
         let templateCode = TemplateCode.resv_remind_deposit
 
-        if (isFirstDepositMessage) 
+        if (isFirstDepositMessage)
             templateCode = TemplateCode.resv_wait_deposit
 
         const sendRes = await this.sendMessages([MsgType.email], templateCode, order, branch, true)
 
         this.setNextDepositReminder(order)
 
+        await this.alteaDb.saveOrder(order)
+
         return new ApiResult<Order>(order, ApiStatus.ok)
     }
+
 
 
     /**
@@ -137,13 +181,15 @@ export class OrderMessaging extends OrderMessagingBase {
         var currentMsgOn = order.msgOnDate() ?? new Date()
         var depositBy = order.depositByDate()
 
-        var minutesDiff = dateFns.differenceInMinutes(depositBy, currentMsgOn)
-        minutesDiff = Math.round(minutesDiff)
+        const minutesDiff = dateFns.differenceInMinutes(depositBy, currentMsgOn)
+        const nextMsgInMinutes = Math.round(minutesDiff / 2)
 
-        if (minutesDiff > 60) {
+        if (nextMsgInMinutes > 59) {
 
-            const nextMsgOn = dateFns.addMinutes(currentMsgOn, minutesDiff)
+            const nextMsgOn = dateFns.addMinutes(currentMsgOn, nextMsgInMinutes)
+            order.msgCode = TemplateCode.resv_remind_deposit
             order.msgOn = DateHelper.yyyyMMddhhmmss(nextMsgOn)
+            order.m.setDirty('msgCode', 'msgOn')
         }
 
 
@@ -176,7 +222,7 @@ export class OrderMessaging extends OrderMessagingBase {
             const nextReminder = futureReminders[0]
 
             order.msgOn = DateHelper.yyyyMMddhhmmss(nextReminder.date)
-            order.msgCode = 'reminder'
+            order.msgCode = TemplateCode.resv_reminder
             order.m.setDirty('msgOn', 'msgCode')
 
         }

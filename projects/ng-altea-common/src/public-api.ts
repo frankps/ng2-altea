@@ -12,4 +12,5 @@ export * from './lib/order-mgr.service'
 export * from './lib/session.service'
 export * from './lib/order-mgr' 
 export * from './lib/local.service' 
+export * from './lib/messaging.service' 
 

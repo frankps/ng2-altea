@@ -3,22 +3,110 @@
 
 <ul class="list-group">
 
-    <li class="list-group-item" *ngFor="let message of messages$ | async">
-        <h5 *ngIf="message.from">{{message.from.name}} {{message.from.addr}}</h5>
+    <!-- $ | async-->
+    <li class="list-group-item" *ngFor="let message of messages">
 
-        <button type="button" class="btn btn-primary btn-sm float-end" (click)="toggle(message)" translate>dic.reply</button>
+        <div class="row">
+            <div class="col-8">
 
+                <h5>
+
+                    <i [class]="MsgDirIcon[message.dir]" [style.color]="MsgDirColor[message.dir]"></i> &nbsp;
+                    <i [class]="MsgTypeIcon[message.type]" [style.color]="MsgDirColor[message.dir]"></i> &nbsp;
+        
+                    <ng-container [ngSwitch]="message.dir">
+                        <ng-container *ngSwitchCase="'in'">
+                            <ng-container *ngIf="message.from"> 
+                                {{'dic.from' | translate}}: {{message.from.name}} <i
+                                    style="font-size: small;">[{{message.from.addr}}]</i></ng-container>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'out'">
+                            {{'dic.to' | translate}}:
+                            <ng-container *ngFor="let to of message?.to">
+                                {{to.name}} <i style="font-size: small;">[{{to.addr}}]</i>
+                            </ng-container>
+        
+        
+        
+        
+                        </ng-container>
+                    </ng-container>
+
+
+                    
+                </h5>
+
+                
+                <b>Onderwerp</b>: {{message.subj}}
+                
+
+
+            </div>
+            <div class="col-4">
+
+                <h5 class="float-end">
+
+                    <i *ngIf="message.auto" class="fa-duotone fa-car" [ngbTooltip]="'objects.message.auto' | translate"></i> &nbsp;
+
+                    <i *ngIf="MsgStateIcon[message.state]" [class]="MsgStateIcon[message.state]" [style.color]="message.stateColor()"></i> &nbsp;
+                    &nbsp;
+                    <i class="fa-duotone fa-trash" (click)="delete(message)"></i>
+                    &nbsp;
+                    <i class="fa-duotone fa-reply" (click)="toggle(message)"></i>
+                </h5>
+
+            </div>      
+          </div>
+      
+
+
+
+
+
+
+
+
+
+<!-- 
+        <button type="button" class="btn btn-primary btn-sm float-end" 
+            translate>dic.reply</button> -->
+
+        <div class="mt-2" [innerHTML]="message.body"></div>
+
+        <!-- 
         {{message.body}}
+ -->
+        <ng-container *ngIf="msgId == message.id">
 
-        <ng-container *ngIf="msgId == message.id">EDIT
+            <ng-container [ngSwitch]="message.type">
+                <ng-container *ngSwitchCase="MsgType.email">
+                    
+                    
+
+                    <div class="NgxEditor__Wrapper">
+                        <ngx-editor-menu [editor]="editor"> </ngx-editor-menu>
+                        <ngx-editor [editor]="editor" [(ngModel)]="html" [disabled]="false" height="200px" style="height: 200px"
+                            [placeholder]="'Nieuw bericht...'" ></ngx-editor>
+                    </div>
+
+
+                </ng-container>
+                <ng-container *ngSwitchDefault>
+
+                    <ngx-altea-label-control label="objects.gift.toMessage" for="body">
+                        <textarea rows="2" class="form-control" id="body" name="body" style="height: 80px"
+                            [(ngModel)]="body"></textarea>
+                    </ngx-altea-label-control>
+
+                </ng-container>
+            </ng-container>
         
-            <ngx-altea-label-control label="objects.gift.toMessage" for="body">
-                <textarea rows="2" class="form-control" id="body" name="body" style="height: 80px"
-                    [(ngModel)]="body"></textarea>
-            </ngx-altea-label-control>
-        
-            <button type="button" class="btn btn-primary btn-sm float-end" (click)="sendReply(message, body)" translate>dic.send</button>
-        
+
+
+
+            <button type="button" class="btn btn-primary btn-sm float-end mt-2" (click)="sendReply(message, body)"
+                translate>dic.send</button>
+
         </ng-container>
 
     </li>

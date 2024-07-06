@@ -1,4 +1,4 @@
-import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, OrderTemplate, Branch, MessageAddress, TemplateCode } from 'ts-altea-model'
+import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MessageAddress, TemplateCode } from 'ts-altea-model'
 import { AlteaDb } from '../../general/altea-db'
 import { IDb } from '../../interfaces/i-db'
 import { ArrayHelper } from 'ts-common'
@@ -28,11 +28,11 @@ export class OrderMessagingBase {
          * Some message types work with internal templates (from DB): email, sms
          * other message types (whatsapp) work with templates configured in those systems => no need to lookup template
          */
-            
+
         const typesInternalTemplates = types.filter(type => type != MsgType.wa)
 
         if (ArrayHelper.NotEmpty(typesInternalTemplates)) {
-         
+
             let templates = await this.alteaDb.getTemplates(order.branchId, templateCode)
 
             for (let type of types) {
@@ -49,10 +49,8 @@ export class OrderMessagingBase {
 
                 await this.sendMessage(type, template, order, branch, send)
             }
-
         }
-
-    } 
+    }
 
 
     async sendMessage(type: MsgType, template: Template, order: Order, branch: Branch, send: boolean = true): Promise<Message> {
@@ -66,11 +64,15 @@ export class OrderMessagingBase {
             default:
                 throw `Message type ${type} not supported!`
         }
+
     }
 
     async sendEmailMessage(template: Template, order: Order, branch: Branch, send: boolean = true): Promise<Message> {
 
-        const msg = template.mergeWithOrder(order)
+        const contact = order.contact
+
+        const msg = template.mergeWithOrder(order, branch)
+
 
         msg.from = new MessageAddress(branch.emailFrom, branch.name)
 
@@ -78,7 +80,15 @@ export class OrderMessagingBase {
             msg.addBcc(branch.emailBcc)
 
         //msg.to.push(order.contact.email)
-        msg.addTo('frank@dvit.eu', 'Frank Paepens')
+        //msg.addTo('frank@dvit.eu', 'Frank Paepens')
+
+        if (!msg.conIds)
+            msg.conIds = []
+
+        msg.conIds.push(contact.id)
+
+        msg.addTo('frank@dvit.eu', contact.name, contact.id)  // contact.email
+
         msg.type = MsgType.email
 
         if (send) {
@@ -93,7 +103,7 @@ export class OrderMessagingBase {
 
     async sendSmsMessage(template: Template, order: Order, branch: Branch, send: boolean = true): Promise<Message> {
 
-        const msg = template.mergeWithOrder(order)
+        const msg = template.mergeWithOrder(order, branch)
 
         msg.addTo(order.contact.mobile, order.contact.getName(), order.contact.id)
         msg.type = MsgType.sms

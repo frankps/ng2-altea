@@ -163,7 +163,7 @@ Datum: 1 april 2024 om 19h00
 
     const checkDeposits = new CheckDeposists(this.dbSvc)
 
-    checkDeposits.cancelExpiredDeposists()
+    // checkDeposits.cancelExpiredDeposists()
 
 
   }

@@ -1,4 +1,4 @@
-import { ApiListResult, ApiResult, ApiStatus, DateHelper, DbObject, DbObjectCreate, DbObjectMulti, DbObjectMultiCreate, DbQuery, DbQueryTyped, ObjectHelper, ObjectWithId, QueryOperator } from 'ts-common'
+import { ApiListResult, ApiResult, ApiStatus, DateHelper, DbObject, DbObjectCreate, DbObjectMulti, DbObjectMultiCreate, DbQuery, DbQueryBaseTyped, DbQueryTyped, DbUpdateManyWhere, ObjectHelper, ObjectWithId, QueryOperator } from 'ts-common'
 import { Branch, Gift, Subscription, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template, OrderLine, BankTransaction, Message, LoyaltyProgram, LoyaltyCard, PlanningType, ResourcePlannings, TemplateCode } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { IDb } from '../interfaces/i-db'
@@ -84,13 +84,14 @@ export class AlteaDb {
         return branches
     }
 
-    async getExpiredDepositOrders(): Promise<Order[]> {
+    async getExpiredDepositOrders(date: Date = new Date()): Promise<Order[]> {
 
-        const now = DateHelper.yyyyMMddhhmmss()
+        const dateNum = DateHelper.yyyyMMddhhmmss(date)
 
         const qry = new DbQueryTyped<Order>('order', Order)
         qry.and('state', QueryOperator.equals, OrderState.waitDeposit)
-        qry.and('depositBy', QueryOperator.lessThan, now)
+        qry.and('depositBy', QueryOperator.lessThan, dateNum)
+        qry.and('paid', QueryOperator.equals, 0)
         qry.include('contact', 'lines')
 
         const templates = await this.db.query$<Order>(qry)
@@ -98,9 +99,27 @@ export class AlteaDb {
         return templates
     }
 
+
+    async getOrdersDepositTimeOut(date: Date = new Date()) {
+        const qry = new DbQueryTyped<Order>('order', Order)
+
+        qry.include('contact')
+
+        const dateNum = DateHelper.yyyyMMddhhmmss(date)
+
+        qry.and('depositBy', QueryOperator.lessThanOrEqual, dateNum)
+
+        const orders = await this.db.query$<Order>(qry)
+
+        return orders
+    }
+
+
     async getOrdersNeedingCommunication(date: Date = new Date()) {
 
         const qry = new DbQueryTyped<Order>('order', Order)
+
+        qry.include('contact')
 
         const dateNum = DateHelper.yyyyMMddhhmmss(date)
 
@@ -580,6 +599,34 @@ export class AlteaDb {
         return updateResult
     }
 
+    async deletePlanningsForOrder(orderId: string, softDelete: boolean = true) {
+
+
+        try {
+            if (softDelete) {
+
+                const updateClause = new DbUpdateManyWhere('resourcePlanning', ResourcePlanning)
+                updateClause.addWhere('orderId', orderId)
+                updateClause.set('act', false)
+                updateClause.set('del', true)
+
+                const res = await this.db.updateManyWhere$(updateClause)
+
+            } else {
+                const qry = new DbQueryBaseTyped<ResourcePlanning>('resourcePlanning', ResourcePlanning)
+                qry.and('orderId', QueryOperator.equals, orderId)
+    
+                const res = await this.db.deleteMany$(qry)
+    
+                console.log(res)
+
+            }
+
+        } catch (error) {
+
+            console.log(error)
+        }
+    }
 
 
     async getLoyaltyCards(contactId?: string): Promise<LoyaltyCard[]> {

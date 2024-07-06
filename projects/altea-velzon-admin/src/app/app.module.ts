@@ -32,7 +32,8 @@ import { getAuth, provideAuth } from '@angular/fire/auth';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { ScheduleModule } from '@syncfusion/ej2-angular-schedule';
 import {NgIdleModule} from '@ng-idle/core'
-
+import { NgxEditorModule } from 'ngx-editor'
+//import { RichTextEditorModule } from '@syncfusion/ej2-angular-richtexteditor';
 
 defineLocale('nl-be', nlBeLocale);
 
@@ -74,7 +75,9 @@ if (environment.defaultauth === 'firebase') {
     NgAlteaCommonModule,
     InterfaceModule,
     ScheduleModule,
-    NgIdleModule.forRoot()
+    NgIdleModule.forRoot(),
+   // RichTextEditorModule
+  //  NgxEditorModule.forRoot()
   
     
   ],

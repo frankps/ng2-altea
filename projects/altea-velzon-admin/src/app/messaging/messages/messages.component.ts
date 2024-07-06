@@ -1,24 +1,51 @@
-import { Component, ViewChild, OnInit, inject } from '@angular/core';
+import { Component, ViewChild, OnInit, inject, OnDestroy } from '@angular/core';
 import { Firestore, collection, collectionData, addDoc, CollectionReference, updateDoc, serverTimestamp, doc, docData, DocumentChange, DocumentData } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
-import { getDocs, limit, or, orderBy, query, where } from 'firebase/firestore';
+import { deleteDoc, getDocs, limit, or, orderBy, query, where } from 'firebase/firestore';
 import { SessionService } from 'ng-altea-common';
-import { Message, WhatsAppMessage, WhatsAppProviderInfo } from 'ts-altea-model';
+import { Message, MessageAddress, MsgDirColor, MsgDirIcon, MsgStateIcon, MsgType, MsgTypeIcon, TemplateFormat, WhatsAppMessage, WhatsAppProviderInfo } from 'ts-altea-model';
 import { MessagingService } from 'projects/ng-altea-common/src/lib/messaging.service';
+import { plainToInstance } from 'class-transformer';
+import { Editor, toHTML } from 'ngx-editor'
 
 @Component({
   selector: 'app-messages',
   templateUrl: './messages.component.html',
   styleUrls: ['./messages.component.scss']
 })
-export class MessagesComponent implements OnInit {
+export class MessagesComponent implements OnInit, OnDestroy {
   private firestore: Firestore = inject(Firestore)
-  messages$: Observable<any[]>
+  //  messages$: Observable<any[]>
+  messages: Message[]
 
   msgId?: string
 
   /** text for new message or reply */
   body: string
+
+  MsgType = MsgType
+
+  MsgDirIcon = MsgDirIcon
+  MsgDirColor = MsgDirColor
+  MsgTypeIcon = MsgTypeIcon
+  MsgStateIcon = MsgStateIcon
+
+  // html editor 
+  editor: Editor;
+
+  htmlInit = `<br><br>`   // needed for ngx-editor: otherwise enters do not work!!
+
+  html: string = this.htmlInit
+
+  editorChange(event: any) {
+    console.error(event)
+    console.error(this.html)
+
+    /*
+    this.body = toHTML(event.content);
+    console.log(this.body);
+    */
+  }
 
   constructor(protected sessionSvc: SessionService, protected msgSvc: MessagingService) {
 
@@ -26,13 +53,56 @@ export class MessagesComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
 
+    this.editor = new Editor()
+
     await this.getMessages()
 
   }
 
-  getMessages() {
-    const aCollection = collection(this.firestore, "branches", this.sessionSvc.branchId, "msg")
-    this.messages$ = collectionData(aCollection);
+  ngOnDestroy(): void {
+    this.editor.destroy();
+  }
+
+  
+
+  async getMessages() {
+    const msgCol = collection(this.firestore, "branches", this.sessionSvc.branchId, "msg")
+
+    const qry = query(msgCol, null, orderBy('cre', 'desc'))  // , limit(10)
+
+    collectionData(qry).subscribe(dataSet => {
+
+      this.messages = dataSet.map(data => plainToInstance(Message, data))
+      //console.log(res)
+
+    })
+    
+
+
+
+
+/*     const querySnapshot = await getDocs(qry);
+
+    this.messages = querySnapshot.docs.map(doc => {
+      const obj = doc.data()
+      const msg = plainToInstance(Message, obj)
+      return msg
+    }
+
+    )
+
+    console.log(this.messages)
+ */
+
+
+    /*
+        this.messages$ = collectionData(qry).pipe(res => {
+    
+          console.log(res)
+          return res
+        })  // msgCol
+      */
+
   }
 
   toggle(msg: Message) {
@@ -49,35 +119,57 @@ export class MessagesComponent implements OnInit {
 
   }
 
-  sendReply(msg: Message, body) {
+  async delete(msg: Message) {
+    console.error(msg)
 
-    if (!msg)
+    const res = await deleteDoc(doc(this.firestore, "branches", this.sessionSvc.branchId, "msg", msg.id));
+  }
+
+  sendReply(origMsg: Message, body: string) {
+
+    console.log(this.html)
+
+
+
+    if (!origMsg)
       return
 
-    let providerInfo = msg.prov as WhatsAppProviderInfo
 
-    const whatsapp = new WhatsAppMessage(msg.from.addr, this.body, providerInfo.phoneId, providerInfo.id)
 
+    const reply: Message = origMsg.createReply()
+
+    reply.from = new MessageAddress(this.sessionSvc.branch.emailFrom)
+
+    if (origMsg.type == MsgType.email) {
+      reply.body = this.html
+      reply.fmt = TemplateFormat.html
+    }
+    else
+      reply.body = this.body
+
+    if (this.sessionSvc.humanResource)
+      reply.resId = this.sessionSvc.humanResource.id
+
+    console.log(reply)
+
+    const res = this.msgSvc.sendMessage$(reply)
+
+    this.msgId = undefined
+    this.body = ''
+    this.html = this.htmlInit
+
+
+    /*
+    let providerInfo = origMsg.prov as WhatsAppProviderInfo
+
+    const whatsapp = new WhatsAppMessage(origMsg.from.addr, this.body, providerInfo.phoneId, providerInfo.id)
 
     const res = this.msgSvc.sendWhatsApp$(whatsapp)
 
     console.log(res)
+  */
 
   }
 
-  /*
-    async getMessagesOld() {
-      const msgCol = collection(this.firestore, "branches", this.sessionSvc.branchId, "msg");
-  
-      const qry = query(msgCol, orderBy('cre', 'desc'), limit(10))
-  
-      const querySnapshot = await getDocs(qry);
-  
-      querySnapshot.forEach((doc) => {
-        
-        console.log(doc.id, " => ", doc.data());
-      });
-    }
-  */
 
 }

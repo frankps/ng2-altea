@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { ObjectWithId, BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, ApiBatchResult, DbQuery, ObjectHelper, ApiStatus, ConnectTo, DbQueryTyped, DbObjectCreate, DbObjectMulti, DbObject, DbObjectMultiCreate } from 'ts-common'
+import { ObjectWithId, BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, ApiBatchResult, DbQuery, ObjectHelper, ApiStatus, ConnectTo, DbQueryTyped, DbObjectCreate, DbObjectMulti, DbObject, DbObjectMultiCreate, DbQueryBaseTyped, DbUpdateManyWhere } from 'ts-common'
 import { plainToInstance } from "class-transformer";
 import { Observable, map, Subject, take } from "rxjs";
 import { SessionService } from './session.service';
@@ -53,6 +53,23 @@ export class ObjectService implements IDb {
 
   }
 
+  async delete$<T>(httpServer: string, pageUrl: string, body: any): Promise<T> {
+
+    const me = this
+
+    return new Promise<any>(function (resolve, reject) {
+
+      const fullUrl = `${httpServer}/${pageUrl}`
+
+      me.http.delete<any>(fullUrl, body).pipe(take(1)).subscribe(res => {
+        resolve(res)
+      })
+
+    })
+
+  }
+
+
 
 
 
@@ -102,6 +119,24 @@ export class ObjectService implements IDb {
     return typedRes
   }
 
+  async updateManyWhere$<T extends ObjectWithId>(update: DbUpdateManyWhere<T>): Promise<any> {
+
+    let res = await this.put$(this.sessionSvc.backend, `${this.sessionSvc.branchUnique}/objects/updateManyWhere`, update)
+
+    return res
+
+  }
+
+
+  async deleteMany$<T extends ObjectWithId>(query: DbQueryBaseTyped<T>): Promise<any>  {
+
+    let res = await this.delete$(this.sessionSvc.backend, `${this.sessionSvc.branchUnique}/objects/deleteMany`, query)
+
+    return res
+
+  }
+
+
   /*
   async createCheckoutSession$(checkout: CreateCheckoutSession): Promise<any> {
 
@@ -142,6 +177,8 @@ export class ObjectService implements IDb {
     })
 
   }
+
+
 
 
 
