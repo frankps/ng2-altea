@@ -71,6 +71,15 @@ export class DateRange {
         return new TimeSpan(dif)
     }
 
+    set duration(value: TimeSpan) {
+
+        if (!value)
+            return
+
+        this.to = dateFns.addSeconds(this.from, value.seconds)
+
+    }
+
     seconds(): number {
         return this.duration.seconds
     }

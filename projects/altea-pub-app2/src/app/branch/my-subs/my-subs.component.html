@@ -1,0 +1,17 @@
+
+
+<h4>Mijn Abonnementen</h4>
+
+<ng-container *ngIf="subs">
+
+    <ul class="list-group">
+        <li class="list-group-item" *ngFor="let sub of subs" (click)="bookSubscription(sub)">
+    
+            {{sub.name}}
+
+            <div class="float-end">{{sub.usedQty}} / {{sub.totalQty}}</div>
+    
+        </li>
+    </ul>
+
+</ng-container>

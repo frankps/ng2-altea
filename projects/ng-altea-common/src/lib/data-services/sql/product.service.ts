@@ -36,6 +36,7 @@ options:orderBy=idx.values:orderBy=idx
 
 
 
+
   getCategories(type?: ProductType, categoryId: string | null = null): Observable<Product[]> {
     const query = this.getCategoriesQuery(type, categoryId)
     return this.query(query).pipe(map(obj => obj.data ? obj.data : []))
@@ -65,17 +66,28 @@ options:orderBy=idx.values:orderBy=idx
   }
 
 
-
-  getProductsInCategory(categoryId: string): Observable<Product[]> {
+  getProductsInCategoryQuery(categoryId: string | null = null) : DbQuery {
     const query = new DbQuery()
-    // query.and('type', QueryOperator.equals, type)
-    // query.and('isCategory', QueryOperator.equals, true)
+    
     query.and('del', QueryOperator.equals, false)
     query.and('catId', QueryOperator.equals, categoryId)
     query.and('online', QueryOperator.not, OnlineMode.invisible)
     query.include('options:orderBy=idx.values:orderBy=idx')
     query.take = 200
-    //  query.select('id', 'catId', 'name', 'type', 'isCategory')
+
+    return query
+  }
+
+  getProductsInCategory$(categoryId: string | null = null): Promise<Product[]> {
+
+    const query = this.getProductsInCategoryQuery(categoryId)
+
+    return this.query$(query)
+  }
+
+  getProductsInCategory(categoryId: string | null = null): Observable<Product[]> {
+
+    const query = this.getProductsInCategoryQuery(categoryId)
 
     return this.query(query).pipe(map(obj => obj.data ? obj.data : []))
   }

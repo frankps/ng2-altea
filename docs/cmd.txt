@@ -23,6 +23,13 @@ Deploy:
     https://altea-pub-app.web.app/auth/sign-in
 
 
+    Public app for cconsumers:
+
+    ng build --aot --project altea-pub-app2
+    firebase deploy --only hosting:altea-pub-app2
+    https://altea-pub-app2.web.app
+
+
     Project Console: https://console.firebase.google.com/project/altea-24/overview
     Hosting URL: https://altea-velzon-admin.web.app
 
@@ -89,6 +96,8 @@ ng generate component resource/resourceUserLink --project altea-velzon-admin
 
 
 ng generate application altea-pub-app2 --style=scss --routing=true
+ng generate component branch/mySubs --project altea-pub-app2
+
 
 
 ng generate component ngbs5 --project dvit-gen

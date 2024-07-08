@@ -31,7 +31,17 @@ export class SolutionItem {
 
     notes: SolutionNote[] = []
 
+    /** the item number within solution: if items re-ordered, we can still see what original order was */
+    num: number = 0
+
     constructor(public request: ResourceRequestItem, public dateRange: DateRange, public exactStart = false, ...resources: Resource[]) {
+
+        if (exactStart) {
+            if (dateRange.duration.seconds > request.duration.seconds) {
+                dateRange.duration = request.duration
+            }
+        }
+
         if (Array.isArray(resources))
             this.resources = resources
     }
@@ -70,7 +80,14 @@ export class Solution extends ObjectWithId {
 
     constructor(...items: SolutionItem[]) {
         super()
-        this.items.push(...items)
+
+        if (ArrayHelper.NotEmpty(items)) {
+            this.items.push(...items)
+
+            let num = 1
+            items.forEach(item => { item.num = num++ })
+
+        }
     }
 
     getOccupationForResource(resource: Resource): DateRangeSet {
@@ -102,21 +119,24 @@ export class Solution extends ObjectWithId {
 
     add(item: SolutionItem, limitOtherItems = true) {
 
+        if (!item)
+            return
+
         if (!Array.isArray(this.items))
             this.items = []
-        else {
-            this.items.push(item)
 
-            
-             if (!this.hasExactStart() && limitOtherItems) {
-                const offsetSeconds = item.request.offset.seconds
+        this.items.push(item)
+        item.num = this.items.length // keep track when item is added (items can be re-ordered)
 
-                const refFrom = dateFns.addSeconds(item.dateRange.from, -offsetSeconds)
-                const refTo = dateFns.addSeconds(item.dateRange.to, -offsetSeconds)
+        if (!this.hasExactStart() && limitOtherItems) {
+            const offsetSeconds = item.request.offset.seconds
 
-                this.limitOtherItems(refFrom, refTo)
-            } 
+            const refFrom = dateFns.addSeconds(item.dateRange.from, -offsetSeconds)
+            const refTo = dateFns.addSeconds(item.dateRange.to, -offsetSeconds)
+
+            this.limitOtherItems(refFrom, refTo)
         }
+
     }
 
     limitOtherItems(refFrom: Date, refTo: Date) {

@@ -22,6 +22,10 @@ export class MenuComponent {
       code: 'buy-gift'
     },
     {
+      code: 'my-subs'
+    }
+    ,
+    {
       code: 'demo-orders'
     }
 

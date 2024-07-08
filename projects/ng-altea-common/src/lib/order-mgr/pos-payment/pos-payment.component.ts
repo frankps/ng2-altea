@@ -167,13 +167,11 @@ export class PosPaymentComponent implements OnInit {
     let orderLine = this.mgrUiSvc.order.getLineByProduct(subs.unitProductId)
 
     if (orderLine) {
-      // orderLine
 
+      /** The back-end will update the subscription when saving the order */
       const payment = this.mgrUiSvc.addPayment(orderLine.product.salesPrice, PaymentType.subs, 'pos')
       payment.subsId = subs.id
-      /* 
-            let res = await this.mgrUiSvc.testPaymentProcessing()
-            console.warn(res) */
+
     }
 
   }

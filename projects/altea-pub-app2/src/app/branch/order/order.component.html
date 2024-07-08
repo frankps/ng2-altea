@@ -95,3 +95,9 @@
     <ng-container *ngSwitchDefault>
     </ng-container>
 </ng-container>
+
+
+
+<order-mgr-debug-plannings *ngIf="orderMgrSvc.plannings" [plannings]="orderMgrSvc.plannings" ></order-mgr-debug-plannings>
+
+<order-mgr-debug-availability [response]="orderMgrSvc.availabilityResponse"></order-mgr-debug-availability>

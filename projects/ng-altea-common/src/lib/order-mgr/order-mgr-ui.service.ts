@@ -198,11 +198,16 @@ export class OrderMgrUiService {   // implements OnInit
 
   async newOrder(uiMode: OrderUiMode = OrderUiMode.newOrder, gift?: Gift) {
 
-    this.order = new Order(this.sessionSvc.branch.unique, true)
+    let me = this
+
+
+    let branch = await this.sessionSvc.branch$()
+
+    this.order = new Order(branch.unique, true)
     this.orderDirty = false
 
-    this.order.branchId = this.sessionSvc.branchId
-    this.order.branch = await this.sessionSvc.branch$()
+    this.order.branchId = branch.id
+    this.order.branch = branch
 
     this.uiMode = uiMode
 
@@ -626,37 +631,25 @@ export class OrderMgrUiService {   // implements OnInit
     this.path = []
     this.currentCategoryId = null
 
-    if (Array.isArray(this.rootCategories) && this.rootCategories.length > 0) {
+    if (ArrayHelper.NotEmpty(this.rootCategories)) {
       this.products = this.rootCategories
       return this.rootCategories
     }
 
     const me = this
+    const rootProducts = await me.productSvc.getProductsInCategory$()
+    me.products = rootProducts
+    me.rootCategories = me.products
 
-    return new Promise<Product[]>(function (resolve, reject) {
+    if (rootProducts) {
 
-      //  me.spinner.show()
+      me.rootProductCats = rootProducts.filter(c => c.type == ProductType.prod)
+      me.rootServiceCats = rootProducts.filter(c => c.type == ProductType.svc)
 
+    }
 
+    return rootProducts
 
-      me.productSvc.getCategories().pipe(take(1)).subscribe(categories => {
-        me.products = categories
-
-        me.rootCategories = categories
-
-        if (categories) {
-
-          me.rootProductCats = categories.filter(c => c.type == ProductType.prod)
-          me.rootServiceCats = categories.filter(c => c.type == ProductType.svc)
-
-        }
-
-        resolve(categories)
-        // console.error(res)
-        //  me.spinner.hide()
-      })
-
-    })
 
   }
 
@@ -732,15 +725,32 @@ export class OrderMgrUiService {   // implements OnInit
 
   }
 
+  async addProductById(productId: string, qty = 1) : Promise<OrderLine[]> {
+
+    const product = await this.loadProduct$(productId)
+
+    if (!product) {
+      console.error(`Product not found: ${productId}`)
+      return []
+    }
+
+    const orderLines = await this.addProduct(product, qty)
+
+    return orderLines
+    console.warn(this.order)
+  }
 
 
-  async addProduct(product: Product, qty = 1, initOptionValues?: Map<String, String[]>) {
+  /** method used to add products (used in demo orders) */
+  async addProduct(product: Product, qty = 1, initOptionValues?: Map<String, String[]>): Promise<OrderLine[]> {
 
     if (product.sub == ProductSubType.bundle) {
 
       console.error(product.items)
       if (ArrayHelper.IsEmpty(product.items))
-        return
+        return []
+
+      const orderLines = []
 
       for (let item of product.items) {
 
@@ -753,14 +763,50 @@ export class OrderMgrUiService {   // implements OnInit
 
         let orderLine = this.newOrderLine(product, item.qty, item.getOptionValuesAsMap())
         await this.addOrderLine(orderLine)
+        orderLines.push(orderLine)
+
       }
+
+      return orderLines
 
     } else {
       let orderLine = this.newOrderLine(product, qty, initOptionValues)
       await this.addOrderLine(orderLine)
+      return [orderLine]
     }
 
   }
+
+
+  /** method used in UI
+   *  to do: if bundle (add individual products)
+   * 
+   * @param orderLine 
+   * @param qty 
+   * @param setUnitPrice use false for custom products (gifts etc...)
+   */
+  async addOrderLine(orderLine: OrderLine, qty = 1, setUnitPrice = true) {
+    // orderLine.orderId = this.order.id
+
+    // if this is a bundle, then we need to unpack the product (and add product.items individually)
+    if (orderLine.product.sub == ProductSubType.bundle) {
+      const orderLines = await this.addProduct(orderLine.product, orderLine.qty)
+
+      if (ArrayHelper.NotEmpty(orderLines)) {
+        this.orderLine = orderLines[0]
+      }
+
+      return
+    }
+
+    this.order.addLine(orderLine, setUnitPrice)
+    this.orderDirty = true
+    this.orderLineIsNew = false
+
+    await this.calculateLoyalty()
+  }
+
+
 
   newOrderLine(product: Product, qty = 1, initOptionValues?: Map<String, String[]>): OrderLine {
 
@@ -775,14 +821,7 @@ export class OrderMgrUiService {   // implements OnInit
 
 
 
-  async addOrderLine(orderLine: OrderLine, qty = 1, setUnitPrice = true) {
-    // orderLine.orderId = this.order.id
-    this.order.addLine(orderLine, setUnitPrice)
-    this.orderDirty = true
-    this.orderLineIsNew = false
 
-    await this.calculateLoyalty()
-  }
 
   deleteCurrentOrderLine() {
     if (!this.orderLine)

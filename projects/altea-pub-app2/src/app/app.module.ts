@@ -11,7 +11,7 @@ import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { defineLocale } from 'ngx-bootstrap/chronos';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { nlBeLocale } from 'ngx-bootstrap/locale';
-import { NgAlteaCommonModule } from 'ng-altea-common';
+import { NgAlteaCommonModule, SessionService } from 'ng-altea-common';
 import { OrderMgrModule } from 'ng-altea-common';
 import { OrderComponent } from './branch/order/order.component';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
@@ -53,4 +53,11 @@ export function createTranslateLoader(http: HttpClient): any {
   providers: [],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule { 
+
+  constructor(protected sessionSvc: SessionService) {
+    sessionSvc.init(environment)
+  }
+
+
+}

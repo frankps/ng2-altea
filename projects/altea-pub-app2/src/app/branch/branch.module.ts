@@ -13,6 +13,7 @@ import { PayOnlineComponent } from './pay-online/pay-online.component';
 import { PayFinishedComponent } from './pay-finished/pay-finished.component';
 
 import { TaskComponent } from './task/task.component';
+import { MySubsComponent } from './my-subs/my-subs.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { TaskComponent } from './task/task.component';
     PayOnlineComponent,
     PayFinishedComponent,
 
-    TaskComponent
+    TaskComponent,
+     MySubsComponent
   ],
   imports: [
     CommonModule,

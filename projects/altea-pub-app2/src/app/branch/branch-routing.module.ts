@@ -9,6 +9,7 @@ import { PayFinishedComponent } from './pay-finished/pay-finished.component';
 import { PayOnlineComponent } from './pay-online/pay-online.component';
 
 import { TaskComponent } from './task/task.component';
+import { MySubsComponent } from './my-subs/my-subs.component';
 
 const routes: Routes = [{
   path: ':branch', component: BranchComponent,
@@ -19,10 +20,12 @@ const routes: Routes = [{
     { path: "buy-gift", component: BuyGiftComponent },
     { path: "pay-online", component: PayOnlineComponent },
     { path: "pay-finished", component: PayFinishedComponent },
-
+    { path: "my-subs", component: MySubsComponent },
     { path: "task", component: TaskComponent },
   ]
 }]
+
+// my-subs
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
