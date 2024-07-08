@@ -2,9 +2,9 @@
 
     <div class="row my-4 ">
         <div class="col-4">
-            <div style="font-weight: bold;">{{branch.name}}</div>
+            <div style="font-weight: bold;">{{branch.name}} </div>
         </div>
-        <div class="col-4"> <span *ngIf="authSvc.user" style="font-size: small;">{{authSvc.user.email}}</span> </div>
+        <div class="col-4"> >{{authSvc.loggedOn()}}< <span *ngIf="authSvc.user" style="font-size: small;">{{authSvc.user.email}}</span> </div>
         <div class="col-4">
 
 
@@ -40,8 +40,12 @@
             <button type="button" class="btn btn-primary btn-sm float-end ms-1" translate (click)="gotoMenu()"><i
                     class="fa-solid fa-bars fa-lg"></i></button>
 
-            <button type="button" class="btn btn-primary btn-sm float-end ms-1" translate (click)="appSignOut()"><i
+            <button *ngIf="authSvc.loggedOn()" type="button" class="btn btn-primary btn-sm float-end ms-1" translate (click)="appSignOut()"><i
                     class="fa-duotone fa-person-from-portal fa-lg"></i></button>
+
+            <button *ngIf="!authSvc.loggedOn()" type="button" class="btn btn-primary btn-sm float-end ms-1" translate (click)="appSignIn()"><i
+                    class="fa-duotone fa-person-to-portal fa-lg"></i></button>
+
 
             <!--    <i class="fa-solid fa-bars"></i>       -->
 

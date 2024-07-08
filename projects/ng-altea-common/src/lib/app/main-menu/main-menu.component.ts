@@ -23,6 +23,7 @@ export class MainMenuComponent implements OnInit {
   @Output() select: EventEmitter<MenuItem> = new EventEmitter();
 
   @Input() menu = []
+  @Input() loggedIn = false
 
   constructor(protected translationSvc: TranslationService, protected sessionSvc: SessionService) {
 

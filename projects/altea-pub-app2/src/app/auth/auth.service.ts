@@ -4,7 +4,7 @@ import { Auth, GoogleAuthProvider, signInWithRedirect, signInWithPopup, user, Us
 import { ActivatedRoute, Router } from '@angular/router';
 import { ResourceService, UserService } from 'ng-altea-common';
 import * as altea from 'ts-altea-model';
-import { DbQuery, QueryOperator } from 'ts-common';
+import { ArrayHelper, DbQuery, QueryOperator } from 'ts-common';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { Exclude, Type, Transform, plainToInstance, instanceToPlain } from "class-transformer";
 import { JsonPipe } from '@angular/common';
@@ -80,6 +80,10 @@ export class AuthService {
 
   }
 
+  loggedOn(): boolean {
+
+    return (this.fbUser != null && this.fbUser != undefined)
+  }
 
   init() {
 
@@ -92,6 +96,8 @@ export class AuthService {
 
       this.fbUser = firebaseUser
 
+      if (firebaseUser == null)
+        return
 
       if (firebaseUser) {
 
@@ -169,9 +175,39 @@ export class AuthService {
 
     user.uid = firebaseUser.uid
 
-    user.prov = 'google'
-    user.provEmail = firebaseUser.email
-    user.email = firebaseUser.email
+    if (ArrayHelper.NotEmpty(firebaseUser.providerData)) {
+
+      const providerData = firebaseUser.providerData[0]
+
+      switch (providerData.providerId) {
+
+        case 'facebook.com':
+          user.prov = 'facebook'
+          user.provEmail = providerData.email
+          user.email = providerData.email
+          user.provId = providerData.uid
+          
+          if (providerData.displayName) {
+            let names = providerData.displayName.split(' ')
+            user.first = names[0]
+            names.splice(0, 1)
+            user.last = names.join(' ')
+          }
+
+
+          break
+
+        default:
+          user.prov = 'google'
+          user.provEmail = firebaseUser.email
+          user.email = firebaseUser.email
+
+      }
+
+
+    }
+
+
 
     let res = await this.userSvc.create$(user)
 

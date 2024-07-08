@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrderMgrUiService, OrderUiMode, OrderUiState, SessionService } from 'ng-altea-common';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-menu',
@@ -13,20 +14,25 @@ export class MenuComponent {
   menu = [
 
     {
-      code: 'new-reserv'
+      code: 'new-reserv',
+      loggedOff: true
     },
     {
-      code: 'use-gift'
+      code: 'use-gift',
+      loggedOff: true
     },
     {
-      code: 'buy-gift'
+      code: 'buy-gift',
+      loggedOff: true
     },
     {
-      code: 'my-subs'
+      code: 'my-subs',
+      loggedOff: false
     }
     ,
     {
-      code: 'demo-orders'
+      code: 'demo-orders',
+      loggedOff: true
     }
 
     /*
@@ -41,7 +47,9 @@ export class MenuComponent {
     } */
   ]
 
-  constructor(protected sessionSvc: SessionService, protected router: Router, protected orderMgrSvc: OrderMgrUiService) { }
+  constructor(protected sessionSvc: SessionService, protected router: Router, protected orderMgrSvc: OrderMgrUiService,
+    protected authSvc: AuthService
+  ) { }
 
 
   menuClicked(menuItem) {
@@ -61,13 +69,13 @@ export class MenuComponent {
         this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'order'])
         break
 
-/*       case 'use-gift':
-        this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'use-gift'])
-        break
-
-      case 'buy-gift':
-        this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'buy-gift'])
-        break */
+      /*       case 'use-gift':
+              this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'use-gift'])
+              break
+      
+            case 'buy-gift':
+              this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'buy-gift'])
+              break */
 
       case 'demo-orders':
 

@@ -27,7 +27,9 @@ Deploy:
 
     ng build --aot --project altea-pub-app2
     firebase deploy --only hosting:altea-pub-app2
-    https://altea-pub-app2.web.app
+    https://altea-pub-app2.web.app/
+    https://altea-pub-app2.web.app/auth/sign-in
+    
 
 
     Project Console: https://console.firebase.google.com/project/altea-24/overview
@@ -98,7 +100,9 @@ ng generate component resource/resourceUserLink --project altea-velzon-admin
 ng generate application altea-pub-app2 --style=scss --routing=true
 ng generate component branch/mySubs --project altea-pub-app2
 
-
+ng generate module info --project altea-pub-app2 --routing
+ng generate component info/privacy --project altea-pub-app2
+ng generate component info/user-data-deletion --project altea-pub-app2
 
 ng generate component ngbs5 --project dvit-gen
 

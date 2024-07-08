@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { Auth, GoogleAuthProvider, signInWithRedirect, signInWithPopup, user, User, signOut } from '@angular/fire/auth';
+import { Auth, GoogleAuthProvider, signInWithRedirect, signInWithPopup, user, User, signOut, FacebookAuthProvider } from '@angular/fire/auth';
 import { Subscription, of } from 'rxjs';
 
 
@@ -46,18 +46,56 @@ export class SignInComponent implements OnInit {
      *  https://stackoverflow.com/questions/75918184/angularfire-signinwithredirect-and-getredirectresult-not-working
      * 
      */
-  
-    return signInWithPopup(this.auth, new GoogleAuthProvider()).then(async (userCredentials) => {
+
+
+    return signInWithPopup(this.auth, new FacebookAuthProvider()).then(async (userCredentials) => {
       this.user = userCredentials.user;
       console.error(this.user)
 
       this.idToken = await this.user.getIdToken();
       return of(this.user);
     });
-    
 
-  //  return signInWithRedirect(this.auth, new GoogleAuthProvider());
+
   }
+
+
+  signIn(provider: 'google' | 'facebook') {
+
+    let prov
+
+    switch (provider) {
+
+      case 'google':
+        prov = new GoogleAuthProvider()
+        break
+
+      case 'facebook':
+        prov = new FacebookAuthProvider()
+        break
+    }
+
+
+    /**
+     *  Copied from:
+     * 
+     *  https://stackoverflow.com/questions/75918184/angularfire-signinwithredirect-and-getredirectresult-not-working
+     * 
+     */
+
+
+    return signInWithPopup(this.auth, prov).then(async (userCredentials) => {
+      this.user = userCredentials.user;
+      console.error(this.user)
+
+      this.idToken = await this.user.getIdToken();
+      return of(this.user);
+    });
+
+
+  }
+
+
 
 
 }

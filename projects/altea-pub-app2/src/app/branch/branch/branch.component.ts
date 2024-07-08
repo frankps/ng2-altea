@@ -30,8 +30,20 @@ export class BranchComponent implements OnInit {
 
   }
 
+  /*
+  loggedOn() : boolean {
+    
+    var loggedOn = this.authSvc.loggedOn()
+    console.warn(loggedOn)
+    return loggedOn
+  }*/
+
   appSignOut() {
     return signOut(this.auth)
+  }
+
+  appSignIn() {
+    this.router.navigate(['/auth', 'sign-in'])
   }
 
   async gotoBasket() {

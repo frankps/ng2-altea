@@ -7,7 +7,13 @@
 <div class="mt-5">
 
     <div class="col mx-5  d-grid">
-        <button type="button" class="btn btn-primary" (click)="googleSignIn()" translate>Dashboard</button>
+        <button type="button" class="btn btn-primary"  translate>Dashboard</button>
+
+        <button type="button" class="btn btn-outline-primary mt-2" (click)="signIn('facebook')">Facebook</button>
+
+
+        <button type="button" class="btn btn-outline-primary mt-2" (click)="signIn('google')">Google</button>
+
     </div>
     
 </div>
