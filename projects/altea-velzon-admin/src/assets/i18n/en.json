@@ -810,6 +810,7 @@
       "emailRemind": "Stuur e-mail herinneringen",
       "mobile": "GSM nummer",
       "mobilePrefix": "Land",
+      "msgPref": "Communicatie voorkeur",
       "smsRemind": "Stuur sms herinneringen",
       "phone": "Telefoon",
       "lang": "Taal",

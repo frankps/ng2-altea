@@ -61,6 +61,15 @@ export class AuthService {
 
   }
 
+  clearUserData() {
+    this.fbUser = undefined
+    this.user = undefined
+    this.userId = undefined
+    this.resource = undefined
+    this.resourceId = undefined
+  }
+
+
   async logout() {
 
     var signOutResult = await signOut(this.auth)
@@ -72,11 +81,8 @@ export class AuthService {
       let cachedInfo = localStorage.removeItem(storageKey)
 
     }
-    this.fbUser = undefined
-    this.user = undefined
-    this.userId = undefined
-    this.resource = undefined
-    this.resourceId = undefined
+
+    this.clearUserData()
 
   }
 
@@ -97,10 +103,11 @@ export class AuthService {
       this.fbUser = firebaseUser
 
       if (firebaseUser == null)
-        return
+        this.clearUserData()
 
       if (firebaseUser) {
 
+        let newUser = false
         this.spinner.show()
 
         /*         try {
@@ -127,7 +134,10 @@ export class AuthService {
           } else {
             this.user = await this.userSvc.getByUid(firebaseUser.uid)
 
-            if (!this.user) {
+            if (!this.user) newUser = true
+
+
+            if (newUser) {
               this.user = await this.createUser$(firebaseUser)
               console.log('User NOT found!')
               console.warn(this.user)
@@ -150,7 +160,18 @@ export class AuthService {
 
 
           console.error('forwarding user!')
-          this.router.navigate(['branch', 'aqua', 'menu'])
+
+
+          // to test
+          this.router.navigate(['/auth', 'profile'])
+
+          /*
+          if (newUser)
+            this.router.navigate(['/auth', 'profile'])
+          else
+            this.router.navigate(['branch', 'aqua', 'menu'])
+          */
+
           // this.router.navigate(['staff', 'dashboard'])
 
         } finally {
@@ -163,7 +184,7 @@ export class AuthService {
 
 
       } else {
-        this.router.navigate(['auth', 'sign-in'])
+      //  this.router.navigate(['auth', 'sign-in'])
       }
     })
 
@@ -179,21 +200,35 @@ export class AuthService {
 
       const providerData = firebaseUser.providerData[0]
 
+      if (firebaseUser.providerData.length > 1) // we expect only 1 item in array
+        user.prvOrig = firebaseUser.providerData
+      else
+        user.prvOrig = providerData
+
+
+
       switch (providerData.providerId) {
 
         case 'facebook.com':
           user.prov = 'facebook'
-          user.provEmail = providerData.email
+
+          const provInfo = new altea.ProviderInfo()
+          provInfo.email = providerData.email
+          provInfo.id = providerData.uid
+
+          user.prv = provInfo
+
+          /*           user.provEmail = providerData.email
+                    user.provId = providerData.uid */
+
           user.email = providerData.email
-          user.provId = providerData.uid
-          
+
           if (providerData.displayName) {
             let names = providerData.displayName.split(' ')
             user.first = names[0]
             names.splice(0, 1)
             user.last = names.join(' ')
           }
-
 
           break
 

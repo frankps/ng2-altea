@@ -1,24 +1,29 @@
+<form #phoneForm="ngForm">
 
-<div [class]="css.row">
+    <div [class]="css.row">
 
-    <div [class]="css.colPrefix">
-        <ngx-altea-label-control label="objects.contact.mobilePrefix" for="mobile">
-            <ng-select id="countryPrefix" name="countryPrefix" [items]="countries" bindLabel="label"
-                bindValue="prefix" [clearable]="false" [multiple]="false" [(ngModel)]="countryPrefix" (change)="prefixChanged($event)">
-            </ng-select>
-        </ngx-altea-label-control>
-    </div>
+        <div [class]="css.colPrefix">
+            <ngx-altea-label-control label="objects.contact.mobilePrefix" for="mobile">
+                <ng-select id="countryPrefix" name="countryPrefix" [items]="countries" bindLabel="label"
+                    bindValue="prefix" [clearable]="false" [multiple]="false" [(ngModel)]="countryPrefix"
+                    (change)="prefixChanged($event)">
+                </ng-select>
+            </ngx-altea-label-control>
+        </div>
 
-    <div [class]="css.colLocalNum">
-        <ngx-altea-label-control label="objects.contact.mobile" for="mobile">
-            <input type="text" id="mobile" name="mobile" class="form-control"
-                [(ngModel)]="_localNum" (keypress)="localPhoneChanged($event)" (keydown)="specialKeyPressed($event)" (paste)="onPaste($event)"/>
-        </ngx-altea-label-control>
-    </div>
+        <div [class]="css.colLocalNum">
+            <ngx-altea-label-control label="objects.contact.mobile" for="mobile">
+                <input required type="text" id="mobile" name="mobile" class="form-control" [(ngModel)]="_localNum"
+                    (keypress)="localPhoneChanged($event)" (keydown)="specialKeyPressed($event)"
+                    (paste)="onPaste($event)" (change)="checkPhone()" />
+            </ngx-altea-label-control>
+        </div>
 
-    <!--
+        <!--
     (keypress)
     (change)="phoneChanged()"
     -->
 
-</div>
+    </div>
+
+</form>

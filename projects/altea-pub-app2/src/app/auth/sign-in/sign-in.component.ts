@@ -60,7 +60,7 @@ export class SignInComponent implements OnInit {
   }
 
 
-  signIn(provider: 'google' | 'facebook') {
+  async signIn(provider: 'google' | 'facebook') {
 
     let prov
 
@@ -84,13 +84,19 @@ export class SignInComponent implements OnInit {
      */
 
 
-    return signInWithPopup(this.auth, prov).then(async (userCredentials) => {
+    const credentials = await signInWithPopup(this.auth, prov).then(async (userCredentials) => {
       this.user = userCredentials.user;
       console.error(this.user)
 
       this.idToken = await this.user.getIdToken();
-      return of(this.user);
+      //return of(this.user);
+
+      return userCredentials
     });
+
+    console.warn(credentials)
+
+    return credentials
 
 
   }

@@ -20,7 +20,7 @@ export class BranchComponent implements OnInit {
   constructor(protected sessionSvc: SessionService, protected router: Router,  protected orderMgrSvc: OrderMgrUiService, protected authSvc: AuthService) {
 
   }
-
+   
 
  async ngOnInit() {
 

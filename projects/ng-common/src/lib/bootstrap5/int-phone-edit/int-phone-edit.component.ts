@@ -1,15 +1,50 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import * as countryLib from 'country-list-js';
 import ta from 'date-fns/locale/ta';
 import { ObjectHelper } from 'ts-common';
+import { AbstractControl, Validator, NG_VALIDATORS, NgForm } from '@angular/forms';
 
+export class CountryPhoneSpec {
+  regEx: string
+  length: { min, max }
+}
 
 @Component({
   selector: 'int-phone-edit',
   templateUrl: './int-phone-edit.component.html',
-  styleUrls: ['./int-phone-edit.component.css']
+  styleUrls: ['./int-phone-edit.component.css'],
+
 })
 export class IntPhoneEditComponent {
+
+  // https://en.wikipedia.org/wiki/List_of_mobile_telephone_prefixes_by_country
+  countrySpecs = new Map<string, CountryPhoneSpec>([
+
+    ['31', { regEx: '^(6)[0-9]*', length: { min: 9, max: 9 } }],
+    ['32', { regEx: '^(455|456|46|47|48|49)[0-9]*', length: { min: 9, max: 9 } }],
+    ['33', { regEx: '^(6|7)[0-9]*', length: { min: 9, max: 9 } }],  // France
+    ['34', { regEx: '^(6|7)[0-9]*', length: { min: 9, max: 9 } }],  // Spain
+    ['44', { regEx: '^(7)[0-9]*', length: { min: 10, max: 10 } }],  // UK
+    ['49', { regEx: '^(15|16|17)[0-9]*', length: { min: 10, max: 11 } }],  // Germany
+  ])
+
+  /*
+  {
+    32: {
+      re: '^(455|456|460|465|466|467|468|47|48|49)[0-9]*',
+      length: { min: 9, max: 9 }
+    },
+    31: {
+      re: '^(6)[0-9]*',
+      length: { min: 9, max: 9 }
+    }
+  }*/
+
+  @ViewChild('phoneForm')
+  phoneForm: NgForm
+
+  /*   @ViewChild('mobileInput')
+    mobileInput: ElementRef */
 
   _localNum: string
 
@@ -79,6 +114,7 @@ export class IntPhoneEditComponent {
 
   prefixChanged(event: any) {
     var fullNum = this.countryPrefix + this._localNum
+    this.checkPhone()
     this.phoneChange.emit(fullNum)
 
   }
@@ -98,17 +134,19 @@ export class IntPhoneEditComponent {
       await this.sleep(200)
 
       this.getFullNumber()
-      
-
     }
-
-
   }
 
-  getFullNumber() {
+  cleanLocalNum() {
 
     this._localNum = this._localNum.replace(/^0+/, "")
     this._localNum = this._localNum.replace(/[^0-9]/g, "")
+  }
+
+
+  getFullNumber(): string {
+
+    this.cleanLocalNum()
 
     var fullNum = this.countryPrefix + this._localNum
 
@@ -120,7 +158,16 @@ export class IntPhoneEditComponent {
   async localPhoneChanged(event: KeyboardEvent) {
     const pattern = /[0-9]/;
 
-    console.error(event)
+
+    /*
+    console.error(this.mobileInput)
+
+    let nativeElement : HTMLInputElement = this.mobileInput.nativeElement
+
+    console.error(nativeElement)
+    */
+
+
 
     console.error(event.key)
 
@@ -134,9 +181,64 @@ export class IntPhoneEditComponent {
 
       await this.sleep(200)
       this.getFullNumber()
-      
+
 
     }
+
+    this.checkPhone()
+
+  }
+
+  checkPhone() {
+    // https://stackoverflow.com/questions/43553544/how-can-i-manually-set-an-angular-form-field-as-invalid
+
+    let ok = true
+    //var reg = new RegExp('^[0-9]$');
+    if (this._localNum == null || this._localNum == undefined) {
+      this._localNum = ""
+      ok = false
+    }
+    const countrySpec = this.countrySpecs.get(this.countryPrefix)
+
+    if (!countrySpec) {
+      console.error('NO COUNTRY SPEC')
+      return this.setErrors()
+    }
+    else
+      console.warn(countrySpec)
+
+
+    this.cleanLocalNum()
+
+    const length = this._localNum.length
+    if (length < countrySpec.length.min || length > countrySpec.length.max) {
+      console.warn(`Phone wrong length`)
+      return this.setErrors()
+    }
+
+
+    var reg = new RegExp(countrySpec.regEx)
+    ok = reg.test(this._localNum)
+
+
+    return this.setErrors(ok)
+
+  }
+
+  setErrors(ok: boolean = false) {
+
+    if (ok)
+      this.phoneForm.controls['mobile'].setErrors(null)
+    else
+      this.phoneForm.controls['mobile'].setErrors({ 'incorrect': true })
+
+    return ok
+  }
+
+  isValid() {
+
+
+    return this.phoneForm ? this.phoneForm.valid : false
   }
 
 
@@ -150,6 +252,9 @@ export class IntPhoneEditComponent {
 
     this.getFullNumber()
     console.log(this._localNum)
+
+    this.checkPhone()
+
   }
 
 

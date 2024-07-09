@@ -1,0 +1,58 @@
+
+
+
+<form #userForm="ngForm" *ngIf="user">
+    <div class="row {{css_cls_row}}">
+        <div class="col">
+            <ngx-altea-label-control label="objects.contact.first" for="first">
+                <input required type="text" id="first" name="first" class="form-control"
+                    [(ngModel)]="user.first">
+            </ngx-altea-label-control>
+        </div>
+    </div>
+
+    <div class="row {{css_cls_row}}">
+        <div class="col">
+            <ngx-altea-label-control label="objects.contact.last" for="last">
+                <input required type="text" id="last" name="last" class="form-control"
+                    [(ngModel)]="user.last">
+            </ngx-altea-label-control>
+        </div>
+    </div>
+    <div class="row {{css_cls_row}}">
+        <div class="col">
+            <ngx-altea-label-control label="objects.contact.email" for="email">
+                <input required type="text" id="email" name="email" class="form-control"
+                    [(ngModel)]="user.email">
+            </ngx-altea-label-control>
+        </div>
+    </div>
+  
+    <int-phone-edit #intPhone required [(phone)]="user.mobile" (phoneChange)="formChanged('user')"></int-phone-edit>
+
+    <div class="row {{css_cls_row}}">
+        <div class="col">
+
+            <span translate>objects.contact.msgPref</span>:
+
+            <div class="form-check form-switch ms-3 mt-1" *ngFor="let msgType of msgTypes">
+                <input type="checkbox" class="form-check-input" [id]="msgType.key" [name]="msgType.key" [disabled]="!canSelectMsgType(msgType.key)" [checked]="user.msgTypeSelected(msgType.key)" (change)="user.selectMsgType(msgType.key, $event.target['checked'])">
+                <label class="form-check-label" for="news">{{'enums.msg-type.' + msgType.key |
+                    translate}}</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="row {{css_cls_row}}">
+        <div class="col">
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary" translate (click)="continue()"
+                    [disabled]="!mobileValid() || !userForm.form.valid">dic.continue</button>
+            </div>
+        </div>
+    </div>
+<!-- 
+    && !userForm.form.valid -->
+
+
+</form>

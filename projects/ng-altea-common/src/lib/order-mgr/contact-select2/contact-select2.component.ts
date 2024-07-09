@@ -11,7 +11,7 @@ import { OrderMgrUiService } from '../order-mgr-ui.service';
   templateUrl: './contact-select2.component.html',
   styleUrls: ['./contact-select2.component.css']
 })
-export class ContactSelect2Component {
+export class ContactSelect2Component implements OnInit {
 
   @Output() selected: EventEmitter<Contact> = new EventEmitter<Contact>();
 
@@ -134,9 +134,6 @@ export class ContactSelect2Component {
       default:
         return false
     }
-
-    
-
   }
 
 

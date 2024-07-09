@@ -103,6 +103,8 @@ ng generate component branch/mySubs --project altea-pub-app2
 ng generate module info --project altea-pub-app2 --routing
 ng generate component info/privacy --project altea-pub-app2
 ng generate component info/user-data-deletion --project altea-pub-app2
+ng generate component auth/contact --project altea-pub-app2
+
 
 ng generate component ngbs5 --project dvit-gen
 

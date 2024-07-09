@@ -281,122 +281,24 @@ export class WeekSchedule {
 
 }
 
+export class ProviderInfo {
+  name: 'facebook' | 'google' | 'apple'
 
-export class User extends ObjectWithIdPlus {
+  id: string
 
-  uid?: string
+  email: string
 
-  prov?: string
-  provId?: string
-  provEmail?: string
-
-  first?: string
-  last?: string
-
-  email?: string
-  mobile?: string
-
-  @Type(() => Contact)
-  contacts: Contact[]
-
-  @Type(() => Resource)
-  resources: Resource[]
-}
-
-export enum PhoneCountryPrefix {
-  be = "32"
-}
-
-
-export class ContactMetrics {
-
-  /** Life time value */
-  ltv: number = 0
-
-  /** Last visit (format: yyyymmdd) */
-  lv: number = 0
-
-  /** */
-  v: number = 0
 
 
 }
 
-export enum DepositMode {
-  none = 'none',
-  full = 'full',
-  default = 'default',
-  custom = 'custom'
-}
-
-export class Contact extends ObjectWithId {
-
-  //@Type(() => Organisation)
-  organisation?: Organisation;
-
-  orgId?: string
-  branchId?: string
-
-  @Type(() => Order)
-  orders?: Order[];
-  name?: string;
-  first?: string;
-  last?: string;
-  gender: Gender = Gender.unknown
-  birth?: number;  // format: yyyyMMdd
-  email?: string;
-  /** Email address confirmed */
-  emailConf = false
-
-  mobile?: string;
-  /** Mobile number confirmed */
-  mobileConf = false
-
+/**
+ * implements shared logic for Contact & User
+ */
+export class UserBase extends ObjectWithIdPlus {
 
   /** Allowed messaging for communication (valid strings: see enum MsgTyp) */
-  msg: string[] = ['email', 'wa']
-
-  phone?: string;
-
-  /** language: iso2, lower case */
-  lang?: string;
-
-  str?: string;
-  strNr?: string;
-  postal?: string;
-  city?: string;
-  country?: string;
-
-  company?: string;
-  vatNum?: string;
-  branches?: string[];
-
-  deposit: DepositMode = DepositMode.default
-  depositPct?: number
-
-  news: boolean = false
-  rules: boolean = false
-
-  /*   active = true
-    deleted = false
-    deletedAt?: Date; */
-
-  @Type(() => User)
-  user?: User
-
-  @Type(() => Subscription)
-  subscriptions?: Subscription[]
-
-  /** gifts given by this contact to others */
-  @Type(() => Gift)
-  giftsOut?: Gift[]
-
-  /** received gifts (can also be gifts created by system for cancellations) */
-  @Type(() => Gift)
-  giftsIn?: Gift[]
-
-  @Type(() => LoyaltyCard)
-  cards?: LoyaltyCard[]
+  msg: string[] = ['email', 'wa', 'sms']
 
   /** Is the given message type selected? */
   msgTypeSelected(type: any): boolean {
@@ -429,6 +331,145 @@ export class Contact extends ObjectWithId {
 
 
   }
+
+
+}
+
+export class User extends UserBase {
+
+  uid?: string
+
+  prov?: string
+  provId?: string
+  provEmail?: string
+
+  @Type(() => ProviderInfo)
+  prv?: ProviderInfo = new ProviderInfo()
+
+  /** initial data received from provider (facebook, google) via Firebase */
+  prvOrig?: any
+
+  first?: string
+  last?: string
+
+  email?: string
+  mobile?: string
+
+  @Type(() => Contact)
+  contacts: Contact[]
+
+  @Type(() => Resource)
+  resources: Resource[]
+
+  mobileValid() : boolean {
+
+    console.log(this.mobile)
+    const valid = (this.mobile != null && this.mobile != undefined && this.mobile.length > 5)
+    console.log(valid)
+    return valid
+
+  }
+
+
+}
+
+export enum PhoneCountryPrefix {
+  be = "32"
+}
+
+
+export class ContactMetrics {
+
+  /** Life time value */
+  ltv: number = 0
+
+  /** Last visit (format: yyyymmdd) */
+  lv: number = 0
+
+  /** */
+  v: number = 0
+
+
+}
+
+export enum DepositMode {
+  none = 'none',
+  full = 'full',
+  default = 'default',
+  custom = 'custom'
+}
+
+export class Contact extends UserBase {
+
+  //@Type(() => Organisation)
+  organisation?: Organisation;
+
+  orgId?: string
+  branchId?: string
+
+  @Type(() => Order)
+  orders?: Order[];
+  name?: string;
+  first?: string;
+  last?: string;
+  gender: Gender = Gender.unknown
+  birth?: number;  // format: yyyyMMdd
+  email?: string;
+  /** Email address confirmed */
+  emailConf = false
+
+  mobile?: string;
+  /** Mobile number confirmed */
+  mobileConf = false
+
+
+  /** Allowed messaging for communication (valid strings: see enum MsgTyp) */
+  //msg: string[] = ['email', 'wa']
+
+  phone?: string;
+
+  /** language: iso2, lower case */
+  lang?: string;
+
+  str?: string;
+  strNr?: string;
+  postal?: string;
+  city?: string;
+  country?: string;
+
+  company?: string;
+  vatNum?: string;
+  branches?: string[];
+
+  deposit: DepositMode = DepositMode.default
+  depositPct?: number
+
+  news: boolean = false
+  rules: boolean = false
+
+  /*   active = true
+    deleted = false
+    deletedAt?: Date; */
+
+  @Type(() => User)
+  user?: User
+  userId?: string
+
+  @Type(() => Subscription)
+  subscriptions?: Subscription[]
+
+  /** gifts given by this contact to others */
+  @Type(() => Gift)
+  giftsOut?: Gift[]
+
+  /** received gifts (can also be gifts created by system for cancellations) */
+  @Type(() => Gift)
+  giftsIn?: Gift[]
+
+  @Type(() => LoyaltyCard)
+  cards?: LoyaltyCard[]
+
+
 
   setName() {
 
@@ -1838,16 +1879,16 @@ export class Branch extends ObjectWithIdPlus {
   @Type(() => Number)
   depositPct?: number
 
-//  @Type(() => DepositTerm)
+  //  @Type(() => DepositTerm)
   depositTerms?: DepositTerm[]
 
-//  @Type(() => ReminderConfig)
+  //  @Type(() => ReminderConfig)
   reminders?: ReminderConfig[]
 
   /** this branch uses the gift functionality */
   giftOn = false
 
-//  @Type(() => GiftConfig)
+  //  @Type(() => GiftConfig)
   gift?: GiftConfig
 
 
@@ -4519,7 +4560,7 @@ export class Template extends ObjectWithIdPlus {
       deposit: `€${order.deposit}`,
       term: this.getTerm(order),
       first: order?.contact?.first,
-     // info: "baby giraffe"
+      // info: "baby giraffe"
     }
 
     if (this.body) {
