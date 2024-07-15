@@ -40,14 +40,16 @@
             <button type="button" class="btn btn-primary btn-sm float-end ms-1" translate (click)="gotoMenu()"><i
                     class="fa-solid fa-bars fa-lg"></i></button>
 
-            <button *ngIf="authSvc.loggedOn()" type="button" class="btn btn-primary btn-sm float-end ms-1" translate (click)="appSignOut()"><i
-                    class="fa-duotone fa-person-from-portal fa-lg"></i></button>
+            <button *ngIf="authSvc.loggedOn()" type="button" class="btn btn-primary btn-sm float-end ms-1" translate
+                (click)="appSignOut()"><i class="fa-duotone fa-person-from-portal fa-lg"></i></button>
 
-            <button *ngIf="!authSvc.loggedOn()" type="button" class="btn btn-primary btn-sm float-end ms-1" translate (click)="appSignIn()"><i
-                    class="fa-duotone fa-person-to-portal fa-lg"></i></button>
+            <button *ngIf="!authSvc.loggedOn()" type="button" class="btn btn-primary btn-sm float-end ms-1" translate
+                (click)="appSignIn()"><i class="fa-duotone fa-person-to-portal fa-lg"></i></button>
 
+            <button type="button" class="btn btn-primary btn-sm float-end ms-1" (click)="gotoProfile()"><i
+                    class="fa-duotone fa-user fa-lg"></i></button>
 
-            <!--    <i class="fa-solid fa-bars"></i>       -->
+            <!--    <i class="fa-solid fa-bars"></i>   <i class="fa-duotone fa-user"></i>    -->
 
         </div>
     </div>

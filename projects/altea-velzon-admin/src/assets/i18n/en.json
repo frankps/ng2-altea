@@ -1078,6 +1078,12 @@
         "manage": "Beheer",
         "dashboard": "Overzicht"
       }
+    },
+    "accounting": {
+      "label": "Boekhouding",
+      "sub": {
+        "transactions": "Transacties"
+      }
     }
   },
   "MENUITEMS": {

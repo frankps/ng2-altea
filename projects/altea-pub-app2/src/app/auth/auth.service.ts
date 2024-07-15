@@ -163,14 +163,14 @@ export class AuthService {
 
 
           // to test
-          this.router.navigate(['/auth', 'profile'])
+          //this.router.navigate(['/auth', 'profile'])
 
-          /*
+
           if (newUser)
             this.router.navigate(['/auth', 'profile'])
           else
             this.router.navigate(['branch', 'aqua', 'menu'])
-          */
+
 
           // this.router.navigate(['staff', 'dashboard'])
 
@@ -184,11 +184,27 @@ export class AuthService {
 
 
       } else {
-      //  this.router.navigate(['auth', 'sign-in'])
+        //  this.router.navigate(['auth', 'sign-in'])
       }
     })
 
   }
+
+
+  /** to be used when user object has changed in other part of the application: updates user in authService and also cached version in local storage */
+  async refreshUser(user: altea.User) {
+
+    this.user = user
+
+    let storageKey = `user-${this.fbUser.uid}`
+    this.resource = await this.getResource(user.id)
+
+    let cachedAuthInfo = new AuthLocalStorage(this.user, this.resource)
+    localStorage.setItem(storageKey, JSON.stringify(cachedAuthInfo))
+
+
+  }
+
 
   async createUser$(firebaseUser: User): Promise<altea.User> {
 

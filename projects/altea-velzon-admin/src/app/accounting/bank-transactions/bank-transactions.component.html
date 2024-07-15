@@ -1,0 +1,29 @@
+
+{{bank.from}}
+
+<ul class="list-group">
+    <li class="list-group-item" *ngFor="let tx of txs" (click)="toggleTx(tx.id)">
+
+        <div class="row">
+            <div class="col">{{tx.refDateObject() | date : "dd/MM"}}</div>
+            <div class="col">{{tx.num}}</div>
+            <div class="col">{{tx.amount}}</div>
+            <div class="col">{{tx.remoteName}}</div>
+            <div class="col">{{tx.type}}</div>
+            <div class="col">{{tx.info1()}}</div>
+        </div>
+
+        <ng-container *ngIf="txId == tx.id">
+            <div class="row">
+                <div class="col">{{tx.details}}</div>
+            </div>
+    
+<!--             <div class="row">
+                <div class="col">{{tx.info}}</div>
+            </div> -->
+        </ng-container>
+
+
+
+    </li>
+</ul>

@@ -1,4 +1,5 @@
-import { ObjectWithId, ObjectWithIdPlus } from "ts-common";
+import { DateHelper, ObjectWithId, ObjectWithIdPlus } from "ts-common";
+import * as dateFns from 'date-fns'
 
 export enum BankTxType {
     unknown = 'unknown',
@@ -73,6 +74,68 @@ export class BankTransaction extends ObjectWithId {
     type?: string
 
     providerRef?: string
+
+    _refDate?: Date
+    refDateObject(): Date {
+
+        if (!this.refDate)
+            return null
+
+        if (!this._refDate)
+            this._refDate = DateHelper.parse(this.refDate)
+
+        return this._refDate
+    }
+
+    _info1: string = null
+
+    info1(): string {
+
+        if (this._info1 != null)
+            return this._info1
+
+
+        const refDate = this.refDateObject()
+
+        let info1 = ''
+
+        if (refDate) {
+            info1 += dateFns.format(refDate, 'd/M')
+        }
+
+        if (this.type) {
+
+            const type = this.type.toLowerCase()
+
+            if (this.cost > 0 && (type == "kredietkaart" || type.indexOf('credit') >= 0 || type.indexOf('stripe') >= 0)) {
+    
+                info1 += ` = ${this.orig} - ${this.cost}`
+            }
+        }
+
+        this._info1 = info1
+
+        return info1
+    }
+
+    /*
+    if (tx.Type != null && (tx.Type == "KredietKaart" || tx.Type.Contains("Credit") || tx.Type.Contains("Stripe")))
+        {
+            if (tx.RefDate.HasValue)
+                txText += string.Format(" ({0:d/M} = € {1:0.00} - {2:0.00})", tx.RefDate.Value, tx.AmountOriginal, tx.AmountCost);
+        }
+        else if (tx.Type != null && (tx.Type == "Terminal" || tx.Type.Contains("BC")))
+        {
+            if (tx.RefDate.HasValue)
+                txText += string.Format(" ({0:d/M})", tx.RefDate.Value);
+        }
+        else
+        {
+            if (tx.RefDate.HasValue)
+                txText += string.Format(" ({0:d/M H:m})", tx.RefDate.Value);
+        }
+*/
+
 }
 
 

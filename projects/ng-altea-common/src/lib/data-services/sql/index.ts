@@ -1,3 +1,4 @@
+export * from './bank-transaction.service'
 export * from './branch.service'
 export * from './contact.service'
 export * from './custom-json.service'

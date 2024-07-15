@@ -8,6 +8,7 @@ import { UserService } from 'ng-altea-common';
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import { retry } from 'rxjs';
 import { IntPhoneEditComponent } from 'ng-common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-user',
@@ -30,7 +31,7 @@ export class UserComponent {
   country: Translation[] = []
   msgTypes: Translation[] = []
 
-  constructor(protected authSvc: AuthService, protected translationSvc: TranslationService, protected userSvc: UserService) {
+  constructor(protected router: Router, protected authSvc: AuthService, protected translationSvc: TranslationService, protected userSvc: UserService) {
 
   }
 
@@ -53,7 +54,12 @@ export class UserComponent {
     this.initialized = true
   }
 
+  mobileChanged() {
+   // this.formChanged('user')
+    this.userForm.form.markAsDirty()
+  }
 
+  /*
   formChanged(sectionId: string) {
 
     console.log(`Form changed: ${sectionId}`)
@@ -65,6 +71,13 @@ export class UserComponent {
         break
 
     }
+  } */
+
+
+  selectMsgType(msgType: any, selected: boolean) {
+    this.user.selectMsgType(msgType, selected)
+   // this.userForm.controls[msgType].markAsDirty()
+   this.userForm.form.markAsDirty()
   }
 
   canSelectMsgType(msgType: any) {
@@ -89,9 +102,20 @@ export class UserComponent {
 
   async continue() {
 
-    const res = await this.userSvc.update$(this.user)
+    if (this.userForm.form.dirty) {
+      console.warn(this.user)
+      const res = await this.userSvc.update$(this.user)
+      console.warn(res)
+  
+      console.log(res)
+  
+      if (res.isOk) {
+        await this.authSvc.refreshUser(this.user)
+        
+      }
+    }
 
-    console.log(res)
+    this.router.navigate(['/branch', 'aqua', 'user-contact'])
   }
 
 
@@ -103,6 +127,9 @@ export class UserComponent {
     const valid = this.intPhone?this.intPhone.isValid():false
 
     return valid
+
+    //this.userForm.dirty
+
     /*
     const parsedNumber = parsePhoneNumberFromString(this.user.mobile, 'BE');
 

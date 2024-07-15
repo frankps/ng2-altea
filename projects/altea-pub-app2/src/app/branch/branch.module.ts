@@ -14,6 +14,7 @@ import { PayFinishedComponent } from './pay-finished/pay-finished.component';
 
 import { TaskComponent } from './task/task.component';
 import { MySubsComponent } from './my-subs/my-subs.component';
+import { UserContactMatchComponent } from './user-contact-match/user-contact-match.component';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,8 @@ import { MySubsComponent } from './my-subs/my-subs.component';
     PayFinishedComponent,
 
     TaskComponent,
-     MySubsComponent
+     MySubsComponent,
+     UserContactMatchComponent
   ],
   imports: [
     CommonModule,

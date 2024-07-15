@@ -10,6 +10,7 @@ import { PayOnlineComponent } from './pay-online/pay-online.component';
 
 import { TaskComponent } from './task/task.component';
 import { MySubsComponent } from './my-subs/my-subs.component';
+import { UserContactMatchComponent } from './user-contact-match/user-contact-match.component';
 
 const routes: Routes = [{
   path: ':branch', component: BranchComponent,
@@ -22,6 +23,7 @@ const routes: Routes = [{
     { path: "pay-finished", component: PayFinishedComponent },
     { path: "my-subs", component: MySubsComponent },
     { path: "task", component: TaskComponent },
+    { path: "user-contact", component: UserContactMatchComponent },
   ]
 }]
 

@@ -42,6 +42,10 @@ export class BranchComponent implements OnInit {
     return signOut(this.auth)
   }
 
+  gotoProfile() {
+    this.router.navigate(['/auth', 'profile'])
+  }
+
   appSignIn() {
     this.router.navigate(['/auth', 'sign-in'])
   }

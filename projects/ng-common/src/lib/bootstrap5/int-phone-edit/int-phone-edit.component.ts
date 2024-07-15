@@ -112,10 +112,19 @@ export class IntPhoneEditComponent {
 */
   }
 
-  prefixChanged(event: any) {
+  emitPhoneChangedEvent(): string {
+    this.cleanLocalNum()
     var fullNum = this.countryPrefix + this._localNum
-    this.checkPhone()
-    this.phoneChange.emit(fullNum)
+
+    if (this.checkPhone())
+      this.phoneChange.emit(fullNum)
+
+    return fullNum
+  }
+
+  prefixChanged(event: any) {
+
+    this.emitPhoneChangedEvent()
 
   }
 
@@ -133,7 +142,7 @@ export class IntPhoneEditComponent {
 
       await this.sleep(200)
 
-      this.getFullNumber()
+      this.emitPhoneChangedEvent()
     }
   }
 
@@ -143,18 +152,18 @@ export class IntPhoneEditComponent {
     this._localNum = this._localNum.replace(/[^0-9]/g, "")
   }
 
-
-  getFullNumber(): string {
-
-    this.cleanLocalNum()
-
-    var fullNum = this.countryPrefix + this._localNum
-
-    this.phoneChange.emit(fullNum)
-
-    return fullNum
-  }
-
+  /*
+    getFullNumber(): string {
+  
+      this.cleanLocalNum()
+  
+      var fullNum = this.countryPrefix + this._localNum
+  
+      this.phoneChange.emit(fullNum)
+  
+      return fullNum
+    }
+  */
   async localPhoneChanged(event: KeyboardEvent) {
     const pattern = /[0-9]/;
 
@@ -180,14 +189,19 @@ export class IntPhoneEditComponent {
     } else {
 
       await this.sleep(200)
-      this.getFullNumber()
+      this.emitPhoneChangedEvent()
 
 
     }
 
-    this.checkPhone()
+  //  this.checkPhone()
 
   }
+
+  phoneChanged() {
+    this.emitPhoneChangedEvent()
+  }
+
 
   checkPhone() {
     // https://stackoverflow.com/questions/43553544/how-can-i-manually-set-an-angular-form-field-as-invalid
@@ -242,6 +256,8 @@ export class IntPhoneEditComponent {
   }
 
 
+
+
   async onPaste(event) {
 
     console.log(event)
@@ -250,7 +266,7 @@ export class IntPhoneEditComponent {
 
     await this.sleep(100)
 
-    this.getFullNumber()
+    this.emitPhoneChangedEvent()
     console.log(this._localNum)
 
     this.checkPhone()

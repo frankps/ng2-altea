@@ -1,0 +1,13 @@
+<ul class="list-group" *ngIf="contacts">
+    <li class="list-group-item" *ngFor="let contact of contacts">
+        {{contact.first}} {{contact.last}}<br>
+
+        <div class="row">
+            <div class="col-6" *ngIf="contact.email">Email: {{contact.email}}</div>
+            <div class="col-6" *ngIf="contact.mobile">Gsm: {{contact.mobile}}</div>
+        </div>
+
+        <button type="button" class="btn btn-primary btn-sm" (click)="linkContactToUser(contact)" translate>dic.add</button>
+
+    </li>
+</ul>

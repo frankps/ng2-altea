@@ -58,6 +58,9 @@ New firestore service:
 
 New component:
 
+ng generate module bank --project=altea-velzon-admin --routing
+ng generate component bank/bank-transactions --project=altea-velzon-admin
+
 ng generate component calendar/syncFusScheduler --project=altea-velzon-admin
 
 ng generate component loyalty/loyalty-reward --project=altea-velzon-admin
@@ -104,6 +107,9 @@ ng generate module info --project altea-pub-app2 --routing
 ng generate component info/privacy --project altea-pub-app2
 ng generate component info/user-data-deletion --project altea-pub-app2
 ng generate component auth/contact --project altea-pub-app2
+
+
+ng generate component branch/userContactMatch --project altea-pub-app2
 
 
 ng generate component ngbs5 --project dvit-gen

@@ -148,6 +148,20 @@ export const MENU: MenuItem[] = [
     ]
   },
   {
+    id: 17,
+    label: 'menu.accounting.label',
+    icon: 'home',
+    link: '/aqua/accounting',
+    subItems: [
+      {
+        id: 121,
+        label: 'menu.accounting.sub.transactions',
+        link: '/aqua/accounting/transactions',
+        parentId: 12
+      }
+    ]
+  },
+  {
     id: 13,
     label: 'menu.loyalty.label',
     icon: 'home',
