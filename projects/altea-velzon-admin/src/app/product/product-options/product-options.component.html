@@ -109,6 +109,22 @@
                 </div>
 
                 <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="prevShow" [(ngModel)]="option.prev.show" />
+                  <label class="form-check-label" for="prevShow" translate="objects.productOption.prev.show"></label>
+                </div>
+
+                <div class="row ms-4 mt-2" *ngIf="option.prev.show">
+                  <div class="col-2">Prefix: </div>
+                  <div class="col-3"><input type="text" id="prefix" name="prefix" class="form-control"
+                      [(ngModel)]="option.prev.pre" /></div>
+
+                  <div class="col-2">Suffix: </div>
+                  <div class="col-3"><input type="text" id="suffix" name="suffix" class="form-control"
+                      [(ngModel)]="option.prev.suf" /></div>
+
+                </div>
+
+                <div class="form-check">
                   <input class="form-check-input" type="checkbox" id="hasPrice" [(ngModel)]="option.hasPrice" />
                   <label class="form-check-label" for="hasPrice" translate="objects.productOption.hasPrice"></label>
                 </div>
@@ -239,7 +255,8 @@
                   objects.productOptionValue.factor</div> -->
               </ng-container>
               <div class="col d-flex justify-content-center">
-                {{'objects.productOptionValue.default' | translate}} / {{'objects.productOptionValue.pvt' | translate}}</div>
+                {{'objects.productOptionValue.default' | translate}} / {{'objects.productOptionValue.pvt' | translate}}
+              </div>
             </div>
 
             <li class="list-group-item" *ngFor="let value of option.values; let valueIdx = index">
@@ -305,7 +322,7 @@
                     <input class="form-check-input" type="checkbox" id="default" name="default"
                       (change)="defaultChanged(option, value, $event.target['checked'])" [(ngModel)]="value.default" />
 
-                      <input class="form-check-input ms-2" type="checkbox" id="pvt" name="pvt" [(ngModel)]="value.pvt" />
+                    <input class="form-check-input ms-2" type="checkbox" id="pvt" name="pvt" [(ngModel)]="value.pvt" />
                   </div>
 
 

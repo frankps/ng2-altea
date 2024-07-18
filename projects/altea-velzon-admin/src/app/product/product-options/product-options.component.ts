@@ -1,6 +1,6 @@
 import { Component, ViewChild, OnInit, Input } from '@angular/core';
 import { ProductService, PriceService, ProductResourceService, ProductOptionService, SessionService, ProductOptionValueService } from 'ng-altea-common'
-import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ProductOptionValue, FormulaTerm } from 'ts-altea-model'
+import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ProductOptionValue, FormulaTerm, ProductOptionPreview } from 'ts-altea-model'
 import { DashboardService, FormCardSectionEventData, NgEditBaseComponent, ToastType, TranslationService } from 'ng-common'
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxModalComponent, DeleteModalComponent } from 'ng-common';
@@ -31,9 +31,16 @@ export class ProductOptionsComponent implements OnInit {
     if (value) {
       if (!value.options)
         value.options = []
+      else {
+        
+        value.options.forEach(option => {
+          if (!option.prev)
+            option.prev = new ProductOptionPreview()
+        })
+      }
 
       this.optionChanges = new CollectionChangeTracker<ProductOption>(value.options, ProductOption, {
-        propsToUpdate: ['name', 'required', 'multiSelect', 'hasDuration', 'hasValue', 'hasPrice', 'pvt', 'hasFormula', 'formula'],
+        propsToUpdate: ['name', 'required', 'multiSelect', 'hasDuration', 'hasValue', 'hasPrice', 'pvt', 'hasFormula', 'formula', 'prev'],
         propsToRemove: ['values']
       })
     }

@@ -911,7 +911,10 @@
       "hasPrice": "Deze optie heeft een prijs",
       "hasValue": "Deze optie heeft een waarde",
       "hasFormula": "Deze optie heeft een formule",
-      "pvt": "Private optie: klanten kunnen dit niet selecteren, enkel intern"
+      "pvt": "Private optie: klanten kunnen dit niet selecteren, enkel intern",
+      "prev": {
+        "show": "Toon optie(waarden) in order preview"
+      }
     },
     "productOptionValue": {
       "name": "Naam",

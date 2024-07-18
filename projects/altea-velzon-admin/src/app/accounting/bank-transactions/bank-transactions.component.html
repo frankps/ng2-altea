@@ -1,11 +1,24 @@
+<div class="row my-3">
+    <div class="col">
+        <input type="text" placeholder="Datepicker" class="form-control" bsDatepicker [(ngModel)]="bank.from">
+    </div>
+    <div class="col">
+        <input type="text" placeholder="Datepicker" class="form-control" bsDatepicker [(ngModel)]="bank.to">
+    </div>
+    <div class="col">
+        <input type="text" id="txSearch" name="txSearch" class="form-control" [(ngModel)]="bank.search" />
+    </div>
+    <div class="col">
+        <button type="button" class="btn btn-primary" (click)="getTransactions()" translate>dic.search</button>
+    </div>
+</div>
 
-{{bank.from}}
 
 <ul class="list-group">
-    <li class="list-group-item" *ngFor="let tx of txs" (click)="toggleTx(tx.id)">
+    <li class="list-group-item" *ngFor="let tx of txs" >
 
-        <div class="row">
-            <div class="col">{{tx.refDateObject() | date : "dd/MM"}}</div>
+        <div class="row" [style.color]="tx.ok?'green':'red'" (click)="toggleTx(tx)">
+            <div class="col">{{tx.execDateObject() | date : "dd/MM"}}</div>
             <div class="col">{{tx.num}}</div>
             <div class="col">{{tx.amount}}</div>
             <div class="col">{{tx.remoteName}}</div>
@@ -13,14 +26,63 @@
             <div class="col">{{tx.info1()}}</div>
         </div>
 
-        <ng-container *ngIf="txId == tx.id">
-            <div class="row">
+        <ng-container *ngIf="tx['open']">
+            <div class="row my-3">
+                <div class="col-1"></div>
                 <div class="col">{{tx.details}}</div>
+                <div class="col-2">
+                    <button type="button" class="btn btn-primary btn-sm" (click)="findPaymentsForTx(tx)">Linken</button>
+                </div>
             </div>
-    
-<!--             <div class="row">
-                <div class="col">{{tx.info}}</div>
-            </div> -->
+
+
+            <div class="row my-3" *ngIf="pays && txId == tx.id">
+                <div class="col-1"></div>
+                <div class="col">
+
+                    <ul class="list-group">
+
+                        <li class="list-group-item" *ngFor="let pay of pays" >
+
+                            <div class="row">
+                                <div class="col-1">
+                                    <i *ngIf="pay.bankTxId == tx.id" [style.color]="'green'" class="fa-duotone fa-solid fa-link"></i>
+                                </div>
+                                <div class="col-2"> € {{pay.amount}}</div>
+                                <div class="col-2"> {{pay.type}}</div>
+                                <div class="col-2"> {{pay.order.for}}</div>
+                                <div class="col" *ngIf="pay.order.sum"> 
+                                    <ng-container *ngFor="let line of pay.order.sum">
+                                        <span class="badge text-bg-info">{{line.d}}</span>&nbsp;
+                                    </ng-container>
+                                    
+                                </div>
+                            </div>
+
+                           
+
+
+                            
+
+                        </li>
+
+                        <li class="list-group-item">
+
+                            <div class="row">
+                                <div class="col-2">  <b>Totaal: {{payments.total}}</b> </div>
+                                <div class="col-2"> Gelinkt: {{payments.linked}} </div>
+                            </div>
+
+                           
+                        </li>
+                    </ul>
+
+
+                </div>
+            </div>
+
+
+
         </ng-container>
 
 

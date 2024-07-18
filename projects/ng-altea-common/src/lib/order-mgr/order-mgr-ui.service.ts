@@ -725,7 +725,7 @@ export class OrderMgrUiService {   // implements OnInit
 
   }
 
-  async addProductById(productId: string, qty = 1) : Promise<OrderLine[]> {
+  async addProductById(productId: string, qty = 1): Promise<OrderLine[]> {
 
     const product = await this.loadProduct$(productId)
 
@@ -859,8 +859,17 @@ export class OrderMgrUiService {   // implements OnInit
 
   async setContact(contact: Contact) {
 
-    this.order.contactId = contact.id
+    if (contact) {
+      this.order.contactId = contact.id
+      this.order.for = contact.name
+    }
+    else {
+      this.order.contactId = null
+      this.order.for = null
+    }
+
     this.order.m.setDirty('contactId')
+    this.order.m.setDirty('for')
     this.orderDirty = true
 
     this.order.contact = contact

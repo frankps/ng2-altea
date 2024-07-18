@@ -361,7 +361,7 @@ export class User extends UserBase {
   @Type(() => Resource)
   resources: Resource[]
 
-  mobileValid() : boolean {
+  mobileValid(): boolean {
 
     console.log(this.mobile)
     const valid = (this.mobile != null && this.mobile != undefined && this.mobile.length > 5)
@@ -2277,6 +2277,15 @@ export class FormulaTerm {
   optionId?: string
 }
 
+/** Specifies if this option is visible in the order(line) preview, if so, selected values will be stored in order.sum[x].o */
+export class ProductOptionPreview {
+  show = false
+
+  pre: string = ""
+
+  suf: string = ""
+}
+
 export class ProductOption extends ObjectWithIdPlus {
   productId?: string;
   product?: Product;
@@ -2309,6 +2318,8 @@ export class ProductOption extends ObjectWithIdPlus {
   /** the property providing the value*/
   //factorOptionProp?: string
 
+  @Type(() => ProductOptionPreview)
+  prev?: ProductOptionPreview
 
 
   hasValues(): boolean {
@@ -2605,10 +2616,28 @@ export class OrderCancel {
 
 }
 
+export class OrderLineOptionSummary {
+  /** value for option */
+  v?: string;
+}
+
+export class OrderLineSummary {
+  /** description */
+  d?: string;
+
+  /** quantity */
+  @Type(() => Number)
+  q = 1;
+
+  /** option value summaries */
+  @Type(() => OrderLineOptionSummary)
+  o?: OrderLineOptionSummary[] = []
+}
+
 export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  // 
 
   static defaultInclude = ['lines:orderBy=idx.product.items', 'contact', 'payments:orderBy=idx', 'planning']
-  static jsonProps = ['vatLines', 'persons', 'info']
+  static jsonProps = ['vatLines', 'persons', 'info', 'sum']
 
   organisation?: Organisation;
   orgId?: string;
@@ -2620,12 +2649,19 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
   contact?: Contact;
   contactId?: string;
 
+  /** name of contact (to reduce external joins with contact table) */
+  for?: string
+
   @Type(() => Invoice)
   invoice?: Invoice;
   invoiceId?: string;
 
   @Type(() => OrderLine)
   lines?: OrderLine[] = []
+
+  /** short summary of orderlines, stored as json (to reduce external joins with contact table) */
+  @Type(() => OrderLineSummary)
+  sum?: OrderLineSummary[] = []
 
   @Type(() => Payment)
   payments?: Payment[] = []
@@ -3009,6 +3045,9 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
   addLine(orderLine: OrderLine, setUnitPrice = true) {
 
+    if (!orderLine)
+      return
+
     orderLine.idx = this.nextOrderLineIdx()
 
     if (!this.lines)
@@ -3019,10 +3058,50 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
     this.lines.push(orderLine)
 
+    /** inside the order (stored as json), we keep track of a short summary of this orderline */
+    let summary = orderLine.getSummary()
+
+    if (!this.sum)
+      this.sum = []
+
+    this.sum.push(summary)
+    this.markAsUpdated('sum')
+
     orderLine.markAsNew()
 
     this.calculateAll()
+  }
 
+  /** in order.sum, we keep track of a short summary of all orderlines (stored as json) */
+  refreshSummary() {
+
+    this.sum = []
+    this.markAsUpdated('sum')
+
+    if (!this.hasLines())
+      return
+
+    for (let line of this.lines) {
+      const summary = line.getSummary()
+      this.sum.push(summary)
+    }
+
+  }
+
+  deleteLine(orderLine: OrderLine): boolean {
+
+    if (!this.lines || !orderLine)
+      return false
+
+    const removed = _.remove(this.lines, l => l.id == orderLine.id)
+
+    if (Array.isArray(removed) && removed.length > 0 && !orderLine.m.n)  // orderLine.m.n = it was a new line not yet saved in backend
+      this.markAsRemoved('lines', orderLine.id)
+
+    this.calculateAll()
+    this.refreshSummary()
+
+    return (Array.isArray(removed) && removed.length > 0)
   }
 
   calculateAll() {
@@ -3205,20 +3284,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     return (Array.isArray(removed) && removed.length > 0)
   }
 
-  deleteLine(orderLine: OrderLine): boolean {
 
-    if (!this.lines || !orderLine)
-      return false
-
-    const removed = _.remove(this.lines, l => l.id == orderLine.id)
-
-    if (Array.isArray(removed) && removed.length > 0 && !orderLine.m.n)  // orderLine.m.n = it was a new line not yet saved in backend
-      this.markAsRemoved('lines', orderLine.id)
-
-    this.calculateAll()
-
-    return (Array.isArray(removed) && removed.length > 0)
-  }
 
   getProductIds(): string[] {
 
@@ -3509,6 +3575,10 @@ export class OrderLineOption extends ObjectWithId {
     return olOption
   }
 
+  hasValues(): boolean {
+    return ArrayHelper.NotEmpty(this.values)
+  }
+
   hasFormula(): boolean {
     return Array.isArray(this.formula) && this.formula.length > 0
   }
@@ -3769,6 +3839,36 @@ export class OrderLine extends ObjectWithIdPlus {
 
   }
 
+
+  getSummary(): OrderLineSummary {
+    let summary = new OrderLineSummary()
+    summary.d = this.descr
+    summary.q = this.qty
+
+    if (this.product && this.product.hasOptions()) {
+
+      for (var option of this.product.options.filter(o => o.prev?.show)) {
+
+        let prefix = option.prev.pre ? option.prev.pre : ''
+        let suffix = option.prev.suf ? option.prev.suf : ''
+
+        var orderLineOption = this.getOptionById(option.id)
+
+        if (orderLineOption?.hasValues()) {
+          let optionSummary = new OrderLineOptionSummary()
+          let values = orderLineOption.values.map(value => `${prefix}${value.name}${suffix}`)
+          optionSummary.v = values.join(', ')
+          summary.o.push(optionSummary)
+
+        }
+      }
+
+    }
+
+
+    return summary
+  }
+
   hasPersons(): boolean {
     return (Array.isArray(this.persons) && this.persons.length > 0)
   }
@@ -3883,6 +3983,10 @@ export class OrderLine extends ObjectWithIdPlus {
 
   }
 
+  getOptionById(optionId: string): OrderLineOption {
+    let olOption = this.options.find(o => o.id == optionId)
+    return olOption
+  }
 
   getOption(option: OrderLineOption): OrderLineOption {
 
@@ -4839,6 +4943,46 @@ export enum PaymentType {
   subs = 'subs',
 }
 
+/*
+
+8/7   628     (5/7)
+
+GLOBALISATIE 11 VERRICHTINGEN POS TERMINAL NR.884543 DATUM : 05/07/2024 BANKREFERENTIE : 2407081912302678 VALUTADATUM : 08/07/2024
+Linked payments:
+05/07/24: €10,00 afspraak: 05/07/24 12:30 klant: Annelies De Paepe
+05/07/24: €260,00 creatie: 05/07/24 12:56 klant: Virginie Bolle
+05/07/24: €30,00 afspraak: 05/07/24 12:30 klant: Ann Declercq
+05/07/24: €51,00 creatie: 05/07/24 16:02 klant: Sofie Boxstaele
+05/07/24: €71,00 afspraak: 05/07/24 16:45 klant: Diana Cabrera
+05/07/24: €25,00 afspraak: 05/07/24 10:15 klant: Petroesjka Versijpt
+05/07/24: €50,00 creatie: 05/07/24 10:57 klant: Martijn Cantaert
+05/07/24: €22,00 afspraak: 05/07/24 13:00 klant: Lut De Beule
+05/07/24: €60,00 afspraak: 05/07/24 18:45 klant: Leen De Clercq
+05/07/24: €29,00 afspraak: 05/07/24 17:30 klant: Phaedra Bauwens
+05/07/24: €20,00 afspraak: 05/07/24 11:00 klant: Marieke Juwet
+
+
+
+8/7   626     (6/7)
+
+GLOBALISATIE 10 VERRICHTINGEN POS TERMINAL NR.884543 DATUM : 06/07/2024 BANKREFERENTIE : 2407081912302743 VALUTADATUM : 08/07/2024
+Linked payments:
+06/07/24: €90,00 afspraak: 23/10/24 15:00 klant: Dorien D'Hooge
+06/07/24: €18,00 afspraak: 06/07/24 10:40 klant: Friedl Vandermeersch
+06/07/24: €25,00 afspraak: 06/07/24 11:00 klant: Sara Burm
+06/07/24: €86,00 afspraak: 06/07/24 16:00 klant: Brinda  Glorieux
+06/07/24: €112,00 afspraak: 06/07/24 14:30 klant: Ellen Devos
+06/07/24: €11,00 afspraak: 06/07/24 19:30 klant: Herman De Beukelaer
+06/07/24: €25,00 afspraak: 06/07/24 12:30 klant: Anne De Lange
+06/07/24: €10,00 afspraak: 06/07/24 14:30 klant: Justine Hamerlinck
+06/07/24: €15,00 afspraak: 06/07/24 15:35 klant: Silvy Matthys
+06/07/24: €90,00 afspraak: 23/10/24 15:00 klant: Dorien D'Hooge
+06/07/24: €144,00 afspraak: 06/07/24 11:15 klant: Elke Geeraerts
+
+
+
+
+*/
 
 
 export class Payment extends ObjectWithIdPlus {
@@ -4867,12 +5011,22 @@ export class Payment extends ObjectWithIdPlus {
   bankTxId?: string
   bankTxNum?: string
 
-  date?: Date = new Date()
+  //date?: Date = new Date()
+
+  @Type(() => Number)
+  date?: number; // format: yyyyMMddHHmmss
 
   info?: string
 
   /** amount is declared */
   decl: boolean = false
+
+  constructor() {
+    super()
+
+    this.date = DateHelper.yyyyMMddhhmmss()
+
+  }
 
 }
 

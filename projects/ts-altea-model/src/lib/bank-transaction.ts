@@ -24,6 +24,9 @@ export class BankTxInfo {
         this.type = type
     }
 
+    forDateTime() {
+        return DateHelper.parse(this.forDate)
+    }
 }
 
 export class BankTransaction extends ObjectWithId {
@@ -71,9 +74,23 @@ export class BankTransaction extends ObjectWithId {
     createdAt = new Date()
     shortInfo?: string
     info?: string
-    type?: string
+    type?: BankTxType
 
     providerRef?: string
+
+    _execDate?: Date
+    execDateObject(): Date {
+
+        if (!this.execDate)
+            return null
+
+        if (!this._execDate)
+            this._execDate = DateHelper.parse(this.execDate)
+
+        return this._execDate
+    }
+
+
 
     _refDate?: Date
     refDateObject(): Date {
@@ -108,7 +125,7 @@ export class BankTransaction extends ObjectWithId {
             const type = this.type.toLowerCase()
 
             if (this.cost > 0 && (type == "kredietkaart" || type.indexOf('credit') >= 0 || type.indexOf('stripe') >= 0)) {
-    
+
                 info1 += ` = ${this.orig} - ${this.cost}`
             }
         }

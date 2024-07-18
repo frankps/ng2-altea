@@ -93,6 +93,9 @@ ng generate component order-mgr/posPayment --project altea-velzon-admin
 ng generate component pos/posPayment --project ng-altea-common
 ng generate component order-mgr/debug-plannings --project ng-altea-common
 ng generate component order-mgr/cancel-order --project ng-altea-common
+
+ng generate service data-services/sql/payment --project ng-altea-common
+
 ng generate service stripe --project ng-altea-common
 
 ng generate service messaging --project ng-altea-common

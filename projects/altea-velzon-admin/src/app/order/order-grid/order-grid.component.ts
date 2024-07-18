@@ -179,9 +179,9 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
         break
     }
 
-    query.take = 10
+    query.take = 30
     query.include('lines.planning.resource', 'contact')
-    query.orderBy('cre', SortOrder.desc)
+    query.orderBy('start', SortOrder.asc)
 
     this.objects$ = this.orderSvc.query(query)
 
