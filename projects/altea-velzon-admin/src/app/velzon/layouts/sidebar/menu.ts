@@ -198,6 +198,20 @@ export const MENU: MenuItem[] = [
     label: 'menu.messaging.label',
     icon: 'home',
     link: '/aqua/messaging',
+  },
+  {
+    id: 30,
+    label: 'menu.platform.label',
+    icon: 'home',
+    link: '/platform/users',
+    subItems: [
+      {
+        id: 301,
+        label: 'menu.platform.sub.users',
+        link: '/platform/users',
+        parentId: 30
+      }
+    ]
   }
   /*
   {

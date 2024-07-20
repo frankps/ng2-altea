@@ -58,6 +58,14 @@ New firestore service:
 
 New component:
 
+ng generate module platform --project=altea-velzon-admin --routing
+ng generate component platform/manage-users --project=altea-velzon-admin
+ng generate component platform/edit-user --project=altea-velzon-admin
+ng generate component platform/user-list --project=altea-velzon-admin
+
+
+
+
 ng generate module bank --project=altea-velzon-admin --routing
 ng generate component bank/bank-transactions --project=altea-velzon-admin
 

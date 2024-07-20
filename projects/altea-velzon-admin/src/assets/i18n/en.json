@@ -1087,6 +1087,12 @@
       "sub": {
         "transactions": "Transacties"
       }
+    },
+    "platform": {
+      "label": "Platform",
+      "sub": {
+        "users": "Gebruikers"
+      }
     }
   },
   "MENUITEMS": {

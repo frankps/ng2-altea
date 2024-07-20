@@ -119,6 +119,11 @@ export enum OnlineMode {
   invisible = 'invisible',
 }
 
+export enum ProviderIcon {
+  facebook = 'fa-brands fa-facebook',
+  google = 'fa-brands fa-google'
+}
+
 
 export enum ProductTypeIcons {
   prod = 'fa-duotone fa-box',

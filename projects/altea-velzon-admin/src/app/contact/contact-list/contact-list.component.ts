@@ -84,6 +84,11 @@ export class ContactListComponent extends NgBaseListComponent<Contact> implement
   //   else
   //     this.router.navigate(['/aqua/contacts/' + mobileMod])
   // }
+  /*
+
+<i class="fa-brands fa-facebook"></i>
+<i class="fa-brands fa-google"></i>
+  */
 
 }
 
