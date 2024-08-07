@@ -375,6 +375,9 @@ export class User extends UserBase {
 
   }
 
+  /** last login date */
+  @Type(() => Date)
+  public login: Date = new Date()
 
 }
 
@@ -409,6 +412,8 @@ export class Contact extends UserBase {
   //@Type(() => Organisation)
   organisation?: Organisation;
 
+  branch?: Branch;
+
   orgId?: string
   branchId?: string
 
@@ -416,7 +421,15 @@ export class Contact extends UserBase {
   orders?: Order[];
   name?: string;
   first?: string;
-  last?: string;
+  last?: string
+
+  alert?: string
+  remark?: string
+  color?: string
+
+  /** a unique code to automatically enter the shop/business (code panel/QR) */
+  entry?: string
+
   gender: Gender = Gender.unknown
   birth?: number;  // format: yyyyMMdd
   email?: string;
@@ -1673,6 +1686,17 @@ export class Message extends ObjectWithIdPlus implements IEmail {
     return msg
   }
 
+  addFrom(addr: string, name?: string, conId?: string) {
+    const msgAddr = new MessageAddress(addr, name, conId)
+    this.from = msgAddr
+  }
+
+  addTos(addr: string[]) {
+    if (ArrayHelper.IsEmpty(addr))
+      return
+
+    addr.forEach(addr => this.addTo(addr))
+  }
 
   addTo(addr: string, name?: string, conId?: string) {
     const msgAddr = new MessageAddress(addr, name, conId)
@@ -1841,6 +1865,10 @@ export class Branch extends ObjectWithIdPlus {
 
   //@Type(() => Organisation)
   organisation?: Organisation;
+
+  @Type(() => Contact)
+  contacts?: Contact[]
+
 
   orgId?: string;
   name?: string;
@@ -2054,6 +2082,10 @@ export class Resource extends ObjectWithIdPlus {
   @Exclude()
   _endDate: Date | null = null
 
+  /** get this.branch as Branch (and not ConnectTo) */
+  branchType(): Branch {
+    return this.branch as Branch
+  }
 
   shortOrName(): string {
     return (this.short) ? this.short : this.name!

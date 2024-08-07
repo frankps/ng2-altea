@@ -26,6 +26,7 @@ export class DeleteModalComponent {
 
   @Output() deleted: EventEmitter<any> = new EventEmitter();
 
+  @Input() nameProperty = 'name'
 
   /** In some languages the article (lidwoord) is different for other words (HET paard vs DE koe) */
   deleteTransParams = { article: null, object_sc: '', object_lc: '', name: '' }
@@ -51,7 +52,7 @@ export class DeleteModalComponent {
     this.deleteTransParams.object_lc = sc.lowercase(this.objectType)
 
     if (this.object)
-      this.deleteTransParams.name = this.object.name
+      this.deleteTransParams.name = this.object[this.nameProperty]
 
 
     console.error(this.deleteTransParams)

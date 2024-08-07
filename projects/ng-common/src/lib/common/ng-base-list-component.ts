@@ -239,7 +239,9 @@ export abstract class NgBaseListComponent<T extends ObjectWithId> extends NgBase
 
         const path = []
 
-        path.push(this.dashboardSvc.rootPath)
+      //  path.push(this.dashboardSvc.rootPath)
+
+         path.push('platform') 
 
         let items = this.config.path.split('/')
 

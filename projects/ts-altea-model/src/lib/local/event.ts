@@ -5,19 +5,24 @@ import { th } from "date-fns/locale"
 
 export enum EventType {
     wellness_start = 'wellness_start',
-    wellness_end = 'wellness_end'
+    wellness_end = 'wellness_end',
+    door_enable = 'door_enable',
+    door_disable = 'door_disable',
 }
 
 export class Event {
     id: string
     type: string
     date: number
-    resourceId: string
+    resourceId?: string
+    orderId?: string
+    contactId?: string
+    custom?: any
 
     @Type(() => Job)
     jobs: Job[]
 
-    constructor(type: string, date: number, resourceId: string, id?: string) {
+    constructor(type: string, date: number, resourceId?: string, id?: string) {
 
         if (id)
             this.id = id
@@ -46,9 +51,9 @@ export class Events {
 
     //find(wellnessResourceId, 'start', planning.start) 
 
-    find(resourceId: string, type: string, date: number): Event {
+    find(type: string, date: number, resourceId?: string): Event {
 
-        const ev = this.events.find(e => e.resourceId == resourceId && e.type == type && e.date == date)
+        const ev = this.events.find(e =>  e.type == type && e.date == date && (!resourceId || e.resourceId == resourceId))
 
         return ev
     }

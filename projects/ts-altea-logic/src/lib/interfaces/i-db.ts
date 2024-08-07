@@ -9,7 +9,8 @@ export interface IDb {
 
     // updateMany$<Inp extends ObjectWithId, Out>(dbObject: DbObjectMulti<Out>): Promise<ApiListResult<Out>>
     updateMany$<Inp extends ObjectWithId, Out>(dbObject: DbObjectMulti<Inp, Out>): Promise<ApiListResult<Out>>
-
+    updateManyWhere$<T extends ObjectWithId>(update: DbUpdateManyWhere<T>): Promise<any> 
+    
     create$<T>(dbObject: DbObjectCreate<T>): Promise<ApiResult<T>>
     createMany$<T>(dbObject: DbObjectMultiCreate<T>): Promise<ApiListResult<T>>
 
@@ -18,7 +19,7 @@ export interface IDb {
 
     deleteMany$<T extends ObjectWithId>(query: DbQueryBaseTyped<T>): Promise<any> 
 
-    updateManyWhere$<T extends ObjectWithId>(update: DbUpdateManyWhere<T>): Promise<any> 
+    
 
 
     //  async deleteMany$<T extends ObjectWithId>(query: DbQueryBaseTyped<T>): Promise<any> 

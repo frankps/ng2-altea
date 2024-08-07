@@ -58,6 +58,11 @@ export class DateRange {
         return new DateRange(fromDate, toDate);
     }
 
+    static hours(nrOfHours: number, from: Date = new Date()) {
+        const to = dateFns.addHours(from, nrOfHours)
+        return new DateRange(from, to);
+    }
+
     toString(format: string = 'HH:mm'): string {   //  'dd/MM HH:mm'
 
         return `[${dateFns.format(this.from, format)}-${dateFns.format(this.to, format)}]`

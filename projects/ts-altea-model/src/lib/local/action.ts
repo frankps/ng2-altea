@@ -2,7 +2,8 @@ export enum ActionType {
     sendMail = 'sendMail',
     luxom = 'luxom',
     luxomState = 'luxomState',
-    script = 'script'
+    script = 'script',
+    doorAccess = 'doorAccess'
 }
 
 export class ActionArgs {
@@ -25,4 +26,20 @@ export enum ActionStatus {
 
 export class ActionLog {
     constructor(public status: ActionStatus, public msg?: string) { }
+}
+
+
+export class DoorAccessArgs extends ActionArgs {
+
+    
+
+    /**
+     * 
+     * @param enable 
+     */
+    constructor(public enable: boolean) {
+        super()
+    }
+
+
 }

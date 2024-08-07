@@ -32,6 +32,8 @@ export class ScriptRepository {
         return script
     }
 
+
+
     static get wellness_start_min15(): Script {
         const script = new Script("Wellness Start -15", "wellness_start_min15")
 

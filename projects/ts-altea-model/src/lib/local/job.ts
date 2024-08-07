@@ -32,7 +32,6 @@ export class ScriptLog {
 
 export class Job extends Script {
 
-    
     date: number
     eventId: string
     

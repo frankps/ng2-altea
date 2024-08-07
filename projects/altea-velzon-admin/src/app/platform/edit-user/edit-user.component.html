@@ -1,1 +1,133 @@
-<p>edit-user works!</p>
+<ng-container *ngIf="object">
+
+    <ngx-altea-delete-modal #deleteModal objectType="user" [object]="object" [objectSvc]="userSvc"
+        [config]="deleteConfig" [nameProperty]="'email'"></ngx-altea-delete-modal>
+
+    <div class="row">
+        <div class="col-9">
+            <h4><i [class]="ProviderIcon[object.prov]"></i> &nbsp; {{object.email}} </h4>
+            <!-- [style.color]="object.color" -->
+        </div>
+        <div class="col-3">
+
+            <div class="d-inline-block float-end" ngbDropdown #myDrop="ngbDropdown">
+                <button type="button" class="btn btn-outline-primary me-2" id="dropdownManual" ngbDropdownAnchor
+                    (focus)="myDrop.open()">
+                    Acties
+                </button>
+                <div ngbDropdownMenu aria-labelledby="dropdownManual">
+                    <button ngbDropdownItem (click)="delete()"><i class="fa-duotone fa-trash me-1"></i>
+                        Verwijderen</button>
+                </div>
+            </div>
+
+  
+        </div>
+
+    </div>
+
+
+    <ngx-altea-form-card-section sectionName="ui.user.edit.sections.general.title" sectionId="general"
+        [editSectionId]="editSectionId" (save)="save()" (cancel)="cancel()" (editModeChanged)="editModeChanged($event)"
+        [enableSave]="!generalForm?.form.pristine && generalForm?.form.valid">
+        <ng-container readonly>
+            <!-- <div>{{ object.descr }}</div> -->
+
+
+
+
+            <div class="row">
+                <div class="col-6"> <ngx-altea-label-value label="objects.contact.first"
+                        [value]="object.first"></ngx-altea-label-value> </div>
+                <div class="col-6"> <ngx-altea-label-value label="objects.contact.last"
+                        [value]="object.last"></ngx-altea-label-value> </div>
+            </div>
+
+            <div class="row">
+                <div class="col-6"><ngx-altea-label-value label="objects.contact.email"
+                        [value]="object.email"></ngx-altea-label-value></div>
+
+            </div>
+
+            <div class="row">
+                <div class="col-6"><ngx-altea-label-value label="objects.user.uid"
+                        [value]="object.uid"></ngx-altea-label-value></div>
+            </div>
+
+
+            <div class="mt-4" *ngIf="object.contacts">
+                <h6>Linked contacts</h6>
+                <ul class="list-group">
+                    <li class="list-group-item" *ngFor="let contact of object.contacts">{{contact.name}}
+                        <span *ngIf="contact.branch">&nbsp; {{contact.branch}}</span>
+                    </li>
+                </ul>
+            </div>
+
+
+            <div class="mt-4" *ngIf="object.resources">
+                <h6>Linked resources</h6>
+                <ul class="list-group">
+                    <li class="list-group-item" *ngFor="let resource of object.resources">{{resource.name}}
+                        <span *ngIf="resource.branch">&nbsp; {{resource.branchType().name}}</span>
+                    </li>
+                </ul>
+            </div>
+
+
+
+        </ng-container>
+        <ng-container edit>
+
+            <form #generalForm="ngForm">
+
+                <!-- help="objects.resource.help.{{object.type}}-name" -->
+
+
+                <div class="row">
+                    <div class="col-6">
+                        <ngx-altea-label-control label="objects.contact.first" for="first">
+                            <input type="text" id="first" name="first" class="form-control"
+                                [(ngModel)]="object.first" />
+                        </ngx-altea-label-control>
+                    </div>
+                    <div class="col-6">
+                        <ngx-altea-label-control label="objects.contact.last" for="last">
+                            <input type="text" id="last" name="last" class="form-control"
+                                [(ngModel)]="object.last" />
+                        </ngx-altea-label-control>
+                    </div>
+                </div>
+
+
+
+
+                <div class="row mt-3">
+                    <div class="col-6">
+                        <ngx-altea-label-control label="objects.contact.email" for="email">
+                            <input type="text" id="email" name="email" class="form-control"
+                                [(ngModel)]="object.email" />
+                        </ngx-altea-label-control>
+                    </div>
+
+                </div>
+
+
+                <int-phone-edit [css]="mobilePhoneCss" [(phone)]="object.mobile"
+                    (phoneChange)="formChanged('general')"></int-phone-edit>
+
+
+
+
+            </form>
+
+
+
+
+        </ng-container>
+
+    </ngx-altea-form-card-section>
+
+
+
+</ng-container>

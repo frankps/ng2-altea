@@ -390,6 +390,15 @@
         }
       }
     },
+    "user": {
+      "edit": {
+        "sections": {
+          "general": {
+            "title": "Algemene info"
+          }
+        }
+      }
+    },
     "contact": {
       "edit": {
         "sections": {
@@ -799,6 +808,10 @@
       "gift": "Is cadeaubon",
       "giftCode": "Cadeaubon code",
       "state": "Status"
+    },
+    "user": {
+      "article": "de",
+      "uid": "Firebase id"
     },
     "contact": {
       "name": "Naam",

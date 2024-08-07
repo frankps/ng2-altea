@@ -5,14 +5,20 @@ import { EditUserComponent } from './edit-user/edit-user.component';
 import { ManageUsersComponent } from './manage-users/manage-users.component';
 
 const routes: Routes = [
-  { path: "mobile/", component: UserListComponent},
-  { path: "mobile/:id", component: EditUserComponent},
-  { path: "", component: ManageUsersComponent,  children: [
-    { path: ":id", component: EditUserComponent },
-    { path: "new/", component: EditUserComponent },
-  ] }, 
-  { path: "manage", component: ManageUsersComponent },
-  { path: "list", component: UserListComponent },
+  {
+    path: "users", children:
+      [{ path: "mobile/", component: UserListComponent },
+      { path: "mobile/:id", component: EditUserComponent },
+      {
+        path: "", component: ManageUsersComponent, children: [
+          { path: ":id", component: EditUserComponent },
+          { path: "new/", component: EditUserComponent },
+        ]
+      },
+      { path: "manage", component: ManageUsersComponent },
+      { path: "list", component: UserListComponent }]
+  }
+
 ];
 
 @NgModule({
