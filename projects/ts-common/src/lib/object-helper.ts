@@ -81,6 +81,10 @@ export class ObjectHelper {
         });
     }
 
+    static createRandomNumberString(length, chars = "0123456789") {
+        return ObjectHelper.createRandomString(length, chars)
+    }
+
     static createRandomString(length, chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789") {
 
         // const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"  // "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";

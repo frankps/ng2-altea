@@ -12,9 +12,6 @@ export class DomoticaComponent implements OnInit {
 
   luxomStates: LuxomState[]
 
-  events: Event[]
-
-  event: Event
 
 
   constructor(protected localSvc: LocalService) {
@@ -26,10 +23,6 @@ export class DomoticaComponent implements OnInit {
     this.luxomStates = LuxomAddress.getAllAddressStates()
     console.log(this.luxomStates)
 
-
-    this.events = await this.localSvc.getEvents$()
-
-    console.error(this.events)
 
     //await this.getLuxomState()
   }
@@ -89,15 +82,6 @@ export class DomoticaComponent implements OnInit {
 
   }
 
-  toggleEvent(event: Event) {
-
-    if (!this.event)
-      this.event = event
-    else
-      this.event = undefined
-
-
-  }
 
 
 }

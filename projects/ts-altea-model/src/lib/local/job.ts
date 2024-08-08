@@ -1,3 +1,4 @@
+import { DateHelper } from "ts-common"
 import { ActionLog, ActionStatus } from "./action"
 import { Script } from "./script"
 
@@ -43,6 +44,17 @@ export class Job extends Script {
         this.date = date
         this.eventId = eventId
 
+    }
+
+
+
+    jsDate() : Date {
+
+        if (!this.date)
+            return undefined
+
+        return DateHelper.parse(this.date)
+    
     }
 
 

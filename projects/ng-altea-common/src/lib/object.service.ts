@@ -73,7 +73,7 @@ export class ObjectService implements IDb {
 
 
 
-  update<Inp, Out>(dbObject: DbObject<Inp, Out>): Observable<ApiResult<Out>> {
+  update<Out>(dbObject: DbObject<Out>): Observable<ApiResult<Out>> {
 
     return this.http.put<ApiResult<Out>>(`${this.sessionSvc.backend}/${this.sessionSvc.branchUnique}/objects/update`, dbObject).pipe(map(res => {
 
@@ -94,12 +94,12 @@ export class ObjectService implements IDb {
 
   //  async update$<T extends ObjectWithId>(dbObject: DbObjectCreate<T>): Promise<ApiResult<T>> {
 
-  async update$<Inp, Out>(dbObject: DbObject<Inp, Out>): Promise<ApiResult<Out>> {
+  async update$<Inp, Out>(dbObject: DbObject<Out>): Promise<ApiResult<Out>> {
     const me = this
 
     return new Promise<ApiResult<Out>>(function (resolve, reject) {
 
-      me.update<Inp, Out>(dbObject).pipe(take(1)).subscribe(res => {
+      me.update<Out>(dbObject).pipe(take(1)).subscribe(res => {
         resolve(res)
       })
 

@@ -226,7 +226,7 @@ export class DbQueryTyped<T> extends DbQuery {
  *  Inp: partial object having an id and only those properties to update {id: 'abc', propToUpodate: 'update' }
  *  Out: the full object type to return
  */
-export class DbObject<Inp, Out> {
+export class DbObject<Out> {
   /**
    * 
    * @param typeName 
@@ -234,7 +234,7 @@ export class DbObject<Inp, Out> {
    * @param object 
    * 
    */
-  constructor(public typeName: string, public type: { new(): Out; }, public object: Inp) {
+  constructor(public typeName: string, public type: { new(): Out; }, public object: any) {
   }
 }
 

@@ -5,12 +5,12 @@ import { Observable } from 'rxjs'
 export interface IDb {
 
     // Generic methods  extends ObjectWithId
-    update$<Inp extends ObjectWithId, Out>(dbObject: DbObject<Inp, Out>): Promise<ApiResult<Out>>
+    update$<Out>(dbObject: DbObject<Out>): Promise<ApiResult<Out>>
 
     // updateMany$<Inp extends ObjectWithId, Out>(dbObject: DbObjectMulti<Out>): Promise<ApiListResult<Out>>
     updateMany$<Inp extends ObjectWithId, Out>(dbObject: DbObjectMulti<Inp, Out>): Promise<ApiListResult<Out>>
     updateManyWhere$<T extends ObjectWithId>(update: DbUpdateManyWhere<T>): Promise<any> 
-    
+
     create$<T>(dbObject: DbObjectCreate<T>): Promise<ApiResult<T>>
     createMany$<T>(dbObject: DbObjectMultiCreate<T>): Promise<ApiListResult<T>>
 

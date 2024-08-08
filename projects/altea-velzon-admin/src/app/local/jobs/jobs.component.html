@@ -1,1 +1,127 @@
-<p>jobs works!</p>
+<div class="row">
+
+    <!--     -->
+    <div class="col-3"><input type="text" placeholder="Datepicker" class="form-control" bsDatepicker
+            (bsValueChange)="dateChanged($event)" [(ngModel)]="date">
+    </div>
+
+    <div class="col"><button type="button" class="btn btn-primary btn-sm" (click)="runWellness()">Wellness</button>
+
+        <button type="button" class="btn btn-primary btn-sm ms-3" (click)="runDoorEntry()">Doors</button>
+    </div>
+    <!--   <div class="col-3"></div>
+    <div class="col-3"></div> -->
+</div>
+
+
+
+
+
+
+<ng-container *ngIf="events">
+
+
+    <div class="row mt-3">
+        <div class="col-4">
+
+            <h4>Events</h4>
+
+            <ul class="list-group">
+                <li class="list-group-item" *ngFor="let event of events" (click)="toggleEvent(event)">
+
+                    <div class="row">
+                        <div class="col-12">{{event.type}}</div>
+                        <div class="col-12">{{event.jsDate() | date:"dd/MM/yyyy HH:mm"}} </div>
+
+                    </div>
+
+                </li>
+            </ul>
+
+        </div>
+        <div class="col-4">
+
+            <ng-container *ngIf="jobs">
+
+                <h4>Jobs</h4>
+
+                <ul class="list-group">
+                    <li class="list-group-item" *ngFor="let job of jobs" (click)="toggleJob(job)">
+
+                        <div class="row">
+                            <div class="col-12">{{job.name}}</div>
+                            <div class="col-12">{{job.jsDate() | date:"dd/MM/yyyy HH:mm"}} </div>
+                            <div class="col-12">{{job.status}} </div>
+                        </div>
+
+                    </li>
+                </ul>
+
+
+
+
+
+            </ng-container>
+
+
+
+
+        </div>
+        <div class="col-4">
+
+            <ng-container *ngIf="job">
+
+                <h4>Job</h4>
+
+                <ul class="list-group">
+                    <li class="list-group-item" *ngFor="let action of job.actions">
+
+                        <div class="row">
+                            <div class="col-12">{{action.type}}</div>
+
+
+                            <div class="col-12">
+
+                                <ng-container [ngSwitch]="action.type">
+                                    <ng-container *ngSwitchCase="'luxom'">
+                                        {{action.args['addr']['info']}}
+                                        [{{action.args['addr']['grp']}}.{{action.args['addr']['addr']}}]
+                                        cmd={{action.args['cmd']}}
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'doorAccess'">
+                                        enable={{action.args['enable']}}
+                                    </ng-container>
+                                    <ng-container *ngSwitchDefault>
+                                    </ng-container>
+                                </ng-container>
+
+                            </div>
+
+
+
+
+
+
+
+
+
+                        </div>
+
+                    </li>
+                </ul>
+
+
+
+
+            </ng-container>
+
+
+        </div>
+    </div>
+
+
+
+
+
+
+</ng-container>

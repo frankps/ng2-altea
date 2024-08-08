@@ -364,7 +364,7 @@ export class AlteaDb {
 
         let dbObject = new DbObject(typeName, type, objectToUpdate)
 
-        let updateResult = await this.db.update$<ObjectWithId, T>(dbObject)
+        let updateResult = await this.db.update$<T>(dbObject)
 
         return updateResult
     }
