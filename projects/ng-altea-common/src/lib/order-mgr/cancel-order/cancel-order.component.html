@@ -4,7 +4,7 @@
 
 
         <div class="alert alert-danger" role="alert"
-            *ngIf="checks.message != CancelOrderMessage.success && checks.message != CancelOrderMessage.noMoreFreeCancel"
+            *ngIf="checks.message != CancelOrderMessage.possible && checks.message != CancelOrderMessage.noMoreFreeCancel"
             translate>
             enums.cancel-order-message.{{checks.message}}
         </div>
@@ -25,7 +25,7 @@
 
             </div>
         </div>
-
+  
   
 
 

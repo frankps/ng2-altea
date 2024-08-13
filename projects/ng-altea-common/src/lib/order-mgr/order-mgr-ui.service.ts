@@ -392,7 +392,7 @@ export class OrderMgrUiService {   // implements OnInit
 
       this.order = order
 
-      let depoDate = order.calculateDepositByDate()
+      //let depoDate = order.calculateDepositByDate()
 
       this.order.branch = this.sessionSvc.branch
 
@@ -410,6 +410,39 @@ export class OrderMgrUiService {   // implements OnInit
     })
 
   }
+
+
+  async loadOrder$(orderId: string) : Promise<Order> {
+
+    this.spinner.show()
+
+    // .resources.resource
+    const order = await this.orderSvc.get$(orderId, "lines.planning.resource,lines:orderBy=idx.product,contact.cards,payments:orderBy=idx")
+
+    this.order = order
+
+    //let depoDate = order.calculateDepositByDate()
+
+    this.order.branch = this.sessionSvc.branch
+
+    if (!this.order.branch || order.branchId != order.branch.id)
+      throw new Error('Wrong branch on order!')
+
+    this.orderLineOptions = null
+    this.orderLine = null
+    this.resources = order.getResources()
+    this.orderDirty = false
+
+    this.spinner.hide()
+
+    console.error(order)
+
+    return order
+
+  }
+
+
+
 
   nrOfOrderLines(): number {
 

@@ -15,5 +15,6 @@ export * from './lib/logic'
 export * from './lib/stripe'
 export * from './lib/messaging'
 export * from './lib/local'
+export * from './lib/bot'
 
 

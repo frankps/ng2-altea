@@ -17,6 +17,7 @@ export class Event {
     resourceId?: string
     orderId?: string
     contactId?: string
+    contactName?: string
     custom?: any
 
     @Type(() => Job)

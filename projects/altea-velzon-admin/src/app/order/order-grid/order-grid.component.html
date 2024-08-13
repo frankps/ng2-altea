@@ -2,8 +2,8 @@
 <!-- 
 (bsValueChange)="rangePickerChanged($event)" -->
 
-<div class="row mb-4">  
-    <div class="col-4">
+<div class="row mb-4" *ngIf="initialized">  
+    <div class="col-3">
         <input class="form-control" #drp="bsDaterangepicker" bsDaterangepicker [(ngModel)]="dateRange" [bsConfig]="{useUtc: true}" onkeydown="return false">
 
     </div>
@@ -11,6 +11,13 @@
         <ng-select *ngIf="searchTypeSelect && searchTypeSelect.length > 0" id="searchTypeSelect" name="searchTypeSelect" [items]="searchTypeSelect" bindLabel="trans" bindValue="key"
         [clearable]="false" [multiple]="false" [(ngModel)]="orderSearch.typeSelect">
     </ng-select>
+    </div>
+
+    <div class="col-3">
+
+        <ng-select id="orderState" name="orderState" [items]="orderState" bindLabel="trans" bindValue="key" [clearable]="false" [multiple]="true" [(ngModel)]="orderSearch.states"></ng-select>
+
+
     </div>
 
 

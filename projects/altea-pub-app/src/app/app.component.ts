@@ -29,6 +29,7 @@ export class AppComponent implements OnInit {
 
     this.authSvc.init()
 
+    /*
     this.branchSvc.get(this.sessionSvc.branchId).subscribe(branch => {
 
       this.sessionSvc.branch = branch
@@ -36,12 +37,15 @@ export class AppComponent implements OnInit {
       console.error(branch)
 
     })
-
+*/
 
     
   }
 
-  ngOnInit(): void {
+  async ngOnInit() {
+
+    this.sessionSvc.branch = await this.branchSvc.get$(this.sessionSvc.branchId)
+    console.error(this.sessionSvc.branch)
 
     const res = localStorage.getItem('web-push-subscr')
 

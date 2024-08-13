@@ -1,0 +1,35 @@
+<div class="row">
+
+    <div class="col-4">
+        
+        <button type="button" class="btn btn-primary btn-sm ms-3" (click)="dialogflowWebhook()">Dialogflow webhook</button>
+    </div>
+
+    <div class="col-8">
+
+        <ng-container *ngIf="textResponse">{{textResponse}}</ng-container>
+
+
+    </div>
+</div>
+
+
+
+<div class="row mt-3">
+    <div class="col">
+
+        <h4>Kies antwoord:</h4>
+
+        <ul class="list-group">
+            <li class="list-group-item" *ngFor="let answer of answers" (click)="setAnswer(answer)">
+
+                <div class="row">
+                    <div class="col-12">{{answer}}</div>
+                 
+                </div>
+
+            </li>
+        </ul>
+
+    </div>
+</div>

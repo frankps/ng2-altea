@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbQuery, DbQueryTyped, ObjectHelper, QueryOperator } from 'ts-common'
-import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, TemplateCode } from 'ts-altea-model'
+import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, TemplateCode, CustomerCancelReasons } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import * as dateFns from 'date-fns'
 import * as Handlebars from "handlebars"
@@ -91,9 +91,15 @@ export class OrderMessaging extends OrderMessagingBase {
                 console.info(`Deposit messaging for ${order.code}`)
                 return await this.depositMessaging(order)
 
-            case OrderState.noDepositCancel:
-                console.info(`No deposit cancel messaging for ${order.code}`)
-                return await this.depositMessaging(order)
+            case OrderState.cancelled:
+
+                switch (order.cancel?.reason) {
+                    case CustomerCancelReasons.noDeposit:
+                        console.info(`No deposit cancel messaging for ${order.code}`)
+                        return await this.depositMessaging(order)
+                }
+
+                break
 
             case OrderState.confirmed:
                 console.info(`Reminder messaging for ${order.code}`)
@@ -142,7 +148,7 @@ export class OrderMessaging extends OrderMessagingBase {
             return new ApiResult<Order>(order, ApiStatus.error, `Error sending noDepositCancel messaging`)
 
         }
-        
+
     }
 
 

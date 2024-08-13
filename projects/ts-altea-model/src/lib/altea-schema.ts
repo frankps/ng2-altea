@@ -9,6 +9,7 @@ import * as dateFns from 'date-fns'
 import * as Handlebars from "handlebars"
 import * as sc from 'stringcase'
 import { OrderPersonMgr } from "./order-person-mgr";
+import { CancelOrderMessage } from "ts-altea-logic";
 
 function TransformToNumber() {
 
@@ -2548,9 +2549,9 @@ export enum OrderState {
   confirmed = 'confirmed',
 
   cancelled = 'cancelled',
-  noDepositCancel = 'noDepositCancel',
-  inTimeCancel = 'inTimeCancel',
-  lateCancel = 'lateCancel',
+  //noDepositCancel = 'noDepositCancel',
+  // inTimeCancel = 'inTimeCancel',
+  // lateCancel = 'lateCancel',
 
   arrived = 'arrived',
   noShow = 'noShow',
@@ -2602,6 +2603,9 @@ export enum CustomerCancelReasons {
   traffic = "traffic",
   work = "work",
   noShow = "noShow",
+  noDeposit = "noDeposit",
+  inTime = "inTime",  // in time cancel
+  late = "late",  // late cancel
   other = "other"
 }
 
@@ -2929,6 +2933,29 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     this.depositBy = DateHelper.yyyyMMddhhmmss(this.calculateDepositByDate())
   }
 
+  calculateCancelCompensation(cancelBy: OrderCancelBy): number {
+
+    if (ArrayHelper.IsEmpty(this.payments)) {
+      return 0
+    }
+
+    let compensation = 0
+
+    let totalActualPaid = this.totalPaidNotOfType(PaymentType.gift, PaymentType.subs)
+
+    if (cancelBy == OrderCancelBy.cust) {  // then we keep the deposit amount    // && this.message == CancelOrderMessage.noMoreFreeCancel
+      compensation = totalActualPaid - this.deposit
+    } else {
+      compensation = totalActualPaid
+    }
+
+    if (compensation < 0)
+      compensation = 0
+
+    return compensation
+  }
+
+
   asDbObject(): DbObjectCreate<Order> {
     return new DbObjectCreate<Order>('order', Order, this)
   }
@@ -3015,6 +3042,8 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
   /**
    * The default cancel time is defined on branch (branch.cancel in hours = number of hours before start of booking where free cancellation is not allowed anymore)
    * Products can optionally specify another minimum interval
+   * 
+   * Make sure to have branch and products loaded!
    * 
    * @returns 
    */
@@ -3321,6 +3350,17 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     return (Array.isArray(removed) && removed.length > 0)
   }
 
+  deleteAllPlannings() {
+
+    if (ArrayHelper.NotEmpty(this.planning)) {
+      // inform back-end that plannings should be removed
+      this.planning.forEach(plan => this.markAsRemoved('planning', plan.id))
+
+      // remove client-side planning
+      this.planning = []
+    }
+
+  }
 
 
   getProductIds(): string[] {

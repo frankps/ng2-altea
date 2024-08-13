@@ -15,6 +15,8 @@ import { PayFinishedComponent } from './pay-finished/pay-finished.component';
 import { TaskComponent } from './task/task.component';
 import { MySubsComponent } from './my-subs/my-subs.component';
 import { UserContactMatchComponent } from './user-contact-match/user-contact-match.component';
+import { MyOrdersComponent } from './my-orders/my-orders.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
   declarations: [
@@ -28,13 +30,15 @@ import { UserContactMatchComponent } from './user-contact-match/user-contact-mat
 
     TaskComponent,
      MySubsComponent,
-     UserContactMatchComponent
+     UserContactMatchComponent,
+     MyOrdersComponent
   ],
   imports: [
     CommonModule,
     BranchRoutingModule,
     NgAlteaCommonModule,
-    OrderMgrModule
+    OrderMgrModule,
+    TranslateModule
   ]
 })
 export class BranchModule { }

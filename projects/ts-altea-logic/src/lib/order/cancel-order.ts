@@ -15,7 +15,7 @@ import * as Handlebars from "handlebars"
 import * as _ from "lodash"
 
 export enum CancelOrderMessage {
-    success = "success",
+    possible = "possible",
     alreadyCancelled = "alreadyCancelled",
     giftAlreadyUsed = "giftAlreadyUsed",
     subscriptionAlreadyUsed = "subscriptionAlreadyUsed",
@@ -46,16 +46,16 @@ export class CancelOrderChecks {
 
     subsPayments = []
 
-    constructor(public message: CancelOrderMessage = CancelOrderMessage.success) {
+    constructor(public message: CancelOrderMessage = CancelOrderMessage.possible) {
 
     }
 
     hasProblems() {
-        return (this.message != CancelOrderMessage.success)
+        return (this.message != CancelOrderMessage.possible)
     }
 
     static get success(): CancelOrderChecks {
-        return new CancelOrderChecks(CancelOrderMessage.success)
+        return new CancelOrderChecks(CancelOrderMessage.possible)
     }
 
 }

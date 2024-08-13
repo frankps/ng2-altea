@@ -10,11 +10,15 @@ import { NgbModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { Bootstrap5Module } from 'ng-common';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { DialogflowComponent } from './dialogflow/dialogflow.component';
+import { DoorAccessComponent } from './door-access/door-access.component';
 
 @NgModule({
   declarations: [
     DomoticaComponent,
-    JobsComponent
+    JobsComponent,
+    DialogflowComponent,
+    DoorAccessComponent
   ],
   imports: [
     CommonModule,

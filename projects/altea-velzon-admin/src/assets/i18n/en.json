@@ -78,6 +78,7 @@
     },
     "order-state": {
       "creation": "Creatie",
+      "created": "Aangemaakt",
       "waitDeposit": "Afwachting voorschot",
       "confirmed": "Geconfirmeerd",
       "cancelled": "Geannuleerd",
@@ -86,10 +87,11 @@
       "finished": "Afgerond"
     },
     "cancel-order-message": {
+      "possible": "Kosteloos annuleren is mogelijk",
       "alreadyCancelled": "Order reeds geannuleerd!",
       "giftAlreadyUsed": "Cadeaubon reeds gebruikt",
       "subscriptionAlreadyUsed": "Abonnement reeds gebruikt",
-      "noMoreFreeCancel": "Laattijdige annulatie! Annulatie zonder vergoeding niet meer mogelijk!"
+      "noMoreFreeCancel": "Laattijdige annulatie: annuleren zonder vergoeding niet meer mogelijk!"
     },
     "cancel-by": {
       "cust": "Klant",
@@ -601,6 +603,10 @@
         "h1": "Mijn abonnementen",
         "inf": "Abonnementen bekijken en gebruiken"
       },
+      "my-orders": {
+        "h1": "Mijn reservaties/bestellingen",
+        "inf": "Open reservaties"
+      },
       "my-loyalty": {
         "h1": "Mijn klantenkaart",
         "inf": "Status van mijn klantenkaart"
@@ -1026,7 +1032,9 @@
       "label": "Lokaal",
       "sub": {
         "domo": "Domotica",
-        "jobs": "Jobs"
+        "jobs": "Jobs",
+        "dialogflow": "Dialogflow",
+        "doorAccess": "Deur toegang"
       }
     },
     "resources": {

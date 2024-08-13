@@ -1,0 +1,77 @@
+<h4>Mijn reservaties/bestellingen:</h4>
+
+<ng-container *ngIf="orders">
+
+    <ul class="list-group">
+        <li class="list-group-item" *ngFor="let order of orders">
+
+
+
+            <div class="row">
+                <div class="col-4">{{order.startDate | date:"dd/MM/yyyy HH:mm"}}
+
+
+
+                </div>
+                <div class="col-8">
+
+                    <ng-container *ngIf="order.lines">
+                        <span *ngFor="let line of order.lines"><i>{{line.descr}}</i><br></span>
+                    </ng-container>
+                    <!-- 
+                    <span></span>
+                    <ul class="list-group" *ngIf="order.lines">
+                        <li class="list-group-item" *ngFor="let line of order.lines">
+                            {{line.descr}}
+                        </li>
+                    </ul> -->
+
+
+                </div>
+
+            </div>
+
+            <div class="row" *ngIf="order.start && order.start > nowNum">
+
+                <div class="col d-flex justify-content-end">
+
+                    <button type="button" class="btn btn-primary btn-sm me-3" (click)="checkCancel(order)"
+                        translate>dic.cancel</button>
+
+                    <button type="button" class="btn btn-primary btn-sm" (click)="moveOrder()"
+                        translate>dic.move</button>
+
+                </div>
+
+
+            </div>
+
+            <div class="row my-3" *ngIf="order.id == curOrder?.id">
+
+                <div class="col" *ngIf="mode == 'cancel' && cancelChecks">
+
+                    {{'enums.cancel-order-message.' + cancelChecks.message | translate }}
+
+
+                    <ng-container *ngIf="cancelChecks.message == 'possible'">
+
+                        <button type="button" class="btn btn-danger" (click)="confirmCancel(order)">Confirmeer annulatie</button>
+                    </ng-container>
+
+
+
+                </div>
+            </div>
+
+
+        </li>
+    </ul>
+
+</ng-container>
+
+
+<!-- 
+(click)="bookSubscription(sub)"
+
+            <div class="float-end">{{sub.usedQty}} / {{sub.totalQty}}</div>
+-->

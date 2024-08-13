@@ -86,10 +86,11 @@
       "finished": "Afgerond"
     },
     "cancel-order-message": {
+      "possible": "Kosteloos annuleren is mogelijk",
       "alreadyCancelled": "Order reeds geannuleerd!",
       "giftAlreadyUsed": "Cadeaubon reeds gebruikt",
       "subscriptionAlreadyUsed": "Abonnement reeds gebruikt",
-      "noMoreFreeCancel": "Laattijdige annulatie! Annulatie zonder vergoeding niet meer mogelijk!"
+      "noMoreFreeCancel": "Laattijdige annulatie: annuleren zonder vergoeding niet meer mogelijk!"
     },
     "cancel-by": {
       "cust": "Klant",
@@ -390,6 +391,15 @@
         }
       }
     },
+    "user": {
+      "edit": {
+        "sections": {
+          "general": {
+            "title": "Algemene info"
+          }
+        }
+      }
+    },
     "contact": {
       "edit": {
         "sections": {
@@ -591,6 +601,10 @@
       "my-subs": {
         "h1": "Mijn abonnementen",
         "inf": "Abonnementen bekijken en gebruiken"
+      },
+      "my-orders": {
+        "h1": "Mijn reservaties/bestellingen",
+        "inf": "Open reservaties"
       },
       "my-loyalty": {
         "h1": "Mijn klantenkaart",
@@ -800,6 +814,10 @@
       "giftCode": "Cadeaubon code",
       "state": "Status"
     },
+    "user": {
+      "article": "de",
+      "uid": "Firebase id"
+    },
     "contact": {
       "name": "Naam",
       "first": "Voornaam",
@@ -911,7 +929,10 @@
       "hasPrice": "Deze optie heeft een prijs",
       "hasValue": "Deze optie heeft een waarde",
       "hasFormula": "Deze optie heeft een formule",
-      "pvt": "Private optie: klanten kunnen dit niet selecteren, enkel intern"
+      "pvt": "Private optie: klanten kunnen dit niet selecteren, enkel intern",
+      "prev": {
+        "show": "Toon optie(waarden) in order preview"
+      }
     },
     "productOptionValue": {
       "name": "Naam",
@@ -1010,7 +1031,9 @@
       "label": "Lokaal",
       "sub": {
         "domo": "Domotica",
-        "jobs": "Jobs"
+        "jobs": "Jobs",
+        "dialogflow": "Dialogflow",
+        "doorAccess": "Deur toegang"
       }
     },
     "resources": {
@@ -1077,6 +1100,18 @@
       "sub": {
         "manage": "Beheer",
         "dashboard": "Overzicht"
+      }
+    },
+    "accounting": {
+      "label": "Boekhouding",
+      "sub": {
+        "transactions": "Transacties"
+      }
+    },
+    "platform": {
+      "label": "Platform",
+      "sub": {
+        "users": "Gebruikers"
       }
     }
   },

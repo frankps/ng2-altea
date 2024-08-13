@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { plainToInstance } from 'class-transformer';
-import { LocalService } from 'ng-altea-common';
-import { Action, ActionType, Event, LuxomAddress, LuxomState, LuxomGetState, Job } from 'ts-altea-model';
+import { BotService, LocalService } from 'ng-altea-common';
+import { Action, ActionType, Event, LuxomAddress, LuxomState, LuxomGetState, Job, DialogflowWebhookRequest } from 'ts-altea-model';
 import { ArrayHelper, DateHelper } from 'ts-common';
+import { DashboardService, ToastType } from 'ng-common'
 
 @Component({
   selector: 'app-jobs',
@@ -24,7 +25,7 @@ export class JobsComponent {
 
 
 
-  constructor(protected localSvc: LocalService) {
+  constructor(protected localSvc: LocalService, public dashboardSvc: DashboardService, public  botSvc: BotService) {
 
   }
 
@@ -38,6 +39,17 @@ export class JobsComponent {
 
   }
 
+  
+  async dialogflowWebhook() {
+
+    const request = DialogflowWebhookRequest.getDemo()
+
+    console.warn(request)
+
+    const response = await this.botSvc.dialogflowWebhook$(request)
+    console.warn(response)
+    
+  }
 
   async loadEvents(onDate: Date = new Date()) {
 
@@ -59,6 +71,13 @@ export class JobsComponent {
 
     this.loadEvents(newDate)
   }
+
+  async deleteEvents(): Promise<any> {
+    console.log('delete events')
+    const res = await this.localSvc.deleteAllEvents$()
+    console.error(res)
+  }
+
 
   async getJobs(eventId: string): Promise<Job[]> {
 
@@ -115,5 +134,20 @@ export class JobsComponent {
     console.warn(result)
 
   }
+
+  async executeAction(action: Action, job: Job) {
+
+    const res = await this.localSvc.executeAction$(action)
+
+    if (res.isOk)
+      this.dashboardSvc.showToastType(ToastType.saveSuccess)
+    else {
+      this.dashboardSvc.showToastType(ToastType.saveError)
+    }
+
+    console.log(res)
+
+  }
+
 
 }

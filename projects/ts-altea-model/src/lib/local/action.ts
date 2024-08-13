@@ -31,13 +31,11 @@ export class ActionLog {
 
 export class DoorAccessArgs extends ActionArgs {
 
-    
-
     /**
      * 
      * @param enable 
      */
-    constructor(public enable: boolean) {
+    constructor(public enable: boolean, public contactName: string, public orderId: string, public contactId: string, public code: string, public doors: string[]) {
         super()
     }
 

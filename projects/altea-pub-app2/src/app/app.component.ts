@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
 
   title = 'altea-pub-app 2'
   //firestore: Firestore = inject(Firestore);
@@ -37,5 +37,13 @@ export class AppComponent {
 
     
   }
+
+  async ngOnInit() {
+
+    this.sessionSvc.branch = await this.branchSvc.get$(this.sessionSvc.branchId)
+    console.error(this.sessionSvc.branch)
+  }
+
+  
 
 }

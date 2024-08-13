@@ -5,9 +5,15 @@
             (bsValueChange)="dateChanged($event)" [(ngModel)]="date">
     </div>
 
-    <div class="col"><button type="button" class="btn btn-primary btn-sm" (click)="runWellness()">Wellness</button>
+    <div class="col">
+        
+        <button type="button" class="btn btn-primary btn-sm" (click)="runWellness()">Wellness</button>
 
         <button type="button" class="btn btn-primary btn-sm ms-3" (click)="runDoorEntry()">Doors</button>
+
+        <button type="button" class="btn btn-primary btn-sm ms-3" (click)="deleteEvents()">Delete</button>
+
+        <button type="button" class="btn btn-primary btn-sm ms-3" (click)="dialogflowWebhook()">Dialogflow webhook</button>
     </div>
     <!--   <div class="col-3"></div>
     <div class="col-3"></div> -->
@@ -77,7 +83,14 @@
                     <li class="list-group-item" *ngFor="let action of job.actions">
 
                         <div class="row">
-                            <div class="col-12">{{action.type}}</div>
+                            <div class="col-8">{{action.type}}</div>
+
+                            <div class="col-4">
+                                <button type="button" class="btn btn-primary btn-sm"
+                                    (click)="executeAction(action, job)">
+                                    <i class="fa-solid fa-play"></i> &nbsp; Run</button>
+                            </div>
+
 
 
                             <div class="col-12">

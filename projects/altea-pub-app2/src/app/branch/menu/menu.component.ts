@@ -20,7 +20,7 @@ export class MenuComponent {
     {
       code: 'use-gift',
       loggedOff: true
-    },
+    },  
     {
       code: 'buy-gift',
       loggedOff: true
@@ -28,8 +28,11 @@ export class MenuComponent {
     {
       code: 'my-subs',
       loggedOff: false
-    }
-    ,
+    },
+    {
+      code: 'my-orders',
+      loggedOff: false
+    },
     {
       code: 'demo-orders',
       loggedOff: true

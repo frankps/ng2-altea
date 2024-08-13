@@ -1,0 +1,24 @@
+
+<div class="row mt-3">
+    <div class="col">
+
+        <h4>Door users</h4>
+
+        <ul class="list-group">
+            <li class="list-group-item" *ngFor="let user of users">
+
+                <div class="row">
+                    <div class="col-12">{{user.name}} 
+                        <span class="badge text-bg-secondary ms-2" *ngIf="user.device">{{user.device}}</span>
+                        <span class="badge text-bg-info ms-2" *ngIf="user.device">{{user.code}}</span>
+                    </div>
+                
+
+                </div>
+
+            </li>
+        </ul>
+
+
+    </div>
+</div>

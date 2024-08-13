@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
-import { Order, Gift, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, ConfirmOrderResponse, OrderSource, TemplateCode, OrderCancel, OrderCancelBy } from 'ts-altea-model'
+import { Order, Gift, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, ConfirmOrderResponse, OrderSource, TemplateCode, OrderCancel, OrderCancelBy, CustomerCancelReasons } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { AlteaDb } from '../general/altea-db'
 import { IDb } from '../interfaces/i-db'
@@ -44,7 +44,8 @@ export class OrderMgmtService {
         const processed = []
 
         for (let order of orders) {
-            order.state = OrderState.noDepositCancel
+            order.state = OrderState.cancelled
+            order.cancel.reason = CustomerCancelReasons.noDeposit
             order.cancel = new OrderCancel()
             order.cancel.date = new Date()
             order.cancel.by = OrderCancelBy.int
@@ -98,7 +99,7 @@ export class OrderMgmtService {
 
 
 
-                order.state = OrderState.noDepositCancel
+                order.state = OrderState.cancelled
                 order.m.setDirty('state')
         
                 this.alteaDb.saveOrder(order)
@@ -213,6 +214,10 @@ export class OrderMgmtService {
         response.plannings = this.createResourcePlanningsForNewOrder(order, reservationOption, solution)
 
         console.info(response.plannings)
+
+        //order.planning.forEach(plan => order.m.r)
+
+        order.deleteAllPlannings()
 
         const orderApiResult = await this.alteaDb.saveOrder(order)
 

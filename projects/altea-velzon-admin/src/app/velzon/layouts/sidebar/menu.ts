@@ -186,8 +186,20 @@ export const MENU: MenuItem[] = [
       },
       {
         id: 152,
-        label: 'menu.catalog.sub.prod',
+        label: 'menu.local.sub.jobs',
         link: '/aqua/local/jobs',
+        parentId: 15
+      },
+      {
+        id: 153,
+        label: 'menu.local.sub.dialogflow',
+        link: '/aqua/local/dialogflow',
+        parentId: 15
+      },
+      {
+        id: 154,
+        label: 'menu.local.sub.doorAccess',
+        link: '/aqua/local/door-access',
         parentId: 15
       }
 

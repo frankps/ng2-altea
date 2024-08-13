@@ -70,7 +70,7 @@ export class SessionService implements OnInit {
 
   delay(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
-  }
+  }  
 
 
   async branch$(): Promise<Branch> {

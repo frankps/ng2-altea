@@ -107,6 +107,8 @@ ng generate service data-services/sql/payment --project ng-altea-common
 ng generate service stripe --project ng-altea-common
 
 ng generate service messaging --project ng-altea-common
+ng generate service bot --project ng-altea-common
+
 
 ng generate component resource/resourceUserLink --project altea-velzon-admin
 
@@ -121,7 +123,7 @@ ng generate component auth/contact --project altea-pub-app2
 
 
 ng generate component branch/userContactMatch --project altea-pub-app2
-
+ng generate component branch/my-orders --project altea-pub-app2
 
 ng generate component ngbs5 --project dvit-gen
 
@@ -163,5 +165,7 @@ ng generate component <TYPE>/<TYPE>-list --project=altea-velzon-admin
 
 ng generate module local --routing --project=altea-velzon-admin
 ng generate component local/domotica --project=altea-velzon-admin
+ng generate component local/dialogflow --project=altea-velzon-admin
+ng generate component local/doorAccess --project=altea-velzon-admin
 
 ng generate service local --project=ng-altea-common

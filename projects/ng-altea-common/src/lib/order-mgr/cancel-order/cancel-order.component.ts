@@ -51,7 +51,7 @@ export class CancelOrderComponent {
     await this.doChecks()
 
     if (this.checks) {
-      if (this.checks.message == CancelOrderMessage.success || this.checks.message == CancelOrderMessage.noMoreFreeCancel)
+      if (this.checks.message == CancelOrderMessage.possible || this.checks.message == CancelOrderMessage.noMoreFreeCancel)
         this.cancelIsPossible = true
     }
     //cancelPossible ook in UI
@@ -80,9 +80,11 @@ export class CancelOrderComponent {
 
   }
 
-  calculateCompensation(cancelBy: OrderCancelBy) {
 
-    //   console.error(this.orderCancel.by)
+
+/*
+  calculateCompensation2(cancelBy: OrderCancelBy) {
+
 
     if (ArrayHelper.IsEmpty(this.order.payments)) {
       this.orderCancel.compensation = 0
@@ -99,11 +101,9 @@ export class CancelOrderComponent {
 
     if (this.orderCancel.compensation < 0)
       this.orderCancel.compensation = 0
-
-
-
-
   }
+
+  */
 
 
   async confirmCancel($event) {
@@ -125,11 +125,14 @@ export class CancelOrderComponent {
   }
 
   bySelected(by: OrderCancelBy) {
+    
     if (by != this.orderCancel.by) {
       this.orderCancel.reason = undefined
       this.orderCancel.compensate = OrderCancelCompensate.none
     }
 
-    this.calculateCompensation(by)
+    this.orderCancel.compensation = this.order.calculateCancelCompensation(by)
+
+    // this.calculateCompensation2(by)
   }
 }

@@ -1,8 +1,8 @@
 
 import { OrderService } from 'ng-altea-common'
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Order, OrderLine, Product, ProductType, ProductTypeIcons, Resource } from 'ts-altea-model'
-import { ApiListResult, DbQuery, QueryOperator, Translation, ApiResult, ApiStatus, DateHelper, SortOrder } from 'ts-common'
+import { Order, OrderLine, OrderState, Product, ProductType, ProductTypeIcons, Resource } from 'ts-altea-model'
+import { ApiListResult, DbQuery, QueryOperator, Translation, ApiResult, ApiStatus, DateHelper, SortOrder, ArrayHelper } from 'ts-common'
 import { ProductService } from 'ng-altea-common'
 import { DashboardService, TranslationService, NgBaseListComponent } from 'ng-common'
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -66,6 +66,7 @@ export class OrderSearch {
   start?: number
   end?: number
   typeSelect?: string = "appointmentsOn"
+  states?: OrderState[]
 }
 
 @Component({
@@ -76,6 +77,7 @@ export class OrderSearch {
 export class OrderGridComponent extends NgBaseListComponent<Order> implements OnInit {
 
   searchTypeSelect: Translation[] = []
+  orderState: Translation[] = []
 
   // OrderDateSelect = SearchTypeSelect
 
@@ -84,6 +86,9 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
   orderSearch = new OrderSearch()
 
   uiOrders: UIOrder[] = []
+
+  initialized = false
+
 
   constructor(private orderSvc: OrderService, private translationSvc: TranslationService, private modalService: NgbModal,
     dashboardSvc: DashboardService, protected route: ActivatedRoute, router: Router, spinner: NgxSpinnerService) {
@@ -107,6 +112,10 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
     this.search()
 
     await this.translationSvc.translateEnum(SearchTypeSelect, 'ui.order.search-type-select.', this.searchTypeSelect)
+
+    await this.translationSvc.translateEnum(OrderState, 'enums.order-state.', this.orderState)
+
+    this.initialized = true
 
     console.warn(this.searchTypeSelect)
 
@@ -179,9 +188,17 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
         break
     }
 
+
+    if (ArrayHelper.NotEmpty(this.orderSearch.states)) {
+      query.and('state', QueryOperator.in, this.orderSearch.states)
+    }
+
+
     query.take = 30
     query.include('lines.planning.resource', 'contact')
     query.orderBy('start', SortOrder.asc)
+
+
 
     this.objects$ = this.orderSvc.query(query)
 
