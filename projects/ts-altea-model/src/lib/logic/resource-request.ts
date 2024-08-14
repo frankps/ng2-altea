@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { OrderLine, OrderPerson, Product, ProductResource, Resource, ResourceType, Schedule } from "../altea-schema"
+import { OrderLine, OrderPerson, Product, ProductResource, Resource, ResourceType, Schedule } from "ts-altea-model"
 import { OffsetDuration } from "./offset-duration"
 import { TimeSpan } from "./dates/time-span"
 import { DateRangeSet } from "./dates"

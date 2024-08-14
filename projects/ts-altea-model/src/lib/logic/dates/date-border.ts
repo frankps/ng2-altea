@@ -1,4 +1,4 @@
-import { Resource } from "../../altea-schema"
+import { Resource } from "ts-altea-model"
 import * as _ from "lodash";
 
 /**

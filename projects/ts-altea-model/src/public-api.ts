@@ -16,5 +16,6 @@ export * from './lib/stripe'
 export * from './lib/messaging'
 export * from './lib/local'
 export * from './lib/bot'
+export * from './lib/schema'
 
 

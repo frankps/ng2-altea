@@ -1,5 +1,5 @@
 import { List } from "lodash";
-import { Order, OrderLine, Product, Resource } from "./altea-schema";
+import { Order, OrderLine, Product, Resource } from "ts-altea-model"
 import * as _ from "lodash";
 import { PersonLine } from "./person-line";
 /*

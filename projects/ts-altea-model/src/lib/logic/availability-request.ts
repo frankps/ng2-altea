@@ -1,5 +1,5 @@
 import { DateHelper } from "ts-common";
-import { Order } from "../altea-schema";
+import { Order } from "ts-altea-model"
 import { AvailabilityContext } from "./availability-context";
 import { ResourceRequest } from "./resource-request";
 import { ResourceAvailability } from "./resource-availability";

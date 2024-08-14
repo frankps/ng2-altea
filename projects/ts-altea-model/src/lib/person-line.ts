@@ -1,4 +1,5 @@
-import { OrderLine, OrderPerson } from "./altea-schema";
+import { OrderLine } from "ts-altea-model"
+
 
 
 export class PersonLine {

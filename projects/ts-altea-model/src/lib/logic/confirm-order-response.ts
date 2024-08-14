@@ -1,4 +1,4 @@
-import { Order, ResourcePlanning } from "../altea-schema";
+import { Order, ResourcePlanning } from "ts-altea-model"
 
 
 

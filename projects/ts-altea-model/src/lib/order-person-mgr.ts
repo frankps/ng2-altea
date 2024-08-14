@@ -1,4 +1,4 @@
-import { OrderPerson } from "./altea-schema";
+import { OrderPerson } from "ts-altea-model"
 
 export class OrderPersonMgr {
 

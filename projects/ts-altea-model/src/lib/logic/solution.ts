@@ -1,5 +1,5 @@
 import { extend } from "lodash";
-import { Resource, ResourcePlanning, ResourcePlannings } from "../altea-schema";
+import { Resource, ResourcePlanning, ResourcePlannings } from "ts-altea-model"
 import { DateRange, DateRangeSet, TimeSpan } from "./dates";
 import { ResourceRequestItem } from "./resource-request";
 import { ArrayHelper, ObjectHelper, ObjectWithId } from "ts-common";

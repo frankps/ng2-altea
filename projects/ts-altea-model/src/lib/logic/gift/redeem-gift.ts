@@ -1,5 +1,4 @@
-import { Gift, GiftType } from "../../altea-schema";
-
+import { Gift, GiftType } from "ts-altea-model"
 /** There are 2 types of gifts: amount or specific
  *  An amount gift: users should select services/products themselves
  *  A specific gift: users can book the specific gift (mode='specific') OR they can select something else (mode='amount'))

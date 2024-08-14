@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { Order, OrderLine, PlanningBlockSeries, PlanningMode, Product, ProductResource, Resource, ResourcePlanning, ResourcePlannings, ResourceType, Schedule, TimeUnit } from "../altea-schema";
+import { Order, OrderLine, PlanningBlockSeries, PlanningMode, Product, ProductResource, Resource, ResourcePlanning, ResourcePlannings, ResourceType, Schedule, TimeUnit } from "ts-altea-model"
 import * as _ from "lodash";
 import { TimeSpan } from "./dates/time-span";
 import { AvailabilityRequest } from "./availability-request";

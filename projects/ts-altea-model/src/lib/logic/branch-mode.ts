@@ -1,4 +1,4 @@
-import { Schedule } from "../altea-schema";
+import { Schedule } from "ts-altea-model"
 import { DateRange } from "./dates";
 
 

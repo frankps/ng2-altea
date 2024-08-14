@@ -1,4 +1,4 @@
-import { Resource, ResourceType } from "../altea-schema"
+import { Resource, ResourceType } from "ts-altea-model"
 import * as _ from "lodash"
 
 export class ResourceSet {

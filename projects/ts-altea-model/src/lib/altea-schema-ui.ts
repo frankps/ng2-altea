@@ -8,9 +8,9 @@
  */
 
 import { Type } from "class-transformer"
-import { Contact, Order, OrderLine, OrderLineOption, OrderLineOptionValue, OrderState, PlanningType, Resource, ResourcePlanning, ResourceType } from "./altea-schema"
 import { ArrayHelper, DateHelper, ObjectWithId } from "ts-common"
 import * as _ from "lodash";
+import { OrderLineOptionValue, PlanningType, Resource, ResourcePlanning, ResourceType, OrderLineOption, OrderLine, OrderState, Contact, Order } from "ts-altea-model";
 
 export class ObjectUi {
     id: string

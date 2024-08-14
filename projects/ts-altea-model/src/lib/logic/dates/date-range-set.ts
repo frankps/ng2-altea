@@ -5,7 +5,7 @@ import * as _ from "lodash"
 import * as dateFns from 'date-fns'
 import { ResourceRequest, ResourceRequestItem } from "../resource-request"
 import { Solution, SolutionItem, SolutionSet } from "../solution"
-import { Resource, ResourcePlanning } from "../../altea-schema"
+import { Resource, ResourcePlanning } from "ts-altea-model"
 import { TimeSpan } from "./time-span"
 import { ArrayHelper, DateHelper } from "ts-common"
 
