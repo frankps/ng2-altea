@@ -18,6 +18,8 @@ const routes: Routes = [{
   children: [
     { path: "menu", component: MenuComponent },
     { path: "order", component: OrderComponent },
+    { path: "order/:id/:mode", component: OrderComponent },
+    { path: "orderMode/:mode", component: OrderComponent },
     { path: "use-gift", component: UseGiftComponent },
     { path: "buy-gift", component: BuyGiftComponent },
     { path: "pay-online", component: PayOnlineComponent },

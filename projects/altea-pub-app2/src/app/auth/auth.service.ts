@@ -53,9 +53,10 @@ export class AuthService {
   /** resource id of human resource + all ids of resource groups it belongs to */
   resourceIds: string[] = []
 
-
   userSubscription: Subscription;
   authStateSubscription: Subscription;
+
+  redirect: string[] = null
 
   constructor(protected router: Router, protected userSvc: UserService, protected resourceSvc: ResourceService, protected spinner: NgxSpinnerService) {
 
@@ -165,11 +166,20 @@ export class AuthService {
           // to test
           //this.router.navigate(['/auth', 'profile'])
 
+          if (this.redirect) {
+            this.router.navigate(this.redirect)
+            this.redirect = null
+            
+          } else {
 
-          if (newUser)
-            this.router.navigate(['/auth', 'profile'])
-          else
-            this.router.navigate(['branch', 'aqua', 'menu'])
+
+            if (newUser)
+              this.router.navigate(['/auth', 'profile'])
+            else
+              this.router.navigate(['branch', 'aqua', 'menu'])
+
+
+          }
 
 
           // this.router.navigate(['staff', 'dashboard'])

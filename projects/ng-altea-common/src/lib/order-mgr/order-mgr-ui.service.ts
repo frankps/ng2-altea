@@ -72,6 +72,7 @@ export class OrderMgrUiService {   // implements OnInit
   uiMode = OrderUiMode.newOrder
 
   /** available after calling getAvailabilities() */
+  availabilityRequest: AvailabilityRequest
   availabilityResponse: AvailabilityResponse
   options: ReservationOption[]
 
@@ -100,6 +101,13 @@ export class OrderMgrUiService {   // implements OnInit
     this.autoCreateOrder()
 
   }
+
+  hasOptions() : boolean {
+
+    return ArrayHelper.NotEmpty(this.options)
+
+  }
+
   /* 
     async ngOnInit() {
   
@@ -387,8 +395,8 @@ export class OrderMgrUiService {   // implements OnInit
 
     this.spinner.show()
 
-    // .resources.resource
-    this.orderSvc.get(orderId, "lines.planning.resource,lines:orderBy=idx.product,contact.cards,payments:orderBy=idx").subscribe(order => {
+    // .resources.resourcewxs
+    this.orderSvc.get(orderId, "planning.resource,lines:orderBy=idx.product,contact.cards,payments:orderBy=idx").subscribe(order => {
 
       this.order = order
 
@@ -417,7 +425,7 @@ export class OrderMgrUiService {   // implements OnInit
     this.spinner.show()
 
     // .resources.resource
-    const order = await this.orderSvc.get$(orderId, "lines.planning.resource,lines:orderBy=idx.product,contact.cards,payments:orderBy=idx")
+    const order = await this.orderSvc.get$(orderId, "planning.resource,lines:orderBy=idx.product,contact.cards,payments:orderBy=idx")
 
     this.order = order
 
@@ -454,6 +462,14 @@ export class OrderMgrUiService {   // implements OnInit
 
 
 
+  availabilityRequestFromDate() {
+    if (!this.availabilityRequest?.from) 
+      return null
+    
+    const from = DateHelper.parse(this.availabilityRequest.from)
+    return from
+  }
+
 
   async getAvailabilities() {
 
@@ -461,13 +477,14 @@ export class OrderMgrUiService {   // implements OnInit
     /*     this.options = ReservationOptionSet.createDummy().options
         console.error(this.options)
     
-        return */
+        return */   
 
 
-
+   
     console.warn(this.order)
 
     const request = new AvailabilityRequest(this.order)
+    this.availabilityRequest = request
     request.debug = true
     request.from = this.from
 
@@ -481,6 +498,7 @@ export class OrderMgrUiService {   // implements OnInit
     if (this.availabilityResponse?.optionSet?.options)
       this.options = this.availabilityResponse.optionSet.options
 
+    console.error(request)
     console.error(response)
 
   }
@@ -533,7 +551,7 @@ export class OrderMgrUiService {   // implements OnInit
       this.dashboardSvc.showToastType(ToastType.saveError)
 
 
-    this.plannings = confirmOrderResponse.plannings
+    this.plannings = confirmOrderResponse.order?.planning
 
 
     this.spinner.hide()

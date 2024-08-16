@@ -19,6 +19,13 @@ export class SelectTimeSlotComponent {
 
   }
 
+  ngOnInit() {
+    const from = this.orderMgrSvc.availabilityRequestFromDate()
+
+    console.error('From date: ', from)
+
+  }
+
   selectOtherDate() {
     this.changeDate.emit()
   }
@@ -30,5 +37,9 @@ export class SelectTimeSlotComponent {
       await this.orderMgrSvc.selectTimeSlot(option)
 
     this.selected.emit(option)
+  }
+
+  test() {
+    this.orderMgrSvc.hasOptions()
   }
 }

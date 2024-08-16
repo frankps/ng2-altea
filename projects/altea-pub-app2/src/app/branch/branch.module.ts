@@ -17,6 +17,7 @@ import { MySubsComponent } from './my-subs/my-subs.component';
 import { UserContactMatchComponent } from './user-contact-match/user-contact-match.component';
 import { MyOrdersComponent } from './my-orders/my-orders.component';
 import { TranslateModule } from '@ngx-translate/core';
+import { AuthModule } from '../auth/auth.module';
 
 @NgModule({
   declarations: [
@@ -38,7 +39,8 @@ import { TranslateModule } from '@ngx-translate/core';
     BranchRoutingModule,
     NgAlteaCommonModule,
     OrderMgrModule,
-    TranslateModule
+    TranslateModule,
+    AuthModule
   ]
 })
 export class BranchModule { }

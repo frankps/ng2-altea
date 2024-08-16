@@ -70,7 +70,11 @@ export class MyOrdersComponent implements OnInit {
 
 
 
-  moveOrder() {
+  async moveOrder(order: Order) {
+
+    // await this.orderMgrSvc.loadOrder$(order.id)
+
+    this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'order', order.id, 'select-date'])
 
   }
  

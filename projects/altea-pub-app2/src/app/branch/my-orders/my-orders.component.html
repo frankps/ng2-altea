@@ -18,14 +18,7 @@
                     <ng-container *ngIf="order.lines">
                         <span *ngFor="let line of order.lines"><i>{{line.descr}}</i><br></span>
                     </ng-container>
-                    <!-- 
-                    <span></span>
-                    <ul class="list-group" *ngIf="order.lines">
-                        <li class="list-group-item" *ngFor="let line of order.lines">
-                            {{line.descr}}
-                        </li>
-                    </ul> -->
-
+                   
 
                 </div>
 
@@ -38,20 +31,21 @@
                     <button type="button" class="btn btn-primary btn-sm me-3" (click)="checkCancel(order)"
                         translate>dic.cancel</button>
 
-                    <button type="button" class="btn btn-primary btn-sm" (click)="moveOrder()"
+                    <button type="button" class="btn btn-primary btn-sm" (click)="moveOrder(order)"
                         translate>dic.move</button>
 
                 </div>
-
 
             </div>
 
             <div class="row my-3" *ngIf="order.id == curOrder?.id">
 
+                <div class="col" *ngIf="mode == 'cancel'"></div>
+
+
                 <div class="col" *ngIf="mode == 'cancel' && cancelChecks">
 
                     {{'enums.cancel-order-message.' + cancelChecks.message | translate }}
-
 
                     <ng-container *ngIf="cancelChecks.message == 'possible'">
 

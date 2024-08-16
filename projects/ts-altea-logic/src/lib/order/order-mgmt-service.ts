@@ -219,6 +219,8 @@ export class OrderMgmtService {
 
         order.deleteAllPlannings()
 
+        order.addPlanning(...response.plannings)
+
         const orderApiResult = await this.alteaDb.saveOrder(order)
 
         if (orderApiResult.status != ApiStatus.ok) {
@@ -228,7 +230,7 @@ export class OrderMgmtService {
 
         response.order = orderApiResult.object
 
-        const planningResult = await this.alteaDb.saveResourcePlannings(response.plannings)
+       // const planningResult = await this.alteaDb.saveResourcePlannings(response.plannings)
 
         return response
 

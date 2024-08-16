@@ -38,6 +38,9 @@ import { ClipboardModule } from '@angular/cdk/clipboard'
     NgxSpinnerModule,
     ClipboardModule
     
+  ],
+  exports: [
+    SignInComponent
   ]
 })
 export class AuthModule { }

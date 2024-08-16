@@ -454,7 +454,8 @@
         "title": "Kies uw datum"
       },
       "select-time-slot": {
-        "title": "Keuze uur",
+        "title": "Mogelijkheden op",
+        "no-slots": "Er zijn geen mogelijkheden",
         "other-date": "Kies andere datum"
       },
       "contacts": {
@@ -1211,9 +1212,6 @@
         "TWOCOLUMN": "Two Column",
         "HOVERED": "Hovered"
       }
-    },
-    "PAGES": {
-      "TEXT": "Pages"
     },
     "AUTHENTICATION": {
       "TEXT": "Authentication",

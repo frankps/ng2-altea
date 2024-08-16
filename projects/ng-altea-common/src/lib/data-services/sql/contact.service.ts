@@ -37,6 +37,21 @@ export class ContactService extends BackendHttpServiceBase<Contact> {
     return this.query$(query)
   }
 
+  /**
+   * 
+   * @param userId 
+   * @param branchId 
+   * @returns 
+   */
+  async getContactForUserInBranch(userId: string, branchId: string) {
+    let query = new DbQuery()
+
+    query.and('userId', QueryOperator.equals, userId)
+    query.and('branchId', QueryOperator.equals, branchId)
+
+    return this.queryFirst$(query)
+  }
+
   async searchContacts$(contact: Contact): Promise<Contact[]> {
 
     let query = new DbQuery()

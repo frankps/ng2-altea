@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { OrderMgrUiService, OrderUiMode, SessionService } from 'ng-altea-common';
+import { ContactService, OrderMgrUiService, OrderUiMode, SessionService } from 'ng-altea-common';
 import { Contact, OrderLine } from 'ts-altea-model';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AuthService } from '../../auth/auth.service';
 
 
 
@@ -14,8 +15,11 @@ export class OrderComponent implements OnInit {
 
   mode: string = 'browse-catalog'  //'demo-orders'
 
+  contact: Contact  // (branch) contact matching user
+
   // protected sessionSvc: SessionService, protected orderMgrSvc: OrderMgrUiService, protected router: Router
-  constructor(protected orderMgrSvc: OrderMgrUiService, protected route: ActivatedRoute, protected router: Router, protected sessionSvc: SessionService) {
+  constructor(protected orderMgrSvc: OrderMgrUiService, protected route: ActivatedRoute, protected router: Router
+    , protected sessionSvc: SessionService, protected authSvc: AuthService, protected contactSvc: ContactService) {
   }
 
   ngOnInit(): void {
@@ -31,6 +35,36 @@ export class OrderComponent implements OnInit {
       if (newMode)
         this.mode = newMode
     })
+
+    this.route.params.subscribe(async params => {
+
+      if (params) {
+
+        console.warn('params', params)
+
+        const id = params['id']
+        const mode = params['mode']
+
+        if (id) {
+          await this.orderMgrSvc.loadOrder$(id)
+        }
+
+        if (mode) {
+          this.mode = mode
+        
+          if (mode == 'continue-after-sign-in') {
+
+            await this.loadContactForUser()
+
+          }
+        
+        }
+
+      }
+    })
+
+
+
   }
 
   browseCatalog() {
@@ -78,9 +112,48 @@ export class OrderComponent implements OnInit {
     this.mode = "select-time-slot"
   }
 
-  timeSlotSelected(slot) {
+  /**
+   * We require that a user is logged in (Google, Facebook, email,...)
+   * After a user is logged in, we represent him the contact info
+   */
+  async loadContactForUser() {
+    this.contact = await this.contactSvc.getContactForUserInBranch(this.authSvc.userId, this.sessionSvc.branchId)
+
+
+    if (!this.contact) {
+
+      // we are logged in => a valid user should exist!
+      const user = this.authSvc.user
+      this.contact = user.toContact(this.sessionSvc.branchId)
+
+      // to inform component it's a new contact
+      this.contact.id = null
+
+    }
+
+    console.warn('Current contact', this.contact)
 
     this.mode = 'contact-select'
+  }
+
+
+  async timeSlotSelected(slot) {
+
+    // this.mode = 'contact-select'
+
+    if (!this.authSvc.loggedOn()) {
+
+      this.authSvc.redirect = ['branch', 'aqua', 'orderMode', 'continue-after-sign-in']
+
+      this.mode = 'sign-in'
+    }
+    else {
+
+      await this.loadContactForUser()
+
+    }
+
+
   }
 
 

@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, Output, EventEmitter, Input } from '@angu
 import { NgForm } from '@angular/forms'
 import { Branch, Contact, Country, MsgType } from 'ts-altea-model'
 import { DashboardService, TranslationService } from 'ng-common'
-import { Translation } from 'ts-common'
+import { ArrayHelper, ObjectHelper, Translation } from 'ts-common'
 import { ContactService, SessionService } from 'ng-altea-common';
 import { OrderMgrUiService } from '../order-mgr-ui.service';
 
@@ -19,8 +19,15 @@ export class ContactSelect2Component implements OnInit {
 
 
   @Input() set contact(value: Contact) {
-    this._contact = value
-    this.isNew = false
+
+    if (value) {
+      this._contact = value
+      this.isNew = (value.id == null)
+    } else {
+
+      this._contact = new Contact()
+      this.isNew = true
+    }
   }
 
   get contact() {
@@ -106,14 +113,30 @@ export class ContactSelect2Component implements OnInit {
 
     console.log(me.contacts)
 
-    me.showContacts = true
+    if (ArrayHelper.NotEmpty(me.contacts))
+      me.showContacts = true
+    else
+      await this.saveContact()
 
   }
 
-  async updateContact() {
+  async saveContact(): Promise<Contact> {
+
+    if (this.contact.id)
+      return await this.updateContact()
+    else
+      return await this.createAsNew()
+  }
+
+  async updateContact(): Promise<Contact> {
     let me = this
 
     let res = await me.contactSvc.update$(me.contact, this.dashboardSvc.resourceId)
+
+    this.selectContact(me.contact)
+
+
+    return res.object
   }
 
   canSelectMsgType(msgType: any) {
@@ -154,9 +177,15 @@ export class ContactSelect2Component implements OnInit {
     this.selected.emit(contact)
   }
 
-  async createAsNew() {
+  async createAsNew(): Promise<Contact> {
 
-    this.contact.branchId = this.branch.id
+    if (!this.contact.id)
+      this.contact.id = ObjectHelper.newGuid()
+
+
+    if (!this.contact.branchId)
+      this.contact.branchId = this.branch.id
+
     this.contact.setName()
 
     const res = await this.contactSvc.create$(this.contact, this.dashboardSvc.resourceId)
@@ -166,6 +195,7 @@ export class ContactSelect2Component implements OnInit {
       this.selectContact(res.object)
     }
 
+    return res.object
   }
 
   editContact() {

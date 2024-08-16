@@ -838,9 +838,21 @@ export class OrderPerson extends ObjectWithId {
         // remove client-side planning
         this.planning = []
       }
-  
     }
   
+    addPlanning(...planning: ResourcePlanning[]) {
+
+      if (ArrayHelper.IsEmpty(planning))
+        return
+
+      planning.forEach(plan => plan.markAsNew())
+
+      if (!this.planning)
+        this.planning = []
+
+      this.planning.push(...planning)
+
+    }
   
     getProductIds(): string[] {
   
@@ -910,26 +922,21 @@ export class OrderPerson extends ObjectWithId {
   
     getResources(): Resource[] {
   
-      if (!this.lines)
+      if (ArrayHelper.IsEmpty(this.planning))
         return []
   
       let resources: Resource[] = []
   
-      for (const orderLine of this.lines) {
   
-        if (!orderLine.planning)
+      for (const planning of this.planning) {
+  
+        if (!(planning.resource))
           continue
-  
-        for (const planning of orderLine.planning) {
-  
-          if (!(planning.resource))
-            continue
-  
-          if (resources.findIndex(r => r.id == (planning.resource as Resource)?.id) >= 0)
-            continue
-  
-          resources.push(planning.resource as Resource)
-        }
+
+        if (resources.findIndex(r => r.id == (planning.resource as Resource)?.id) >= 0)
+          continue
+
+        resources.push(planning.resource as Resource)
       }
   
       resources = _.orderBy(resources, 'type')    //this.resources.sort()
