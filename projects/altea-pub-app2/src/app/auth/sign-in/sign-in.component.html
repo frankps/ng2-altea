@@ -4,19 +4,40 @@
     </div>
 </div> -->
 
-<div class="mt-5">
-
-    <div class="col mx-5  d-grid">
-        <button type="button" class="btn btn-primary"  translate>Dashboard</button>
-
-        <button type="button" class="btn btn-outline-primary mt-2" (click)="signIn('facebook')">Facebook</button>
 
 
-        <button type="button" class="btn btn-outline-primary mt-2" (click)="signIn('google')">Google</button>
 
-    </div>
-    
-</div>
+
+<ng-container [ngSwitch]="provider">
+    <ng-container *ngSwitchCase="'email'">
+
+        <app-email-passwd></app-email-passwd>
+
+    </ng-container>
+    <ng-container *ngSwitchDefault>
+
+
+        <div class="mt-5">
+
+            <div class="col mx-5 d-grid">
+                <button type="button" class="btn btn-primary" translate (click)="toDashboard()">Dashboard</button>
+
+                <button type="button" class="btn btn-outline-primary mt-2"
+                    (click)="signIn('facebook')">Facebook</button>
+
+
+                <button type="button" class="btn btn-outline-primary mt-2" (click)="signIn('google')">Google</button>
+
+                <button type="button" class="btn btn-outline-primary mt-2" (click)="signIn('email')">Email</button>
+
+            </div>
+
+        </div>
+
+
+    </ng-container>
+</ng-container>
+
 
 
 <!-- class=”d-flex justify-content-center”

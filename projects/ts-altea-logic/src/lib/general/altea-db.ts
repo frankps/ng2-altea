@@ -29,7 +29,7 @@ export class AlteaDb {
         const orderClone = order.clone()
 
         delete orderClone['branch']
-        delete orderClone['contact']
+        //delete orderClone['contact']
 
         orderClone.lines?.forEach(l => {
 

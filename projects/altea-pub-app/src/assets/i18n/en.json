@@ -16,6 +16,7 @@
     "continue": "Doorgaan",
     "color": "Kleur",
     "create": "Maak",
+    "create-account": "Account maken",
     "communication": "Communicatie",
     "currency": "Munteenheid",
     "delete": "Verwijder",
@@ -32,12 +33,15 @@
     "duration": "Duurtijd",
     "durationMin": "Duurtijd in minuten",
     "hour": "uur",
+    "login": "Inloggen",
     "msgType": "Berichttype",
     "ok": "OK",
+    "passwd": "Paswoord",
     "phone": "Tel",
     "price": "Prijs",
     "qty": "Aantal",
     "reply": "Antwoorden",
+    "reset-password": "Wachtwoord opnieuw instellen",
     "timeUnit": "Tijdseenheid",
     "to": "Aan",
     "save": "Opslaan",
@@ -48,6 +52,13 @@
     "end": "einde"
   },
   "enums": {
+    "fb-auth": {
+      "auth/weak-password": "Paswoord moet minstens 6 karakters hebben",
+      "auth/missing-password": "Ontbrekend paswoord",
+      "auth/email-already-in-use": "Email reeds in gebruik, probeer in te loggen",
+      "auth/invalid-credential": "Ongeldig paswoord voor opgegeven email adres",
+      "auth/missing-email": "Email adres ontbreekt"
+    },
     "template-format": {
       "text": "Tekst",
       "html": "HTML"
@@ -584,6 +595,10 @@
   "app": {
     "menu": {
       "title": "[branch] menu",
+      "login": {
+        "h1": "Aanloggen",
+        "inf": "Beheer uw afspraken"
+      },
       "new-reserv": {
         "h1": "Nieuwe reservatie",
         "inf": "Maak een nieuwe reservatie"
@@ -594,7 +609,7 @@
       },
       "buy-gift": {
         "h1": "Cadeaubon kopen",
-        "inf": "Ik wil een ccadeaubon kopen"
+        "inf": "Ik wil een cadeaubon kopen"
       },
       "my-reservs": {
         "h1": "Mijn reservaties",
@@ -619,6 +634,10 @@
       "tasks": {
         "h1": "Taken",
         "inf": "Overzicht taken"
+      },
+      "logout": {
+        "h1": "Uitloggen",
+        "inf": "Beheer uw afspraken"
       }
     },
     "gift": {

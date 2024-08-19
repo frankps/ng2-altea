@@ -10,7 +10,7 @@
                     <div class="col">
                         <ngx-altea-label-control label="objects.contact.first" for="first">
                             <input required type="text" id="first" name="first" class="form-control"
-                                [(ngModel)]="contact.first">
+                                [(ngModel)]="contact.first" (change)="propertyChanged('first')">
                         </ngx-altea-label-control>
                     </div>
                 </div>
@@ -18,7 +18,7 @@
                     <div class="col">
                         <ngx-altea-label-control label="objects.contact.last" for="last">
                             <input required type="text" id="last" name="last" class="form-control"
-                                [(ngModel)]="contact.last">
+                                [(ngModel)]="contact.last" (change)="propertyChanged('last')">
                         </ngx-altea-label-control>
                     </div>
                 </div>
@@ -26,13 +26,13 @@
                     <div class="col">
                         <ngx-altea-label-control label="objects.contact.email" for="email">
                             <input required type="text" id="email" name="email" class="form-control"
-                                [(ngModel)]="contact.email">
+                                [(ngModel)]="contact.email" (change)="propertyChanged('email')">
                         </ngx-altea-label-control>
                     </div>
                 </div>
 
 
-                <int-phone-edit [(phone)]="contact.mobile" (phoneChange)="formChanged('contact')"></int-phone-edit>
+                <int-phone-edit [(phone)]="contact.mobile" (phoneChange)="phoneChanged()"></int-phone-edit>
 
 
                 <!-- Allowed message types  -->

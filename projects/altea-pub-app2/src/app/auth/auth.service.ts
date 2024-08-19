@@ -35,8 +35,8 @@ export class AuthLocalStorage {
   providedIn: 'root'
 })
 export class AuthService {
-  auth: Auth = inject(Auth);
-  authState$ = authState(this.auth);
+  auth: Auth = inject(Auth)
+  authState$ = authState(this.auth)
 
   fbUser$ = user(this.auth);
   fbUser
@@ -169,7 +169,7 @@ export class AuthService {
           if (this.redirect) {
             this.router.navigate(this.redirect)
             this.redirect = null
-            
+
           } else {
 
 

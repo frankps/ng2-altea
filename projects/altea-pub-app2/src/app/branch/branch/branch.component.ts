@@ -13,7 +13,7 @@ import { AuthService } from '../../auth/auth.service';
   styleUrls: ['./branch.component.scss']
 })
 export class BranchComponent implements OnInit {
-  auth: Auth = inject(Auth);
+  auth: Auth = inject(Auth)
 
   branch: Branch
 

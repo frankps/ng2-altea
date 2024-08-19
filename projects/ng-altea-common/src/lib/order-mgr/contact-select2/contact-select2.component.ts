@@ -17,6 +17,8 @@ export class ContactSelect2Component implements OnInit {
 
   _contact: Contact = new Contact()
 
+  /** a user (email/password) can be created at the same time */
+  @Input() createUser = false
 
   @Input() set contact(value: Contact) {
 
@@ -84,6 +86,11 @@ export class ContactSelect2Component implements OnInit {
     this.initialized = true
   }
 
+  phoneChanged() {
+    this.formChanged('contact')
+    this.propertyChanged('mobile')
+  }
+
   formChanged(sectionId: string) {
 
     console.log(`Form changed: ${sectionId}`)
@@ -95,6 +102,17 @@ export class ContactSelect2Component implements OnInit {
         break
 
     }
+  }
+
+  propertyChanged(property: string, event?: any) {
+
+    if (property)
+      this._contact.m.setDirty(property)
+
+    if (property == 'first' || property == 'last') {
+      this._contact.setName()
+    }
+
   }
 
 

@@ -15,14 +15,16 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { Bootstrap5Module } from 'ng-common';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
-import { ClipboardModule } from '@angular/cdk/clipboard'
+import { ClipboardModule } from '@angular/cdk/clipboard';
+import { EmailPasswdComponent } from './email-passwd/email-passwd.component'
 
 @NgModule({
   declarations: [
     SignInComponent,
     SignOutComponent,
     ContactComponent,
-    UserComponent
+    UserComponent,
+    EmailPasswdComponent
   ],
   imports: [
     CommonModule,
@@ -40,7 +42,8 @@ import { ClipboardModule } from '@angular/cdk/clipboard'
     
   ],
   exports: [
-    SignInComponent
+    SignInComponent,
+    EmailPasswdComponent
   ]
 })
 export class AuthModule { }

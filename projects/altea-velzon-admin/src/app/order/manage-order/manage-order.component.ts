@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrderMgrUiService, BrowseCatalogComponent } from 'ng-altea-common';
 import { DashboardService, NgBaseComponent } from 'ng-common';
@@ -25,7 +25,7 @@ export enum PosOrderMenuItem {
   templateUrl: './manage-order.component.html',
   styleUrls: ['./manage-order.component.scss'],
 })
-export class ManageOrderComponent extends NgBaseComponent {
+export class ManageOrderComponent extends NgBaseComponent implements OnInit {
 
   @ViewChild('editContact') public editContact: ContactSelect2Component;
 
@@ -54,7 +54,7 @@ export class ManageOrderComponent extends NgBaseComponent {
   constructor(protected route: ActivatedRoute, protected orderMgrSvc: OrderMgrUiService, protected dashboardSvc: DashboardService) {
     super()
 
-    this.route.params.subscribe(params => {
+    this.route.params.subscribe(async params => {
       if (params && params['id']) {
 
         console.error(params['id'])
@@ -62,15 +62,20 @@ export class ManageOrderComponent extends NgBaseComponent {
         const orderId = params['id']
 
         if (orderId)
-          this.orderMgrSvc.loadOrder(orderId)
+          await this.orderMgrSvc.loadOrder$(orderId)
       }
     })
-
+    
     this.dashboardSvc.showSearch = true
 
     this.dashboardSvc.search$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(searchString => {
       this.orderMgrSvc.searchProductsOld(searchString)
     })
+
+  }
+
+  async ngOnInit() {
+
 
   }
 

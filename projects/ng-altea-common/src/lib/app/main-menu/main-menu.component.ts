@@ -1,12 +1,10 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { TranslationService } from 'ng-common'
 import { SessionService } from '../../session.service';
-import { Branch } from 'ts-altea-model';
+import { Branch, MenuItem } from 'ts-altea-model';
 
 
-export class MenuItem {
-  constructor(public code: string) {}
-}
+
 
 @Component({
   selector: 'altea-lib-main-menu',

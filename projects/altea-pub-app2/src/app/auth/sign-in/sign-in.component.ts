@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { Auth, GoogleAuthProvider, signInWithRedirect, signInWithPopup, user, User, signOut, FacebookAuthProvider } from '@angular/fire/auth';
 import { Subscription, of } from 'rxjs';
-
+import { ActivatedRoute, Router } from '@angular/router';
 
 /**
  * https://github.com/angular/angularfire/blob/HEAD/docs/auth.md#authentication
@@ -21,6 +21,12 @@ export class SignInComponent implements OnInit {
   user
   idToken
 
+  provider: 'unknown' | 'google' | 'facebook' | 'email' = 'unknown'
+
+  constructor(protected router: Router) {
+
+  }
+
 
   ngOnInit() {
 
@@ -34,6 +40,12 @@ export class SignInComponent implements OnInit {
 
     return signOut(this.auth)
 
+
+  }
+
+  toDashboard() {
+
+    this.router.navigate(['branch', 'aqua', 'menu'])
 
   }
 
@@ -60,7 +72,9 @@ export class SignInComponent implements OnInit {
   }
 
 
-  async signIn(provider: 'google' | 'facebook') {
+  async signIn(provider: 'google' | 'facebook' | 'email') {
+
+    this.provider = provider
 
     let prov
 
@@ -73,6 +87,10 @@ export class SignInComponent implements OnInit {
       case 'facebook':
         prov = new FacebookAuthProvider()
         break
+
+      case 'email':
+        return null
+      
     }
 
 

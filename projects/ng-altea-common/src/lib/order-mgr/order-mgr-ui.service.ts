@@ -391,6 +391,7 @@ export class OrderMgrUiService {   // implements OnInit
     this.spinner.hide()
   }
 
+  /*
   loadOrder(orderId: string) {
 
     this.spinner.show()
@@ -418,6 +419,7 @@ export class OrderMgrUiService {   // implements OnInit
     })
 
   }
+    */
 
 
   async loadOrder$(orderId: string) : Promise<Order> {
@@ -440,6 +442,7 @@ export class OrderMgrUiService {   // implements OnInit
     this.orderLine = null
     this.resources = order.getResources()
     this.orderDirty = false
+
 
     this.spinner.hide()
 
