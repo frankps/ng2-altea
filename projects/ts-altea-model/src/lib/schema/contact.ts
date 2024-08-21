@@ -17,6 +17,9 @@ import { CancelOrderMessage } from "ts-altea-logic";
  */
 export class UserBase extends ObjectWithIdPlus {
 
+  first?: string
+  last?: string
+
   /** Allowed messaging for communication (valid strings: see enum MsgTyp) */
   msg: string[] = ['email', 'wa', 'sms']
 
@@ -51,9 +54,24 @@ export class UserBase extends ObjectWithIdPlus {
         this.m.setDirty('msg')
       }
     }
+  }
 
+  getName(): string {
+    let components = []
 
+    if (this.first) {
+      this.first = sc.capitalcase(this.first)
+      components.push(this.first)
+    }
 
+    if (this.last) {
+      this.last = sc.capitalcase(this.last)
+      components.push(this.last)
+    }
+
+    const name = components.join(' ')
+
+    return name
 
   }
 
@@ -75,8 +93,7 @@ export class User extends UserBase {
   /** initial data received from provider (facebook, google) via Firebase */
   prvOrig?: any
 
-  first?: string
-  last?: string
+
 
   email?: string
   mobile?: string
@@ -137,8 +154,7 @@ export class Contact extends UserBase {
   @Type(() => Order)
   orders?: Order[];
   name?: string;
-  first?: string;
-  last?: string
+
 
   alert?: string
   remark?: string
@@ -231,24 +247,6 @@ export class Contact extends UserBase {
     this.m.setDirty('name')
   }
 
-  getName(): string {
-    let components = []
-
-    if (this.first) {
-      this.first = sc.capitalcase(this.first)
-      components.push(this.first)
-    }
-
-    if (this.last) {
-      this.last = sc.capitalcase(this.last)
-      components.push(this.last)
-    }
-
-    const name = components.join(' ')
-
-    return name
-
-  }
 
 
 }

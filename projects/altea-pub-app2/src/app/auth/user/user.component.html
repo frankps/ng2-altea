@@ -1,8 +1,18 @@
 
-
+<!-- 
 <span *ngIf="userForm">{{userForm.dirty}}</span>
+ -->
+
+
 
 <form #userForm="ngForm" *ngIf="user">
+
+    <div class="row my-3">
+        <div class="col">Welkom! Gelieve uw profiel te vervolledigen: </div>
+    </div>
+    
+
+
     <div class="row {{css_cls_row}}">
         <div class="col">
             <ngx-altea-label-control label="objects.contact.first" for="first">
@@ -43,16 +53,16 @@
             </div>
         </div>
     </div>
-
+    
     <div class="row {{css_cls_row}}">
         <div class="col">
             <div class="d-grid gap-2">
-                <button class="btn btn-primary" translate (click)="continue()"
-                    [disabled]="!mobileValid() || !userForm.form.valid">dic.continue</button>
+                <button class="btn btn-primary" (click)="continue()"
+                    [disabled]="userForm.form.pristine || !mobileValid() || !userForm.form.valid">{{translationPaths.button | translate}}</button>
             </div>
         </div>
     </div>
-<!-- 
+<!-- dic.continue
     && !userForm.form.valid -->
 
 

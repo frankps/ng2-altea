@@ -43,7 +43,8 @@ import { EmailPasswdComponent } from './email-passwd/email-passwd.component'
   ],
   exports: [
     SignInComponent,
-    EmailPasswdComponent
+    EmailPasswdComponent,
+    UserComponent
   ]
 })
 export class AuthModule { }

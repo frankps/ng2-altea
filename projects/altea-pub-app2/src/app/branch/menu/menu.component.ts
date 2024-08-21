@@ -43,7 +43,7 @@ export class MenuComponent {
         break
 
       case 'logout':
-        return signOut(this.auth)
+        await this.authSvc.logout()
         break
 
 

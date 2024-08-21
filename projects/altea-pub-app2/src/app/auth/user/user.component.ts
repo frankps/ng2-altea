@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, Input } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { TranslationService } from 'ng-common';
 import { Country, MsgType, User } from 'ts-altea-model';
@@ -9,6 +9,7 @@ import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import { retry } from 'rxjs';
 import { IntPhoneEditComponent } from 'ng-common';
 import { Router } from '@angular/router';
+import { NgxSpinnerService } from "ngx-spinner"
 
 @Component({
   selector: 'app-user',
@@ -16,6 +17,10 @@ import { Router } from '@angular/router';
   styleUrls: ['./user.component.scss']
 })
 export class UserComponent {
+
+  @Input() linkUserToContact = true
+
+  redirect: string[]
 
   user: User
 
@@ -31,7 +36,15 @@ export class UserComponent {
   country: Translation[] = []
   msgTypes: Translation[] = []
 
-  constructor(protected router: Router, protected authSvc: AuthService, protected translationSvc: TranslationService, protected userSvc: UserService) {
+  translationPaths = {
+    button: 'dic.continue'
+  }
+
+  // translationPaths.button
+
+  constructor(protected router: Router, protected authSvc: AuthService, protected translationSvc: TranslationService, protected userSvc: UserService,
+    protected spinner: NgxSpinnerService
+  ) {
 
   }
 
@@ -44,7 +57,11 @@ export class UserComponent {
 
     //this.user = this.authSvc.user
 
-    await this.loadTestUser()
+    // await this.loadTestUser()
+
+
+
+    this.user = this.authSvc.user
 
     console.warn(this.user)
 
@@ -52,10 +69,17 @@ export class UserComponent {
     await this.translationSvc.translateEnum(MsgType, 'enums.msg-type.', this.msgTypes)
 
     this.initialized = true
+    this.translationPaths.button = 'msg.save'
+
+    if (this.linkUserToContact) {
+
+    }
+
+    // console.warn(this.linkUserToContact)
   }
 
   mobileChanged() {
-   // this.formChanged('user')
+    // this.formChanged('user')
     this.userForm.form.markAsDirty()
   }
 
@@ -76,8 +100,8 @@ export class UserComponent {
 
   selectMsgType(msgType: any, selected: boolean) {
     this.user.selectMsgType(msgType, selected)
-   // this.userForm.controls[msgType].markAsDirty()
-   this.userForm.form.markAsDirty()
+    // this.userForm.controls[msgType].markAsDirty()
+    this.userForm.form.markAsDirty()
   }
 
   canSelectMsgType(msgType: any) {
@@ -103,28 +127,35 @@ export class UserComponent {
   async continue() {
 
     if (this.userForm.form.dirty) {
+
+      this.spinner.show()
+
+
       console.warn(this.user)
       const res = await this.userSvc.update$(this.user)
       console.warn(res)
-  
+
       console.log(res)
-  
+
       if (res.isOk) {
         await this.authSvc.refreshUser(this.user)
-        
+
+        this.spinner.hide()
       }
     }
 
-    this.router.navigate(['/branch', 'aqua', 'user-contact'])
+
+    if (this.linkUserToContact) 
+      this.router.navigate(['/branch', 'aqua', 'user-contact'])
   }
 
 
-  mobileValid() : boolean {
+  mobileValid(): boolean {
 
     if (!this.user || !this.user.mobile)
       return false
 
-    const valid = this.intPhone?this.intPhone.isValid():false
+    const valid = this.intPhone ? this.intPhone.isValid() : false
 
     return valid
 

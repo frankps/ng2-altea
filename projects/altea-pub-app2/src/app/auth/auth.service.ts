@@ -39,10 +39,12 @@ export class AuthService {
   authState$ = authState(this.auth)
 
   fbUser$ = user(this.auth);
-  fbUser
+  fbUser = undefined
 
-  user: altea.User
-  userId: string
+  user: altea.User = undefined
+  userId: string = undefined
+
+
 
   /**
    *  if user is also a human resource
@@ -89,27 +91,28 @@ export class AuthService {
 
   loggedOn(): boolean {
 
-    return (this.fbUser != null && this.fbUser != undefined)
+    return (this.fbUser != null && this.fbUser != undefined && this.user != undefined)
   }
 
   init() {
 
+    const me = this
     // https://github.com/angular/angularfire/blob/HEAD/docs/auth.md#authentication
 
-    this.authStateSubscription = this.authState$.subscribe(async (firebaseUser: User | null) => {
+    me.authStateSubscription = me.authState$.subscribe(async (firebaseUser: User | null) => {
       //handle auth state changes here. Note, that user will be null if there is no currently logged in user.
       console.error('authState$ CHANGES')
       console.log(firebaseUser);
 
-      this.fbUser = firebaseUser
+      me.fbUser = firebaseUser
 
       if (firebaseUser == null)
-        this.clearUserData()
+        me.clearUserData()
 
       if (firebaseUser) {
 
         let newUser = false
-        this.spinner.show()
+        me.spinner.show()
 
         /*         try {
                   
@@ -128,36 +131,36 @@ export class AuthService {
             console.log('retrieved from cache!', cachedAuthInfo)
 
 
-            this.user = cachedAuthInfo.user
-            this.resource = cachedAuthInfo.resource
+            me.user = cachedAuthInfo.user
+            me.resource = cachedAuthInfo.resource
 
 
           } else {
-            this.user = await this.userSvc.getByUid(firebaseUser.uid)
+            me.user = await me.userSvc.getByUid(firebaseUser.uid)
 
-            if (!this.user) newUser = true
+            if (!me.user) newUser = true
 
 
             if (newUser) {
-              this.user = await this.createUser$(firebaseUser)
+              me.user = await me.createUser$(firebaseUser)
               console.log('User NOT found!')
-              console.warn(this.user)
+              console.warn(me.user)
             } else {
               console.log('User found!')
-              console.warn(this.user)
+              console.warn(me.user)
             }
 
-            this.resource = await this.getResource(this.user.id)
+            me.resource = await me.getResource(me.user.id)
 
-            let cachedAuthInfo = new AuthLocalStorage(this.user, this.resource)
+            let cachedAuthInfo = new AuthLocalStorage(me.user, me.resource)
             localStorage.setItem(storageKey, JSON.stringify(cachedAuthInfo))
 
           }
 
-          this.userId = this.user.id
-          this.setResourceData(this.resource)
+          me.userId = me.user.id
+          me.setResourceData(me.resource)
 
-          const authLocalStorage = new AuthLocalStorage(this.user, this.resource)
+          const authLocalStorage = new AuthLocalStorage(me.user, me.resource)
 
 
           console.error('forwarding user!')
@@ -166,17 +169,17 @@ export class AuthService {
           // to test
           //this.router.navigate(['/auth', 'profile'])
 
-          if (this.redirect) {
-            this.router.navigate(this.redirect)
-            this.redirect = null
+          if (me.redirect) {
+            me.router.navigate(me.redirect)
+            me.redirect = null
 
           } else {
 
 
-            if (newUser)
-              this.router.navigate(['/auth', 'profile'])
+            if (newUser || !me.user.first)
+              me.router.navigate(['/auth', 'profile'])
             else
-              this.router.navigate(['branch', 'aqua', 'menu'])
+              me.router.navigate(['branch', 'aqua', 'menu'])
 
 
           }
@@ -186,7 +189,7 @@ export class AuthService {
 
         } finally {
 
-          this.spinner.hide()
+          me.spinner.hide()
 
         }
 

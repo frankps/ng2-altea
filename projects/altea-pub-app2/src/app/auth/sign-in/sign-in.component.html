@@ -16,11 +16,25 @@
     </ng-container>
     <ng-container *ngSwitchDefault>
 
+        <div class="row mt-5">
+            <div class="col mx-5 d-flex justify-content-center">
 
-        <div class="mt-5">
+                Gelieve aan te loggen of eenvoudig & snel een account te maken om uw reservatie of bestelling af te werken.
+            
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col mx-5 d-flex justify-content-center">
+                <small>Door nu aan te loggen, kan u later uw reservatie verder beheren.</small>
+            </div>
+
+        </div>
+
+        <div class="row mt-5">
 
             <div class="col mx-5 d-grid">
-                <button type="button" class="btn btn-primary" translate (click)="toDashboard()">Dashboard</button>
+                <button type="button" *ngIf="dashboardLink" class="btn btn-primary" translate (click)="toDashboard()">Dashboard</button>
 
                 <button type="button" class="btn btn-outline-primary mt-2"
                     (click)="signIn('facebook')">Facebook</button>
@@ -30,6 +44,7 @@
 
                 <button type="button" class="btn btn-outline-primary mt-2" (click)="signIn('email')">Email</button>
 
+                <button type="button" class="btn btn-outline-primary mt-2" (click)="clearCache()">Clear cache</button>
             </div>
 
         </div>

@@ -1,13 +1,41 @@
-<ul class="list-group" *ngIf="contacts">
-    <li class="list-group-item" *ngFor="let contact of contacts">
-        {{contact.first}} {{contact.last}}<br>
 
-        <div class="row">
-            <div class="col-6" *ngIf="contact.email">Email: {{contact.email}}</div>
-            <div class="col-6" *ngIf="contact.mobile">Gsm: {{contact.mobile}}</div>
-        </div>
 
-        <button type="button" class="btn btn-primary btn-sm" (click)="linkContactToUser(contact)" translate>dic.add</button>
+<ng-container *ngIf="contactsFound">
 
-    </li>
-</ul>
+    <div class="row my-3">
+        <div class="col">Er werden reeds bestaande Aquansense profielen gevonden met (enkele van) uw gegevens, selecteer het beste profiel: </div>
+    </div>
+    
+    
+    <ul class="list-group">
+    
+        <li class="list-group-item" *ngFor="let contact of contacts">
+            {{contact.first}} {{contact.last}}<br>
+    
+            <div class="row">
+                <div class="col-6" *ngIf="contact.email">Email: {{contact.email}}</div>
+                <div class="col-6" *ngIf="contact.mobile">Gsm: {{contact.mobile}}</div>
+            </div>
+    
+            <button type="button" class="btn btn-primary btn-sm float-end" (click)="linkContactToUser(contact)">Gebruik dit profiel</button>
+    
+        </li>
+    
+    
+    </ul>
+
+    <div class="row my-3">
+        <div class="col">Indien u zich niet herkent in de bovenstaande profielen kan u een nieuw profiel aanmaken:</div>
+    </div>
+
+</ng-container>
+
+
+<div class="row my-3">
+    <div class="col d-flex justify-content-center">
+        <button type="button" class="btn btn-primary btn-sm float-end" (click)="createNewContactForUser()" translate>Maak nieuw profiel</button>
+    </div>
+</div>
+
+
+

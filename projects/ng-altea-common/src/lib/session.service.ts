@@ -1,7 +1,7 @@
 import { Injectable, OnInit } from '@angular/core';
 import { ScheduleService } from './data-services/sql/schedule.service';
 import { DbQuery, QueryOperator } from 'ts-common';
-import { AppMode, Branch, Resource } from 'ts-altea-model';
+import { AppMode, Branch, Contact, Resource } from 'ts-altea-model';
 import * as Rx from "rxjs";
 
 
@@ -47,6 +47,9 @@ export class SessionService implements OnInit {
 
   /** for internal use (POS): the current user working with the app */
   public humanResource: Resource
+
+  /** for consumer app: the contact matching to the currently logged on user (for current branch) */
+  public contact: Contact
 
   ngOnInit() {
 

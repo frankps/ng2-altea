@@ -1,7 +1,8 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, Input } from '@angular/core';
 import { Auth, GoogleAuthProvider, signInWithRedirect, signInWithPopup, user, User, signOut, FacebookAuthProvider } from '@angular/fire/auth';
 import { Subscription, of } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AuthService } from '../auth.service';
 
 /**
  * https://github.com/angular/angularfire/blob/HEAD/docs/auth.md#authentication
@@ -16,6 +17,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class SignInComponent implements OnInit {
   auth: Auth = inject(Auth);
 
+  @Input() dashboardLink = true
 
   googleAuth: GoogleAuthProvider
   user
@@ -23,7 +25,7 @@ export class SignInComponent implements OnInit {
 
   provider: 'unknown' | 'google' | 'facebook' | 'email' = 'unknown'
 
-  constructor(protected router: Router) {
+  constructor(protected router: Router, protected authSvc: AuthService) {
 
   }
 
@@ -35,6 +37,11 @@ export class SignInComponent implements OnInit {
     this.googleAuth = new GoogleAuthProvider()
 
   }
+
+  clearCache() {
+
+  }
+
 
   appSignOut() {
 

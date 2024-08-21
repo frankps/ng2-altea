@@ -1,20 +1,23 @@
 <ng-container *ngIf="orderMgrSvc.options">
 
     <div class="card">
-        <div class="card-header"><span translate>ui.order-mgr.select-time-slot.title</span> {{orderMgrSvc.availabilityRequestFromDate() | date:"dd/MM/yy" }}:</div>  
+        <div class="card-header"><span translate>ui.order-mgr.select-time-slot.title</span>
+            {{orderMgrSvc.availabilityRequestFromDate() | date:"dd/MM/yy" }}:</div>
         <!--  {{}} -->
         <div class="card-body">
 
             <span *ngIf="!orderMgrSvc.hasOptions()" translate>ui.order-mgr.select-time-slot.no-slots</span>
+            <h4>
+                <ng-container *ngIf="orderMgrSvc.hasOptions()">
+                    <ng-container *ngFor="let option of orderMgrSvc.options">
 
-            <ng-container *ngIf="orderMgrSvc.hasOptions()">
-                <ng-container *ngFor="let option of orderMgrSvc.options">
+                        <span class="badge bg-danger" (click)="selectTimeSlot(option)">{{option.date |
+                            date:"HH:mm"}}</span>
+                        &nbsp;
 
-                    <span class="badge bg-danger" (click)="selectTimeSlot(option)">{{option.date | date:"HH:mm"}}</span>
-                    &nbsp;
-
+                    </ng-container>
                 </ng-container>
-            </ng-container>
+            </h4>
 
 
         </div>
@@ -25,4 +28,4 @@
 <div class="d-grid mt-3">
     <button type="button" class="btn btn-outline-secondary float-end" (click)="selectOtherDate()"
         translate>ui.order-mgr.select-time-slot.other-date</button>
-</div>  
+</div>

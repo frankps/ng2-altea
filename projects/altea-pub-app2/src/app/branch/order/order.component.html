@@ -74,7 +74,7 @@
     <!-- app-sign-in  -->
     
     <ng-container *ngSwitchCase="'sign-in'">
-        <app-sign-in></app-sign-in>
+        <app-sign-in [dashboardLink]="false"></app-sign-in>
     </ng-container>
 
 
@@ -103,7 +103,8 @@
 </ng-container>
 
 
-
+<!--
 <order-mgr-debug-plannings *ngIf="orderMgrSvc.plannings" [plannings]="orderMgrSvc.plannings" ></order-mgr-debug-plannings>
 
 <order-mgr-debug-availability [response]="orderMgrSvc.availabilityResponse"></order-mgr-debug-availability>
+-->

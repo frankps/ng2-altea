@@ -99,21 +99,21 @@ export class RequestGiftComponent implements OnInit {
 
   }
 
-  buttonNext() {
+  async buttonNext() {
 
-    this.initGift(this.gift)
+    await this.initGift(this.gift)
 
     this.request.emit(this.gift)
     console.warn(this.gift)
   }
 
-  initGift(gift: Gift) {
+  async initGift(gift: Gift) {
 
     gift.newCode()
 
-    this.orderMgrSvc.newOrder(OrderUiMode.newGift,gift)
 
 
+    await this.orderMgrSvc.newOrder(OrderUiMode.newGift,gift)
 
     if (gift.type == GiftType.amount) {
 

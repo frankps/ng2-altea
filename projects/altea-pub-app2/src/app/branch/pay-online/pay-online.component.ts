@@ -45,34 +45,36 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
 
   async startPayment() {
 
+    let me = this
+
     console.warn('startPayment...')
 
     const stripe : any = new Stripe('pk_test_lTy1ovFLMXISWhS20E268osc');
-    const branch = await this.sessionSvc.branch$()
+    const branch = await me.sessionSvc.branch$()
   
 
-    let userInfo = await this.translationSvc.getTrans('app.stripe.gift')
+    let userInfo = await me.translationSvc.getTrans('app.stripe.gift')
 
-    let amount = this.orderMgrSvc.order.incl
+    let amount = me.orderMgrSvc.order.incl
 
-    console.log(this.orderMgrSvc.order)
+    console.log(me.orderMgrSvc.order)
 
     let returnUrl = `http://localhost:4300/branch/${branch.unique}/pay-finished?orderId=123&sessionId={CHECKOUT_SESSION_ID}`
 
     const createCheckout = CreateCheckoutSession.embedded(amount * 100, branch.cur, userInfo, returnUrl)
-    const apiResult = await this.stripeSvc.createCheckoutSession$(createCheckout)
+    const apiResult = await me.stripeSvc.createCheckoutSession$(createCheckout)
     
     console.error(apiResult)
   
     const clientSecret = apiResult.object.clientSecret
   
     
-    this.checkout = await stripe.initEmbeddedCheckout({
+    me.checkout = await stripe.initEmbeddedCheckout({
       clientSecret,
     });
   
     // Mount Checkout
-    this.checkout.mount('#checkout');
+    me.checkout.mount('#checkout');
 
   }
 

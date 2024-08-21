@@ -18,6 +18,7 @@ import { UserContactMatchComponent } from './user-contact-match/user-contact-mat
 import { MyOrdersComponent } from './my-orders/my-orders.component';
 import { TranslateModule } from '@ngx-translate/core';
 import { AuthModule } from '../auth/auth.module';
+import { ProfileComponent } from './profile/profile.component';
 
 @NgModule({
   declarations: [
@@ -32,7 +33,8 @@ import { AuthModule } from '../auth/auth.module';
     TaskComponent,
      MySubsComponent,
      UserContactMatchComponent,
-     MyOrdersComponent
+     MyOrdersComponent,
+     ProfileComponent
   ],
   imports: [
     CommonModule,

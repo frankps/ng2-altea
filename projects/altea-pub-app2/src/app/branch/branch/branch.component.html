@@ -46,7 +46,7 @@
             <button *ngIf="!authSvc.loggedOn()" type="button" class="btn btn-primary btn-sm float-end ms-1" translate
                 (click)="appSignIn()"><i class="fa-duotone fa-person-to-portal fa-lg"></i></button>
 
-            <button type="button" class="btn btn-primary btn-sm float-end ms-1" (click)="gotoProfile()"><i
+            <button type="button" class="btn btn-primary btn-sm float-end ms-1" (click)="gotoProfile()" *ngIf="authSvc.loggedOn()"><i
                     class="fa-duotone fa-user fa-lg"></i></button>
 
             <!--    <i class="fa-solid fa-bars"></i>   <i class="fa-duotone fa-user"></i>    -->

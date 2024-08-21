@@ -29,6 +29,8 @@ export enum OrderUiMode {
 })
 export class OrderMgrUiService {   // implements OnInit
 
+  tmp = ''
+
   //allCategories?: Product[] = []
 
   debug = true
@@ -842,22 +844,31 @@ export class OrderMgrUiService {   // implements OnInit
   async addOrderLine(orderLine: OrderLine, qty = 1, setUnitPrice = true) {
     // orderLine.orderId = this.order.id
 
+    const me = this
+
     // if this is a bundle, then we need to unpack the product (and add product.items individually)
-    if (orderLine.product.sub == ProductSubType.bundle) {
-      const orderLines = await this.addProduct(orderLine.product, orderLine.qty)
+    
+    if (orderLine?.product?.sub == ProductSubType.bundle) {
+      const orderLines = await me.addProduct(orderLine.product, orderLine.qty)
 
       if (ArrayHelper.NotEmpty(orderLines)) {
-        this.orderLine = orderLines[0]
+        me.orderLine = orderLines[0]
       }
 
       return
+    } else {
+      console.warn(me.order)
+
+      me.order.addLine(orderLine, setUnitPrice)
+      me.orderDirty = true
+      me.orderLineIsNew = false
+  
+      await me.calculateLoyalty()
     }
+      
+    this.tmp = 'aaaa'
 
-    this.order.addLine(orderLine, setUnitPrice)
-    this.orderDirty = true
-    this.orderLineIsNew = false
 
-    await this.calculateLoyalty()
   }
 
 

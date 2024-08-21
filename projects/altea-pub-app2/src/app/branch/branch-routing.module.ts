@@ -12,6 +12,7 @@ import { TaskComponent } from './task/task.component';
 import { MySubsComponent } from './my-subs/my-subs.component';
 import { UserContactMatchComponent } from './user-contact-match/user-contact-match.component';
 import { MyOrdersComponent } from './my-orders/my-orders.component';
+import { ProfileComponent } from './profile/profile.component';
 
 const routes: Routes = [{
   path: ':branch', component: BranchComponent,
@@ -27,6 +28,7 @@ const routes: Routes = [{
     { path: "my-subs", component: MySubsComponent },
     { path: "my-orders", component: MyOrdersComponent },
     { path: "task", component: TaskComponent },
+    { path: "profile", component: ProfileComponent },
     { path: "user-contact", component: UserContactMatchComponent },
   ]
 }]

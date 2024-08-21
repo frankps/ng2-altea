@@ -31,6 +31,10 @@
         {
             "filePath": "projects/ts-altea-model/src/lib/altea-schema-ui.ts",
             "group": "Default"
+        },
+        {
+            "filePath": "projects/ts-altea-model/src/lib/schema",
+            "group": "Default"
         }
     ]
 }
