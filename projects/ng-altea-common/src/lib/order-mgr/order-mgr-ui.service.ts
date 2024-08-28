@@ -527,6 +527,10 @@ export class OrderMgrUiService {   // implements OnInit
     return 0
   }
 
+
+  // 8552b3ae-d1fb-494c-9dd1-1425a809ab28
+
+
   async selectTimeSlot(option: ReservationOption): Promise<ConfirmOrderResponse> {
 
     console.warn(option)
@@ -544,6 +548,8 @@ export class OrderMgrUiService {   // implements OnInit
 
 
     const confirmOrderResponse = await this.alteaSvc.orderMgmtService.confirmOrder(this.order, option, solutionForOption)
+
+    console.warn(confirmOrderResponse)
 
     if (confirmOrderResponse?.order) {
 

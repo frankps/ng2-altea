@@ -127,6 +127,10 @@ export class User extends UserBase {
     const contact = new Contact()
     contact.first = this.first
     contact.last = this.last
+    contact.branchId = branchId
+
+    contact.setName()
+
     contact.userId = this.id
 
     contact.email = this.email

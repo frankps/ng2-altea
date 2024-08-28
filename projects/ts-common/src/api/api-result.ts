@@ -10,6 +10,8 @@ export class ApiResultBase {
   get isOk(): boolean {
     return this.status == ApiStatus.ok
   }
+
+
 }
 
 export class ApiMultiResult extends ApiResultBase {
@@ -44,7 +46,7 @@ export class ApiMultiResult extends ApiResultBase {
 
 }
 
-export class ApiResult<T> extends ApiResultBase {
+export class ApiResult<T = null> extends ApiResultBase {
 
   object: T
 
@@ -55,4 +57,14 @@ export class ApiResult<T> extends ApiResultBase {
     this.status = status
     this.message = message
   }
+
+  static error(message?: string) : ApiResult {
+
+    let res = new ApiResult(null, ApiStatus.error, message)
+
+    return res
+
+  }
+
+
 }

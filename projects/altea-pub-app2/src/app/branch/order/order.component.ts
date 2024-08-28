@@ -235,7 +235,12 @@ export class OrderComponent implements OnInit {
     //this.mode = 'select-date'
   }
 
-  contactSelected(contact: Contact) {
+  async contactSelected(contact: Contact) {
+
+    if (!contact)   // should not happen
+      return
+
+    await this.orderMgrSvc.saveOrder()
 
     this.gotoNextMode()
   }

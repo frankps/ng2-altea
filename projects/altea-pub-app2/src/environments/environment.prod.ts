@@ -11,4 +11,5 @@ export const environment = {
     measurementId: "G-2VD4P10F7W"
   },
   backend: 'https://dvit-477c9.uc.r.appspot.com',
+  app: 'http://localhost:4350'
 };

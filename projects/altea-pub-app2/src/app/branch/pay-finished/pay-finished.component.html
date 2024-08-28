@@ -1,1 +1,21 @@
-<p>pay-finished works!</p>
+
+
+
+<ng-container *ngIf="!sessionStatus">
+    Even geduld.... wij controleren de betaling... 
+</ng-container>
+
+
+<ng-container *ngIf="sessionStatus">
+
+
+    <ng-container *ngIf="allOk">
+        Wij hebben uw betaling goed ontvangen!
+    </ng-container>
+
+
+    <ng-container *ngIf="!allOk">
+        Er was een probleem met uw betaling.
+    </ng-container>
+
+</ng-container>

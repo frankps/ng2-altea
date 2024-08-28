@@ -157,7 +157,7 @@ export class OrderPerson extends ObjectWithId {
   export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  // 
   
     static defaultInclude = ['lines:orderBy=idx.product.items', 'contact', 'payments:orderBy=idx', 'planning']
-    static jsonProps = ['vatLines', 'persons', 'info', 'sum']
+    static jsonProps = ['vatLines', 'persons', 'info', 'sum', 'extIds']
   
     organisation?: Organisation;
     orgId?: string;
@@ -267,8 +267,10 @@ export class OrderPerson extends ObjectWithId {
   
     /** The device/location where app was created (needed for deposit handling) */
     src?: OrderSource = OrderSource.pos
-  
-  
+
+    /** external ids for this order (for instance: used for Stripe payment intends) */
+    //extIds?: string[] = []
+
     msgOnDate(): Date | null {
   
       if (this.msgOn && Number.isInteger(this.msgOn))

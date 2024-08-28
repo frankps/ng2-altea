@@ -1,14 +1,15 @@
 import { Component, ViewChild } from '@angular/core';
-import { Contact, SmsMessage, User } from 'ts-altea-model';
+import { Contact, Order, PaymentType, SmsMessage, User } from 'ts-altea-model';
 import { SearchContactComponent } from '../../contact/search-contact/search-contact.component';
-import { BranchService, ObjectService, ProductService, ResourceService, ScheduleService, TemplateService, UserService } from 'ng-altea-common';
-import { CheckDeposists } from 'ts-altea-logic';
+import { AlteaService, BranchService, ObjectService, ProductService, ResourceService, ScheduleService, TemplateService, UserService } from 'ng-altea-common';
+import { CheckDeposists, OrderMgmtService } from 'ts-altea-logic';
 import { TranslationService } from 'ng-common'
 import { Country } from 'ts-altea-model'
 import { DbQuery, ObjectHelper, QueryOperator, Translation } from 'ts-common';
 import { HttpClient } from '@angular/common/http';
 import * as dateFns from 'date-fns'
 import { MessagingService } from 'projects/ng-altea-common/src/lib/messaging.service';
+import { StripeService } from 'projects/ng-altea-common/src/lib/stripe.service';
 
 // Volgnummer;Uitvoeringsdatum;Valutadatum;Bedrag;Valuta rekening;Rekeningnummer;Type verrichting;Tegenpartij;Naam van de tegenpartij;
 // Mededeling;Details;Status;Reden van weigering
@@ -39,12 +40,32 @@ export class DemoComponent {
 
   constructor(private http: HttpClient, public dbSvc: ObjectService, protected translationSvc: TranslationService, protected backEndSvc: ObjectService
     , protected userSvc: UserService, protected resourceSvc: ResourceService, protected anySvc: ScheduleService, protected productSvc: ProductService,
-    protected messagingSvc: MessagingService) {
-
-
+    protected messagingSvc: MessagingService, protected stripeSvc: StripeService) {
 
   }
 
+  async orderPay() {
+
+    const orderMgmtSvc = new OrderMgmtService(this.dbSvc)
+
+    var res = await orderMgmtSvc.addPaymentToOrder('0100523b-0ca9-44f4-932f-ecfcbeb3a1aa', PaymentType.stripe, 50)
+
+    console.warn(res)
+
+    //var alteaSvc = new AlteaService(this)
+
+   // var res = this.dbSvc
+
+  }
+
+
+  async stripeWebhook() {
+    const order = new Order()
+
+    var res = await this.stripeSvc.webhookTest(order)
+
+    console.warn('stripeWebhook', res)
+  }
 
 
   differenceInWeeks() {

@@ -58,9 +58,10 @@ export class AuthService {
   userSubscription: Subscription;
   authStateSubscription: Subscription;
 
+  redirectEnabled = true
   redirect: string[] = null
 
-  constructor(protected router: Router, protected userSvc: UserService, protected resourceSvc: ResourceService, protected spinner: NgxSpinnerService) {
+  constructor(protected router: Router, protected route: ActivatedRoute, protected userSvc: UserService, protected resourceSvc: ResourceService, protected spinner: NgxSpinnerService) {
 
   }
 
@@ -169,20 +170,25 @@ export class AuthService {
           // to test
           //this.router.navigate(['/auth', 'profile'])
 
-          if (me.redirect) {
-            me.router.navigate(me.redirect)
-            me.redirect = null
+          console.error(this.route)
 
-          } else {
-
-
-            if (newUser || !me.user.first)
-              me.router.navigate(['/auth', 'profile'])
-            else
-              me.router.navigate(['branch', 'aqua', 'menu'])
-
-
+          if (me.redirectEnabled) {
+            if (me.redirect) {
+              me.router.navigate(me.redirect)
+              me.redirect = null
+  
+            } else {
+  
+  
+              if (newUser || !me.user.first)
+                me.router.navigate(['/auth', 'profile'])
+              else
+                me.router.navigate(['branch', 'aqua', 'menu'])
+  
+  
+            }
           }
+
 
 
           // this.router.navigate(['staff', 'dashboard'])
@@ -214,8 +220,6 @@ export class AuthService {
 
     let cachedAuthInfo = new AuthLocalStorage(this.user, this.resource)
     localStorage.setItem(storageKey, JSON.stringify(cachedAuthInfo))
-
-
   }
 
 
@@ -247,8 +251,8 @@ export class AuthService {
 
           user.prv = provInfo
 
-          /*           user.provEmail = providerData.email
-                    user.provId = providerData.uid */
+          /* user.provEmail = providerData.email
+              user.provId = providerData.uid */
 
           user.email = providerData.email
 

@@ -67,15 +67,18 @@
 
     </ng-container>
 
+    <ng-container *ngSwitchCase="'sign-in'">
+        <app-sign-in [dashboardLink]="false"></app-sign-in>
+    </ng-container>
+
+
+
     <ng-container *ngSwitchCase="'contact-select'">
         <order-mgr-contact-select2 [contact]="contact" (selected)="contactSelected($event)"></order-mgr-contact-select2>
     </ng-container>
 
     <!-- app-sign-in  -->
     
-    <ng-container *ngSwitchCase="'sign-in'">
-        <app-sign-in [dashboardLink]="false"></app-sign-in>
-    </ng-container>
 
 
     <ng-container *ngSwitchCase="'pay-online'">

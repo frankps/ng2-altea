@@ -1,4 +1,46 @@
+<ng-container [ngSwitch]="mode">
 
-<div id="checkout">
-    <!-- Checkout will insert the payment form here -->
-</div>
+    <ng-container *ngSwitchCase="'SelectOption'">
+
+        <ng-container *ngIf="payOptions">
+
+            
+            Om uw reservatie/bestelling te bevestigen heeft u de keuze uit devolgende betalingen:
+
+
+            <div class="row my-3" *ngFor="let option of payOptions">
+                <!-- <div class="col-12" *ngIf="option.info">{{option.info}}</div> 
+                d-grid gap-2 d-md-block 
+                -->
+
+                <div class="col-12 d-flex justify-content-center">
+
+                    <button class="btn btn-primary" type="button" style="width: 250px;"
+                        (click)="selectPayOption(option)">{{option.cta}}</button>
+
+                </div>
+            </div>
+
+
+        </ng-container>
+
+
+
+
+
+
+    </ng-container>
+
+
+    <ng-container *ngSwitchCase="'PayOnline'">
+
+
+        <div id="checkout">
+            <!-- Checkout will insert the payment form here -->
+        </div>
+
+
+    </ng-container>
+
+
+</ng-container>

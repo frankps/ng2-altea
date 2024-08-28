@@ -2,6 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { OrderMgrUiService, OrderUiMode } from 'ng-altea-common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { StripeService } from 'projects/ng-altea-common/src/lib/stripe.service';
+import { AuthService } from '../../auth/auth.service';
+import { StripeSessionStatus } from 'ts-altea-model';
+import { NgxSpinnerService } from "ngx-spinner"
+
 
 export class PayFinishedParams {
   orderId?: string
@@ -15,13 +19,19 @@ export class PayFinishedParams {
 })
 export class PayFinishedComponent implements OnInit {
 
-  constructor(protected orderMgrSvc: OrderMgrUiService, protected route: ActivatedRoute, protected stripeSvc: StripeService) {
+  sessionStatus: StripeSessionStatus
+  allOk = false
+
+  constructor(protected orderMgrSvc: OrderMgrUiService, protected route: ActivatedRoute, protected stripeSvc: StripeService, protected authSvc: AuthService, protected spinner: NgxSpinnerService) {
 
     console.error('PayFinishedComponent')
 
   }
 
   async ngOnInit() {
+
+
+    this.authSvc.redirectEnabled = false
 
     console.error('ngOnInit')
     console.error(this.orderMgrSvc.order)
@@ -46,11 +56,35 @@ export class PayFinishedComponent implements OnInit {
       return
     }
 
-    const sessionStatus = await this.stripeSvc.sessionStatus(queryParams.sessionId)
+    this.spinner.show()
+
+    const res = await this.stripeSvc.sessionStatus(queryParams.sessionId)
+
+    const sessionStatus = res.object
+    
 
     console.error(sessionStatus)
 
+    this.spinner.hide()
+
+    if (sessionStatus) {
+
+      if (sessionStatus.status == 'complete' && sessionStatus.paymentStatus == 'paid') {
+
+        this.allOk = true
+
+      }
+
+      this.sessionStatus = sessionStatus
+
+    }
+
+
+
+    console.warn(this.orderMgrSvc.order)
 
   }
+
+
 
 }

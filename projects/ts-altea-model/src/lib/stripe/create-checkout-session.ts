@@ -12,6 +12,14 @@ export class CreateCheckoutSession {
 
     public methodTypes: any[] = ['card', 'bancontact']
 
+    /** Customer email */ 
+    public email: string
+
+    /** Customer name */ 
+    public name: string
+
+    public orderId: string
+
     constructor(public amount: number, public currency: string, public description, public embedded = true) {
     }
 

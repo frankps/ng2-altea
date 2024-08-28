@@ -1,5 +1,7 @@
 
 
+
+
 Serve:
 
     ng serve altea-velzon-admin
@@ -35,6 +37,8 @@ Deploy:
     Project Console: https://console.firebase.google.com/project/altea-24/overview
     Hosting URL: https://altea-velzon-admin.web.app
 
+8f24c61f-3c64-4071-8968-b92dbf17da00
+
 
 
 Dev:
@@ -50,7 +54,7 @@ Test:
 
     Visa    4242424242424242
 
-
+Stripe test numbers: https://docs.stripe.com/testing
 
 New firestore service:
     ng generate service data-services/firestore/orderFirestore --project=ng-altea-common
@@ -172,3 +176,9 @@ ng generate component local/dialogflow --project=altea-velzon-admin
 ng generate component local/doorAccess --project=altea-velzon-admin
 
 ng generate service local --project=ng-altea-common
+
+
+
+
+
+2911ef86-e3db-4033-9817-c898065673a9

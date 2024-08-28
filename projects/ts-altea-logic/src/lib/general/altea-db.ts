@@ -99,6 +99,18 @@ export class AlteaDb {
         return templates
     }
 
+    async getOrder(orderId: string, ...includes: string[]): Promise<Order> {
+
+        const qry = new DbQueryTyped<Order>('order', Order)
+
+        qry.include('payments', ...includes)
+
+        qry.and('id', QueryOperator.equals, orderId)
+
+        const order = await this.db.queryFirst$(qry)
+
+        return order
+    }
 
     async getOrdersDepositTimeOut(date: Date = new Date()) {
         const qry = new DbQueryTyped<Order>('order', Order)
@@ -615,9 +627,9 @@ export class AlteaDb {
             } else {
                 const qry = new DbQueryBaseTyped<ResourcePlanning>('resourcePlanning', ResourcePlanning)
                 qry.and('orderId', QueryOperator.equals, orderId)
-    
+
                 const res = await this.db.deleteMany$(qry)
-    
+
                 console.log(res)
 
             }

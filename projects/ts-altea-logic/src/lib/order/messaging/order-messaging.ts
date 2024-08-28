@@ -124,10 +124,13 @@ export class OrderMessaging extends OrderMessagingBase {
 
     async confirmationMessaging(order: Order): Promise<ApiResult<Order>> {
 
+        /*
         if (order.deposit == 0 || order.paid >= order.deposit)
             return new ApiResult<Order>(order, ApiStatus.error, 'No deposit needed or deposit already paid!')
 
         order.contact.selectMsgType
+*/
+
 
         return new ApiResult<Order>(order, ApiStatus.ok)
     }

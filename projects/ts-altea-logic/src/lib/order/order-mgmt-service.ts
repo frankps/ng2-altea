@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
-import { Order, Gift, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, ConfirmOrderResponse, OrderSource, TemplateCode, OrderCancel, OrderCancelBy, CustomerCancelReasons } from 'ts-altea-model'
+import { Order, Gift, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, ConfirmOrderResponse, OrderSource, TemplateCode, OrderCancel, OrderCancelBy, CustomerCancelReasons, PaymentType, Payment } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { AlteaDb } from '../general/altea-db'
 import { IDb } from '../interfaces/i-db'
@@ -33,6 +33,34 @@ export class OrderMgmtService {
             this.alteaDb = db
         else
             this.alteaDb = new AlteaDb(db)
+    }
+
+    async addPaymentToOrder(orderId: string, type: PaymentType, amount: number, provId?: string): Promise<ApiResult<Order>> {
+
+        const order = await this.alteaDb.getOrder(orderId, 'payments')
+
+        if (!order) {
+            const msg = `Order not found: ${orderId}: can't add payment!`
+            console.error(msg)
+            return ApiResult.error(msg)
+        }
+
+        const payment = new Payment()
+        payment.type = type
+        payment.amount = amount
+        payment.provId = provId
+        payment.date = DateHelper.yyyyMMddhhmmss()
+
+        order.addPayment(payment)
+
+        const result = await this.alteaDb.saveOrder(order)
+
+        if (!result.isOk)
+            console.error(result.message)
+
+        this.changeState(order)
+
+        return result
     }
 
     /** set state to noDepositCancel */
@@ -91,9 +119,9 @@ export class OrderMgmtService {
 
                 for (let template of branchTemplates) {
 
-                  //  const msg = await this.taskHub.MessagingTasks.sendEmailMessage(template, order, branch, true)
+                    //  const msg = await this.taskHub.MessagingTasks.sendEmailMessage(template, order, branch, true)
 
-                  //  console.warn(msg)
+                    //  console.warn(msg)
 
                 }
 
@@ -101,7 +129,7 @@ export class OrderMgmtService {
 
                 order.state = OrderState.cancelled
                 order.m.setDirty('state')
-        
+
                 this.alteaDb.saveOrder(order)
 
             }
@@ -134,13 +162,43 @@ export class OrderMgmtService {
     }
 
 
+    determineOrderState(order: Order): OrderState | null {
+
+        if ([OrderState.creation, OrderState.created, OrderState.waitDeposit].indexOf(order.state) >= 0) {
+
+            if (order.paid >= order.deposit)
+                return OrderState.confirmed
+        }
+
+        return null
+    }
 
 
 
-    async changeState(order: Order, newState: OrderState): Promise<ApiResult<Order>> {  //  : Promise<ApiResult<Order>>
+    /**
+     * 
+     * @param order 
+     * @param newState the new state, if null, then we try to find new state (typically to set to confirmed after deposit was paid)
+     * @returns 
+     */
+    async changeState(order: Order, newState: OrderState | null = null): Promise<ApiResult<Order>> {  //  : Promise<ApiResult<Order>>
 
         const msgSvc = new OrderMessaging(this.alteaDb)
 
+        if (newState == null) {
+            newState = this.determineOrderState(order)
+
+
+            if (newState == null) {  // if still null (we ca't find new state)
+                const msg = `New order state not found!`
+                return new ApiResult<Order>(order, ApiStatus.error, msg)
+            }
+        }
+
+        if (order.state == newState) {
+            const msg = `Can't change state: order has already state '${newState}'`
+            return new ApiResult<Order>(order, ApiStatus.notProcessed, msg)
+        }
 
         order.state = newState
         order.m.setDirty('state')
@@ -159,8 +217,8 @@ export class OrderMgmtService {
 
                     await msgSvc.depositMessaging(order, true)
                     order.state = OrderState.waitDeposit
-                    order.m.setDirty('state')
-                
+                 
+
                 } else {
 
                     this.changeState(order, OrderState.confirmed)
@@ -176,8 +234,8 @@ export class OrderMgmtService {
             case OrderState.confirmed:
 
                 await msgSvc.confirmationMessaging(order)
-                order.state = OrderState.waitDeposit
-                order.m.setDirty('state')
+                
+                
                 break
 
 
@@ -230,7 +288,7 @@ export class OrderMgmtService {
 
         response.order = orderApiResult.object
 
-       // const planningResult = await this.alteaDb.saveResourcePlannings(response.plannings)
+        // const planningResult = await this.alteaDb.saveResourcePlannings(response.plannings)
 
         return response
 

@@ -14,7 +14,8 @@ export const environment = {
     appId: "1:75363142531:web:3019579db680c76a4bc4b6",
     measurementId: "G-2VD4P10F7W"
   },
-    backend: 'http://localhost:8080'
+  backend: 'http://localhost:8080',
+  app: 'http://localhost:4350'
 };
 
 /*

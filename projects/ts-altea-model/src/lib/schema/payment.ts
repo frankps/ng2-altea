@@ -59,6 +59,9 @@ export enum PaymentType {
     /** amount is declared */
     decl: boolean = false
   
+    /** provider id, if payment executed by external provider (example: Stripe payment intent id) */
+    provId: string
+
     constructor() {
       super()
   
