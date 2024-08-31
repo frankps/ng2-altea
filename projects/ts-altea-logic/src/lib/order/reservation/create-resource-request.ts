@@ -22,8 +22,6 @@ export class CreateResourceRequest {
 
     create(availabilityCtx: AvailabilityContext): ResourceRequest[] {
 
-
-
         console.error('CreateResourceRequest')
 
         const order = availabilityCtx.order

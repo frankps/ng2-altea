@@ -142,7 +142,9 @@ export class ManageProductService {
     await this.setRootPathName(product.type)
 
     const temp = []
-    temp.push(product)
+
+    if (product.isCategory())
+      temp.push(product)
 
     let cat = this.allCategories.find(c => c.id == product.catId)
     let count = 0

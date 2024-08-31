@@ -42,13 +42,19 @@ options:orderBy=idx.values:orderBy=idx
     return this.query(query).pipe(map(obj => obj.data ? obj.data : []))
   }
 
-  getCategories$(type?: ProductType, categoryId: string | null = null): Promise<Product[]> {
+  /**
+   * 
+   * @param type 
+   * @param categoryId if 'any', then we search categoryId independent
+   * @returns 
+   */
+  getCategories$(type?: ProductType, categoryId: 'any' | string | null = 'any'): Promise<Product[]> {
     const query = this.getCategoriesQuery(type, categoryId)
     return this.query$(query)
   }
 
 
-  getCategoriesQuery(type?: ProductType, categoryId: string | null = null): DbQuery {
+  getCategoriesQuery(type?: ProductType, categoryId: 'any' | string | null = null): DbQuery {
 
     const query = new DbQuery()
 
@@ -57,7 +63,10 @@ options:orderBy=idx.values:orderBy=idx
 
     query.and('sub', QueryOperator.equals, ProductSubType.cat)
     query.and('del', QueryOperator.equals, false)
-    query.and('catId', QueryOperator.equals, categoryId)
+
+    if (categoryId != 'any')
+      query.and('catId', QueryOperator.equals, categoryId)
+
     query.and('online', QueryOperator.not, OnlineMode.invisible)
     query.take = 200
     query.select('id', 'catId', 'name', 'type', 'sub')
@@ -66,9 +75,9 @@ options:orderBy=idx.values:orderBy=idx
   }
 
 
-  getProductsInCategoryQuery(categoryId: string | null = null) : DbQuery {
+  getProductsInCategoryQuery(categoryId: string | null = null): DbQuery {
     const query = new DbQuery()
-    
+
     query.and('del', QueryOperator.equals, false)
     query.and('catId', QueryOperator.equals, categoryId)
     query.and('online', QueryOperator.not, OnlineMode.invisible)
@@ -96,7 +105,7 @@ options:orderBy=idx.values:orderBy=idx
 
   // 'prices,options:orderBy=idx.values:orderBy=idx,items:orderBy=idx,resources:orderBy=idx.resource'
 
-  
+
   async getAllProductsForExport(): Promise<Product[]> {
 
     const query = new DbQuery()

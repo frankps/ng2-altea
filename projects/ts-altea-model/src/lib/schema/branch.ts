@@ -54,9 +54,44 @@ export class ReminderConfig {
 }
 
 
+/** if product orders can be picked up */
+export class ProdSalesPickup {
+    on: boolean = true
+
+    /** duration in minutes for the pickup of an order (in case staff needs to be booked upfront) */
+    dur: number = 10
+}
+
+export class ProdSalesShippingRate {
+    from: number = 0
+
+    cost: number = 8
+}
+
+/** if product orders can be shipped */
+export class ProdSalesShipping {
+    on: boolean = true
+
+    /** true if shipping is free of charge */
+    free: boolean = false
+
+    /** rates for shipping (specify cost as from order total) */
+    rates: ProdSalesShippingRate[] = [{ from: 0, cost: 8 }]
+}
+
+/** Configuration for product sales: shipping */
+export class ProdSalesConfig {  
+
+    pickup: ProdSalesPickup = new ProdSalesPickup()
+
+    ship: ProdSalesShipping = new ProdSalesShipping()
+
+}
+
+
 export class Branch extends ObjectWithIdPlus {
 
-    orders?: Order[];
+    orders?: Order[];  
 
     @Type(() => Number)
     idx = 0
@@ -115,6 +150,9 @@ export class Branch extends ObjectWithIdPlus {
 
     //  @Type(() => ReminderConfig)
     reminders?: ReminderConfig[]
+
+    /** configuration for product only orders (shipping, pickup, ...) */
+    prodSales?: ProdSalesConfig
 
     /** this branch uses the gift functionality */
     giftOn = false

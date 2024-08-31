@@ -47,10 +47,12 @@
                                                 <span
                                                     *ngFor="let val of option.values; let idx3 = index">{{val.name}}</span>
                                             </ng-container>
-
+<!-- 
                                             <ng-container *ngIf="!Array.isArray(option.values)">
                                                 {{<option value="" class="values"></option>.name}}
                                             </ng-container>
+ -->
+                                            
                                         </ng-container>
 
 
@@ -150,7 +152,7 @@
 
             <li *ngIf="sectionInEdit(ListSectionMode.readOnly)" class="list-group-item"
                 style="text-align: center; cursor: pointer;" (click)="startAdd()">
-                <i class="fa-duotone fa-circle-plus fa-xl"></i> &nbsp; {{ 'ui.product.edit.sections.options.add-btn' |
+                <i class="fa-duotone fa-circle-plus fa-xl"></i> &nbsp; {{ 'ui.product.edit.sections.items.add-btn' |
                 translate
                 }}
             </li>

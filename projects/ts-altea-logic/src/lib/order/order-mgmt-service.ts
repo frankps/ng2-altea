@@ -190,13 +190,15 @@ export class OrderMgmtService {
 
 
             if (newState == null) {  // if still null (we ca't find new state)
-                const msg = `New order state not found!`
+                const msg = `New order state not found for order ${order.id}!`
+                console.error(msg)
                 return new ApiResult<Order>(order, ApiStatus.error, msg)
             }
         }
 
         if (order.state == newState) {
             const msg = `Can't change state: order has already state '${newState}'`
+            console.warn(msg)
             return new ApiResult<Order>(order, ApiStatus.notProcessed, msg)
         }
 

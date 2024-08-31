@@ -141,6 +141,14 @@ export class OrderComponent implements OnInit {
 
     // this.mode = 'contact-select'
 
+    await this.collectUserInfo()
+
+
+  }
+
+
+  async collectUserInfo() {
+
     if (!this.authSvc.loggedOn()) {
 
       this.authSvc.redirect = ['branch', 'aqua', 'orderMode', 'continue-after-sign-in']
@@ -154,8 +162,8 @@ export class OrderComponent implements OnInit {
     }
 
 
-  }
 
+  }
 
 
   orderFinished() {
@@ -195,11 +203,13 @@ export class OrderComponent implements OnInit {
 
     let nexMode = 'pay-online'
 
+    const hasServices = order.hasServices()
+
     const needsPersonSelect = order.needsPersonSelect()
 
     console.warn('needsPersonSelect', needsPersonSelect)
 
-    if (currentIdx < personSelect && needsPersonSelect) {
+    if (needsPersonSelect && currentIdx < personSelect) {
       nexMode = 'person-select'
     }
     else if (currentIdx < selectDate && order.needsPlanning()) {

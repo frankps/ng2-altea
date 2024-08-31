@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { Product, ProductSubType, ProductType, ProductTypeIcons } from 'ts-altea-model'
 import { ApiListResult, DbQuery, QueryOperator, Translation, ApiResult, ApiStatus, ConnectTo } from 'ts-common'
 import { ProductService, SessionService } from 'ng-altea-common'
@@ -21,6 +21,8 @@ export class NewProductComponent implements OnInit {
 
   @ViewChild('productTypeModal') public selectTypeModal: NgTemplateOutlet | null = null
 
+  @Input() categoryId: string
+
   ProductTypeIcons = ProductTypeIcons
   ProductType = ProductType
   productTypes: Translation[] = []
@@ -42,6 +44,8 @@ export class NewProductComponent implements OnInit {
 
   async ngOnInit() {
     this.translationSvc.translateEnum(ProductType, 'enums.product-type.', this.productTypes)
+
+    console.warn('new product', this.newProduct)
   }
 
   isFolder() {
@@ -60,7 +64,7 @@ export class NewProductComponent implements OnInit {
   }
 
 
-  createProduct(modal: NgbActiveModal | null = null) {
+  async createProduct(modal: NgbActiveModal | null = null) {
 
     this.spinner.show()
 
@@ -69,6 +73,7 @@ export class NewProductComponent implements OnInit {
 
     this.newProduct.orgId = this.sessionSvc.orgId
     this.newProduct.branchId = this.sessionSvc.branchId
+    this.newProduct.catId = this.categoryId
 
     if (this.isFolder())
       this.newProduct.sub = ProductSubType.cat
@@ -76,31 +81,33 @@ export class NewProductComponent implements OnInit {
       this.newProduct.sub = ProductSubType.basic
 
 
-    this.productSvc.create(this.newProduct, this.sessionSvc.humanResource?.id).subscribe((res: ApiResult<Product>) => {
+    const res = await this.productSvc.create$(this.newProduct, this.sessionSvc.humanResource?.id)
 
-      console.log('Object saved')
-      console.error(res)
+    // .subscribe((res: ApiResult<Product>) => {
 
-      if (res.status != ApiStatus.ok) {
-        this.message = res.message.split('\n')[0]
-        this.step = -1
-      }
+    console.log('Object saved')
+    console.error(res)
 
-      if (res.status == ApiStatus.ok) {
-        if (modal)
-          modal.close()
+    if (res.status != ApiStatus.ok) {
+      this.message = res.message.split('\n')[0]
+      this.step = -1
+    }
 
-        console.error(this.router.getCurrentNavigation())
+    if (res.status == ApiStatus.ok) {
+      if (modal)
+        modal.close()
 
-        const url = `/aqua/catalog/${this.newProduct.type}/` + res.object.id
+      console.error(this.router.getCurrentNavigation())
 
-        console.error(url)
+      const url = `/aqua/catalog/${this.newProduct.type}/` + res.object.id
 
-        this.router.navigate([url])
-      }
+      console.error(url)
 
-      this.spinner.hide()
-    })
+      this.router.navigate([url])
+    }
+
+    this.spinner.hide()
+
 
   }
 

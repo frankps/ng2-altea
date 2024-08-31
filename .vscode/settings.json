@@ -35,6 +35,14 @@
         {
             "filePath": "projects/ts-altea-model/src/lib/schema",
             "group": "Default"
+        },
+        {
+            "filePath": "projects/ts-altea-logic/src/lib/order/order-mgmt-service.ts",
+            "group": "Default"
+        },
+        {
+            "filePath": "projects/ts-altea-logic/src/lib/order/messaging/order-messaging.ts",
+            "group": "Default"
         }
     ]
 }

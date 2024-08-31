@@ -77,6 +77,7 @@ export class DemoOrdersComponent implements OnInit {
   bodysculptor12x30 = "3667402e-2e5b-4655-b93e-a9e6955cbd4d"
   bodysculptorReveal30min = "578fd568-5560-473c-931b-1fb770ed85d6"
   veryGoodMorningId = "00ae379f-ea9b-4ab4-a41e-c7e70e6308de"
+  heltiBarId = "00ee102f-907e-4319-849b-ed115323f282"
 
   names = ['Wellness 2h/2p', 'Massage']
 
@@ -91,7 +92,8 @@ export class DemoOrdersComponent implements OnInit {
     ['Massage & Manicure', DemoOrder.new(this.massageId, 1).add(this.manicureId, 1)],  // .fromProducts(this.massageId, this.manicureId)
     ['BodySculptor 12x30min', DemoOrder.fromProducts(this.bodysculptor12x30)],
     ['BodySculptor Reveal 30min', DemoOrder.fromProducts(this.bodysculptorReveal30min)],
-    ['A very good morning', DemoOrder.fromProducts(this.veryGoodMorningId)]
+    ['A very good morning', DemoOrder.fromProducts(this.veryGoodMorningId)],
+    ['Heltitude products', DemoOrder.fromProducts(this.heltiBarId)]
     //  
   ]);
 

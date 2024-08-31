@@ -119,25 +119,14 @@ export class ProductListComponent extends NgBaseListComponent<Product> implement
 
     this.spinner.hide()
 
-    /*
-    var qry = new DbUpdateMany<any>()
 
-    qry.and('id', QueryOperator.in, this.selectedIds)
-
-    
-    qry.update = {
-      act: false,
-      del: true,
-      upd: new Date()
-    }
-
-    const res = this.productSvc.updateMany$(qry)
-*/
   }
 
   async startMoveSelected() {
 
     this.categories = await this.productSvc.getCategories$(this.productType)
+
+    console.warn(this.categories)
 
     this.categories = _.orderBy(this.categories, 'name')
     this.modalService.open(this.moveModal)
@@ -234,7 +223,7 @@ export class ProductListComponent extends NgBaseListComponent<Product> implement
     })
 
     if (this.route.firstChild) {
-      this.route.firstChild.params.subscribe(params => {
+      this.route.firstChild.params.subscribe(async params => {
 
         console.error('product-list PARAMS !!!')
         //console.error(this.route.firstChild.params._value)
@@ -243,12 +232,33 @@ export class ProductListComponent extends NgBaseListComponent<Product> implement
         if (params && params['id']) {
           this.currentId = params['id']
 
+          // NEW
+
+          const product = await this.productSvc.get$(this.currentId)
+
+          if (!product)
+            return
+
+          if (product.isCategory()) {
+            this.categoryId = product.id
+          } else {
+            this.categoryId = product.catId
+          }
+
+          this.getListObjects()
+
+
+          // OLD
+
+
           // this only works if categories already fetched
+          /*
           if (this.manageProductSvc.isCategory(this.currentId)) {
             this.categoryId = this.currentId
             this.getListObjects()
           }
-          // this.showProductsInCategory(this.currentId)
+            */
+         
         }
 
 
@@ -326,10 +336,12 @@ export class ProductListComponent extends NgBaseListComponent<Product> implement
 
   selectProduct(product: Product) {
 
+    console.warn('product selected', product)
+
     if (this.editMode)  // in edit mode we can only check the checkboxes
       return
 
-    if (product.isCategory) {
+    if (product.isCategory()) {
       //this.manageProductSvc.showPath(product.id)
       this.categoryId = product.id
       this.getListObjects()

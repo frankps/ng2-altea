@@ -396,6 +396,10 @@
             "title": "Voorschotten",
             "help": "Hier kan u een standaard voorschot percentage instellen. Dit percentage zal toegepast worden op alle orders. U kan dit percentage nog aanpassen per product of per klant. Op deze manier kan u bijvoorbeeld instellen dat sommige klanten geen voorschot hoeven te betalen ofwel alles moeten betalen."
           },
+          "prodSales": {
+            "title": "Productverkoop",
+            "help": "Instellingen mbt productverkoop: orders afhalen, verzendingen, ..."
+          },
           "reminders": {
             "title": "Herinneringen",
             "help": "Hier kan u instellen hoe (email,sms) en hoeveel tijd voorafgaand de reservatie herinneringen verstuurd worden."
@@ -559,6 +563,7 @@
           },
           "items": {
             "none": "Dit product heeft geen items",
+            "add-btn": "Product item toevoegen",
             "title": "Product items"
           },
           "resources": {
@@ -805,6 +810,20 @@
           "on": "Cadeaubonnen kunnen gefactureerd worden",
           "off": "Cadeaubonnen kunnen niet gefactureerd worden"
         }
+      },
+      "prodSales": {
+        "pickup": {
+          "on": "Producten kunnen afgehaald worden",
+          "dur": "Te reserveren duurtijd"
+        },
+        "ship": {
+          "on": "Producten kunnen verstuurd worden",
+          "free": "Producten versturen is altijd gratis",
+          "rates": {
+            "from": "Vanaf bedrag",
+            "cost": "Transportkost"
+          }
+        }
       }
     },
     "reminder": {
@@ -927,8 +946,8 @@
       "help": {
         "short": "Wordt getoond in product overzichten (menu's & zoekopdracheten) ",
         "customers": "Aantal klanten dat gelijktijdig wordt bediend",
-        "product-name": "De naam van het product",
-        "service-name": "De naam van de dienst",
+        "prod-name": "De naam van het product",
+        "svc-name": "De naam van de dienst",
         "duration": "Duurtijd v/d behandeling",
         "salesPrice": "",
         "online": "Wat kunnen de klanten online zien of doen?",
