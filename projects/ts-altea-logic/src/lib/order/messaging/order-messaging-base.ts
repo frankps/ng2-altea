@@ -17,7 +17,16 @@ export class OrderMessagingBase {
     }
 
 
-    async sendMessages(types: MsgType[], templateCode: TemplateCode, order: Order, branch: Branch, send: boolean = true) {
+    async sendMessages(templateCode: TemplateCode | string, order: Order, branch: Branch, send: boolean = true, ...types: MsgType[]) {
+
+        /** if types (email, sms, wa=WhatsApp) are not specified explicitly, then we use preferred contact message types */
+        if (ArrayHelper.IsEmpty(types)) {
+
+            types = order.contact.msg
+            /* console.warn(`No messages to send: types array is empty`)
+            return */
+        }
+
 
         if (ArrayHelper.IsEmpty(types)) {
             console.warn(`No messages to send: types array is empty`)

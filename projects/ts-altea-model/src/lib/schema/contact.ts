@@ -1,5 +1,5 @@
 
-import { Branch, DepositMode, Gender, Gift, Invoice, LoyaltyCard, Order, OrderLine, OrderType, Organisation, PlanningMode, Product, ProductResource, ProductType, ProviderInfo, Resource, ResourcePlanning, Schedule, Subscription } from "ts-altea-model";
+import { Branch, DepositMode, Gender, Gift, Invoice, LoyaltyCard, MsgType, Order, OrderLine, OrderType, Organisation, PlanningMode, Product, ProductResource, ProductType, ProviderInfo, Resource, ResourcePlanning, Schedule, Subscription } from "ts-altea-model";
 import { Exclude, Type, Transform } from "class-transformer";
 import 'reflect-metadata';
 import { ArrayHelper, ConnectTo, DateHelper, DbObjectCreate, IAsDbObject, ManagedObject, ObjectHelper, ObjectMgmt, ObjectReference, ObjectWithId, ObjectWithIdPlus, QueryOperator, TimeHelper } from 'ts-common'
@@ -20,8 +20,9 @@ export class UserBase extends ObjectWithIdPlus {
   first?: string
   last?: string
 
-  /** Allowed messaging for communication (valid strings: see enum MsgTyp) */
-  msg: string[] = ['email', 'wa', 'sms']
+  /** Allowed messaging for communication (valid strings: see enum MsgType) */
+  //msg: string[] = ['email', 'wa', 'sms']
+  msg: MsgType[] = [MsgType.email, MsgType.wa, MsgType.sms]
 
   /** Is the given message type selected? */
   msgTypeSelected(type: any): boolean {

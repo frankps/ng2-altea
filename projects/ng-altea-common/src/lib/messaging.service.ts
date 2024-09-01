@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, map, Subject, take } from "rxjs";
-import { Message, SmsMessage, WebPushToUsers, WhatsAppMessage } from 'ts-altea-model';
+import { Message, SmsMessage, WebPushToUsers, WhatsAppMessage, WhatsAppTemplate } from 'ts-altea-model';
 import { ApiListResult } from 'ts-common';
 import { SessionService } from './session.service';
 
@@ -52,6 +52,16 @@ export class MessagingService {
   async sendWhatsApp$(msg: WhatsAppMessage): Promise<any> {
 
     let res = await this.post$<any>(`${this.sessionSvc.backend}/messaging/sendWhatsApp`, msg)
+
+    return res
+
+  }
+
+  // sendWhatsAppTemplate
+
+  async sendWhatsAppTemplate$(tpl: WhatsAppTemplate): Promise<any> {
+
+    let res = await this.post$<any>(`${this.sessionSvc.backend}/messaging/sendWhatsAppTemplate`, tpl)
 
     return res
 

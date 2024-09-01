@@ -138,7 +138,7 @@ export class OrderMessaging extends OrderMessagingBase {
     async noDepositCancel(order: Order): Promise<ApiResult<Order>> {
 
         try {
-            const sendRes = await this.sendMessages([MsgType.email], TemplateCode.resv_no_deposit_cancel, order, order.branch, true)
+            const sendRes = await this.sendMessages(TemplateCode.resv_no_deposit_cancel, order, order.branch, true)
 
             order.clearMsgCode()
 
@@ -170,7 +170,7 @@ export class OrderMessaging extends OrderMessagingBase {
         if (isFirstDepositMessage)
             templateCode = TemplateCode.resv_wait_deposit
 
-        const sendRes = await this.sendMessages([MsgType.email], templateCode, order, branch, true)
+        const sendRes = await this.sendMessages(templateCode, order, branch, true)
 
         this.setNextDepositReminder(order)
 

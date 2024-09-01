@@ -34,7 +34,8 @@ import { ContactSelect2Component } from './contact-select2/contact-select2.compo
 import { DebugPlanningsComponent } from './debug-plannings/debug-plannings.component';
 import { CancelOrderComponent } from './cancel-order/cancel-order.component';
 import { LoyaltyComponent } from './loyalty/loyalty.component';
-import { ClipboardModule } from '@angular/cdk/clipboard'
+import { ClipboardModule } from '@angular/cdk/clipboard';
+import { DebugMessagingComponent } from './debug-messaging/debug-messaging.component'
 
 @NgModule({
   declarations: [
@@ -58,6 +59,7 @@ import { ClipboardModule } from '@angular/cdk/clipboard'
     DebugPlanningsComponent,
     CancelOrderComponent,
     LoyaltyComponent,
+    DebugMessagingComponent,
   ],
   imports: [
     CommonModule,
@@ -94,7 +96,8 @@ import { ClipboardModule } from '@angular/cdk/clipboard'
     SendOfferComponent,
     SearchContactComponent,
     DebugPlanningsComponent,
-    CancelOrderComponent
+    CancelOrderComponent,
+    DebugMessagingComponent
   ]
 })
 export class OrderMgrModule {}

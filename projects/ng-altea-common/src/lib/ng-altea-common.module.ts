@@ -11,6 +11,7 @@ import { OrderMgrModule } from './order-mgr/order-mgr.module';
 import { RequestInvoiceComponent } from './invoice/request-invoice/request-invoice.component';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { UserSelectComponent } from './pos/user-select/user-select.component';
+
 @NgModule({
   imports: [CommonModule,
   HttpClientModule,
@@ -32,7 +33,8 @@ import { UserSelectComponent } from './pos/user-select/user-select.component';
     RequestInvoiceComponent,
     MainMenuComponent,
     OrderMgrModule,
-    UserSelectComponent
+    UserSelectComponent,
+
   ]
 })
 export class NgAlteaCommonModule {}

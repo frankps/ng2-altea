@@ -37,6 +37,7 @@ export enum TemplateType {
   
   
   export enum TemplateCode {
+    
     resv_wait_deposit = 'resv_wait_deposit',
     resv_remind_deposit = 'resv_remind_deposit',
     resv_confirmation = 'resv_confirmation',

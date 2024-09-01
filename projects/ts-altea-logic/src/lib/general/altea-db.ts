@@ -169,7 +169,7 @@ export class AlteaDb {
         return templates
     }
 
-    async getTemplates(branchId: string, code: TemplateCode): Promise<Template[]> {
+    async getTemplates(branchId: string, code: TemplateCode | string): Promise<Template[]> {
 
         const qry = new DbQueryTyped<Template>('template', Template)
         qry.and('branchId', QueryOperator.equals, branchId)

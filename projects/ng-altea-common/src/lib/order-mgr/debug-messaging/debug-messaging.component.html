@@ -1,0 +1,43 @@
+<h3>Berichten testen</h3>
+
+<p *ngIf="!orderMgrUiSvc.order?.contact">
+    Maak eerst een order met een klant.
+</p>
+
+<div class="card" *ngIf="orderMgrUiSvc.order?.contact">
+    <div class="card-body">
+
+        <div class="row">
+            <div class="col-3">
+                Contact
+            </div>
+            <div class="col-3"></div>
+            <div class="col-3"></div>
+            <div class="col-3"></div>
+
+        </div>
+
+        <div class="row">
+            <div class="col-3">
+                <button type="button" class="btn btn-primary btn-sm"
+                    (click)="sendTemplate('resv_wait_deposit')">resv_wait_deposit</button>
+
+
+            </div>
+            <div class="col-3">
+                <button type="button" class="btn btn-primary btn-sm" (click)="testWhatsApp()">WhatsApp</button>
+
+
+            </div>
+            <div class="col-3">
+                <button type="button" class="btn btn-primary btn-sm" (click)="testWhatsAppTemplate()">WA Template</button>
+
+            </div>
+            <div class="col-3"></div>
+
+        </div>
+
+
+
+    </div>
+</div>

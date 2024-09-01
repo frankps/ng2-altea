@@ -161,11 +161,23 @@
 
         <order-mgr-order (orderLineSelected)="orderLineSelected($event)" (cancel)="cancelOrder($event)"></order-mgr-order>
 
-        <order-mgr-demo-orders></order-mgr-demo-orders>
 <!-- 
         <order-mgr-person-select></order-mgr-person-select> -->
     </div>
 </div>
+
+<div class="row">
+    <div class="col-8">
+
+        <order-mgr-debug-messaging></order-mgr-debug-messaging>
+    
+    </div>
+    <div class="col-4">
+
+        <order-mgr-demo-orders></order-mgr-demo-orders>
+    </div>
+</div>
+
 
 <order-mgr-debug-plannings *ngIf="orderMgrSvc.plannings" [plannings]="orderMgrSvc.plannings" ></order-mgr-debug-plannings>
 
