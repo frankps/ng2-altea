@@ -15,5 +15,8 @@ export * from './schedule'
 export * from './subscription'
 export * from './task'
 export * from './template'
+export * from './template-enums'
+export * from './text-parameter'
 //export * from './user'
 export * from './user-base'
+//export * from './object-with-parameters'   ++ can not be exported !!!

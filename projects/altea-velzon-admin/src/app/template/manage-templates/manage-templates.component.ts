@@ -1,8 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Template, TemplateAction, TemplateChannel, TemplateFormat, TemplateRecipient, TemplateType, orderTemplates } from 'ts-altea-model' //'../../../../../../libs/ts-altea-common/src';
+import { Template, TemplateAction, TemplateChannel, TemplateFormat, TemplateRecipient, TemplateType, WhatsAppTemplate, WhatsAppTemplateUpdate, orderTemplates } from 'ts-altea-model' //'../../../../../../libs/ts-altea-common/src';
 import { DashboardService, NgSectionsComponent, ToastType } from 'ng-common';
 import { ApiStatus, CollectionChangeTracker, DbQuery, QueryOperator } from 'ts-common'
-import { SessionService, TemplateService } from 'ng-altea-common'
+import { MessagingService, SessionService, TemplateService } from 'ng-altea-common'
 import * as _ from "lodash";
 import { NgxSpinnerService } from "ngx-spinner"
 import { ToastService } from '../../velzon/dashboard/dashboard/toast-service';
@@ -42,13 +42,17 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
 
   TemplateFormat = TemplateFormat
 
+  canExport = false
+
   //selectionProps = ['emailToProvider', 'msgToProvider', 'emailToClient', 'msgToClient']
+
+  channels = [TemplateChannel.email, TemplateChannel.wa]
 
   variants = [
     new TemplateVariant(TemplateChannel.email, TemplateRecipient.provider),
-    new TemplateVariant(TemplateChannel.sms, TemplateRecipient.provider),
+    new TemplateVariant(TemplateChannel.wa, TemplateRecipient.provider),
     new TemplateVariant(TemplateChannel.email, TemplateRecipient.client),
-    new TemplateVariant(TemplateChannel.sms, TemplateRecipient.client)
+    new TemplateVariant(TemplateChannel.wa, TemplateRecipient.client)
   ]
 
   selections: { [index: string]: TemplateTypeSelections } = {};
@@ -68,7 +72,8 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
 
 
   constructor(protected spinner: NgxSpinnerService, protected sessionSvc: SessionService, protected templateSvc: TemplateService
-    , protected dashboardSvc: DashboardService, public translationSvc: TranslationService, public toastService: ToastService) {
+    , protected dashboardSvc: DashboardService, public translationSvc: TranslationService, public toastService: ToastService,
+    private messagingSvc: MessagingService) {
     super()
 
 
@@ -126,7 +131,8 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
       if (!_.includes(this.templateCodes, template.code))
         continue
 
-      let channel = _.find(template.channels, channel => channel == TemplateChannel.email || channel == TemplateChannel.sms)
+      // channels
+      let channel = _.find(template.channels, channel => channel == TemplateChannel.email || channel == TemplateChannel.wa)
       let recipient = _.find(template.to, recipient => recipient == TemplateRecipient.provider || recipient == TemplateRecipient.client)
 
       if (!channel || !recipient)
@@ -148,6 +154,9 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
 
     const query = new DbQuery()
     query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
+    query.and('code', QueryOperator.in, orderTemplates)
+    query.and('act', QueryOperator.equals, true)
+
     query.orderBy('idx')
 
     this.templateSvc.query(query).subscribe(templates => {
@@ -187,12 +196,15 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
   }
 
   editTemplate(templateCode: string, variant: TemplateVariant) {
-    // this.template = new Template()
+
 
     console.warn('Edit template', templateCode, variant)
 
-    // _.constant
-    // this.isEmail = (selectionProp && selectionProp.startsWith('email'))
+
+    /*
+    Template should already exist!
+    Was created by: selectionChanged(...)
+    */
 
     var template = this.templates.find(t => t.code == templateCode && t.channels && t.to
       && _.includes(t.channels, variant.channel) && _.includes(t.to, variant.recipient))
@@ -209,9 +221,150 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
       template.actions.push(new TemplateAction())
 */
 
+    this.canExport = template.hashChanged()
+
     this.template = template
 
     console.warn(template)
+  }
+
+
+  /**
+   *  Templates:
+   *     https://business.facebook.com/wa/manage/message-templates/?business_id=1868859750078498&waba_id=317260764808883 
+   */
+
+  async exportToWhatsApp(template: Template) {
+
+    console.warn(template)
+
+    // if template was not yet exported (no extId)
+    if (!template.extId)
+      await this.createNewWhatsAppTemplate(template)
+    else
+      await this.updateWhatsAppTemplate(template)
+
+  }
+
+  async updateWhatsAppTemplate(template: Template) {
+
+    let error
+
+    try {
+      this.spinner.show()
+
+
+      template.updateParameters()
+      console.warn(template)
+
+      const whatsAppTpl = WhatsAppTemplateUpdate.fromTemplate(template)  //WhatsAppTemplate.fromTemplate(template)
+
+      /*
+      console.warn(whatsAppTpl)
+
+      this.spinner.hide()
+      return
+*/
+
+      const whatsAppResult = await this.messagingSvc.updateWhatsAppTemplate$(whatsAppTpl)
+
+      console.warn(whatsAppResult)
+
+
+      if (!whatsAppResult.isOk) {
+
+        console.log('Hash: ', this.template.hash)
+
+        this.template.updateHash()
+
+        const tplUpdateResult = await this.templateSvc.update$(this.template, this.sessionSvc.humanResource?.id)
+
+        console.log('Hash: ', this.template.hash)
+        this.canExport = false
+
+        console.warn(this.template, tplUpdateResult)
+
+        if (whatsAppResult.error?.error_user_msg)
+          error = whatsAppResult.error?.error_user_msg
+        else
+          error = 'Problem updating WhatsApp template!'
+      }
+
+
+
+
+
+    } catch (err) {
+
+      console.error(err)
+      error = 'Problem updating WhatsApp template!'
+
+    } finally {
+
+      this.spinner.hide()
+
+      if (error)
+        this.dashboardSvc.showErrorToast(error)
+      else
+        this.dashboardSvc.showSuccessToast('Template exported')
+
+    }
+
+
+
+  }
+
+
+  async createNewWhatsAppTemplate(template: Template) {
+
+    const whatsAppTpl = WhatsAppTemplate.fromTemplate(template)
+
+    if (!whatsAppTpl)
+      return
+
+    try {
+      this.spinner.show()
+
+      const whatsAppResult = await this.messagingSvc.createWhatsAppTemplate$(whatsAppTpl)
+
+      console.warn(whatsAppResult)
+
+      if (whatsAppResult.isOk && whatsAppResult.object.id) {
+
+        this.template.extId = whatsAppResult.object.id
+        this.template.markAsUpdated('extId')
+
+        console.log('Hash: ', this.template.hash)
+
+        this.template.updateHash()
+
+        const tplUpdateResult = await this.templateSvc.update$(this.template, this.sessionSvc.humanResource?.id)
+
+        console.log('Hash: ', this.template.hash)
+
+        console.warn(tplUpdateResult)
+
+        if (tplUpdateResult.isOk)
+          this.dashboardSvc.showSuccessToast('Template exported')
+        else
+          this.dashboardSvc.showErrorToast('Could not update template')
+
+      } else {
+        this.dashboardSvc.showErrorToast('Could not create template')
+      }
+
+
+      console.error(whatsAppResult)
+
+    } catch (err) {
+
+      console.error(err)
+
+    } finally {
+      this.spinner.hide()
+    }
+
+
   }
 
 

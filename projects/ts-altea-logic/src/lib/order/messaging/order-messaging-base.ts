@@ -46,7 +46,7 @@ export class OrderMessagingBase {
 
             for (let type of types) {
 
-                let template = templates.find(tpl => tpl.channels.indexOf(type) >= 0)
+                let template = templates.find(tpl => tpl.channels.indexOf(type) >= 0 )
 
                 if (!template)
                     template = templates.find(tpl => tpl.channels.indexOf(MsgType.email) >= 0)
@@ -70,17 +70,69 @@ export class OrderMessagingBase {
                 return await this.sendEmailMessage(template, order, branch, send)
             case MsgType.sms:
                 return await this.sendSmsMessage(template, order, branch, send)
+            case MsgType.wa:
+                return await this.sendWhatsAppMessage(template, order, branch, send)
             default:
                 throw `Message type ${type} not supported!`
         }
+    }
+
+    async sendWhatsAppMessage(template: Template, order: Order, branch: Branch, send: boolean = true): Promise<Message> {
+
+        const contact = order.contact
+
+        const msg = template.mergeWithOrder(order, branch, false)
+
+        if (send) {
+
+            const sendRes = await this.alteaDb.db.sendMessage$(msg)
+            console.warn(sendRes)
+
+        }
+
+        return msg
 
     }
+
+    /*
+
+        const tpl = new WhatsAppTemplate('32478336034', 'resv_wait_deposito', 'NL', [new WhatsAppTextParameter('Aquasense 2'),
+    new WhatsAppTextParameter('€85'),
+    new WhatsAppTextParameter('13h')
+    ])
+
+
+            // Store the message as a generic message
+        if (ArrayHelper.NotEmpty(whatsappApiResult.messages)) {
+
+            let msg = whatsappApiResult.messages[0]
+
+            let message = new Message()
+
+            message.type = MsgType.wa
+            message.code = tpl.name
+            message.addTo(tpl.to, tpl.contact?.name, tpl.contact?.id)
+            message.dir = MessageDirection.out
+            message.orderId = tpl.orderId
+            message.prov = new MessageWhatsAppInfo()
+            message.prov.id = msg.id
+
+            if (tpl.contact?.id)
+                message.conIds = [tpl.contact?.id]
+
+            message.state = msg.message_status
+
+            await this.msgFireSvc.storeMessage(message)
+        }
+            */
+
+
 
     async sendEmailMessage(template: Template, order: Order, branch: Branch, send: boolean = true): Promise<Message> {
 
         const contact = order.contact
 
-        const msg = template.mergeWithOrder(order, branch)
+        const msg = template.mergeWithOrder(order, branch, true)
 
 
         msg.from = new MessageAddress(branch.emailFrom, branch.name)
@@ -112,7 +164,7 @@ export class OrderMessagingBase {
 
     async sendSmsMessage(template: Template, order: Order, branch: Branch, send: boolean = true): Promise<Message> {
 
-        const msg = template.mergeWithOrder(order, branch)
+        const msg = template.mergeWithOrder(order, branch, false)
 
         msg.addTo(order.contact.mobile, order.contact.getName(), order.contact.id)
         msg.type = MsgType.sms

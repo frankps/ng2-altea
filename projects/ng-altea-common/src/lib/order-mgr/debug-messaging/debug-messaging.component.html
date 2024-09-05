@@ -20,12 +20,19 @@
         <div class="row">
             <div class="col-3">
                 <button type="button" class="btn btn-primary btn-sm"
-                    (click)="sendTemplate('resv_wait_deposit')">resv_wait_deposit</button>
+                    (click)="sendTemplate('resv_wait_deposito')">resv_wait_deposito</button>
 
 
             </div>
+
             <div class="col-3">
-                <button type="button" class="btn btn-primary btn-sm" (click)="testWhatsApp()">WhatsApp</button>
+                <button type="button" class="btn btn-primary btn-sm" (click)="sendEmail('resv_wait_deposito')">Email</button>
+
+
+            </div>
+
+            <div class="col-3">
+                <button type="button" class="btn btn-primary btn-sm" (click)="testWhatsAppTemplate_old()">WhatsApp</button>
 
 
             </div>
@@ -33,7 +40,7 @@
                 <button type="button" class="btn btn-primary btn-sm" (click)="testWhatsAppTemplate()">WA Template</button>
 
             </div>
-            <div class="col-3"></div>
+           
 
         </div>
 

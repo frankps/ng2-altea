@@ -55,12 +55,9 @@ export class OrderMessaging extends OrderMessagingBase {
             return
         }
 
-
         for (let order of orders) {
             const res = this.doMessaging(order)
         }
-
-
     }
 
     async doMessaging(order: Order): Promise<ApiResult<Order>> {
@@ -74,7 +71,7 @@ export class OrderMessaging extends OrderMessagingBase {
         */
 
         switch (order.msgCode) {
-            case TemplateCode.resv_wait_deposit:
+            case TemplateCode.resv_wait_deposito:
 
 
             case TemplateCode.resv_no_deposit_cancel:
@@ -168,7 +165,7 @@ export class OrderMessaging extends OrderMessagingBase {
         let templateCode = TemplateCode.resv_remind_deposit
 
         if (isFirstDepositMessage)
-            templateCode = TemplateCode.resv_wait_deposit
+            templateCode = TemplateCode.resv_wait_deposito
 
         const sendRes = await this.sendMessages(templateCode, order, branch, true)
 

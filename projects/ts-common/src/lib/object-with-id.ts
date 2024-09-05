@@ -1,6 +1,7 @@
 import { Exclude, Type, Transform } from "class-transformer";
 import { DbObjectCreate } from "../api";
 import { ObjectHelper } from "./object-helper";
+import 'reflect-metadata'
 
 export class RemovedFromCollection {
 

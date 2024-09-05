@@ -1,9 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, map, Subject, take } from "rxjs";
-import { Message, SmsMessage, WebPushToUsers, WhatsAppMessage, WhatsAppTemplate } from 'ts-altea-model';
-import { ApiListResult } from 'ts-common';
+import { Message, SmsMessage, WebPushToUsers, WhatsAppCreateResult, WhatsAppMessage, WhatsAppTemplate, WhatsAppTemplateTrigger, WhatsAppTemplateUpdate, WhatsAppUpdateResult } from 'ts-altea-model';
+import { ApiListResult, ApiResult } from 'ts-common';
 import { SessionService } from './session.service';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable({
   providedIn: 'root'
@@ -59,13 +60,30 @@ export class MessagingService {
 
   // sendWhatsAppTemplate
 
-  async sendWhatsAppTemplate$(tpl: WhatsAppTemplate): Promise<any> {
+  async sendWhatsAppTemplate$(tpl: WhatsAppTemplateTrigger): Promise<any> {
 
     let res = await this.post$<any>(`${this.sessionSvc.backend}/messaging/sendWhatsAppTemplate`, tpl)
 
     return res
 
   }
+
+  async createWhatsAppTemplate$(tpl: WhatsAppTemplate): Promise<ApiResult<WhatsAppCreateResult>> {
+
+    let res = await this.post$<any>(`${this.sessionSvc.backend}/messaging/createWhatsAppTemplate`, tpl)
+
+    return plainToInstance(ApiResult<WhatsAppCreateResult>, res)
+
+  }
+
+  async updateWhatsAppTemplate$(tpl: WhatsAppTemplateUpdate): Promise<ApiResult<WhatsAppUpdateResult>> {
+
+    let res = await this.post$<any>(`${this.sessionSvc.backend}/messaging/updateWhatsAppTemplate`, tpl)
+
+    return plainToInstance(ApiResult<WhatsAppUpdateResult>, res)
+
+  }
+
 
   async sendSms$(msg: SmsMessage): Promise<any> {
 

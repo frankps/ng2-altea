@@ -317,7 +317,7 @@
       "reminder": "Herinnering"
     },
     "template-code": {
-      "resv_wait_deposit": "Wachten op voorschot",
+      "resv_wait_deposito": "Wachten op voorschot",
       "resv_remind_deposit": "Herinnering voorschot",
       "resv_confirmation": "Confirmatie",
       "resv_no_deposit_cancel": "Annulatie - geen voorschot",

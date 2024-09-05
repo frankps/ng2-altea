@@ -18,10 +18,25 @@
             <div class="col-2">
 
             </div>
-            <div class="col-2" style="text-align: center" translate>
-                ui.template.email-to-provider
+            <div class="col-4" style="text-align: center" translate>
+                ui.template.to-provider
             </div>
-            <div class="col-2" style="text-align: center" translate>
+            <div class="col-4" style="text-align: center" translate>
+                ui.template.to-client
+            </div>
+
+        </div>
+
+        <div class="row mb-3  d-flex justify-content-center">
+
+            <div class="col-2 d-flex justify-content-center" style="text-align: center" *ngFor="let channel of channels" translate>
+                {{'enums.msg-type.' + channel | translate}}
+            </div>
+            <div class="col-2 d-flex justify-content-center" style="text-align: center" *ngFor="let channel of channels" translate>
+                {{'enums.msg-type.' + channel | translate}}
+            </div>
+
+<!--             <div class="col-2" style="text-align: center" translate>
                 ui.template.sms-to-provider
             </div>
             <div class="col-2" style="text-align: center" translate>
@@ -29,7 +44,7 @@
             </div>
             <div class="col-2" style="text-align: center" translate>
                 ui.template.sms-to-client
-            </div>
+            </div> -->
         </div>
 
         <ng-container *ngIf="selectionsAvailable">
@@ -83,18 +98,19 @@
 
 
                 </div>
-                <div class="col-10 mt-2" *ngIf="template.isEmail()">
+                <!--*ngIf="template.isEmail()"-->
+                <div class="col-10 mt-2">
 
                     <div class="row">
-                        <div class="col-9">
+                        <div class="col">
                             
                             <ngx-altea-label-control label="objects.template.subject" for="subject">
-                                <input type="text" id="subject" name="subject" required class="form-control"
+                                <input type="text" id="subject" name="subject" class="form-control"
                                     [(ngModel)]="template.subject" />
                             </ngx-altea-label-control>
 
                         </div>
-                        <div class="col-3" *ngIf="initialized">
+                        <div class="col-3" *ngIf="initialized && template.isEmail()">
 
 
                             <ngx-altea-label-control label="objects.template.format" for="format">
@@ -102,6 +118,10 @@
                                     [clearable]="false" [multiple]="false" [(ngModel)]="template.format"></ng-select>
                             </ngx-altea-label-control>
 
+
+                        </div>
+                        <div class="col-3" *ngIf="initialized && template.isType('wa')">
+                            <button type="button" class="btn btn-primary btn-sm" [disabled]="!canExport" (click)="exportToWhatsApp(template)" translate>dic.export</button>
 
                         </div>
                     </div>

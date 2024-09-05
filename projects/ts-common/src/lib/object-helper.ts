@@ -1,6 +1,15 @@
 import { plainToClass, instanceToPlain } from "class-transformer"
 import * as _ from "lodash";
 
+
+export class StringHelper {
+
+    static isEmptyOrSpaces(str) : boolean {
+        return str === undefined || str === null || str.match(/^ *$/) !== null;
+    }
+
+}
+
 export class ArrayHelper {
     static AtLeastOneItem(array: any): boolean {
         return (Array.isArray(array) && array.length > 0)

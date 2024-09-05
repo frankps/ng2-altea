@@ -317,7 +317,7 @@
       "reminder": "Herinnering"
     },
     "template-code": {
-      "resv_wait_deposit": "Wachten op voorschot",
+      "resv_wait_deposito": "Wachten op voorschot",
       "resv_remind_deposit": "Herinnering voorschot",
       "resv_confirmation": "Confirmatie",
       "resv_no_deposit_cancel": "Annulatie - geen voorschot",
@@ -584,10 +584,12 @@
       }
     },
     "template": {
+      "to-provider": "Naar uw zaak",
+      "to-client": "Naar klant",
       "email-to-provider": "Emails naar uw zaak",
-      "sms-to-provider": "SMS'en naar uw zaak",
+      "wa-to-provider": "SMS'en naar uw zaak",
       "email-to-client": "Emails naar klant",
-      "sms-to-client": "SMS'en naar klant",
+      "wa-to-client": "SMS'en naar klant",
       "edit": {
         "sections": {
           "config": {
@@ -884,7 +886,8 @@
       "format": "Formaat",
       "body": {
         "email": "E-mail",
-        "sms": "SMS"
+        "sms": "SMS",
+        "wa": "WhatsApp"
       },
       "action": {
         "label": "Label",

@@ -27,6 +27,16 @@ Firebase:
   https://github.com/angular/angularfire/blob/HEAD/docs/auth.md#authentication
 
 
+
+Error:
+Uncaught TypeError: Reflect.getMetadata is not a function
+
+Make sure to have the following import:   import 'reflect-metadata';
+
+
+
+
+
 Error: browser kept refreshing in endless loop
 --> was caused by same issue below
 

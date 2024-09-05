@@ -1,9 +1,20 @@
 
 
-export class WhatsAppMessage {
 
-    constructor(public to: string, public body: string, public phoneId?: string, public replyToMessageId?: string) {
-    }
+export class WhatsAppBaseMessage {
+
+  contactId: string
+  orderId: string
+
+  contact: { id: string, name: string }
+
+}
+
+export class WhatsAppMessage extends WhatsAppBaseMessage {
+
+  constructor(public to: string, public body: string, public phoneId?: string, public replyToMessageId?: string) {
+    super()
+  }
 
 }
 
@@ -33,22 +44,27 @@ export class WhatsAppMessage {
 
 
 export abstract class WhatsAppTplParameter {
-    constructor(public type: "text" | "currency" | "date_time") {
+  constructor(public type: "text" | "currency" | "date_time") {
 
-    }
+  }
 }
 
 export class WhatsAppTextParameter extends WhatsAppTplParameter {
 
-    constructor(public text: string) {
-        super("text")
-    }
+  constructor(public text: string) {
+    super("text")
+  }
 }
 
+export class WhatsAppTplParameters {
+  header: WhatsAppTplParameter[] = []
+  body: WhatsAppTplParameter[] = []
+}
 
-export class WhatsAppTemplate {
+export class WhatsAppTemplateTrigger extends WhatsAppBaseMessage {
 
-    constructor(public to: string, public name: string, public langLocale: string, public params: WhatsAppTplParameter[] = [], public phoneId?: string) {
-    }
+  constructor(public to: string, public name: string, public langLocale: string, public params: WhatsAppTplParameters, public phoneId?: string) {
+    super()
+  }
 
 }

@@ -49,6 +49,7 @@ export class ApiMultiResult extends ApiResultBase {
 export class ApiResult<T = null> extends ApiResultBase {
 
   object: T
+  error: any
 
   constructor(obj: T, status: ApiStatus = ApiStatus.ok, message?: string) {
     super()
@@ -58,9 +59,10 @@ export class ApiResult<T = null> extends ApiResultBase {
     this.message = message
   }
 
-  static error(message?: string) : ApiResult {
+  static error(message?: string, obj?) : ApiResult {
 
-    let res = new ApiResult(null, ApiStatus.error, message)
+    let res = new ApiResult(obj, ApiStatus.error, message)
+    res.error = obj
 
     return res
 

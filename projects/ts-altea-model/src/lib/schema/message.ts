@@ -1,19 +1,13 @@
 
 
-import { Branch, DepositMode, Gender, Gift, Invoice, LoyaltyCard, Order, OrderLine, OrderType, Organisation, PlanningMode, Product, ProductResource, ProductType, ResourcePlanning, Schedule, Subscription, TemplateFormat, User, UserBase } from "ts-altea-model";
+import { TemplateFormat } from "ts-altea-model";
 import { Exclude, Type, Transform } from "class-transformer";
 import 'reflect-metadata';
-import { ArrayHelper, ConnectTo, DateHelper, DbObjectCreate, IAsDbObject, ManagedObject, ObjectHelper, ObjectMgmt, ObjectReference, ObjectWithId, ObjectWithIdPlus, QueryOperator, TimeHelper } from 'ts-common'
+import { ArrayHelper, DateHelper, ObjectWithIdPlus } from 'ts-common'
 import * as _ from "lodash";
-import { PersonLine } from "../person-line";
-import { DateRange, DateRangeSet, TimeBlock, TimeBlockSet, TimeSpan } from "../logic";
-import * as dateFns from 'date-fns'
-import * as Handlebars from "handlebars"
-import * as sc from 'stringcase'
-import { OrderPersonMgr } from "../order-person-mgr";
-import { CancelOrderMessage } from "ts-altea-logic";
-
-
+import { TextParameter } from "./text-parameter";
+import { ObjectWithParameters } from "./object-with-parameters";
+//import { ObjectWithParameters } from "./object-with-parameters";
 
 
 export class IEmail {
@@ -32,6 +26,9 @@ export class MessageProviderInfo {
 
 }
 
+export class MessageWhatsAppInfo extends MessageProviderInfo {
+
+}
 
 export class WhatsAppProviderInfo extends MessageProviderInfo {
 
@@ -63,12 +60,15 @@ export class MsgInfo {
         this.code = code
 
     }
-}
+}  
 
 
 export enum MessageState {
     notSent = 'notSent',
     error = 'err',
+    accepted = 'accepted',   // supported by WhatsApp
+    delivered = 'delivered', // supported by WhatsApp
+    read = 'read', // supported by WhatsApp
     sent = 'sent',
     received = 'rec',
     archived = 'arch',
@@ -154,7 +154,61 @@ export enum MsgType {
 }
 
 
-export class Message extends ObjectWithIdPlus implements IEmail {
+/*
+    {
+      "type": "text",
+      "text": "text-string"
+    }
+*/
+
+/*
+
+export class ObjectWithParametersMessage extends ObjectWithIdPlus {
+
+    // in case external system will do templating (example: Whatsapp) 
+    params: TextParameter[]
+  
+    addTextParameter(comp: 'body' | 'subject' = 'body', name: string, idx?: number, value?: string) {
+  
+      const param = TextParameter.text(comp, name, idx, value)
+  
+      if (!this.params)
+        this.params = []
+  
+      this.params.push(param)
+    }
+  
+    extractParameterNames(text: string): string[] {
+  
+      if (!text)
+        return []
+  
+      const regex = /\{\{(\w+)\}\}/g;
+      const matches = [...text.matchAll(regex)].map(match => match[1])
+  
+      return matches
+    }
+  
+    extractParameters(comp: 'body' | 'subject' = 'body', text: string): TextParameter[] {
+      const names = this.extractParameterNames(text)
+  
+      const params = names.map(name => TextParameter.text(comp, name))
+  
+      return params
+    }
+  
+  
+  }
+  */
+
+
+
+/**
+ * For email & sms we keep track of subj(ect) and body (where parameters of templates are replaced with their values)
+ * For whatsapp: we keep track of parameter replacements
+ */
+export class Message extends ObjectWithParameters implements IEmail {
+
 
     branchId?: string
     orderId?: string
@@ -175,6 +229,8 @@ export class Message extends ObjectWithIdPlus implements IEmail {
   */
 
     //  tags: string[] = []
+
+    /** template code */
     code?: string
 
     sent?: number  // yyyyMMddhhmmss
@@ -200,6 +256,17 @@ export class Message extends ObjectWithIdPlus implements IEmail {
     usrId?: string
     /** resource id: internal human resource  */
     resId?: string
+
+    
+    constructor() {
+        super()
+
+        const now = new Date()
+        this.sent = DateHelper.yyyyMMddhhmmss(now)
+
+    }
+
+
 
     stateColor(): string {
         if (this.state == MessageState.sent)

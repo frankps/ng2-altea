@@ -48,6 +48,7 @@
     "class-transformer": "^0.5.1",
     "cldr-data": "^36.0.2",
     "country-list-js": "^3.1.8",
+    "crypto-js": "^4.2.0",
     "date-fns": "^2.30.0",
     "firebase": "^10.7.1",
     "handlebars": "^4.7.8",
