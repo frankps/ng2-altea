@@ -9,9 +9,9 @@ export class ObjectWithParameters extends ObjectWithIdPlus {
   // in case external system will do templating (example: Whatsapp)
   params: TextParameter[]
 
-  addTextParameter(name: string, value?: string) {
+  addTextParameter(name: string, value?: string, comp?: TextComponent, idx?: number) {
 
-    const param = TextParameter.text(name, value)
+    const param = TextParameter.text(name, value, comp, idx)
 
     if (!this.params)
       this.params = []

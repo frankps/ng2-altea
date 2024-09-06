@@ -24,6 +24,13 @@ export class MessageProviderInfo {
     /** id of this message assigned by provider (ex: whatsapp id) */
     id: string
 
+    /** result */
+    res: any
+
+    constructor(id?: string) {
+        this.id = id
+    }
+
 }
 
 export class MessageWhatsAppInfo extends MessageProviderInfo {
@@ -31,6 +38,10 @@ export class MessageWhatsAppInfo extends MessageProviderInfo {
 }
 
 export class WhatsAppProviderInfo extends MessageProviderInfo {
+
+    constructor(id: string) {
+        super(id)
+    }
 
     /** name of user in provider network/app (ex. whatsapp user name) */
     name: string
@@ -60,12 +71,12 @@ export class MsgInfo {
         this.code = code
 
     }
-}  
+}
 
 
 export enum MessageState {
     notSent = 'notSent',
-    error = 'err',
+    error = 'error',
     accepted = 'accepted',   // supported by WhatsApp
     delivered = 'delivered', // supported by WhatsApp
     read = 'read', // supported by WhatsApp
@@ -80,6 +91,7 @@ export enum MsgStateIcon {
     notSent = 'fa-duotone fa-do-not-enter',
     err = 'fa-duotone fa-circle-exclamation',
     sent = 'fa-duotone fa-circle-check',
+    read = 'fa-duotone fa-solid fa-glasses',
     received = '',
     archived = '',
     spam = '',
@@ -87,6 +99,7 @@ export enum MsgStateIcon {
 }
 
 /*
+<i class="fa-duotone fa-solid fa-glasses"></i>
 <i class="fa-duotone fa-circle-exclamation"></i>
 <i class="fa-solid fa-do-not-enter"></i>
 <i class="fa-duotone fa-circle-check"></i>
@@ -248,7 +261,7 @@ export class Message extends ObjectWithParameters implements IEmail {
     body?: string
 
     log?: string
-    state?: MessageState = MessageState.notSent
+    state?: MessageState | string = MessageState.notSent  // 
 
     /** message format: text or html */
     fmt: TemplateFormat = TemplateFormat.text
@@ -257,7 +270,7 @@ export class Message extends ObjectWithParameters implements IEmail {
     /** resource id: internal human resource  */
     resId?: string
 
-    
+
     constructor() {
         super()
 
@@ -269,10 +282,21 @@ export class Message extends ObjectWithParameters implements IEmail {
 
 
     stateColor(): string {
+        /*
         if (this.state == MessageState.sent)
             return 'green'
         else
             return 'red'
+*/
+
+        switch (this.state) {
+            case MessageState.error:
+            case MessageState.notSent:
+                return 'red'
+            default:
+                return 'green'
+
+        }
     }
 
     createReply(): Message {

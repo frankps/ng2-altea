@@ -264,16 +264,19 @@ export class Template extends ObjectWithParameters {
     message.auto = true   //this is automatic message
     message.fmt = this.format
 
+    const replacements = {
+      branch: branch.name,
+      deposit: `€${order.deposit}`,
+      term: this.getTerm(order),
+      first: order?.contact?.first,
+      // info: "baby giraffe"
+    }
+
+    console.warn(replacements)
+
     /** local templating */
     if (merge) {
 
-      const replacements = {
-        branch: branch.name,
-        deposit: `€${order.deposit}`,
-        term: this.getTerm(order),
-        first: order?.contact?.first,
-        // info: "baby giraffe"
-      }
 
       if (this.body) {
         const hbTemplate = Handlebars.compile(this.body)
@@ -293,10 +296,16 @@ export class Template extends ObjectWithParameters {
 
       //message.addTextParameter(TextComponent.subject, 'branch', 1, 'Aquasense')
 
+      this.addParameters(TextComponent.subject, replacements, message)
+
+      this.addParameters(TextComponent.body, replacements, message)
+
+
+/*
       message.addTextParameter('branch', 'Aquasense')
       message.addTextParameter('deposit', '€85')
       message.addTextParameter('term', '13h')
-
+*/
 
     }
 
@@ -306,6 +315,24 @@ export class Template extends ObjectWithParameters {
 
     return message
 
+  }
+
+  addParameters(comp: TextComponent, replacements: any, message: Message) {
+
+    const paramNames = this.getParameterNames(comp)
+
+    if (ArrayHelper.NotEmpty(paramNames)) {
+
+      let idx = 1
+      for (let paramName of paramNames) {
+        let paramValue = replacements[paramName]
+
+        if (!paramValue)
+          paramValue = 'MISSING'
+
+        message.addTextParameter(paramName, paramValue, comp, idx++)
+      }
+    }
   }
 
 }

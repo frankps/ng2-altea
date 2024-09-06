@@ -17,30 +17,22 @@
 
         </div>
 
-        <div class="row">
+        <div class="row mt-2" *ngFor="let code of templateCodes">
             <div class="col-3">
                 <button type="button" class="btn btn-primary btn-sm"
-                    (click)="sendTemplate('resv_wait_deposito')">resv_wait_deposito</button>
-
-
+                    (click)="sendTemplate(code)">{{code}}</button>
             </div>
 
             <div class="col-3">
-                <button type="button" class="btn btn-primary btn-sm" (click)="sendEmail('resv_wait_deposito')">Email</button>
-
-
+                <button type="button" class="btn btn-primary btn-sm" (click)="sendEmail(code)">Email</button>
             </div>
 
             <div class="col-3">
-                <button type="button" class="btn btn-primary btn-sm" (click)="testWhatsAppTemplate_old()">WhatsApp</button>
+                <button type="button" class="btn btn-primary btn-sm" (click)="sendWhatsApp(code)">WhatsApp</button>
 
-
-            </div>
-            <div class="col-3">
-                <button type="button" class="btn btn-primary btn-sm" (click)="testWhatsAppTemplate()">WA Template</button>
+                <!-- testWhatsAppTemplate_old() -->
 
             </div>
-           
 
         </div>
 

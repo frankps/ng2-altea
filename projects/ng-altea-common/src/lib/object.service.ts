@@ -128,7 +128,7 @@ export class ObjectService implements IDb {
   }
 
 
-  async deleteMany$<T extends ObjectWithId>(query: DbQueryBaseTyped<T>): Promise<any>  {
+  async deleteMany$<T extends ObjectWithId>(query: DbQueryBaseTyped<T>): Promise<any> {
 
     let res = await this.delete$(this.sessionSvc.backend, `${this.sessionSvc.branchUnique}/objects/deleteMany`, query)
 
@@ -264,17 +264,19 @@ export class ObjectService implements IDb {
 
       console.error(res)
 
-      let typedRes = res
+      let apiResult = res
 
       if (res && res.object) {
 
         const object = res.object
 
-        typedRes = plainToInstance(ApiResult<Message>, res)
-        typedRes.object = plainToInstance(Message, object)
+        apiResult = plainToInstance(ApiResult<Message>, res)
+
+        if (apiResult.isOk)
+          apiResult.object = plainToInstance(Message, object)
       }
 
-      return typedRes
+      return apiResult
 
     }
     ))

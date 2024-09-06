@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { AlteaService, MessagingService, OrderMgrUiService, SessionService } from 'ng-altea-common';
 import { OrderMgmtService } from 'ts-altea-logic';
-import { MsgType, WhatsAppBodyComponent, WhatsAppMessage, WhatsAppTemplate, WhatsAppTemplateTrigger, WhatsAppTextParameter, WhatsAppTplParameters } from 'ts-altea-model';
+import { MsgType, orderTemplates, TemplateCode, WhatsAppBodyComponent, WhatsAppMessage, WhatsAppTemplate, WhatsAppTemplateTrigger, WhatsAppTextParameter, WhatsAppTplParameters } from 'ts-altea-model';
 
 @Component({
   selector: 'order-mgr-debug-messaging',
@@ -11,6 +11,8 @@ import { MsgType, WhatsAppBodyComponent, WhatsAppMessage, WhatsAppTemplate, What
 export class DebugMessagingComponent {
 
   MsgType = MsgType
+
+  templateCodes = orderTemplates
 
   constructor(protected orderMgrUiSvc: OrderMgrUiService, private alteaSvc: AlteaService, private sessionSvc: SessionService,
     private messagingSvc: MessagingService
@@ -36,6 +38,10 @@ export class DebugMessagingComponent {
     await this.sendTemplate(templateCode, MsgType.email)
   }
 
+  async sendWhatsApp(templateCode: string) {
+
+    await this.sendTemplate(templateCode, MsgType.wa)
+  }
 
   async testWhatsApp() {
 

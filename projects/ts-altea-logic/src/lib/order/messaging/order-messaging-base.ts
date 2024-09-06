@@ -33,32 +33,38 @@ export class OrderMessagingBase {
             return
         }
 
+        let templates = await this.alteaDb.getTemplates(order.branchId, templateCode)
+
+        for (let type of types) {
+
+            let template = templates.find(tpl => tpl.channels.indexOf(type) >= 0 )
+
+            if (!template)
+                template = templates.find(tpl => tpl.channels.indexOf(MsgType.email) >= 0)
+
+            if (!template) {
+                console.error(`No template found ${templateCode} and channel/type ${type}`)
+            }
+
+
+            await this.sendMessage(type, template, order, branch, send)
+        }
+
+
+
         /**
          * Some message types work with internal templates (from DB): email, sms
          * other message types (whatsapp) work with templates configured in those systems => no need to lookup template
-         */
+         
 
         const typesInternalTemplates = types.filter(type => type != MsgType.wa)
 
         if (ArrayHelper.NotEmpty(typesInternalTemplates)) {
 
-            let templates = await this.alteaDb.getTemplates(order.branchId, templateCode)
 
-            for (let type of types) {
-
-                let template = templates.find(tpl => tpl.channels.indexOf(type) >= 0 )
-
-                if (!template)
-                    template = templates.find(tpl => tpl.channels.indexOf(MsgType.email) >= 0)
-
-                if (!template) {
-                    console.error(`No template found ${templateCode} and channel/type ${type}`)
-                }
-
-
-                await this.sendMessage(type, template, order, branch, send)
-            }
         }
+
+        */
     }
 
 
@@ -83,6 +89,16 @@ export class OrderMessagingBase {
 
         const msg = template.mergeWithOrder(order, branch, false)
 
+        if (!msg.conIds)
+            msg.conIds = []
+
+        msg.conIds.push(contact.id)
+
+
+        msg.addTo(contact.mobile, contact.name, contact.id)  // contact.email
+
+        msg.type = MsgType.wa
+
         if (send) {
 
             const sendRes = await this.alteaDb.db.sendMessage$(msg)
@@ -93,40 +109,6 @@ export class OrderMessagingBase {
         return msg
 
     }
-
-    /*
-
-        const tpl = new WhatsAppTemplate('32478336034', 'resv_wait_deposito', 'NL', [new WhatsAppTextParameter('Aquasense 2'),
-    new WhatsAppTextParameter('€85'),
-    new WhatsAppTextParameter('13h')
-    ])
-
-
-            // Store the message as a generic message
-        if (ArrayHelper.NotEmpty(whatsappApiResult.messages)) {
-
-            let msg = whatsappApiResult.messages[0]
-
-            let message = new Message()
-
-            message.type = MsgType.wa
-            message.code = tpl.name
-            message.addTo(tpl.to, tpl.contact?.name, tpl.contact?.id)
-            message.dir = MessageDirection.out
-            message.orderId = tpl.orderId
-            message.prov = new MessageWhatsAppInfo()
-            message.prov.id = msg.id
-
-            if (tpl.contact?.id)
-                message.conIds = [tpl.contact?.id]
-
-            message.state = msg.message_status
-
-            await this.msgFireSvc.storeMessage(message)
-        }
-            */
-
-
 
     async sendEmailMessage(template: Template, order: Order, branch: Branch, send: boolean = true): Promise<Message> {
 
