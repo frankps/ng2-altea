@@ -25,6 +25,7 @@ export class ContactSelect2Component implements OnInit {
     if (value) {
       this._contact = value
       this.isNew = (value.id == null)
+    
     } else {
 
       this._contact = new Contact()
@@ -75,6 +76,8 @@ export class ContactSelect2Component implements OnInit {
   async ngOnInit() {
     await this.translationSvc.translateEnum(Country, 'enums.country.', this.country)
     await this.translationSvc.translateEnum(MsgType, 'enums.msg-type.', this.msgTypes)
+
+    this.msgTypes = this.msgTypes.filter(t => t.key != 'sms')
 
     this.branch = await this.sessionSvc.branch$()
 
@@ -166,7 +169,8 @@ export class ContactSelect2Component implements OnInit {
 
     switch (msgType) {
       case MsgType.email:
-        return contact.email
+        return false    // we always send emails => user can not disable
+        // return contact.email
 
       case MsgType.sms:
       case MsgType.wa:

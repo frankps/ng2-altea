@@ -1,0 +1,48 @@
+<div class="row">
+    <div class="col-lg-4 col-md-6 col-6">
+
+        <ngx-altea-label-control label="Order id" for="orderId">
+            <input type="text" id="orderId" name="orderId" required class="form-control" [(ngModel)]="orderId" />
+        </ngx-altea-label-control>
+
+
+    </div>
+    <div class="col-lg-3 col-md-6 col-6">
+        <button type="button" class="btn btn-primary" (click)="getOrder(orderId)" translate>dic.search</button>
+
+    </div>
+
+</div>
+
+<ng-container *ngIf="order">
+
+    <div class="row">
+        <div class="col-8">
+            <order-mgr-order-summary [order]="order" [pays]="true"></order-mgr-order-summary>
+        </div>
+    </div>
+
+
+
+
+</ng-container>
+
+
+
+<div class="row my-5">
+
+    <div class="col-lg-3 col-md-6 col-6">
+
+        <ngx-altea-label-control label="Betaling" for="amount">
+            <input type="number" id="amount" name="amount" class="form-control" [(ngModel)]="amount" />
+        </ngx-altea-label-control>
+
+
+    </div>
+    <div class="col-lg-3 col-md-6 col-6">
+        <button type="button" class="btn btn-primary" (click)="addPayment(orderId, amount)">Betaling
+            toevoegen</button>
+
+    </div>
+
+</div>

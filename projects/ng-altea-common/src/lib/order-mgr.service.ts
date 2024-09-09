@@ -5,15 +5,25 @@ import { ObjectWithId, BackendServiceBase, ApiListResult, ApiResult, ApiBatchPro
 import { plainToInstance } from "class-transformer";
 import { Observable, map, Subject, take } from "rxjs";
 import { SessionService } from './session.service';
+import { HttpClientService } from './http-client.service';
+import { AddPaymentToOrderParams } from 'ts-altea-logic';
 
 @Injectable({
   providedIn: 'root'
 })
-export class OrderMgrService {
+export class OrderMgrService extends HttpClientService {
+
+  /*
+  constructor(http: HttpClient, protected sessionSvc: SessionService) {
+    super(http, sessionSvc.localServer)
+  }*/
+
 
   urlDifferentiator = 'order-mgr'
 
-  constructor(protected http: HttpClient, protected sessionSvc: SessionService) { }
+  constructor(http: HttpClient, protected sessionSvc: SessionService) { 
+    super(http, sessionSvc.backend)
+  }
 
 
   getPossibleDates(order: Order) {
@@ -33,5 +43,21 @@ export class OrderMgrService {
       console.warn(res)
     })
   }
+
+
+
+  //@Post('addPaymentToOrder')
+  async addPaymentToOrder(params: AddPaymentToOrderParams): Promise<ApiResult<Order>> {
+
+    var res = await this.post$(`${this.sessionSvc.branchUnique}/order-mgr/addPaymentToOrder`, params)
+
+    if (res) {
+      const apiResult = plainToInstance(ApiResult, res)
+      return apiResult
+    }
+     
+    return null
+  }
+
 
 }

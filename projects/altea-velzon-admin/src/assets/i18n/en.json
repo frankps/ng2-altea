@@ -1154,7 +1154,8 @@
     "platform": {
       "label": "Platform",
       "sub": {
-        "users": "Gebruikers"
+        "users": "Gebruikers",
+        "orderDebug": "Order Details"
       }
     }
   },

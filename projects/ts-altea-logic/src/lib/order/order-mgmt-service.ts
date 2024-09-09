@@ -16,6 +16,13 @@ import * as _ from "lodash"
 import { OrderMessaging } from './messaging/order-messaging'
 
 
+export class AddPaymentToOrderParams {
+    orderId: string
+    type: PaymentType
+    amount: number
+    provId?: string
+}
+
 
 
 export class OrderMgmtService {
@@ -34,6 +41,7 @@ export class OrderMgmtService {
         else
             this.alteaDb = new AlteaDb(db)
     }
+
 
     async addPaymentToOrder(orderId: string, type: PaymentType, amount: number, provId?: string): Promise<ApiResult<Order>> {
 
@@ -155,8 +163,6 @@ export class OrderMgmtService {
 
 
     async depositTimeOuts() {
-
-
 
 
     }

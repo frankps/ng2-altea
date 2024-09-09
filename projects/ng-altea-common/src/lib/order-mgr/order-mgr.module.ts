@@ -35,7 +35,9 @@ import { DebugPlanningsComponent } from './debug-plannings/debug-plannings.compo
 import { CancelOrderComponent } from './cancel-order/cancel-order.component';
 import { LoyaltyComponent } from './loyalty/loyalty.component';
 import { ClipboardModule } from '@angular/cdk/clipboard';
-import { DebugMessagingComponent } from './debug-messaging/debug-messaging.component'
+import { DebugMessagingComponent } from './debug-messaging/debug-messaging.component';
+import { OrderSummaryComponent } from './order-summary/order-summary.component';
+import { OrderDebugComponent } from './order-debug/order-debug.component'
 
 @NgModule({
   declarations: [
@@ -60,6 +62,8 @@ import { DebugMessagingComponent } from './debug-messaging/debug-messaging.compo
     CancelOrderComponent,
     LoyaltyComponent,
     DebugMessagingComponent,
+    OrderSummaryComponent,
+    OrderDebugComponent,
   ],
   imports: [
     CommonModule,
@@ -97,7 +101,9 @@ import { DebugMessagingComponent } from './debug-messaging/debug-messaging.compo
     SearchContactComponent,
     DebugPlanningsComponent,
     CancelOrderComponent,
-    DebugMessagingComponent
+    DebugMessagingComponent,
+    OrderSummaryComponent,
+    OrderDebugComponent
   ]
 })
 export class OrderMgrModule {}

@@ -29,8 +29,12 @@ export class OrderMessagingBase {
 
 
         if (ArrayHelper.IsEmpty(types)) {
-            console.warn(`No messages to send: types array is empty`)
-            return
+          /*  console.warn(`No messages to send: types array is empty`)
+            return */
+
+            console.warn(`Contact has no preffered types specified: fall-back to email`)
+            types = [ MsgType.email ]
+
         }
 
         let templates = await this.alteaDb.getTemplates(order.branchId, templateCode)

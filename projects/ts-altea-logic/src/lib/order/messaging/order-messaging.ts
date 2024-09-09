@@ -72,8 +72,6 @@ export class OrderMessaging extends OrderMessagingBase {
 
         switch (order.msgCode) {
             case TemplateCode.resv_wait_deposito:
-
-
             case TemplateCode.resv_no_deposit_cancel:
                 await this.noDepositCancel(order)
 
@@ -81,8 +79,6 @@ export class OrderMessaging extends OrderMessagingBase {
         }
 
         switch (order.state) {
-
-            case OrderState.waitDeposit:
 
             case OrderState.waitDeposit:
                 console.info(`Deposit messaging for ${order.code}`)
@@ -127,6 +123,11 @@ export class OrderMessaging extends OrderMessagingBase {
 
         order.contact.selectMsgType
 */
+
+        const branch = await this.alteaDb.getBranch(order.branchId)
+
+
+        const sendRes = await this.sendMessages(TemplateCode.resv_confirmation, order, branch, true)
 
 
         return new ApiResult<Order>(order, ApiStatus.ok)

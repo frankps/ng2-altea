@@ -111,7 +111,7 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
 
 
 
-  async postOrPut$<T>(url: string, body: any, method : 'post' | 'put' = 'post'): Promise<T> {
+  async postOrPut$<T>(url: string, body: any, method: 'post' | 'put' = 'post'): Promise<T> {
     const me = this
 
     return new Promise<T>(function (resolve, reject) {
@@ -176,13 +176,22 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
     ))
   }
 
-  get$(id: string, includes: string | null = null): Promise<T> {
+  get$(id: string, includes: string | string[] | null = null): Promise<T> {
 
     const me = this
 
+    let includeString = null
+
+    if (includes) {
+      if (Array.isArray(includes))
+        includeString = includes.join(',')
+      else
+        includeString = includes
+    }
+
     return new Promise<any>(function (resolve, reject) {
 
-      me.get(id, includes).pipe(take(1)).subscribe(res => {
+      me.get(id, includeString).pipe(take(1)).subscribe(res => {
         resolve(res)
       })
     })
@@ -558,7 +567,7 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
     return objects
   }
 
-  
+
 
   /*
     const loyaltyProgramQry = new DbQuery()
@@ -739,8 +748,14 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
           const updates = objectChange.object
           delete updates['id']
 
-          if (!cachedObject)
-            throw new Error(`Can't update cache, because object not in cache (id=${objId})`)
+          if (!cachedObject) {
+
+            const msg = `Can't update cache, because object not in cache (id=${objId})`
+            console.error(msg)
+            console.warn(objectChange)
+            throw new Error(msg)
+          }
+
 
           Object.keys(updates).forEach(property => {
 

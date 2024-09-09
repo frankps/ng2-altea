@@ -222,6 +222,12 @@ export const MENU: MenuItem[] = [
         label: 'menu.platform.sub.users',
         link: '/platform/users',
         parentId: 30
+      },
+      {
+        id: 301,
+        label: 'menu.platform.sub.orderDebug',
+        link: '/platform/order-debug',
+        parentId: 30
       }
     ]
   }

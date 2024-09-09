@@ -11,6 +11,12 @@
 
     <ng-container *ngIf="allOk">
         Wij hebben uw betaling goed ontvangen!
+
+
+        <order-mgr-order-summary [order]="orderMgrSvc.order"></order-mgr-order-summary>
+
+        
+
     </ng-container>
 
 

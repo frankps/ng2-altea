@@ -39,12 +39,16 @@
                 <div class="row {{css_cls_row}}">
                     <div class="col">
 
-                        <span>Communicatie voorkeur:</span>
+                        <span>Communicatie:</span>
 
                         <div class="form-check form-switch ms-3 mt-1" *ngFor="let msgType of msgTypes">
                             <input type="checkbox" class="form-check-input" [id]="msgType.key" [name]="msgType.key" [disabled]="!canSelectMsgType(msgType.key)" [checked]="contact.msgTypeSelected(msgType.key)" (change)="contact.selectMsgType(msgType.key, $event.target['checked'])">
-                            <label class="form-check-label" for="news">{{'enums.msg-type.' + msgType.key |
-                                translate:translateParam}}</label>
+                           <!--  -->
+                           
+                           <label class="form-check-label" for="news">{{'enums.msg-type.' + msgType.key |
+                                translate:translateParam}}   
+                                
+                            </label>
                         </div>
                     </div>
                 </div>

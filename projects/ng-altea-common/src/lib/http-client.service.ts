@@ -5,7 +5,7 @@ import { Observable, map, Subject, take } from "rxjs";
 
 export class HttpClientService {
 
-    constructor(protected http: HttpClient, protected httpServer: string) {
+    constructor(public http: HttpClient, protected httpServer: string) {
   
     }
   

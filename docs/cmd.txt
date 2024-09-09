@@ -67,6 +67,7 @@ ng generate component platform/manage-users --project=altea-velzon-admin
 ng generate component platform/edit-user --project=altea-velzon-admin
 ng generate component platform/user-list --project=altea-velzon-admin
 
+ng generate component platform/order-debug --project=altea-velzon-admin
 
 
 
@@ -100,6 +101,7 @@ ng generate service auth/auth --project altea-pub-app
 ng generate module staff --project altea-pub-app --routing
 ng generate component staff/dashboard --project altea-pub-app
 ng generate component staff/task --project altea-pub-app
+
 
 ng generate component order-mgr/posPayment --project altea-velzon-admin
 ng generate component pos/posPayment --project ng-altea-common

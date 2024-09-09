@@ -16,13 +16,16 @@ import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { TimepickerModule } from 'ngx-bootstrap/timepicker';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerModule } from 'ngx-spinner';
+import { OrderDebugPageComponent } from './order-debug-page/order-debug-page.component';
+import { NgAlteaCommonModule } from "../../../../ng-altea-common/src/lib/ng-altea-common.module";
+import { OrderMgrModule } from "../../../../ng-altea-common/src/lib/order-mgr/order-mgr.module";
 
 @NgModule({
   declarations: [
     ManageUsersComponent,
     EditUserComponent,
-    UserListComponent
-  ],
+    UserListComponent,
+    OrderDebugPageComponent],
   imports: [
     CommonModule,
     PlatformRoutingModule,
@@ -34,7 +37,10 @@ import { NgxSpinnerModule } from 'ngx-spinner';
     ModalModule,
     BsDatepickerModule,
     TimepickerModule,
-    NgxSpinnerModule
+    NgxSpinnerModule,
+    NgAlteaCommonModule,
+    NgxSpinnerModule,
+    OrderMgrModule
   ]
 })
 export class PlatformModule { }
