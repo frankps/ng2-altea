@@ -71,8 +71,12 @@ export class OrderComponent implements OnInit {
     this.mode = 'browse-catalog'
   }
 
-  newDemoOrder() {
-    this.mode = 'order'
+  async newDemoOrder() {
+
+    var order = await this.orderMgrSvc.saveOrder()
+
+    console.log(order)
+    this.mode = 'pay-online'
   }
 
   productSelected() {

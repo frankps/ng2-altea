@@ -1,6 +1,40 @@
 <div class="card">
     <div class="card-body">
 
+        <!-- 
+        <div class="custom-control custom-radio custom-control-inline">
+            <input type="radio" id="customRadioInline1" name="customRadioInline1" class="custom-control-input">
+            <label class="custom-control-label" for="customRadioInline1">Toggle this custom radio</label>
+        </div>
+        <div class="custom-control custom-radio custom-control-inline">
+            <input type="radio" id="customRadioInline2" name="customRadioInline1" class="custom-control-input">
+            <label class="custom-control-label" for="customRadioInline2">Or toggle this other custom radio</label>
+        </div>
+
+        <div class="form-check" *ngFor="let item of items">
+            <input class="form-check-input" type="radio" name="select-item" [id]="item.key" [value]="item.key"
+                [(ngModel)]="bindObject[bindProp]">
+            <label class="form-check-label" [for]="item.key">{{item.trans}}<br>
+                <small>{{item.help}}</small>
+            </label>
+        </div>
+ -->
+
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="paymentType" id="gift" value="gift"
+                [(ngModel)]="paymentType">
+            <label class="form-check-label" for="gift">Ik heb een cadeaubon
+            </label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="paymentType" id="online" value="online"
+                [(ngModel)]="paymentType">
+            <label class="form-check-label" for="online">Ik betaal online
+            </label>
+        </div>
+
+
+
 
         <ng-container *ngFor="let demo of demoNames">
 

@@ -1,13 +1,14 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 //import Stripe from 'stripe';
 import { ActivatedRoute, Router } from '@angular/router';
-import { OrderMgrUiService, OrderUiMode, SessionService } from 'ng-altea-common';
+import { DemoOrdersComponent, GiftService, OrderMgrUiService, OrderUiMode, SessionService } from 'ng-altea-common';
 import { StripeService } from 'projects/ng-altea-common/src/lib/stripe.service';
-import { CreateCheckoutSession } from 'ts-altea-model';
+import { CreateCheckoutSession, PaymentType } from 'ts-altea-model';
 import { TranslationService } from 'ng-common'
 import { AuthService } from '../../auth/auth.service';
 import { environment } from '../../../environments/environment';
 import { NgxSpinnerService } from "ngx-spinner"
+import { ArrayHelper } from 'ts-common';
 
 /*
 
@@ -15,6 +16,16 @@ https://stripe.com/docs/payments/accept-a-payment?platform=web&ui=embedded-check
 
 import Stripe from 'stripe';
 const stripe = new Stripe('sk_test_DFr3nlEXpSATg1nltMs3kvbT');
+
+
+
+http://localhost:4350/branch/aqua/orderMode/demo-orders
+
+
+http://localhost:4350/branch/aqua/orderMode/pay-online
+
+
+
 
 */
 
@@ -46,21 +57,98 @@ declare var Stripe;
 })
 export class PayOnlineComponent implements OnInit, OnDestroy {
 
-  mode: 'SelectOption' | 'PayOnline' = 'SelectOption'
+  // in order to pay with gifts
+  giftCode: string
+
+  giftMessage = ''
+
+
+  mode: 'SelectOption' | 'PayMethod' | 'PayOnline' = 'SelectOption'
 
   payOptions: PaymentOption[] = []
+
+  // Selected payment option
+  payOption: PaymentOption
+  toPay = 0
 
   checkout
 
   constructor(protected orderMgrSvc: OrderMgrUiService, protected route: ActivatedRoute, protected sessionSvc: SessionService,
-    protected stripeSvc: StripeService, private translationSvc: TranslationService, protected authSvc: AuthService, protected spinner: NgxSpinnerService
+    protected stripeSvc: StripeService, private translationSvc: TranslationService, protected authSvc: AuthService, protected spinner: NgxSpinnerService,
+    protected giftSvc: GiftService, protected router: Router
   ) {
   }
 
   async ngOnInit() {
 
+
+    console.log(this.orderMgrSvc.order)
+
+
     await this.setPaymentOptions()
+
+    // for easy dubugging (auto select first option, go to pay type)
+    await this.selectPayOption(this.payOptions[0])
     // this.startPayment()
+
+    //  await this.debug()
+
+  }
+
+
+
+
+  /**
+   * 
+   * @param giftCode Try to pay with gift
+   */
+  async tryPayGift(giftCode: string) {
+    this.giftMessage = ''
+
+    const gifts = await this.giftSvc.searchGift(giftCode)
+
+    if (ArrayHelper.IsEmpty(gifts)) {
+
+      this.giftMessage = `Cadeaubon '${giftCode}' niet gevonden`
+
+    } else {
+
+      const gift = gifts[0]
+
+      const available = gift.availableAmount()
+
+      if (available > 0) {
+        const takeFromGift = Math.min(available, this.toPay)
+        const remaining = available - takeFromGift
+
+        this.giftMessage = `€${takeFromGift} van cadeaubon '${giftCode}' genomen. De cadeaubon bevat nog €${remaining}.`
+
+
+        const pay = this.orderMgrSvc.addPayment(takeFromGift, PaymentType.gift, 'app')
+        pay.giftId = gift.id
+
+        this.calculateToPay()
+
+        // nothing left to pay
+        if (this.toPay == 0) {
+
+          const savedOrder = this.orderMgrSvc.saveOrder()
+          console.log(savedOrder)
+
+
+          this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'orderMode', 'order-finished']) //])
+
+        }
+
+
+      } else {
+        // show message to user
+        this.giftMessage = `Cadeaubon '${giftCode}' heeft geen beschikbare waarde meer`
+      }
+
+
+    }
+
 
   }
 
@@ -97,17 +185,37 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
 
   }
 
+  calculateToPay(): number {
+    this.toPay = this.payOption.amount
+    const paid = this.orderMgrSvc.order.paid
+    this.toPay = Math.max(this.toPay - paid, 0)
+
+    return this.toPay
+  }
+
   async selectPayOption(payOption: PaymentOption) {
 
     if (!payOption)
       return
 
+    this.payOption = payOption
+
+    this.calculateToPay()
+
+    this.mode = 'PayMethod'
+    /*
     this.mode = 'PayOnline'
     await this.startPayment(payOption.amount)
-
+*/
   }
 
+  async payOnline() {
 
+    const toPay = this.calculateToPay()
+
+
+    await this.startPayment(toPay)
+  }
 
   async ngOnDestroy() {
 
@@ -116,6 +224,8 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
   }
 
   async startPayment(amount: number) {
+
+    this.mode = 'PayOnline'
 
     let me = this
 
@@ -131,7 +241,7 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
 
     const order = me.orderMgrSvc.order
 
-    //    let amount = order.incl
+    //    let amount = order.incl  
 
     console.log(me.orderMgrSvc.order)
 

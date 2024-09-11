@@ -608,7 +608,7 @@ export class OrderMgrUiService {   // implements OnInit
   }
 
 
-  async saveOrder() {
+  async saveOrder() : Promise<Order> {
 
     this.spinner.show()
 
@@ -650,6 +650,8 @@ export class OrderMgrUiService {   // implements OnInit
     console.error(res)
 
     this.spinner.hide()
+
+    return res.object
   }
 
 

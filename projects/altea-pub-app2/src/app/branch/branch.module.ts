@@ -19,6 +19,8 @@ import { MyOrdersComponent } from './my-orders/my-orders.component';
 import { TranslateModule } from '@ngx-translate/core';
 import { AuthModule } from '../auth/auth.module';
 import { ProfileComponent } from './profile/profile.component';
+import { FormsModule } from '@angular/forms';
+import { OrderFinishedComponent } from './order-finished/order-finished.component';
 
 @NgModule({
   declarations: [
@@ -34,7 +36,8 @@ import { ProfileComponent } from './profile/profile.component';
      MySubsComponent,
      UserContactMatchComponent,
      MyOrdersComponent,
-     ProfileComponent
+     ProfileComponent,
+     OrderFinishedComponent
   ],
   imports: [
     CommonModule,
@@ -42,7 +45,8 @@ import { ProfileComponent } from './profile/profile.component';
     NgAlteaCommonModule,
     OrderMgrModule,
     TranslateModule,
-    AuthModule
+    AuthModule,
+    FormsModule
   ]
 })
 export class BranchModule { }

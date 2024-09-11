@@ -22,8 +22,6 @@ export class UseGiftComponent {
 
     this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'order'])
 
-
-    //gift.l
     
   }
 }

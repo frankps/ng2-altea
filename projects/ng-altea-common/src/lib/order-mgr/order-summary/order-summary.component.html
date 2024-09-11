@@ -53,27 +53,38 @@
 
 
 
-    <ng-container *ngIf="pays && order.payments">
+
+    <ng-container *ngIf="pays">
 
         <!--  <b class="">Betalingen:</b> -->
 
-        <div class="row mt-3">
-            <div class="col"><b>Betalingen:</b></div>
-        </div>
+        <ng-container *ngIf="order.paid == 0">
 
-        <ng-container *ngFor="let pay of order.payments">
+        </ng-container>
 
 
-            <div class="row ps-2 mt-1">
-                <div class="col-3">{{pay.amount}}</div>
-                <div class="col-3">{{pay.type}}</div>
-                <div class="col-3"></div>
-                <div class="col-3"></div>
+        <ng-container *ngIf="order.paid != 0 && order.payments">
+
+            <div class="row mt-3">
+                <div class="col"><b>Betalingen:</b></div>
             </div>
-
+    
+            <ng-container *ngFor="let pay of order.payments">
+    
+    
+                <div class="row ps-2 mt-1">
+                    <div class="col-3">{{pay.amount}}</div>
+                    <div class="col-3">{{pay.type}}</div>
+                    <div class="col-3"></div>
+                    <div class="col-3"></div>
+                </div>
+    
+            </ng-container>
 
 
         </ng-container>
+
+
     </ng-container>
 
 

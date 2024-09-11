@@ -21,8 +21,8 @@ export class SelectDateComponent {
   alteaDb: AlteaDb
 
   // for debugging
-  minDate = new Date(2024, 2, 1)
-
+  minDate = new Date()  //new Date(2024, 2, 1)
+ 
   constructor(protected orderMgrUiSvc: OrderMgrUiService, protected sessionSvc: SessionService, protected objectSvc: ObjectService, protected spinner: NgxSpinnerService) {
 
     this.alteaDb = new AlteaDb(objectSvc)

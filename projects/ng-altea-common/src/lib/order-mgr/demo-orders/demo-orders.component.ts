@@ -67,6 +67,10 @@ export class DemoOrder {
 })
 export class DemoOrdersComponent implements OnInit {
 
+
+  paymentType: 'gift' | 'online' = 'online'
+
+
   @Output() new: EventEmitter<Order> = new EventEmitter<Order>();
 
   wellnessId = "31eaebbc-af39-4411-a997-f2f286c58a9d"
@@ -109,7 +113,7 @@ export class DemoOrdersComponent implements OnInit {
   demoNames: string[] = []
   contactNames: string[] = []
 
-  preselect: string // = 'Bodyslimming sessie' // 'Wellness 2h/2p'
+  preselect: string = 'Wellness 2h/2p' // = 'Bodyslimming sessie' // 'Wellness 2h/2p'
   onDate: number // = 20240315000000
 
 
@@ -119,6 +123,8 @@ export class DemoOrdersComponent implements OnInit {
     this.contactNames = Array.from(this.contacts.keys())
 
   }
+
+
 
   async setContact(entry) {
 

@@ -7,6 +7,10 @@ import { StripeSessionStatus } from 'ts-altea-model';
 import { NgxSpinnerService } from "ngx-spinner"
 
 
+/**
+ * Component is shown after a Stripe payment
+ */
+
 export class PayFinishedParams {
   orderId?: string
   sessionId?: string
@@ -51,6 +55,13 @@ export class PayFinishedComponent implements OnInit {
 
   async process(queryParams: PayFinishedParams) {
 
+    console.warn(queryParams)
+
+    if (queryParams.orderId) {
+      await this.orderMgrSvc.loadOrder$(queryParams.orderId)
+    }
+
+
     if (!queryParams.sessionId) {
       console.error('Stripe sessionId required!')
       return
@@ -62,6 +73,8 @@ export class PayFinishedComponent implements OnInit {
 
     const sessionStatus = res.object
     
+
+
 
     console.error(sessionStatus)
 

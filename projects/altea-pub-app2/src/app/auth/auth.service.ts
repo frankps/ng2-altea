@@ -107,8 +107,10 @@ export class AuthService {
 
       me.fbUser = firebaseUser
 
-      if (firebaseUser == null)
+      if (firebaseUser == null) {
         me.clearUserData()
+        return
+      }
 
       if (firebaseUser) {
 
@@ -166,26 +168,35 @@ export class AuthService {
 
           console.error('forwarding user!')
 
-
-          // to test
-          //this.router.navigate(['/auth', 'profile'])
-
-          console.error(this.route)
+          let originalUrl = me.route.snapshot['_routerState'].url
+          console.error(originalUrl)
 
           if (me.redirectEnabled) {
             if (me.redirect) {
               me.router.navigate(me.redirect)
               me.redirect = null
-  
-            } else {
-  
-  
+
+            } else if (originalUrl) {
+
+              // introduced to bring back user to original URL
+
+              console.warn(`Redirecting to: ${originalUrl}`)
+              if (originalUrl[0] == '/')
+                originalUrl = originalUrl.substring(1)
+              const pathItems = originalUrl.split('/')
+
+              me.router.navigate(pathItems)
+
+            }
+            else {
+
+
               if (newUser || !me.user.first)
                 me.router.navigate(['/auth', 'profile'])
               else
                 me.router.navigate(['branch', 'aqua', 'menu'])
-  
-  
+
+
             }
           }
 

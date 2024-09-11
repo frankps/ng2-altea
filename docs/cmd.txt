@@ -124,6 +124,8 @@ ng generate component resource/resourceUserLink --project altea-velzon-admin
 ng generate application altea-pub-app2 --style=scss --routing=true
 ng generate component branch/mySubs --project altea-pub-app2
 ng generate component branch/profile --project altea-pub-app2
+ng generate component branch/order-finished --project altea-pub-app2
+
 
 ng generate module info --project altea-pub-app2 --routing
 ng generate component info/privacy --project altea-pub-app2

@@ -1,10 +1,68 @@
+<ng-template #orderSummary>
+
+    <ng-container>
+
+        Overzicht van uw reservatie/bestelling:
+
+        <div class="my-3 mx-4">
+            <order-mgr-order-summary [order]="orderMgrSvc.order" [pays]="true"></order-mgr-order-summary>
+        </div>
+
+    </ng-container>
+
+    <b>Reeds betaald:</b> €{{orderMgrSvc.order.paid}} <br>
+    <b>Totaal:</b> €{{payOption?.amount}} <br>
+    <b>Nog te betalen:</b> €{{toPay}} <br><br>
+
+
+</ng-template>
+
+
+
+
 <ng-container [ngSwitch]="mode">
+
+
+    <ng-container *ngSwitchCase="'PayMethod'">
+
+        <ng-container *ngTemplateOutlet="orderSummary"></ng-container>
+
+
+        <div class="row">
+            <div class="col-6">
+                <input type="text" id="giftCode" name="giftCode" class="form-control" [(ngModel)]="giftCode" />
+            </div>
+            <div class="col-6">
+                <button type="button" class="btn btn-primary" [disabled]="!giftCode" (click)="tryPayGift(giftCode)"
+                    translate>dic.add</button>
+            </div>
+        </div>
+        <div class="row" *ngIf="giftMessage">
+            <div class="col-12">
+                {{giftMessage}}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <button type="button" class="btn btn-primary" (click)="payOnline()" translate>dic.payOnline</button>
+            </div>
+        </div>
+
+    </ng-container>
+
+
 
     <ng-container *ngSwitchCase="'SelectOption'">
 
+        <ng-container *ngTemplateOutlet="orderSummary"></ng-container>
+
         <ng-container *ngIf="payOptions">
 
-            
+
+
+
+
             Om uw reservatie/bestelling <b>te bevestigen</b> heeft u de keuze uit devolgende betalingen:
 
             <div class="row my-3" *ngFor="let option of payOptions">
@@ -20,12 +78,7 @@
                 </div>
             </div>
 
-            Overzicht van uw reservatie/bestelling:
 
-            <div class="my-5">
-                <order-mgr-order-summary [order]="orderMgrSvc.order"></order-mgr-order-summary>
-            </div>
-            
 
 
         </ng-container>
@@ -41,12 +94,16 @@
     <ng-container *ngSwitchCase="'PayOnline'">
 
 
-        <div id="checkout">
-            <!-- Checkout will insert the payment form here -->
-        </div>
+
 
 
     </ng-container>
 
 
 </ng-container>
+
+
+
+<div id="checkout">
+    <!-- Checkout will insert the payment form here -->
+</div>
