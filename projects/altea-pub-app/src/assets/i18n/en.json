@@ -648,6 +648,10 @@
         "inf": "Beheer uw afspraken"
       }
     },
+    "payment": {
+      "full": "Volledig bedrag",
+      "deposit": "Voorschot"
+    },
     "gift": {
       "choice": "Wat wenst u te schenken: een bedrag of kiest u liever zelf een dienst uit het aanbod?",
       "types": {

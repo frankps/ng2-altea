@@ -10,10 +10,16 @@
 
     </ng-container>
 
-    <b>Reeds betaald:</b> €{{orderMgrSvc.order.paid}} <br>
-    <b>Totaal:</b> €{{payOption?.amount}} <br>
-    <b>Nog te betalen:</b> €{{toPay}} <br><br>
 
+    <b>{{ 'app.payment.' + payOption.type | translate }}:</b> €{{payOption?.amount}} <br>
+
+
+    <ng-container *ngIf="orderMgrSvc.order.paid > 0">
+        <b>Reeds betaald:</b> €{{orderMgrSvc.order.paid}} <br>
+        <b>Nog te betalen:</b> €{{toPay}} <br>
+    </ng-container>
+    <br>
+  
 
 </ng-template>
 
@@ -27,14 +33,20 @@
 
         <ng-container *ngTemplateOutlet="orderSummary"></ng-container>
 
+       
+        <div class="row my-2">
+            <div class="col">
+                <b>Betalen met cadeaubon:</b>
+            </div>
+        </div>
 
         <div class="row">
             <div class="col-6">
-                <input type="text" id="giftCode" name="giftCode" class="form-control" [(ngModel)]="giftCode" />
+                <input type="text" id="giftCode" name="giftCode" class="form-control" placeholder="Cadeaubon nummer" [(ngModel)]="giftCode" />
             </div>
-            <div class="col-6">
+            <div class="col-6 d-grid gap-2">
                 <button type="button" class="btn btn-primary" [disabled]="!giftCode" (click)="tryPayGift(giftCode)"
-                    translate>dic.add</button>
+                    >Cadeaubon valideren</button>
             </div>
         </div>
         <div class="row" *ngIf="giftMessage">
@@ -43,9 +55,16 @@
             </div>
         </div>
 
-        <div class="row">
+        <div class="row mt-4 mb-2">
             <div class="col">
-                <button type="button" class="btn btn-primary" (click)="payOnline()" translate>dic.payOnline</button>
+                <b>Online betalen:</b>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+        
+            <div class="col-6 align-self-center d-grid gap-2">
+                <button type="button" class="btn btn-primary" (click)="payOnline()">€{{toPay}} {{'dic.payOnline' | translate }}</button>
             </div>
         </div>
 

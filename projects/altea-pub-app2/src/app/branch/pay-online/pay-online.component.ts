@@ -32,14 +32,17 @@ http://localhost:4350/branch/aqua/orderMode/pay-online
 export class PaymentOption {
   amount: number
 
+  type: 'deposit' | 'full'
+
   /** Call To Action */
   cta: string
 
   info: string
 
-  constructor(amount: number, cta?: string, info?: string) {
+  constructor(amount: number, type: 'deposit' | 'full', cta?: string, info?: string) {
 
     this.amount = amount
+    this.type = type
     this.cta = cta
     this.info = info
 
@@ -161,12 +164,12 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
     var deposit = order.deposit
 
     if (deposit && deposit > 0) {
-      const depositPayOption = new PaymentOption(deposit, `Voorschot: €${deposit}`)
+      const depositPayOption = new PaymentOption(deposit, 'deposit', `Voorschot: €${deposit}`)
       this.payOptions.push(depositPayOption)
     }
 
     if (order.incl && order.incl > deposit) {
-      const fullPayOption = new PaymentOption(order.incl, `Volledig: €${order.incl}`)
+      const fullPayOption = new PaymentOption(order.incl, 'full', `Volledig: €${order.incl}`)
       this.payOptions.push(fullPayOption)
     }
 
