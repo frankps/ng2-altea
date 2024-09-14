@@ -86,6 +86,14 @@ export class OrderMgrUiService {   // implements OnInit
 
   branch: Branch
 
+
+  /*  
+  */
+  mode: string
+  modeChanges: BehaviorSubject<string> = new BehaviorSubject<string>(null)
+
+
+
   constructor(private productSvc: ProductService, private orderSvc: OrderService, private orderMgrSvc: OrderMgrService
     , protected spinner: NgxSpinnerService, public dbSvc: ObjectService, public alteaSvc: AlteaService, protected sessionSvc: SessionService,
     public dashboardSvc: DashboardService, protected stripeSvc: StripeService, protected resourceSvc: ResourceService, protected giftSvc: GiftService) {
@@ -104,7 +112,18 @@ export class OrderMgrUiService {   // implements OnInit
 
   }
 
-  hasOptions() : boolean {
+
+  changeMode(newMode: string) {
+
+    if (newMode != this.mode) {
+      this.modeChanges.next(newMode)
+      this.mode = newMode
+    }
+
+  }
+
+
+  hasOptions(): boolean {
 
     return ArrayHelper.NotEmpty(this.options)
 
@@ -206,6 +225,14 @@ export class OrderMgrUiService {   // implements OnInit
     this.uiMode = uiMode
   }
 
+  clearData() {
+    this.orderLineOptions = null
+    this.orderLine = null
+    this.orderDirty = false
+    this.options = null
+
+  }
+
   async newOrder(uiMode: OrderUiMode = OrderUiMode.newOrder, gift?: Gift) {
 
     let me = this
@@ -213,8 +240,9 @@ export class OrderMgrUiService {   // implements OnInit
 
     let branch = await this.sessionSvc.branch$()
 
+    this.clearData()
     this.order = new Order(branch.unique, true)
-    this.orderDirty = false
+
 
     this.order.branchId = branch.id
     this.order.branch = branch
@@ -424,14 +452,23 @@ export class OrderMgrUiService {   // implements OnInit
     */
 
 
-  async loadOrder$(orderId: string) : Promise<Order> {
+
+
+
+  async loadOrder$(orderId: string): Promise<Order> {
 
     this.spinner.show()
+
+    this.clearData()
 
     // .resources.resource
     const order = await this.orderSvc.get$(orderId, "planning.resource,lines:orderBy=idx.product,contact.cards,payments:orderBy=idx")
 
     this.order = order
+
+
+    /*     var isNew = order.isNew()
+        console.warn(isNew) */
 
     //let depoDate = order.calculateDepositByDate()
 
@@ -440,10 +477,9 @@ export class OrderMgrUiService {   // implements OnInit
     if (!this.order.branch || order.branchId != order.branch.id)
       throw new Error('Wrong branch on order!')
 
-    this.orderLineOptions = null
-    this.orderLine = null
+
     this.resources = order.getResources()
-    this.orderDirty = false
+
 
 
     this.spinner.hide()
@@ -468,9 +504,9 @@ export class OrderMgrUiService {   // implements OnInit
 
 
   availabilityRequestFromDate() {
-    if (!this.availabilityRequest?.from) 
+    if (!this.availabilityRequest?.from)
       return null
-    
+
     const from = DateHelper.parse(this.availabilityRequest.from)
     return from
   }
@@ -482,10 +518,10 @@ export class OrderMgrUiService {   // implements OnInit
     /*     this.options = ReservationOptionSet.createDummy().options
         console.error(this.options)
     
-        return */   
+        return */
 
 
-   
+
     console.warn(this.order)
 
     const request = new AvailabilityRequest(this.order)
@@ -608,7 +644,7 @@ export class OrderMgrUiService {   // implements OnInit
   }
 
 
-  async saveOrder() : Promise<Order> {
+  async saveOrder(): Promise<Order> {
 
     this.spinner.show()
 
@@ -855,7 +891,7 @@ export class OrderMgrUiService {   // implements OnInit
     const me = this
 
     // if this is a bundle, then we need to unpack the product (and add product.items individually)
-    
+
     if (orderLine?.product?.sub == ProductSubType.bundle) {
       const orderLines = await me.addProduct(orderLine.product, orderLine.qty)
 
@@ -868,12 +904,16 @@ export class OrderMgrUiService {   // implements OnInit
       console.warn(me.order)
 
       me.order.addLine(orderLine, setUnitPrice)
+
+      /** introduced for wellness, has options adults & kids => this influences nrOfPersons */
+      me.updateNrOfPersons(orderLine)
+
       me.orderDirty = true
       me.orderLineIsNew = false
-  
+
       await me.calculateLoyalty()
     }
-      
+
     this.tmp = 'aaaa'
 
 
@@ -892,6 +932,65 @@ export class OrderMgrUiService {   // implements OnInit
     return this.orderLine
   }
 
+
+  
+
+  updateNrOfPersons(orderLine: OrderLine = this.orderLine) {
+
+    const nrOfPersons = orderLine.getNrOfPersonsDefinedOnOptions()
+    console.warn('nrOfPersons', nrOfPersons)
+
+    if (nrOfPersons > 0) {
+
+      if (this.order.nrOfPersons < nrOfPersons) {
+        this.order.nrOfPersons = nrOfPersons
+        this.order.updatePersons()
+      }
+
+      /*       for (let idx = 0; idx < nrOfPersons; idx++) {
+              let person = this.order.persons[idx]
+              orderLine.persons.push(person.id)
+            } */
+
+    }
+    
+
+    let orderLinePersons = orderLine.persons.length
+    if (orderLine.persons.length != nrOfPersons) {
+
+      if (orderLinePersons < nrOfPersons) {
+
+        for (let idx = 0; idx < this.order.persons.length; idx++) {
+
+          const person = this.order.persons[idx]
+
+          if (orderLine.persons.indexOf(person.id) == -1) {
+            orderLine.persons.push(person.id)
+            orderLinePersons++
+          }
+
+          if (orderLinePersons == nrOfPersons)
+            break
+
+        }
+
+
+      } else {
+
+        orderLine.persons.splice(nrOfPersons)
+
+      }
+
+    }
+
+    orderLine.persons = _.orderBy(orderLine.persons)
+    
+
+
+
+
+
+  }
 
 
 

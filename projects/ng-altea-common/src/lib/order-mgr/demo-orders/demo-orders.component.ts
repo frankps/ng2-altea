@@ -113,7 +113,7 @@ export class DemoOrdersComponent implements OnInit {
   demoNames: string[] = []
   contactNames: string[] = []
 
-  preselect: string = 'Wellness 2h/2p' // = 'Bodyslimming sessie' // 'Wellness 2h/2p'
+  preselect: string // = 'Wellness 2h/2p' // = 'Bodyslimming sessie' 
   onDate: number // = 20240315000000
 
 

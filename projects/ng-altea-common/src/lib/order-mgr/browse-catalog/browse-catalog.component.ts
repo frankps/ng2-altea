@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { OrderMgrUiService } from '../order-mgr-ui.service';
 import { ProductService } from 'ng-altea-common'
 import { Product, ProductType } from 'ts-altea-model';
@@ -10,7 +10,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
   templateUrl: './browse-catalog.component.html',
   styleUrls: ['./browse-catalog.component.scss'],
 })
-export class BrowseCatalogComponent {
+export class BrowseCatalogComponent implements OnInit {
 
   categories: Product[] = []
 
@@ -19,17 +19,35 @@ export class BrowseCatalogComponent {
 
   constructor(protected orderMgrSvc: OrderMgrUiService, private productSvc: ProductService, protected spinner: NgxSpinnerService) {
 
-//     this.showRootFolders()
+    //     this.showRootFolders()
 
-    
-/*     this.orderMgrSvc.orderUiStateChanges.subscribe(newState => {
 
-      console.error(newState)
-    
-    }) */
+
 
   }
-  
+
+
+
+
+  ngOnInit(): void {
+
+
+    this.orderMgrSvc.modeChanges.subscribe(newState => {
+
+      console.warn(newState)
+
+      if (newState == 'showRootFolders')
+        this.showRoot()
+
+      //console.error(newState)
+
+    })
+
+
+  }
+
+
+
   showRoot() {
 
     this.orderMgrSvc.showRootCategories()
@@ -41,28 +59,28 @@ export class BrowseCatalogComponent {
 
   }
 
-/* 
-  showRootFolders() {
-
-    this.spinner.show()  
-
-    this.productSvc.getAllCategories().pipe(take(1)).subscribe(res => {
-      this.categories = res
-
-      this.serviceCats = this.categories.filter(cat => cat.type == ProductType.service)
-
-      this.productCats = this.categories.filter(cat => cat.type == ProductType.product)
-      console.error(res)
-
-      this.spinner.hide()
-    })
-
-  }
-
-  selectCategory(category: Product) {
-    this.orderMgrSvc.showProductsInCategory(category)
-  }
- */
+  /* 
+    showRootFolders() {
+  
+      this.spinner.show()  
+  
+      this.productSvc.getAllCategories().pipe(take(1)).subscribe(res => {
+        this.categories = res
+  
+        this.serviceCats = this.categories.filter(cat => cat.type == ProductType.service)
+  
+        this.productCats = this.categories.filter(cat => cat.type == ProductType.product)
+        console.error(res)
+  
+        this.spinner.hide()
+      })
+  
+    }
+  
+    selectCategory(category: Product) {
+      this.orderMgrSvc.showProductsInCategory(category)
+    }
+   */
 
 
 

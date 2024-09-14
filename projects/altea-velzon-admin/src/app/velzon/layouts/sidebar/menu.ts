@@ -7,6 +7,48 @@ export const MENU: MenuItem[] = [
     isTitle: true
   },
   {
+    id: 7,
+    label: 'menu.calendar.label',
+    icon: 'home',
+    link: '/aqua/calendar/syncfusion',
+  },
+  {
+    id: 10,
+    label: 'menu.order.label',
+    icon: 'home',
+    link: '/aqua/orders/manage',
+  },
+  {
+    id: 6,
+    label: 'menu.orders.label',
+    icon: 'home',
+    link: '/aqua/orders',
+  },
+  {
+    id: 16,
+    label: 'menu.messaging.label',
+    icon: 'home',
+    link: '/aqua/messaging',
+  },
+  {
+    id: 5,
+    label: 'menu.contacts.label',
+    icon: 'home',
+    link: '/aqua/contacts',
+  },  
+  {
+    id: 8,
+    label: 'menu.gifts.label',
+    icon: 'home',
+    link: '/aqua/gifts',
+  },
+  {
+    id: 9,
+    label: 'menu.subscriptions.label',
+    icon: 'home',
+    link: '/aqua/subscriptions',
+  },
+  {
     id: 2,
     label: 'menu.resources.label',
     icon: 'home',
@@ -66,24 +108,6 @@ export const MENU: MenuItem[] = [
     link: '/aqua/templates',
   },
   {
-    id: 5,
-    label: 'menu.contacts.label',
-    icon: 'home',
-    link: '/aqua/contacts',
-  },
-  {
-    id: 6,
-    label: 'menu.orders.label',
-    icon: 'home',
-    link: '/aqua/orders',
-  },
-  {
-    id: 7,
-    label: 'menu.calendar.label',
-    icon: 'home',
-    link: '/aqua/calendar',
-  },
-  {
     id: 7,
     label: 'menu.calendar.label',
     icon: 'home',
@@ -103,24 +127,8 @@ export const MENU: MenuItem[] = [
       }
     ]
   },
-  {
-    id: 8,
-    label: 'menu.gifts.label',
-    icon: 'home',
-    link: '/aqua/gifts',
-  },
-  {
-    id: 9,
-    label: 'menu.subscriptions.label',
-    icon: 'home',
-    link: '/aqua/subscriptions',
-  },
-  {
-    id: 10,
-    label: 'menu.order.label',
-    icon: 'home',
-    link: '/aqua/orders/manage',
-  },
+  
+  
   {
     id: 11,
     label: 'menu.branch.label',
@@ -204,12 +212,6 @@ export const MENU: MenuItem[] = [
       }
 
     ]
-  },
-  {
-    id: 16,
-    label: 'menu.messaging.label',
-    icon: 'home',
-    link: '/aqua/messaging',
   },
   {
     id: 30,

@@ -56,6 +56,7 @@ export class OrderComponent implements OnInit {
         break
 
       case AppMode.pos: // point of sale
+        this.show.next = true
         this.show.save = true
         this.show.posOnly = true
         this.show.deposit = true

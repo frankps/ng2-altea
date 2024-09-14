@@ -55,13 +55,16 @@ export interface ProductCategory {
 
 
 /**
- *  A formula term 
+ *  A formula term: factor * (value + inc) * option
  */
 export class FormulaTerm {
   factor = 1
 
   value = true
 
+  /** increment/decrement for the value */
+  inc = 0
+  
   optionId?: string
 }
 
@@ -86,6 +89,9 @@ export class ProductOption extends ObjectWithIdPlus {
   public = true
   required = true
   multiSelect = false
+
+  /** this option(.value) has effect on order.nrOfPersons */
+  persons = false
 
   hasDuration = false
   hasPrice = false
@@ -482,6 +488,16 @@ export class Product extends ObjectWithIdPlus {
       series = this.plan?.filter(blockSeries => !Array.isArray(blockSeries.scheduleIds) || blockSeries.scheduleIds.length == 0)
 
     return series
+  }
+
+  getOption(optionId: string): ProductOption {
+
+    if (!this.hasOptions())
+      return null
+
+    const option = this.options.find(o => o.id == optionId)
+
+    return option
   }
 
   getOptionValues(optionId: string): ProductOptionValue[] {

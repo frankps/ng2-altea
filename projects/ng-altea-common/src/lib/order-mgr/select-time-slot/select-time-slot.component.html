@@ -25,7 +25,7 @@
 
 </ng-container>
 
-<div class="d-grid mt-3">
+<div class="d-grid mt-3" *ngIf="otherDateButton">
     <button type="button" class="btn btn-outline-secondary float-end" (click)="selectOtherDate()"
         translate>ui.order-mgr.select-time-slot.other-date</button>
 </div>

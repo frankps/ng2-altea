@@ -3,14 +3,14 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { OrderMgrUiService, BrowseCatalogComponent } from 'ng-altea-common';
 import { DashboardService, NgBaseComponent } from 'ng-common';
 import { ContactSelect2Component } from 'projects/ng-altea-common/src/lib/order-mgr/contact-select2/contact-select2.component';
-import { Observable, take, takeUntil } from 'rxjs';
-import { Contact, Gift, Order, OrderLine } from 'ts-altea-model';
+import { BehaviorSubject, Observable, take, takeUntil } from 'rxjs';
+import { Contact, Gift, MenuItem, Order, OrderLine } from 'ts-altea-model';
 
 
 
 
 
-export enum PosOrderMenuItem {
+export enum PosOrderMode {
   start = 'start',
   buyGift = 'buyGift',
   compose = 'compose',
@@ -30,24 +30,14 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
   @ViewChild('editContact') public editContact: ContactSelect2Component;
 
   menu = [
+    new MenuItem('new-reserv', 'always'),
+    new MenuItem('buy-gift', 'always')
 
-    {
-      code: 'new-reserv'
-    },
-    
-    {
-      code: 'buy-gift'
-    }
-    /*,
-    {
-      code: 'use-gift'
-    },
-    {
-      code: 'demo-orders'
-    }*/
   ]
 
-  mode: PosOrderMenuItem = PosOrderMenuItem.plan
+  //mode: PosOrderMode = PosOrderMode.plan
+
+  modeChanges: BehaviorSubject<string> = new BehaviorSubject<string>(null)
 
   showPersonSelect = false
 
@@ -61,11 +51,16 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
 
         const orderId = params['id']
 
-        if (orderId)
+        if (orderId) {
           await this.orderMgrSvc.loadOrder$(orderId)
+
+          var isNew = this.orderMgrSvc.order.isNew()
+          console.warn(isNew)
+        
+        }
       }
     })
-    
+
     this.dashboardSvc.showSearch = true
 
     this.dashboardSvc.search$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(searchString => {
@@ -79,15 +74,42 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
 
   }
 
+  get mode() : string {
+    return this.orderMgrSvc.mode
+  }
+
+  set mode(newMode: string) {
+    this.orderMgrSvc.changeMode(newMode)
+  }
+
+  changeMode(newMode: string) {
+
+    this.orderMgrSvc.changeMode(newMode)
+
+    /*
+    if (newMode != this.mode) {
+      this.modeChanges.next(newMode)
+      this.mode = newMode
+    }*/
+
+    
+
+
+  }
+
+  orderContinue() {
+    this.changeMode(PosOrderMode.plan)
+  }
+
   orderLineSelected(orderLine: OrderLine) {
 
-    this.mode = PosOrderMenuItem.compose
+    this.changeMode(PosOrderMode.compose)
 
   }
 
   cancelOrder(order: Order) {
 
-    this.mode = PosOrderMenuItem.cancel
+    this.changeMode(PosOrderMode.cancel)
 
   }
 
@@ -98,7 +120,12 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
   }
 
 
-  menuClicked(menuItem) {
+  timeSlotSelected(slot) {
+    this.changeMode(PosOrderMode.contact)
+  }
+
+
+  async menuClicked(menuItem) {
 
     console.error(menuItem)
 
@@ -110,20 +137,25 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
 
       case 'new-reserv':
 
-        this.orderMgrSvc.newOrder()
-        this.mode = PosOrderMenuItem.compose
+        await this.orderMgrSvc.newOrder()
+
+        // in order to trigger the BrowseCatalogComponent catalog component to show root folders
+        this.changeMode('showRootFolders')
+
+
+        this.changeMode(PosOrderMode.compose)
 
 
         break
 
 
       case 'buy-gift':
-        this.mode = PosOrderMenuItem.buyGift
-        
+        this.changeMode(PosOrderMode.buyGift)
+
         break
 
       default:
-        
+
 
     }
 

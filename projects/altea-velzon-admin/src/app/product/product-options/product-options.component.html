@@ -84,6 +84,13 @@
                   <input class="form-check-input" type="checkbox" id="required" [(ngModel)]="option.required" />
                   <label class="form-check-label" for="required" translate="objects.productOption.required"></label>
                 </div>
+
+
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="persons" [(ngModel)]="option.persons" />
+                  <label class="form-check-label" for="persons" translate="objects.productOption.persons"></label>
+                </div>
+
                 <div class="form-check">
                   <input class="form-check-input" type="checkbox" id="pvt" [(ngModel)]="option.pvt" />
                   <label class="form-check-label" for="pvt" translate="objects.productOption.pvt"></label>
@@ -156,7 +163,8 @@
                       <div class="col-9">
                         Formule = <ng-container *ngFor="let term of option.formula; let idx = index"><span
                             *ngIf="idx > 0"> + </span>(<span>{{term.factor}}</span>
-                          <span *ngIf="term.value">&nbsp;x&nbsp;{{'objects.formulaTerm.value' | translate}}</span>
+                          <span *ngIf="term.value">&nbsp;x&nbsp;({{'objects.formulaTerm.value' | translate}}<span *ngIf="term.inc"> + {{term.inc}}</span>)
+                          </span>
                           <span *ngIf="term.optionId"> x {{getOptionName(term.optionId)}}</span>) <i
                             class="fa-solid fa-trash" (click)="removeTerm(option, idx)"></i> &nbsp;
 
@@ -166,18 +174,33 @@
                     </div>
 
                     <div class="row">
-                      <div class="col-3"><input type="number" id="factor" name="factor" class="form-control"
-                          [(ngModel)]="formulaTerm.factor" /></div>
+                      <div class="col-2">
 
-                      <div class="col-3">
+                        <input type="number" id="factor" name="factor" class="form-control form-control-sm"
+                          [(ngModel)]="formulaTerm.factor" />
+                      </div> x (
+
+                      <div class="col-2">
+
                         <div class="form-check">
                           <input class="form-check-input" type="checkbox" id="value" [(ngModel)]="formulaTerm.value" />
                           <label class="form-check-label" for="value" translate="objects.formulaTerm.value"></label>
                         </div>
 
                       </div>
+                      <ng-container *ngIf="formulaTerm.value">
 
-                      <div class="col-3"><ng-select id="optionId" name="optionId" [items]="product.options"
+
+                        +
+                        <div class="col-2">
+
+                          <input type="number" id="inc" name="inc" class="form-control form-control-sm"
+                            [(ngModel)]="formulaTerm.inc" />
+                        </div>
+                      </ng-container>
+
+                      ) x
+                      <div class="col-3"> <ng-select id="optionId" name="optionId" [items]="product.options"
                           bindLabel="name" bindValue="id" [clearable]="true" [multiple]="false"
                           [(ngModel)]="formulaTerm.optionId">
                         </ng-select></div>

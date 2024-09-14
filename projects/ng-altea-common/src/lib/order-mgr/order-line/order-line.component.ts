@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { OrderMgrUiService } from '../order-mgr-ui.service';
 import { ProductService, SessionService } from 'ng-altea-common'
 import { OrderLine, OrderLineOption, OrderLineOptionValue, Product, ProductType } from 'ts-altea-model';
@@ -12,6 +12,7 @@ import { OrderLine, OrderLineOption, OrderLineOptionValue, Product, ProductType 
 })
 export class OrderLineComponent {
 
+  @Input() showConfirm = true
 
   @Output() new: EventEmitter<OrderLine> = new EventEmitter<OrderLine>();
   @Output() delete: EventEmitter<OrderLine> = new EventEmitter<OrderLine>();
@@ -50,6 +51,8 @@ export class OrderLineComponent {
 
   addOrderLine(orderLine: OrderLine) {
 
+
+
     this.orderMgrSvc.addOrderLine(orderLine)
     this.new.emit(orderLine)
 
@@ -79,16 +82,23 @@ export class OrderLineComponent {
 
     console.error(optionValue)
 
-    
+
 
     this.orderLine.markAsUpdated("options")
 
     console.error('has price!!')
 
     this.orderLine.calculateAll()
-    this.orderMgrSvc.calculateAll()
-    this.orderMgrSvc.orderDirty = true
 
+    this.orderMgrSvc.calculateAll()
+
+
+    const productOption = this.product.getOption(option.id)
+
+    if (productOption?.persons) 
+      this.orderMgrSvc.updateNrOfPersons()
+
+    this.orderMgrSvc.orderDirty = true
 
   }
 

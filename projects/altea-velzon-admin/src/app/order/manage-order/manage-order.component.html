@@ -78,7 +78,7 @@
 
                     
             
-                    <order-mgr-order-line></order-mgr-order-line>
+                    <order-mgr-order-line [showConfirm]="false"></order-mgr-order-line>
             
                 </div>
             </div>
@@ -95,7 +95,7 @@
                 </div>
                 <div class="col-6">
 
-                    <order-mgr-select-time-slot></order-mgr-select-time-slot>
+                    <order-mgr-select-time-slot [otherDateButton]="false" (selected)="timeSlotSelected($event)"></order-mgr-select-time-slot>
 
                 </div>
             </div>
@@ -159,7 +159,7 @@
 
     <div class="col-4">
 
-        <order-mgr-order (orderLineSelected)="orderLineSelected($event)" (cancel)="cancelOrder($event)"></order-mgr-order>
+        <order-mgr-order (orderLineSelected)="orderLineSelected($event)" (cancel)="cancelOrder($event)" (continue)="orderContinue()"></order-mgr-order>
 
 <!-- 
         <order-mgr-person-select></order-mgr-person-select> -->

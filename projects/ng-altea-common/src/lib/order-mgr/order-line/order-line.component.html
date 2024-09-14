@@ -121,7 +121,7 @@
                     <button type="button" class="btn btn-outline-secondary float-end" (click)="deleteOrderLine()"><i
                             class="fa-solid fa-trash-can"></i> &nbsp; {{ 'dic.delete' | translate }} </button>
                 </div>
-                <div class="col-7 d-grid">
+                <div class="col-7 d-grid" *ngIf="showConfirm">
                     <button type="button" class="btn btn-outline-primary float-end" (click)="triggerConfirm()"><i
                             class="fa-solid fa-circle-check"></i> &nbsp; {{ 'dic.confirm' | translate }} </button>
                 </div>

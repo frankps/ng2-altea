@@ -973,6 +973,7 @@
       "public": "Klant kan optie zien & selecteren",
       "required": "Een waarde moet geselecteerd worden",
       "multiSelect": "Er kan meer dan 1 waarde selecteerd worden",
+      "persons": "Waarde van deze optie bepaalt aantal personen",
       "hasDuration": "Deze optie heeft een duurtijd",
       "hasPrice": "Deze optie heeft een prijs",
       "hasValue": "Deze optie heeft een waarde",

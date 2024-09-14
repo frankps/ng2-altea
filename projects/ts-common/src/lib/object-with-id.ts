@@ -12,10 +12,10 @@ export class RemovedFromCollection {
 
 export class ObjectMgmt {
   /** new, set to true if new */
-  n?: boolean
+  n?: boolean = false
 
   /** updated, set to true if updated/dirty */
-  u?: boolean
+  u?: boolean = false
 
   /** removed ids from collections */
   r?: { [collection: string]: string[] }
