@@ -4,7 +4,11 @@ import { Contact, OrderLine } from 'ts-altea-model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
 
+/*
 
+http://localhost:4350/branch/aqua/order/01e28ce2-0014-4dfe-8e81-d4f77460ee09/contact-edit
+
+*/
 
 @Component({
   selector: 'app-order',
@@ -195,7 +199,7 @@ export class OrderComponent implements OnInit {
 
   nextMode(currentMode: string) {
 
-    const modes = ['browse-catalog', 'order-line', 'order', 'person-select', 'staff-select', 'select-date', 'select-time-slot', 'contact-select', 'pay-online']
+    const modes = ['browse-catalog', 'order-line', 'order', 'person-select', 'staff-select', 'select-date', 'select-time-slot', 'contact-select', 'summary', 'contact-edit', 'pay-online']
 
     const currentIdx = modes.indexOf(currentMode)
     const personSelect = 3
@@ -206,6 +210,11 @@ export class OrderComponent implements OnInit {
     const order = this.orderMgrSvc.order
 
     let nexMode = 'pay-online'
+
+    switch (currentMode) {
+      case 'contact-edit':
+        return 'pay-online'
+    }
 
     const hasServices = order.hasServices()
 

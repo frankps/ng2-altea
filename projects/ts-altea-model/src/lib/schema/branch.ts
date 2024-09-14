@@ -176,10 +176,27 @@ export class Branch extends ObjectWithIdPlus {
 
     // 
     //nextDayTerm: number = 5
+    
+    getMaxDepositWaitTimeInHours(days: number) : number {
+
+        // if nothing configured, then 2 hours
+        if (ArrayHelper.IsEmpty(this?.depositTerms))
+            return 2
+
+        const terms = _.orderBy(this?.depositTerms, 'bt')
+
+        let term = terms.find(term => term.bt >= days)
+
+        if (!term)
+            term = terms[terms.length - 1]
+
+        return term.pt
+    }
 
     hasReminders() {
         return (Array.isArray(this.reminders) && this.reminders.length > 0)
     }
+
 
     getDepositTerm(beforeTime: number, beforeUnit: string = 'd') {
         if (!Array.isArray(this?.depositTerms))

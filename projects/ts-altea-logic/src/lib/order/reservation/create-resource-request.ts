@@ -97,12 +97,18 @@ export class CreateResourceRequest {
 
             const orderLinePersonIds = orderLine.hasPersons() ? orderLine.persons! : [persons[0].id!]  // fall back to 1st specified person id
 
+            let personIdx = 0
+            let allocateResources = true
+
+            let personOffsetToAdd = TimeSpan.zero
+
+
             // most of the time there will be only 1 personId
             for (const personId of orderLinePersonIds) {
 
                 const personOffset = offsetPerPerson.get(personId)!
 
-                const personOffsetToAdd = TimeSpan.zero
+                personOffsetToAdd = TimeSpan.zero
 
                 for (const productResource of productResources) {
 
@@ -143,11 +149,12 @@ export class CreateResourceRequest {
 
                     resourceRequest.add(resReqItem)
 
+                    /* 
                     if (orderLine.qty > 1) {
                         for (let i = 2; i <= orderLine.qty; i++) {
                             resourceRequest.add(resReqItem.clone())
                         }
-                    }
+                    } */
 
                     // at the end we will increment 
                     if (offsetDuration.duration.seconds > personOffsetToAdd.seconds)
@@ -158,7 +165,25 @@ export class CreateResourceRequest {
 
                 personOffset.addInternal(personOffsetToAdd)
 
+                personIdx++
+
+                /** in case of wellness, we have just 1 resource to allocate for multiple persons */
+                if (personIdx >= orderLine.qty)
+                    break
             }
+
+            /** in case of wellness, we have just 1 resource to allocate for multiple persons 
+             *  => we have to update all personOffsets of all other persons involved
+            */
+            if (personIdx < orderLinePersonIds.length) {
+
+                for (let idx = personIdx; idx < orderLinePersonIds.length; idx++) {
+                    const personId = orderLinePersonIds[idx]
+                    const personOffset = offsetPerPerson.get(personId)!
+                    personOffset.addInternal(personOffsetToAdd)
+                }
+            }
+
 
             console.error(orderLine)
         }

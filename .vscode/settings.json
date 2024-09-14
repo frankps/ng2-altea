@@ -43,6 +43,10 @@
         {
             "filePath": "projects/ts-altea-logic/src/lib/order/messaging/order-messaging.ts",
             "group": "Default"
+        },
+        {
+            "filePath": "projects/ts-altea-logic/src/lib/order",
+            "group": "Default"
         }
     ]
 }

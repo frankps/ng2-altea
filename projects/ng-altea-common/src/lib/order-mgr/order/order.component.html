@@ -89,7 +89,7 @@
                     <div class="row mt-1" style="font-size: 75%;">
                         <div class="col-1"></div>
                         <div class="col">
-                            Persons: <span *ngFor="let personId of line.persons">{{personId}}, </span>
+                            Persons: <span *ngFor="let personId of line.persons; let idx = index">{{personId}} <span *ngIf="idx < line.persons.length - 1"> - </span> </span>
                         </div>
                     </div>
                 </ng-container>

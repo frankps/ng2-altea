@@ -418,20 +418,20 @@ export class OrderLine extends ObjectWithIdPlus {
   getNrOfPersonsDefinedOnOptions() : number {
 
     if (!this.product.hasOptions())
-      return 0
+      return 1
 
 
     var nrOfPersonOptions = this.product.options.filter(o => o.persons == true)
 
     if (ArrayHelper.IsEmpty(nrOfPersonOptions))
-      return 0
+      return 1
 
     var nrOfPersonOptionIds = nrOfPersonOptions.map(o => o.id)
 
     var nrOfPersonOptionValues = this.allOptionValues(nrOfPersonOptionIds)
 
     if (ArrayHelper.IsEmpty(nrOfPersonOptionValues))
-      return 0
+      return 1
     
 
     var nrOfPersons = _.sumBy(nrOfPersonOptionValues, 'val')

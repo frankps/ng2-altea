@@ -10,9 +10,10 @@
 
     </ng-container>
 
-
-    <b>{{ 'app.payment.' + payOption.type | translate }}:</b> €{{payOption?.amount}} <br>
-
+    <ng-container *ngIf="payOption">
+        <b>{{ 'app.payment.' + payOption.type | translate }}:</b> €{{payOption?.amount}} <br>
+    </ng-container>
+    
 
     <ng-container *ngIf="orderMgrSvc.order.paid > 0">
         <b>Reeds betaald:</b> €{{orderMgrSvc.order.paid}} <br>
@@ -25,9 +26,33 @@
 
 
 
-
 <ng-container [ngSwitch]="mode">
 
+    <ng-container *ngSwitchCase="'SelectOption'">
+
+        <ng-container *ngTemplateOutlet="orderSummary"></ng-container>
+
+        <ng-container *ngIf="payOptions">
+
+            Om uw reservatie/bestelling <b>te bevestigen</b> heeft u de keuze uit devolgende betalingen:
+
+            <div class="row my-3" *ngFor="let option of payOptions">
+                <!-- <div class="col-12" *ngIf="option.info">{{option.info}}</div> 
+                d-grid gap-2 d-md-block 
+                -->
+
+                <div class="col-12 d-flex justify-content-center">
+
+                    <button class="btn btn-primary" type="button" style="width: 250px;"
+                        (click)="selectPayOption(option)">{{option.cta}}</button>
+
+                </div>
+            </div>
+
+        </ng-container>
+
+
+    </ng-container>
 
     <ng-container *ngSwitchCase="'PayMethod'">
 
@@ -72,42 +97,7 @@
 
 
 
-    <ng-container *ngSwitchCase="'SelectOption'">
 
-        <ng-container *ngTemplateOutlet="orderSummary"></ng-container>
-
-        <ng-container *ngIf="payOptions">
-
-
-
-
-
-            Om uw reservatie/bestelling <b>te bevestigen</b> heeft u de keuze uit devolgende betalingen:
-
-            <div class="row my-3" *ngFor="let option of payOptions">
-                <!-- <div class="col-12" *ngIf="option.info">{{option.info}}</div> 
-                d-grid gap-2 d-md-block 
-                -->
-
-                <div class="col-12 d-flex justify-content-center">
-
-                    <button class="btn btn-primary" type="button" style="width: 250px;"
-                        (click)="selectPayOption(option)">{{option.cta}}</button>
-
-                </div>
-            </div>
-
-
-
-
-        </ng-container>
-
-
-
-
-
-
-    </ng-container>
 
 
     <ng-container *ngSwitchCase="'PayOnline'">

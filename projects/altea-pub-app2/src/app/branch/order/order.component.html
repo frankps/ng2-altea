@@ -27,14 +27,15 @@
 
     <ng-container *ngSwitchCase="'order-line'">
 
-        <order-mgr-order-line (new)="newOrderLine()" (confirm)="closeOrderLine()"
-            (delete)="deleteOrderLine()" (back)="showCatalog()"></order-mgr-order-line>
+        <order-mgr-order-line (new)="newOrderLine()" (confirm)="closeOrderLine()" (delete)="deleteOrderLine()"
+            (back)="showCatalog()"></order-mgr-order-line>
 
     </ng-container>
 
     <ng-container *ngSwitchCase="'order'">
 
-        <order-mgr-order (orderLineSelected)="orderLineSelected($event)" (addProduct)="browseCatalog()" (continue)="orderFinished()"></order-mgr-order>
+        <order-mgr-order (orderLineSelected)="orderLineSelected($event)" (addProduct)="browseCatalog()"
+            (continue)="orderFinished()"></order-mgr-order>
 
     </ng-container>
 
@@ -49,7 +50,7 @@
 
         <order-mgr-person-select (selected)="personsSelected()"></order-mgr-person-select>
 
-    </ng-container>  
+    </ng-container>
 
 
     <ng-container *ngSwitchCase="'select-date'">
@@ -59,11 +60,12 @@
 
     </ng-container>
 
-    
+
 
     <ng-container *ngSwitchCase="'select-time-slot'">
-<!--          -->
-        <order-mgr-select-time-slot (changeDate)="selectDate()" (selected)="timeSlotSelected($event)"></order-mgr-select-time-slot>
+        <!--          -->
+        <order-mgr-select-time-slot (changeDate)="selectDate()"
+            (selected)="timeSlotSelected($event)"></order-mgr-select-time-slot>
 
     </ng-container>
 
@@ -77,8 +79,14 @@
         <order-mgr-contact-select2 [contact]="contact" (selected)="contactSelected($event)"></order-mgr-contact-select2>
     </ng-container>
 
+
+
+
+
+
+
     <!-- app-sign-in  -->
-    
+
 
 
     <ng-container *ngSwitchCase="'pay-online'">
@@ -102,7 +110,17 @@
     </ng-container>
 
 
-    
+    <!-- Flow -->
+
+    <ng-container *ngSwitchCase="'summary'">
+        <order-mgr-order-summary [order]="orderMgrSvc.order" [pays]="true"></order-mgr-order-summary>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="'contact-edit'">
+        <order-mgr-contact-select2 [contact]="orderMgrSvc.order?.contact"
+            (selected)="contactSelected($event)"></order-mgr-contact-select2>
+    </ng-container>
+
 
     <ng-container *ngSwitchCase="'default'">
     </ng-container>
@@ -114,6 +132,19 @@
 
 
 <!--
+
+
+    <ng-container>
+
+        Overzicht van uw reservatie/bestelling:
+
+        <div class="my-3 mx-4">
+            <order-mgr-order-summary [order]="orderMgrSvc.order" [pays]="true"></order-mgr-order-summary>
+        </div>
+
+    </ng-container>
+
+
 <order-mgr-debug-plannings *ngIf="orderMgrSvc.plannings" [plannings]="orderMgrSvc.plannings" ></order-mgr-debug-plannings>
 
 <order-mgr-debug-availability [response]="orderMgrSvc.availabilityResponse"></order-mgr-debug-availability>

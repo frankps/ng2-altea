@@ -42,6 +42,9 @@ export class SelectTimeSlotComponent {
     this.selected.emit(option)
   }
 
+
+
+
   test() {
     this.orderMgrSvc.hasOptions()
   }

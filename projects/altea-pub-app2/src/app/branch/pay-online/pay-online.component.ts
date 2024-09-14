@@ -66,7 +66,7 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
   giftMessage = ''
 
 
-  mode: 'SelectOption' | 'PayMethod' | 'PayOnline' = 'SelectOption'
+  mode: 'Init' | 'SelectOption' | 'PayMethod' | 'PayOnline' = 'Init'
 
   payOptions: PaymentOption[] = []
 
@@ -91,10 +91,8 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
     await this.setPaymentOptions()
 
     // for easy dubugging (auto select first option, go to pay type)
-    await this.selectPayOption(this.payOptions[0])
-    // this.startPayment()
+    // await this.selectPayOption(this.payOptions[0])
 
-    //  await this.debug()
 
   }
 
@@ -155,7 +153,7 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
 
   }
 
-
+ 
   async setPaymentOptions() {
 
     this.payOptions = []
@@ -173,6 +171,7 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
       this.payOptions.push(fullPayOption)
     }
 
+    console.log(this.payOptions)
 
     /** If there is only 1 option, then no need for user to select
      *  We immediatly go to payment
@@ -181,11 +180,15 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
 
       let onlyOption = this.payOptions[0]
 
-      if (onlyOption.amount > 0)
+      if (onlyOption.amount > 0) {
         await this.selectPayOption(onlyOption)
+        return
+      }
 
     }
 
+    this.mode = 'SelectOption'
+    
   }
 
   calculateToPay(): number {

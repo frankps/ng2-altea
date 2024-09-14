@@ -466,6 +466,8 @@ export class OrderMgrUiService {   // implements OnInit
 
     this.order = order
 
+    console.error(order)
+
 
     /*     var isNew = order.isNew()
         console.warn(isNew) */
@@ -479,6 +481,7 @@ export class OrderMgrUiService {   // implements OnInit
 
 
     this.resources = order.getResources()
+    this.setContact
 
 
 
@@ -544,24 +547,59 @@ export class OrderMgrUiService {   // implements OnInit
 
   }
 
-  maxWaitForDepositInMinutes(appMode: AppMode): number {
+  setMaxWaitForDepositInHours(appMode: AppMode, bookingStart: Date): number {
+
+    const now = new Date()
+
+    this.order.depositMins = this.maxWaitForDepositInMinutes(appMode, bookingStart)
+
+    const by = dateFns.addHours(now, this.order.depositMins)
+
+    this.order.depositBy = DateHelper.yyyyMMddhhmmss(by)
+
+    this.order.m.setDirty('depositMins', 'depositBy')
+
+    return this.order.depositMins
+  }
+
+
+  /**
+   * When consumer makes booking themselves, we require almost immediate payment
+   * 
+   * When bookings are created internally, we follow deposit settings
+   * 
+   * @param appMode 
+   * @returns 
+   */
+  maxWaitForDepositInMinutes(appMode: AppMode, bookingStart: Date): number {
+
+    const now = new Date()
 
     switch (appMode) {
 
       case AppMode.consum:
-        return 15
-        break
+        return 30
 
       case AppMode.pos:
         // let branch = await this.sessionSvc.branch$()
 
+        const diffDays = dateFns.differenceInDays(bookingStart, now)
+
+
+        const maxWaitHours = this.branch.getMaxDepositWaitTimeInHours(diffDays) //this.setMaxWaitForDepositInMinutes(diffDays)
+
+        console.error('diffDays!!', diffDays, maxWaitHours)
+
+        //this.branch.getDepositTerm()
+
         //branch.depositTerms
-        return 0
-        break
+        return maxWaitHours * 60
 
     }
+
     return 0
   }
+
 
 
   // 8552b3ae-d1fb-494c-9dd1-1425a809ab28
@@ -569,39 +607,41 @@ export class OrderMgrUiService {   // implements OnInit
 
   async selectTimeSlot(option: ReservationOption): Promise<ConfirmOrderResponse> {
 
+    let me = this
+
     console.warn(option)
 
     this.spinner.show()
 
-    const solutionForOption = this.availabilityResponse.solutionSet.getSolutionById(option.solutionIds[0])
+    const solutionForOption = me.availabilityResponse.solutionSet.getSolutionById(option.solutionIds[0])
 
     console.warn(solutionForOption)
 
     /*     this.spinner.hide()
         return */
 
-    const depositMinutes = this.maxWaitForDepositInMinutes(this.sessionSvc.appMode)
 
+    const depositMinutes = me.setMaxWaitForDepositInHours(me.sessionSvc.appMode, option.date)
 
-    const confirmOrderResponse = await this.alteaSvc.orderMgmtService.confirmOrder(this.order, option, solutionForOption)
+    const confirmOrderResponse = await me.alteaSvc.orderMgmtService.confirmOrder(me.order, option, solutionForOption)
 
     console.warn(confirmOrderResponse)
 
     if (confirmOrderResponse?.order) {
 
-      this.refreshOrder(confirmOrderResponse?.order)
+      me.refreshOrder(confirmOrderResponse?.order)
 
-      this.orderDirty = false
-      this.dashboardSvc.showToastType(ToastType.saveSuccess)
+      me.orderDirty = false
+      me.dashboardSvc.showToastType(ToastType.saveSuccess)
     }
     else
-      this.dashboardSvc.showToastType(ToastType.saveError)
+      me.dashboardSvc.showToastType(ToastType.saveError)
 
 
-    this.plannings = confirmOrderResponse.order?.planning
+    me.plannings = confirmOrderResponse.order?.planning
 
 
-    this.spinner.hide()
+    me.spinner.hide()
 
     return confirmOrderResponse
   }
@@ -890,9 +930,10 @@ export class OrderMgrUiService {   // implements OnInit
 
     const me = this
 
+    const product = orderLine?.product
     // if this is a bundle, then we need to unpack the product (and add product.items individually)
 
-    if (orderLine?.product?.sub == ProductSubType.bundle) {
+    if (product?.sub == ProductSubType.bundle) {
       const orderLines = await me.addProduct(orderLine.product, orderLine.qty)
 
       if (ArrayHelper.NotEmpty(orderLines)) {
@@ -903,10 +944,17 @@ export class OrderMgrUiService {   // implements OnInit
     } else {
       console.warn(me.order)
 
+
+
+
+
       me.order.addLine(orderLine, setUnitPrice)
 
-      /** introduced for wellness, has options adults & kids => this influences nrOfPersons */
-      me.updateNrOfPersons(orderLine)
+      if (product.type == ProductType.svc) {
+        /** introduced for wellness, has options adults & kids => this influences nrOfPersons */
+        me.updateNrOfPersons(orderLine)
+      }
+
 
       me.orderDirty = true
       me.orderLineIsNew = false
@@ -914,7 +962,7 @@ export class OrderMgrUiService {   // implements OnInit
       await me.calculateLoyalty()
     }
 
-    this.tmp = 'aaaa'
+    //this.tmp = 'aaaa'
 
 
   }
@@ -929,16 +977,24 @@ export class OrderMgrUiService {   // implements OnInit
     this.prepareProduct(product)
     this.orderLine = new OrderLine(product, qty, initOptionValues)
 
+
     return this.orderLine
   }
 
 
-  
+
 
   updateNrOfPersons(orderLine: OrderLine = this.orderLine) {
 
-    const nrOfPersons = orderLine.getNrOfPersonsDefinedOnOptions()
+    /** service 'Wellness' has options 'adults' & 'children' => these options define persons */
+    let nrOfPersons = orderLine.getNrOfPersonsDefinedOnOptions()
     console.warn('nrOfPersons', nrOfPersons)
+
+    /** to support a duo-massage for instance: 2 persons same service at same time */
+    if (orderLine.qty > 1) {
+      nrOfPersons *= orderLine.qty
+    }
+
 
     if (nrOfPersons > 0) {
 
@@ -953,7 +1009,9 @@ export class OrderMgrUiService {   // implements OnInit
             } */
 
     }
-    
+
+
+
 
     let orderLinePersons = orderLine.persons.length
     if (orderLine.persons.length != nrOfPersons) {
@@ -984,7 +1042,7 @@ export class OrderMgrUiService {   // implements OnInit
     }
 
     orderLine.persons = _.orderBy(orderLine.persons)
-    
+
 
 
 
