@@ -11,7 +11,7 @@ export class WhatsAppTemplateComponent {
 
     // format: 'TEXT' | 'IMAGE' | 'LOCATION' = 'TEXT'    >> mag niet gebruikt worden bij BODY
 
-    constructor(public type: 'HEADER' | 'BODY' | 'FOOTER' | 'BUTTONS', public text?: string) {
+    constructor(public type: 'HEADER' | 'BODY' | 'FOOTER' | 'BUTTONS' | 'URL', public text?: string) {
 
     }
 }
@@ -46,6 +46,34 @@ export class WhatsAppHeaderComponent extends WhatsAppTemplateComponent {
             this.example.header_text.push(...sampleValues)
     }
 }
+
+export class WhatsAppButtonsComponent extends WhatsAppTemplateComponent {
+
+    buttons: WhatsAppButtonComponent[] = []
+
+    constructor() {
+        super('BUTTONS')
+
+        delete this.text
+    }
+}
+
+
+export class WhatsAppButtonComponent extends WhatsAppTemplateComponent {
+}
+
+export class WhatsAppUrlButtonComponent extends WhatsAppButtonComponent {
+
+    example = []
+
+    constructor(text: string = "", public url: string, exampleUrl?: string) {
+        super('URL', text)
+
+        if (exampleUrl)
+            this.example.push(exampleUrl)
+    }
+}
+
 
 export class WhatsAppTemplateBase {
 

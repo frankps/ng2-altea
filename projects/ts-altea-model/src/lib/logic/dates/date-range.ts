@@ -89,6 +89,16 @@ export class DateRange {
         return this.duration.seconds
     }
 
+    sameFromDateOtherHour(hour: number, minutes: number = 0) : Date {
+
+        let newDate = dateFns.setHours(this.from, hour)
+        newDate = dateFns.setMinutes(newDate, minutes)
+
+        return newDate
+
+    }
+
+
     // existingPrepBlockEqualOrLonger
 
     isEqualOrLongerThen(other: DateRange): boolean {

@@ -57,6 +57,8 @@ export class CreateAvailabilityContext {
 
         ctx.resourcePlannings = await this.loadResourcePlannings(ctx.allResourceIds, availabilityRequest)
 
+
+
         /* Load schedules of resources that have custom scheduling */
         const resourcesWithCustomSchedules = ctx.allResources.filter(r => r.customSchedule)
         const resourceIdsWithCustomSchedules = resourcesWithCustomSchedules.map(r => r.id!)
@@ -65,13 +67,16 @@ export class CreateAvailabilityContext {
 
         ctx.scheduleDateRanges = this.createScheduleDateRanges(resourceIdsWithCustomSchedules, ctx.schedules, availabilityRequest.from, availabilityRequest.to, ctx.resourcePlannings)
 
+        //ctx.planMissingStaffBreaks()
 
+        console.warn(ctx.scheduleDateRanges)
         
 
         return ctx
     }
 
-    
+
+
 
 
 

@@ -147,8 +147,14 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
     const query = new DbQuery()
 
 
-    if (orderSearch.searchFor)
-      query.and('contact.name', QueryOperator.contains, orderSearch.searchFor)
+    if (orderSearch.searchFor) {
+
+      if (orderSearch.searchFor.length == 36)
+        query.and('id', QueryOperator.equals, orderSearch.searchFor)
+      else
+        query.and('contact.name', QueryOperator.contains, orderSearch.searchFor)
+    }
+
 
 
     if (this.orderSearch.typeSelect == SearchTypeSelect.appointmentsMadeOn || this.orderSearch.typeSelect == SearchTypeSelect.nonAppointments) {

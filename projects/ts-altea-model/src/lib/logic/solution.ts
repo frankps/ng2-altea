@@ -1,5 +1,5 @@
 import { extend } from "lodash";
-import { Resource, ResourcePlanning, ResourcePlannings } from "ts-altea-model"
+import { Resource, ResourcePlanning, ResourcePlannings, ResourceType } from "ts-altea-model"
 import { DateRange, DateRangeSet, TimeSpan } from "./dates";
 import { ResourceRequestItem } from "./resource-request";
 import { ArrayHelper, ObjectHelper, ObjectWithId } from "ts-common";
@@ -50,6 +50,13 @@ export class SolutionItem {
         const item = new SolutionItem(this.request, this.dateRange.clone(), this.exactStart, ...this.resources)
         item.notes = this.notes
         return item
+    }
+
+    humanResources() : Resource[] {
+        if (ArrayHelper.IsEmpty(this.resources))
+            return []
+
+        return this.resources.filter(r => r.type == ResourceType.human && !r.isGroup)
     }
 
     addNote(content: string, level: SolutionNoteLevel = SolutionNoteLevel.info) {

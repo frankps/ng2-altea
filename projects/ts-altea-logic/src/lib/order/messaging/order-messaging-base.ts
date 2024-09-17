@@ -1,7 +1,7 @@
 import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MessageAddress, TemplateCode } from 'ts-altea-model'
 import { AlteaDb } from '../../general/altea-db'
 import { IDb } from '../../interfaces/i-db'
-import { ArrayHelper } from 'ts-common'
+import { ApiResult, ArrayHelper } from 'ts-common'
 
 
 export class OrderMessagingBase {
@@ -93,6 +93,8 @@ export class OrderMessagingBase {
 
         const msg = template.mergeWithOrder(order, branch, false)
 
+        console.warn(msg)
+
         if (!msg.conIds)
             msg.conIds = []
 
@@ -106,6 +108,7 @@ export class OrderMessagingBase {
         if (send) {
 
             const sendRes = await this.alteaDb.db.sendMessage$(msg)
+            //const sendRes = new ApiResult(msg)
             console.warn(sendRes)
 
         }

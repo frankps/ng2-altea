@@ -19,12 +19,23 @@ export class ObjectWithParameters extends ObjectWithIdPlus {
     this.params.push(param)
   }
 
+  extractParameterNamesArray(texts: string[]): string[] {
+
+    if (ArrayHelper.IsEmpty(texts))
+      return []
+
+    const paramNames = texts.flatMap(text => this.extractParameterNames(text))
+
+    return paramNames
+
+  }
+
   extractParameterNames(text: string): string[] {
 
     if (!text)
       return []
 
-    const regex = /\{\{(\w+)\}\}/g;
+    const regex = /\{\{([\w-]+)\}\}/g;
     let matches = [...text.matchAll(regex)].map(match => match[1])
 
     if (ArrayHelper.NotEmpty(matches))
@@ -40,7 +51,7 @@ export class ObjectWithParameters extends ObjectWithIdPlus {
     const params = names.map(name => TextParameter.text(name, null, comp, idx++))
 
     return params
-  }   
+  }
 
 
 }

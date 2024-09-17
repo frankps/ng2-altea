@@ -603,7 +603,13 @@
               "vendorChunk": true,
               "extractLicenses": false,
               "sourceMap": true,
-              "namedChunks": true
+              "namedChunks": true,  
+              "fileReplacements": [
+                {
+                  "replace": "projects/altea-pub-app2/src/environments/environment.ts",
+                  "with": "projects/altea-pub-app2/src/environments/environment.development.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"

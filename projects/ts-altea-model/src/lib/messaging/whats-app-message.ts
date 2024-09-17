@@ -59,6 +59,9 @@ export class WhatsAppTextParameter extends WhatsAppTplParameter {
 export class WhatsAppTplParameters {
   header: WhatsAppTplParameter[] = []
   body: WhatsAppTplParameter[] = []
+
+  // for each button, max 1 parameter
+  buttons: WhatsAppTextParameter[] = []
 }
 
 export class WhatsAppTemplateTrigger extends WhatsAppBaseMessage {

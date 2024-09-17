@@ -221,7 +221,9 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
       template.actions.push(new TemplateAction())
 */
 
-    this.canExport = template.hashChanged()
+
+  //  this.canExport = true
+   this.canExport = template.hashChanged()
 
     this.template = template
 
@@ -259,9 +261,8 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
 
       const whatsAppTpl = WhatsAppTemplateUpdate.fromTemplate(template)  //WhatsAppTemplate.fromTemplate(template)
 
-      /*
       console.warn(whatsAppTpl)
-
+/*
       this.spinner.hide()
       return
 */

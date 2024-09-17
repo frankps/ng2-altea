@@ -160,14 +160,16 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
 
     const order = this.orderMgrSvc.order
     var deposit = order.deposit
+    var total = order.incl
+    var alreadyPaid = order.paid
 
-    if (deposit && deposit > 0) {
-      const depositPayOption = new PaymentOption(deposit, 'deposit', `Voorschot: €${deposit}`)
+    if (deposit && deposit > 0 && alreadyPaid < deposit) {
+      const depositPayOption = new PaymentOption(deposit, 'deposit', `Voorschot = €${deposit - alreadyPaid}`)
       this.payOptions.push(depositPayOption)
     }
 
-    if (order.incl && order.incl > deposit) {
-      const fullPayOption = new PaymentOption(order.incl, 'full', `Volledig: €${order.incl}`)
+    if (total && total > deposit && alreadyPaid < total) {
+      const fullPayOption = new PaymentOption(order.incl, 'full', `Volledige bedrag = €${order.incl - alreadyPaid}`)
       this.payOptions.push(fullPayOption)
     }
 

@@ -3,7 +3,8 @@ import 'reflect-metadata'
 
 export enum TextComponent {
   subject,
-  body
+  body,
+  actions     // buttons, ...
 }
 
 export class TextParameter {

@@ -20,12 +20,51 @@ export class SlotFinder {
         return SlotFinder._I
     }
 
+    /** we need to be sure that staff can take a break during the day */
+    checkStaffBreaks(solutionSet: SolutionSet, ctx: AvailabilityContext) {
+
+        const breakRangesbyResourceId = ctx.getStaffBreakRanges()
+
+        for (var solution of solutionSet.solutions) {
+
+            for (var solutionItem of solution.items) {
+
+                // normally just 1 human resource
+                const humanResources = solutionItem.humanResources()
+
+                for (let human of humanResources) {
+
+                    const breakRanges = breakRangesbyResourceId.get(human.id)
+
+                    console.warn(breakRanges)
+
+                    if (!breakRanges)
+                        continue
+
+
+
+
+
+                }
+
+
+            }
+
+
+
+        }
+
+
+
+    }
+
+
     /**
      *  There can be multiple resourceRequests: for instance different requests per branch schedule 
      */
     findSlots(availability2: ResourceAvailability2, ctx: AvailabilityContext, ...resourceRequests: ResourceRequest[]): SolutionSet {
 
-        
+
 
         const branchModeRanges = ctx.getBranchModeRanges(ctx.request.getDateRange())
         console.warn(branchModeRanges)
@@ -45,7 +84,7 @@ export class SlotFinder {
 
             const result = this.findSlotsInternal(availability2, ctx, resourceRequest)
             allSolutions.add(...result.solutions)
-        } 
+        }
 
         const exactSolutions = allSolutions //.toExactSolutions()
 
@@ -95,6 +134,8 @@ export class SlotFinder {
 
             solutionSet = this.handleResourceRequestItem(requestItem, solutionSet, availability2)
         }
+
+        this.checkStaffBreaks(solutionSet, ctx)
 
         this.orderSolutionSet(solutionSet)
 
@@ -225,7 +266,7 @@ export class SlotFinder {
                     }
 
                     if (requestItem.resourceGroup) {
-                        
+
 
                         solution.addNote(`Not enough recources for '${resourceGroupName}': ${availableResources.length}/${requestItem.qty}, ${interval}, available: ${onlyAvailable}`)
 

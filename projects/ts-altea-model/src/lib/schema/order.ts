@@ -279,7 +279,35 @@ export class OrderPerson extends ObjectWithId {
         return null
   
     }
+
+    depositTime() : string {
+
+      if (!Number.isNaN(this.depositMins))
+        return ''
+
+      let minutesInDay = 60 * 24
+
+      if (this.depositMins < 60)
+        return `de ${this.depositMins} minuten`
+      else if (this.depositMins = 60)
+        return `het uur`
+      else if (this.depositMins <= minutesInDay)
+        return `${this.depositMins / 60} uren`
+      else
+        return `${this.depositMins / minutesInDay} dagen`
+    }
   
+    depositDate() : string {
+
+      const date = this.depositByDate()
+
+      if (!date)
+        return ''
+
+      const short = dateFns.format(date, 'd/M HH:mm')
+      return short
+    }
+
     depositByDate(): Date | null {
   
       if (this.depositBy && Number.isInteger(this.depositBy))

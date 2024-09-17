@@ -1,7 +1,7 @@
 
 
 
-import { Branch, Message, MessageDirection, MsgType, Order, TemplateAction, TemplateFormat, TextComponent, TextParameter, WhatsAppBodyComponent, WhatsAppHeaderComponent, WhatsAppTemplateComponent } from "ts-altea-model";
+import { Branch, Message, MessageDirection, MsgType, Order, TemplateAction, TemplateFormat, TextComponent, TextParameter, WhatsAppBodyComponent, WhatsAppButtonComponent, WhatsAppButtonsComponent, WhatsAppHeaderComponent, WhatsAppTemplateComponent, WhatsAppUrlButtonComponent } from "ts-altea-model";
 import 'reflect-metadata';
 import { ArrayHelper, DateHelper, ObjectWithIdPlus, StringHelper } from 'ts-common'
 import * as _ from "lodash";
@@ -82,8 +82,14 @@ export class Template extends ObjectWithParameters {
   createTemplateHash(): string {
     let input = ''
 
+    input = JSON.stringify(this)
+    /*
     if (!StringHelper.isEmptyOrSpaces(this.subject)) input += this.subject
     if (!StringHelper.isEmptyOrSpaces(this.body)) input += this.body
+
+    if (ArrayHelper.NotEmpty(this.actions)) {
+      
+    }*/
 
     const hash = this.generateHash(input)
 
@@ -132,7 +138,7 @@ export class Template extends ObjectWithParameters {
   getWhatsAppComponents(...comps: TextComponent[]): WhatsAppTemplateComponent[] {
 
     if (ArrayHelper.IsEmpty(comps))
-      comps = [TextComponent.subject, TextComponent.body]
+      comps = [TextComponent.subject, TextComponent.body, TextComponent.actions]
 
     const whatsAppComponents = []
 
@@ -153,6 +159,39 @@ export class Template extends ObjectWithParameters {
 
     for (let param of paramNames) {
       text = text.replaceAll(param, '' + (startAt++))
+    }
+
+    return text
+
+  }
+
+  replaceParamNamesWithValues(text: string, values: Map<string, string>) {
+
+    if (!values)
+      return text
+
+    for (let param of values.keys()) {
+
+      const value = values.get(param)
+
+      const toReplace = '{{' + param + '}}'
+      const replaceWith = value
+
+      text = text.replaceAll(toReplace, replaceWith)
+    }
+
+    return text
+
+  }
+
+
+  removeParamBrackets(text: string, paramNames: string[]) {
+
+    if (ArrayHelper.IsEmpty(paramNames))
+      return text
+
+    for (let param of paramNames) {
+      text = text.replaceAll('{{' + param + '}}', param)
     }
 
     return text
@@ -196,6 +235,39 @@ export class Template extends ObjectWithParameters {
       }
 
 
+      case TextComponent.actions: {
+
+        if (ArrayHelper.IsEmpty(this.actions))
+          return null
+
+        const whatsappButtons = new WhatsAppButtonsComponent()
+
+
+        for (let action of this.actions) {
+
+          if (StringHelper.isEmptyOrSpaces(action.url))
+            continue
+
+          console.warn(action)
+
+          const paramNames = this.extractParameterNames(action.url)
+          let url = this.replaceParamNamesWithNumbers(action.url, paramNames)
+
+          let exampleUrl = null
+
+          if (paramNames.length == 1) {
+            exampleUrl = this.removeParamBrackets(action.url, paramNames)
+          }
+
+          const button = new WhatsAppUrlButtonComponent(action.label, url, exampleUrl)
+          whatsappButtons.buttons.push(button)
+        }
+
+        return whatsappButtons.buttons.length > 0 ? whatsappButtons : null
+
+      }
+
+
       default:
         throw new Error('Not implemented!')
 
@@ -213,6 +285,12 @@ export class Template extends ObjectWithParameters {
         return this.extractParameterNames(this.body)
       case TextComponent.subject:
         return this.extractParameterNames(this.subject)
+      case TextComponent.actions:
+        if (ArrayHelper.IsEmpty(this.actions))
+          return []
+
+        const urls = this.actions.map(action => action.url)
+        return this.extractParameterNamesArray(urls)
       default:
         throw new Error('Not yet implemented')
     }
@@ -252,6 +330,20 @@ export class Template extends ObjectWithParameters {
 
   }
 
+  createValueMap(params: string[], allReplacements: any): Map<string, string> {
+
+    const map = new Map<string, string>()
+
+    if (ArrayHelper.IsEmpty(params))
+      return map
+
+    for (let param of params) {
+      let value = allReplacements[param]
+      map.set(param, value)
+    }
+
+    return map
+  }
 
   mergeWithOrder(order: Order, branch: Branch, merge: boolean): Message {
 
@@ -266,11 +358,18 @@ export class Template extends ObjectWithParameters {
 
     const replacements = {
       branch: branch.name,
+      'branch-unique': branch.unique,
       deposit: `€${order.deposit}`,
+      depositTime: order.depositTime(),
+      depositDate: order.depositDate(),
       term: this.getTerm(order),
       first: order?.contact?.first,
+      'order-id': order?.id,
+      //'url-path': 'branch/aqua/order/a420eb76-497d-4b4a-a22d-90f9e78d6113/pos-summary'
       // info: "baby giraffe"
     }
+
+    // https://altea-pub-app2.web.app/branch/{{branch-short}}/order/{{order-id}}/pos-summary
 
     console.warn(replacements)
 
@@ -288,6 +387,8 @@ export class Template extends ObjectWithParameters {
         message.subj = hbTemplate(replacements)
       }
 
+
+
     } else {
 
       /** remote templating: whatsapp has it's own template system 
@@ -296,16 +397,45 @@ export class Template extends ObjectWithParameters {
 
       //message.addTextParameter(TextComponent.subject, 'branch', 1, 'Aquasense')
 
+
       this.addParameters(TextComponent.subject, replacements, message)
 
       this.addParameters(TextComponent.body, replacements, message)
 
+      if (ArrayHelper.NotEmpty(this.actions)) {
 
-/*
-      message.addTextParameter('branch', 'Aquasense')
-      message.addTextParameter('deposit', '€85')
-      message.addTextParameter('term', '13h')
-*/
+        let actionIdx = 0
+        for (let action of this.actions) {
+
+          let url = action.url
+          const paramNames = this.extractParameterNames(url)
+
+
+
+
+          if (ArrayHelper.NotEmpty(paramNames)) {
+
+            const valueMap = this.createValueMap(paramNames, replacements)
+            url = this.replaceParamNamesWithValues(url, valueMap)
+
+            var urlPath = new URL(url).pathname
+            urlPath = urlPath.substring(1)
+
+            message.addTextParameter('url-path', urlPath, TextComponent.actions, actionIdx)
+           
+          }
+
+          actionIdx++
+        }
+
+      }
+
+
+      /*
+            message.addTextParameter('branch', 'Aquasense')
+            message.addTextParameter('deposit', '€85')
+            message.addTextParameter('term', '13h')
+      */
 
     }
 

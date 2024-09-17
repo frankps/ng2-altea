@@ -32,6 +32,10 @@ Deploy:
     https://altea-pub-app2.web.app/
     https://altea-pub-app2.web.app/auth/sign-in
     
+    http://localhost:4350/branch/aqua/order/{{1}}/pos-summary
+    https://altea-pub-app2.web.app/branch/aqua/order/{{1}}/pos-summary
+https://altea-pub-app2.web.app/branch/aqua/order/a420eb76-497d-4b4a-a22d-90f9e78d6113/pos-summary
+    
 
 
     Project Console: https://console.firebase.google.com/project/altea-24/overview

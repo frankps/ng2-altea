@@ -112,8 +112,32 @@
 
     <!-- Flow -->
 
-    <ng-container *ngSwitchCase="'summary'">
+    <ng-container *ngSwitchCase="'pos-summary'">
         <order-mgr-order-summary [order]="orderMgrSvc.order" [pays]="true"></order-mgr-order-summary>
+
+
+        <div class="row mt-4">
+            <div class="col">
+                Om uw afspraak te confirmeren, gelieve in devolgende stappen:
+                <ul>
+                    <li>uw gegevens te controleren of aan te vullen</li>
+                    <li>een voorschot te betalen</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col d-flex justify-content-center">
+
+                <button type="button" class="btn btn-primary" (click)="posShowContact()">Controleer uw gegevens</button>
+            </div>
+        </div>
+
+
+
+        
+
+
     </ng-container>
 
     <ng-container *ngSwitchCase="'contact-edit'">

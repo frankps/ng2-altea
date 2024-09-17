@@ -122,6 +122,74 @@ export class AvailabilityContext {
         return this.products.filter(prod => _.includes(productIdsWithPlanning, prod.id))
     }
 
+
+    /** Do not use: we will implement break-checks at the end
+     * (because breaks can fluctuate)
+     */
+    getStaffBreakRanges(): Map<string, DateRangeSet> {
+
+        const breakRangesbyResourceId = new Map<string, DateRangeSet>()
+
+        const humanResources = this.allResources.filter(r => r.type == ResourceType.human && !r.isGroup)
+
+        if (ArrayHelper.IsEmpty(humanResources))
+            return breakRangesbyResourceId
+
+        const minTimeForBreak = TimeSpan.hours(6)
+
+
+        for (let human of humanResources) {
+
+            var schedule = this.scheduleDateRanges.get(human.id)
+
+            if (!schedule || schedule.isEmpty())
+                continue
+
+            const breakRangesForResource = new DateRangeSet()
+            breakRangesbyResourceId.set(human.id, breakRangesForResource)
+
+            for (let range of schedule.ranges) {
+
+                // 
+                if (range.duration.seconds < minTimeForBreak.seconds)
+                    continue
+
+                range.from
+
+                if (range.containsLabels('START', 'END')) {
+
+                    let from, to: Date
+                    const startHour = range.from.getHours()
+
+                    if (startHour <= 10) {
+                        from = range.sameFromDateOtherHour(12, 20)
+                        to = range.sameFromDateOtherHour(14, 40)
+                    } else {
+                        from = range.sameFromDateOtherHour(17, 20)
+                        to = range.sameFromDateOtherHour(19, 0)
+                    }
+
+                    const breakRange = new DateRange(from, to)
+                    breakRangesForResource.addRange(breakRange)
+
+                }
+
+                console.log(range)
+            }
+        }
+
+        return new Map<string, DateRangeSet>()
+
+
+
+
+        // this.alteaDb.saveResourcePlannings()
+
+    }
+
+
+
+
     /** Not every orderLine requires plannings, only returns those orderLines that have resources linked to the product 5viq ProductResource-
      * 
      */
@@ -160,6 +228,7 @@ export class AvailabilityContext {
     }
 
 
+    /** the system can behave differently on certain time periods (holidays, etc): therefor we look for ranges with exact same behavior */
     getBranchModeRanges(dateRange: DateRange): BranchModeRange[] {
 
         const branchSchedules = this.getBranchSchedules(dateRange)

@@ -199,7 +199,7 @@ export class OrderComponent implements OnInit {
 
   nextMode(currentMode: string) {
 
-    const modes = ['browse-catalog', 'order-line', 'order', 'person-select', 'staff-select', 'select-date', 'select-time-slot', 'contact-select', 'summary', 'contact-edit', 'pay-online']
+    const modes = ['browse-catalog', 'order-line', 'order', 'person-select', 'staff-select', 'select-date', 'select-time-slot', 'contact-select', 'pos-summary', 'pos-contact', 'pay-online']
 
     const currentIdx = modes.indexOf(currentMode)
     const personSelect = 3
@@ -214,6 +214,10 @@ export class OrderComponent implements OnInit {
     switch (currentMode) {
       case 'contact-edit':
         return 'pay-online'
+
+        /*
+      case 'pos-summary':
+        return 'pos-contact' */
     }
 
     const hasServices = order.hasServices()
@@ -266,6 +270,13 @@ export class OrderComponent implements OnInit {
     await this.orderMgrSvc.saveOrder()
 
     this.gotoNextMode()
+  }
+
+
+  posShowContact() {
+
+    this.mode = 'contact-edit'
+
   }
 
 }

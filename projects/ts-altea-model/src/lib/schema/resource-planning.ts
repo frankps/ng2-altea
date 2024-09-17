@@ -20,7 +20,8 @@ export enum PlanningType {
     abs = 'abs',   // absence, not paid by employer
     edu = 'edu',
     avl = 'avl',    // available
-    sch = 'sch'     // planning schedule
+    sch = 'sch',    // planning schedule
+    brk = 'brk'     // break (such as lunch break): at work, but not working
   }
   
 
