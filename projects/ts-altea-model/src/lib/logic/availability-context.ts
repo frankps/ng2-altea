@@ -123,17 +123,22 @@ export class AvailabilityContext {
     }
 
 
-    /** Do not use: we will implement break-checks at the end
-     * (because breaks can fluctuate)
+    /**
+     * Is staff starts before 10h, then break should be between 12h20 & 14h40
+     * If staff starts before 13h, then break between 17h and 19h
+     * If later, then break between 17h20 and 19h
+     * 
+     * 
+     * @returns 
      */
     getStaffBreakRanges(): Map<string, DateRangeSet> {
 
-        const breakRangesbyResourceId = new Map<string, DateRangeSet>()
+        const breaksByResourceId = new Map<string, DateRangeSet>()
 
         const humanResources = this.allResources.filter(r => r.type == ResourceType.human && !r.isGroup)
 
         if (ArrayHelper.IsEmpty(humanResources))
-            return breakRangesbyResourceId
+            return breaksByResourceId
 
         const minTimeForBreak = TimeSpan.hours(6)
 
@@ -145,8 +150,8 @@ export class AvailabilityContext {
             if (!schedule || schedule.isEmpty())
                 continue
 
-            const breakRangesForResource = new DateRangeSet()
-            breakRangesbyResourceId.set(human.id, breakRangesForResource)
+            let breakRangesForResource = new DateRangeSet()
+            breaksByResourceId.set(human.id, breakRangesForResource)
 
             for (let range of schedule.ranges) {
 
@@ -164,6 +169,9 @@ export class AvailabilityContext {
                     if (startHour <= 10) {
                         from = range.sameFromDateOtherHour(12, 20)
                         to = range.sameFromDateOtherHour(14, 40)
+                    } else if (startHour <= 13) {
+                        from = range.sameFromDateOtherHour(17, 0)
+                        to = range.sameFromDateOtherHour(19, 0)
                     } else {
                         from = range.sameFromDateOtherHour(17, 20)
                         to = range.sameFromDateOtherHour(19, 0)
@@ -176,9 +184,13 @@ export class AvailabilityContext {
 
                 console.log(range)
             }
+
+            // there might already be plannings during (part of) the break => the possible break ranges decreases
+            const alreadyOccupied = this.resourcePlannings.filterByResource(human.id)
+            breakRangesForResource = breakRangesForResource.subtract(alreadyOccupied.toDateRangeSet())
         }
 
-        return new Map<string, DateRangeSet>()
+        return breaksByResourceId
 
 
 

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { AvailabilityContext, DateRange, DateRangeSet, PlanningBlockSeries, PlanningMode, PossibleSlots, Product, Resource, ResourceAvailability, ResourceAvailability2, ResourcePlanning, ResourceRequest, ResourceRequestItem, ResourceType, SlotInfo, Solution, SolutionItem, TimeSpan } from "ts-altea-model";
+import { AvailabilityContext, DateRange, DateRangeSet, PlanningBlockSeries, PlanningMode, PossibleSlots, Product, Resource, ResourceAvailability, ResourceAvailability2, ResourcePlanning, ResourceRequest, ResourceRequestItem, ResourceType, SlotInfo, Solution, SolutionItem, SolutionNoteLevel, TimeSpan } from "ts-altea-model";
 import * as _ from "lodash"
 import { ResourceRequestOptimizer } from "./resource-request-optimizer";
 import { scheduled } from "rxjs";
@@ -20,41 +20,74 @@ export class SlotFinder {
         return SlotFinder._I
     }
 
-    /** we need to be sure that staff can take a break during the day */
     checkStaffBreaks(solutionSet: SolutionSet, ctx: AvailabilityContext) {
 
-        const breakRangesbyResourceId = ctx.getStaffBreakRanges()
-
-        for (var solution of solutionSet.solutions) {
-
-            for (var solutionItem of solution.items) {
-
-                // normally just 1 human resource
-                const humanResources = solutionItem.humanResources()
-
-                for (let human of humanResources) {
-
-                    const breakRanges = breakRangesbyResourceId.get(human.id)
-
-                    console.warn(breakRanges)
-
-                    if (!breakRanges)
-                        continue
+        /** can contain breaks for multiple days! */
 
 
+
+        const breaksByResourceId = ctx.getStaffBreakRanges()
+
+
+        for (var solution of solutionSet.validSolutions) {
+
+
+            const humanResourcesItems = solution.getHumanResourceItems()
+
+            if (humanResourcesItems.isEmpty())
+                continue
+
+            const humanResources = humanResourcesItems.humanResources()
+
+            for (var human of humanResources) {
+
+                const breaksForStaffMember = breaksByResourceId.get(human.id)
+
+                if (!breaksForStaffMember || breaksForStaffMember.isEmpty())
+                    continue
+
+                const staffSolItems = humanResourcesItems.getItemsForResource(human.id)
+
+                const staffDateRanges = staffSolItems.toDateRangeSet()
+
+                const dayBreaksForStaffMember = breaksForStaffMember.getRangesForSameDay(solution.offsetRefDate)
+
+                if (solution.hasExactStart()) {
+                    const newBreaks = dayBreaksForStaffMember.subtract(staffDateRanges)
+
+                    const tooSmallBreaks = newBreaks.lessThen(TimeSpan.minutes(40))
+
+                    if (tooSmallBreaks.notEmpty()) {
+                        // this solution is causing too small breaks!!
+                        solution.valid = false
+
+
+                        const breakTooSmall = tooSmallBreaks.ranges[0]
+                        solution.addNote(`Problem with too small break for ${human.name} ${breakTooSmall.toString()}`, SolutionNoteLevel.blocking)
+                        break
+                    }
+                } else {
+                    /* solution has not exact start, but has window of possible starts */
+
+                    // check if solution items (for staff member) has overlap with break
+                   
+                    const staffDateRange = staffSolItems.getOuterRange2()
+
+                    // if no potential overlap with breaks, then continue
+                    if (!dayBreaksForStaffMember.hasOverlapWith(staffDateRange))
+                        continue 
+                   
 
 
 
                 }
 
-
             }
 
-
+            if (!solution.valid)
+                break
 
         }
-
-
 
     }
 
@@ -135,7 +168,7 @@ export class SlotFinder {
             solutionSet = this.handleResourceRequestItem(requestItem, solutionSet, availability2)
         }
 
-        this.checkStaffBreaks(solutionSet, ctx)
+//        this.checkStaffBreaks(solutionSet, ctx)
 
         this.orderSolutionSet(solutionSet)
 
@@ -333,7 +366,12 @@ export class SlotFinder {
 
                         const newSolution = solution.clone()
 
-                        const solutionItem = new SolutionItem(requestItem, availabilityForResource.clone(), false, ...resources)
+                        let availableRange = availabilityForResource.clone()
+                        
+                        
+                        availableRange.to = dateFns.subSeconds(availableRange.to, requestItem.duration.seconds)
+
+                        const solutionItem = new SolutionItem(requestItem, availableRange, false, ...resources)
                         newSolution.add(solutionItem)
 
                         resultSolutions.add(newSolution)

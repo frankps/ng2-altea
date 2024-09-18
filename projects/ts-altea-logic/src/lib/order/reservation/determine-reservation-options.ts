@@ -26,10 +26,9 @@ export class DetermineReservationOptions {
             if (solution.isEmpty())
                 continue
 
-            if (solution.valid) {
-                const reservationOptions = this.getReservationOptionsForSolution(solution)
-                result.addSet(reservationOptions)
-            }
+            const reservationOptions = this.getReservationOptionsForSolution(solution)
+            result.addSet(reservationOptions)
+
         }
 
         const uniqResult = this.removeDuplicates(result)

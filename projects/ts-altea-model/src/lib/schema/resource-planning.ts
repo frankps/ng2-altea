@@ -28,7 +28,6 @@ export enum PlanningType {
 /** Manage multiple ResourcePlanning's  */
 export class ResourcePlannings {
 
-
     constructor(public plannings: ResourcePlanning[] = []) {
   
     }
@@ -42,7 +41,7 @@ export class ResourcePlannings {
     }
   
     filterByResource(resourceId: string): ResourcePlannings {
-      const planningsForResource = this.plannings.filter(rp => rp.resourceId == resourceId)
+      const planningsForResource = this.plannings.filter(rp => rp.resourceId == resourceId && !rp.scheduleId)
   
       if (!Array.isArray(planningsForResource))
         return new ResourcePlannings()
@@ -165,6 +164,9 @@ export class ResourcePlannings {
     }
   
     toDateRangeSet(): DateRangeSet {
+
+      if (ArrayHelper.IsEmpty(this.plannings))
+        return new DateRangeSet()
   
       const dateRanges = this.plannings.map(rp => rp.toDateRange())
       const set = new DateRangeSet(dateRanges)

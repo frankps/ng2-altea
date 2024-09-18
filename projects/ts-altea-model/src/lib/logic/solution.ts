@@ -1,9 +1,10 @@
-import { extend } from "lodash";
+import { extend, uniq } from "lodash";
 import { Resource, ResourcePlanning, ResourcePlannings, ResourceType } from "ts-altea-model"
 import { DateRange, DateRangeSet, TimeSpan } from "./dates";
 import { ResourceRequestItem } from "./resource-request";
 import { ArrayHelper, ObjectHelper, ObjectWithId } from "ts-common";
 import * as dateFns from 'date-fns'
+import * as _ from "lodash"
 
 export enum SolutionNoteLevel {
     info,
@@ -46,13 +47,23 @@ export class SolutionItem {
             this.resources = resources
     }
 
+    containsResource(resourceId: string): boolean {
+
+        if (ArrayHelper.IsEmpty(this.resources))
+            return false
+
+        const idx = this.resources.findIndex(res => res.id == resourceId)
+
+        return (idx >= 0)
+    }
+
     clone(): SolutionItem {
         const item = new SolutionItem(this.request, this.dateRange.clone(), this.exactStart, ...this.resources)
         item.notes = this.notes
         return item
     }
 
-    humanResources() : Resource[] {
+    humanResources(): Resource[] {
         if (ArrayHelper.IsEmpty(this.resources))
             return []
 
@@ -73,28 +84,120 @@ export class SolutionItem {
 }
 
 
+export class SolutionItems extends ObjectWithId {
+    items: SolutionItem[] = []
+
+    constructor(items: SolutionItem[]) {
+        super()
+
+        this.items.push(...items)
+    }
+
+    humanResources(): Resource[] {
+
+        if (ArrayHelper.IsEmpty(this.items))
+            return []
+
+        var resources = this.items.flatMap(item => item.humanResources())
+
+        resources = uniq(resources)
+
+        return resources
+
+    }
+
+    getItemsForResource(resourceId: string): SolutionItems {
+        const items = this.items.filter(item => item.containsResource(resourceId))
+        return new SolutionItems(items)
+    }
+
+    toDateRangeSet(): DateRangeSet {
+
+        const dateRanges = this.items.map(item => item.dateRange)
+
+        const set = new DateRangeSet(dateRanges)
+
+        return set
+    }
+
+    getOuterRange(): DateRange {
+
+        if (this.isEmpty())
+            return null
+
+        //this.items.find(item => item.dateRange.from)
+        const froms = this.items.map(i => i.dateRange.from)
+        const tos = this.items.map(i => i.dateRange.to)
+
+        const minFrom = _.min(froms)
+        const maxTo = _.max(tos)
+
+        return new DateRange(minFrom, maxTo)
+
+    }
+
+    getOuterRange2(): DateRange {
+
+        if (this.isEmpty())
+            return null
+
+        const dateRanges = this.items.map(i => i.dateRange)
+        const minFrom = _.minBy(dateRanges, 'from')  // from
+
+        const endTimesWithinSolution = this.items.map(i => i.request.offset.add(i.request.duration))  //offset
+        const maxEndTime = _.maxBy(endTimesWithinSolution, 'seconds')
+
+        const newFrom = minFrom.from
+        const newTo = dateFns.addSeconds(minFrom.to, maxEndTime.seconds)
+
+        return new DateRange(newFrom, newTo)
+
+    }
+
+    /*
+    occupiedBetween(resource: Resource) : DateRange {
+
+        return new DateRange()
+
+
+    }*/
+
+    isEmpty(): boolean {
+        return ArrayHelper.IsEmpty(this.items)
+    }
+
+    notEmpty(): boolean {
+        return ArrayHelper.NotEmpty(this.items)
+    }
+}
+
+
 /** Short for reservation solution. */
-export class Solution extends ObjectWithId {
+export class Solution extends SolutionItems {
 
     /** offset reference date: resource planning is always done with an offset to this date (in this solution) */
     offsetRefDate: Date
 
-    items: SolutionItem[] = []
+    //items: SolutionItem[] = []
 
     valid = true
 
     notes: SolutionNote[] = []
 
     constructor(...items: SolutionItem[]) {
-        super()
+        super(items)
 
         if (ArrayHelper.NotEmpty(items)) {
-            this.items.push(...items)
-
+          
             let num = 1
             items.forEach(item => { item.num = num++ })
 
         }
+    }
+
+    getHumanResourceItems(): SolutionItems {
+        let items = this.items.filter(item => item.resources.findIndex(r => r.type == ResourceType.human && !r.isGroup) >= 0)
+        return new SolutionItems(items)
     }
 
     getOccupationForResource(resource: Resource): DateRangeSet {
@@ -175,7 +278,9 @@ export class Solution extends ObjectWithId {
             this.notes.push(...notes)
     }
 
-    /** most likely the reference date is the start date of this solution, but there can be exceptions */
+    /** most likely the reference date is the start date of this solution, but there can be exceptions 
+     * example: ref date could be start of wellness session, but massages can be planned before start wellness
+    */
     referenceDate(): Date | undefined {
 
         if (!Array.isArray(this.items) || this.items.length == 0)
@@ -184,9 +289,8 @@ export class Solution extends ObjectWithId {
         return this.items[0].dateRange.from
     }
 
-    isEmpty(): boolean {
-        return ArrayHelper.IsEmpty(this.items)
-    }
+
+
 
     hasItems(): boolean {
         return (Array.isArray(this.items) && this.items.length > 0)

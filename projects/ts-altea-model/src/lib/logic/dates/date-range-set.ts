@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { DateBorder, DateBorderInfo } from "./date-border"
-import { DateRange } from "./date-range"
+import { DateRange, OverlapMode } from "./date-range"
 import * as _ from "lodash"
 import * as dateFns from 'date-fns'
 import { ResourceRequest, ResourceRequestItem } from "../resource-request"
@@ -99,6 +99,18 @@ export class    DateRangeSet {
 
     }
 
+
+    outerRange() : DateRange {
+
+        if (ArrayHelper.IsEmpty(this.ranges))
+            return null
+
+        const min = _.minBy(this.ranges, 'from')
+        const max = _.minBy(this.ranges, 'to')
+
+        return new DateRange(min.from, max.to)
+    }
+
     /** check if this.ranges contains at least 1 range that contains  */
     contains(range: DateRange): boolean {
 
@@ -133,6 +145,18 @@ export class    DateRangeSet {
         return ranges
     }
 
+    getRangesForSameDay(day: Date): DateRangeSet {
+
+        const start = dateFns.startOfDay(day)
+        const end = dateFns.addDays(start, 1)
+
+        const ranges = this.ranges.filter(r => r.from >= start && r.from < end)
+
+        return new DateRangeSet(ranges)
+    }
+
+
+
     getDateBorders(): DateBorder[] {
 
         const dateBorders: DateBorder[] = []
@@ -145,6 +169,41 @@ export class    DateRangeSet {
         }
 
         return dateBorders
+
+    }
+
+    hasOverlapWith(overlapWith: DateRange) : boolean {
+
+        if (this.isEmpty() || overlapWith == null)
+            return false
+
+        for (let range of this.ranges) {
+
+            let mode = range.overlapWith(overlapWith)
+
+            if (mode != OverlapMode.noOverlap)
+                return true
+        }
+
+        return false
+
+    }
+    filterOverlappingRanges(overlapWith: DateRange) : DateRangeSet {
+
+        const overlaps = new DateRangeSet()
+
+        if (this.isEmpty() || overlapWith == null)
+            return overlaps
+
+        for (let range of this.ranges) {
+
+            let mode = range.overlapWith(overlapWith)
+
+            if (mode != OverlapMode.noOverlap)
+                overlaps.addRange(range)
+        }
+
+        return overlaps
 
     }
 
@@ -171,6 +230,18 @@ export class    DateRangeSet {
 
         return this.subtract(outsideRanges)
     }
+
+
+    lessThen(time: TimeSpan): DateRangeSet {
+
+        const ranges = this.ranges.filter(r => r.duration.seconds < time.seconds)
+
+        if (!Array.isArray(ranges) || ranges.length == 0)
+            return DateRangeSet.empty
+
+        return new DateRangeSet(ranges.map(r => r.clone()), this.resource)
+    }
+
 
     minimum(minTime: TimeSpan): DateRangeSet {
 
