@@ -56,7 +56,7 @@ export class DateRangeSets {
 }
 
 /** A set contains multiple date ranges */
-export class    DateRangeSet {
+export class DateRangeSet {
 
     /** optional: provide resourceId if date ranges are linked to specific resources */
     //resourceId?: string
@@ -69,6 +69,16 @@ export class    DateRangeSet {
     static get empty() {
         return new DateRangeSet()
     }
+
+    toString(): string {
+        if (this.isEmpty())
+            return '[]'
+
+        const ranges = this.ranges.map(r => r.toString())
+
+        return '[' + ranges.join(', ') + ']'
+    }
+
 
     isEmpty(): boolean {
         return ArrayHelper.IsEmpty(this.ranges)
@@ -100,7 +110,7 @@ export class    DateRangeSet {
     }
 
 
-    outerRange() : DateRange {
+    outerRange(): DateRange {
 
         if (ArrayHelper.IsEmpty(this.ranges))
             return null
@@ -125,15 +135,21 @@ export class    DateRangeSet {
 
         // console.error(dates)
 
-        
+
         dates = _.uniqBy(dates, DateHelper.yyyyMMdd)
 
-/*         if (ArrayHelper.NotEmpty(dates) && dates.length > 1)
-            console.warn(`fromDays()`, dates) */
+        /*         if (ArrayHelper.NotEmpty(dates) && dates.length > 1)
+                    console.warn(`fromDays()`, dates) */
 
         //  console.error(dates)
 
         return dates
+    }
+
+    getRangeStartingAt(from: Date): DateRange {
+
+        return this.ranges.find(r => r.from.getTime() === from.getTime())
+        
     }
 
     getRangesForDay(start: Date): DateRange[] {
@@ -172,7 +188,7 @@ export class    DateRangeSet {
 
     }
 
-    hasOverlapWith(overlapWith: DateRange) : boolean {
+    hasOverlapWith(overlapWith: DateRange): boolean {
 
         if (this.isEmpty() || overlapWith == null)
             return false
@@ -188,7 +204,7 @@ export class    DateRangeSet {
         return false
 
     }
-    filterOverlappingRanges(overlapWith: DateRange) : DateRangeSet {
+    filterOverlappingRanges(overlapWith: DateRange): DateRangeSet {
 
         const overlaps = new DateRangeSet()
 
@@ -231,6 +247,15 @@ export class    DateRangeSet {
         return this.subtract(outsideRanges)
     }
 
+    atLeast(time: TimeSpan): DateRangeSet {
+
+        const ranges = this.ranges.filter(r => r.duration.seconds >= time.seconds)
+
+        if (!Array.isArray(ranges) || ranges.length == 0)
+            return DateRangeSet.empty
+
+        return new DateRangeSet(ranges.map(r => r.clone()), this.resource)
+    }
 
     lessThen(time: TimeSpan): DateRangeSet {
 
@@ -379,6 +404,24 @@ export class    DateRangeSet {
         return this.subtract(set)
 
     }
+
+    substractAll(timeSpan: TimeSpan): DateRangeSet {
+
+        if (this.isEmpty())
+            return new DateRangeSet()
+
+        const result = new DateRangeSet()
+
+        for (let range of this.ranges) {
+
+            const newRange = range.subtractTimeSpan(timeSpan)
+            result.addRange(newRange)
+        }
+
+        return result
+    }
+
+
 
     subtract(toSubtract: DateRangeSet): DateRangeSet {
 

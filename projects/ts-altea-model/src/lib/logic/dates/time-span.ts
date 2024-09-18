@@ -33,6 +33,14 @@ export class TimeSpan {
         return new TimeSpan(this.seconds + timeSpan.seconds)
     }
 
+    subtract(timeSpan: TimeSpan): TimeSpan {
+        return new TimeSpan(this.seconds - timeSpan.seconds)
+    }
+
+    times(multiplier: number) {
+        return new TimeSpan(this.seconds * multiplier)
+    }
+
     addInternal(timeSpan: TimeSpan): void {
         this.seconds += timeSpan.seconds
     }

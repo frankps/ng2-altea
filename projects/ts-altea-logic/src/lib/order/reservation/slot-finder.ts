@@ -20,17 +20,18 @@ export class SlotFinder {
         return SlotFinder._I
     }
 
-    checkStaffBreaks(solutionSet: SolutionSet, ctx: AvailabilityContext) {
+    checkStaffBreaks(solutionSet: SolutionSet, ctx: AvailabilityContext, breakTimeInMinutes: number = 40) {
 
         /** can contain breaks for multiple days! */
-
-
-
         const breaksByResourceId = ctx.getStaffBreakRanges()
+        const staffBreak = TimeSpan.minutes(breakTimeInMinutes)
 
+        // we will invalidate some solutions and replace with new solutions to allow breaks for staff
+        const newSolutions: Solution[] = []
 
         for (var solution of solutionSet.validSolutions) {
 
+            let newSolutionCreated = false
 
             const humanResourcesItems = solution.getHumanResourceItems()
 
@@ -52,42 +53,118 @@ export class SlotFinder {
 
                 const dayBreaksForStaffMember = breaksForStaffMember.getRangesForSameDay(solution.offsetRefDate)
 
+                if (!dayBreaksForStaffMember || dayBreaksForStaffMember.isEmpty())
+                    continue
+
                 if (solution.hasExactStart()) {
                     const newBreaks = dayBreaksForStaffMember.subtract(staffDateRanges)
 
-                    const tooSmallBreaks = newBreaks.lessThen(TimeSpan.minutes(40))
+                    const possibleBreaks = newBreaks.atLeast(staffBreak)
 
-                    if (tooSmallBreaks.notEmpty()) {
+                    if (possibleBreaks.isEmpty()) {
                         // this solution is causing too small breaks!!
                         solution.valid = false
 
-
-                        const breakTooSmall = tooSmallBreaks.ranges[0]
-                        solution.addNote(`Problem with too small break for ${human.name} ${breakTooSmall.toString()}`, SolutionNoteLevel.blocking)
+                        solution.addNote(`Problem with too small breaks for ${human.name} ${newBreaks.toString()}`, SolutionNoteLevel.blocking)
                         break
                     }
                 } else {
                     /* solution has not exact start, but has window of possible starts */
 
                     // check if solution items (for staff member) has overlap with break
-                   
+
                     const staffDateRange = staffSolItems.getOuterRange2()
 
                     // if no potential overlap with breaks, then continue
                     if (!dayBreaksForStaffMember.hasOverlapWith(staffDateRange))
-                        continue 
-                   
+                        continue
 
+
+                    /* check if overlap with break windows too small => always still possible to have a pause
+                      
+                    if (break window - staff Occupation) / 2 >= staff break 
+                       then there is never a problem
+                    */
+                    const staffOccupation: TimeSpan = staffSolItems.totalRequestDuration()
+                    let newBreakWindows = dayBreaksForStaffMember.substractAll(staffOccupation)
+                    let compareWith = staffBreak.times(2)
+                    const tooSmallBreakWindows = newBreakWindows.lessThen(compareWith)
+
+                    if (tooSmallBreakWindows.isEmpty()) {
+                        // no too small breaks => no risk with this solution
+                        continue
+                    }
+
+
+                    // here we assume that at least 1 pause is in the middle of this solution, so we need to split
+
+                    for (let tooSmallBreakWindow of tooSmallBreakWindows.ranges) {
+
+                        // retrieve original break window
+                        let breakWindow = dayBreaksForStaffMember.getRangeStartingAt(tooSmallBreakWindow.from)
+
+                        /** get time from beginning of solution until this staff member is not needed anymore */
+                        const staffOccupationFromStart: TimeSpan = staffSolItems.totalRequestDurationInclOffset()
+
+
+                        const endOfFirstBreak = dateFns.addMinutes(breakWindow.from, breakTimeInMinutes)
+                        const startOfLastBreak = dateFns.subMinutes(breakWindow.to, breakTimeInMinutes)
+
+                        solution.valid = false
+                        newSolutionCreated = true
+
+                        // Create first solution (before break)
+
+                        const lastPossibleStartOfSolution = dateFns.subSeconds(startOfLastBreak, staffOccupationFromStart.seconds)
+
+                        const solutionBeforeBreak = solution.clone()
+                        newSolutions.push(solutionBeforeBreak)
+
+
+                        solutionBeforeBreak.limitOtherItems(solution.offsetRefDate, lastPossibleStartOfSolution)
+
+                        const lastBreak = new DateRange(startOfLastBreak, breakWindow.to)
+                        solutionBeforeBreak.addNote(`Solution created to enable break for ${human.name}. Last possible break: ${lastBreak.toString()}`)
+
+
+                        // Create second solution (after break)
+
+                        //const lastPossibleStartOfSolution = dateFns.subSeconds(startOfLastBreak, staffOccupationFromStart.seconds)
+
+                        const solutionAfterBreak = solution.clone()
+                        newSolutions.push(solutionAfterBreak)
+
+
+                        solutionAfterBreak.limitOtherItems(endOfFirstBreak)
+
+                        const firstBreak = new DateRange(breakWindow.from, endOfFirstBreak)
+                        solutionAfterBreak.addNote(`Solution created to enable break for ${human.name}. First possible break: ${firstBreak.toString()}`)
+
+
+
+
+
+                        break
+
+                    }
+
+
+                    if (newSolutionCreated)
+                        break
 
 
                 }
 
+                if (!solution.valid)
+                    break
             }
 
-            if (!solution.valid)
-                break
+
 
         }
+
+
+        solutionSet.add(...newSolutions)
 
     }
 
@@ -168,7 +245,7 @@ export class SlotFinder {
             solutionSet = this.handleResourceRequestItem(requestItem, solutionSet, availability2)
         }
 
-//        this.checkStaffBreaks(solutionSet, ctx)
+        this.checkStaffBreaks(solutionSet, ctx)
 
         this.orderSolutionSet(solutionSet)
 
@@ -367,8 +444,8 @@ export class SlotFinder {
                         const newSolution = solution.clone()
 
                         let availableRange = availabilityForResource.clone()
-                        
-                        
+
+
                         availableRange.to = dateFns.subSeconds(availableRange.to, requestItem.duration.seconds)
 
                         const solutionItem = new SolutionItem(requestItem, availableRange, false, ...resources)

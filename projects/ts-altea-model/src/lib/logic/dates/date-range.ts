@@ -296,6 +296,13 @@ export class DateRange {
         return DateRange.subtract(this, other)
     }
 
+    subtractTimeSpan(span: TimeSpan): DateRange {
+
+        const newTo = dateFns.subSeconds(this.to, span.seconds)
+        return new DateRange(this.from, newTo)
+
+    }
+
     static subtract(source: DateRange, other: DateRange): DateRange[] {
 
         const overlapMode = source.overlapWith(other)

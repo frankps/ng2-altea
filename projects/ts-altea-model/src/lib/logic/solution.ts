@@ -1,7 +1,7 @@
 import { extend, uniq } from "lodash";
 import { Resource, ResourcePlanning, ResourcePlannings, ResourceType } from "ts-altea-model"
 import { DateRange, DateRangeSet, TimeSpan } from "./dates";
-import { ResourceRequestItem } from "./resource-request";
+import { ResourceRequest, ResourceRequestItem } from "./resource-request";
 import { ArrayHelper, ObjectHelper, ObjectWithId } from "ts-common";
 import * as dateFns from 'date-fns'
 import * as _ from "lodash"
@@ -136,6 +136,11 @@ export class SolutionItems extends ObjectWithId {
 
     }
 
+    /**
+     * Returns a date range with the minimal from
+     * and the corresponding to is incremented with the highest offset+duration
+     * @returns 
+     */
     getOuterRange2(): DateRange {
 
         if (this.isEmpty())
@@ -153,6 +158,52 @@ export class SolutionItems extends ObjectWithId {
         return new DateRange(newFrom, newTo)
 
     }
+
+
+    /** from the start of the earliest request, till the end of the latest request */
+    totalRequestDuration(): TimeSpan {
+
+        if (this.isEmpty())
+            return new TimeSpan(0)
+
+        let requests = this.items.map(i => i.request)
+
+        let offsets: TimeSpan[] = requests.map(request => request.offset)
+
+        let minOffset = _.minBy(offsets, 'seconds')
+
+        let offsetDurations: TimeSpan[] = requests.map(request => request.offset.add(request.duration))
+
+        let maxOffsetDuration = _.maxBy(offsetDurations, 'seconds')
+
+
+        let totalDuration = maxOffsetDuration.subtract(minOffset)
+
+
+        return totalDuration
+    }
+
+    /** from the start of the earliest request, till the end of the latest request */
+    totalRequestDurationInclOffset(): TimeSpan {
+
+        if (this.isEmpty())
+            return new TimeSpan(0)
+
+        let requests = this.items.map(i => i.request)
+
+        let offsets: TimeSpan[] = requests.map(request => request.offset)
+
+        //        let minOffset = _.minBy(offsets, 'seconds')
+
+        let offsetDurations: TimeSpan[] = requests.map(request => request.offset.add(request.duration))
+
+        let maxOffsetDuration = _.maxBy(offsetDurations, 'seconds')
+
+        return maxOffsetDuration
+    }
+
+
+
 
     /*
     occupiedBetween(resource: Resource) : DateRange {
@@ -188,7 +239,7 @@ export class Solution extends SolutionItems {
         super(items)
 
         if (ArrayHelper.NotEmpty(items)) {
-          
+
             let num = 1
             items.forEach(item => { item.num = num++ })
 
@@ -242,6 +293,8 @@ export class Solution extends SolutionItems {
             const offsetSeconds = item.request.offset.seconds
 
             const refFrom = dateFns.addSeconds(item.dateRange.from, -offsetSeconds)
+
+            // important: the to refers to the last possible start of this item (and not to the finished end of this item)
             const refTo = dateFns.addSeconds(item.dateRange.to, -offsetSeconds)
 
             this.limitOtherItems(refFrom, refTo)
@@ -249,18 +302,26 @@ export class Solution extends SolutionItems {
 
     }
 
-    limitOtherItems(refFrom: Date, refTo: Date) {
+    /*
+    [refFrom - refTo] refers to the interval of possible start moments
+    (as such refTo has nothing to see with the actual end of a service)
+    */
+    limitOtherItems(refFrom?: Date, refTo?: Date) {
 
         if (ArrayHelper.IsEmpty(this.items))
             return
 
+        this.offsetRefDate = refFrom
 
         for (let item of this.items) {
 
             const offsetSeconds = item.request.offset.seconds
 
-            item.dateRange.from = dateFns.addSeconds(refFrom, offsetSeconds)
-            item.dateRange.to = dateFns.addSeconds(refTo, offsetSeconds)
+            if (refFrom)
+                item.dateRange.from = dateFns.addSeconds(refFrom, offsetSeconds)
+
+            if (refTo)
+                item.dateRange.to = dateFns.addSeconds(refTo, offsetSeconds)
         }
 
 
@@ -311,8 +372,8 @@ export class Solution extends SolutionItems {
         //    return ObjectHelper.clone(this, Solution) as Solution
 
         const clone = new Solution(...this.items.map(item => item.clone()))
-        clone.valid = this.valid
-        clone.notes = this.notes
+      //  clone.valid = this.valid
+        clone.notes = [...this.notes]
         clone.offsetRefDate = this.offsetRefDate
         return clone
 
