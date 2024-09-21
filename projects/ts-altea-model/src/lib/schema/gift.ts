@@ -253,9 +253,11 @@ export class GiftLineOptionValue {
   
   
     /** created at */
+    /*
     @Type(() => Date)
     crea = new Date()
-  
+  */
+ 
     //certificate: GiftCertificate = GiftCertificate.inStore
   
   
@@ -329,12 +331,12 @@ export class GiftLineOptionValue {
       return this.type == GiftType.specific
     }
   
-    availableAmount() {
+    availableAmount(maxAmount?: number) {
   
       if (this.used && this.used > 0)  // we had a bug that used was negative
         return this.value - this.used
   
-      return this.value
+      return maxAmount ? Math.min(maxAmount, this.value) : this.value
   
     }
   

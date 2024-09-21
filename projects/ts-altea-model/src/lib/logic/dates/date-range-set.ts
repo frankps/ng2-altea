@@ -257,6 +257,20 @@ export class DateRangeSet {
         return new DateRangeSet(ranges.map(r => r.clone()), this.resource)
     }
 
+    get count() {
+        if (ArrayHelper.IsEmpty(this.ranges))
+            return 0
+
+        return this.ranges.length
+    }
+
+    allAtLeast(time: TimeSpan): boolean {
+        
+        const idx = this.ranges.findIndex(r => r.duration.seconds < time.seconds)
+
+        return idx == -1 
+    }
+
     lessThen(time: TimeSpan): DateRangeSet {
 
         const ranges = this.ranges.filter(r => r.duration.seconds < time.seconds)
@@ -422,6 +436,13 @@ export class DateRangeSet {
     }
 
 
+    subtractRange(range: DateRange): DateRangeSet {
+
+        const toSubtract = new DateRangeSet( [ range ])
+
+        return this.subtract(toSubtract)
+
+    }
 
     subtract(toSubtract: DateRangeSet): DateRangeSet {
 

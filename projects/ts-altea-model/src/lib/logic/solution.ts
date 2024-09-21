@@ -372,7 +372,7 @@ export class Solution extends SolutionItems {
         //    return ObjectHelper.clone(this, Solution) as Solution
 
         const clone = new Solution(...this.items.map(item => item.clone()))
-      //  clone.valid = this.valid
+        //  clone.valid = this.valid
         clone.notes = [...this.notes]
         clone.offsetRefDate = this.offsetRefDate
         return clone
@@ -446,7 +446,34 @@ export class SolutionSet {
     }
 
     get validSolutions(): Solution[] {
-        return this.solutions.filter(s => !s.isEmpty() && s.valid)
+
+        var solutions = this.solutions.filter(s => !s.isEmpty() && s.valid)
+
+        // because we work with pop() method => by reversing, first element will be popped first
+        solutions = solutions.reverse()
+
+        return solutions
+    }
+
+
+
+
+    getFirstValid(): Solution {
+
+        if (this.isEmpty())
+            return null
+
+
+        const idx = this.solutions.findIndex(sol => sol.valid)
+
+        if (idx == -1)
+            return null
+
+        const firstValidSolution = this.solutions[idx]
+
+        this.solutions.splice(idx, 1)
+
+        return firstValidSolution
     }
 
 

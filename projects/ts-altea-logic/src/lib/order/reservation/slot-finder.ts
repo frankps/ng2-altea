@@ -27,11 +27,20 @@ export class SlotFinder {
         const staffBreak = TimeSpan.minutes(breakTimeInMinutes)
 
         // we will invalidate some solutions and replace with new solutions to allow breaks for staff
-        const newSolutions: Solution[] = []
+        // const newSolutions: Solution[] = []
 
-        for (var solution of solutionSet.validSolutions) {
+        let solutionsToCheck : Solution[] = solutionSet.validSolutions
 
-            let newSolutionCreated = false
+        //solutionsToCheck = solutionsToCheck.splice(1, solutionsToCheck.length - 1)
+
+        let solution: Solution
+
+        let solutionCount = 0
+
+
+        while (solution = solutionsToCheck.pop()) {
+
+            let newSolutionsCreated = false
 
             const humanResourcesItems = solution.getHumanResourceItems()
 
@@ -57,6 +66,7 @@ export class SlotFinder {
                     continue
 
                 if (solution.hasExactStart()) {
+
                     const newBreaks = dayBreaksForStaffMember.subtract(staffDateRanges)
 
                     const possibleBreaks = newBreaks.atLeast(staffBreak)
@@ -75,10 +85,19 @@ export class SlotFinder {
 
                     const staffDateRange = staffSolItems.getOuterRange2()
 
-                    // if no potential overlap with breaks, then continue
+                    // if no potential overlap with breaks, then no problem
+                    
                     if (!dayBreaksForStaffMember.hasOverlapWith(staffDateRange))
                         continue
 
+
+                    // if remaining of break window is still big enough, then no problem
+                
+                    const remainingOfBreaks = dayBreaksForStaffMember.subtractRange(staffDateRange)  
+
+                    if (remainingOfBreaks.count == dayBreaksForStaffMember.count 
+                        && remainingOfBreaks.allAtLeast(staffBreak))
+                        continue
 
                     /* check if overlap with break windows too small => always still possible to have a pause
                       
@@ -111,14 +130,19 @@ export class SlotFinder {
                         const startOfLastBreak = dateFns.subMinutes(breakWindow.to, breakTimeInMinutes)
 
                         solution.valid = false
-                        newSolutionCreated = true
+
 
                         // Create first solution (before break)
 
                         const lastPossibleStartOfSolution = dateFns.subSeconds(startOfLastBreak, staffOccupationFromStart.seconds)
 
                         const solutionBeforeBreak = solution.clone()
-                        newSolutions.push(solutionBeforeBreak)
+
+                        // we need te re-evalutae this new solution for other (potential) break problems
+                        solutionSet.add(solutionBeforeBreak)
+                       // solutionsToCheck.splice(0, solutionsToCheck.length)
+                        solutionsToCheck.push(solutionBeforeBreak)
+
 
 
                         solutionBeforeBreak.limitOtherItems(solution.offsetRefDate, lastPossibleStartOfSolution)
@@ -132,7 +156,10 @@ export class SlotFinder {
                         //const lastPossibleStartOfSolution = dateFns.subSeconds(startOfLastBreak, staffOccupationFromStart.seconds)
 
                         const solutionAfterBreak = solution.clone()
-                        newSolutions.push(solutionAfterBreak)
+
+                        // we need te re-evalutae this new solution for other (potential) problems
+                        solutionSet.add(solutionAfterBreak)
+                        solutionsToCheck.push(solutionAfterBreak)
 
 
                         solutionAfterBreak.limitOtherItems(endOfFirstBreak)
@@ -140,16 +167,14 @@ export class SlotFinder {
                         const firstBreak = new DateRange(breakWindow.from, endOfFirstBreak)
                         solutionAfterBreak.addNote(`Solution created to enable break for ${human.name}. First possible break: ${firstBreak.toString()}`)
 
-
-
-
+                        newSolutionsCreated = true
 
                         break
 
                     }
 
 
-                    if (newSolutionCreated)
+                    if (newSolutionsCreated)   // then we re-evaluate these new solutions from the beginning
                         break
 
 
@@ -160,11 +185,19 @@ export class SlotFinder {
             }
 
 
+            solutionCount++
+
+            if (solutionCount > 200) {
+                break
+
+            }
+                
 
         }
 
 
-        solutionSet.add(...newSolutions)
+
+
 
     }
 

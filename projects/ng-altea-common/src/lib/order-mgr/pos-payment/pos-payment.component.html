@@ -69,7 +69,7 @@
                     <div class="col-4">{{gift.used}}/{{gift.value}}</div>
                     <div class="col-4">
                         <button type="button" [disabled]="gift.availableAmount() <= 0" class="btn btn-primary btn-sm"
-                            (click)="useGift(gift)">{{gift.availableAmount()}}</button>
+                            (click)="useGift(gift)">{{gift.availableAmount(mgrUiSvc.order.toPay())}}</button>
                     </div>
                 </div>
 

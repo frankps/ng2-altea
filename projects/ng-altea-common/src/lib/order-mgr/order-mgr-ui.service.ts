@@ -950,7 +950,7 @@ export class OrderMgrUiService {   // implements OnInit
 
       me.order.addLine(orderLine, setUnitPrice)
 
-      if (product.type == ProductType.svc) {
+      if (product?.type == ProductType.svc) {
         /** introduced for wellness, has options adults & kids => this influences nrOfPersons */
         me.updateNrOfPersons(orderLine)
       }

@@ -40,7 +40,7 @@ export class PosPaymentComponent implements OnInit {
   }
 
   async ngOnInit() {
-    
+
     console.warn('ngOnInit')
 
     await this.getRewards()
@@ -140,12 +140,19 @@ export class PosPaymentComponent implements OnInit {
 
   async useGift(gift: Gift) {
 
-    let canUse = gift.canUse(this.amount)
+    //let amount = gift.availableAmount()
+
+    let amount = gift.availableAmount(this.mgrUiSvc.order.toPay())
+
+    let canUse = gift.canUse(amount)
 
     console.warn(canUse)
 
     if (canUse.valid && canUse.amount > 0) {
       const payment = this.mgrUiSvc.addPayment(canUse.amount, PaymentType.gift, 'pos')
+      
+      gift.used += canUse.amount   // for local client: the back-end will do this also when saving the order
+
       payment.giftId = gift.id
       /* 
             let res = await this.mgrUiSvc.testPaymentProcessing()

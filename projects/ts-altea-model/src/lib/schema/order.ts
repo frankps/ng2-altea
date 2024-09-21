@@ -590,6 +590,11 @@ export class OrderPerson extends ObjectWithId {
       return (Array.isArray(this.payments) && this.payments.length > 0)
     }
   
+    toPay() : number {
+      return this.incl - this.paid
+    }
+
+
     makePayTotals() {
   
   
