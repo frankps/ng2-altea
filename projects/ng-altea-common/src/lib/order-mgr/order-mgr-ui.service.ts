@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import { Injectable, OnInit } from '@angular/core';
-import { AppMode, AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Branch, ConfirmOrderResponse, Contact, CreateCheckoutSession, DateBorder, Gift, GiftType, Order, OrderLine, OrderLineOption, OrderState, Payment, PaymentType, Product, ProductSubType, ProductType, ProductTypeIcons, RedeemGift, ReservationOption, ReservationOptionSet, Resource, ResourcePlanning, ResourceType } from 'ts-altea-model'
+import { AppMode, AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Branch, ConfirmOrderResponse, Contact, CreateCheckoutSession, DateBorder, Gift, GiftLine, GiftType, Order, OrderLine, OrderLineOption, OrderState, Payment, PaymentType, Product, ProductSubType, ProductType, ProductTypeIcons, RedeemGift, ReservationOption, ReservationOptionSet, Resource, ResourcePlanning, ResourceType } from 'ts-altea-model'
 import { ApiListResult, ApiStatus, ArrayHelper, DateHelper, DbQuery, QueryOperator, Translation } from 'ts-common'
 import { AlteaService, GiftService, ObjectService, OrderMgrService, OrderService, ProductService, ResourceService, SessionService } from 'ng-altea-common'
 import * as _ from "lodash";
@@ -474,7 +474,7 @@ export class OrderMgrUiService {   // implements OnInit
 
     //let depoDate = order.calculateDepositByDate()
 
-    this.order.branch = this.sessionSvc.branch
+    this.order.branch = await this.sessionSvc.branch$() // branch
 
     if (!this.order.branch || order.branchId != order.branch.id)
       throw new Error('Wrong branch on order!')
@@ -730,6 +730,34 @@ export class OrderMgrUiService {   // implements OnInit
     return res.object
   }
 
+
+  syncGiftWithOrder(gift: Gift, order: Order, branch: Branch) {
+
+    
+    gift.value = order.incl
+
+    if (gift.isSpecific()) {
+
+      for (let orderLine of order.lines) {
+
+        let giftLine = gift.getLine(orderLine.id)
+
+        if (!giftLine) 
+          giftLine = gift.newLine(orderLine)
+        else
+        giftLine.sync(orderLine)
+
+
+
+      }
+
+
+    }
+    
+
+    
+
+  }
 
 
   selectDate() {

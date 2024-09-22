@@ -193,8 +193,8 @@ export class OrderComponent implements OnInit {
   }
 
   payOnline() {
-    this.mode = 'pay-online'
-    this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'order'])
+  //  this.mode = 'pay-online'
+    this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'orderMode', 'pay-online'])
   }
 
   nextMode(currentMode: string) {

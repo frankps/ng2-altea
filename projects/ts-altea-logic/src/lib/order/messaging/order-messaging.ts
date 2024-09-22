@@ -350,6 +350,14 @@ export class OrderMessaging extends OrderMessagingBase {
 
 
 
+    giftMessaging(order: Order) {
+
+        order
+
+    }
+
+
+
 
 }
 

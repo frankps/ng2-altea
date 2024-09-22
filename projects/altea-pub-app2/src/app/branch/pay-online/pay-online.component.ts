@@ -233,6 +233,11 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
 
   async startPayment(amount: number) {
 
+
+    // introduced for gift payment
+    await this.orderMgrSvc.saveOrder()
+
+
     this.mode = 'PayOnline'
 
     let me = this

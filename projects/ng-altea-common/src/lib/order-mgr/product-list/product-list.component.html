@@ -21,6 +21,12 @@
 </ng-container>
 
 
+<ng-container *ngIf="!orderMgrSvc.products">
+    <ul class="list-group">
+        <li class="list-group-item">Ophalen producten & diensten</li>
+    </ul>
+</ng-container>
+
 
 <ng-container *ngIf="orderMgrSvc.currentCategoryId && orderMgrSvc.products">
 
