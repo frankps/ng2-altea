@@ -75,8 +75,24 @@ export class OrderLineOption extends ObjectWithId {
     return olOption
   }
 
+  /*
+  valuesWithNonDefaultValues(): OrderLineOptionValue[] {
+
+
+  }*/
+
   hasValues(): boolean {
     return ArrayHelper.NotEmpty(this.values)
+  }
+
+  hasNonDefaultValues(): boolean {
+
+    if (!this.hasValues())
+      return false
+
+    var idx = this.values.findIndex(val => val?.d === false)
+
+    return idx >= 0
   }
 
   hasFormula(): boolean {
@@ -125,6 +141,9 @@ export class OrderLineOptionValue extends ObjectWithId {
   @Type(() => Number)
   val = 0
 
+  /** is default option value (in product config) */
+  d = false
+
   // @Type(() => Number)
   // factor = 0
 
@@ -139,6 +158,8 @@ export class OrderLineOptionValue extends ObjectWithId {
     this.dur = productOptionValue.duration
     this.val = productOptionValue.value
 
+    this.d = productOptionValue.default
+
     this.prc = productOptionValue.price
     //this.factor = productOptionValue.factor
   }
@@ -149,6 +170,7 @@ export class OrderLineOptionValue extends ObjectWithId {
     olOptionValue.name = prodOptionValue.name
     olOptionValue.dur = prodOptionValue.duration
     olOptionValue.val = prodOptionValue.value
+    olOptionValue.d = prodOptionValue.default
 
     olOptionValue.prc = prodOptionValue.price
     //olOptionValue.factor = prodOptionValue.factor
@@ -326,6 +348,15 @@ export class OrderLine extends ObjectWithIdPlus {
     console.error(this.incl)
   }
 
+  optionsWithNonDefaultValues() : OrderLineOption[] {
+
+    if (ArrayHelper.IsEmpty(this.options))
+      return []
+
+    var options = this.options.filter(option => option.hasNonDefaultValues())
+
+    return options
+  }
 
   static custom(descr: string, unit: number, vatPct: number): OrderLine {
 

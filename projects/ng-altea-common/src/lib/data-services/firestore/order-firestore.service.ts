@@ -244,6 +244,8 @@ export class OrderFirestoreService {
 
       orderUis = this.filterOrderUis(orderUis, [OrderState.cancelled])
 
+      orderUis.forEach(orderUi => { orderUi?.planning.forEach(planUi => planUi.order = orderUi) })
+      
       let planningUis = orderUis.flatMap(orderUi => orderUi.planning)
 
       let wellnessId = 'b39b2d8a-9a06-46b8-8334-4fc400cfc2c5'

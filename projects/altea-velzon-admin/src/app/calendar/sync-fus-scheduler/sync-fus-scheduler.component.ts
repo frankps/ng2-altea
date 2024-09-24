@@ -85,7 +85,7 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
 
   async ngOnInit() {
 
-    const refDate = new Date(2024,5, 17)
+    const refDate = new Date() //2024,5, 17)
 
     await this.showWeekEvents(refDate)
     this.currentView = "Week"
@@ -117,8 +117,8 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
         break
 
       case "Week":
-        this.startOfVisible = dateFns.startOfWeek(event.currentDate)
-        this.endOfVisible = dateFns.endOfWeek(event.currentDate)
+        this.startOfVisible = dateFns.startOfWeek(event.currentDate,  { weekStartsOn: 1 })
+        this.endOfVisible = dateFns.endOfWeek(event.currentDate,  { weekStartsOn: 1 })
         break
 
       case "Month":
@@ -134,6 +134,9 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
 
 
   oneventRendered(args: any): void {
+
+//    console.warn(args)
+
     let categoryColor: string = args.data["CategoryColor"] as string;
     if (!args.element || !categoryColor) {
       return;
@@ -146,6 +149,7 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
   }
 
   baseEventToEvent(eventBase: BaseEvent) {
+
     return {
       Id: eventBase.id,
       Subject: eventBase.subject,

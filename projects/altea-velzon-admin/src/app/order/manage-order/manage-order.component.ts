@@ -27,6 +27,8 @@ export enum PosOrderMode {
 })
 export class ManageOrderComponent extends NgBaseComponent implements OnInit {
 
+  debug = false
+
   @ViewChild('editContact') public editContact: ContactSelect2Component;
 
   menu = [
@@ -35,7 +37,7 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
 
   ]
 
-  //mode: PosOrderMode = PosOrderMode.plan
+  //mode: PosOrderMode = PosOrderMode.pland
 
   modeChanges: BehaviorSubject<string> = new BehaviorSubject<string>(null)
 
@@ -117,6 +119,8 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
 
     console.error(gift)
 
+    this.changeMode(PosOrderMode.compose)
+
   }
 
 
@@ -150,6 +154,9 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
 
 
       case 'buy-gift':
+
+      await this.orderMgrSvc.newOrder()
+
         this.changeMode(PosOrderMode.buyGift)
 
         break

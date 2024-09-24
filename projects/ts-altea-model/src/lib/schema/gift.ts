@@ -1,5 +1,5 @@
 
-import { Branch, Contact, DepositMode, Invoice, Order, OrderLine, OrderType, Organisation, PlanningMode, Product, ProductResource, ProductType, ResourcePlanning, Schedule, TimeUnit, User } from "ts-altea-model";
+import { Branch, Contact, DepositMode, Invoice, Order, OrderLine, OrderLineOption, OrderLineOptionValue, OrderType, Organisation, PlanningMode, Product, ProductResource, ProductType, ResourcePlanning, Schedule, TimeUnit, User } from "ts-altea-model";
 import { Exclude, Type, Transform } from "class-transformer";
 import 'reflect-metadata';
 import { ArrayHelper, ConnectTo, DateHelper, DbObjectCreate, IAsDbObject, ManagedObject, ObjectHelper, ObjectMgmt, ObjectReference, ObjectWithId, ObjectWithIdPlus, QueryOperator, TimeHelper } from 'ts-common'
@@ -123,6 +123,27 @@ export class GiftLineOptionValue {
   id?: string
   name?: string
   prc = 0
+  val = 0
+
+  constructor(id?: string, name?: string, prc = 0, val = 0) {
+
+    this.id = id
+    this.name = name
+    this.prc = prc
+    this.val = val
+  }
+
+  static fromOrderLineOptionValue(olOptVal: OrderLineOptionValue): GiftLineOptionValue {
+    let giftLineOptionValue = new GiftLineOptionValue(olOptVal.id, olOptVal.name, olOptVal.prc, olOptVal.val)
+    return giftLineOptionValue
+  }
+
+  sync(olOptVal: OrderLineOptionValue) {
+    this.name = olOptVal.name
+    this.prc = olOptVal.prc
+    this.val = olOptVal.val
+  }
+
 }
 
 export class GiftLineOption {
@@ -131,6 +152,77 @@ export class GiftLineOption {
 
   @Type(() => GiftLineOptionValue)
   vals: GiftLineOptionValue[] = []
+
+  constructor(id?: string, name?: string) {
+
+    this.id = id
+    this.name = name
+  }
+
+  static fromOrderLineOption(orderLineOption: OrderLineOption): GiftLineOption {
+
+    let giftLineOption = new GiftLineOption(orderLineOption.id, orderLineOption.name)
+
+    if (ArrayHelper.NotEmpty(orderLineOption.values)) {
+
+      for (let olOptionValue of orderLineOption.values) {
+        let giftLineOptionValue = GiftLineOptionValue.fromOrderLineOptionValue(olOptionValue)
+        giftLineOption.vals.push(giftLineOptionValue)
+      }
+
+    }
+
+    return giftLineOption
+  }
+
+  getOptionValue(optionValueId: string): GiftLineOptionValue {
+
+    if (ArrayHelper.IsEmpty(this.vals))
+      return undefined
+
+    return this.vals.find(val => val.id == optionValueId)
+
+  }
+
+
+  sync(olOption: OrderLineOption) {
+
+    if (ArrayHelper.IsEmpty(olOption.values)) {
+      this.vals = []
+      return
+    }
+
+    for (let olOptValue of olOption.values) {
+
+      let giftLineOptionValue = this.getOptionValue(olOptValue.id)
+
+      if (!giftLineOptionValue) {
+        let giftLineOptionValue = GiftLineOptionValue.fromOrderLineOptionValue(olOptValue)
+        this.vals.push(giftLineOptionValue)
+      } else {
+        giftLineOptionValue.sync(olOptValue)
+      }
+
+    }
+
+    // remove values that were also remove from order
+    const valueIdsToRemove = []
+    for (let giftLineOptValue of this.vals) {
+
+      let olOptValue = olOption.getValueById(giftLineOptValue.id)
+      if (!olOptValue)
+        valueIdsToRemove.push(giftLineOptValue.id)
+
+    }
+
+    if (valueIdsToRemove.length > 0)
+      _.remove(this.vals, val => valueIdsToRemove.indexOf(val.id) >= 0)
+
+  }
+
+
+
+
 }
 
 
@@ -167,7 +259,61 @@ export class GiftLine {
     giftLine.pId = orderLine.productId
     giftLine.descr = orderLine.descr
 
+    var orderLineOptions = orderLine.options  // optionsWithNonDefaultValues()
+
+    if (ArrayHelper.NotEmpty(orderLineOptions)) {
+
+      for (let olOption of orderLineOptions) {
+        let giftLineOption = GiftLineOption.fromOrderLineOption(olOption)
+        giftLine.opts.push(giftLineOption)
+      }
+    }
+
     return giftLine
+  }
+
+  getOption(optionId: string): GiftLineOption {
+
+    if (ArrayHelper.IsEmpty(this.opts))
+      return undefined
+
+    return this.opts.find(option => option.id == optionId)
+
+  }
+
+  sync(orderLine: OrderLine) {
+
+    if (this.id != orderLine.id)
+      throw new Error(`Can't sync orderLine with giftLine: id's different`)
+
+    this.qty = orderLine.qty
+    this.prc = orderLine.incl
+    this.pId = orderLine.productId
+    this.descr = orderLine.descr
+
+    var orderLineOptions = orderLine.options  //optionsWithNonDefaultValues()
+
+    if (ArrayHelper.NotEmpty(orderLineOptions)) {
+
+      for (let olOption of orderLineOptions) {
+
+        var giftLineOption = this.getOption(olOption.id)
+
+        if (!giftLineOption) {
+          let giftLineOption = GiftLineOption.fromOrderLineOption(olOption)
+          this.opts.push(giftLineOption)
+        } else {
+          giftLineOption.sync(olOption)
+        }
+
+
+
+      }
+
+
+    }
+
+
   }
 
 
@@ -302,12 +448,12 @@ export class Gift extends ObjectWithIdPlus {
 
   }
 
-  newLine(orderLine: OrderLine) : GiftLine {
+  newLine(orderLine: OrderLine): GiftLine {
     if (!orderLine)
       return null
 
     let giftLine = GiftLine.fromOrderLine(orderLine)
-    
+
     if (!this.lines)
       this.lines = []
 
@@ -388,6 +534,40 @@ export class Gift extends ObjectWithIdPlus {
   methodSelected() {
     const methods = this.methods
     return (methods.emailFrom || methods.emailTo || methods.pos || methods.postal)
+
+  }
+
+
+  /**
+   * A gift is always created from an order, a gift needs to reflect what is ordered
+   * 
+   * @param order 
+   * @param branch 
+   */
+  syncFromOrder(order: Order) {   // , branch?: Branch
+
+    this.value = order.incl
+
+    if (this.isSpecific()) {
+
+      for (let orderLine of order.lines) {
+
+        let giftLine = this.getLine(orderLine.id)
+
+        if (!giftLine)
+          giftLine = this.newLine(orderLine)
+        else
+          giftLine.sync(orderLine)
+
+
+
+      }
+
+
+    }
+
+
+
 
   }
 }

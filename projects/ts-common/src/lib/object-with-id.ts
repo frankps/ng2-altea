@@ -52,6 +52,10 @@ export abstract class ManagedObject {
   @Type(() => ObjectMgmt)
   m = new ObjectMgmt()
 
+  constructor() {
+    //this.markAsNew()
+  }
+
   isNew() {
     return (this.m?.n == true)
   }
@@ -131,6 +135,7 @@ export abstract class ObjectWithId extends ManagedObject {
     super()
 
     this.id = ObjectHelper.newGuid()
+    
 
     /** declare this object as new */
     // this.m.n = true

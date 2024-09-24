@@ -464,6 +464,13 @@ export class OrderMgrUiService {   // implements OnInit
     // .resources.resource
     const order = await this.orderSvc.get$(orderId, "planning.resource,lines:orderBy=idx.product,contact.cards,payments:orderBy=idx")
 
+    if (order.gift) {
+      this.gift = await this.giftSvc.getByOrderId$(orderId)
+
+      if (!this.gift)
+        this.dashboardSvc.showErrorToast('Could not find gift for this order!')
+    }
+
     this.order = order
 
     console.error(order)
@@ -553,7 +560,7 @@ export class OrderMgrUiService {   // implements OnInit
 
     this.order.depositMins = this.maxWaitForDepositInMinutes(appMode, bookingStart)
 
-    const by = dateFns.addHours(now, this.order.depositMins)
+    const by = dateFns.addMinutes(now, this.order.depositMins)
 
     this.order.depositBy = DateHelper.yyyyMMddhhmmss(by)
 
@@ -686,6 +693,8 @@ export class OrderMgrUiService {   // implements OnInit
 
   async saveOrder(): Promise<Order> {
 
+    let me = this
+
     this.spinner.show()
 
     console.warn(this.order)
@@ -699,13 +708,14 @@ export class OrderMgrUiService {   // implements OnInit
 
     if (res.isOk) {
       this.refreshOrder(res.object)
-      this.orderDirty = false
+      me.orderDirty = false
 
-      if (this.order.gift) {
+      if (me.order.gift && me.gift) {
 
         if (this.gift?.isNew()) {
 
           this.gift.orderId = this.order.id
+          this.gift.syncFromOrder(this.order)
           let giftRes = await this.giftSvc.create$(this.gift, this.dashboardSvc.resourceId)
 
           console.warn(giftRes)
@@ -714,6 +724,9 @@ export class OrderMgrUiService {   // implements OnInit
             this.gift = giftRes.object
           }
 
+        } else {
+          this.gift.syncFromOrder(this.order)
+          let giftRes = await this.giftSvc.update$(this.gift, this.dashboardSvc.resourceId)
         }
       }
 
@@ -731,33 +744,7 @@ export class OrderMgrUiService {   // implements OnInit
   }
 
 
-  syncGiftWithOrder(gift: Gift, order: Order, branch: Branch) {
 
-    
-    gift.value = order.incl
-
-    if (gift.isSpecific()) {
-
-      for (let orderLine of order.lines) {
-
-        let giftLine = gift.getLine(orderLine.id)
-
-        if (!giftLine) 
-          giftLine = gift.newLine(orderLine)
-        else
-        giftLine.sync(orderLine)
-
-
-
-      }
-
-
-    }
-    
-
-    
-
-  }
 
 
   selectDate() {

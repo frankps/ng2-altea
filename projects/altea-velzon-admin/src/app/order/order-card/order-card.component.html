@@ -42,6 +42,10 @@
         <!--               
         <h5 class="card-title">{{order.contact.name}}</h5> -->
 
+        <div class="row" *ngIf="order.giftCode">
+            <div class="col">Cadeaubon: {{order.giftCode}}</div>
+        </div>
+        
 
 
         <div class="row" *ngFor="let line of order.lines">

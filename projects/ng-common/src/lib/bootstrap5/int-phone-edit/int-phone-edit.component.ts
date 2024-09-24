@@ -28,6 +28,9 @@ export class IntPhoneEditComponent {
     ['49', { regEx: '^(15|16|17)[0-9]*', length: { min: 10, max: 11 } }],  // Germany
   ])
 
+
+  @Input() required: boolean = true
+
   /*
   {
     32: {
@@ -59,8 +62,11 @@ export class IntPhoneEditComponent {
 
     console.log(value, this.countries)
 
-    if (!value || value.trim().length == 0)
+    if (!value || value.trim().length == 0) {
+      this._localNum = ''
       return
+    }
+      
 
 
     let phone = value.trim()

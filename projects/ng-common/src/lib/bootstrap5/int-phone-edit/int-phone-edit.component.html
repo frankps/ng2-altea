@@ -13,7 +13,7 @@
 
         <div [class]="css.colLocalNum">
             <ngx-altea-label-control label="objects.contact.mobile" for="mobile">
-                <input required type="text" id="mobile" name="mobile" class="form-control" [(ngModel)]="_localNum"
+                <input [required]="required" type="text" id="mobile" name="mobile" class="form-control" [(ngModel)]="_localNum"
                     (keypress)="localPhoneChanged($event)" (keydown)="specialKeyPressed($event)"
                     (paste)="onPaste($event)" (change)="phoneChanged()" />
             </ngx-altea-label-control>

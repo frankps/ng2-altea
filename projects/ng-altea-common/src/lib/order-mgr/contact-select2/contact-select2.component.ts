@@ -5,6 +5,8 @@ import { DashboardService, TranslationService } from 'ng-common'
 import { ArrayHelper, ObjectHelper, Translation } from 'ts-common'
 import { ContactService, SessionService } from 'ng-altea-common';
 import { OrderMgrUiService } from '../order-mgr-ui.service';
+import { NgxSpinnerService } from "ngx-spinner"
+
 
 @Component({
   selector: 'order-mgr-contact-select2',
@@ -25,7 +27,7 @@ export class ContactSelect2Component implements OnInit {
     if (value) {
       this._contact = value
       this.isNew = (value.id == null)
-    
+
     } else {
 
       this._contact = new Contact()
@@ -54,12 +56,22 @@ export class ContactSelect2Component implements OnInit {
 
   showContacts = false
 
-  constructor(protected translationSvc: TranslationService, private contactSvc: ContactService
-    , protected orderMgrSvc: OrderMgrUiService, private sessionSvc: SessionService, private dashboardSvc: DashboardService) {
+  inputsRequired = false
 
+  constructor(protected translationSvc: TranslationService, private contactSvc: ContactService
+    , protected orderMgrSvc: OrderMgrUiService, private sessionSvc: SessionService, private dashboardSvc: DashboardService,
+    protected spinner: NgxSpinnerService) {
 
 
   }
+
+  newContact() {
+    this.contact = new Contact()
+    this.contact.markAsNew()
+    this.isNew = true
+    console.log(this.contact)
+  }
+
 
   demoData() {
     /*
@@ -143,14 +155,42 @@ export class ContactSelect2Component implements OnInit {
 
   async saveContact(): Promise<Contact> {
 
-    if (this.contact.id)
-      return await this.updateContact()
-    else
+
+
+    // if (this.contact.id)
+
+    if (this.contact.isNew())
       return await this.createAsNew()
+    else
+      return await this.updateContact()
+
+
   }
 
   async updateContact(): Promise<Contact> {
     let me = this
+
+    let error
+    try {
+      this.spinner.show()
+
+    } catch (err) {
+
+      console.error(err)
+      error = 'Problem updating contact!'
+
+    } finally {
+
+      this.spinner.hide()
+
+      if (error)
+        this.dashboardSvc.showErrorToast(error)
+      else
+        this.dashboardSvc.showSuccessToast('Contact saved!')
+
+    }
+
+
 
     let res = await me.contactSvc.update$(me.contact, this.dashboardSvc.resourceId)
 
@@ -170,7 +210,7 @@ export class ContactSelect2Component implements OnInit {
     switch (msgType) {
       case MsgType.email:
         return false    // we always send emails => user can not disable
-        // return contact.email
+      // return contact.email
 
       case MsgType.sms:
       case MsgType.wa:
@@ -201,23 +241,45 @@ export class ContactSelect2Component implements OnInit {
 
   async createAsNew(): Promise<Contact> {
 
-    if (!this.contact.id)
-      this.contact.id = ObjectHelper.newGuid()
+    let contact: Contact
+    let error
 
+    try {
+      this.spinner.show()
 
-    if (!this.contact.branchId)
-      this.contact.branchId = this.branch.id
+      if (!this.contact.id)
+        this.contact.id = ObjectHelper.newGuid()
 
-    this.contact.setName()
+      if (!this.contact.branchId)
+        this.contact.branchId = this.branch.id
 
-    const res = await this.contactSvc.create$(this.contact, this.dashboardSvc.resourceId)
-    console.warn(res)
+      this.contact.setName()
 
-    if (res.isOk) {
-      this.selectContact(res.object)
+      const res = await this.contactSvc.create$(this.contact, this.dashboardSvc.resourceId)
+      console.warn(res)
+
+      if (res.isOk) {
+        contact = res.object
+        this.selectContact(contact)
+      }
+
+    } catch (err) {
+
+      console.error(err)
+      error = 'Problem creating contact!'
+
+    } finally {
+
+      this.spinner.hide()
+
+      if (error)
+        this.dashboardSvc.showErrorToast(error)
+      else
+        this.dashboardSvc.showSuccessToast('Contact created!')
+
     }
 
-    return res.object
+    return contact
   }
 
   editContact() {

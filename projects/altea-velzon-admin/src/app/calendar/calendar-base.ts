@@ -23,6 +23,7 @@ export class BaseEvent {
     to: Date
     color: string
 
+    contact: string
     resource: Resource
 
     static newEventBase(id: string, type: BaseEventType, subject: string, from: Date, to: Date, color: string) {
@@ -112,8 +113,8 @@ export abstract class CalendarBase {
 
     async showWeekEvents(date: Date = new Date()) {
 
-        const startOfVisible = dateFns.startOfWeek(date)
-        const endOfVisible = dateFns.endOfWeek(date)
+        const startOfVisible = dateFns.startOfWeek(date, { weekStartsOn: 1 })
+        const endOfVisible = dateFns.endOfWeek(date, { weekStartsOn: 1 })
 
         await this.showEventsBetween(startOfVisible, endOfVisible)
     }
@@ -279,7 +280,9 @@ export abstract class CalendarBase {
 
     planningUiToEventBase(planningUi: ResourcePlanningUi): BaseEvent {
 
-        return BaseEvent.newEventBase(planningUi.id, BaseEventType.OrderPlanning, planningUi.order?.shortInfo(), planningUi.startDate, planningUi.endDate, (planningUi.resource as Resource)?.color)
+        const baseEvent = BaseEvent.newEventBase(planningUi.id, BaseEventType.OrderPlanning, planningUi.order?.shortInfo(), planningUi.startDate, planningUi.endDate, (planningUi.resource as Resource)?.color)
+        //  baseEvent.contact = planningUi.
+        return baseEvent
     }
 
     /** This is a callback function that is called by the OrderFirestoreService whenever there are changes to the visible orders 

@@ -26,5 +26,19 @@ export class GiftService extends BackendHttpServiceBase<Gift> {
     return gifts
   }
 
+
+  async getByOrderId$(orderId: string) : Promise<Gift> {
+
+    const query = new DbQuery()
+    query.take = 10
+    query.and('orderId', QueryOperator.equals, orderId)
+
+    const gift = await this.queryFirst$(query)
+
+    return gift
+  }
+
+
+
 }
 

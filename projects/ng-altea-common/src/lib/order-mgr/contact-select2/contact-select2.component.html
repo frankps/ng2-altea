@@ -1,23 +1,30 @@
 <ng-container *ngIf="!showContacts">
 
+
+
     <div class="card">
         <div class="card-header" translate>
             ui.order-mgr.contact-select2.title
+
+
+            <button class="btn btn-primary btn-sm float-end" translate (click)="newContact()">dic.new</button>
+
+
         </div>
         <div class="card-body">
             <form #contactForm="ngForm">
                 <div class="row {{css_cls_row}}">
                     <div class="col">
                         <ngx-altea-label-control label="objects.contact.first" for="first">
-                            <input required type="text" id="first" name="first" class="form-control"
-                                [(ngModel)]="contact.first" (change)="propertyChanged('first')">
+                            <input [required]="inputsRequired" type="text" id="first" name="first" class="form-control"
+                                [(ngModel)]="contact.first"  (change)="propertyChanged('first')">
                         </ngx-altea-label-control>
                     </div>
                 </div>
                 <div class="row {{css_cls_row}}">
                     <div class="col">
                         <ngx-altea-label-control label="objects.contact.last" for="last">
-                            <input required type="text" id="last" name="last" class="form-control"
+                            <input [required]="inputsRequired" type="text" id="last" name="last" class="form-control"
                                 [(ngModel)]="contact.last" (change)="propertyChanged('last')">
                         </ngx-altea-label-control>
                     </div>
@@ -25,14 +32,14 @@
                 <div class="row {{css_cls_row}}">
                     <div class="col">
                         <ngx-altea-label-control label="objects.contact.email" for="email">
-                            <input required type="text" id="email" name="email" class="form-control"
+                            <input [required]="inputsRequired" type="text" id="email" name="email" class="form-control"
                                 [(ngModel)]="contact.email" (change)="propertyChanged('email')">
                         </ngx-altea-label-control>
                     </div>
                 </div>
 
 
-                <int-phone-edit [(phone)]="contact.mobile" (phoneChange)="phoneChanged()"></int-phone-edit>
+                <int-phone-edit [(phone)]="contact.mobile" [required]="inputsRequired" (phoneChange)="phoneChanged()"></int-phone-edit>
 
 
                 <!-- Allowed message types  -->

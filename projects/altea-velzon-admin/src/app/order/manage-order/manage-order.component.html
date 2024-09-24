@@ -166,69 +166,34 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="col-8">
+<div class="form-check form-switch">
+    <input class="form-check-input" type="checkbox" id="smsOn" name="smsOn" [(ngModel)]="debug" />
+    <label class="form-check-label" for="smsOn">Debug info</label>
+</div>
 
-        <order-mgr-order-summary [order]="orderMgrSvc.order"></order-mgr-order-summary>
-        <order-mgr-debug-messaging></order-mgr-debug-messaging>
+
+<ng-container *ngIf="debug">
+
+    <div class="row">
+        <div class="col-8">
     
-    </div>
-    <div class="col-4">
-
-        <order-mgr-demo-orders></order-mgr-demo-orders>
-    </div>
-</div>
-
-
-<order-mgr-debug-plannings *ngIf="orderMgrSvc.plannings" [plannings]="orderMgrSvc.plannings" ></order-mgr-debug-plannings>
-
-<order-mgr-debug-availability [response]="orderMgrSvc.availabilityResponse"></order-mgr-debug-availability>
-
-
-
-
-<!-- 
-
-[resources]="orderMgrSvc.resources"
-
-<ngx-altea-browse-catalog></ngx-altea-browse-catalog>
-
-<div class="row">
-    <div class="col-4">
-        <div>   
-
-            <button type="button" class="btn btn-primary btn-sm"
-                (click)="showPersonSelect=!showPersonSelect">Personen</button>
+            <order-mgr-order-summary [order]="orderMgrSvc.order"></order-mgr-order-summary>
+            <order-mgr-debug-messaging></order-mgr-debug-messaging>
+        
         </div>
-
-
-        <order-mgr-person-select *ngIf="showPersonSelect"></order-mgr-person-select>
-
-
-        <order-mgr-product-list></order-mgr-product-list>
-
-        <order-mgr-select-date></order-mgr-select-date>
+        <div class="col-4">
+    
+            <order-mgr-demo-orders></order-mgr-demo-orders>
+        </div>
     </div>
-    <div class="col-4">
+    
+    
+    <order-mgr-debug-plannings *ngIf="orderMgrSvc.plannings" [plannings]="orderMgrSvc.plannings" ></order-mgr-debug-plannings>
+    
+    <order-mgr-debug-availability [response]="orderMgrSvc.availabilityResponse"></order-mgr-debug-availability>
+    
+    
+    
 
-        <order-mgr-select-time-slot></order-mgr-select-time-slot>
+</ng-container>
 
-        <order-mgr-order-line></order-mgr-order-line>
-
-
-        <order-mgr-staff-select></order-mgr-staff-select>
-
-        <order-mgr-pos-payment></order-mgr-pos-payment>
-
-    </div>
-    <div class="col-4">
-        <order-mgr-order></order-mgr-order>
-
-        <order-mgr-demo-orders></order-mgr-demo-orders>
-        <order-mgr-contact-select></order-mgr-contact-select>
-    </div>
-</div>
-
-
-
-<order-mgr-debug-availability [response]="orderMgrSvc.availabilityResponse"></order-mgr-debug-availability> -->
