@@ -20,12 +20,17 @@ export enum PosOrderMode {
   cancel = 'cancel'
 }
 
+
+
 @Component({
   selector: 'ngx-altea-manage-order',
   templateUrl: './manage-order.component.html',
   styleUrls: ['./manage-order.component.scss'],
 })
 export class ManageOrderComponent extends NgBaseComponent implements OnInit {
+
+  defaultOrder = ['start', 'compose', 'plan', 'contact', 'pay']
+
 
   debug = false
 
@@ -86,6 +91,9 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
 
   changeMode(newMode: string) {
 
+    console.warn('new mode', newMode)
+
+
     this.orderMgrSvc.changeMode(newMode)
 
     /*
@@ -100,7 +108,16 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
   }
 
   orderContinue() {
-    this.changeMode(PosOrderMode.plan)
+
+    var currentMode = this.mode
+
+    var idx = this.defaultOrder.indexOf(currentMode)
+
+    if (idx < this.defaultOrder.length - 1) {
+      var nextMode = this.defaultOrder[idx + 1]
+      this.changeMode(nextMode)
+    }
+    
   }
 
   orderLineSelected(orderLine: OrderLine) {

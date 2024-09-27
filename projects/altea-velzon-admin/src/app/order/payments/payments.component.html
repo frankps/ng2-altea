@@ -1,0 +1,68 @@
+<div class="row my-2">
+    <div class="col-3">
+<!--         <input class="form-control" #drp="bsDaterangepicker" bsDaterangepicker [(ngModel)]="dateRange" [bsConfig]="{useUtc: true}" onkeydown="return false">
+ -->
+
+        <input class="form-control"
+           placeholder="Datepicker"
+           bsDatepicker
+           (bsValueChange)="dateChange($event)">
+    </div>
+    <div class="col">
+        <button type="button" class="btn btn-primary btn-sm me-3" (click)="showGroup(group)"
+        *ngFor="let group of paymentsByType">
+        {{'enums.pay-type.' + group.name | translate}}: €{{group.total}}</button>
+
+    </div>
+
+</div>
+
+
+<div class="row my-2">
+    <div class="col-1">Betaling</div>
+    <div class="col-1">Afspraak</div>
+    <div class="col-2">Type</div>
+    <div class="col-2">Bedrag</div>
+    <div class="col-2">Klant</div>
+    <div class="col-4">Details</div>
+</div>
+   
+<ng-container *ngFor="let pay of payments">
+
+    <div class="row mb-1" (click)="togglePayment(pay)">
+        <div class="col-1">{{pay.date | intdate}}</div>
+        <div class="col-1">{{pay?.order?.start | intdate}}</div>
+        <div class="col-2">{{'enums.pay-type.' + pay.type | translate}}</div>
+        <div class="col-2">€{{pay.amount}}</div>
+
+        <ng-container *ngIf="pay.order">
+            <div class="col-2">{{pay.order.for}}</div>
+
+
+            <div class="col-4">
+
+                <span *ngIf="pay.id != payId">{{pay.order.sum?.[0].q}} x {{pay.order.sum?.[0].d}}</span>
+
+                <ng-container *ngIf="pay.id == payId">
+                    <span *ngFor="let sum of pay.order.sum">{{sum.q}} x {{sum.d}}<br></span>
+                </ng-container>
+                
+
+
+            </div>
+
+        </ng-container>
+
+
+
+        <!--         <div class="col-3">{{pay.date}}</div>
+ -->
+
+
+    </div>
+
+    <div class="row my-2" *ngIf="pay.id == payId">
+        <div class="col"></div>
+    </div>
+
+</ng-container>

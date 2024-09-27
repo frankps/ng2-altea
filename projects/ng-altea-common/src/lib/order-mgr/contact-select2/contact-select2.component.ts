@@ -22,6 +22,8 @@ export class ContactSelect2Component implements OnInit {
   /** a user (email/password) can be created at the same time */
   @Input() createUser = false
 
+  @Input() inputsRequired = false
+
   @Input() set contact(value: Contact) {
 
     if (value) {
@@ -56,7 +58,7 @@ export class ContactSelect2Component implements OnInit {
 
   showContacts = false
 
-  inputsRequired = false
+  
 
   constructor(protected translationSvc: TranslationService, private contactSvc: ContactService
     , protected orderMgrSvc: OrderMgrUiService, private sessionSvc: SessionService, private dashboardSvc: DashboardService,
@@ -159,7 +161,8 @@ export class ContactSelect2Component implements OnInit {
 
     // if (this.contact.id)
 
-    if (this.contact.isNew())
+    // if (this.contact.isNew())
+    if (this.isNew)
       return await this.createAsNew()
     else
       return await this.updateContact()

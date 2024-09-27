@@ -39,7 +39,7 @@
         </div>
     </div>
   
-    <int-phone-edit #intPhone required [(phone)]="user.mobile" (phoneChange)="mobileChanged()"></int-phone-edit>
+    <int-phone-edit #intPhone [required]="true" [(phone)]="user.mobile" (phoneChange)="mobileChanged()"></int-phone-edit>
 
     <div class="row {{css_cls_row}}">
         <div class="col">

@@ -162,10 +162,16 @@ export const MENU: MenuItem[] = [
     link: '/aqua/accounting',
     subItems: [
       {
-        id: 121,
+        id: 171,
         label: 'menu.accounting.sub.transactions',
         link: '/aqua/accounting/transactions',
-        parentId: 12
+        parentId: 17
+      },
+      {
+        id: 172,
+        label: 'menu.accounting.sub.payments',
+        link: '/aqua/orders/payments',
+        parentId: 17
       }
     ]
   },

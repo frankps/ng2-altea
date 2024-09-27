@@ -15,9 +15,10 @@ import { TimepickerModule } from 'ngx-bootstrap/timepicker';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { NgAlteaCommonModule, OrderMgrModule } from 'ng-altea-common';
 import { ManageOrderComponent } from './manage-order/manage-order.component';
+import { PaymentsComponent } from './payments/payments.component';
 
 @NgModule({
-  declarations: [OrderGridComponent, OrderCardComponent, ManageOrderComponent],
+  declarations: [OrderGridComponent, OrderCardComponent, ManageOrderComponent, PaymentsComponent],
   imports: [CommonModule,     
     OrderRoutingModule, 
     NgCommonModule, 

@@ -149,9 +149,20 @@ export class OrderMgmtService {
     }
 
 
-    async saveOrder(order: Order): Promise<ApiResult<Order>> {
+    async saveOrder(order: Order, autoChangeState = false): Promise<ApiResult<Order>> {
 
-        const orderApiResult = await this.alteaDb.saveOrder(order)
+        let orderApiResult = await this.alteaDb.saveOrder(order)
+
+        if (orderApiResult.isOk && autoChangeState) {
+
+            order = orderApiResult.object
+
+            const newState = this.determineOrderState(order)
+
+            if (newState && newState != order.state)
+                orderApiResult = await this.changeState(order)
+
+        }
 
         return orderApiResult
     }
@@ -176,6 +187,17 @@ export class OrderMgmtService {
                 return OrderState.confirmed
         }
 
+        if (order.src == OrderSource.pos && order.state == OrderState.creation) {
+           
+            const hasServices = order.hasServices()
+
+            if (order.contactId && (!hasServices || order.start)) {
+                return OrderState.created
+            }
+
+        }
+
+
         return null
     }
 
@@ -195,7 +217,7 @@ export class OrderMgmtService {
             newState = this.determineOrderState(order)
 
 
-            if (newState == null) {  // if still null (we ca't find new state)
+            if (newState == null) {  // if still null (we can't find new state)
                 const msg = `New order state not found for order ${order.id}!`
                 console.error(msg)
                 return new ApiResult<Order>(order, ApiStatus.error, msg)

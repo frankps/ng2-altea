@@ -35,6 +35,7 @@
     "hour": "uur",
     "login": "Inloggen",
     "msgType": "Berichttype",
+    "new": "Nieuw",
     "ok": "OK",
     "passwd": "Paswoord",
     "payOnline": "Online betalen",
@@ -151,6 +152,7 @@
       "specific": "Specifiek"
     },
     "pay-type": {
+      "all": "Totaal",
       "cash": "Cash",
       "transfer": "Overschrijving",
       "credit": "VISA",
@@ -1154,7 +1156,8 @@
     "accounting": {
       "label": "Boekhouding",
       "sub": {
-        "transactions": "Transacties"
+        "transactions": "Transacties",
+        "payments": "Betalingen"
       }
     },
     "platform": {

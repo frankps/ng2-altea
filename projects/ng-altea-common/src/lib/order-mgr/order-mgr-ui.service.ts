@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import { Injectable, OnInit } from '@angular/core';
-import { AppMode, AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Branch, ConfirmOrderResponse, Contact, CreateCheckoutSession, DateBorder, Gift, GiftLine, GiftType, Order, OrderLine, OrderLineOption, OrderState, Payment, PaymentType, Product, ProductSubType, ProductType, ProductTypeIcons, RedeemGift, ReservationOption, ReservationOptionSet, Resource, ResourcePlanning, ResourceType } from 'ts-altea-model'
+import { AppMode, AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Branch, ConfirmOrderResponse, Contact, CreateCheckoutSession, DateBorder, Gift, GiftLine, GiftType, Order, OrderLine, OrderLineOption, OrderSource, OrderState, Payment, PaymentType, Product, ProductSubType, ProductType, ProductTypeIcons, RedeemGift, ReservationOption, ReservationOptionSet, Resource, ResourcePlanning, ResourceType } from 'ts-altea-model'
 import { ApiListResult, ApiStatus, ArrayHelper, DateHelper, DbQuery, QueryOperator, Translation } from 'ts-common'
 import { AlteaService, GiftService, ObjectService, OrderMgrService, OrderService, ProductService, ResourceService, SessionService } from 'ng-altea-common'
 import * as _ from "lodash";
@@ -246,6 +246,9 @@ export class OrderMgrUiService {   // implements OnInit
 
     this.order.branchId = branch.id
     this.order.branch = branch
+   
+    // register source of order (pos=point of sale or consumer app)
+    this.order.src = this.sessionSvc.appMode == AppMode.pos ? OrderSource.pos : OrderSource.ngApp
 
     this.uiMode = uiMode
 
@@ -701,13 +704,17 @@ export class OrderMgrUiService {   // implements OnInit
 
     const newOrder = this.order.isNew()
 
-    const res = await this.alteaSvc.orderMgmtService.saveOrder(this.order)
+    let autoChangeState = (this.sessionSvc.appMode == AppMode.pos)
+
+    const res = await this.alteaSvc.orderMgmtService.saveOrder(this.order, autoChangeState)
 
     console.error(res.object)
 
-
     if (res.isOk) {
-      this.refreshOrder(res.object)
+
+      let order = res.object
+
+      this.refreshOrder(order)
       me.orderDirty = false
 
       if (me.order.gift && me.gift) {

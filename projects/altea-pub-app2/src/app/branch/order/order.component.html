@@ -76,7 +76,7 @@
 
 
     <ng-container *ngSwitchCase="'contact-select'">
-        <order-mgr-contact-select2 [contact]="contact" (selected)="contactSelected($event)"></order-mgr-contact-select2>
+        <order-mgr-contact-select2 [contact]="contact" [inputsRequired]="true" (selected)="contactSelected($event)"></order-mgr-contact-select2>
     </ng-container>
 
 

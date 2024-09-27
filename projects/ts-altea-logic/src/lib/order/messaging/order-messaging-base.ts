@@ -19,6 +19,7 @@ export class OrderMessagingBase {
 
     async sendMessages(templateCode: TemplateCode | string, order: Order, branch: Branch, send: boolean = true, ...types: MsgType[]) {
 
+
         /** if types (email, sms, wa=WhatsApp) are not specified explicitly, then we use preferred contact message types */
         if (ArrayHelper.IsEmpty(types)) {
 
