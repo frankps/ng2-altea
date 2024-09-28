@@ -58,7 +58,8 @@ export class ContactSelect2Component implements OnInit {
 
   showContacts = false
 
-  
+  orderDirtyOnChange = true
+
 
   constructor(protected translationSvc: TranslationService, private contactSvc: ContactService
     , protected orderMgrSvc: OrderMgrUiService, private sessionSvc: SessionService, private dashboardSvc: DashboardService,
@@ -103,10 +104,7 @@ export class ContactSelect2Component implements OnInit {
     this.initialized = true
   }
 
-  phoneChanged() {
-    this.formChanged('contact')
-    this.propertyChanged('mobile')
-  }
+
 
   formChanged(sectionId: string) {
 
@@ -121,6 +119,14 @@ export class ContactSelect2Component implements OnInit {
     }
   }
 
+  phoneChanged() {
+    this.formChanged('contact')
+    this.propertyChanged('mobile')
+
+    if (this.orderDirtyOnChange)
+      this.orderMgrSvc.orderDirty = true
+  }
+
   propertyChanged(property: string, event?: any) {
 
     if (property)
@@ -130,6 +136,8 @@ export class ContactSelect2Component implements OnInit {
       this._contact.setName()
     }
 
+    if (this.orderDirtyOnChange)
+      this.orderMgrSvc.orderDirty = true
   }
 
 

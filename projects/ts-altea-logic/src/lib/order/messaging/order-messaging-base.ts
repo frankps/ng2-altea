@@ -1,7 +1,7 @@
 import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MessageAddress, TemplateCode } from 'ts-altea-model'
 import { AlteaDb } from '../../general/altea-db'
 import { IDb } from '../../interfaces/i-db'
-import { ApiResult, ArrayHelper } from 'ts-common'
+import { ApiListResult, ApiResult, ArrayHelper } from 'ts-common'
 
 
 export class OrderMessagingBase {
@@ -17,7 +17,9 @@ export class OrderMessagingBase {
     }
 
 
-    async sendMessages(templateCode: TemplateCode | string, order: Order, branch: Branch, send: boolean = true, ...types: MsgType[]) {
+    async sendMessages(templateCode: TemplateCode | string, order: Order, branch: Branch, send: boolean = true, ...types: MsgType[]): Promise<ApiListResult<Message>> {
+
+        var fullResult = new ApiListResult<Message>()
 
 
         /** if types (email, sms, wa=WhatsApp) are not specified explicitly, then we use preferred contact message types */
@@ -30,11 +32,11 @@ export class OrderMessagingBase {
 
 
         if (ArrayHelper.IsEmpty(types)) {
-          /*  console.warn(`No messages to send: types array is empty`)
-            return */
+            /*  console.warn(`No messages to send: types array is empty`)
+              return */
 
             console.warn(`Contact has no preffered types specified: fall-back to email`)
-            types = [ MsgType.email ]
+            types = [MsgType.email]
 
         }
 
@@ -42,7 +44,7 @@ export class OrderMessagingBase {
 
         for (let type of types) {
 
-            let template = templates.find(tpl => tpl.channels.indexOf(type) >= 0 )
+            let template = templates.find(tpl => tpl.channels.indexOf(type) >= 0)
 
             if (!template)
                 template = templates.find(tpl => tpl.channels.indexOf(MsgType.email) >= 0)
@@ -52,8 +54,16 @@ export class OrderMessagingBase {
             }
 
 
-            await this.sendMessage(type, template, order, branch, send)
+            var sendResult = await this.sendMessage(type, template, order, branch, send)
+
+            if (!sendResult.isOk)
+                fullResult.status = sendResult.status
+
+            if (sendResult.object)
+                fullResult.data.push(sendResult.object)
         }
+
+        return fullResult
 
 
 
@@ -73,7 +83,7 @@ export class OrderMessagingBase {
     }
 
 
-    async sendMessage(type: MsgType, template: Template, order: Order, branch: Branch, send: boolean = true): Promise<Message> {
+    async sendMessage(type: MsgType, template: Template, order: Order, branch: Branch, send: boolean = true): Promise<ApiResult<Message>> {
 
         switch (type) {
 
@@ -88,9 +98,12 @@ export class OrderMessagingBase {
         }
     }
 
-    async sendWhatsAppMessage(template: Template, order: Order, branch: Branch, send: boolean = true): Promise<Message> {
+    async sendWhatsAppMessage(template: Template, order: Order, branch: Branch, send: boolean = true): Promise<ApiResult<Message>> {
 
         const contact = order.contact
+
+        if (!contact?.mobile)
+            return ApiResult.error(`Can't send Whatsapp: contact has no mobile number`)
 
         const msg = template.mergeWithOrder(order, branch, false)
 
@@ -114,16 +127,21 @@ export class OrderMessagingBase {
 
         }
 
-        return msg
+        return new ApiResult(msg)
 
     }
 
-    async sendEmailMessage(template: Template, order: Order, branch: Branch, send: boolean = true): Promise<Message> {
+    async sendEmailMessage(template: Template, order: Order, branch: Branch, send: boolean = true): Promise<ApiResult<Message>> {
+
+        if (!branch.emailFrom)
+            return ApiResult.error(`Branch 'emailFrom' missing`)
 
         const contact = order.contact
 
-        const msg = template.mergeWithOrder(order, branch, true)
+        if (!contact?.email)
+            return ApiResult.error(`Can't send email: contact has no email address`)
 
+        const msg = template.mergeWithOrder(order, branch, true)
 
         msg.from = new MessageAddress(branch.emailFrom, branch.name)
 
@@ -138,7 +156,8 @@ export class OrderMessagingBase {
 
         msg.conIds.push(contact.id)
 
-        msg.addTo('frank@dvit.eu', contact.name, contact.id)  // contact.email
+        msg.addTo(contact?.email, contact.name, contact.id)
+        //msg.addTo('frank@dvit.eu', contact.name, contact.id)  // contact.email
 
         msg.type = MsgType.email
 
@@ -146,13 +165,18 @@ export class OrderMessagingBase {
 
             const sendRes = await this.alteaDb.db.sendMessage$(msg)
             console.warn(sendRes)
-
         }
 
-        return msg
+        return new ApiResult(msg)
     }
 
-    async sendSmsMessage(template: Template, order: Order, branch: Branch, send: boolean = true): Promise<Message> {
+    async sendSmsMessage(template: Template, order: Order, branch: Branch, send: boolean = true): Promise<ApiResult<Message>> {
+
+
+        const contact = order.contact
+
+        if (!contact?.mobile)
+            return ApiResult.error(`Can't send Whatsapp: contact has no mobile number`)
 
         const msg = template.mergeWithOrder(order, branch, false)
 
@@ -166,6 +190,6 @@ export class OrderMessagingBase {
 
         }
 
-        return msg
+        return new ApiResult(msg)
     }
 }

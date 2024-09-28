@@ -4,6 +4,12 @@
 
 <div class="row mb-4" *ngIf="initialized">  
     <div class="col-3">
+
+        <input class="form-control"
+        placeholder="Datepicker"
+        bsDatepicker
+        (bsValueChange)="dateChange($event)">
+
         <input class="form-control" #drp="bsDaterangepicker" bsDaterangepicker [(ngModel)]="dateRange" [bsConfig]="{useUtc: true}" onkeydown="return false">
 
     </div>

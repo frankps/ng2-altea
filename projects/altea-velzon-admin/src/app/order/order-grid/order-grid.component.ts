@@ -121,6 +121,18 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
 
   }
 
+  async dateChange(value: Date) {
+
+    if (!value)
+      return
+
+    this.dateRange = []
+    this.dateRange.push(value, value)
+
+    this.startSearch()
+  }
+
+
   startSearch() {
 
     if (this.dateRange?.length == 2) {

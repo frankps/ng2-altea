@@ -241,7 +241,6 @@
                     <button type="button" class="btn btn-primary" (click)="incrementPersons()">+</button>
                 </div>
 
-
                 <div class="ms-3 btn-group btn-group-sm float-end" role="group" *ngIf="order.hasServices()"
                     aria-label="Basic example">
                     <button type="button" class="btn btn-primary" (click)="toggleHumanResources()"><i
@@ -264,6 +263,14 @@
             <div class="col-6">Gemaakt op {{order.cre | date: sessionSvc.formats.dateShort}}</div>
 
 
+
+            <div class="d-grid mt-3" *ngIf="showConfirm">
+                <button type="button" class="btn btn-outline-secondary float-end" (click)="confirm()"
+                    translate>dic.confirm</button>
+            </div>
+
+
+            <!-- probably not used anymore ? -->
             <div class="d-grid mt-3" *ngIf="show.save">
                 <button type="button" class="btn btn-outline-secondary float-end" (click)="save()"
                     translate>msg.save</button>
@@ -271,7 +278,8 @@
 
 
 
-            <div class="d-grid mt-3" *ngIf="show.next && !order.isEmpty()">
+            <!-- if we already show the confirmation -->
+            <div class="d-grid mt-3" *ngIf="show.next && !order.isEmpty() && !showConfirm">
                 <button type="button" class="btn btn-outline-secondary float-end" (click)="next()"
                     translate>msg.continue</button>
             </div>
@@ -293,9 +301,9 @@
                 <button type="button" class="btn btn-primary btn-sm mx-2" (click)="orderMgrSvc.saveOrder()"
                     translate>dic.save</button> -->
 
-
+<!-- 
                 <button type="button" class="btn btn-primary btn-sm mx-2" (click)="orderMgrSvc.changeState()">Change
-                    state</button>
+                    state</button> -->
 
 
             </div>

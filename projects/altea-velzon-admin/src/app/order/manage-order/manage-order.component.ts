@@ -4,7 +4,7 @@ import { OrderMgrUiService, BrowseCatalogComponent } from 'ng-altea-common';
 import { DashboardService, NgBaseComponent } from 'ng-common';
 import { ContactSelect2Component } from 'projects/ng-altea-common/src/lib/order-mgr/contact-select2/contact-select2.component';
 import { BehaviorSubject, Observable, take, takeUntil } from 'rxjs';
-import { Contact, Gift, MenuItem, Order, OrderLine } from 'ts-altea-model';
+import { Contact, Gift, MenuItem, Order, OrderLine, OrderState } from 'ts-altea-model';
 
 
 
@@ -48,6 +48,9 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
 
   showPersonSelect = false
 
+
+  showConfirm = false
+
   constructor(protected route: ActivatedRoute, protected orderMgrSvc: OrderMgrUiService, protected dashboardSvc: DashboardService) {
     super()
 
@@ -63,7 +66,7 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
 
           var isNew = this.orderMgrSvc.order.isNew()
           console.warn(isNew)
-        
+
         }
       }
     })
@@ -81,7 +84,7 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
 
   }
 
-  get mode() : string {
+  get mode(): string {
     return this.orderMgrSvc.mode
   }
 
@@ -102,10 +105,10 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
       this.mode = newMode
     }*/
 
-    
-
-
   }
+
+
+
 
   orderContinue() {
 
@@ -117,8 +120,55 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
       var nextMode = this.defaultOrder[idx + 1]
       this.changeMode(nextMode)
     }
-    
+
+    this.showConfirm = this.showConfirmButton()
+
+
   }
+
+
+  showConfirmButton(): boolean {
+
+    const order = this.orderMgrSvc.order
+
+    if (!order)
+      return false
+
+    if (order.state == OrderState.creation) {
+
+      const hasServices = order.hasServices()
+
+      /** if contact specified and 
+       *    product only order 
+       *    OR service order and start date selected) */
+      if (order.contactId && (!hasServices || order.start)) {
+        return true
+      }
+    }
+
+    return false
+
+  }
+
+  contactSelected(contact: Contact) {
+    console.warn(contact)
+
+    this.editContact.contact = contact
+
+    this.showConfirm = this.showConfirmButton()
+  }
+
+  /*
+  if (order.src == OrderSource.pos && order.state == OrderState.creation) {
+           
+    const hasServices = order.hasServices()
+
+    if (order.contactId && (!hasServices || order.start)) {
+        return OrderState.created
+    }
+}
+    */
+
 
   orderLineSelected(orderLine: OrderLine) {
 
@@ -158,6 +208,7 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
 
       case 'new-reserv':
 
+        this.showConfirm = false
         await this.orderMgrSvc.newOrder()
 
         // in order to trigger the BrowseCatalogComponent catalog component to show root folders
@@ -172,7 +223,7 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
 
       case 'buy-gift':
 
-      await this.orderMgrSvc.newOrder()
+        await this.orderMgrSvc.newOrder()
 
         this.changeMode(PosOrderMode.buyGift)
 
@@ -189,12 +240,7 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
 
   }
 
-  contactSelected(contact: Contact) {
-    console.warn(contact)
 
-    this.editContact.contact = contact
-
-  }
 
   test() {
 

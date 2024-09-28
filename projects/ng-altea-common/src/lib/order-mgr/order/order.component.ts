@@ -31,6 +31,9 @@ export class OrderComponent implements OnInit {
 
   appMode: AppMode
 
+  /** show the confirmation button to finalise order (introduced for POS) */
+  @Input() showConfirm = false
+
   show = {
     posOnly: false,
     contact: false, // show detailed contact info
@@ -57,7 +60,7 @@ export class OrderComponent implements OnInit {
 
       case AppMode.pos: // point of sale
         this.show.next = true
-        this.show.save = true
+       // this.show.save = true
         this.show.posOnly = true
         this.show.deposit = true
         this.show.contact = true
@@ -123,6 +126,14 @@ export class OrderComponent implements OnInit {
 
     await this.orderMgrSvc.saveOrder()
   }
+
+
+  async confirm() {
+
+    const autoChangeState = true
+    await this.orderMgrSvc.saveOrder(autoChangeState)  
+  }
+
 
   async nextStripe() {
 

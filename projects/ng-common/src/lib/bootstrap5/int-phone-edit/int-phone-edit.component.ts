@@ -128,6 +128,10 @@ export class IntPhoneEditComponent {
     return fullNum
   }
 
+  phoneChanged() {
+    this.emitPhoneChangedEvent()
+  }
+
   prefixChanged(event: any) {
 
     this.emitPhoneChangedEvent()
@@ -204,9 +208,7 @@ export class IntPhoneEditComponent {
 
   }
 
-  phoneChanged() {
-    this.emitPhoneChangedEvent()
-  }
+
 
 
   checkPhone() {

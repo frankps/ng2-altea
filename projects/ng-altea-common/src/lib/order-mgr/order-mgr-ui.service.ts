@@ -694,7 +694,7 @@ export class OrderMgrUiService {   // implements OnInit
   }
 
 
-  async saveOrder(): Promise<Order> {
+  async saveOrder(autoChangeState: boolean = false): Promise<Order> {
 
     let me = this
 
@@ -704,7 +704,7 @@ export class OrderMgrUiService {   // implements OnInit
 
     const newOrder = this.order.isNew()
 
-    let autoChangeState = (this.sessionSvc.appMode == AppMode.pos)
+    // let autoChangeState = (this.sessionSvc.appMode == AppMode.pos)
 
     const res = await this.alteaSvc.orderMgmtService.saveOrder(this.order, autoChangeState)
 
