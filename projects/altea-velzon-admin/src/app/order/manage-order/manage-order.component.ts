@@ -62,7 +62,11 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
         const orderId = params['id']
 
         if (orderId) {
-          await this.orderMgrSvc.loadOrder$(orderId)
+          let order = await this.orderMgrSvc.loadOrder$(orderId)
+
+          if (order) {
+            this.showConfirm = true
+          }
 
           var isNew = this.orderMgrSvc.order.isNew()
           console.warn(isNew)
@@ -144,6 +148,10 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
       if (order.contactId && (!hasServices || order.start)) {
         return true
       }
+    } else {
+
+      return true
+
     }
 
     return false

@@ -7,7 +7,7 @@
             ui.order-mgr.contact-select2.title
 
 
-           
+
             <button class="btn btn-primary btn-sm float-end" translate (click)="newContact()">dic.new</button>
 
 
@@ -18,7 +18,7 @@
                     <div class="col">
                         <ngx-altea-label-control label="objects.contact.first" for="first">
                             <input [required]="inputsRequired" type="text" id="first" name="first" class="form-control"
-                                [(ngModel)]="contact.first"  (change)="propertyChanged('first')">
+                                [(ngModel)]="contact.first" (change)="propertyChanged('first')">
                         </ngx-altea-label-control>
                     </div>
                 </div>
@@ -40,7 +40,8 @@
                 </div>
 
 
-                <int-phone-edit [(phone)]="contact.mobile" [required]="inputsRequired" (phoneChange)="phoneChanged()"></int-phone-edit>
+                <int-phone-edit [(phone)]="contact.mobile" [required]="inputsRequired"
+                    (phoneChange)="phoneChanged()"></int-phone-edit>
 
 
                 <!-- Allowed message types  -->
@@ -50,12 +51,15 @@
                         <span>Communicatie:</span>
 
                         <div class="form-check form-switch ms-3 mt-1" *ngFor="let msgType of msgTypes">
-                            <input type="checkbox" class="form-check-input" [id]="msgType.key" [name]="msgType.key" [disabled]="!canSelectMsgType(msgType.key)" [checked]="contact.msgTypeSelected(msgType.key)" (change)="contact.selectMsgType(msgType.key, $event.target['checked'])">
-                           <!--  -->
-                           
-                           <label class="form-check-label" for="news">{{'enums.msg-type.' + msgType.key |
-                                translate:translateParam}}   
-                                
+                            <input type="checkbox" class="form-check-input" [id]="msgType.key" [name]="msgType.key"
+                                [disabled]="!canSelectMsgType(msgType.key)"
+                                [checked]="contact.msgTypeSelected(msgType.key)"
+                                (change)="contact.selectMsgType(msgType.key, $event.target['checked'])">
+                            <!--  -->
+
+                            <label class="form-check-label" for="news">{{'enums.msg-type.' + msgType.key |
+                                translate:translateParam}}
+
                             </label>
                         </div>
                     </div>
@@ -65,8 +69,8 @@
                 <div class="row {{css_cls_row}}">
                     <div class="col">
                         <div class="form-check form-switch">
-                            <input type="checkbox" class="form-check-input" id="news" name="news" [disabled]="!contact.email"
-                                [(ngModel)]="contact.news">
+                            <input type="checkbox" class="form-check-input" id="news" name="news"
+                                [disabled]="!contact.email" [(ngModel)]="contact.news">
                             <label class="form-check-label" for="news">{{'objects.contact.news' |
                                 translate:translateParam}}</label>
                         </div>
@@ -76,12 +80,14 @@
                     <div class="col">
                         <div class="d-grid gap-2">
                             <button class="btn btn-primary" translate (click)="searchContact()"
-                                [disabled]="!contactForm.form.valid">dic.continue</button>
+                                [disabled]="!contactForm.form.valid">dic.validate</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- contactForm.form.pristine ||           msg.save-->
+
+                <!-- POS: Put in comment, because saved via order -->
+<!-- 
                 <div class="row {{css_cls_row}}" *ngIf="!isNew">
                     <div class="col">
                         <div class="d-grid gap-2">
@@ -89,7 +95,7 @@
                                 [disabled]="!contactForm.form.valid">dic.continue</button>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
 
             </form>
@@ -102,7 +108,7 @@
 </ng-container>
 
 
-  
+
 
 <ng-container *ngIf="showContacts">
 
@@ -119,7 +125,7 @@
                 <ul class="list-group mt-3 mb-4">
                     <li class="list-group-item list-group-item-success" (click)="selectContact(contact)"
                         *ngFor="let contact of contacts">
-    
+
                         <div class="row">
                             <div class="col-6">{{contact.name}}</div>
                             <div class="col-6"><span class="float-end">{{contact.mobile}}</span></div>
@@ -127,7 +133,7 @@
                         <div class="row">
                             <div class="col-12">{{contact.email}}</div>
                         </div>
-    
+
                     </li>
                 </ul>
 

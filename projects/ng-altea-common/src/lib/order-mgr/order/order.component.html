@@ -264,7 +264,7 @@
 
 
 
-            <div class="d-grid mt-3" *ngIf="showConfirm">
+            <div class="d-grid mt-3" *ngIf="showConfirm && orderMgrSvc.orderDirty">
                 <button type="button" class="btn btn-outline-secondary float-end" (click)="confirm()"
                     translate>dic.confirm</button>
             </div>

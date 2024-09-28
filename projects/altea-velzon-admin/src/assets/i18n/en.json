@@ -51,7 +51,8 @@
     "send": "Versturen",
     "spacingAfter": "Kuistijd in minuten",
     "start": "begin",
-    "end": "einde"
+    "end": "einde",
+    "validate": "Valideren"
   },
   "enums": {
     "fb-auth": {
