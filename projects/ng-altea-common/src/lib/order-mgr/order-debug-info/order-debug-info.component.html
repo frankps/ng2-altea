@@ -1,0 +1,20 @@
+<ul class="list-group">
+
+    <li class="list-group-item" *ngFor="let message of messages" (click)="selectMessage(message)">
+        <i [class]="MsgTypeIcon[message.type]" [style.color]="MsgDirColor[message.dir]"></i> &nbsp; <small>{{message.sent | intdate}}</small> &nbsp; {{message.subj}} &nbsp; {{message.state}}
+    
+
+        <ng-container *ngIf="message.id == selMessage?.id">
+
+            <div class="my-2" [innerHTML]="message.body"></div>
+
+        </ng-container>
+        
+    
+    
+    </li>
+
+</ul>
+
+
+<order-mgr-debug-plannings *ngIf="planning" [plannings]="planning" ></order-mgr-debug-plannings>

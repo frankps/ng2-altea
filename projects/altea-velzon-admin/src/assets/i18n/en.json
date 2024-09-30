@@ -903,6 +903,9 @@
       },
       "short": "SMS"
     },
+    "planning": {
+      "prep":"Is voorbereidings- of opkuistijd"
+    },
     "resource": {
       "article": "de",
       "qty": "Aantal",

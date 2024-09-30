@@ -10,44 +10,66 @@ import { NgTemplateOutlet } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxSpinnerService } from "ngx-spinner"
 import * as _ from "lodash";
+import * as dateFns from 'date-fns'
 
 import { Observable, take, takeUntil } from 'rxjs';
+import { plainToInstance } from 'class-transformer';
 
-export class UIOrder {
+export class UIOrder extends Order {
   order: Order
+
   resources: Resource[] = []
 
-  constructor(order: Order) {
-    if (!order)
-      return
-
-    this.order = order
-    this.resources = order.getResources()
-
-    // if (!order.lines)
-    //   return
-
-    // for (var orderLine of order.lines) {
-
-    //   if (!orderLine.planning)
-    //     continue
-
-    //   for (var planning of orderLine.planning) {
-
-    //     if (!planning.resource)
-    //       continue
-
-    //     if (this.resources.findIndex(r => r.id == planning.resource.id) >= 0)
-    //       continue
-
-    //     this.resources.push(planning.resource)
-
-    //   }
-    // }
-
-    // this.resources = _.orderBy(this.resources, 'type')    //this.resources.sort()
-
+  pay = {
+    info: '',
+    color: 'green'
   }
+
+  summary: string
+
+  constructor() {
+    super()
+  }
+
+  static fromOrder(order: Order): UIOrder {
+
+    const uiOrder = plainToInstance(UIOrder, order)
+    uiOrder.resources = order.getResources()
+
+
+
+    if (order.paid < order.deposit) {
+
+      const now = new Date()
+      const depositByDate = order.depositByDate()
+
+      uiOrder.pay.info = `€${order.paid}/ €${order.deposit} / €${order.incl}`
+
+      if (depositByDate < now)
+        uiOrder.pay.color = 'red'
+      else
+        uiOrder.pay.color = 'orange'
+
+    } else {
+      uiOrder.pay.info = `€${order.paid} / €${order.incl}`
+      uiOrder.pay.color = 'green'
+    }
+
+
+    if (ArrayHelper.NotEmpty(order.lines)) {
+
+      var mostExpensiveLine = _.maxBy(order.lines, 'incl')
+
+      if (mostExpensiveLine)
+        uiOrder.summary = `${mostExpensiveLine.qty} x ${mostExpensiveLine.descr}`
+
+
+
+    }
+
+    return uiOrder
+  }
+
 }
 
 export enum SearchTypeSelect {
@@ -86,8 +108,13 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
   orderSearch = new OrderSearch()
 
   uiOrders: UIOrder[] = []
+  orders: Order[] = []
 
   initialized = false
+
+
+  /** if of current order in focus */
+  selected?: Order
 
 
   constructor(private orderSvc: OrderService, private translationSvc: TranslationService, private modalService: NgbModal,
@@ -132,6 +159,17 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
     this.startSearch()
   }
 
+  showDetails(uiOrder: UIOrder) {
+
+    this.selected = uiOrder
+  }
+
+  openOrder(uiOrder: UIOrder) {
+
+    // ['/aqua/orders/manage', orderId]
+    this.router.navigate(['aqua', 'orders', 'manage', uiOrder.id])
+  }
+
 
   startSearch() {
 
@@ -140,13 +178,14 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
       this.orderSearch.start = DateHelper.yyyyMMdd000000(startDate)
 
       var endDate = this.dateRange[1]
-      this.orderSearch.end = DateHelper.yyyyMMdd000000(endDate) + 1000000 // we add 1 day
+      endDate = dateFns.addDays(endDate, 1)
+      this.orderSearch.end = DateHelper.yyyyMMdd000000(endDate)
     }
 
     this.advancedSearch(this.orderSearch)
   }
 
-  advancedSearch(orderSearch: OrderSearch = this.orderSearch) {
+  async advancedSearch(orderSearch: OrderSearch = this.orderSearch) {
 
     console.warn('Searching...')
 
@@ -218,24 +257,16 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
 
 
 
-    this.objects$ = this.orderSvc.query(query)
+    this.objects = await this.orderSvc.query$(query)
 
-    this.objects$.subscribe(res => {
+    this.uiOrders = this.objects.map(order => UIOrder.fromOrder(order))
 
-      if (res?.data) {
-        this.objects = res.data
 
-        this.uiOrders = this.objects.map(order => new UIOrder(order))
+    console.error(this.objects)
 
-        console.warn(this.uiOrders)
-      }
-      else
-        this.objects = []
+    this.spinner.hide()
 
-      console.error(this.objects)
 
-      this.spinner.hide()
-    })
   }
 
   override search(searchFor?: string) {

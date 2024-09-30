@@ -1,7 +1,7 @@
 import { OrderUi, PlanningType, Resource, ResourcePlanning, ResourcePlanningUi, ResourcePlannings } from "ts-altea-model"
 import * as dateFns from 'date-fns'
 import { Unsubscribe } from 'firebase/firestore';
-import { OrderFirestoreService, ResourcePlanningService, ResourceService, SessionService } from "ng-altea-common";
+import { OrderFireFilters, OrderFirestoreService, ResourcePlanningService, ResourceService, SessionService } from "ng-altea-common";
 import { ArrayHelper, DbQueryTyped, QueryOperator } from "ts-common";
 import { AlteaDb, AlteaPlanningQueries } from "ts-altea-logic";
 
@@ -72,6 +72,8 @@ export abstract class CalendarBase {
 
     protected showHr = false
     protected showPlanning = true
+
+    public filters: OrderFireFilters = new OrderFireFilters()
 
 
     unsubscribe: Unsubscribe
@@ -148,6 +150,11 @@ export abstract class CalendarBase {
         this.refreshSchedule()
 
 
+    }
+
+
+    refreshEvents() {
+        this.showEventsBetween(this.startOfVisible, this.endOfVisible)
     }
 
     /** -----------------   For HR view  -------------------------- */
@@ -275,7 +282,7 @@ export abstract class CalendarBase {
         if (this.unsubscribe)  // we unsubscribe from previous changes
             this.unsubscribe()
 
-        this.unsubscribe = await this.orderFirestore.getPlanningUisBetween(start, end, this.showPlanningUis, this)
+        this.unsubscribe = await this.orderFirestore.getPlanningUisBetween(start, end, this.filters, this.showPlanningUis, this)
     }
 
     planningUiToEventBase(planningUi: ResourcePlanningUi): BaseEvent {

@@ -1,27 +1,26 @@
-
 <!-- 
 (bsValueChange)="rangePickerChanged($event)" -->
 
-<div class="row mb-4" *ngIf="initialized">  
+<div class="row mb-4" *ngIf="initialized">
     <div class="col-3">
 
-        <input class="form-control"
-        placeholder="Datepicker"
-        bsDatepicker
-        (bsValueChange)="dateChange($event)">
+        <input class="form-control" placeholder="Datepicker" bsDatepicker (bsValueChange)="dateChange($event)">
 
+        <!-- To select date range
         <input class="form-control" #drp="bsDaterangepicker" bsDaterangepicker [(ngModel)]="dateRange" [bsConfig]="{useUtc: true}" onkeydown="return false">
-
+ -->
     </div>
     <div class="col-3">
-        <ng-select *ngIf="searchTypeSelect && searchTypeSelect.length > 0" id="searchTypeSelect" name="searchTypeSelect" [items]="searchTypeSelect" bindLabel="trans" bindValue="key"
-        [clearable]="false" [multiple]="false" [(ngModel)]="orderSearch.typeSelect">
-    </ng-select>
+        <ng-select *ngIf="searchTypeSelect && searchTypeSelect.length > 0" id="searchTypeSelect" name="searchTypeSelect"
+            [items]="searchTypeSelect" bindLabel="trans" bindValue="key" [clearable]="false" [multiple]="false"
+            [(ngModel)]="orderSearch.typeSelect">
+        </ng-select>
     </div>
 
     <div class="col-3">
 
-        <ng-select id="orderState" name="orderState" [items]="orderState" bindLabel="trans" bindValue="key" [clearable]="false" [multiple]="true" [(ngModel)]="orderSearch.states"></ng-select>
+        <ng-select id="orderState" name="orderState" [items]="orderState" bindLabel="trans" bindValue="key"
+            [clearable]="false" [multiple]="true" [(ngModel)]="orderSearch.states"></ng-select>
 
 
     </div>
@@ -34,11 +33,43 @@
 
 
 
+<ng-container *ngIf="objects">
+
+    <ng-container *ngFor="let uiOrder of uiOrders">
+
+        <!-- showDetails openOrder -->
+        <div class="row mb-1" (click)="openOrder(uiOrder)">
+            <div class="col-1">{{uiOrder.start| intdate}}</div>
+            <div class="col-2">{{uiOrder.for}}</div>
+
+            <div class="col-2" [style.color]="uiOrder.pay.color">{{uiOrder.pay.info}}</div>
+
+            <div class="col" *ngIf="selected?.id != uiOrder.id">{{uiOrder.summary}}</div>
+
+            <div class="col" *ngIf="selected?.id == uiOrder.id">
+
+                <div *ngFor="let line of uiOrder.lines"> 
+                    {{line.qty}} x {{line.descr}}
+                </div>
+
+
+            </div>
+        </div>
+
+    </ng-container>
+
+
+
+</ng-container>
+
+
+<!-- CARD GRID: requested to show table instead of cards
 
 <div class="row row-cols-1 row-cols-md-2 g-4" *ngIf="objects">
     <div class="col" *ngFor="let uiOrder of uiOrders">
-
         <app-order-card [uiOrder]="uiOrder"></app-order-card>
     </div>
 
-</div>
+</div> 
+
+-->

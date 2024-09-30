@@ -5,39 +5,61 @@ https://ej2.syncfusion.com/angular/documentation/schedule/getting-started
 [(ngModel)]="showHr"
 -->
 
-<div class="btn-group mb-3" role="group" aria-label="Basic example">
-    <button type="button" class="btn {{showHr?'btn-primary':'btn-outline-primary'}}" (click)="toggleShowHr()" >Aanwezigheden</button>
-    <button type="button" class="btn {{showPlanning?'btn-primary':'btn-outline-primary'}}" (click)="toggleShowPlanning()" >Planning</button>
+<div class="row">
+  <div class="col-3">
+    <div class="btn-group mb-3" role="group" aria-label="Basic example">
+      <button type="button" class="btn {{showHr?'btn-primary':'btn-outline-primary'}}"
+        (click)="toggleShowHr()">Aanwezigheden</button>
+      <button type="button" class="btn {{showPlanning?'btn-primary':'btn-outline-primary'}}"
+        (click)="toggleShowPlanning()">Planning</button>
+    </div>
   </div>
+  <div class="col-3">
+    <div class="form-check form-switch">
+      <input class="form-check-input" type="checkbox" id="prep" name="prep" [(ngModel)]="filters.prep"
+        (change)="filterChanged('prep')" />
+      <label class="form-check-label" for="smsOn" translate="objects.product.preTime"></label>
+    </div>
+  </div>
+  <div class="col"></div>
+  <div class="col"></div>
+</div>
 
 
-<ejs-schedule #schedule [eventSettings]='eventSettings' [timeFormat]="timeFormat" [firstDayOfWeek]="1" startHour="08:00" endHour="23:00"
-    (navigating)="navigating($event)" (eventRendered)="oneventRendered($event)">
 
-    	<!-- Content Template -->
-			<ng-template #quickInfoTemplatesContent let-data>
-				<ng-container [ngTemplateOutlet]="data.elementType == 'cell' ? cellContent : eventContent" [ngTemplateOutletContext]="{data:data}"></ng-container>
-			</ng-template>
-			<ng-template #cellContent let-data="data">
-				<div class="e-cell-content">
-					<form class="e-schedule-form">
-						<div style="padding:10px">
-							<input class="e-subject e-field" type="text" name="Subject" placeholder="Title" style="width:100%">
-          </div>
-          <div style="padding:10px">
-            <input class="location e-field" type="text" name="Location" placeholder="Location" style="width:100%">
-          </div>
-        </form>
-      </div>
-    </ng-template>
-    <ng-template #eventContent let-data="data">
-      <div class="e-event-content" style="padding:10px">
-        <div class="subject" style="padding-bottom:10px">Subject: {{data.Subject}}</div>
-        <div class="start-time" style="padding-bottom:10px">Start: {{data.StartTime.toLocaleString()}}</div>
-        <div class="end-time" style="padding-bottom:10px">End: {{data.EndTime.toLocaleString()}}</div>
-        <div class="location" style="padding-bottom:10px">Location: {{data.Location}}</div>
-        <div class="description" style="padding-bottom:10px">Description: {{data.Description}}</div>
-      </div>
-    </ng-template>
-  
+
+
+
+
+
+<ejs-schedule #schedule [eventSettings]='eventSettings' [timeFormat]="timeFormat" [firstDayOfWeek]="1" startHour="08:00"
+  endHour="23:00" (navigating)="navigating($event)" (eventRendered)="oneventRendered($event)">
+
+  <!-- Content Template -->
+  <ng-template #quickInfoTemplatesContent let-data>
+    <ng-container [ngTemplateOutlet]="data.elementType == 'cell' ? cellContent : eventContent"
+      [ngTemplateOutletContext]="{data:data}"></ng-container>
+  </ng-template>
+  <ng-template #cellContent let-data="data">
+    <div class="e-cell-content">
+      <form class="e-schedule-form">
+        <div style="padding:10px">
+          <input class="e-subject e-field" type="text" name="Subject" placeholder="Title" style="width:100%">
+        </div>
+        <div style="padding:10px">
+          <input class="location e-field" type="text" name="Location" placeholder="Location" style="width:100%">
+        </div>
+      </form>
+    </div>
+  </ng-template>
+  <ng-template #eventContent let-data="data">
+    <div class="e-event-content" style="padding:10px">
+      <div class="subject" style="padding-bottom:10px">Subject: {{data.Subject}}</div>
+      <div class="start-time" style="padding-bottom:10px">Start: {{data.StartTime.toLocaleString()}}</div>
+      <div class="end-time" style="padding-bottom:10px">End: {{data.EndTime.toLocaleString()}}</div>
+      <div class="location" style="padding-bottom:10px">Location: {{data.Location}}</div>
+      <div class="description" style="padding-bottom:10px">Description: {{data.Description}}</div>
+    </div>
+  </ng-template>
+
 </ejs-schedule>

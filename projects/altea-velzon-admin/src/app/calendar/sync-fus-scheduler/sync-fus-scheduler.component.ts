@@ -53,24 +53,7 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
 
   public eventSettings: EventSettingsModel = {
     dataSource: this.events
-    /*,
-    fields: {
-        id: 'id',
-        subject: { name: 'subject' },
-        startTime: { name: 'from' },
-        endTime: { name: 'to' },
-        categoryColor: { name: 'to' }
 
-      
-        isAllDay: { name: 'FullDay' },
-        location: { name: 'Source' },
-        description: { name: 'Comments' },
-        startTime: { name: 'DepartureTime' },
-        endTime: { name: 'ArrivalTime' },
-        startTimezone: { name: 'Origin' },
-        endTimezone: { name: 'Destination' }
-        
-    }*/
   }
 
   constructor(sessionSvc: SessionService, private planningSvc: ResourcePlanningService, orderFirestore: OrderFirestoreService, resourceSvc: ResourceService, protected objSvc: ObjectService) {
@@ -87,6 +70,7 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
 
     const refDate = new Date() //2024,5, 17)
 
+
     await this.showWeekEvents(refDate)
     this.currentView = "Week"
     this.schedule.currentView = "Week"  //changeView("Day")
@@ -96,8 +80,14 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
     // await this.showOrderWeek()
   }
 
+  filterChanged(filterName: string) {
+      this.refreshEvents()
+
+  }
+
   refreshSchedule() {
-    this.schedule.refresh()
+    if (this.schedule)
+      this.schedule.refresh()
   }
 
   /** event triggered by grid when changing dates */
@@ -117,8 +107,8 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
         break
 
       case "Week":
-        this.startOfVisible = dateFns.startOfWeek(event.currentDate,  { weekStartsOn: 1 })
-        this.endOfVisible = dateFns.endOfWeek(event.currentDate,  { weekStartsOn: 1 })
+        this.startOfVisible = dateFns.startOfWeek(event.currentDate, { weekStartsOn: 1 })
+        this.endOfVisible = dateFns.endOfWeek(event.currentDate, { weekStartsOn: 1 })
         break
 
       case "Month":
@@ -128,14 +118,15 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
 
     }
 
-    //  await this.showOrdersBetween(this.startOfVisible, this.endOfVisible)
-    await this.showEventsBetween(this.startOfVisible, this.endOfVisible)
+    this.refreshEvents()
+
+    //await this.showEventsBetween(this.startOfVisible, this.endOfVisible)
   }
 
 
   oneventRendered(args: any): void {
 
-//    console.warn(args)
+    //    console.warn(args)
 
     let categoryColor: string = args.data["CategoryColor"] as string;
     if (!args.element || !categoryColor) {

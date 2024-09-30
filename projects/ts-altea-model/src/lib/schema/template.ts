@@ -345,7 +345,7 @@ export class Template extends ObjectWithParameters {
     return map
   }
 
-  mergeWithOrder(order: Order, branch: Branch, merge: boolean): Message {
+  mergeWithOrder(order: Order, branch: Branch, addParamsForRemoteTemplating: boolean = false): Message {
 
     const message = new Message()
 
@@ -373,23 +373,26 @@ export class Template extends ObjectWithParameters {
 
     console.warn(replacements)
 
+    /** important remark: 
+     *  Whats App will not use message.body or message.subj, this is just for local storage of messages
+     *  => instead we pass parameters (see addParamsForRemoteTemplating): WhatsApp will do the merge of text with parameters
+     */
+
+
+    if (this.body) {
+      const hbTemplate = Handlebars.compile(this.body)
+      message.body = hbTemplate(replacements)
+    }
+
+    if (this.subject) {
+      const hbTemplate = Handlebars.compile(this.subject)
+      message.subj = hbTemplate(replacements)
+    }
+
+
+
     /** local templating */
-    if (merge) {
-
-
-      if (this.body) {
-        const hbTemplate = Handlebars.compile(this.body)
-        message.body = hbTemplate(replacements)
-      }
-
-      if (this.subject) {
-        const hbTemplate = Handlebars.compile(this.subject)
-        message.subj = hbTemplate(replacements)
-      }
-
-
-
-    } else {
+    if (addParamsForRemoteTemplating) {
 
       /** remote templating: whatsapp has it's own template system 
        * => we will just pass the template id and the parameters
@@ -422,7 +425,7 @@ export class Template extends ObjectWithParameters {
             urlPath = urlPath.substring(1)
 
             message.addTextParameter('url-path', urlPath, TextComponent.actions, actionIdx)
-           
+
           }
 
           actionIdx++

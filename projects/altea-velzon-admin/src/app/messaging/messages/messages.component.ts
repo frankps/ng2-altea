@@ -77,32 +77,6 @@ export class MessagesComponent implements OnInit, OnDestroy {
 
     })
     
-
-
-
-
-/*     const querySnapshot = await getDocs(qry);
-
-    this.messages = querySnapshot.docs.map(doc => {
-      const obj = doc.data()
-      const msg = plainToInstance(Message, obj)
-      return msg
-    }
-
-    )
-
-    console.log(this.messages)
- */
-
-
-    /*
-        this.messages$ = collectionData(qry).pipe(res => {
-    
-          console.log(res)
-          return res
-        })  // msgCol
-      */
-
   }
 
   toggle(msg: Message) {

@@ -7,16 +7,16 @@ export const MENU: MenuItem[] = [
     isTitle: true
   },
   {
-    id: 7,
-    label: 'menu.calendar.label',
-    icon: 'calendar',
-    link: '/aqua/calendar/syncfusion',
-  },
-  {
     id: 10,
     label: 'menu.order.label',
     icon: 'plus-circle',
     link: '/aqua/orders/manage',
+  },
+  {
+    id: 7,
+    label: 'menu.calendar.label',
+    icon: 'calendar',
+    link: '/aqua/calendar/syncfusion',
   },
   {
     id: 6,

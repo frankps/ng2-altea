@@ -119,6 +119,7 @@ ng generate component order-mgr/debug-plannings --project ng-altea-common
 ng generate component order-mgr/cancel-order --project ng-altea-common
 ng generate component order-mgr/debug-messaging --project ng-altea-common
 
+ng generate component order-mgr/order-debug-info --project ng-altea-common
 
 ng generate service data-services/sql/payment --project ng-altea-common
 

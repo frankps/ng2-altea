@@ -1,13 +1,17 @@
 import { Component, ViewChild, OnInit, inject, Injectable } from '@angular/core';
 import { Firestore, collection, collectionData, addDoc, CollectionReference, updateDoc, serverTimestamp, doc, docData, DocumentChange, DocumentData } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
-import { Query, Unsubscribe, and, getDocs, limit, onSnapshot, or, orderBy, query, where } from 'firebase/firestore';
+import { Query, QueryCompositeFilterConstraint, QueryFieldFilterConstraint, Unsubscribe, and, getDocs, limit, onSnapshot, or, orderBy, query, where } from 'firebase/firestore';
 import { SessionService } from '../../session.service';
 import { plainToInstance } from 'class-transformer';
 import { OrderState, OrderType, OrderUi, Resource, ResourcePlanningUi, ResourceType } from 'ts-altea-model';
 import { ArrayHelper, DateHelper, ObjectHelper } from 'ts-common';
 import { ResourceService } from '../sql';
 import * as _ from "lodash";
+
+export class OrderFireFilters {
+  prep?: boolean = true    // show preparation times
+}
 
 @Injectable({
   providedIn: 'root'
@@ -60,7 +64,7 @@ export class OrderFirestoreService {
     return orderUis
   }
 
-  async prepareFireStoreQuery(start: Date, end: Date): Promise<Query> {
+  async prepareFireStoreQuery(start: Date, end: Date, filters?: OrderFireFilters): Promise<Query> {
 
     if (this.resources == null) // the local cached resources will be mapped later with orderUi.planning.resource
       this.resources = await this.resourceSvc.getAllForBranch$()
@@ -70,7 +74,21 @@ export class OrderFirestoreService {
     const startNum = DateHelper.yyyyMMddhhmmss(start)
     const endNum = DateHelper.yyyyMMddhhmmss(end)
 
-    const qry = query(orderCol, and(where("start", ">=", startNum), where("start", "<", endNum)), orderBy('start', 'asc'))  // , limit(10)
+    const qryFilters: QueryFieldFilterConstraint[] = []
+
+    qryFilters.push(where("start", ">=", startNum))
+    qryFilters.push(where("start", "<", endNum))
+
+    /*
+    if (filters) {
+      if (filters.prep !== undefined)
+        qryFilters.push(where("prep", "==", filters.prep))
+    }
+      */
+
+    const qryFilter: QueryCompositeFilterConstraint = and(...qryFilters)
+
+    const qry = query(orderCol, qryFilter, orderBy('start', 'asc'))  // , limit(10)
 
     return qry
   }
@@ -90,14 +108,17 @@ export class OrderFirestoreService {
     return filtered
   }
 
-  filterPlannings(planningUis: ResourcePlanningUi[], types: ResourceType[], orResourceIds: string[], prep?: boolean): ResourcePlanningUi[] {
+  filterPlannings(planningUis: ResourcePlanningUi[], types: ResourceType[], orResourceIds: string[], filters?: OrderFireFilters): ResourcePlanningUi[] {
 
     if (ArrayHelper.IsEmpty(planningUis))
       return []
 
-    if (prep != null && prep != undefined)
-      planningUis = planningUis.filter(planUi => planUi.prep == prep)
+    if (filters) {
 
+      if (!filters.prep) // != null && filters.prep != undefined
+        planningUis = planningUis.filter(planUi => planUi.prep == false)
+    }
+   
     let filteredByType: ResourcePlanningUi[] = [], filteredByResourceId: ResourcePlanningUi[] = []
 
     if (ArrayHelper.NotEmpty(types))
@@ -227,9 +248,9 @@ export class OrderFirestoreService {
  * @param context will be passed again as the first parameter to the callBackFunc (this.* is replaced by context.* inside the callBackFunc) 
  * @returns 
  */
-  async getPlanningUisBetween(start: Date, end: Date, callBackFunc: (context: any, planningUis: ResourcePlanningUi[]) => void, context): Promise<Unsubscribe> {
+  async getPlanningUisBetween(start: Date, end: Date, filters: OrderFireFilters, callBackFunc: (context: any, planningUis: ResourcePlanningUi[]) => void, context): Promise<Unsubscribe> {
 
-    const qry = await this.prepareFireStoreQuery(start, end)
+    const qry = await this.prepareFireStoreQuery(start, end, filters)
 
     const unsubscribe = onSnapshot(qry, (querySnapshot) => {
 
@@ -245,7 +266,7 @@ export class OrderFirestoreService {
       orderUis = this.filterOrderUis(orderUis, [OrderState.cancelled])
 
       orderUis.forEach(orderUi => { orderUi?.planning.forEach(planUi => planUi.order = orderUi) })
-      
+
       let planningUis = orderUis.flatMap(orderUi => orderUi.planning)
 
       let wellnessId = 'b39b2d8a-9a06-46b8-8334-4fc400cfc2c5'
@@ -253,7 +274,7 @@ export class OrderFirestoreService {
       let ucwId = 'e238c289-3e84-463a-84ca-1108d98ebaf4'
       let bodysculptorId = '9bc1e435-84de-4a02-b970-6e3d325e9715'
 
-      planningUis = this.filterPlannings(planningUis, [ResourceType.human], [wellnessId, bodyslimmingId, ucwId, bodysculptorId])
+      planningUis = this.filterPlannings(planningUis, [ResourceType.human], [wellnessId, bodyslimmingId, ucwId, bodysculptorId], filters)
 
       console.warn(planningUis)
       planningUis = this.groupPlannings(planningUis)
