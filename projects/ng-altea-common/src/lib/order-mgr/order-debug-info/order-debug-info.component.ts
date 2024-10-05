@@ -87,7 +87,8 @@ export class OrderDebugInfoComponent {
       this.messageSub.unsubscribe()
 
     this.messageSub = collectionData(qry).subscribe(dataSet => {
-      this.messages = dataSet.map(data => plainToInstance(Message, data))
+      let messages = dataSet.map(data => plainToInstance(Message, data))
+      this.messages = _.orderBy(messages, ['sent'], ['desc'])
 
       console.log(this.messages)
     })

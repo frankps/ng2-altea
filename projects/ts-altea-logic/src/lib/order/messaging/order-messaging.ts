@@ -37,6 +37,48 @@ Different kinds of messages:
 
  */
 
+export class HtmlTable {
+
+    rows: any[] = []
+
+
+    addRow(cols: string[]) {
+        this.rows.push(cols)
+    }
+
+
+    toString(): string {
+
+
+
+        if (ArrayHelper.IsEmpty(this.rows))
+            return ''
+
+        const htmlLines = []
+
+        for (let row of this.rows) {
+
+            if (ArrayHelper.IsEmpty(row))
+                continue
+
+            htmlLines.push('<tr>')
+            for (let col of row) {
+                htmlLines.push(`<td>${col}</td>`)
+
+            }
+            htmlLines.push('</tr>')
+
+
+        }
+
+        return htmlLines.join('\n')
+
+    }
+
+}
+
+
+
 export class OrderMessaging extends OrderMessagingBase {
 
 
@@ -135,6 +177,9 @@ export class OrderMessaging extends OrderMessagingBase {
 
     async noDepositCancel(order: Order): Promise<ApiResult<Order>> {
 
+        if (!order.msg) // messaging disabled for order
+            return ApiResult.warning('Messaging disabled for order!')
+
         try {
             const sendRes = await this.sendMessages(TemplateCode.resv_no_deposit_cancel, order, order.branch, true)
 
@@ -154,6 +199,9 @@ export class OrderMessaging extends OrderMessagingBase {
 
 
     async depositMessaging(order: Order, isFirstDepositMessage = false): Promise<ApiResult<Order>> {
+
+        if (!order.msg) // messaging disabled for order
+            return ApiResult.warning('Messaging disabled for order!')
 
         if (order.deposit == 0 || order.paid >= order.deposit)
             return new ApiResult<Order>(order, ApiStatus.error, 'No deposit needed or deposit already paid!')
@@ -186,9 +234,9 @@ export class OrderMessaging extends OrderMessagingBase {
     setNextDepositReminder(order: Order) {
 
         var currentMsgOn = order.msgOnDate() ?? new Date()
-        var depositBy = order.depositByDate()
+        var depoBy = order.depoByDate()
 
-        const minutesDiff = dateFns.differenceInMinutes(depositBy, currentMsgOn)
+        const minutesDiff = dateFns.differenceInMinutes(depoBy, currentMsgOn)
         const nextMsgInMinutes = Math.round(minutesDiff / 2)
 
         if (nextMsgInMinutes > 59) {
@@ -203,6 +251,10 @@ export class OrderMessaging extends OrderMessagingBase {
     }
 
     async reminderMessaging(order: Order): Promise<ApiResult<Order>> {
+
+        if (!order.msg) // messaging disabled for order
+            return ApiResult.warning('Messaging disabled for order!')
+
 
         const now = new Date()
         const startDate = order.startDate
@@ -353,6 +405,73 @@ export class OrderMessaging extends OrderMessagingBase {
     giftMessaging(order: Order) {
 
         order
+
+    }
+
+
+
+
+    /** Send message to admin about cancelled orders (due to expired deposits) */
+    async messageExpiredDepositCancels(branch: Branch, cancelledOrders: Order[], errors: ApiResult<Order>[]): Promise<ApiResult<Message>> {
+
+        const reportBlocks: string[] = []
+
+        if (ArrayHelper.NotEmpty(cancelledOrders)) {
+
+            reportBlocks.push(`<h4>Cancelled orders</h4>`)
+
+            const cancelledTable = new HtmlTable()
+
+            const cols = []
+
+            for (let order of cancelledOrders) {
+
+                cols.push(DateHelper.dateToString_DM_HHmm(order.startDate))
+                cols.push(order.for)
+                cols.push(order.paid)
+                cols.push(order.incl)
+            }
+
+            cancelledTable.rows.push(cols)
+
+            reportBlocks.push(cancelledTable.toString())
+        }
+
+        if (ArrayHelper.NotEmpty(errors)) {
+
+            reportBlocks.push(`<h4>Errors</h4>`)
+
+            const errorTable = new HtmlTable()
+
+            const cols = []
+
+            for (let error of errors) {
+
+                let order = error.object
+
+                cols.push(error.error)
+
+                if (order) {
+                    cols.push(DateHelper.dateToString_DM_HHmm(order.startDate))
+                    cols.push(order.for)
+                    cols.push(order.paid)
+                    cols.push(order.incl)
+                }
+
+            }
+
+            errorTable.rows.push(cols)
+
+            reportBlocks.push(errorTable.toString())
+        }
+
+        const body = reportBlocks.join('\n')
+
+        const msg = Message.adminEmail(branch, 'Cancelled orders: voorschot niet betaald', body)
+
+        const res = await this.alteaDb.db.sendMessage$(msg)
+
+        return res
 
     }
 

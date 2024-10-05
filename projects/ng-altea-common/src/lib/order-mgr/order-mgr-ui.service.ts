@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import { Injectable, OnInit } from '@angular/core';
-import { AppMode, AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Branch, ConfirmOrderResponse, Contact, CreateCheckoutSession, DateBorder, Gift, GiftLine, GiftType, Order, OrderLine, OrderLineOption, OrderSource, OrderState, Payment, PaymentType, Product, ProductSubType, ProductType, ProductTypeIcons, RedeemGift, ReservationOption, ReservationOptionSet, Resource, ResourcePlanning, ResourceType } from 'ts-altea-model'
+import { AppMode, AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Branch, ConfirmOrderResponse, Contact, CreateCheckoutSession, DateBorder, DepositMode, Gift, GiftLine, GiftType, Order, OrderLine, OrderLineOption, OrderSource, OrderState, Payment, PaymentType, Product, ProductSubType, ProductType, ProductTypeIcons, RedeemGift, ReservationOption, ReservationOptionSet, Resource, ResourcePlanning, ResourceType } from 'ts-altea-model'
 import { ApiListResult, ApiStatus, ArrayHelper, DateHelper, DbQuery, QueryOperator, Translation } from 'ts-common'
 import { AlteaService, GiftService, ObjectService, OrderMgrService, OrderService, ProductService, ResourceService, SessionService } from 'ng-altea-common'
 import * as _ from "lodash";
@@ -561,15 +561,15 @@ export class OrderMgrUiService {   // implements OnInit
 
     const now = new Date()
 
-    this.order.depositMins = this.maxWaitForDepositInMinutes(appMode, bookingStart)
+    this.order.depoMins = this.maxWaitForDepositInMinutes(appMode, bookingStart)
 
-    const by = dateFns.addMinutes(now, this.order.depositMins)
+    const by = dateFns.addMinutes(now, this.order.depoMins)
 
-    this.order.depositBy = DateHelper.yyyyMMddhhmmss(by)
+    this.order.depoBy = DateHelper.yyyyMMddhhmmss(by)
 
-    this.order.m.setDirty('depositMins', 'depositBy')
+    this.order.m.setDirty('depoMins', 'depoBy')
 
-    return this.order.depositMins
+    return this.order.depoMins
   }
 
 
@@ -1125,6 +1125,7 @@ export class OrderMgrUiService {   // implements OnInit
     this.orderDirty = true
 
     this.order.contact = contact
+
 
     this.order.calculateAll()
 

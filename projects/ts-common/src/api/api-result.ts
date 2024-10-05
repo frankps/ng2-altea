@@ -6,6 +6,7 @@ export class ApiResultBase {
 
   message?: string
 
+  error: any
 
   get isOk(): boolean {
     return this.status == ApiStatus.ok
@@ -49,7 +50,7 @@ export class ApiMultiResult extends ApiResultBase {
 export class ApiResult<T = null> extends ApiResultBase {
 
   object: T
-  error: any
+  
 
   constructor(obj: T, status: ApiStatus = ApiStatus.ok, message?: string) {
     super()
@@ -59,14 +60,22 @@ export class ApiResult<T = null> extends ApiResultBase {
     this.message = message
   }
 
-  static error(message?: string, obj?) : ApiResult {
+  static error(message?: string, error?, obj?) : ApiResult {
 
     let res = new ApiResult(obj, ApiStatus.error, message)
-    res.error = obj
+    res.error = error
 
+    return res
+  }
+
+  static warning(message?: string, obj?) : ApiResult {
+
+    let res = new ApiResult(obj, ApiStatus.warning, message)
+    
     return res
 
   }
+
 
 
 }

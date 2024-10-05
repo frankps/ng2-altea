@@ -7,16 +7,16 @@
     <li class="list-group-item" *ngFor="let message of messages">
 
         <div class="row">
-            <div class="col-8">
+            <div class="col-6">
 
                 <h5>
 
                     <i [class]="MsgDirIcon[message.dir]" [style.color]="MsgDirColor[message.dir]"></i> &nbsp;
                     <i [class]="MsgTypeIcon[message.type]" [style.color]="MsgDirColor[message.dir]"></i> &nbsp;
-        
+
                     <ng-container [ngSwitch]="message.dir">
                         <ng-container *ngSwitchCase="'in'">
-                            <ng-container *ngIf="message.from"> 
+                            <ng-container *ngIf="message.from">
                                 {{'dic.from' | translate}}: {{message.from.name}} <i
                                     style="font-size: small;">[{{message.from.addr}}]</i></ng-container>
                         </ng-container>
@@ -25,39 +25,48 @@
                             <ng-container *ngFor="let to of message?.to">
                                 {{to.name}} <i style="font-size: small;">[{{to.addr}}]</i>
                             </ng-container>
-        
-        
-        
-        
+
+
+
+
                         </ng-container>
                     </ng-container>
 
 
-                    
+
                 </h5>
 
-                
+
                 <b>Onderwerp</b>: {{message.subj}}
-                
+
 
 
             </div>
+            <div class="col-2">
+                <small class="float-end">{{message.sent | intdate}}</small>
+            </div>
             <div class="col-4">
 
+                
+
                 <h5 class="float-end">
+                    
 
-                    <i *ngIf="message.auto" class="fa-duotone fa-car" [ngbTooltip]="'objects.message.auto' | translate"></i> &nbsp;
+                    <i *ngIf="message.auto" class="fa-duotone fa-car"
+                        [ngbTooltip]="'objects.message.auto' | translate"></i> &nbsp;
 
-                    <i *ngIf="MsgStateIcon[message.state]" [class]="MsgStateIcon[message.state]" [style.color]="message.stateColor()"></i> &nbsp;
+                    <i *ngIf="MsgStateIcon[message.state]" [class]="MsgStateIcon[message.state]"
+                        [style.color]="message.stateColor()"></i> &nbsp;
                     &nbsp;
                     <i class="fa-duotone fa-trash" (click)="delete(message)"></i>
                     &nbsp;
                     <i class="fa-duotone fa-reply" (click)="toggle(message)"></i>
                 </h5>
 
-            </div>      
-          </div>
-      
+                
+
+            </div>
+        </div>
 
 
 
@@ -67,7 +76,8 @@
 
 
 
-<!-- 
+
+        <!-- 
         <button type="button" class="btn btn-primary btn-sm float-end" 
             translate>dic.reply</button> -->
 
@@ -80,13 +90,13 @@
 
             <ng-container [ngSwitch]="message.type">
                 <ng-container *ngSwitchCase="MsgType.email">
-                    
-                    
+
+
 
                     <div class="NgxEditor__Wrapper">
                         <ngx-editor-menu [editor]="editor"> </ngx-editor-menu>
-                        <ngx-editor [editor]="editor" [(ngModel)]="html" [disabled]="false" height="200px" style="height: 200px"
-                            [placeholder]="'Nieuw bericht...'" ></ngx-editor>
+                        <ngx-editor [editor]="editor" [(ngModel)]="html" [disabled]="false" height="200px"
+                            style="height: 200px" [placeholder]="'Nieuw bericht...'"></ngx-editor>
                     </div>
 
 
@@ -100,7 +110,7 @@
 
                 </ng-container>
             </ng-container>
-        
+
 
 
 

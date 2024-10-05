@@ -1,6 +1,6 @@
 
 
-import { TemplateFormat } from "ts-altea-model";
+import { Branch, TemplateFormat } from "ts-altea-model";
 import { Exclude, Type, Transform } from "class-transformer";
 import 'reflect-metadata';
 import { ArrayHelper, DateHelper, ObjectWithIdPlus } from 'ts-common'
@@ -279,6 +279,34 @@ export class Message extends ObjectWithParameters implements IEmail {
 
     }
 
+    static adminEmail(branch: Branch, subject: string, body: string) : Message {
+
+        const msg = new Message()
+
+        msg.addFrom(branch.emailFrom, branch.name)
+
+        msg.addTo(branch.emailBcc)
+        
+        msg.type = MsgType.email
+        msg.dir = MessageDirection.out
+
+        msg.subj = subject
+        msg.body = body
+
+        return msg
+    }
+
+    static email(subject: string, body: string) : Message {
+
+        const msg = new Message()
+        msg.type = MsgType.email
+        msg.dir = MessageDirection.out
+
+        msg.subj = subject
+        msg.body = body
+
+        return msg
+    }
 
 
     stateColor(): string {

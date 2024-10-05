@@ -26,6 +26,8 @@ export class BaseEvent {
     contact: string
     resource: Resource
 
+    order: OrderUi
+
     static newEventBase(id: string, type: BaseEventType, subject: string, from: Date, to: Date, color: string) {
         const event = new BaseEvent()
 
@@ -288,6 +290,9 @@ export abstract class CalendarBase {
     planningUiToEventBase(planningUi: ResourcePlanningUi): BaseEvent {
 
         const baseEvent = BaseEvent.newEventBase(planningUi.id, BaseEventType.OrderPlanning, planningUi.order?.shortInfo(), planningUi.startDate, planningUi.endDate, (planningUi.resource as Resource)?.color)
+        
+        baseEvent.order = planningUi.order
+        
         //  baseEvent.contact = planningUi.
         return baseEvent
     }

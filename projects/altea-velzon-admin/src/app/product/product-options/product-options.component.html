@@ -26,8 +26,24 @@
               <h6 *ngIf="option !== optionInEdit; else editOptionName">{{option.name}}</h6>
 
               <ng-template #editOptionName>
-                <input type="text" id="name_{{option.id}}" name="name_{{option.id}}" required
-                  class="form-control form-control-sm" [(ngModel)]="option.name" />
+
+                <div class="row">
+                  <div class="col-6">
+
+                    <input type="text" id="name_{{option.id}}" name="name_{{option.id}}" required
+                      class="form-control form-control-sm" [(ngModel)]="option.name" />
+
+                  </div>
+                  <div class="col-6">
+
+                    <input type="text" id="short_{{option.id}}" name="short_{{option.id}}"
+                      class="form-control form-control-sm" [(ngModel)]="option.short" />
+
+                  </div>
+                </div>
+
+
+
 
               </ng-template>
 
@@ -163,7 +179,8 @@
                       <div class="col-9">
                         Formule = <ng-container *ngFor="let term of option.formula; let idx = index"><span
                             *ngIf="idx > 0"> + </span>(<span>{{term.factor}}</span>
-                          <span *ngIf="term.value">&nbsp;x&nbsp;({{'objects.formulaTerm.value' | translate}}<span *ngIf="term.inc"> + {{term.inc}}</span>)
+                          <span *ngIf="term.value">&nbsp;x&nbsp;({{'objects.formulaTerm.value' | translate}}<span
+                              *ngIf="term.inc"> + {{term.inc}}</span>)
                           </span>
                           <span *ngIf="term.optionId"> x {{getOptionName(term.optionId)}}</span>) <i
                             class="fa-solid fa-trash" (click)="removeTerm(option, idx)"></i> &nbsp;

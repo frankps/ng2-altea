@@ -1,7 +1,7 @@
 
 import { Component, ViewChild, OnInit } from '@angular/core';
 import { ProductService, PriceService, ProductResourceService, ResourceService, ScheduleService, ContactService, SessionService, BranchService } from 'ng-altea-common'
-import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ResourceType, ResourceTypeIcons, Resource, Schedule, Contact, Language, Branch, DepositTerm, TimeUnit, MsgType, ReminderConfig, Country, GiftConfig, GiftVatPct, Currency, ProdSalesConfig } from 'ts-altea-model'
+import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ResourceType, ResourceTypeIcons, Resource, Schedule, Contact, Language, Branch, DepositTerm, TimeUnit, MsgType, ReminderConfig, Country, GiftConfig, GiftVatPct, Currency, ProdSalesConfig, CommunicationConfig } from 'ts-altea-model'
 import { BackendHttpServiceBase, DashboardService, FormCardSectionEventData, NgEditBaseComponent, ToastType, TranslationService } from 'ng-common'
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxModalComponent, DeleteModalComponent } from 'ng-common';
@@ -66,7 +66,7 @@ export class EditBranchComponent extends NgEditBaseComponent<Branch> implements 
       , router, route, spinner, dashboardSvc)
 
     this.sectionProps.set('general', ['name', 'descr', 'str', 'strNr', 'postal', 'country', 'city', 'lang', 'vatPcts', 'vatPct', 'vatNr', 'vatIncl', 'phone', 'mobile', 'email', 'cur', 'cancel'])
-    this.sectionProps.set('communication', ['emailFrom', 'emailBcc', 'smsOn'])
+    this.sectionProps.set('communication', ['emailFrom', 'emailBcc', 'smsOn', 'comm'])
     this.sectionProps.set('reminders', ['reminders'])
     this.sectionProps.set('deposit', ['depositPct', 'depositTerms', 'reminders'])
     this.sectionProps.set('gift', ['giftOn', 'gift'])
@@ -99,6 +99,9 @@ export class EditBranchComponent extends NgEditBaseComponent<Branch> implements 
   }
 
   override objectRetrieved(branch: Branch): void {
+
+    if (!branch.comm)
+      branch.comm = new CommunicationConfig()
 
     if (!branch.prodSales) {
       branch.prodSales = new ProdSalesConfig()

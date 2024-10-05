@@ -40,6 +40,20 @@ export class DateHelper {
         return yearMonths   
     }
 
+    /**
+     * Returns date in format D/M HH:mm
+     * @param date 
+     * @returns 
+     */
+    static dateToString_DM_HHmm(date: Date): string {
+
+        if (!date)
+            return ''
+
+        return dateFns.format(date, 'd/M HH:mm')
+
+    }
+
 
     static getDayName(day: number) {
 

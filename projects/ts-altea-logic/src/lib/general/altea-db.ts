@@ -90,13 +90,13 @@ export class AlteaDb {
 
         const qry = new DbQueryTyped<Order>('order', Order)
         qry.and('state', QueryOperator.equals, OrderState.waitDeposit)
-        qry.and('depositBy', QueryOperator.lessThan, dateNum)
+        qry.and('depoBy', QueryOperator.lessThan, dateNum)
         qry.and('paid', QueryOperator.equals, 0)
         qry.include('contact', 'lines')
 
-        const templates = await this.db.query$<Order>(qry)
+        const expiredDepositOrders = await this.db.query$<Order>(qry)
 
-        return templates
+        return expiredDepositOrders
     }
 
     async getOrder(orderId: string, ...includes: string[]): Promise<Order> {
@@ -119,7 +119,7 @@ export class AlteaDb {
 
         const dateNum = DateHelper.yyyyMMddhhmmss(date)
 
-        qry.and('depositBy', QueryOperator.lessThanOrEqual, dateNum)
+        qry.and('depoBy', QueryOperator.lessThanOrEqual, dateNum)
 
         const orders = await this.db.query$<Order>(qry)
 

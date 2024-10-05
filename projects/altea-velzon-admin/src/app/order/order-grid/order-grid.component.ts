@@ -41,11 +41,11 @@ export class UIOrder extends Order {
     if (order.paid < order.deposit) {
 
       const now = new Date()
-      const depositByDate = order.depositByDate()
+      const depoByDate = order.depoByDate()
 
       uiOrder.pay.info = `€${order.paid}/ €${order.deposit} / €${order.incl}`
 
-      if (depositByDate < now)
+      if (depoByDate < now)
         uiOrder.pay.color = 'red'
       else
         uiOrder.pay.color = 'orange'
@@ -78,8 +78,8 @@ export enum SearchTypeSelect {
   nonAppointments = 'nonAppointments',
   toInvoice = 'toInvoice',
   invoiced = 'invoiced',
-  gifts = "gifts"
-
+  gifts = "gifts",
+  none = "none"
 
 }
 
@@ -116,6 +116,8 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
   /** if of current order in focus */
   selected?: Order
 
+  OrderState = OrderState
+
 
   constructor(private orderSvc: OrderService, private translationSvc: TranslationService, private modalService: NgbModal,
     dashboardSvc: DashboardService, protected route: ActivatedRoute, router: Router, spinner: NgxSpinnerService) {
@@ -123,10 +125,11 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
       , orderSvc, dashboardSvc, spinner, router)
 
 
-    var today = new Date()
-    this.dateRange.push(today, today)
+  }
 
 
+  setDate(date = new Date()) {
+    this.dateRange.push(date, date)
   }
 
   override ngOnDestroy() {
@@ -136,25 +139,38 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
   async ngOnInit() {
     super._ngOnInit()
 
-    this.search()
+    this.setDate()
+
+    this.startSearch()
 
     await this.translationSvc.translateEnum(SearchTypeSelect, 'ui.order.search-type-select.', this.searchTypeSelect)
 
     await this.translationSvc.translateEnum(OrderState, 'enums.order-state.', this.orderState)
+    // this.orderState.push(new Translation('all', 'Alle'))
 
-    this.initialized = true
+    console.warn(this.orderState)
+
+
+
 
     console.warn(this.searchTypeSelect)
 
+    this.initialized = true
   }
+
 
   async dateChange(value: Date) {
 
-    if (!value)
+    const me = this
+
+    if (!this.initialized)
       return
 
-    this.dateRange = []
-    this.dateRange.push(value, value)
+    if (value == me.dateRange?.[0] && value == me.dateRange?.[1])
+      return
+
+    me.dateRange = []
+    me.dateRange.push(value, value)
 
     this.startSearch()
   }
@@ -175,11 +191,12 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
 
     if (this.dateRange?.length == 2) {
       var startDate = this.dateRange[0]
-      this.orderSearch.start = DateHelper.yyyyMMdd000000(startDate)
+
+      this.orderSearch.start = startDate ? DateHelper.yyyyMMdd000000(startDate) : undefined
 
       var endDate = this.dateRange[1]
       endDate = dateFns.addDays(endDate, 1)
-      this.orderSearch.end = DateHelper.yyyyMMdd000000(endDate)
+      this.orderSearch.end = endDate ? DateHelper.yyyyMMdd000000(endDate) : undefined
     }
 
     this.advancedSearch(this.orderSearch)
@@ -208,7 +225,7 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
 
 
 
-    if (this.orderSearch.typeSelect == SearchTypeSelect.appointmentsMadeOn || this.orderSearch.typeSelect == SearchTypeSelect.nonAppointments) {
+    if (orderSearch.typeSelect == SearchTypeSelect.appointmentsMadeOn || orderSearch.typeSelect == SearchTypeSelect.nonAppointments) {
       if (orderSearch.start)
         query.and('cre', QueryOperator.greaterThanOrEqual, DateHelper.parse(orderSearch.start))
 
@@ -226,7 +243,7 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
 
 
 
-    switch (this.orderSearch.typeSelect) {
+    switch (orderSearch.typeSelect) {
       case SearchTypeSelect.toInvoice:
         query.and('toInvoice', QueryOperator.equals, true)
         query.and('invoiced', QueryOperator.equals, false)
@@ -246,14 +263,14 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
     }
 
 
-    if (ArrayHelper.NotEmpty(this.orderSearch.states)) {
-      query.and('state', QueryOperator.in, this.orderSearch.states)
+    if (ArrayHelper.NotEmpty(orderSearch.states)) {
+      query.and('state', QueryOperator.in, orderSearch.states)
     }
 
 
     query.take = 30
     query.include('lines.planning.resource', 'contact')
-    query.orderBy('start', SortOrder.asc)
+    query.orderBy('start', SortOrder.desc)
 
 
 

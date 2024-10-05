@@ -44,6 +44,17 @@ export class DemoComponent {
 
   }
 
+
+  async cancelExpiredDeposits() {
+    const orderMgmtSvc = new OrderMgmtService(this.dbSvc)
+
+    console.warn('cancelExpiredDeposistOrders')
+
+    orderMgmtSvc.cancelExpiredDeposistOrders()
+  }
+
+
+
   async orderPay() {
 
     const orderMgmtSvc = new OrderMgmtService(this.dbSvc)
@@ -54,7 +65,7 @@ export class DemoComponent {
 
     //var alteaSvc = new AlteaService(this)
 
-   // var res = this.dbSvc
+    // var res = this.dbSvc
 
   }
 

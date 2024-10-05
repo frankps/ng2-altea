@@ -89,7 +89,8 @@
                     <div class="row mt-1" style="font-size: 75%;">
                         <div class="col-1"></div>
                         <div class="col">
-                            Persons: <span *ngFor="let personId of line.persons; let idx = index">{{personId}} <span *ngIf="idx < line.persons.length - 1"> - </span> </span>
+                            Persons: <span *ngFor="let personId of line.persons; let idx = index">{{personId}} <span
+                                    *ngIf="idx < line.persons.length - 1"> - </span> </span>
                         </div>
                     </div>
                 </ng-container>
@@ -156,8 +157,20 @@
         </div>
 
         <div class="row mt-1" style="font-size: 80%;">
-            <div class="col-8"><span class="float-end" translate>objects.order.deposit</span> </div>
-            <div class="col-4 d-flex justify-content-end">€ {{order.deposit}}</div>
+            <div class="col-8">
+                <div class="form-check form-switch float-end">
+                    <input class="form-check-input" type="checkbox" id="depo" name="depo" [(ngModel)]="order.depo"
+                        (change)="toggleDeposit()" />
+                    <span class="" translate>objects.order.deposit</span>
+                </div>
+            </div>
+
+
+
+            <div class="col-4 d-flex justify-content-end">
+                <span *ngIf="order.depo">€ {{order.deposit}}</span>
+                <s *ngIf="!order.depo">€ {{order.deposit}}</s>
+            </div>
         </div>
 
         <div class="row mt-1">
@@ -198,18 +211,18 @@
         </ng-container>
 
 
-        <div class="row mt-3" *ngIf="show.deposit">
+        <div class="row mt-3" *ngIf="show.deposit && order.depo">
             <div class="col-4 d-flex align-items-center">Betaaltermijn</div>
             <div class="col-4">
 
-                <ng-select id="depositMins" name="depositMins" [items]="depositTimes" bindLabel="label" bindValue="mins"
-                    [clearable]="false" [multiple]="false" [(ngModel)]="order.depositMins">
+                <ng-select id="depoMins" name="depoMins" [items]="depositTimes" bindLabel="label" bindValue="mins"
+                    [clearable]="false" [multiple]="false" [(ngModel)]="order.depoMins" (change)="fieldChanged('depoMins')">
                 </ng-select>
 
 
             </div>
             <div class="col-4 d-flex justify-content-end align-items-center" style="font-size: 0.8rem;">
-                {{order?.depositByDate() | date:"dd/MM/yy HH:mm"}}</div>
+                {{order?.depoByDate() | date:"dd/MM/yy HH:mm"}}</div>
 
         </div>
 
@@ -250,6 +263,9 @@
                 <button type="button" class="btn btn-primary btn-sm" (click)="cancelOrder()"><i
                         class="fa-solid fa-trash-can"></i></button>
 
+                <button type="button" *ngIf="isPOS()" class="btn btn-primary btn-sm ms-2" (click)="show.extra = !show.extra"><i
+                        class="fa-solid fa-pen"></i></button>
+
             </div>
         </div>
 
@@ -257,11 +273,41 @@
         <order-mgr-loyalty *ngIf="show.loyalty" [order]="order" [loyalty]="orderMgrSvc.loyalty"></order-mgr-loyalty>
 
 
+
+        <ng-container *ngIf="show.extra">
+
+            <div class="row">
+                <div class="col">
+
+                    <div class="form-check form-switch float-end">
+                        <input class="form-check-input" type="checkbox" id="msg" name="msg" [(ngModel)]="order.msg" />
+                        <span class="" translate>objects.order.msg</span>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="row mt-2">
+                <div class="col">
+
+                    <ng-select id="orderStates" name="orderStates" [items]="orderStates" bindLabel="trans" bindValue="key" [clearable]="false" [multiple]="false" 
+                    [(ngModel)]="order.state" (change)="stateChanged($event.key)"></ng-select>
+
+                </div>
+            </div>
+
+        </ng-container>
+
+
+
+
+
+
+
     </div>
     <div class="card-footer p-2">
         <div class="row text-muted" style="font-size: 80%;">
             <div class="col-6">Gemaakt op {{order.cre | date: sessionSvc.formats.dateShort}}</div>
-
 
 
             <div class="d-grid mt-3" *ngIf="showConfirm && orderMgrSvc.orderDirty">
@@ -284,6 +330,15 @@
                     translate>msg.continue</button>
             </div>
         </div>
+
+
+
+
+
+
+
+
+
         <div class="row mt-3">
             <!-- <div class="col-4"> </div>
              style="font-size: 80%;" 
@@ -291,7 +346,7 @@
             -->
             <div class="col" *ngIf="sessionSvc.devMode">
 
-<!--                 <button type="button" class="btn btn-primary btn-sm"
+                <!--                 <button type="button" class="btn btn-primary btn-sm"
                     (click)="orderMgrSvc.getAvailabilities()">Slots</button>
 
                 <button type="button" class="btn btn-primary btn-sm mx-2" (click)="next()"
@@ -301,7 +356,7 @@
                 <button type="button" class="btn btn-primary btn-sm mx-2" (click)="orderMgrSvc.saveOrder()"
                     translate>dic.save</button> -->
 
-<!-- 
+                <!-- 
                 <button type="button" class="btn btn-primary btn-sm mx-2" (click)="orderMgrSvc.changeState()">Change
                     state</button> -->
 

@@ -1,7 +1,10 @@
 import { Component, Output, EventEmitter, Input, OnInit } from '@angular/core';
 import { OrderMgrUiService } from '../order-mgr-ui.service';
 import { ObjectService, ResourceService, SessionService } from 'ng-altea-common';
-import { AppMode, CreateCheckoutSession, Order, OrderLine, OrderPerson, Resource, ResourcePreferences, ResourceType } from 'ts-altea-model';
+import { AppMode, CreateCheckoutSession, Order, OrderLine, OrderPerson, OrderState, Resource, ResourcePreferences, ResourceType } from 'ts-altea-model';
+import { TranslationService } from 'ng-common'
+import { Translation } from 'ts-common'
+
 
 @Component({
   selector: 'order-mgr-order',
@@ -42,10 +45,14 @@ export class OrderComponent implements OnInit {
     vat: false,
     loyalty: false,
     next: false,   // show the next button (in consumer app)
-    save: false    // show the save button 
+    save: false,    // show the save button 
+    extra: false
   }
 
-  constructor(protected orderMgrSvc: OrderMgrUiService, protected sessionSvc: SessionService, protected stripeSvc: ObjectService, protected resourceSvc: ResourceService) {
+  orderStates: Translation[] = []
+
+  constructor(protected orderMgrSvc: OrderMgrUiService, protected sessionSvc: SessionService, protected stripeSvc: ObjectService, 
+    protected resourceSvc: ResourceService, protected translationSvc: TranslationService) {
 
   }
 
@@ -71,7 +78,28 @@ export class OrderComponent implements OnInit {
 
     }
 
+    await this.translationSvc.translateEnum(OrderState, 'enums.order-state.', this.orderStates)
 
+
+
+  }
+
+  fieldChanged(field: string) {
+    this.order.markAsUpdated(field)
+    this.orderMgrSvc.orderDirty = true
+  }
+
+  stateChanged(newState) {
+
+    console.warn(newState)
+
+    this.fieldChanged('state')
+  
+  }
+
+  /** Is Point Of Sale (=> internal use of app) => more functionalities */
+  isPOS() {
+    return this.appMode == AppMode.pos
   }
 
   cancelOrder() {
@@ -82,8 +110,8 @@ export class OrderComponent implements OnInit {
 
   humanResourcesChanged() {
 
-    this.order.m.setDirty('resPrefs')
-    this.orderMgrSvc.orderDirty = true
+    this.fieldChanged('resPrefs')
+
 
   }
 
@@ -112,6 +140,12 @@ export class OrderComponent implements OnInit {
 
   get orderLineOptions() {
     return this.orderMgrSvc.orderLineOptions
+  }
+
+  toggleDeposit() {
+    this.fieldChanged('depo')
+    //this.order.markAsUpdated('depo')
+    this.order.calculateDeposit()
   }
 
   emitAddProduct() {
@@ -194,6 +228,8 @@ export class OrderComponent implements OnInit {
     if (!line || !person)
       return
 
+  
+
     let idx = -1
 
     if (!line.persons)
@@ -206,6 +242,8 @@ export class OrderComponent implements OnInit {
     else {
       line.persons.push(person.id)
 
+      line.m.setDirty('persons')
+
       console.error(line.persons)
 
       if (line.persons.length > line.qty)
@@ -213,6 +251,9 @@ export class OrderComponent implements OnInit {
 
       console.error(line.persons)
     }
+
+
+    this.orderMgrSvc.orderDirty = true
   }
 
   personCssClass(line: OrderLine, person: OrderPerson) {

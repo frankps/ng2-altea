@@ -84,8 +84,9 @@ export class ProductOption extends ObjectWithIdPlus {
   @Type(() => ProductOptionValue)
   values?: ProductOptionValue[];
   idx = 0
-  name?: string;
-  descr?: string;
+  name?: string
+  short?: string
+  descr?: string
   public = true
   required = true
   multiSelect = false
@@ -333,6 +334,10 @@ export class Product extends ObjectWithIdPlus {
   sub?: ProductSubType = ProductSubType.basic
 
   descr?: string;
+
+  /** Inform customer after purchase service/product with this extra info */
+  inform?: string
+
   showPrice = true
   showDuration = true
   showPos = true

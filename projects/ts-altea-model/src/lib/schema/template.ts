@@ -307,13 +307,13 @@ export class Template extends ObjectWithParameters {
       day: { si: 'dag', pl: 'dagen' },
     }
 
-    if (!order || !order.depositBy)
+    if (!order || !order.depoBy)
       return ''
 
-    var depositByDate = DateHelper.parse(order.depositBy)
+    var depoByDate = DateHelper.parse(order.depoBy)
     const now = new Date()
 
-    const minutes = dateFns.differenceInMinutes(depositByDate, now)
+    const minutes = dateFns.differenceInMinutes(depoByDate, now)
 
     if (minutes < 60)
       return `${minutes} ${minutes == 1 ? trans.min.si : trans.min.pl}`
@@ -365,6 +365,10 @@ export class Template extends ObjectWithParameters {
       term: this.getTerm(order),
       first: order?.contact?.first,
       'order-id': order?.id,
+      'start-date': order.startDateFormat(),
+      'order-lines': order.sumToString(),
+      'footer': branch.comm?.footer
+      //'start-time': order.start
       //'url-path': 'branch/aqua/order/a420eb76-497d-4b4a-a22d-90f9e78d6113/pos-summary'
       // info: "baby giraffe"
     }

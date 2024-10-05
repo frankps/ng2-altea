@@ -348,6 +348,21 @@
                     </div>
                 </div>
 
+                <div class="row mt-3" *ngIf="object.comm">
+                    <div class="col">
+
+                        <ngx-altea-label-control label="dic.footer" for="footer">
+                            <textarea rows="4" class="form-control" id="footer" name="footer" style="height: 80px"
+                                [(ngModel)]="object.comm.footer"></textarea>
+                        </ngx-altea-label-control>
+
+                    </div>
+                  </div>
+              
+
+
+
+
             </form>
         </ng-container>
 
@@ -1025,21 +1040,23 @@
                         <div class="row" *ngFor="let rate of object.prodSales.ship.rates">
 
                             <div class="col-4">
-    
-                                <ngx-altea-label-control label="objects.branch.prodSales.ship.rates.from" for="rateFrom">
+
+                                <ngx-altea-label-control label="objects.branch.prodSales.ship.rates.from"
+                                    for="rateFrom">
                                     <input type="number" id="rateFrom" name="rateFrom" class="form-control"
                                         [(ngModel)]="rate.from" />
                                 </ngx-altea-label-control>
-    
+
                             </div>
 
                             <div class="col-4">
-    
-                                <ngx-altea-label-control label="objects.branch.prodSales.ship.rates.cost" for="rateCost">
+
+                                <ngx-altea-label-control label="objects.branch.prodSales.ship.rates.cost"
+                                    for="rateCost">
                                     <input type="number" id="rateCost" name="rateCost" class="form-control"
                                         [(ngModel)]="rate.cost" />
                                 </ngx-altea-label-control>
-    
+
                             </div>
 
 

@@ -141,12 +141,14 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
 
   baseEventToEvent(eventBase: BaseEvent) {
 
+    
     return {
       Id: eventBase.id,
       Subject: eventBase.subject,
       StartTime: eventBase.from,
       EndTime: eventBase.to,
-      CategoryColor: eventBase.color
+      CategoryColor: eventBase.color,
+      OrderId: eventBase.order?.id
     }
   }
 

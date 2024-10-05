@@ -230,6 +230,12 @@ export const MENU: MenuItem[] = [
         label: 'menu.platform.sub.orderDebug',
         link: '/platform/order-debug',
         parentId: 30
+      },
+      {
+        id: 301,
+        label: 'menu.demo.label',
+        link: '/aqua/demo',
+        parentId: 30
       }
     ]
   }

@@ -245,10 +245,11 @@ export class CancelOrder {
 
         }
     
+        order.cancel = orderCancel
         order.state = OrderState.cancelled
         order.act = false
 
-        order.m.setDirty('state', 'act')  
+        order.m.setDirty('cancel', 'state', 'act')  
 
         let plannings = order.planning
 

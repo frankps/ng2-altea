@@ -25,6 +25,9 @@ export class AddPaymentToOrderParams {
 
 
 
+
+
+
 export class OrderMgmtService {
 
 
@@ -71,82 +74,97 @@ export class OrderMgmtService {
         return result
     }
 
+    async getBranches(orders: Order[]): Promise<Branch[]> {
+
+        if (ArrayHelper.IsEmpty(orders))
+            return []
+
+        const uniq = _.uniqBy(orders, 'branchId')
+        const branchIds = uniq.map(o => o.branchId)
+
+        const branches = await this.alteaDb.getBranches(branchIds)
+
+        return branches
+    }
+
+
     /** set state to noDepositCancel */
-    async cancelExpiredDeposistOrders(before: Date = new Date()) {
+    async cancelExpiredDeposistOrders(before: Date = new Date()): Promise<Order[]> {
 
         const beforeNum = DateHelper.yyyyMMddhhmmss(before)
         const orders = await this.alteaDb.getExpiredDepositOrders(before)
 
-        const processed = []
+        if (ArrayHelper.IsEmpty(orders))
+            return []
 
-        for (let order of orders) {
-            order.state = OrderState.cancelled
-            order.cancel.reason = CustomerCancelReasons.noDeposit
-            order.cancel = new OrderCancel()
-            order.cancel.date = new Date()
-            order.cancel.by = OrderCancelBy.int
+        const cancelledOrders: Order[] = []
+        //const errors: ApiResult[] = []
 
-            order.msgCode = TemplateCode.resv_no_deposit_cancel
-            order.msgOn = beforeNum
+        const branches = await this.getBranches(orders)
 
-            order.m.setDirty('state', 'cancel', 'msgCode', 'msgOn')
-
-            const res = await this.alteaDb.saveOrder(order)
-
-            const del = this.alteaDb.deletePlanningsForOrder(order.id)
-
-            processed.push(res)
-        }
-
-        return processed
-    }
-
-
-
-    async cancelExpiredDeposistsOld() {
-
-        const orders = await this.alteaDb.getExpiredDepositOrders()
-
-        console.warn(orders)
-
-        const branchIds = _.uniqBy(orders, 'branchId').map(o => o.branchId)
-
-        const templates = await this.alteaDb.getTemplatesForBranches(branchIds, TemplateCode.resv_no_deposit_cancel)
-        const branches = await this.alteaDb.getBranches(branchIds)
+        // loop through branches
 
         for (let branch of branches) {
 
-            const branchOrders = orders.filter(o => o.branchId == branch.id)
-            const branchTemplates = templates.filter(t => t.branchId == branch.id)
+            const cancelledBranchOrders: Order[] = []
+            const branchErrors: ApiResult[] = []
 
-            if (!Array.isArray(branchTemplates) || branchTemplates.length == 0)
-                continue
+            let branchOrders = orders.filter(o => o.branchId == branch.id)
 
             for (let order of branchOrders) {
 
+                try {
+                    order.state = OrderState.cancelled
 
-                for (let template of branchTemplates) {
+                    order.cancel = new OrderCancel()
+                    order.cancel.reason = CustomerCancelReasons.noDeposit
+                    order.cancel.date = new Date()
+                    order.cancel.by = OrderCancelBy.int
 
-                    //  const msg = await this.taskHub.MessagingTasks.sendEmailMessage(template, order, branch, true)
+                    order.msgCode = TemplateCode.resv_no_deposit_cancel
+                    order.msgOn = beforeNum
 
-                    //  console.warn(msg)
+                    order.m.setDirty('state', 'cancel', 'msgCode', 'msgOn')
+
+                    const res = await this.alteaDb.saveOrder(order)
+
+                    if (!res.isOk)
+                        throw res
+
+                    const del = this.alteaDb.deletePlanningsForOrder(order.id)
+
+                    //msgSvc.noDepositCancel(order)
+
+                    cancelledBranchOrders.push(res.object)
+
+                } catch (err) {
+
+                    const error = ApiResult.error('Error processing order', err, order)
+                    branchErrors.push(error)
 
                 }
 
 
-
-                order.state = OrderState.cancelled
-                order.m.setDirty('state')
-
-                this.alteaDb.saveOrder(order)
-
+                break  // for debugging, to have just 1 working
             }
+
+            if (cancelledBranchOrders.length > 0 || branchErrors.length > 0) {
+                const msgSvc = new OrderMessaging(this.alteaDb)
+                await msgSvc.messageExpiredDepositCancels(branch, cancelledBranchOrders, branchErrors)
+            }
+
+            cancelledOrders.push(...cancelledBranchOrders)
 
 
         }
 
 
+
+
+        return cancelledOrders
     }
+
+
 
 
     async saveOrder(order: Order, autoChangeState = false): Promise<ApiResult<Order>> {
@@ -188,7 +206,7 @@ export class OrderMgmtService {
         }
 
         if (order.src == OrderSource.pos && order.state == OrderState.creation) {
-           
+
             const hasServices = order.hasServices()
 
             if (order.contactId && (!hasServices || order.start)) {
@@ -237,17 +255,17 @@ export class OrderMgmtService {
             case OrderState.created:
 
                 /** if order was created internally (Point Of Sale) and still a deposit to pay */
-                if (order.src == OrderSource.pos && order.deposit > 0 && order.paid < order.deposit) {
+                if (order.src == OrderSource.pos && order.depo && order.deposit > 0 && order.paid < order.deposit) {
 
-                    // then we calculate depositBy date
+                    // then we calculate depoBy date
                     const now = new Date()
-                    const depositByDate = dateFns.addMinutes(now, order.depositMins)
-                    order.depositBy = DateHelper.yyyyMMddhhmmss(depositByDate)
-                    order.m.setDirty('depositBy')
+                    const depoByDate = dateFns.addMinutes(now, order.depoMins)
+                    order.depoBy = DateHelper.yyyyMMddhhmmss(depoByDate)
+                    order.m.setDirty('depoBy')
 
                     await msgSvc.depositMessaging(order, true)
                     order.state = OrderState.waitDeposit
-                 
+
 
                 } else {
 
@@ -257,15 +275,15 @@ export class OrderMgmtService {
                 break
 
             case OrderState.waitDeposit:
-                order.depositBy = DateHelper.yyyyMMddhhmmss()
-                order.m.setDirty('depositBy')
+                order.depoBy = DateHelper.yyyyMMddhhmmss()
+                order.m.setDirty('depoBy')
                 break
 
             case OrderState.confirmed:
 
                 await msgSvc.confirmationMessaging(order)
-                
-                
+
+
                 break
 
 
@@ -437,6 +455,54 @@ export class OrderMgmtService {
         return deposit
 
     }
+
+
+
+    async cancelExpiredDeposistsOld() {
+
+        const orders = await this.alteaDb.getExpiredDepositOrders()
+
+        console.warn(orders)
+
+        const branchIds = _.uniqBy(orders, 'branchId').map(o => o.branchId)
+
+        const templates = await this.alteaDb.getTemplatesForBranches(branchIds, TemplateCode.resv_no_deposit_cancel)
+        const branches = await this.alteaDb.getBranches(branchIds)
+
+        for (let branch of branches) {
+
+            const branchOrders = orders.filter(o => o.branchId == branch.id)
+            const branchTemplates = templates.filter(t => t.branchId == branch.id)
+
+            if (!Array.isArray(branchTemplates) || branchTemplates.length == 0)
+                continue
+
+            for (let order of branchOrders) {
+
+
+                for (let template of branchTemplates) {
+
+                    //  const msg = await this.taskHub.MessagingTasks.sendEmailMessage(template, order, branch, true)
+
+                    //  console.warn(msg)
+
+                }
+
+
+
+                order.state = OrderState.cancelled
+                order.m.setDirty('state')
+
+                this.alteaDb.saveOrder(order)
+
+            }
+
+
+        }
+
+
+    }
+
 
 
 

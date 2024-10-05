@@ -32,6 +32,13 @@ export class DepositTerm {
     ptu: string = 'h'
 }
 
+export class CommunicationConfig {
+
+    
+    footer?: string
+
+
+}
 
 export class ReminderConfig {
     type: MsgType = MsgType.email
@@ -160,6 +167,8 @@ export class Branch extends ObjectWithIdPlus {
     //  @Type(() => GiftConfig)
     gift?: GiftConfig
 
+
+    comm?: CommunicationConfig
 
     get sameDayTerm(): number { return this.getDepositTerm(0) }
     set sameDayTerm(value: number) { this.setDepositTerm(0, value) }

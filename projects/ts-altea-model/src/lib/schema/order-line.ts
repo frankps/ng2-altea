@@ -14,8 +14,15 @@ import { CancelOrderMessage } from "ts-altea-logic";
 import { Branch, Contact, DepositMode, FormulaTerm, Invoice, Order, OrderType, Organisation, Payment, PaymentType, PlanningMode, Product, ProductOption, ProductOptionValue, ProductType, Resource, ResourcePlanning, Subscription } from "ts-altea-model";
 
 export class OrderLineOptionSummary {
+  /** option name */
+  o?: string
+
   /** value for option */
-  v?: string;
+  v?: string
+
+  toString(): string {
+    return `${this.o}: ${this.v}`
+  }
 }
 
 export class OrderLineSummary {
@@ -29,6 +36,23 @@ export class OrderLineSummary {
   /** option value summaries */
   @Type(() => OrderLineOptionSummary)
   o?: OrderLineOptionSummary[] = []
+
+  toString() {
+
+    let optionStr: string = undefined
+
+    if (ArrayHelper.NotEmpty(this.o)) {
+      let options = this.o.map(o => o.toString())
+      optionStr = options.join(', ')
+    }
+
+    let str = `${this.q} x ${this.d}`
+
+    if (optionStr)
+      str += `: ${optionStr}`
+
+    return str
+  }
 }
 
 
@@ -348,7 +372,13 @@ export class OrderLine extends ObjectWithIdPlus {
     console.error(this.incl)
   }
 
-  optionsWithNonDefaultValues() : OrderLineOption[] {
+  override toString() {
+
+    return `${this.qty} x ${this.descr}`
+
+  }
+
+  optionsWithNonDefaultValues(): OrderLineOption[] {
 
     if (ArrayHelper.IsEmpty(this.options))
       return []
@@ -388,7 +418,11 @@ export class OrderLine extends ObjectWithIdPlus {
 
         if (orderLineOption?.hasValues()) {
           let optionSummary = new OrderLineOptionSummary()
-          let values = orderLineOption.values.map(value => `${prefix}${value.name}${suffix}`)
+          let values = orderLineOption.values.map(value => `${value.name}`) //  ${prefix} ${suffix}
+
+          // if there's a short name for the option, then we use this
+          optionSummary.o = option.short ? option.short : option.name
+          
           optionSummary.v = values.join(', ')
           summary.o.push(optionSummary)
 
@@ -446,7 +480,7 @@ export class OrderLine extends ObjectWithIdPlus {
    * (ex. service Welness has options adults & kids )
    * @returns 
    */
-  getNrOfPersonsDefinedOnOptions() : number {
+  getNrOfPersonsDefinedOnOptions(): number {
 
     if (!this.product.hasOptions())
       return 1
@@ -463,7 +497,7 @@ export class OrderLine extends ObjectWithIdPlus {
 
     if (ArrayHelper.IsEmpty(nrOfPersonOptionValues))
       return 1
-    
+
 
     var nrOfPersons = _.sumBy(nrOfPersonOptionValues, 'val')
 

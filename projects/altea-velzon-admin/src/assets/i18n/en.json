@@ -23,6 +23,7 @@
     "descr": "Omschrijving",
     "email": "Email",
     "edit": "Aanpassen",
+    "footer": "Voettekst",
     "from": "Van",
     "language": "Taal",
     "mobile": "GSM",
@@ -110,6 +111,18 @@
     "cancel-by": {
       "cust": "Klant",
       "int": "Intern"
+    },
+    "cancel-reason": {
+      "sick": "Ziekte",
+      "decease": "Overlijden",
+      "traffic": "Verkeer",
+      "work": "Werk",
+      "noShow": "No show",
+      "noDeposit": "Geen voorschot",
+      "absence": "Afwezig/ziekte",
+      "techProblem": "Technisch probleem",
+      "planProblem": "Planningsprobleem",
+      "other": "Ander"
     },
     "customer-cancel-reason": {
       "sick": "Ziekte",
@@ -331,7 +344,8 @@
       "resv_reminder": "Herinnering",
       "resv_no_show": "No show",
       "resv_satisfaction": "Tevredenheid",
-      "resv_internal_cancel": "Interne annulatie (ziekte, etc...)"
+      "resv_internal_cancel": "Interne annulatie (ziekte, etc...)",
+      "resv_footer": "Voettekst"
     }
   },
   "ui": {
@@ -445,7 +459,8 @@
         "toInvoice": "Te factureren",
         "invoiced": "Gefactureerd",
         "gifts": "Cadeaubonnen",
-        "nonAppointments": "Enkel producten"
+        "nonAppointments": "Enkel producten",
+        "none": "Alles"
       }
     },
     "order-mgr": {
@@ -862,7 +877,8 @@
       "invoiceNum": "Factuur nr",
       "gift": "Is cadeaubon",
       "giftCode": "Cadeaubon code",
-      "state": "Status"
+      "state": "Status",
+      "msg": "Communicatie"
     },
     "user": {
       "article": "de",
@@ -930,6 +946,7 @@
       "pronoun": "dit",
       "short": "Korte omschrijving",
       "descr": "Omschrijving",
+      "inform": "Informeer klant",
       "no-descr": "Er is geen omschrijving",
       "customers": "Aantal klanten",
       "online": "Online zichtbaarheid",

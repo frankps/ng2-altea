@@ -2,14 +2,26 @@
 (bsValueChange)="rangePickerChanged($event)" -->
 
 <div class="row mb-4" *ngIf="initialized">
-    <div class="col-3">
+    <div class="col-2">
 
-        <input class="form-control" placeholder="Datepicker" bsDatepicker (bsValueChange)="dateChange($event)">
+        <div class="row">
+            <div class="col-10 me-1 pe-0">
+                <input class="form-control" *ngIf="dateRange" placeholder="Datepicker" bsDatepicker [(ngModel)]="dateRange[0]"
+                (bsValueChange)="dateChange($event)">
+            </div>
+            <div class="col ms-1 ps-0 d-flex align-items-center">
+                <i class="fa-solid fa-circle-xmark" (click)="dateChange(null)"></i>
+            </div>
+        </div>
+
 
         <!-- To select date range
         <input class="form-control" #drp="bsDaterangepicker" bsDaterangepicker [(ngModel)]="dateRange" [bsConfig]="{useUtc: true}" onkeydown="return false">
  -->
     </div>
+<!--     <div class="col-1">
+       
+    </div> -->
     <div class="col-3">
         <ng-select *ngIf="searchTypeSelect && searchTypeSelect.length > 0" id="searchTypeSelect" name="searchTypeSelect"
             [items]="searchTypeSelect" bindLabel="trans" bindValue="key" [clearable]="false" [multiple]="false"
@@ -38,9 +50,17 @@
     <ng-container *ngFor="let uiOrder of uiOrders">
 
         <!-- showDetails openOrder -->
-        <div class="row mb-1" (click)="openOrder(uiOrder)">
-            <div class="col-1">{{uiOrder.start| intdate}}</div>
-            <div class="col-2">{{uiOrder.for}}</div>
+        <div class="row mb-1">
+            <div class="col-2" (click)="openOrder(uiOrder)">
+                <!-- <i class="fa-solid fa-magnifying-glass" (click)="openOrder(uiOrder)"></i> &nbsp;  -->
+                <i *ngIf="uiOrder.stateIcon()" placement="top" [ngbTooltip]="uiOrder.state"
+                    [style.color]="uiOrder.stateColor()" [class]="uiOrder.stateIcon()"></i>
+                &nbsp;
+
+                {{uiOrder.start| intdate}}
+            </div>
+            <div class="col-2">
+                {{uiOrder.for}}</div>
 
             <div class="col-2" [style.color]="uiOrder.pay.color">{{uiOrder.pay.info}}</div>
 
@@ -48,13 +68,41 @@
 
             <div class="col" *ngIf="selected?.id == uiOrder.id">
 
-                <div *ngFor="let line of uiOrder.lines"> 
+                <div *ngFor="let line of uiOrder.lines">
                     {{line.qty}} x {{line.descr}}
                 </div>
 
 
             </div>
+            <!-- 
+            <div class="col-1">
+                <button type="button" class="btn btn-primary btn-sm" (click)="openOrder(uiOrder)" translate>dic.show</button>
+            </div> -->
+
+
         </div>
+
+        <div class="row" *ngIf="uiOrder.state == OrderState.cancelled && uiOrder.cancel">
+            <div class="col-2">
+                {{uiOrder.cancel.remark}}
+            </div>
+
+            <div class="col-2">
+                {{'enums.cancel-reason.' + uiOrder.cancel.reason | translate}}
+            </div>
+
+            <div class="col-2">
+                <!-- <i class="fa-solid fa-circle-xmark" style="color: red;"></i> -->
+                Geannuleerd:&nbsp;{{uiOrder.cancel.date | date:"dd/MM HH:mm"}}
+            </div>
+
+            <div class="col-2">
+                Deadline: {{uiOrder.depoBy | intdate}}
+            </div>
+
+        </div>
+
+
 
     </ng-container>
 

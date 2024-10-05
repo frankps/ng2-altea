@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { MessagingRoutingModule } from './messaging-routing.module';
 import { MessagesComponent } from './messages/messages.component';
 
-import { Bootstrap5Module } from 'ng-common';
+import { Bootstrap5Module, NgCommonModule } from 'ng-common';
 import { FormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { TranslateModule } from '@ngx-translate/core';
@@ -32,7 +32,8 @@ import { NgxEditorModule } from 'ngx-editor'
     BsDatepickerModule,
     TimepickerModule,
     NgxSpinnerModule,
-    NgxEditorModule
+    NgxEditorModule,
+    NgCommonModule
   ]
 })
 export class MessagingModule { }

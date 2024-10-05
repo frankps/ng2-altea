@@ -26,8 +26,9 @@ export enum TemplateCode {
   resv_reminder = 'resv_reminder',
   resv_no_show = 'resv_no_show',
   resv_satisfaction = 'resv_satisfaction',
-  resv_internal_cancel = 'resv_internal_cancel'
-}
+  resv_internal_cancel = 'resv_internal_cancel',
+  resv_footer = 'resv_footer'
+} 
 
 /*
 cancel

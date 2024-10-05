@@ -3,6 +3,7 @@
 <div class="row" *ngFor="let plan of plannings">
     <div class="col-2">{{plan.startDate | date:"dd/MM HH:mm"}}</div>
     <div class="col-1">{{plan.endDate | date:"HH:mm"}}</div>
+    <div class="col-1">{{plan.act}}</div>
     <div class="col-2">
         <span *ngIf="plan.resourceGroup">{{plan.resourceGroup.shortOrName()}}</span>
     </div>

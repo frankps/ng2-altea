@@ -1,7 +1,7 @@
 import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MessageAddress, TemplateCode } from 'ts-altea-model'
 import { AlteaDb } from '../../general/altea-db'
 import { IDb } from '../../interfaces/i-db'
-import { ApiListResult, ApiResult, ArrayHelper } from 'ts-common'
+import { ApiListResult, ApiResult, ApiStatus, ArrayHelper } from 'ts-common'
 
 
 export class OrderMessagingBase {
@@ -34,6 +34,9 @@ export class OrderMessagingBase {
 
     async sendMessages(templateCode: TemplateCode | string, order: Order, branch: Branch, send: boolean = true, ...types: MsgType[]): Promise<ApiListResult<Message>> {
 
+        if (!order.msg) // messaging disabled for order
+            return ApiListResult.warning(`Messaging disabled for order ${order.id}`)
+
         var fullResult = new ApiListResult<Message>()
 
         // SMS not supported yet!
@@ -46,7 +49,7 @@ export class OrderMessagingBase {
 
             // SMS not supported yet!
             this.removeSms(types)
-            
+
         }
 
         if (ArrayHelper.IsEmpty(types)) {
@@ -100,6 +103,9 @@ export class OrderMessagingBase {
 
     async sendMessage(type: MsgType, template: Template, order: Order, branch: Branch, send: boolean = true): Promise<ApiResult<Message>> {
 
+        if (!order.msg) // messaging disabled for order
+            return ApiResult.warning('Messaging disabled for order!')
+
         switch (type) {
 
             case MsgType.email:
@@ -114,6 +120,9 @@ export class OrderMessagingBase {
     }
 
     async sendWhatsAppMessage(template: Template, order: Order, branch: Branch, send: boolean = true): Promise<ApiResult<Message>> {
+
+        if (!order.msg) // messaging disabled for order
+            return ApiResult.warning('Messaging disabled for order!')
 
         const contact = order.contact
 
@@ -146,6 +155,9 @@ export class OrderMessagingBase {
     }
 
     async sendEmailMessage(template: Template, order: Order, branch: Branch, send: boolean = true): Promise<ApiResult<Message>> {
+
+        if (!order.msg) // messaging disabled for order
+            return ApiResult.warning('Messaging disabled for order!')
 
         if (!branch.emailFrom)
             return ApiResult.error(`Branch 'emailFrom' missing`)
@@ -186,6 +198,8 @@ export class OrderMessagingBase {
 
     async sendSmsMessage(template: Template, order: Order, branch: Branch, send: boolean = true): Promise<ApiResult<Message>> {
 
+        if (!order.msg) // messaging disabled for order
+            return ApiResult.warning('Messaging disabled for order!')
 
         const contact = order.contact
 

@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, Output, EventEmitter, Input } from '@angular/core'
 import { NgForm } from '@angular/forms'
-import { Branch, Contact, Country, MsgType } from 'ts-altea-model'
+import { AppMode, Branch, Contact, Country, MsgType } from 'ts-altea-model'
 import { DashboardService, TranslationService } from 'ng-common'
 import { ArrayHelper, ObjectHelper, Translation } from 'ts-common'
 import { ContactService, SessionService } from 'ng-altea-common';
@@ -60,6 +60,10 @@ export class ContactSelect2Component implements OnInit {
 
   orderDirtyOnChange = true
 
+  /** if internally used (POS), then some more settings */
+  appMode: AppMode
+
+  AppMode = AppMode
 
   constructor(protected translationSvc: TranslationService, private contactSvc: ContactService
     , protected orderMgrSvc: OrderMgrUiService, private sessionSvc: SessionService, private dashboardSvc: DashboardService,
@@ -89,6 +93,10 @@ export class ContactSelect2Component implements OnInit {
   }
 
   async ngOnInit() {
+
+    this.appMode = this.sessionSvc.appMode
+  console.log('APPPPPP MOOODE',this.appMode)
+
     await this.translationSvc.translateEnum(Country, 'enums.country.', this.country)
     await this.translationSvc.translateEnum(MsgType, 'enums.msg-type.', this.msgTypes)
 
@@ -220,7 +228,12 @@ export class ContactSelect2Component implements OnInit {
 
     switch (msgType) {
       case MsgType.email:
-        return false    // we always send emails => user can not disable
+        // appMode != AppMode.pos && 
+
+        if (this.appMode == AppMode.pos)
+          return contact.email
+        else
+          return false    // we always send emails => user can not disable
       // return contact.email
 
       case MsgType.sms:

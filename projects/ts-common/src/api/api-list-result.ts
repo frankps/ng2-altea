@@ -12,6 +12,24 @@ export class ApiListResult<T> extends ApiResultBase {
     this.message = message
   }
 
+
+  static error(message?: string, error?) : ApiListResult<any> {
+
+    let res = new ApiListResult([], ApiStatus.error, message)
+    res.error = error
+
+    return res
+  }
+
+  static warning(message?: string, error?) : ApiListResult<any> {
+
+    let res = new ApiListResult([], ApiStatus.warning, message)
+    res.error = error
+
+    return res
+  }
+
+
   get hasData(): boolean {
 
     return this.isOk && ArrayHelper.NotEmpty(this.data)

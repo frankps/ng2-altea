@@ -58,8 +58,8 @@ export class CancelOrderComponent {
 
 
 
-    await this.translationSvc.translateEnum(CustomerCancelReasons, 'enums.customer-cancel-reason.', this.customerCancelReasons)
-    await this.translationSvc.translateEnum(InternalCancelReasons, 'enums.internal-cancel-reason.', this.internalCancelReasons)
+    await this.translationSvc.translateEnum(CustomerCancelReasons, 'enums.cancel-reason.', this.customerCancelReasons)
+    await this.translationSvc.translateEnum(InternalCancelReasons, 'enums.cancel-reason.', this.internalCancelReasons)
     this.initialized = true
 
   }
