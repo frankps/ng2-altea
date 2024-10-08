@@ -239,7 +239,8 @@
       "USA": "Verenigde Staten"
     },
     "language": {
-      "undefined": "Niet gekend",
+      "null": "Niet gespecifieerd",
+      "undefined": "Niet gespecifieerd",
       "nl": "Nederlands",
       "en": "English",
       "fr": "French",

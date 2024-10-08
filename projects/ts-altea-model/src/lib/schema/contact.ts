@@ -32,6 +32,25 @@ export class UserBase extends ObjectWithIdPlus {
     return this.msg.indexOf(type) >= 0
   }
 
+  /** check if the same message types are selected (this.msg vs other) */
+  hasSameMsg(other: MsgType[]) {
+
+    if (ArrayHelper.IsEmpty(other))
+      other = []
+    else
+      other = other.sort()
+
+    let thisMsg = []
+
+    if (ArrayHelper.NotEmpty(this.msg))
+      thisMsg = this.msg.sort()
+
+    const isEqual = _.isEqual(thisMsg, other)
+    
+    return isEqual
+  }
+
+
   selectMsgType(msgType: any, selected: boolean) {
 
     console.log(msgType, selected)

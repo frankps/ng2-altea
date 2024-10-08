@@ -10,7 +10,7 @@ import * as Handlebars from "handlebars"
 import * as sc from 'stringcase'
 import { OrderPersonMgr } from "../order-person-mgr";
 import { CancelOrderMessage } from "ts-altea-logic";
-import { Branch, Contact, DepositMode, Invoice, OrderLine, OrderLineSummary, OrderType, Organisation, Payment, PaymentType, PlanningMode, Product, ProductType, Resource, ResourcePlanning, Subscription } from "ts-altea-model";
+import { Branch, Contact, DepositMode, Invoice, OrderLine, OrderLineSummary, OrderType, Organisation, Payment, PaymentType, PlanningMode, Product, ProductSubType, ProductType, Resource, ResourcePlanning, Subscription } from "ts-altea-model";
 
 
 
@@ -284,6 +284,17 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
   }
 
+  /**
+   * The field product.inform contains extra info that needs to be sent to the customer after a booking
+   */
+  productInforms(separator: string = '<br>'): string {
+
+    var informs = this.lines.map(l => l.product.inform).filter(inform => inform && inform.length > 0)
+
+    return informs.join(separator)
+
+  }
+
   depositTime(): string {
 
     if (!Number.isNaN(this.depoMins))
@@ -293,12 +304,27 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
     if (this.depoMins < 60)
       return `de ${this.depoMins} minuten`
-    else if (this.depoMins = 60)
-      return `het uur`
-    else if (this.depoMins <= minutesInDay)
-      return `${this.depoMins / 60} uren`
-    else
-      return `${this.depoMins / minutesInDay} dagen`
+
+    else if (this.depoMins <= minutesInDay) {
+
+      let hours = Math.floor(this.depoMins / 60)
+
+      if (hours == 1)
+        return `het uur`
+      else
+        return `de ${hours} uur`
+    }
+    else {
+
+      let days = Math.floor(this.depoMins / minutesInDay)
+
+      if (days == 1)
+        return `de 24 uur`
+      else
+        return `de ${days} dagen`
+
+    }
+
   }
 
   depositDate(): string {
@@ -1142,7 +1168,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
       return false
 
     // try to find an order line with resources
-    const planningLine = this.lines?.find(ol => ol.product?.planMode != PlanningMode.none)  // .hasResources()
+    const planningLine = this.lines?.find(ol => ol.product.sub == ProductSubType.basic && ol.product?.planMode != PlanningMode.none)  // .hasResources()
 
     return planningLine ? true : false
   }

@@ -55,6 +55,17 @@ export class Template extends ObjectWithParameters {
 
   hash: string
 
+
+  channelsToString(): string {
+
+    if (ArrayHelper.IsEmpty(this.channels))
+      return ''
+
+    let str = this.channels.join(', ')
+
+    return str
+  }
+
   isEmail(): boolean {
     return (Array.isArray(this.channels) && _.includes(this.channels, 'email'))
   }
@@ -299,7 +310,9 @@ export class Template extends ObjectWithParameters {
 
   //getBodyParameterNames(): str
 
-  getTerm(order: Order): string {
+
+
+  getTerm_old(order: Order): string {
 
     const trans = {
       min: { si: 'minuut', pl: 'minuten' },
@@ -360,18 +373,23 @@ export class Template extends ObjectWithParameters {
       branch: branch.name,
       'branch-unique': branch.unique,
       deposit: `€${order.deposit}`,
-      depositTime: order.depositTime(),
-      depositDate: order.depositDate(),
-      term: this.getTerm(order),
+      'order.paid': `€${order.paid}`,
+      'cancel-time': '',
+      'deposit-time': order.depositTime(),
+      'deposit-date': order.depositDate(),
+     // term: this.getTerm_old(order),
       first: order?.contact?.first,
       'order-id': order?.id,
       'start-date': order.startDateFormat(),
       'order-lines': order.sumToString(),
-      'footer': branch.comm?.footer
+      'footer': branch.comm?.footer,
+      'product-informs': order.productInforms()
       //'start-time': order.start
       //'url-path': 'branch/aqua/order/a420eb76-497d-4b4a-a22d-90f9e78d6113/pos-summary'
       // info: "baby giraffe"
     }
+
+    console.warn(replacements)
 
     // https://altea-pub-app2.web.app/branch/{{branch-short}}/order/{{order-id}}/pos-summary
 

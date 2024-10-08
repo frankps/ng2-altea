@@ -52,6 +52,15 @@ export class ContactService extends BackendHttpServiceBase<Contact> {
     return this.queryFirst$(query)
   }
 
+  async getContactsForUser(userId: string) : Promise<Contact[]> {
+    let query = new DbQuery()
+
+    query.and('userId', QueryOperator.equals, userId)
+    query.and('act', QueryOperator.equals, true)
+
+    return this.query$(query)
+  }
+
   async searchContacts$(contact: Contact): Promise<Contact[]> {
 
     let query = new DbQuery()

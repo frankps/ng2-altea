@@ -49,10 +49,10 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
   channels = [TemplateChannel.email, TemplateChannel.wa]
 
   variants = [
-    new TemplateVariant(TemplateChannel.email, TemplateRecipient.provider),
-    new TemplateVariant(TemplateChannel.wa, TemplateRecipient.provider),
     new TemplateVariant(TemplateChannel.email, TemplateRecipient.client),
-    new TemplateVariant(TemplateChannel.wa, TemplateRecipient.client)
+    new TemplateVariant(TemplateChannel.wa, TemplateRecipient.client),
+    new TemplateVariant(TemplateChannel.email, TemplateRecipient.provider),
+    new TemplateVariant(TemplateChannel.wa, TemplateRecipient.provider)
   ]
 
   selections: { [index: string]: TemplateTypeSelections } = {};
@@ -195,19 +195,39 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
       template.actions.push(new TemplateAction())
   }
 
+
+  getTemplate(templateCode: string, variant: TemplateVariant) {
+
+    var template = this.templates.find(t => t.code == templateCode && t.channels && t.to
+      && _.includes(t.channels, variant.channel) && _.includes(t.to, variant.recipient))
+
+    return template
+  }
+
+  showTemplate(templateCode: string, variant: TemplateVariant) {
+    this.template = this.getTemplate(templateCode, variant)
+  }
+
+
+  updateTemplate(template) {
+    this.changes.update(template)
+  }
+
   editTemplate(templateCode: string, variant: TemplateVariant) {
 
 
     console.warn('Edit template', templateCode, variant)
 
+    var template = this.getTemplate(templateCode, variant)
+
+    if (!template)
+      return
 
     /*
     Template should already exist!
     Was created by: selectionChanged(...)
     */
 
-    var template = this.templates.find(t => t.code == templateCode && t.channels && t.to
-      && _.includes(t.channels, variant.channel) && _.includes(t.to, variant.recipient))
 
 
     this.changes.update(template)
@@ -222,8 +242,8 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
 */
 
 
-  //  this.canExport = true
-   this.canExport = template.hashChanged()
+    //  this.canExport = true
+    this.canExport = template.hashChanged()
 
     this.template = template
 
@@ -262,10 +282,10 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
       const whatsAppTpl = WhatsAppTemplateUpdate.fromTemplate(template)  //WhatsAppTemplate.fromTemplate(template)
 
       console.warn(whatsAppTpl)
-/*
-      this.spinner.hide()
-      return
-*/
+      /*
+            this.spinner.hide()
+            return
+      */
 
       const whatsAppResult = await this.messagingSvc.updateWhatsAppTemplate$(whatsAppTpl)
 

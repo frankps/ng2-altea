@@ -38,10 +38,12 @@ export class DomoticaComponent implements OnInit {
 
     const res = await this.localSvc.executeAction$(action)
 
-    if (res.status != 'ok' || !res.object?.data)
+    console.warn(res)
+
+    if (res.status != 'ok' || !res.data)
       return
 
-    var states: LuxomState[] = plainToInstance(LuxomState, res.object.data as any[])
+    var states: LuxomState[] = plainToInstance(LuxomState, res.data as any[])
 
     for (let state of states) {
 

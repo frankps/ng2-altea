@@ -13,7 +13,7 @@ export class SessionService implements OnInit {
   formats = {
     date: 'dd/MM/yyyy',
     dateShort: 'dd/MM'
-  }
+  }  
 
   colors = {
     green: 'green',
@@ -43,6 +43,8 @@ export class SessionService implements OnInit {
 
   public backend // = "https://dvit-477c9.uc.r.appspot.com"
   //public backend = "http://localhost:8080"
+
+  // public localServer = "http://altea.dvit.local:3000"
   public localServer = "http://localhost:3000"
 
   /** for internal use (POS): the current user working with the app */
@@ -80,7 +82,7 @@ export class SessionService implements OnInit {
     const me = this
 
     return new Promise<any>(function (resolve, reject) {
-
+      
       // 
       const sub = me.branchSub.pipe(Rx.filter(branch => branch != undefined && branch !== null)).subscribe(async branch => {
 

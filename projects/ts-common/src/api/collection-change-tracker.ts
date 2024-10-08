@@ -91,7 +91,8 @@ export class CollectionChangeTracker<T extends ObjectWithId> {
     if (this.createIds.indexOf(id) >= 0)
       return
 
-    this.updateIds.push(id)
+    if (this.updateIds.indexOf(id) == -1)
+      this.updateIds.push(id)
   }
 
   update(object: T) {

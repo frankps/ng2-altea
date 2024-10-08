@@ -171,13 +171,18 @@ export class AuthService {
           let originalUrl = me.route.snapshot['_routerState'].url
           console.error(originalUrl)
 
+          let redirected = false
+
           if (me.redirectEnabled) {
             if (me.redirect) {
-              me.router.navigate(me.redirect)
+              let redirect = me.redirect
               me.redirect = null
+              me.router.navigate(redirect)
+              redirected = true
 
-            } else if (originalUrl) {
+            } else if (originalUrl && originalUrl != "/auth/sign-in") {
 
+            
               // introduced to bring back user to original URL
 
               console.warn(`Redirecting to: ${originalUrl}`)
@@ -186,21 +191,18 @@ export class AuthService {
               const pathItems = originalUrl.split('/')
 
               me.router.navigate(pathItems)
-
-            }
-            else {
-
-
-              if (newUser || !me.user.first)
-                me.router.navigate(['/auth', 'profile'])
-              else
-                me.router.navigate(['branch', 'aqua', 'menu'])
-
+              redirected = true
 
             }
           }
 
 
+          if (!redirected) {
+            if (newUser || !me.user.first)
+              me.router.navigate(['/auth', 'profile'])
+            else
+              me.router.navigate(['branch', 'aqua', 'menu'])
+          }
 
           // this.router.navigate(['staff', 'dashboard'])
 

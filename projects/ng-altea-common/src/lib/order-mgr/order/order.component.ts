@@ -169,33 +169,7 @@ export class OrderComponent implements OnInit {
   }
 
 
-  async nextStripe() {
 
-    // Stripe test code: https://stripe.com/docs/testing
-
-
-    // const stripPaymentUrl = await this.orderMgrSvc.initStripePayment(59) 
-
-    // window.location.href = stripPaymentUrl;
-
-
-    /*
-    console.warn('next()')
-
-    const checkout = new CreateCheckoutSession(99 * 100, 'Voorschot boeking', 'http://localhost:4300/branch/aqua/menu', 'http://localhost:4300/branch/aqua/menu')
-
-    const apiResult = await this.stripeSvc.createCheckoutSession$(checkout)
-    
-    console.error(apiResult.object.url)
-
-    const stripPaymentUrl = apiResult.object.url
-
-    window.location.href = stripPaymentUrl;
-
-    */
-
-    // this.continue.emit(this.orderMgrSvc.order)
-  }
 
   selectOrderLine(line: OrderLine) {
 

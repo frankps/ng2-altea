@@ -18,25 +18,34 @@
             <div class="col-2">
 
             </div>
-            <div class="col-4" style="text-align: center" translate>
-                ui.template.to-provider
-            </div>
-            <div class="col-4" style="text-align: center" translate>
+
+            <div class="col-2" style="text-align: center" translate>
                 ui.template.to-client
             </div>
+
+            <div class="col-2" style="text-align: center" translate>
+                ui.template.to-provider
+            </div>
+
 
         </div>
 
         <div class="row mb-3  d-flex justify-content-center">
 
-            <div class="col-2 d-flex justify-content-center" style="text-align: center" *ngFor="let channel of channels" translate>
+            <div class="col-2">
+
+            </div>
+
+            <div class="col-1 d-flex justify-content-center" style="text-align: center" *ngFor="let channel of channels"
+                translate>
                 {{'enums.msg-type.' + channel | translate}}
             </div>
-            <div class="col-2 d-flex justify-content-center" style="text-align: center" *ngFor="let channel of channels" translate>
+            <div class="col-1 d-flex justify-content-center" style="text-align: center" *ngFor="let channel of channels"
+                translate>
                 {{'enums.msg-type.' + channel | translate}}
             </div>
 
-<!--             <div class="col-2" style="text-align: center" translate>
+            <!--             <div class="col-2" style="text-align: center" translate>
                 ui.template.sms-to-provider
             </div>
             <div class="col-2" style="text-align: center" translate>
@@ -54,7 +63,7 @@
 
                 <ng-container *ngIf="selections[templateCode]">
 
-                    <div class="col-2 d-flex justify-content-center" *ngFor="let variant of variants">
+                    <div class="col-1 d-flex justify-content-center" *ngFor="let variant of variants">
                         <!-- [(ngModel)]="object.showPrice" -->
 
                         <ng-container *ngIf="sectionInEditIs('config')">
@@ -73,7 +82,8 @@
                         </ng-container>
 
                         <i class="fas fa-eye"
-                            *ngIf="sectionIsReadOnly('config') && selections[templateCode][variant.channel + '_' + variant.recipient]"></i>
+                            *ngIf="sectionIsReadOnly('config') && selections[templateCode][variant.channel + '_' + variant.recipient]"
+                            (click)="showTemplate(templateCode, variant)"></i>
                     </div>
 
 
@@ -86,111 +96,140 @@
 
 
 
-        <ng-container *ngIf="sectionInEditIs('config') && template">
+        <ng-container *ngIf="template">
 
-            <div class="row mt-4  d-flex justify-content-center">
+            <div class="row mt-5  d-flex justify-content-center">
                 <div class="col-10">
-                    {{'objects.template._name' | translate}}
 
 
-
-
+                    <b>{{'objects.template._name' | translate}}: {{'enums.template-code.' + template.code | translate}}
+                        ({{template.channelsToString()}})</b>
 
 
                 </div>
-                <!--*ngIf="template.isEmail()"-->
-                <div class="col-10 mt-2">
 
-                    <div class="row">
-                        <div class="col">
-                            
-                            <ngx-altea-label-control label="objects.template.subject" for="subject">
-                                <input type="text" id="subject" name="subject" class="form-control"
-                                    [(ngModel)]="template.subject" />
-                            </ngx-altea-label-control>
 
+                <ng-container *ngIf="sectionInEditIs('config'); else readOnlyTemplate">
+
+
+
+                    <!--*ngIf="template.isEmail()"-->
+                    <div class="col-10 mt-2">
+
+                        <div class="row">
+                            <div class="col">
+
+                                <ngx-altea-label-control label="objects.template.subject" for="subject">
+                                    <input type="text" id="subject" name="subject" class="form-control"
+                                        [(ngModel)]="template.subject" (change)="updateTemplate(template)"/>
+                                </ngx-altea-label-control>
+
+                            </div>
+                            <div class="col-3" *ngIf="initialized && template.isEmail()">
+
+
+                                <ngx-altea-label-control label="objects.template.format" for="format">
+                                    <ng-select id="format" name="format" [items]="format" bindLabel="trans"
+                                        bindValue="key" [clearable]="false" [multiple]="false"
+                                        [(ngModel)]="template.format" (change)="updateTemplate(template)"></ng-select>
+                                </ngx-altea-label-control>
+
+
+                            </div>
+                            <div class="col-3" *ngIf="initialized && template.isType('wa')">
+                                <button type="button" class="btn btn-primary btn-sm" [disabled]="!canExport"
+                                    (click)="exportToWhatsApp(template)" translate>dic.export</button>
+
+                            </div>
                         </div>
-                        <div class="col-3" *ngIf="initialized && template.isEmail()">
 
 
-                            <ngx-altea-label-control label="objects.template.format" for="format">
-                                <ng-select id="format" name="format" [items]="format" bindLabel="trans" bindValue="key"
-                                    [clearable]="false" [multiple]="false" [(ngModel)]="template.format"></ng-select>
-                            </ngx-altea-label-control>
+
+                    </div>
+                    <div class="col-10 mt-2">
+
+                        <ng-container [ngSwitch]="template.format">
+                            <ng-container *ngSwitchCase="TemplateFormat.text">
+
+                                <ngx-altea-label-control [label]="'objects.template.body.' + template.channels[0]"
+                                    for="body">
+                                    <textarea rows="4" class="form-control" id="body" name="body" style="height: 120px"
+                                        [(ngModel)]="template.body" (change)="updateTemplate(template)"></textarea>
+                                </ngx-altea-label-control>
+
+                            </ng-container>
+                            <ng-container *ngSwitchCase="TemplateFormat.html">
+
+                                <div class="NgxEditor__Wrapper">
+                                    <ngx-editor-menu [editor]="editor"> </ngx-editor-menu>
+                                    <ngx-editor [editor]="editor" [(ngModel)]="template.body" [disabled]="false"
+                                        [placeholder]="'Maak template'" (change)="updateTemplate(template)"></ngx-editor>
+                                </div>
+
+                            </ng-container>
+                        </ng-container>
 
 
-                        </div>
-                        <div class="col-3" *ngIf="initialized && template.isType('wa')">
-                            <button type="button" class="btn btn-primary btn-sm" [disabled]="!canExport" (click)="exportToWhatsApp(template)" translate>dic.export</button>
 
-                        </div>
+
+
+
+
+
+                    </div>
+                    <div class="col-10 mt-2">
+
+                        <h5>Acties &nbsp; <i class="fa-solid fa-circle-plus" (click)="addTemplateAction(template)"></i>
+                        </h5>
+                        <ng-container *ngIf="template.actions">
+                            <ng-container *ngFor="let action of template.actions">
+
+
+                                <div class="row mt-2">
+                                    <div class="col-6">
+                                        <ngx-altea-label-control label="objects.template.action.label"
+                                            for="actionLabel">
+                                            <input type="text" id="actionLabel" name="actionLabel" class="form-control"
+                                                [(ngModel)]="action.label" (change)="updateTemplate(template)"/>
+                                        </ngx-altea-label-control>
+                                    </div>
+                                    <div class="col-6">
+
+                                        <ngx-altea-label-control label="objects.template.action.url" for="actionUrl">
+                                            <input type="text" id="actionUrl" name="actionUrl" class="form-control"
+                                                [(ngModel)]="action.url" (change)="updateTemplate(template)"/>
+                                        </ngx-altea-label-control>
+
+                                    </div>
+
+                                </div>
+
+                            </ng-container>
+                        </ng-container>
+
                     </div>
 
 
 
-                </div>
-                <div class="col-10 mt-2">
+                </ng-container>
 
-                    <ng-container [ngSwitch]="template.format">
-                        <ng-container *ngSwitchCase="TemplateFormat.text">
+                <ng-template #readOnlyTemplate>
 
-                            <ngx-altea-label-control [label]="'objects.template.body.' + template.channels[0]"
-                                for="body">
-                                <textarea rows="4" class="form-control" id="body" name="body" style="height: 120px"
-                                    [(ngModel)]="template.body"></textarea>
-                            </ngx-altea-label-control>
-
-                        </ng-container>
-                        <ng-container *ngSwitchCase="TemplateFormat.html">
-
-                            <div class="NgxEditor__Wrapper">
-                                <ngx-editor-menu [editor]="editor"> </ngx-editor-menu>
-                                <ngx-editor [editor]="editor" [(ngModel)]="template.body" [disabled]="false"
-                                    [placeholder]="'Maak template'"></ngx-editor>
-                            </div>
-
-                        </ng-container>
-                    </ng-container>
+                    <div class="col-10 mt-2">
+                        <i [innerHTML]="template.subject"></i>
+                    </div>
 
 
+                    <div class="col-10 mt-2">
+                        <div [innerHTML]="template.body"></div>
+                    </div>
 
 
+                </ng-template>
 
 
-
-
-                </div>
-                <div class="col-10 mt-2">
-
-                    <h5>Acties &nbsp; <i class="fa-solid fa-circle-plus" (click)="addTemplateAction(template)"></i>
-                    </h5>
-                    <ng-container *ngIf="template.actions">
-                        <ng-container *ngFor="let action of template.actions">
-
-
-                            <div class="row mt-2">
-                                <div class="col-6">
-                                    <ngx-altea-label-control label="objects.template.action.label" for="actionLabel">
-                                        <input type="text" id="actionLabel" name="actionLabel" class="form-control"
-                                            [(ngModel)]="action.label" />
-                                    </ngx-altea-label-control>
-                                </div>
-                                <div class="col-6">
-                                    
-                                    <ngx-altea-label-control label="objects.template.action.url" for="actionUrl">
-                                        <input type="text" id="actionUrl" name="actionUrl" class="form-control"
-                                            [(ngModel)]="action.url" />
-                                    </ngx-altea-label-control>
-
-                                </div>
-
-                            </div>
-
-                        </ng-container>
-                    </ng-container>
-
-                </div>
             </div>
+
 
 
 

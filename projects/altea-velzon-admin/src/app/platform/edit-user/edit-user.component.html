@@ -59,11 +59,14 @@
                 <h6>Linked contacts</h6>
                 <ul class="list-group">
                     <li class="list-group-item" *ngFor="let contact of object.contacts">{{contact.name}}
-                        <span *ngIf="contact.branch">&nbsp; {{contact.branch}}</span>
+
+                        <a [routerLink]="['/', contact.branch.short, 'contacts', contact.id]">{{contact.name}} </a>
+
+                        <span *ngIf="contact.branch">&nbsp; {{contact.branch.name}}</span>
                     </li>
                 </ul>
             </div>
-
+  
 
             <div class="mt-4" *ngIf="object.resources">
                 <h6>Linked resources</h6>

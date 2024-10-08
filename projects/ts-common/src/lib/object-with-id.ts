@@ -60,6 +60,10 @@ export abstract class ManagedObject {
     return (this.m?.n == true)
   }
 
+  isDirty() {
+    return (this.m?.u == true || this.m?.f?.length > 0)
+  }
+
   markAsNew() {
     if (!this.m)
       this.m = new ObjectMgmt()

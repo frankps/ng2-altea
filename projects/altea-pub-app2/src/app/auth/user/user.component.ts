@@ -2,9 +2,9 @@ import { Component, ViewChild, Input } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { TranslationService } from 'ng-common';
 import { Country, MsgType, User } from 'ts-altea-model';
-import { Translation } from 'ts-common';
+import { ArrayHelper, Translation } from 'ts-common';
 import { AuthService } from '../auth.service';
-import { UserService } from 'ng-altea-common';
+import { ContactService, UserService } from 'ng-altea-common';
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import { retry } from 'rxjs';
 import { IntPhoneEditComponent } from 'ng-common';
@@ -18,7 +18,7 @@ import { NgxSpinnerService } from "ngx-spinner"
 })
 export class UserComponent {
 
-  @Input() linkUserToContact = true
+  @Input() linkUserToContact = false
 
   redirect: string[]
 
@@ -42,7 +42,8 @@ export class UserComponent {
 
   // translationPaths.button
 
-  constructor(protected router: Router, protected authSvc: AuthService, protected translationSvc: TranslationService, protected userSvc: UserService,
+  constructor(protected router: Router, protected authSvc: AuthService, protected translationSvc: TranslationService,
+    protected userSvc: UserService, protected contactSvc: ContactService,
     protected spinner: NgxSpinnerService
   ) {
 
@@ -124,7 +125,81 @@ export class UserComponent {
     }
   }
 
+
+  async updateLinkedContacts(user: User) {
+
+    if (!user)
+      return
+
+    let error
+
+    try {
+      this.spinner.show()
+
+      const contacts = await this.contactSvc.getContactsForUser(user.id)
+
+      console.warn(`Linked contacts for user: ${user.id}`, contacts)
+
+      if (ArrayHelper.IsEmpty(contacts))
+        return
+
+
+      for (let contact of contacts) {
+
+        if (contact.email != user.email) {
+          contact.email = user.email
+          contact.markAsUpdated('email')
+        }
+
+        if (contact.mobile != user.mobile) {
+          contact.mobile = user.mobile
+          contact.markAsUpdated('mobile')
+        }
+
+        if (!contact.hasSameMsg(user.msg)) {
+          contact.msg = user.msg
+          contact.markAsUpdated('msg')
+        }
+
+
+        if (contact.isDirty()) {
+
+          console.warn(`Updated contact`, contact)
+
+          var contactUpdateRes = await this.contactSvc.update$(contact)
+
+          console.log(contactUpdateRes)
+
+        }
+
+      }
+
+
+    } catch (err) {
+
+      console.error(err)
+      error = 'Problem updating contacts!'
+
+    } finally {
+
+      this.spinner.hide()
+
+    }
+
+
+
+
+
+
+
+
+
+  }
+
+
   async continue() {
+
+    let me = this
 
     if (this.userForm.form.dirty) {
 
@@ -135,6 +210,8 @@ export class UserComponent {
       const res = await this.userSvc.update$(this.user)
       console.warn(res)
 
+
+
       console.log(res)
 
       if (res.isOk) {
@@ -142,11 +219,15 @@ export class UserComponent {
 
         this.spinner.hide()
       }
+
+
+      const updateContacts = await me.updateLinkedContacts(this.user)
+
     }
 
 
-    if (this.linkUserToContact) 
-      this.router.navigate(['/branch', 'aqua', 'user-contact'])
+    if (me.linkUserToContact)
+      me.router.navigate(['/branch', 'aqua', 'user-contact'])
   }
 
 

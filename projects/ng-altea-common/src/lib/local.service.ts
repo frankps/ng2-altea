@@ -4,7 +4,7 @@ import { SessionService } from './session.service';
 import { Observable, map, Subject, take } from "rxjs";
 import { plainToInstance } from 'class-transformer';
 import { Action, ActionType, Event, Job } from 'ts-altea-model';
-import { ApiResult } from 'ts-common';
+import { ApiListResult, ApiResult } from 'ts-common';
 import { HttpClientService } from './http-client.service';
 
 
@@ -60,11 +60,11 @@ export class LocalService extends HttpClientService {
   }
 
 
-  async executeAction$(action: Action): Promise<ApiResult<any>> {
+  async executeAction$(action: Action): Promise<ApiListResult<any>> {
 
     let result = await this.post$(`actions/execute`, action)
 
-    return plainToInstance(ApiResult<any>, result)
+    return plainToInstance(ApiListResult<any>, result)
 
   }
 

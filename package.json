@@ -9,6 +9,9 @@
     "test": "ng test"
   },
   "private": true,
+  "overrides": {
+    "prosemirror-model": "^1.19"
+  },
   "dependencies": {
     "@angular-slider/ngx-slider": "^2.0.4",
     "@angular/animations": "^16.2.0",

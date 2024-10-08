@@ -1,41 +1,115 @@
-
-
 <ng-container *ngIf="contactsFound">
 
     <div class="row my-3">
-        <div class="col">Er werden reeds bestaande Aquansense profielen gevonden met (enkele van) uw gegevens, selecteer het beste profiel: </div>
+        <div class="col">Er werden reeds bestaande Aquansense profielen gevonden met (enkele van) uw gegevens, selecteer
+            het beste profiel: </div>
     </div>
-    
-    
+
+
+    <div class="row my-2" *ngIf="selected">
+        <div class="col">
+            <button type="button" class="btn btn-primary btn-sm float-end"
+            (click)="back()" translate>dic.back</button>
+        </div>
+    </div>
+
+
     <ul class="list-group">
-    
-        <li class="list-group-item" *ngFor="let contact of contacts">
-            {{contact.first}} {{contact.last}}<br>
-    
-            <div class="row">
-                <div class="col-6" *ngIf="contact.email">Email: {{contact.email}}</div>
-                <div class="col-6" *ngIf="contact.mobile">Gsm: {{contact.mobile}}</div>
-            </div>
-    
-            <button type="button" class="btn btn-primary btn-sm float-end" (click)="linkContactToUser(contact)">Gebruik dit profiel</button>
-    
-        </li>
-    
-    
+
+        <ng-container *ngFor="let contact of contacts">
+
+            <li class="list-group-item" *ngIf="!selected || selected.id == contact.id">
+                {{contact.first}} {{contact.last}}<br>
+
+                <div class="row">
+                    <div class="col-6" *ngIf="contact.email">Email: {{contact.email}}</div>
+                    <div class="col-6" *ngIf="contact.mobile">Gsm: {{contact.mobile}}</div>
+                </div>
+
+                <div class="row my-2" *ngIf="!selected">
+                    <div class="col">
+                        <button type="button" class="btn btn-primary btn-sm float-end"
+                        (click)="startLinkContactToUser(contact)">Gebruik dit profiel</button>
+                    </div>
+                </div>
+                
+
+
+
+                <ng-container *ngIf="selected && contactDiffs">
+
+                    <ng-container *ngIf="contactDiffs.email?.notUniq()">
+
+                        <div class="row mt-3">
+                            <div class="col">
+
+                                <b class="my-2">Welk email adres wil je gebruiken?</b>
+
+                                <div class="form-check" *ngFor="let email of contactDiffs.email?.uniq">
+                                    <input class="form-check-input" type="radio" name="email" [value]="email"
+                                        [(ngModel)]="selected.email" (change)="propertyChanged(contact, 'email')">
+                                    <label class="form-check-label" for="gift">{{email}}
+                                    </label>
+                                </div>
+
+                            </div>
+                        </div>
+
+
+
+                    </ng-container>
+
+
+                    <ng-container *ngIf="contactDiffs.mobile?.notUniq()">
+
+
+                        <div class="row mt-3">
+                            <div class="col">
+
+                                <b>Welk GSM nummer wil je gebruiken?</b>
+
+                                <div class="form-check" *ngFor="let mobile of contactDiffs.mobile?.uniq">
+                                    <input class="form-check-input" type="radio" name="mobile" [value]="mobile"
+                                        [(ngModel)]="selected.mobile" (change)="propertyChanged(contact, 'mobile')">
+                                    <label class="form-check-label" for="gift">{{mobile}}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+
+                    <div class="row my-2">
+                        <div class="col">
+                            <button type="button" class="btn btn-primary btn-sm float-end"
+                            (click)="linkContactToUser(contact, authSvc.user, true)" translate>dic.confirm</button>
+                        </div>
+                    </div>
+
+
+                </ng-container>
+
+
+
+
+            </li>
+
+        </ng-container>
+
+
+
+
     </ul>
 
-    <div class="row my-3">
+    <div class="row my-3" *ngIf="!selected">
         <div class="col">Indien u zich niet herkent in de bovenstaande profielen kan u een nieuw profiel aanmaken:</div>
     </div>
 
 </ng-container>
 
 
-<div class="row my-3">
+<div class="row my-3" *ngIf="!selected">
     <div class="col d-flex justify-content-center">
-        <button type="button" class="btn btn-primary btn-sm float-end" (click)="createNewContactForUser()" translate>Maak nieuw profiel</button>
+        <button type="button" class="btn btn-primary btn-sm float-end" (click)="createNewContactForUser()"
+            translate>Maak nieuw profiel</button>
     </div>
 </div>
-
-
-

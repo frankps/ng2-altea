@@ -35,6 +35,7 @@ export class SignInComponent implements OnInit {
     //this.auth.
 
     this.googleAuth = new GoogleAuthProvider()
+    this.googleAuth.addScope('https://www.googleapis.com/auth/contacts.readonly')
 
   }
 
@@ -66,6 +67,7 @@ export class SignInComponent implements OnInit {
      * 
      */
 
+    this.authSvc.redirectEnabled = false
 
     return signInWithPopup(this.auth, new FacebookAuthProvider()).then(async (userCredentials) => {
       this.user = userCredentials.user;

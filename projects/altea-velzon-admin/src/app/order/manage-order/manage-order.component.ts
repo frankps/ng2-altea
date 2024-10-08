@@ -29,8 +29,8 @@ export enum PosOrderMode {
 })
 export class ManageOrderComponent extends NgBaseComponent implements OnInit {
 
-  defaultOrder = ['start', 'compose', 'plan', 'contact', 'pay']
-
+  defaultServiceOrder = ['start', 'compose', 'plan', 'contact', 'pay']
+  defaultProductOrder = ['start', 'compose', 'contact', 'pay']
 
   debug = true
 
@@ -100,28 +100,31 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
 
     console.warn('new mode', newMode)
 
-
     this.orderMgrSvc.changeMode(newMode)
-
-    /*
-    if (newMode != this.mode) {
-      this.modeChanges.next(newMode)
-      this.mode = newMode
-    }*/
 
   }
 
 
 
 
+  /** method called when 'Continue' is pushed in the OrderComponent */
   orderContinue() {
 
     var currentMode = this.mode
 
-    var idx = this.defaultOrder.indexOf(currentMode)
+    var steps: string[]
 
-    if (idx < this.defaultOrder.length - 1) {
-      var nextMode = this.defaultOrder[idx + 1]
+    if (this.orderMgrSvc.order.needsPlanning()) {
+      steps = this.defaultServiceOrder
+    } else {
+      steps = this.defaultProductOrder
+    }
+
+  
+    var idx = steps.indexOf(currentMode)
+
+    if (idx < steps.length - 1) {
+      var nextMode = steps[idx + 1]
       this.changeMode(nextMode)
     }
 
@@ -140,12 +143,12 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
 
     if (order.state == OrderState.creation) {
 
-      const hasServices = order.hasServices()
+      const needsPlanning = order.needsPlanning()
 
       /** if contact specified and 
        *    product only order 
        *    OR service order and start date selected) */
-      if (order.contactId && (!hasServices || order.start)) {
+      if (order.contactId && ((!needsPlanning && order.paid > 0) || order.start)) {
         return true
       }
     } else {
