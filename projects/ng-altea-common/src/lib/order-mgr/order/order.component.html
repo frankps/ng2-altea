@@ -1,12 +1,13 @@
 <div class="card" *ngIf="order">
     <!-- <img src="..." class="card-img-top" alt="..."> -->
     <div class="card-header p-2" [style.background-color]="orderMgrSvc.dirtyColor()">
-        <div class="row">
-            <div class="col-5" *ngIf="order.contact">{{order.contact.name}}</div>
-            <div class="col-5"> {{order.start | intdate}}</div>
-            <div class="col-4 d-flex justify-content-end align-items-center">
+        <div class="row header">
+            <div class="col-6 px-3" *ngIf="order.contact">{{order.contact.name}}</div>
+            <div class="col-6 px-3 d-flex justify-content-end"> {{order.start | intdate}}</div>
 
 
+
+            <!--             <div class="col-4 d-flex justify-content-end align-items-center">
                 <ng-container *ngIf="resources">
                     <ng-container *ngFor="let resource of resources">
 
@@ -20,18 +21,54 @@
                 </ng-container>
 
             </div>
+ -->
+
+
         </div>
     </div>
     <div class="card-body">
 
         <div class="row">
+            <div class="col-6">
+
+                <ng-container *ngIf="show.contact && order.contact">
+
+                    <div class="row" *ngIf="order.contact.mobile">
+                        <div class="col">{{order.contact.mobile}}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col" *ngIf="order.contact.email"><small>{{order.contact.email}}</small></div>
+                    </div>
+        
+                </ng-container>
+
+
+            </div>
+            <div class="col-6">
+
+                <div class="row">
+                    <div class="col d-flex justify-content-end align-items-center">
+                        {{'enums.order-state.' + order.state | translate}} &nbsp;
+                        <i *ngIf="order.stateIcon()" [style.color]="order.stateColor()" [class]="order.stateIcon()"></i>
+                    </div>
+        
+        
+                </div>
+
+
+            </div>
+        </div>
+
+        
+
+
+<!--         <div class="row">
             <div class="col d-flex justify-content-end align-items-center">{{'objects.order.state' | translate}}:
                 {{'enums.order-state.' + order.state | translate}} &nbsp;
                 <i *ngIf="order.stateIcon()" [style.color]="order.stateColor()" [class]="order.stateIcon()"></i>
             </div>
 
-
-        </div>
+        </div> -->
 
 
         <div class="row mt-2" *ngIf="order.gift">
@@ -39,8 +76,7 @@
         </div>
 
 
-        <!--               
-        <h5 class="card-title">{{order.contact.name}}</h5> -->
+<!--   
         <ng-container *ngIf="show.contact && order.contact">
 
             <div class="row">
@@ -54,7 +90,7 @@
             </div>
 
         </ng-container>
-
+ -->
         <div class="row mt-2">
             <div class="col">&nbsp;</div>
         </div>
@@ -122,7 +158,7 @@
 
 
 
-            <div class="row mt-2 mb-3" *ngIf="order.nrOfPersons > 1">
+            <div class="row mt-2 mb-3" *ngIf="order.nrOfPersons > 1 && show.extra">
                 <div class="col">
                     <div class="btn-group btn-group-sm float-end" role="group" aria-label="Basic example">
 
@@ -131,12 +167,7 @@
                         <button type="button" class="btn {{personCssClass(line, person)}}"
                             *ngFor="let person of order.persons; let idx = index"
                             (click)="togglePerson(line, person, idx)">{{idx + 1}}</button>
-                        <!-- 
-                        <button type="button" class="btn btn-primary" (click)="decrementPersons()">-</button>
-                        <button type="button" class="btn btn-light"><i class="fa-solid fa-person"></i> &nbsp;
-                            {{orderMgrSvc.order.nrOfPersons}}</button>
-                        <button type="button" class="btn btn-primary" (click)="incrementPersons()">+</button>
-                        -->
+
                     </div>
                 </div>
             </div>
@@ -211,12 +242,13 @@
         </ng-container>
 
 
-        <div class="row mt-3" *ngIf="show.deposit && order.depo">
+        <div class="row mt-3" *ngIf="show.deposit && order.depo && !order.depositPaid()">
             <div class="col-4 d-flex align-items-center">Betaaltermijn</div>
             <div class="col-4">
 
                 <ng-select id="depoMins" name="depoMins" [items]="depositTimes" bindLabel="label" bindValue="mins"
-                    [clearable]="false" [multiple]="false" [(ngModel)]="order.depoMins" (change)="fieldChanged('depoMins')">
+                    [clearable]="false" [multiple]="false" [(ngModel)]="order.depoMins"
+                    (change)="fieldChanged('depoMins')">
                 </ng-select>
 
 
@@ -263,14 +295,14 @@
                 <button type="button" class="btn btn-primary btn-sm" (click)="cancelOrder()"><i
                         class="fa-solid fa-trash-can"></i></button>
 
-                <button type="button" *ngIf="isPOS()" class="btn btn-primary btn-sm ms-2" (click)="show.extra = !show.extra"><i
-                        class="fa-solid fa-pen"></i></button>
+                <button type="button" *ngIf="isPOS()" class="btn btn-primary btn-sm ms-2"
+                    (click)="show.extra = !show.extra"><i class="fa-solid fa-pen"></i></button>
 
             </div>
         </div>
 
 
-        <order-mgr-loyalty *ngIf="show.loyalty" [order]="order" [loyalty]="orderMgrSvc.loyalty"></order-mgr-loyalty>
+        <order-mgr-loyalty *ngIf="show.loyalty && order.contact && order?.allPaid()" [order]="order" [loyalty]="orderMgrSvc.loyalty"></order-mgr-loyalty>
 
 
 
@@ -290,8 +322,9 @@
             <div class="row mt-2">
                 <div class="col">
 
-                    <ng-select id="orderStates" name="orderStates" [items]="orderStates" bindLabel="trans" bindValue="key" [clearable]="false" [multiple]="false" 
-                    [(ngModel)]="order.state" (change)="stateChanged($event.key)"></ng-select>
+                    <ng-select id="orderStates" name="orderStates" [items]="orderStates" bindLabel="trans"
+                        bindValue="key" [clearable]="false" [multiple]="false" [(ngModel)]="order.state"
+                        (change)="stateChanged($event.key)"></ng-select>
 
                 </div>
             </div>

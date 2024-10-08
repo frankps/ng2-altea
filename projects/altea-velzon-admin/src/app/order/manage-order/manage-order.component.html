@@ -159,7 +159,7 @@
 
     <div class="col-4">
 
-        <order-mgr-order [showConfirm]="showConfirm" (orderLineSelected)="orderLineSelected($event)" (cancel)="cancelOrder($event)" (continue)="orderContinue()"></order-mgr-order>
+        <order-mgr-order [showConfirm]="showConfirm" (addProduct)="addProduct()" (orderLineSelected)="orderLineSelected($event)" (cancel)="cancelOrder($event)" (continue)="orderContinue()"></order-mgr-order>
 
 <!-- 
         <order-mgr-person-select></order-mgr-person-select> -->

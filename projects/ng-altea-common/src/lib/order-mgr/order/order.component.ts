@@ -73,7 +73,7 @@ export class OrderComponent implements OnInit {
         this.show.contact = true
         this.show.resources = true
         //this.show.vat = true
-        //this.show.loyalty = true
+        this.show.loyalty = true
         break
 
     }

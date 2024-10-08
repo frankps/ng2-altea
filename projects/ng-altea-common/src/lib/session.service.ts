@@ -59,6 +59,14 @@ export class SessionService implements OnInit {
 
   }
 
+  /**
+   * Is POS (Point Of Sales) = is internal usage of app?
+   * @returns 
+   */
+  isPos() : boolean{
+    return (this.appMode == AppMode.pos)
+  }
+
   init(environment: any) {
     this.backend = environment.backend
   }
@@ -82,7 +90,7 @@ export class SessionService implements OnInit {
     const me = this
 
     return new Promise<any>(function (resolve, reject) {
-      
+
       // 
       const sub = me.branchSub.pipe(Rx.filter(branch => branch != undefined && branch !== null)).subscribe(async branch => {
 

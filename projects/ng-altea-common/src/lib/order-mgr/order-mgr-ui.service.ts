@@ -230,6 +230,7 @@ export class OrderMgrUiService {   // implements OnInit
     this.orderLine = null
     this.orderDirty = false
     this.options = null
+    this.loyalty = null
 
   }
 

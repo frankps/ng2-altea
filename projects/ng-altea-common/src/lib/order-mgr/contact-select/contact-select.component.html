@@ -22,7 +22,22 @@
     
             <ul class="list-group mt-3">
                 <li class="list-group-item" (click)="selectContact(contact)" *ngFor="let contact of contacts">
-                    {{contact.name}}</li>
+                    
+                    <div class="row">
+                        <div class="col-12">{{contact.name}}  <span *ngIf="contact?.mobile" class="float-end"><i class="fa-light fa-mobile"></i> &nbsp;{{contact?.mobile}}</span></div>
+                    
+                      </div>
+                  
+                      <div class="row">
+                        <div class="col-12">
+                            <span *ngIf="contact?.email"><i class="fa-duotone fa-solid fa-envelope"></i> &nbsp;{{contact?.email}}</span>
+                        </div>
+                            
+                      </div>
+                  
+
+                
+                </li>
             </ul>
     
         </ng-container>

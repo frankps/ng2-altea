@@ -20,22 +20,26 @@ export class RequestGiftComponent implements OnInit {
   @Output() request: EventEmitter<Gift> = new EventEmitter<Gift>()
 
   // branch: Branch
-  gift 
+  gift
 
   branch: Branch
 
-  settings: AppSettings = new AppSettings()
 
+  // settings: AppSettings = new AppSettings()
+
+
+  isPos: boolean
 
   vatPcts: GiftVatPct[] = []
 
   /** translated labels */
-  lbl = {} 
+  lbl = {}
 
-  constructor(protected translationSvc: TranslationService, protected sessionSvc: SessionService, protected orderMgrSvc: OrderMgrUiService,) {
-   
-   
-    
+  constructor(protected translationSvc: TranslationService, protected sessionSvc: SessionService,
+    protected orderMgrSvc: OrderMgrUiService,) {
+
+
+
 
   }
 
@@ -59,11 +63,14 @@ export class RequestGiftComponent implements OnInit {
 
     this.branch = await this.sessionSvc.branch$()
 
+    this.isPos = this.sessionSvc.isPos()
 
     this.gift = new Gift(true, true)
     this.gift.branchId = this.branch.id
 
-    this.setTestData()
+
+
+    // this.setTestData()
 
     // retrieve possible vat percentages for gifts (in case amount + invoice)
     if (Array.isArray(this.branch.gift.invoice.vatPcts) && this.branch.gift.invoice.vatPcts.length > 0) {
@@ -113,7 +120,7 @@ export class RequestGiftComponent implements OnInit {
 
 
 
-    await this.orderMgrSvc.newOrder(OrderUiMode.newGift,gift)
+    await this.orderMgrSvc.newOrder(OrderUiMode.newGift, gift)
 
     if (gift.type == GiftType.amount) {
 

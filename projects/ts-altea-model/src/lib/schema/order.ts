@@ -327,6 +327,14 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
   }
 
+  allPaid(): boolean {
+    return this.paid >= this.incl
+  }
+
+  depositPaid(): boolean {
+    return this.paid >= this.deposit
+  }
+
   depositDate(): string {
 
     const date = this.depoByDate()

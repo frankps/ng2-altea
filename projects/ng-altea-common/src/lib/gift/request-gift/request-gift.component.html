@@ -57,7 +57,7 @@
             <div class="col">
 
                 <ngx-altea-label-control label="objects.gift.fromName" for="fromName">
-                    <input [required]="!settings.internal" type="text" minlength="2" id="fromName" name="fromName"
+                    <input [required]="!isPos" type="text" minlength="2" id="fromName" name="fromName"
                         class="form-control" [(ngModel)]="gift.fromName" #fromName="ngModel" />
                 </ngx-altea-label-control>
 
@@ -71,7 +71,7 @@
         <div class="row mt-3">
             <div class="col">
                 <ngx-altea-label-control label="objects.gift.toName" for="toName">
-                    <input [required]="!settings.internal" type="text" minlength="2" id="toName" name="toName"
+                    <input [required]="!isPos" type="text" minlength="2" id="toName" name="toName"
                         class="form-control" [(ngModel)]="gift.toName" #toName="ngModel" />
                 </ngx-altea-label-control>
 

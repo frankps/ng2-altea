@@ -32,7 +32,7 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
   defaultServiceOrder = ['start', 'compose', 'plan', 'contact', 'pay']
   defaultProductOrder = ['start', 'compose', 'contact', 'pay']
 
-  debug = true
+  debug = false
 
   @ViewChild('editContact') public editContact: ContactSelect2Component;
 
@@ -105,6 +105,11 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
   }
 
 
+  addProduct() {
+
+    this.mode = 'compose'
+
+  }
 
 
   /** method called when 'Continue' is pushed in the OrderComponent */
