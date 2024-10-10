@@ -4,17 +4,23 @@ import { OffsetDuration } from "./offset-duration"
 import { TimeSpan } from "./dates/time-span"
 import { DateRangeSet } from "./dates"
 import * as _ from "lodash";
+import { Type } from "class-transformer";
   
 export class ResourceRequestItem {
     //person?: OrderPerson
 
     /** only filled in if request is based on a resource group  */
+    @Type(() => Resource)
     resourceGroup?: Resource
 
+    @Type(() => Resource)
     resources: Resource[] = []
     personId?: string
 
+    @Type(() => TimeSpan)
     offset = TimeSpan.zero
+
+    @Type(() => TimeSpan)
     duration = TimeSpan.zero
 
     /** the number of resources that should be allocated from the resourceGroup (or from resources) */
@@ -25,6 +31,7 @@ export class ResourceRequestItem {
     prepOverlap: boolean = false
 
     /** the originating product resource */
+    @Type(() => ProductResource)
     productResource: ProductResource
 
     // set to true when processed

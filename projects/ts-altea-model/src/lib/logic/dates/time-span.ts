@@ -84,7 +84,7 @@ export class TimeSpan {
         const hour = total % 60
         total = (total - hour) / 60
 
-        return `${hour}:${min}:${sec}`
+        return `${hour}h:${min}m:${sec}s`
 
 
 

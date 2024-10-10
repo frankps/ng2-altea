@@ -130,7 +130,7 @@ export class ObjectService implements IDb {
 
   async deleteMany$<T extends ObjectWithId>(query: DbQueryBaseTyped<T>): Promise<any> {
 
-    let res = await this.delete$(this.sessionSvc.backend, `${this.sessionSvc.branchUnique}/objects/deleteMany`, query)
+    let res = await this.post$(this.sessionSvc.backend, `${this.sessionSvc.branchUnique}/objects/deleteMany`, query)
 
     return res
 

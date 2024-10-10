@@ -3,7 +3,7 @@ import { Branch, Gift, Subscription, Order, OrderState, Organisation, Product, R
 import { Observable } from 'rxjs'
 import { IDb } from '../interfaces/i-db'
 import { AlteaPlanningQueries } from './altea-queries'
-
+import * as dateFns from 'date-fns'
 
 export class AlteaDb {
 
@@ -157,6 +157,38 @@ export class AlteaDb {
         return orders
     }
 
+    async getOrdersToCleanup(): Promise<Order[]> {
+
+        const qry = new DbQueryTyped<Order>('order', Order)
+
+        // for debugging
+        /*        const ids = ['e44f1015-97c1-4cbc-bced-059cdef1f2db']
+                qry.and('id', QueryOperator.in, ids)
+        */
+
+        qry.and('state', QueryOperator.equals, OrderState.creation)
+        qry.and('contactId', QueryOperator.equals, null)
+
+        let maxCreationDate = new Date()
+        maxCreationDate = dateFns.subMinutes(maxCreationDate, 15)
+        qry.and('cre', QueryOperator.lessThan, maxCreationDate)
+
+        //    qry.take = 2
+
+        const orders = await this.db.query$<Order>(qry)
+
+        return orders
+
+
+    }
+
+
+    async updateOrders(orders: Order[], propertiesToUpdate: string[]): Promise<ApiListResult<Order>> {
+        let updateResult = await this.updateObjects('order', Order, orders, propertiesToUpdate)
+        return updateResult
+    }
+
+
 
     async getTemplatesForBranches(branchIds: string[], code: string) {
 
@@ -260,7 +292,7 @@ export class AlteaDb {
         return defaultSchedule
     }
 
-    async resourcePlannings(from: number, to: number, resourceIds: string[]): Promise<ResourcePlanning[]> {
+    async resourcePlannings(from: number, to: number, resourceIds: string[], excludeOrderId?: string): Promise<ResourcePlanning[]> {
 
         console.warn('Loading resource plannings ... ')
 
@@ -269,6 +301,10 @@ export class AlteaDb {
         qry.and('end', QueryOperator.greaterThanOrEqual, from)
         qry.and('start', QueryOperator.lessThanOrEqual, to)
         qry.and('act', QueryOperator.equals, true)
+
+        if (excludeOrderId)
+            qry.and('orderId', QueryOperator.not, excludeOrderId)
+        
         qry.and('resourceId', QueryOperator.in, resourceIds)
 
         const resourcePlannings = await this.db.query$<ResourcePlanning>(qry)
@@ -638,6 +674,15 @@ export class AlteaDb {
 
             console.log(error)
         }
+    }
+
+    async deletePlanningsForOrders(orderIds: string[]) {
+
+        const qry = new DbQueryBaseTyped<ResourcePlanning>('resourcePlanning', ResourcePlanning)
+        qry.and('orderId', QueryOperator.in, orderIds)
+
+        const res = await this.db.deleteMany$(qry)
+
     }
 
 

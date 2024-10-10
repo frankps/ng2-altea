@@ -122,7 +122,10 @@
       "absence": "Afwezig/ziekte",
       "techProblem": "Technisch probleem",
       "planProblem": "Planningsprobleem",
-      "other": "Ander"
+      "other": "Ander",
+      "clean": "Auto clean",
+      "inTime": "Op tijd geannuleerd",
+      "late": "Te laat geannuleerd"
     },
     "customer-cancel-reason": {
       "sick": "Ziekte",
@@ -704,7 +707,8 @@
       "invalid": "Ongeldige code",
       "use": "Gebruik deze bon",
       "use-specific": "Boek dit arrangement",
-      "use-amount": "Boek iets anders"
+      "use-amount": "Boek iets anders",
+      "gift-not-found": "Cadeaubon niet gevonden"
     },
     "stripe": {
       "gift": "Cadeaubon"

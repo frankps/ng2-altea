@@ -2,7 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { Contact, Order, PaymentType, SmsMessage, User } from 'ts-altea-model';
 import { SearchContactComponent } from '../../contact/search-contact/search-contact.component';
 import { AlteaService, BranchService, ObjectService, ProductService, ResourceService, ScheduleService, TemplateService, UserService } from 'ng-altea-common';
-import { CheckDeposists, OrderMgmtService } from 'ts-altea-logic';
+import { CheckDeposists, OrderCronJobs, OrderMgmtService } from 'ts-altea-logic';
 import { TranslationService } from 'ng-common'
 import { Country } from 'ts-altea-model'
 import { DbQuery, ObjectHelper, QueryOperator, Translation } from 'ts-common';
@@ -53,6 +53,18 @@ export class DemoComponent {
     orderMgmtSvc.cancelExpiredDeposistOrders()
   }
 
+
+
+  async orderCleanup() {
+
+    console.warn('orderCleanup')
+
+    const cron = new OrderCronJobs(this.dbSvc)
+
+    await cron.cleanupOrders()
+
+
+  }
 
 
   async orderPay() {

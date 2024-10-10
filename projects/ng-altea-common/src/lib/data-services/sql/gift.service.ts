@@ -19,7 +19,7 @@ export class GiftService extends BackendHttpServiceBase<Gift> {
 
     const query = new DbQuery()
     query.take = 10
-    query.and('code', QueryOperator.contains, code)
+    query.and('code', QueryOperator.equals, code)
 
     const gifts = await this.query$(query)
 

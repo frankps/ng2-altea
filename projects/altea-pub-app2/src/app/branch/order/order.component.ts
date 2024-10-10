@@ -24,9 +24,16 @@ export class OrderComponent implements OnInit {
   // protected sessionSvc: SessionService, protected orderMgrSvc: OrderMgrUiService, protected router: Router
   constructor(protected orderMgrSvc: OrderMgrUiService, protected route: ActivatedRoute, protected router: Router
     , protected sessionSvc: SessionService, protected authSvc: AuthService, protected contactSvc: ContactService) {
+
+    console.error(this.orderMgrSvc.order)
+
   }
 
   ngOnInit(): void {
+
+    console.error(this.orderMgrSvc.order)
+
+    let me = this
 
     if (this.orderMgrSvc.hasOrderLines())
       this.mode = 'order'
@@ -38,6 +45,9 @@ export class OrderComponent implements OnInit {
       console.error('New state:', newMode)
       if (newMode)
         this.mode = newMode
+
+
+      console.log(me.orderMgrSvc.order)
     })
 
     this.route.params.subscribe(async params => {
@@ -55,14 +65,17 @@ export class OrderComponent implements OnInit {
 
         if (mode) {
           this.mode = mode
-        
+
           if (mode == 'continue-after-sign-in') {
 
             await this.loadContactForUser()
 
           }
-        
+
         }
+
+
+        console.log(me.orderMgrSvc.order)
 
       }
     })
@@ -193,7 +206,7 @@ export class OrderComponent implements OnInit {
   }
 
   payOnline() {
-  //  this.mode = 'pay-online'
+    //  this.mode = 'pay-online'
     this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'orderMode', 'pay-online'])
   }
 
@@ -215,9 +228,9 @@ export class OrderComponent implements OnInit {
       case 'contact-edit':
         return 'pay-online'
 
-        /*
-      case 'pos-summary':
-        return 'pos-contact' */
+      /*
+    case 'pos-summary':
+      return 'pos-contact' */
     }
 
     const hasServices = order.hasServices()

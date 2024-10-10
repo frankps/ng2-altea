@@ -247,7 +247,7 @@ export class OrderMgrUiService {   // implements OnInit
 
     this.order.branchId = branch.id
     this.order.branch = branch
-   
+
     // register source of order (pos=point of sale or consumer app)
     this.order.src = this.sessionSvc.appMode == AppMode.pos ? OrderSource.pos : OrderSource.ngApp
 
@@ -345,36 +345,12 @@ export class OrderMgrUiService {   // implements OnInit
     return products
   }
 
-  /*   async searchProducts(searchFor: string): Promise<void> {
-  
-      const query = this.searchProductsDbQuery(searchFor)
-  
-  
-      this.spinner.show()
-  
-      this.products = await this.productSvc.query$(query)
-  
-      this.spinner.hide()
-  
-  
-    }
-  
-    searchProductsDbQuery(searchFor: string): DbQuery | null {
-  
-      const query = new DbQuery()
-      query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
-      query.and('name', QueryOperator.contains, searchFor)
-      query.and('del', QueryOperator.equals, false)
-  
-  
-  
-      return query
-  
-    }
-   */
+
 
 
   async redeemGift(redeemGift: RedeemGift) {
+
+    let me = this
 
     console.error(redeemGift)
 
@@ -385,7 +361,7 @@ export class OrderMgrUiService {   // implements OnInit
 
     const availableAmount = gift.availableAmount()
 
-    this.newOrder()
+    await this.newOrder()
 
     /** if specific gift: gift contains specific products/services */
     if (redeemGift.mode == GiftType.specific && gift.hasLines()) {
@@ -405,9 +381,10 @@ export class OrderMgrUiService {   // implements OnInit
       }
     }
 
-    this.addPayment(availableAmount, PaymentType.gift, this.sessionSvc.loc)
+    const giftPay = me.addPayment(availableAmount, PaymentType.gift, this.sessionSvc.loc)
+    giftPay.giftId = gift.id
 
-    console.error(this.order)
+    console.error(me.order)
 
 
   }
@@ -546,6 +523,9 @@ export class OrderMgrUiService {   // implements OnInit
     const toDate = DateHelper.parse(request.from)
     request.to = DateHelper.yyyyMMdd000000(dateFns.addDays(toDate, 1))
 
+    console.log('availabilityRequest', request)
+
+
     const response = await this.alteaSvc.availabilityService.process(request)
 
     this.availabilityResponse = response
@@ -633,6 +613,14 @@ export class OrderMgrUiService {   // implements OnInit
 
 
     const depositMinutes = me.setMaxWaitForDepositInHours(me.sessionSvc.appMode, option.date)
+
+    // pick-up a cancelled order
+    if (me.order.state == OrderState.cancelled) {
+      me.order.state = OrderState.creation
+      me.order.markAsUpdated('state')
+      me.orderDirty = true
+    }
+
 
     const confirmOrderResponse = await me.alteaSvc.orderMgmtService.confirmOrder(me.order, option, solutionForOption)
 
@@ -774,15 +762,22 @@ export class OrderMgrUiService {   // implements OnInit
 
     this.product = product
 
+    this.setOrderLineOptions(product)
+
+
+    this.orderLine = new OrderLine()
+
+    console.error(this.orderLineOptions)
+  }
+
+  setOrderLineOptions(product: Product) {
+
     this.orderLineOptions = []
 
     if (product.options?.length > 0) {
       this.orderLineOptions = product.options.map(prodOption => OrderLineOption.fromProductOption(prodOption))
     }
 
-    this.orderLine = new OrderLine()
-
-    console.error(this.orderLineOptions)
   }
 
   rootCategories: Product[] = []
@@ -929,6 +924,9 @@ export class OrderMgrUiService {   // implements OnInit
         orderLines.push(orderLine)
 
       }
+
+      if (ArrayHelper.NotEmpty(orderLines))
+        await this.selectExistingOrderLine(orderLines[0])
 
       return orderLines
 

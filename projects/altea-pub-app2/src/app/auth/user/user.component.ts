@@ -11,6 +11,8 @@ import { IntPhoneEditComponent } from 'ng-common';
 import { Router } from '@angular/router';
 import { NgxSpinnerService } from "ngx-spinner"
 
+// Frank
+
 @Component({
   selector: 'app-user',
   templateUrl: './user.component.html',
@@ -18,7 +20,7 @@ import { NgxSpinnerService } from "ngx-spinner"
 })
 export class UserComponent {
 
-  @Input() linkUserToContact = false
+  @Input() linkUserToContact = true
 
   redirect: string[]
 
@@ -126,6 +128,11 @@ export class UserComponent {
   }
 
 
+  /**
+   * if user is linked to existing contacts (different businesses), then update these contacts with latest info
+   * @param user 
+   * @returns 
+   */
   async updateLinkedContacts(user: User) {
 
     if (!user)
@@ -146,17 +153,17 @@ export class UserComponent {
 
       for (let contact of contacts) {
 
-        if (contact.email != user.email) {
+        if (contact.email != user.email && user.email) {
           contact.email = user.email
           contact.markAsUpdated('email')
         }
 
-        if (contact.mobile != user.mobile) {
+        if (contact.mobile != user.mobile && user.mobile) {
           contact.mobile = user.mobile
           contact.markAsUpdated('mobile')
         }
 
-        if (!contact.hasSameMsg(user.msg)) {
+        if (!contact.hasSameMsg(user.msg) && ArrayHelper.NotEmpty(user.msg)) {
           contact.msg = user.msg
           contact.markAsUpdated('msg')
         }

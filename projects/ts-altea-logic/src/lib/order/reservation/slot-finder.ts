@@ -51,6 +51,9 @@ export class SlotFinder {
 
             for (var human of humanResources) {
 
+                if (solution.breaksChecked.indexOf(human.id) >= 0)
+                    continue
+
                 const breaksForStaffMember = breaksByResourceId.get(human.id)
 
                 if (!breaksForStaffMember || breaksForStaffMember.isEmpty())
@@ -74,6 +77,7 @@ export class SlotFinder {
                     if (possibleBreaks.isEmpty()) {
                         // this solution is causing too small breaks!!
                         solution.valid = false
+                        solution.breaksChecked.push(human.id)
 
                         solution.addNote(`Problem with too small breaks for ${human.name} ${newBreaks.toString()}`, SolutionNoteLevel.blocking)
                         break
@@ -130,6 +134,7 @@ export class SlotFinder {
                         const startOfLastBreak = dateFns.subMinutes(breakWindow.to, breakTimeInMinutes)
 
                         solution.valid = false
+                        solution.addNote(`${human.name} can't have a break within ${breakWindow.toString()}: we will create new solutions before & after possible break`)
 
 
                         // Create first solution (before break)
@@ -137,6 +142,7 @@ export class SlotFinder {
                         const lastPossibleStartOfSolution = dateFns.subSeconds(startOfLastBreak, staffOccupationFromStart.seconds)
 
                         const solutionBeforeBreak = solution.clone()
+                        solutionBeforeBreak.valid = true 
 
                         // we need te re-evalutae this new solution for other (potential) break problems
                         solutionSet.add(solutionBeforeBreak)
@@ -149,13 +155,14 @@ export class SlotFinder {
 
                         const lastBreak = new DateRange(startOfLastBreak, breakWindow.to)
                         solutionBeforeBreak.addNote(`Solution created to enable break for ${human.name}. Last possible break: ${lastBreak.toString()}`)
-
+                        solutionBeforeBreak.breaksChecked.push(human.id)
 
                         // Create second solution (after break)
 
                         //const lastPossibleStartOfSolution = dateFns.subSeconds(startOfLastBreak, staffOccupationFromStart.seconds)
 
                         const solutionAfterBreak = solution.clone()
+                        solutionAfterBreak.valid = true 
 
                         // we need te re-evalutae this new solution for other (potential) problems
                         solutionSet.add(solutionAfterBreak)
@@ -166,6 +173,7 @@ export class SlotFinder {
 
                         const firstBreak = new DateRange(breakWindow.from, endOfFirstBreak)
                         solutionAfterBreak.addNote(`Solution created to enable break for ${human.name}. First possible break: ${firstBreak.toString()}`)
+                        solutionAfterBreak.breaksChecked.push(human.id)
 
                         newSolutionsCreated = true
 
@@ -179,6 +187,8 @@ export class SlotFinder {
 
 
                 }
+
+                solution.breaksChecked.push(human.id)
 
                 if (!solution.valid)
                     break
@@ -320,8 +330,11 @@ export class SlotFinder {
 
                 // we reduce by the duration because we want interval with possible start dates
                 availableRange.increaseToWithSeconds(-firstRequestItem.duration.seconds)
-                possibleDateRanges.addRange(availableRange)
 
+                if (availableRange.to < availableRange.from)
+                    continue
+
+                possibleDateRanges.addRange(availableRange)
 
                 const solutions = possibleDateRanges.toSolutions(resourceRequest, firstRequestItem, false, set.resource)
                 solutionSet.add(...solutions)
@@ -372,6 +385,7 @@ export class SlotFinder {
             //const refDate = solution.referenceDate()
 
             const referenceSolutionItem = solution.items[0]
+
 
 
             if (referenceSolutionItem.exactStart) {
@@ -457,6 +471,9 @@ export class SlotFinder {
                 // if we have no availabilities for the new requestItem, then we are on a dead-end for this solution
                 if (availableResources.isEmpty()) {
                     solution.valid = false
+
+                    solution.addNote(`No availability found for '${requestItem.resourceNames()}' in range ${checkInRange.toString()} for ${requestItem.duration.toString()}`)
+
 
                     if (trackInvalidSolutions)
                         resultSolutions.add(solution)

@@ -93,23 +93,23 @@ export class CancelOrderGiftAction extends CancelOrderAction {
 /** The various actions performed  */
 export class CancelOrderActions {
     actions: CancelOrderAction[] = []
-    
+
 
     add(action: CancelOrderAction) {
         this.actions.push(action)
     }
 
-    getById(objectId: string) : CancelOrderAction {
+    getById(objectId: string): CancelOrderAction {
 
         const action = this.actions.find(a => a.objectId == objectId)
 
         return action
     }
 
-    isOk() : boolean {
+    isOk(): boolean {
 
         const notOkIdx = this.actions.findIndex(a => !a.ok)
-    
+
         return (notOkIdx == -1)
     }
 
@@ -217,6 +217,9 @@ export class CancelOrder {
             if (!compensateResult) {
                 console.warn(compensateResult)
             }
+
+
+
         }
 
         if (orderCancel.returnSubsPayments) {
@@ -244,13 +247,18 @@ export class CancelOrder {
 
 
         }
-    
+
         order.cancel = orderCancel
         order.state = OrderState.cancelled
         order.act = false
 
-        order.m.setDirty('cancel', 'state', 'act')  
 
+        order.m.setDirty('cancel', 'state', 'act')
+
+
+        await this.alteaDb.deletePlanningsForOrders([order.id])
+
+        /*
         let plannings = order.planning
 
         if (ArrayHelper.IsEmpty(plannings)) {
@@ -265,10 +273,12 @@ export class CancelOrder {
                 planning.m.setDirty('act')
             }
         }
+            */
 
+        /*
         if (orderCancel.hasCompensation())
-            this.handlePayments(order, orderCancel.compensation)
-
+            await this.handlePayments(order, orderCancel.compensation)
+*/
 
         const saveOrderResult = await this.alteaDb.saveOrder(order)
         console.warn(saveOrderResult)
@@ -348,7 +358,7 @@ export class CancelOrder {
                         let cancelAction = cancelOrderActions.getById(gift.id)
                         cancelAction.ok = true
                     })
-                    
+
 
 
                 }
@@ -360,14 +370,41 @@ export class CancelOrder {
         // above we tried to undo existing gift payments
         // if there is still an open amount to compensate, we create a new gift
         if (amountStillToCompensate > 0) {
-            const res = await this.createCompensationGiftOrder(amountStillToCompensate, order)
+            const res: CancelOrderActions = await this.createCompensationGiftOrder(amountStillToCompensate, order)
+
+            if (res?.actions)
+                cancelOrderActions.actions.push(...res.actions)
         }
+
+        console.warn('CancelOrderActions', cancelOrderActions)
+
+        await this.rebalanceOrder(order, amountToCompensate)
 
         return cancelOrderActions
 
     }
 
 
+
+    async rebalanceOrder(order: Order, compensatedAmount: number): Promise<any> {
+
+        let line = new OrderLine()
+        line.unit = -compensatedAmount
+        line.descr = 'Move value to new order/gift'
+        line.vatPct = 0
+        //line.json = cancelActions
+
+        order.addLine(line, false)
+
+        const pay = new Payment()
+
+        pay.type = PaymentType.cash
+        pay.amount = -compensatedAmount
+        //pay.orderId = order.id
+
+        order.addPayment(pay)
+
+    }
 
 
 
@@ -468,6 +505,12 @@ export class CancelOrder {
         order.contactId = origOrder.contactId
         order.state = OrderState.finished
 
+        if (origOrder.for)
+            order.for = origOrder.for
+        else if (origOrder.contact)
+            order.for = origOrder.contact.name
+
+
         let line = new OrderLine()
         line.unit = amount
         //  line.orderId = order.id
@@ -484,16 +527,16 @@ export class CancelOrder {
         order.payments.push(pay)
 
         const saveOrderResult = await this.alteaDb.saveOrder(order)
-        const savedOrder = saveOrderResult.object
+        const newOrder = saveOrderResult.object
 
-        let cancelAction = new CancelOrderAction(CancelOrderActionType.newGiftOrder, savedOrder.id, saveOrderResult.isOk)
+        console.log(`Compensation gift order created`, saveOrderResult)
+
+        let cancelAction = new CancelOrderAction(CancelOrderActionType.newGiftOrder, newOrder.id, saveOrderResult.isOk)
         cancelOrderActions.add(cancelAction)
 
 
         if (!saveOrderResult.isOk)
             return cancelOrderActions
-
-        const newOrder = saveOrderResult.object
 
         let gift = new Gift(true, true)
         gift.toId = origOrder.contactId
@@ -502,7 +545,6 @@ export class CancelOrder {
         gift.value = amount
         gift.orderId = newOrder.id
 
-
         if (origOrder.contact) {
             gift.toName = origOrder.contact.name
             gift.toEmail = origOrder.contact.email
@@ -510,6 +552,8 @@ export class CancelOrder {
         }
 
         const createGiftResult = await this.alteaDb.createGift(gift)
+
+        console.log(`Compensation gift created`, createGiftResult)
 
         let giftAction = new CancelOrderGiftAction(CancelOrderActionType.createCompensationGift, gift.id, gift.code, gift.value, createGiftResult.isOk)
         cancelOrderActions.add(giftAction)

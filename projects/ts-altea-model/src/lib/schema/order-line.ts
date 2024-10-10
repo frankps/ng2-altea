@@ -422,7 +422,7 @@ export class OrderLine extends ObjectWithIdPlus {
 
           // if there's a short name for the option, then we use this
           optionSummary.o = option.short ? option.short : option.name
-          
+
           optionSummary.v = values.join(', ')
           summary.o.push(optionSummary)
 
@@ -441,10 +441,18 @@ export class OrderLine extends ObjectWithIdPlus {
   /** sum of product duration and all options */
   totalDuration(): number | null {
 
+    let product = this.product
+
     if (!this.product)
       return null
 
     let duration = this.product.duration
+
+    if (product.hasPre)
+      duration += product.preTime
+
+    if (product.hasPost)
+      duration += product.postTime
 
     if (!this.options)
       return duration

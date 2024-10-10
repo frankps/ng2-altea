@@ -87,15 +87,15 @@
 
 
                 <!-- POS: Put in comment, because saved via order -->
-<!-- 
-                <div class="row {{css_cls_row}}" *ngIf="!isNew">
+
+                <div class="row {{css_cls_row}}" *ngIf="appMode != AppMode.pos && !isNew">
                     <div class="col">
                         <div class="d-grid gap-2">
                             <button class="btn btn-primary" translate (click)="updateContact()"
                                 [disabled]="!contactForm.form.valid">dic.continue</button>
                         </div>
                     </div>
-                </div> -->
+                </div>
 
 
             </form>

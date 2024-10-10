@@ -23,6 +23,11 @@
             </div>
         </div>
 
+        <div class="row mt-3" *ngIf="noGiftsFound">
+            <div class="col">
+                <span translate>app.redeem.gift-not-found</span>
+            </div>
+        </div>
 
         <!--  redeemForm.form.pristine || -->
 
@@ -47,7 +52,7 @@
                     Nog beschikbaar: {{gift.value - gift.used | currency:branch.cur}}
                     </span>
                 </p>
-
+  
                 <ng-container *ngIf="gift.hasLines()">
 
                     <div class="subSection mt-3" translate>objects.gift.lines</div>
@@ -64,10 +69,17 @@
 
 
 
-                <div class="d-grid mt-3" *ngIf="gift.isAmount()">
-                    <button type="button" class="btn btn-outline-secondary float-end" (click)="useAmountGift()"
-                      translate>app.redeem.use</button>
-                </div>
+                <ng-container *ngIf="gift.isAmount()">
+                    <div class="d-grid mt-3">
+                        <button type="button" class="btn btn-outline-secondary float-end" (click)="useAmountGift()"
+                          translate>app.redeem.use</button>
+                    </div>
+
+                    <div class="d-grid mt-3">
+                        Hierna kan u de gewenste diensten of producten uit onze cataloog selecteren.
+                    </div>
+                </ng-container>
+
 
                 <ng-container *ngIf="gift.isSpecific()">
                     <div class="d-grid mt-3">

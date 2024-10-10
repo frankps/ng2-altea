@@ -1,6 +1,6 @@
 /* eslint-disable no-case-declarations */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { ApiListResult, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
+import { ApiListResult, ArrayHelper, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
 import { DurationMode, Order, AvailabilityContext, OrderLine, OrderPerson, Product, ProductResource, ResourceRequest, ResourceRequestItem, Schedule, SchedulingType, TimeSpan, TimeUnit, OffsetDuration, DurationReference, Resource, ResourceType } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { AlteaDb } from '../../general/altea-db'
@@ -55,7 +55,7 @@ export class CreateResourceRequest {
         for (const scheduleId of scheduleIds) {
 
             const schedule = availabilityCtx.getSchedule(scheduleId)
-            const request = this.createResourceRequest(schedule, persons, orderlinesWithPlanning, availabilityCtx)
+            const request = this.createResourceRequest(schedule, persons, order, orderlinesWithPlanning, availabilityCtx)
             request.branchId = availabilityCtx.branchId
             requests.push(request)
         }
@@ -64,7 +64,7 @@ export class CreateResourceRequest {
     }
 
 
-    private createResourceRequest(schedule: Schedule | undefined, persons: OrderPerson[], orderLines: OrderLine[], availabilityCtx: AvailabilityContext): ResourceRequest {
+    private createResourceRequest(schedule: Schedule | undefined, persons: OrderPerson[], order: Order, orderLines: OrderLine[], availabilityCtx: AvailabilityContext): ResourceRequest {
 
         const resourceRequest = new ResourceRequest("Initial resource request")
         resourceRequest.persons = persons
@@ -128,7 +128,16 @@ export class CreateResourceRequest {
 
                     if (resource.isGroup) {
                         resReqItem.resourceGroup = resource
-                        resReqItem.addResources(resource.getChildResources())
+
+                        let childResources = resource.getChildResources()
+
+                        /** check if preferred staff was selected */
+                        if (resource.type == ResourceType.human && ArrayHelper.NotEmpty(order.resPrefs?.humIds)) {
+                            let humanIds = order.resPrefs?.humIds
+                            childResources = childResources.filter(r => humanIds.indexOf(r.id) >= 0)
+                        }
+
+                        resReqItem.addResources(childResources)
                         resReqItem.qty *= productResource.groupQty
                     } else
                         resReqItem.addResource(resource ? resource : productResource.resource!)

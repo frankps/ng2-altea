@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbQuery, DbQueryTyped, ObjectHelper, QueryOperator } from 'ts-common'
+import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbQuery, DbQueryTyped, HtmlTable, ObjectHelper, QueryOperator } from 'ts-common'
 import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, TemplateCode, CustomerCancelReasons } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import * as dateFns from 'date-fns'
@@ -37,45 +37,7 @@ Different kinds of messages:
 
  */
 
-export class HtmlTable {
 
-    rows: any[] = []
-
-
-    addRow(cols: string[]) {
-        this.rows.push(cols)
-    }
-
-
-    toString(): string {
-
-
-
-        if (ArrayHelper.IsEmpty(this.rows))
-            return ''
-
-        const htmlLines = []
-
-        for (let row of this.rows) {
-
-            if (ArrayHelper.IsEmpty(row))
-                continue
-
-            htmlLines.push('<tr>')
-            for (let col of row) {
-                htmlLines.push(`<td>${col}</td>`)
-
-            }
-            htmlLines.push('</tr>')
-
-
-        }
-
-        return htmlLines.join('\n')
-
-    }
-
-}
 
 
 

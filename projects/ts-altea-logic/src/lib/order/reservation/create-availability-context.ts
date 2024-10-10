@@ -55,7 +55,11 @@ export class CreateAvailabilityContext {
         // Every branch has also a corresponding resource (to manage holidays, opening hours, etc of the branch)       
         ctx.allResourceIds.push(ctx.branchId)
 
-        ctx.resourcePlannings = await this.loadResourcePlannings(ctx.allResourceIds, availabilityRequest)
+
+        
+        let excludeOrderId = ctx.order.id
+
+        ctx.resourcePlannings = await this.loadResourcePlannings(ctx.allResourceIds, availabilityRequest, excludeOrderId)
 
 
 
@@ -334,7 +338,7 @@ export class CreateAvailabilityContext {
     }
 
 
-    async loadResourcePlannings(resourceIds: string[], availabilityRequest: AvailabilityRequest): Promise<ResourcePlannings> {
+    async loadResourcePlannings(resourceIds: string[], availabilityRequest: AvailabilityRequest, excludeOrderId?: string): Promise<ResourcePlannings> {
 
         /*
 Old Logic:
@@ -352,8 +356,7 @@ Possible issues: we don't check OrderStatus anymore
 */
 
 
-
-        const resourcePlannings = await this.alteaDb.resourcePlannings(availabilityRequest.from, availabilityRequest.to, resourceIds)
+        const resourcePlannings = await this.alteaDb.resourcePlannings(availabilityRequest.from, availabilityRequest.to, resourceIds, excludeOrderId)
 
 
         return new ResourcePlannings(resourcePlannings)

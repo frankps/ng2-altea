@@ -23,6 +23,7 @@
     "descr": "Omschrijving",
     "email": "Email",
     "edit": "Aanpassen",
+    "footer": "Voettekst",
     "from": "Van",
     "language": "Taal",
     "mobile": "GSM",
@@ -35,6 +36,7 @@
     "hour": "uur",
     "login": "Inloggen",
     "msgType": "Berichttype",
+    "new": "Nieuw",
     "ok": "OK",
     "passwd": "Paswoord",
     "payOnline": "Online betalen",
@@ -50,7 +52,8 @@
     "send": "Versturen",
     "spacingAfter": "Kuistijd in minuten",
     "start": "begin",
-    "end": "einde"
+    "end": "einde",
+    "validate": "Valideren"
   },
   "enums": {
     "fb-auth": {
@@ -109,6 +112,18 @@
       "cust": "Klant",
       "int": "Intern"
     },
+    "cancel-reason": {
+      "sick": "Ziekte",
+      "decease": "Overlijden",
+      "traffic": "Verkeer",
+      "work": "Werk",
+      "noShow": "No show",
+      "noDeposit": "Geen voorschot",
+      "absence": "Afwezig/ziekte",
+      "techProblem": "Technisch probleem",
+      "planProblem": "Planningsprobleem",
+      "other": "Ander"
+    },
     "customer-cancel-reason": {
       "sick": "Ziekte",
       "decease": "Overlijden",
@@ -151,6 +166,7 @@
       "specific": "Specifiek"
     },
     "pay-type": {
+      "all": "Totaal",
       "cash": "Cash",
       "transfer": "Overschrijving",
       "credit": "VISA",
@@ -223,7 +239,8 @@
       "USA": "Verenigde Staten"
     },
     "language": {
-      "undefined": "Niet gekend",
+      "null": "Niet gespecifieerd",
+      "undefined": "Niet gespecifieerd",
       "nl": "Nederlands",
       "en": "English",
       "fr": "French",
@@ -328,7 +345,8 @@
       "resv_reminder": "Herinnering",
       "resv_no_show": "No show",
       "resv_satisfaction": "Tevredenheid",
-      "resv_internal_cancel": "Interne annulatie (ziekte, etc...)"
+      "resv_internal_cancel": "Interne annulatie (ziekte, etc...)",
+      "resv_footer": "Voettekst"
     }
   },
   "ui": {
@@ -442,7 +460,8 @@
         "toInvoice": "Te factureren",
         "invoiced": "Gefactureerd",
         "gifts": "Cadeaubonnen",
-        "nonAppointments": "Enkel producten"
+        "nonAppointments": "Enkel producten",
+        "none": "Alles"
       }
     },
     "order-mgr": {
@@ -685,7 +704,8 @@
       "invalid": "Ongeldige code",
       "use": "Gebruik deze bon",
       "use-specific": "Boek dit arrangement",
-      "use-amount": "Boek iets anders"
+      "use-amount": "Boek iets anders",
+      "gift-not-found": "Cadeaubon niet gevonden"
     },
     "stripe": {
       "gift": "Cadeaubon"
@@ -859,7 +879,8 @@
       "invoiceNum": "Factuur nr",
       "gift": "Is cadeaubon",
       "giftCode": "Cadeaubon code",
-      "state": "Status"
+      "state": "Status",
+      "msg": "Communicatie"
     },
     "user": {
       "article": "de",
@@ -900,6 +921,9 @@
       },
       "short": "SMS"
     },
+    "planning": {
+      "prep":"Is voorbereidings- of opkuistijd"
+    },
     "resource": {
       "article": "de",
       "qty": "Aantal",
@@ -924,6 +948,7 @@
       "pronoun": "dit",
       "short": "Korte omschrijving",
       "descr": "Omschrijving",
+      "inform": "Informeer klant",
       "no-descr": "Er is geen omschrijving",
       "customers": "Aantal klanten",
       "online": "Online zichtbaarheid",
@@ -973,6 +998,7 @@
       "public": "Klant kan optie zien & selecteren",
       "required": "Een waarde moet geselecteerd worden",
       "multiSelect": "Er kan meer dan 1 waarde selecteerd worden",
+      "persons": "Waarde van deze optie bepaalt aantal personen",
       "hasDuration": "Deze optie heeft een duurtijd",
       "hasPrice": "Deze optie heeft een prijs",
       "hasValue": "Deze optie heeft een waarde",
@@ -1153,7 +1179,8 @@
     "accounting": {
       "label": "Boekhouding",
       "sub": {
-        "transactions": "Transacties"
+        "transactions": "Transacties",
+        "payments": "Betalingen"
       }
     },
     "platform": {

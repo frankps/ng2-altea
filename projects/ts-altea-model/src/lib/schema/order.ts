@@ -108,6 +108,7 @@ export enum InternalCancelReasons {
   absence = "absence",
   techProblem = "techProblem",
   planProblem = "planProblem",
+  clean = "clean",  // not finished orders require a cleanup
   other = "other"
 }
 
@@ -289,7 +290,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
    */
   productInforms(separator: string = '<br>'): string {
 
-    var informs = this.lines.map(l => l.product.inform).filter(inform => inform && inform.length > 0)
+    var informs = this.lines.filter(l => l?.product).map(l => l?.product?.inform).filter(inform => inform && inform.length > 0)
 
     return informs.join(separator)
 
@@ -297,7 +298,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
   depositTime(): string {
 
-    if (!Number.isNaN(this.depoMins))
+    if (Number.isNaN(this.depoMins))
       return ''
 
     let minutesInDay = 60 * 24
@@ -469,9 +470,14 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
       case OrderState.creation: return "fa-solid fa-pen-circle"
       case OrderState.waitDeposit: return "fa-solid fa-credit-card"
       case OrderState.confirmed: return "fa-solid fa-circle-check"
+      case OrderState.finished: return "fa-sharp-duotone fa-solid fa-flag-checkered"
       default: return undefined
     }
   }
+
+  /*
+<i class="fa-sharp-duotone fa-solid fa-flag-checkered"></i>
+  */
 
   stateColor() {
     switch (this?.state) {

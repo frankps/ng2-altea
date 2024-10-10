@@ -18,11 +18,12 @@ export class RedeemGiftComponent implements OnInit {
 
   @Output() redeem: EventEmitter<RedeemGift> = new EventEmitter<RedeemGift>()
 
-  code: string = 'AF9EF'   // AF9EF   D1BAA
+  code: string = ''   // AF9EF   D1BAA
   lbl = {}
   branch: Branch
   gift: Gift
 
+  noGiftsFound = false
 
   constructor(protected translationSvc: TranslationService, protected sessionSvc: SessionService, protected giftSvc: GiftService) {
 
@@ -48,11 +49,16 @@ export class RedeemGiftComponent implements OnInit {
 
     const gifts = await this.giftSvc.query$(query)
 */
+    this.noGiftsFound = false
 
     const gifts = await this.giftSvc.searchGift(this.code)
-    
-    if (Array.isArray(gifts) && gifts.length > 0)
+
+    if (Array.isArray(gifts) && gifts.length > 0) {
       this.gift = gifts[0]
+    } else {
+      this.noGiftsFound = true
+    }
+
 
     console.log(gifts)
   }

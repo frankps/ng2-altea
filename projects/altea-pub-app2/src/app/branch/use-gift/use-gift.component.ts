@@ -16,9 +16,16 @@ export class UseGiftComponent {
 
   async useGift(redeemGift: RedeemGift) {
 
+    let me = this
+
+    console.log(me.orderMgrSvc.order)
+
+
     console.error(redeemGift)
 
     await this.orderMgrSvc.redeemGift(redeemGift)
+
+    console.log(me.orderMgrSvc.order)
 
     this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'order'])
 

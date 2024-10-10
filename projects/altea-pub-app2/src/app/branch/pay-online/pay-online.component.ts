@@ -32,14 +32,14 @@ http://localhost:4350/branch/aqua/orderMode/pay-online
 export class PaymentOption {
   amount: number
 
-  type: 'deposit' | 'full'
+  type: 'deposit' | 'full' | 'confirm'
 
   /** Call To Action */
   cta: string
 
   info: string
 
-  constructor(amount: number, type: 'deposit' | 'full', cta?: string, info?: string) {
+  constructor(amount: number, type: 'deposit' | 'full' | 'confirm', cta?: string, info?: string) {
 
     this.amount = amount
     this.type = type
@@ -153,7 +153,7 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
 
   }
 
- 
+
   async setPaymentOptions() {
 
     this.payOptions = []
@@ -163,14 +163,38 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
     var total = order.incl
     var alreadyPaid = order.paid
 
-    if (deposit && deposit > 0 && alreadyPaid < deposit) {
-      const depositPayOption = new PaymentOption(deposit, 'deposit', `Voorschot = €${deposit - alreadyPaid}`)
-      this.payOptions.push(depositPayOption)
+    if (deposit && deposit > 0) { // && alreadyPaid < deposit
+
+      const openDeposit = deposit - alreadyPaid
+
+      if (openDeposit > 0) {
+        const depositPayOption = new PaymentOption(openDeposit, 'deposit', `Voorschot betalen €${openDeposit}`)
+        this.payOptions.push(depositPayOption)
+      } else {
+
+        const depositPayOption = new PaymentOption(0, 'confirm', `Confirmeren`)
+        this.payOptions.push(depositPayOption)
+
+      }
+
     }
 
     if (total && total > deposit && alreadyPaid < total) {
-      const fullPayOption = new PaymentOption(order.incl, 'full', `Volledige bedrag = €${order.incl - alreadyPaid}`)
-      this.payOptions.push(fullPayOption)
+
+      if (alreadyPaid == 0) {
+
+        const fullPayOption = new PaymentOption(total, 'full', `Volledige bedrag betalen €${total}`)
+        this.payOptions.push(fullPayOption)
+
+      } else {
+        const saldo = total - alreadyPaid
+
+        const fullPayOption = new PaymentOption(saldo, 'full', `Saldo betalen van €${saldo}`)
+        this.payOptions.push(fullPayOption)
+
+      }
+
+
     }
 
     console.log(this.payOptions)
@@ -190,7 +214,7 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
     }
 
     this.mode = 'SelectOption'
-    
+
   }
 
   calculateToPay(): number {
@@ -207,8 +231,14 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
       return
 
     this.payOption = payOption
+    this.toPay = payOption.amount
 
-    this.calculateToPay()
+    if (payOption.amount == 0) {
+      this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'orderMode', 'order-finished'])
+      return
+    }
+
+    //    this.calculateToPay()
 
     this.mode = 'PayMethod'
     /*

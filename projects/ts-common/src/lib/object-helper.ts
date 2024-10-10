@@ -1,5 +1,6 @@
 import { plainToClass, instanceToPlain } from "class-transformer"
 import * as _ from "lodash";
+import { ArrayHelper } from "./array-helper";
 
 
 export class StringHelper {
@@ -10,19 +11,6 @@ export class StringHelper {
 
 }
 
-export class ArrayHelper {
-    static AtLeastOneItem(array: any): boolean {
-        return (Array.isArray(array) && array.length > 0)
-    }
-
-    static NotEmpty(array: any): boolean {
-        return (Array.isArray(array) && array.length > 0)
-    }
-
-    static IsEmpty(array: any): boolean {
-        return (!Array.isArray(array) || array.length == 0)
-    }
-}
 
 export class ObjectHelper {
 

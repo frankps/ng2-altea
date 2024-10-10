@@ -5,6 +5,7 @@ import { ResourceRequest, ResourceRequestItem } from "./resource-request";
 import { ArrayHelper, ObjectHelper, ObjectWithId } from "ts-common";
 import * as dateFns from 'date-fns'
 import * as _ from "lodash"
+import { Type } from "class-transformer";
 
 export enum SolutionNoteLevel {
     info,
@@ -26,16 +27,27 @@ export class SolutionNote {
  */
 export class SolutionItem {
 
+    @Type(() => Resource)
     resources: Resource[] = []
 
     valid = true
 
+    @Type(() => SolutionNote)
     notes: SolutionNote[] = []
 
     /** the item number within solution: if items re-ordered, we can still see what original order was */
     num: number = 0
 
-    constructor(public request: ResourceRequestItem, public dateRange: DateRange, public exactStart = false, ...resources: Resource[]) {
+    @Type(() => ResourceRequestItem)
+    request: ResourceRequestItem
+
+    @Type(() => DateRange)
+    dateRange: DateRange
+
+    constructor(request: ResourceRequestItem, dateRange: DateRange, public exactStart = false, ...resources: Resource[]) {
+
+        this.request = request
+        this.dateRange = dateRange
 
         if (exactStart) {
             if (dateRange.duration.seconds > request.duration.seconds) {
@@ -85,6 +97,8 @@ export class SolutionItem {
 
 
 export class SolutionItems extends ObjectWithId {
+
+    @Type(() => SolutionItem)
     items: SolutionItem[] = []
 
     constructor(items: SolutionItem[]) {
@@ -233,7 +247,11 @@ export class Solution extends SolutionItems {
 
     valid = true
 
+    @Type(() => SolutionNote)
     notes: SolutionNote[] = []
+
+    /** resource ids for which the breaks have been checked */
+    breaksChecked: string[] = []
 
     constructor(...items: SolutionItem[]) {
         super(items)
@@ -257,6 +275,9 @@ export class Solution extends SolutionItems {
             return DateRangeSet.empty
 
         var itemsForResource = this.items.filter(item => item.resources.find(res => res.id == resource.id))
+
+        if (ArrayHelper.IsEmpty(itemsForResource))
+            return DateRangeSet.empty
 
         var dateRangesForResource = itemsForResource.map(item => {
             let dateRange = item.dateRange.clone()
@@ -369,14 +390,18 @@ export class Solution extends SolutionItems {
 
     clone(): Solution {
 
-        //    return ObjectHelper.clone(this, Solution) as Solution
+        
+        let clone = ObjectHelper.clone(this, Solution) as Solution
+        return clone
 
+
+        /*
         const clone = new Solution(...this.items.map(item => item.clone()))
-        //  clone.valid = this.valid
+        clone.valid = this.valid
         clone.notes = [...this.notes]
         clone.offsetRefDate = this.offsetRefDate
         return clone
-
+*/
 
     }
 
