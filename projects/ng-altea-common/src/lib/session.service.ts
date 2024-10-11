@@ -53,6 +53,8 @@ export class SessionService implements OnInit {
   /** for consumer app: the contact matching to the currently logged on user (for current branch) */
   public contact: Contact
 
+  public stripEnvironment: 'test' | 'live' = 'test'
+  
   ngOnInit() {
 
     console.warn('----- SessionService -ee------')

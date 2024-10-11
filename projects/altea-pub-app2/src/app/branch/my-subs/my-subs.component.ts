@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { OrderMgrUiService, OrderUiMode, SessionService, SubscriptionService } from 'ng-altea-common';
-import { PaymentType, Subscription } from 'ts-altea-model';
+import { AuthService } from '../../auth/auth.service';
+import { Contact, PaymentType, Subscription } from 'ts-altea-model';
 import { ArrayHelper, DbQuery, QueryOperator } from 'ts-common';
 
 @Component({
@@ -12,19 +13,24 @@ import { ArrayHelper, DbQuery, QueryOperator } from 'ts-common';
 export class MySubsComponent implements OnInit {
 
   // test
-  contactId = 'd4b3e527-1bdb-40f4-8e8e-541273e26595'
+  // contactId = 'd4b3e527-1bdb-40f4-8e8e-541273e26595'
+
+  contact: Contact
 
   subs: Subscription[]
 
-  constructor(protected subsSvc: SubscriptionService, protected orderMgrSvc: OrderMgrUiService,  protected router: Router,
+  constructor(protected subsSvc: SubscriptionService, protected orderMgrSvc: OrderMgrUiService,
+    protected router: Router, protected authSvc: AuthService,
     protected sessionSvc: SessionService) {
 
   }
 
   async ngOnInit() {
 
-    await this.loadSubscriptions(this.contactId)
+    this.contact = this.sessionSvc.contact
 
+    if (this.contact)
+      await this.loadSubscriptions(this.contact.id)
   }
 
 
@@ -38,23 +44,26 @@ export class MySubsComponent implements OnInit {
 
   }
 
-  async bookSubscription(subs: Subscription) {
+  async bookSubscription(subscription: Subscription) {
 
     await this.orderMgrSvc.newOrder()
 
-    const orderLines = await this.orderMgrSvc.addProductById(subs.unitProductId)
+    const orderLines = await this.orderMgrSvc.addProductById(subscription.unitProductId)
 
     console.log(orderLines)
     console.log(this.orderMgrSvc.order)
 
     if (ArrayHelper.NotEmpty(orderLines)) {
 
+      const turn = subscription.usedQty + 1
+
       /** The back-end will update the subscription when saving the order */
-      const payment =this.orderMgrSvc.addPayment(this.orderMgrSvc.order.incl, PaymentType.subs, 'pos')
-      payment.subsId = subs.id
+      const payment = this.orderMgrSvc.addPayment(this.orderMgrSvc.order.incl, PaymentType.subs, 'app')
+      payment.subsId = subscription.id
+      payment.info = `Beurt ${turn} van ${subscription.totalQty}`
     }
 
-    await this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'order'])
+    await this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'orderMode', 'select-date'])
     // this.orderMgrSvc.addPayment()
 
 

@@ -51,8 +51,8 @@ export class StripeService {
 
 
   // http://localhost:4300/branch/aqua/pay-finished?orderId=123&sessionId=cs_test_a1U1IuChwqT96gB86qVtIhznLrFQ7nE07GZ95cYWRqkKQd8fMYVSAsYB1x%27
-  async sessionStatus(sessionId: string): Promise<ApiResult<StripeSessionStatus>> {
-    const res: ApiResult<StripeSessionStatus> = await this.get$(this.sessionSvc.backend, `stripe/sessionStatus/${sessionId}`)
+  async sessionStatus(environment: 'test' | 'live', sessionId: string): Promise<ApiResult<StripeSessionStatus>> {
+    const res: ApiResult<StripeSessionStatus> = await this.get$(this.sessionSvc.backend, `stripe/sessionStatus/${environment}/${sessionId}`)
 
     const result = plainToInstance(ApiResult<StripeSessionStatus>, res)
 

@@ -221,14 +221,14 @@ export class UserContactMatchComponent implements OnInit {
         user.email = contact.email
         user.markAsUpdated('email')
       }
-      
+
 
       if (user.mobile != contact.mobile) {
         user.mobile = contact.mobile
         user.markAsUpdated('mobile')
       }
 
-    
+
     }
 
     this.spinner.show()
@@ -242,18 +242,33 @@ export class UserContactMatchComponent implements OnInit {
       const resUser = await this.userSvc.update$(user)
       console.warn(resUser)
     }
-  
+
     this.spinner.hide()
 
     console.warn(resContact)
 
     if (resContact.isOk) {
       this.sessionSvc.contact = resContact.object
-      this.router.navigate(['/branch', 'aqua', 'menu'])
+      await this.continue()
     }
 
 
   }
+
+  async continue() {
+
+    if (this.authSvc.redirect) {
+      /** was implemented for flow when user not logged in and making order
+       *  -> at a certain moment 
+       */
+      this.router.navigate(this.authSvc.redirect)
+    }
+    else
+      this.router.navigate(['/branch', 'aqua', 'menu'])
+
+  }
+
+
 
   async createNewContactForUser() {
 
@@ -271,7 +286,7 @@ export class UserContactMatchComponent implements OnInit {
 
     if (res.isOk) {
       this.sessionSvc.contact = res.object
-      this.router.navigate(['/branch', 'aqua', 'menu'])
+      await this.continue()
     }
 
 

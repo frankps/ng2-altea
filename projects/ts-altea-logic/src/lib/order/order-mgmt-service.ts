@@ -48,7 +48,9 @@ export class OrderMgmtService {
 
     async addPaymentToOrder(orderId: string, type: PaymentType, amount: number, provId?: string): Promise<ApiResult<Order>> {
 
-        const order = await this.alteaDb.getOrder(orderId, 'payments')
+
+        // 'lines:orderBy=idx.product', 'contact'
+        const order = await this.alteaDb.getOrder(orderId, ...Order.defaultInclude )  // , 'lines:orderBy=idx.product', 'contact', 'payments:orderBy=idx'
 
         if (!order) {
             const msg = `Order not found: ${orderId}: can't add payment!`
@@ -69,7 +71,8 @@ export class OrderMgmtService {
         if (!result.isOk)
             console.error(result.message)
 
-        this.changeState(order)
+        console.debug('Starting change state')
+        await this.changeState(order)
 
         return result
     }
@@ -198,11 +201,16 @@ export class OrderMgmtService {
 
 
     determineOrderState(order: Order): OrderState | null {
+-
+        console.log(`determineOrderState for ${order?.id}: ${order.state} (deposit=${order.deposit} / paid=${order.paid})`)
 
         if ([OrderState.creation, OrderState.created, OrderState.waitDeposit].indexOf(order.state) >= 0) {
+            
 
-            if (order.paid >= order.deposit)
+            if (order.paid >= order.deposit) {
+                
                 return OrderState.confirmed
+            }
         }
 
         if (order.src == OrderSource.pos && order.state == OrderState.creation) {
@@ -234,6 +242,7 @@ export class OrderMgmtService {
         if (newState == null) {
             newState = this.determineOrderState(order)
 
+            console.debug(`new state =  ${newState}`)
 
             if (newState == null) {  // if still null (we can't find new state)
                 const msg = `New order state not found for order ${order.id}!`
@@ -244,12 +253,14 @@ export class OrderMgmtService {
 
         if (order.state == newState) {
             const msg = `Can't change state: order has already state '${newState}'`
-            console.warn(msg)
+            console.debug(msg)
             return new ApiResult<Order>(order, ApiStatus.notProcessed, msg)
         }
 
         order.state = newState
         order.m.setDirty('state')
+
+        const result = await this.alteaDb.saveOrder(order)
 
         switch (newState) {
             case OrderState.created:
@@ -291,8 +302,6 @@ export class OrderMgmtService {
         }
 
         console.warn(order)
-
-        const result = await this.alteaDb.saveOrder(order)
 
         return result
 

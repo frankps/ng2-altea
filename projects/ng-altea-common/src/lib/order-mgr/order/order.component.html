@@ -216,9 +216,10 @@
             Betalingen
 
             <div class="row ms-2" *ngFor="let pay of order.payments">
-                <div class="col-4">{{'enums.pay-type.' + pay.type | translate}}</div>
-                <div class="col-4">€ {{pay.amount}}</div>
-                <div class="col-4">
+                <div class="col-3">{{'enums.pay-type.' + pay.type | translate}}</div>
+                <div class="col-3">{{pay.info}}</div>
+                <div class="col-3">€ {{pay.amount}}</div>
+                <div class="col-3">
                     <i class="fas fa-trash float-end" (click)="orderMgrSvc.deletePayment(pay)"></i>
                 </div>
             </div>

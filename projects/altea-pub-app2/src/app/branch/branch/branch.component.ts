@@ -6,6 +6,7 @@ import { OrderMgrUiService } from 'ng-altea-common';
 import { Auth, GoogleAuthProvider, signInWithRedirect, signInWithPopup, user, signOut } from '@angular/fire/auth';
 import { Subscription, of } from 'rxjs';
 import { AuthService } from '../../auth/auth.service';
+import { NgxSpinnerService } from "ngx-spinner"
 
 @Component({
   selector: 'app-branch',
@@ -18,14 +19,17 @@ export class BranchComponent implements OnInit {
   branch: Branch
 
   constructor(protected sessionSvc: SessionService, protected router: Router, protected route: ActivatedRoute,
-    protected orderMgrSvc: OrderMgrUiService, protected authSvc: AuthService, protected contactSvc: ContactService) {
+    protected orderMgrSvc: OrderMgrUiService, protected authSvc: AuthService, protected contactSvc: ContactService,
+    protected spinner: NgxSpinnerService) {
 
   }
 
 
   async ngOnInit() {
 
-    this.branch = await this.sessionSvc.branch$()
+    let me = this
+
+
 
     console.error(this.branch)
 
@@ -35,16 +39,27 @@ export class BranchComponent implements OnInit {
         console.warn('New branch', branchUniqueName)
 
 
-        if (this.authSvc.loggedOn()) {
 
-          
+        me.authSvc.user$.subscribe(async user => {
 
-          await this.linkUserToBranchContact(this.branch, this.authSvc.user)
+          me.branch = await this.sessionSvc.branch$()
+
+          console.warn('linkUserToBranchContact', user)
+
+          if (user?.id && user.id != me.sessionSvc.contact?.userId) {
+
+            console.warn(`Current user doesn't match session contact`)
+            await this.linkUserToBranchContact(me.branch, this.authSvc.user)
+          }
+
+        })
 
 
-
-        }
-
+        /*
+                if (this.authSvc.loggedOn()) {
+                  await this.linkUserToBranchContact(this.branch, this.authSvc.user)
+                }
+        */
 
 
 
@@ -55,19 +70,27 @@ export class BranchComponent implements OnInit {
 
   async linkUserToBranchContact(branch: Branch, user: User) {
 
+    this.spinner.show()
+
+
+    if (!user?.id || !branch?.id)
+      return
+
     const contact = await this.contactSvc.getContactForUserInBranch(user.id, branch.id)
+
+    this.spinner.hide()
 
     if (contact) {
       this.sessionSvc.contact = contact
       return
-      
+
     } else {
 
       // contact not existing => we create
       this.router.navigate(['/branch', 'aqua', 'user-contact'])
     }
 
-    
+
 
 
 

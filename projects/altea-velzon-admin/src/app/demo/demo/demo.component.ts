@@ -1,7 +1,7 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, inject } from '@angular/core';
 import { Contact, Order, PaymentType, SmsMessage, User } from 'ts-altea-model';
 import { SearchContactComponent } from '../../contact/search-contact/search-contact.component';
-import { AlteaService, BranchService, ObjectService, ProductService, ResourceService, ScheduleService, TemplateService, UserService } from 'ng-altea-common';
+import { AlteaService, BranchService, ObjectService, ProductService, ResourceService, ScheduleService, SessionService, TemplateService, UserService } from 'ng-altea-common';
 import { CheckDeposists, OrderCronJobs, OrderMgmtService } from 'ts-altea-logic';
 import { TranslationService } from 'ng-common'
 import { Country } from 'ts-altea-model'
@@ -10,6 +10,8 @@ import { HttpClient } from '@angular/common/http';
 import * as dateFns from 'date-fns'
 import { MessagingService } from 'projects/ng-altea-common/src/lib/messaging.service';
 import { StripeService } from 'projects/ng-altea-common/src/lib/stripe.service';
+import { deleteDoc, getDocs, limit, or, orderBy, query, where } from 'firebase/firestore';
+import { Firestore, collection, collectionData, addDoc, CollectionReference, updateDoc, serverTimestamp, doc, docData, DocumentChange, DocumentData } from '@angular/fire/firestore';
 
 // Volgnummer;Uitvoeringsdatum;Valutadatum;Bedrag;Valuta rekening;Rekeningnummer;Type verrichting;Tegenpartij;Naam van de tegenpartij;
 // Mededeling;Details;Status;Reden van weigering
@@ -21,7 +23,7 @@ import { StripeService } from 'projects/ng-altea-common/src/lib/stripe.service';
   styleUrls: ['./demo.component.scss']
 })
 export class DemoComponent {
-
+  private firestore: Firestore = inject(Firestore)
 
   @ViewChild('searchContactModal') public searchContactModal: SearchContactComponent;
 
@@ -40,9 +42,48 @@ export class DemoComponent {
 
   constructor(private http: HttpClient, public dbSvc: ObjectService, protected translationSvc: TranslationService, protected backEndSvc: ObjectService
     , protected userSvc: UserService, protected resourceSvc: ResourceService, protected anySvc: ScheduleService, protected productSvc: ProductService,
-    protected messagingSvc: MessagingService, protected stripeSvc: StripeService) {
+    protected messagingSvc: MessagingService, protected stripeSvc: StripeService, protected sessionSvc: SessionService) {
 
   }
+
+  stripeEvents: any[]
+
+  loadStripeEvents() {
+
+    //    operations/stripe/events
+
+    const msgCol = collection(this.firestore, "operations", "stripe", "events")
+
+    const qry = query(msgCol, orderBy('date', 'desc'), limit(10))  // , limit(10)
+
+    collectionData(qry).subscribe(dataSet => {
+
+      this.stripeEvents = dataSet //dataSet.map(data => plainToInstance(Message, data))
+      //console.log(res)
+
+      console.log(this.stripeEvents)
+
+    })
+
+    /*
+            const container = {
+            id: ObjectHelper.newGuid(),
+            event: event,
+            date: new Date()
+        }
+            */
+
+  }
+
+
+  postToStripeWebhook(event: any) {
+
+
+    var res = this.stripeSvc.webhookTest(event)
+
+    console.log(res)
+  }
+
 
 
   async cancelExpiredDeposits() {

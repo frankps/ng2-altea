@@ -1,16 +1,34 @@
-
-
 <h4>Mijn Abonnementen</h4>
 
-<ng-container *ngIf="subs">
+
+<ng-container *ngIf="!contact">
+    Er was een probleem...
+</ng-container>
+
+
+<ng-container *ngIf="contact && subs">
 
     <ul class="list-group">
-        <li class="list-group-item" *ngFor="let sub of subs" (click)="bookSubscription(sub)">
-    
-            {{sub.name}}
+        <li class="list-group-item" *ngFor="let sub of subs">
 
-            <div class="float-end">{{sub.usedQty}} / {{sub.totalQty}}</div>
-    
+            <div class="row">
+                <div class="col-4">{{sub.name}}</div>
+                <div class="col-4">
+                    <button type="button" class="btn btn-primary btn-sm"  [disabled]="sub.usedQty >= sub.totalQty"   (click)="bookSubscription(sub)">Reserveer</button>
+
+                </div>
+                <div class="col-4">
+
+                    <div class="float-end">{{sub.usedQty}} / {{sub.totalQty}}</div>
+                </div>
+              </div>
+
+              
+
+            
+
+           
+
         </li>
     </ul>
 

@@ -1,23 +1,56 @@
-
 <!-- <altea-lib-upload></altea-lib-upload> -->
 
 <!-- 
 <order-mgr-contact-select2></order-mgr-contact-select2>
  -->
+
+<ng-container *ngIf="stripeEvents">
+
+    <ul class="list-group" *ngFor="let event of stripeEvents">
+        <li class="list-group-item">
+
+
+            <div class="row">
+                <div class="col-6">{{event.event.type}}</div>
+                <div class="col-6">{{event?.orderId}}</div>
+
+            </div>
+
+
+            <div class="row">
+                <div class="col-6"></div>
+                <div class="col-6"><button type="button" class="btn btn-primary btn-sm mx-3" (click)="postToStripeWebhook(event.event)">Post to webhook</button></div>      
+              </div>
+          
+
+
+
+        </li>
+    </ul>
+
+
+
+</ng-container>
+
+
 <div class="row">
 
 
     <div class="col-4">
 
-        <button type="button" class="btn btn-primary btn-sm mx-3" (click)="cancelExpiredDeposits()">cancelExpiredDeposits</button>
+        <button type="button" class="btn btn-primary btn-sm mx-3"
+            (click)="cancelExpiredDeposits()">cancelExpiredDeposits</button>
 
 
 
         <button type="button" class="btn btn-primary btn-sm mx-3" (click)="orderCleanup()">Order cleanup</button>
-        
+
+        <button type="button" class="btn btn-primary btn-sm mx-3" (click)="loadStripeEvents()">Load stripe
+            events</button>
 
 
-<!--         <button type="button" class="btn btn-primary btn-sm mx-3" (click)="orderPay()">Order pay</button>
+
+        <!--         <button type="button" class="btn btn-primary btn-sm mx-3" (click)="orderPay()">Order pay</button>
 
         <button type="button" class="btn btn-primary btn-sm mx-3" (click)="stripeWebhook()">Stripe webhook</button>
 
@@ -38,7 +71,7 @@
 
         <button type="button" class="btn btn-primary btn-sm" (click)="sendSms()">Send SMS</button> -->
 
-<!--         <button type="button" class="btn btn-primary btn-sm" (click)="searchWithModal()">Contact zoeken</button>
+        <!--         <button type="button" class="btn btn-primary btn-sm" (click)="searchWithModal()">Contact zoeken</button>
 
 
         <br>
@@ -66,10 +99,10 @@
             [multiple]="false">
         </ng-select> -->
 
-       
-<!--         <altea-lib-request-invoice></altea-lib-request-invoice> -->
 
-<!--         <order-mgr-send-offer></order-mgr-send-offer>
+        <!--         <altea-lib-request-invoice></altea-lib-request-invoice> -->
+
+        <!--         <order-mgr-send-offer></order-mgr-send-offer>
         <order-mgr-search-contact></order-mgr-search-contact> -->
         <!-- 
         

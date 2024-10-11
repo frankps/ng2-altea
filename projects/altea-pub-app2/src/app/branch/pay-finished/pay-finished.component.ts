@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { OrderMgrUiService, OrderUiMode } from 'ng-altea-common';
+import { OrderMgrUiService, OrderUiMode, SessionService } from 'ng-altea-common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { StripeService } from 'projects/ng-altea-common/src/lib/stripe.service';
 import { AuthService } from '../../auth/auth.service';
@@ -26,7 +26,8 @@ export class PayFinishedComponent implements OnInit {
   sessionStatus: StripeSessionStatus
   allOk = false
 
-  constructor(protected orderMgrSvc: OrderMgrUiService, protected route: ActivatedRoute, protected stripeSvc: StripeService, protected authSvc: AuthService, protected spinner: NgxSpinnerService) {
+  constructor(protected orderMgrSvc: OrderMgrUiService, protected route: ActivatedRoute, protected stripeSvc: StripeService, 
+    protected authSvc: AuthService, protected spinner: NgxSpinnerService, protected sessionSvc: SessionService) {
 
     console.error('PayFinishedComponent')
 
@@ -34,8 +35,8 @@ export class PayFinishedComponent implements OnInit {
 
   async ngOnInit() {
 
-
-    this.authSvc.redirectEnabled = false
+    // we want to be redirected to this page after authentication
+    this.authSvc.redirectEnabled = true
 
     console.error('ngOnInit')
     console.error(this.orderMgrSvc.order)
@@ -69,7 +70,7 @@ export class PayFinishedComponent implements OnInit {
 
     this.spinner.show()
 
-    const res = await this.stripeSvc.sessionStatus(queryParams.sessionId)
+    const res = await this.stripeSvc.sessionStatus(this.sessionSvc.stripEnvironment, queryParams.sessionId)
 
     const sessionStatus = res.object
     

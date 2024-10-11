@@ -290,7 +290,7 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
 
     let returnUrl = `${environment.app}/branch/${branch.unique}/pay-finished?orderId=${order.id}&sessionId={CHECKOUT_SESSION_ID}`
 
-    const createCheckout = CreateCheckoutSession.embedded(amount * 100, branch.cur, userInfo, returnUrl)
+    const createCheckout = CreateCheckoutSession.embedded(amount * 100, branch.cur, userInfo, returnUrl, this.sessionSvc.stripEnvironment)
     createCheckout.orderId = order.id
 
     if (this.authSvc?.user?.email)

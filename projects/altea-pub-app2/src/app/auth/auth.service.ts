@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Subscription, of } from 'rxjs';
+import { BehaviorSubject, Subscription, of } from 'rxjs';
 import { Auth, GoogleAuthProvider, signInWithRedirect, signInWithPopup, user, User, authState, signOut } from '@angular/fire/auth';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ResourceService, UserService } from 'ng-altea-common';
@@ -44,6 +44,8 @@ export class AuthService {
   user: altea.User = undefined
   userId: string = undefined
 
+  user$: BehaviorSubject<altea.User> = new BehaviorSubject<altea.User>(null)
+
 
 
   /**
@@ -55,7 +57,7 @@ export class AuthService {
   /** resource id of human resource + all ids of resource groups it belongs to */
   resourceIds: string[] = []
 
-  userSubscription: Subscription;
+  //userSubscription: Subscription;
   authStateSubscription: Subscription;
 
   redirectEnabled = true
@@ -133,7 +135,6 @@ export class AuthService {
 
             console.log('retrieved from cache!', cachedAuthInfo)
 
-
             me.user = cachedAuthInfo.user
             me.resource = cachedAuthInfo.resource
 
@@ -163,7 +164,9 @@ export class AuthService {
           me.userId = me.user.id
           me.setResourceData(me.resource)
 
-          const authLocalStorage = new AuthLocalStorage(me.user, me.resource)
+          me.user$.next(me.user)
+
+          //const authLocalStorage = new AuthLocalStorage(me.user, me.resource)
 
 
           console.error('forwarding user!')
@@ -173,10 +176,15 @@ export class AuthService {
 
           let redirected = false
 
+          //me.redirectEnabled = true
+
           if (me.redirectEnabled) {
             if (me.redirect) {
               let redirect = me.redirect
-              me.redirect = null
+              //me.redirect = null
+
+              console.warn(`Redirecting to: ${redirect}`)
+
               me.router.navigate(redirect)
               redirected = true
 
@@ -198,6 +206,9 @@ export class AuthService {
 
 
           if (!redirected) {
+
+            console.warn(`Not yet redirected!`)
+
             if (newUser || !me.user.first)
               me.router.navigate(['/auth', 'profile'])
             else

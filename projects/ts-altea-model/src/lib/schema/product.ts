@@ -205,6 +205,9 @@ Product rules:
 */
 export class ProductRule {
   type?: ProductRuleType
+
+
+  @Type(() => Number)
   idx = 0
 
   /** if rule only applies for certain schedules (typically branch schedules) */
@@ -216,9 +219,16 @@ export class ProductRule {
 
   operator?: QueryOperator
 
+
+  @Type(() => Number)
   value?: number
 
+
+  @Type(() => Number)
   preTime?: number
+
+
+  @Type(() => Number)
   postTime?: number
 }
 
@@ -232,15 +242,21 @@ export class PlanningBlockSeries {
   start = "09:00"
 
   /** default duration of 1 block */
+  @Type(() => Number)
   dur = 60
 
   /** absolute minimum time for 1 block */
+  @Type(() => Number)
   min = 60
 
   /** time between 2 blocks */
+
+  @Type(() => Number)
   post = 15
 
   /** number of blocks in series */
+
+  @Type(() => Number)
   count = 1
 
   /** deviations from series allowed */
@@ -324,7 +340,11 @@ export class Product extends ObjectWithIdPlus {
 
   @Type(() => ProductItem)
   usedIn?: ProductItem[]
+
+
+  @Type(() => Number)
   idx?: number;
+
   name?: string;
   short?: string;
 
@@ -348,6 +368,8 @@ export class Product extends ObjectWithIdPlus {
   @Type(() => PlanningBlockSeries)
   plan?: PlanningBlockSeries[]
 
+
+  @Type(() => Number)
   planOrder?: number;
 
   color?: string;
@@ -356,24 +378,48 @@ export class Product extends ObjectWithIdPlus {
   rules?: ProductRule[]
 
   /** min number of hours before reservation for free cancel (undefined/null = take setting from Branch, 0 = always free cancel, 24 = 1 day upfront for free cancel, ...) */
+  
+  @Type(() => Number)
   cancel?: number
 
+
+  @Type(() => Number)
   duration = 0
 
   hasPre = false   // has preparation time
+
+  @Type(() => Number)
   preTime = 15     // preparation time (before actual treatment)
+
+
+  @Type(() => Number)
   preMaxGap = 0    // max gap between preparation (preTime) and actual treatment
 
   hasPost = false  // has cleanup time
+
+
+  @Type(() => Number)
   postTime = 15    // cleanup time (after actual treatment)
+
+
+  @Type(() => Number)
   postMaxGap = 0   // max gap between actual treatment and cleanup
 
+
+  @Type(() => Number)
   stock = 0
+
+  @Type(() => Number)
   minStock = 0
   //advance = 0
+
+  @Type(() => Number)
   vatPct = 0
+
   branches?: string[];
 
+
+  @Type(() => Number)
   depositPct?: number
 
   personSelect = true  // if order is for multiple persons, then customer can specify for each orderLine the person
@@ -745,10 +791,11 @@ export class Price extends ObjectWithIdPlus {
 
   mode: PriceMode = PriceMode.pct
 
-  @Type(() => Number)
+  @Type(() => Number)  //initial
   value?: number = 0
 
   //  @Type(() => Date)
+
   start?: number | null;
 
   //  @Type(() => Date)
@@ -770,7 +817,6 @@ export class Price extends ObjectWithIdPlus {
 
   hasOptions = false  // true if this price also has option specific price changes
   options: OptionPrice[] = []
-
 
 
   idx = 0

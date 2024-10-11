@@ -222,15 +222,15 @@ export class OrderComponent implements OnInit {
 
     const order = this.orderMgrSvc.order
 
-    let nexMode = 'pay-online'
+
+
+
+    let nextMode = order.paid < order.incl ? 'pay-online' : 'order-finished'
 
     switch (currentMode) {
       case 'contact-edit':
-        return 'pay-online'
 
-      /*
-    case 'pos-summary':
-      return 'pos-contact' */
+        return nextMode
     }
 
     const hasServices = order.hasServices()
@@ -240,7 +240,7 @@ export class OrderComponent implements OnInit {
     console.warn('needsPersonSelect', needsPersonSelect)
 
     if (needsPersonSelect && currentIdx < personSelect) {
-      nexMode = 'person-select'
+      nextMode = 'person-select'
     }
     else if (currentIdx < selectDate && order.needsPlanning()) {
 
@@ -248,15 +248,15 @@ export class OrderComponent implements OnInit {
       console.warn('needsStaffSelect', needsStaffSelect)
 
       if (currentIdx < staffSelect && needsStaffSelect && order.nrOfPersons == 1) {
-        nexMode = 'staff-select'
+        nextMode = 'staff-select'
       } else {
-        nexMode = 'select-date'
+        nextMode = 'select-date'
       }
     }
 
-    console.warn(`Current mode = ${currentMode} -> nex mode = ${nexMode} `)
+    console.warn(`Current mode = ${currentMode} -> nex mode = ${nextMode} `)
 
-    return nexMode
+    return nextMode
   }
 
   gotoNextMode() {

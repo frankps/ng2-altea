@@ -1,7 +1,9 @@
 
 
 export class CreateCheckoutSession {
-    public test = true
+    //public test = true
+
+    environment: 'test' | 'live' = 'test'
 
     // In case of Stripe-hosted payment page
     public successUrl: string
@@ -24,11 +26,12 @@ export class CreateCheckoutSession {
     }
 
 
-    static embedded(amount: number, currency: string, description: string, returnUrl: string): CreateCheckoutSession {
+    static embedded(amount: number, currency: string, description: string, returnUrl: string, environment: 'test' | 'live'): CreateCheckoutSession {
 
         const session = new CreateCheckoutSession(amount, currency, description)
 
         session.returnUrl = returnUrl  
+        session.environment = environment
 
         return session
     }
