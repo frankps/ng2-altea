@@ -86,6 +86,7 @@ export class PayFinishedComponent implements OnInit {
       if (sessionStatus.status == 'complete' && sessionStatus.paymentStatus == 'paid') {
 
         this.allOk = true
+        this.orderMgrSvc.mode = 'order-finished'
 
       }
 

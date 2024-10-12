@@ -125,7 +125,7 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
       steps = this.defaultProductOrder
     }
 
-  
+
     var idx = steps.indexOf(currentMode)
 
     if (idx < steps.length - 1) {
@@ -202,7 +202,14 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
 
     console.error(gift)
 
-    this.changeMode(PosOrderMode.compose)
+    if (!gift)
+      return
+
+    if (gift.isAmount())
+      this.changeMode(PosOrderMode.contact)
+    else
+      this.changeMode(PosOrderMode.compose)
+
 
   }
 

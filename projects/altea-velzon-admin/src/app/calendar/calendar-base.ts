@@ -5,6 +5,7 @@ import { OrderFireFilters, OrderFirestoreService, ResourcePlanningService, Resou
 import { ArrayHelper, DbQueryTyped, QueryOperator } from "ts-common";
 import { AlteaDb, AlteaPlanningQueries } from "ts-altea-logic";
 import * as _ from "lodash";
+import {Mutex, MutexInterface, Semaphore, SemaphoreInterface, withTimeout} from 'async-mutex';
 
 export enum BaseEventType {
     ResourceSchedule,
@@ -78,6 +79,7 @@ export abstract class CalendarBase {
 
     public filters: OrderFireFilters = new OrderFireFilters()
 
+    mutex = new Mutex();
 
     unsubscribe: Unsubscribe
 
@@ -141,7 +143,7 @@ export abstract class CalendarBase {
 
             const events = this.baseEventsToEvents(baseEvents)
 
-            this.updateEvents(BaseEventType.ResourceSchedule, events)
+            await this.updateEvents(BaseEventType.ResourceSchedule, events)
 
             /*
             if (ArrayHelper.NotEmpty(baseEvents))
@@ -150,7 +152,7 @@ export abstract class CalendarBase {
         }
 
         if (this.showPlanning) {
-            this.showPlanningBetween(start, end)
+            await this.showPlanningBetween(start, end)
 
 
         }
@@ -318,31 +320,48 @@ export abstract class CalendarBase {
     }
 
 
+    /**
+     * this.events contains all events for different sets of data (defined by event.type: BaseEventType)
+     * When firestore gives updates for new plannings/orders we only need to replace this type of events 
+     * 
+     * @param eventType 
+     * @param events 
+     */
     async updateEvents(eventType: BaseEventType, events: any[]) {
 
-        console.warn('updateEvents', eventType, events)
+        await this.mutex.runExclusive(async () => {
 
-        if (!this.events)
-            this.events = []
-        else {
+            console.warn('updateEvents', eventType, events)
 
-            // remove events of type eventType
-            for (let i = 0; i < this.events.length; i++) {
-                if (this.events[i]['type'] === eventType) {
-                    events.splice(i, 1);
-                    i--;
+            if (!this.events)
+                this.events = []
+            else {
+    
+                
+                // remove events of type eventType
+                const toRemove = []
+                for (let i = this.events.length-1; i >= 0 ; i--) {
+                    if (this.events[i]['type'] === eventType) 
+                        toRemove.push(i)
                 }
-            }
-        }
 
-        this.events.push(...events)
+                for (let idx of toRemove)
+                    this.events.splice(idx, 1)
+
+            }
+    
+            this.events.push(...events)
+            
+        });
+
+
     }
 
 
     /** This is a callback function that is called by the OrderFirestoreService whenever there are changes to the visible orders 
      *  Important: this.* will not work (because it's coming from callback context), instead use context.*
     */
-    showPlanningUis(context: CalendarBase, planningUis: ResourcePlanningUi[]) {
+    async showPlanningUis(context: CalendarBase, planningUis: ResourcePlanningUi[]) {
         let events = []
 
         if (ArrayHelper.AtLeastOneItem(planningUis)) {
@@ -355,7 +374,7 @@ export abstract class CalendarBase {
 
         console.log(events)
 
-        context.updateEvents(BaseEventType.OrderPlanning, events)
+        await context.updateEvents(BaseEventType.OrderPlanning, events)
         /* 
                 if (!context.events)
                     context.events = []

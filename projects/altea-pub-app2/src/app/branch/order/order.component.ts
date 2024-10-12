@@ -17,7 +17,7 @@ http://localhost:4350/branch/aqua/order/01e28ce2-0014-4dfe-8e81-d4f77460ee09/con
 })
 export class OrderComponent implements OnInit {
 
-  mode: string = 'browse-catalog'  //'demo-orders'
+ // mode: string = 'browse-catalog'  //'demo-orders'
 
   contact: Contact  // (branch) contact matching user
 
@@ -27,7 +27,19 @@ export class OrderComponent implements OnInit {
 
     console.error(this.orderMgrSvc.order)
 
+    this.mode = 'browse-catalog'
   }
+
+
+  get mode(): string {
+    return this.orderMgrSvc.mode
+  }
+
+  set mode(newMode: string) {
+    this.orderMgrSvc.changeMode(newMode)
+  }
+
+
 
   ngOnInit(): void {
 

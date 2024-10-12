@@ -51,26 +51,29 @@ export class OrderCronJobs {
 
         let msg = new Message()
         msg.subj = 'Cleanup Orders'
+        let orderCount = 0
 
 
         let html = new HtmlTable()
         try {
 
             let orders = await me.alteaDb.getOrdersToCleanup()
-    
+
             if (ArrayHelper.IsEmpty(orders)) {
                 return 'No orders to clean up!'
             }
-    
+
+            orderCount = orders.length
+
             const orderIds = orders.map(o => o.id)
-    
+
             for (let order of orders) {
-    
+
                 const cols = []
 
                 order.state = OrderState.cancelled
-    
-                cols.push(order.id)  
+
+                cols.push(order.id)
 
                 order.cancel = new OrderCancel()
                 order.cancel.by = OrderCancelBy.int
@@ -82,31 +85,33 @@ export class OrderCronJobs {
             const deletePlanningsRes = await me.alteaDb.deletePlanningsForOrders(orderIds)
 
             html.addRow(['Delete plannings'])
-    
+
             const updateOrdersRes = await me.alteaDb.updateOrders(orders, ['state', 'cancel'])
 
             html.addRow(['Cancel orders'])
 
-        } catch(error) {
+        } catch (error) {
 
             html.addRow(['Error', '' + error])
 
         } finally {
 
             msg.body = html.toString()
-            await me.sendMessage(msg)
-            
+
+            if (orderCount > 0)
+                await me.sendMessage(msg)
+
             return msg.body
         }
 
 
 
-        
+
 
 
     }
 
 
 
-    
+
 }

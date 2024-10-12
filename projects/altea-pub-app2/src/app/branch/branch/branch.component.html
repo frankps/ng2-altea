@@ -4,26 +4,19 @@
         <div class="col-4">
             <div style="font-weight: bold;">{{branch.name}} </div>
         </div>
-        <div class="col-4"> <span *ngIf="authSvc.user" style="font-size: small;">{{authSvc.user.email}}</span> </div>
+        <div class="col-4"> <span *ngIf="authSvc.user" style="font-size: small;">{{authSvc.user.email}}</span> {{orderMgrSvc.mode}}</div>
         <div class="col-4">
 
 
 
             <button type="button" class="btn btn-primary position-relative btn-sm float-end ms-1" translate
+                [disabled]="basketDisabled()"
                 (click)="gotoBasket()"><i class="fa-solid fa-basket-shopping fa-lg"></i>
 
-                <!--                     <span class="position-absolute top-0 end--20 badge rounded-pill bg-danger">
-                        
-                        <span class="visually-hidden">unread messages</span>
-                    </span> -->
-
-                <!--           <span class="badge text-bg-secondary">4</span>
-
- -->
                 <span *ngIf="orderMgrSvc.hasOrderLines()"
                     class="position-absolute top-0 start-100 translate-middle p-2 bg-danger badge rounded-pill">
                     <div style="font-size: xx-small;">{{orderMgrSvc.nrOfOrderLines()}}</div>
-                    <!--  <span class="visually-hidden">New alerts</span> -->
+                    
                 </span>
 
 

@@ -2,8 +2,10 @@
     <!-- <img src="..." class="card-img-top" alt="..."> -->
     <div class="card-header p-2" [style.background-color]="orderMgrSvc.dirtyColor()">
         <div class="row header">
-            <div class="col-6 px-3" *ngIf="order.contact">{{order.contact.name}}</div>
-            <div class="col-6 px-3 d-flex justify-content-end"> {{order.start | intdate}}</div>
+            <div class="col-6 px-3"><span *ngIf="order.contact">{{order.contact.name}}</span></div>
+            <div class="col-6 px-3 d-flex justify-content-end align-items-center"> {{order.start | intdate}}
+                <span *ngIf="order.giftCode">{{order.giftCode}} &nbsp;<i class="fa-duotone fa-solid fa-gift"></i></span>
+            </div>
 
 
 
@@ -39,7 +41,7 @@
                     <div class="row">
                         <div class="col" *ngIf="order.contact.email"><small>{{order.contact.email}}</small></div>
                     </div>
-        
+
                 </ng-container>
 
 
@@ -51,18 +53,24 @@
                         {{'enums.order-state.' + order.state | translate}} &nbsp;
                         <i *ngIf="order.stateIcon()" [style.color]="order.stateColor()" [class]="order.stateIcon()"></i>
                     </div>
-        
-        
+
+
                 </div>
+
+
+ <!--                <div class="row" *ngIf="order.gift">
+                    <div class="col d-flex justify-content-end align-items-center">
+                    </div>
+                </div> -->
 
 
             </div>
         </div>
 
-        
 
 
-<!--         <div class="row">
+
+        <!--         <div class="row">
             <div class="col d-flex justify-content-end align-items-center">{{'objects.order.state' | translate}}:
                 {{'enums.order-state.' + order.state | translate}} &nbsp;
                 <i *ngIf="order.stateIcon()" [style.color]="order.stateColor()" [class]="order.stateIcon()"></i>
@@ -71,12 +79,9 @@
         </div> -->
 
 
-        <div class="row mt-2" *ngIf="order.gift">
-            <div class="col">{{order.giftCode}}</div>
-        </div>
 
 
-<!--   
+        <!--   
         <ng-container *ngIf="show.contact && order.contact">
 
             <div class="row">
@@ -303,7 +308,8 @@
         </div>
 
 
-        <order-mgr-loyalty *ngIf="show.loyalty && order.contact && order?.allPaid()" [order]="order" [loyalty]="orderMgrSvc.loyalty"></order-mgr-loyalty>
+        <order-mgr-loyalty *ngIf="show.loyalty && order.contact && order?.allPaid()" [order]="order"
+            [loyalty]="orderMgrSvc.loyalty"></order-mgr-loyalty>
 
 
 

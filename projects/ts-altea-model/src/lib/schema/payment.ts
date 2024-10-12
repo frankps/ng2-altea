@@ -35,6 +35,7 @@ export enum PaymentType {
     amount = 0
   
     type: PaymentType
+
     loc: string
   
   
