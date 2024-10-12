@@ -292,6 +292,14 @@ export class AlteaDb {
         return defaultSchedule
     }
 
+    /**
+     * 
+     * @param from 
+     * @param to 
+     * @param resourceIds 
+     * @param excludeOrderId sometimes we need to exclude current order id in order to be able to re-plan current order 
+     * @returns 
+     */
     async resourcePlannings(from: number, to: number, resourceIds: string[], excludeOrderId?: string): Promise<ResourcePlanning[]> {
 
         console.warn('Loading resource plannings ... ')
@@ -302,9 +310,11 @@ export class AlteaDb {
         qry.and('start', QueryOperator.lessThanOrEqual, to)
         qry.and('act', QueryOperator.equals, true)
 
-        if (excludeOrderId)
-            qry.and('orderId', QueryOperator.not, excludeOrderId)
-        
+        if (excludeOrderId) {
+            qry.or('orderId', QueryOperator.not, excludeOrderId)
+            qry.or('orderId', QueryOperator.equals, null)
+        }
+
         qry.and('resourceId', QueryOperator.in, resourceIds)
 
         const resourcePlannings = await this.db.query$<ResourcePlanning>(qry)

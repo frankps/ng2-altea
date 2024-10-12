@@ -56,7 +56,7 @@ export class CreateAvailabilityContext {
         ctx.allResourceIds.push(ctx.branchId)
 
 
-        
+
         let excludeOrderId = ctx.order.id
 
         ctx.resourcePlannings = await this.loadResourcePlannings(ctx.allResourceIds, availabilityRequest, excludeOrderId)
@@ -74,7 +74,7 @@ export class CreateAvailabilityContext {
         //ctx.planMissingStaffBreaks()
 
         console.warn(ctx.scheduleDateRanges)
-        
+
 
         return ctx
     }
@@ -337,7 +337,13 @@ export class CreateAvailabilityContext {
         return ids
     }
 
-
+    /**
+     * 
+     * @param resourceIds 
+     * @param availabilityRequest 
+     * @param excludeOrderId sometimes we need to exclude current order id in order to be able to re-plan current order
+     * @returns 
+     */
     async loadResourcePlannings(resourceIds: string[], availabilityRequest: AvailabilityRequest, excludeOrderId?: string): Promise<ResourcePlannings> {
 
         /*
@@ -358,6 +364,9 @@ Possible issues: we don't check OrderStatus anymore
 
         const resourcePlannings = await this.alteaDb.resourcePlannings(availabilityRequest.from, availabilityRequest.to, resourceIds, excludeOrderId)
 
+
+        const debug = resourcePlannings.filter(rp => rp.resourceId == "3d841573-7667-46f0-a4b2-b496ed027740")
+        console.error(debug)
 
         return new ResourcePlannings(resourcePlannings)
 

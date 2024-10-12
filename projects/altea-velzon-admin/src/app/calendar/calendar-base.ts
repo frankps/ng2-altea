@@ -1,9 +1,10 @@
-import { OrderUi, PlanningType, Resource, ResourcePlanning, ResourcePlanningUi, ResourcePlannings } from "ts-altea-model"
+import { EventType, OrderUi, PlanningType, Resource, ResourcePlanning, ResourcePlanningUi, ResourcePlannings } from "ts-altea-model"
 import * as dateFns from 'date-fns'
 import { Unsubscribe } from 'firebase/firestore';
 import { OrderFireFilters, OrderFirestoreService, ResourcePlanningService, ResourceService, SessionService } from "ng-altea-common";
 import { ArrayHelper, DbQueryTyped, QueryOperator } from "ts-common";
 import { AlteaDb, AlteaPlanningQueries } from "ts-altea-logic";
+import * as _ from "lodash";
 
 export enum BaseEventType {
     ResourceSchedule,
@@ -138,9 +139,14 @@ export abstract class CalendarBase {
 
             const baseEvents = await this.getHrPlannings(start, end)
 
+            const events = this.baseEventsToEvents(baseEvents)
+
+            this.updateEvents(BaseEventType.ResourceSchedule, events)
+
+            /*
             if (ArrayHelper.NotEmpty(baseEvents))
                 this.events.push(...this.baseEventsToEvents(baseEvents))
-
+*/
         }
 
         if (this.showPlanning) {
@@ -198,6 +204,8 @@ export abstract class CalendarBase {
             if (!dateRangeSet.isEmpty()) {
 
                 const events = dateRangeSet.ranges.map(range => BaseEvent.newResourceSchedule(humanResource, range.from, range.to))
+
+
                 allEvents.push(...events)
             }
         }
@@ -253,8 +261,17 @@ export abstract class CalendarBase {
 
         console.log(events)
 
-        context.events.splice(0, context.events.length)
+
+        context.updateEvents(BaseEventType.Order, events)
+
+        /*
+        if (!context.events)
+            context.events = []
+        else
+            context.events.splice(0, context.events.length)
+
         context.events.push(...events)
+*/
 
         this.refreshSchedule()
     }
@@ -281,6 +298,9 @@ export abstract class CalendarBase {
 
     async showPlanningBetween(start: Date, end: Date) {
 
+
+        console.log(`showPlanningBetween ${start}-${end}`)
+
         if (this.unsubscribe)  // we unsubscribe from previous changes
             this.unsubscribe()
 
@@ -290,12 +310,34 @@ export abstract class CalendarBase {
     planningUiToEventBase(planningUi: ResourcePlanningUi): BaseEvent {
 
         const baseEvent = BaseEvent.newEventBase(planningUi.id, BaseEventType.OrderPlanning, planningUi.order?.shortInfo(), planningUi.startDate, planningUi.endDate, (planningUi.resource as Resource)?.color)
-        
+
         baseEvent.order = planningUi.order
-        
+
         //  baseEvent.contact = planningUi.
         return baseEvent
     }
+
+
+    async updateEvents(eventType: BaseEventType, events: any[]) {
+
+        console.warn('updateEvents', eventType, events)
+
+        if (!this.events)
+            this.events = []
+        else {
+
+            // remove events of type eventType
+            for (let i = 0; i < this.events.length; i++) {
+                if (this.events[i]['type'] === eventType) {
+                    events.splice(i, 1);
+                    i--;
+                }
+            }
+        }
+
+        this.events.push(...events)
+    }
+
 
     /** This is a callback function that is called by the OrderFirestoreService whenever there are changes to the visible orders 
      *  Important: this.* will not work (because it's coming from callback context), instead use context.*
@@ -313,8 +355,18 @@ export abstract class CalendarBase {
 
         console.log(events)
 
+        context.updateEvents(BaseEventType.OrderPlanning, events)
+        /* 
+                if (!context.events)
+                    context.events = []
+                else
+                    context.events.splice(0, context.events.length)
+        
+        
+                context.events.push(...events)
+         */
 
-        context.events.push(...events)
+        console.log(context.events)
 
         context.refreshSchedule()
     }

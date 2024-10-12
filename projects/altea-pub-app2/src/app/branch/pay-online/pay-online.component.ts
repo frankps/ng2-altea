@@ -76,6 +76,12 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
 
   checkout
 
+  /**
+   *  users can NOT use a certain gift code more then once!
+   *  --> gifts are only updated in the back-end upon saving the order
+   */
+  usedGifCodes: string[] = []
+
   constructor(protected orderMgrSvc: OrderMgrUiService, protected route: ActivatedRoute, protected sessionSvc: SessionService,
     protected stripeSvc: StripeService, private translationSvc: TranslationService, protected authSvc: AuthService, protected spinner: NgxSpinnerService,
     protected giftSvc: GiftService, protected router: Router
@@ -104,6 +110,14 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
    * @param giftCode Try to pay with gift
    */
   async tryPayGift(giftCode: string) {
+    
+    let me = this
+
+    if (me.usedGifCodes.indexOf(giftCode) >= 0) {
+      this.giftMessage = `Cadeaubon '${giftCode}' reeds gebruikt!`
+      return
+    }
+
     this.giftMessage = ''
 
     const gifts = await this.giftSvc.searchGift(giftCode)
@@ -115,6 +129,7 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
     } else {
 
       const gift = gifts[0]
+      
 
       const available = gift.availableAmount()
 
@@ -124,9 +139,12 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
 
         this.giftMessage = `€${takeFromGift} van cadeaubon '${giftCode}' genomen. De cadeaubon bevat nog €${remaining}.`
 
+        this.giftCode = ''
 
         const pay = this.orderMgrSvc.addPayment(takeFromGift, PaymentType.gift, 'app')
         pay.giftId = gift.id
+
+        me.usedGifCodes.push(giftCode)
 
         this.calculateToPay()
 
@@ -136,9 +154,7 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
           const savedOrder = this.orderMgrSvc.saveOrder()
           console.log(savedOrder)
 
-
           this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'orderMode', 'order-finished']) //])
-
         }
 
 

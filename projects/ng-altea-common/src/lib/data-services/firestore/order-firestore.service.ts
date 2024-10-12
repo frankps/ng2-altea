@@ -252,6 +252,8 @@ export class OrderFirestoreService {
 
     const qry = await this.prepareFireStoreQuery(start, end, filters)
 
+    console.log(`getPlanningUisBetween`, qry)
+
     const unsubscribe = onSnapshot(qry, (querySnapshot) => {
 
       let orderUis = querySnapshot.docs.map(doc => {
@@ -262,6 +264,8 @@ export class OrderFirestoreService {
         return orderUi
       }
       )
+
+      console.log(`onSnapshot`, orderUis)
 
       orderUis = this.filterOrderUis(orderUis, [OrderState.cancelled])
 
