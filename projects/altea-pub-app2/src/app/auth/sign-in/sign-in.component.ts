@@ -1,8 +1,10 @@
 import { Component, OnInit, inject, Input } from '@angular/core';
-import { Auth, GoogleAuthProvider, signInWithRedirect, signInWithPopup, user, User, signOut, FacebookAuthProvider } from '@angular/fire/auth';
+import { Auth, GoogleAuthProvider, signInWithRedirect, signInWithPopup, getRedirectResult, user, User, signOut, FacebookAuthProvider } from '@angular/fire/auth';
 import { Subscription, of } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../auth.service';
+import { NgxSpinnerService } from "ngx-spinner"
+
 
 /**
  * https://github.com/angular/angularfire/blob/HEAD/docs/auth.md#authentication
@@ -25,7 +27,17 @@ export class SignInComponent implements OnInit {
 
   provider: 'unknown' | 'google' | 'facebook' | 'email' = 'unknown'
 
-  constructor(protected router: Router, protected authSvc: AuthService) {
+  constructor(protected router: Router, protected authSvc: AuthService, protected spinner: NgxSpinnerService) {
+
+
+    getRedirectResult(this.auth).then(result => {
+      console.warn('getRedirectResult resolved')
+      console.warn(result)
+    }).catch((error) => {
+      // Handle Errors here.
+      console.error('getRedirectResult ERROR')
+      console.error(error)
+    });
 
   }
 
@@ -37,6 +49,9 @@ export class SignInComponent implements OnInit {
     this.googleAuth = new GoogleAuthProvider()
     this.googleAuth.addScope('https://www.googleapis.com/auth/contacts.readonly')
 
+
+    /* 
+     */
   }
 
   clearCache() {
@@ -95,12 +110,29 @@ export class SignInComponent implements OnInit {
 
       case 'facebook':
         prov = new FacebookAuthProvider()
+        prov.setCustomParameters({ prompt: 'select_account', scope: 'openid profile email' });
         break
 
       case 'email':
         return null
-      
+
     }
+
+    /*  First Facebook was not working => implemented signInWithRedirect()
+    But after changing some settings in Facebook dev console the signInWithPopup() appears to be working
+
+     
+        await signInWithRedirect(this.auth, prov).then(result => {
+    
+          console.warn('signInWithRedirect resolved')
+          console.warn(result)
+        })
+    
+        return
+    */
+
+
+
 
 
     /**
@@ -111,6 +143,16 @@ export class SignInComponent implements OnInit {
      */
 
 
+
+    /*
+    signInWithPopup does not work for Facebook on mobile devices
+    */
+
+    let me = this
+
+    me.spinner.show()
+
+
     const credentials = await signInWithPopup(this.auth, prov).then(async (userCredentials) => {
       this.user = userCredentials.user;
       console.error(this.user)
@@ -119,7 +161,15 @@ export class SignInComponent implements OnInit {
       //return of(this.user);
 
       return userCredentials
-    });
+    }).catch(error => {
+      console.error('signInWithPopup error catched')
+      console.log(error)
+
+    }).finally(() => {
+
+      me.spinner.hide()
+
+    })
 
     console.warn(credentials)
 

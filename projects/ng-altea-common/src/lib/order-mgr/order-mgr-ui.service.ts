@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import { Injectable, OnInit } from '@angular/core';
 import { AppMode, AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Branch, ConfirmOrderResponse, Contact, CreateCheckoutSession, DateBorder, DepositMode, Gift, GiftLine, GiftType, Order, OrderLine, OrderLineOption, OrderSource, OrderState, Payment, PaymentType, Product, ProductSubType, ProductType, ProductTypeIcons, RedeemGift, ReservationOption, ReservationOptionSet, Resource, ResourcePlanning, ResourceType } from 'ts-altea-model'
-import { ApiListResult, ApiStatus, ArrayHelper, DateHelper, DbQuery, QueryOperator, Translation } from 'ts-common'
+import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbQuery, QueryOperator, Translation } from 'ts-common'
 import { AlteaService, GiftService, ObjectService, OrderMgrService, OrderService, ProductService, ResourceService, SessionService } from 'ng-altea-common'
 import * as _ from "lodash";
 import { NgxSpinnerService } from "ngx-spinner"
@@ -10,6 +10,7 @@ import { BehaviorSubject, Observable, take, takeUntil } from 'rxjs';
 import { AlteaDb, CancelOrder, LoyaltyUi, LoyaltyUiCard, PaymentProcessing } from 'ts-altea-logic';
 import * as dateFns from 'date-fns'
 import { StripeService } from '../stripe.service';
+import { er } from '@fullcalendar/core/internal-common';
 
 
 /** reflects the UI component that should be visible  */
@@ -383,6 +384,7 @@ export class OrderMgrUiService {   // implements OnInit
 
     const giftPay = me.addPayment(availableAmount, PaymentType.gift, this.sessionSvc.loc)
     giftPay.giftId = gift.id
+    giftPay.info = gift.code
 
     console.error(me.order)
 
@@ -596,53 +598,69 @@ export class OrderMgrUiService {   // implements OnInit
   // 8552b3ae-d1fb-494c-9dd1-1425a809ab28
 
 
-  async selectTimeSlot(option: ReservationOption): Promise<ConfirmOrderResponse> {
+  async selectTimeSlot(option: ReservationOption): Promise<ApiResult<Order>> {   // ConfirmOrderResponse
 
     let me = this
+    let confirmOrderResponse: ApiResult<Order>
 
-    console.warn(option)
+    try {
+      console.warn(option)
 
-    this.spinner.show()
+      this.spinner.show()
 
-    const solutionForOption = me.availabilityResponse.solutionSet.getSolutionById(option.solutionIds[0])
+      const solutionForOption = me.availabilityResponse.solutionSet.getSolutionById(option.solutionIds[0])
 
-    console.warn(solutionForOption)
+      console.warn(solutionForOption)
 
-    /*     this.spinner.hide()
-        return */
+      /*     this.spinner.hide()
+          return */
 
 
-    const depositMinutes = me.setMaxWaitForDepositInHours(me.sessionSvc.appMode, option.date)
+      const depositMinutes = me.setMaxWaitForDepositInHours(me.sessionSvc.appMode, option.date)
 
-    // pick-up a cancelled order
-    if (me.order.state == OrderState.cancelled) {
-      me.order.state = OrderState.creation
-      me.order.markAsUpdated('state')
-      me.orderDirty = true
+      // pick-up a cancelled order
+      if (me.order.state == OrderState.cancelled) {
+        me.order.state = OrderState.creation
+        me.order.markAsUpdated('state')
+        me.orderDirty = true
+      }
+
+      me.adaptGiftPayment(me.order)
+
+      confirmOrderResponse = await me.alteaSvc.orderMgmtService.confirmOrder(me.order, option, solutionForOption)
+
+      console.warn(confirmOrderResponse)
+      let order = confirmOrderResponse?.object
+
+      if (order) {
+
+        me.refreshOrder(order)
+
+        me.orderDirty = false
+        me.dashboardSvc.showToastType(ToastType.saveSuccess)
+      }
+      else
+        me.dashboardSvc.showToastType(ToastType.saveError)
+
+
+      me.plannings = order?.planning
+
+
+
+
+
+    } catch (err) {
+
+      console.error(err)
+    } finally {
+
+      me.spinner.hide()
+
+      return confirmOrderResponse
+
     }
 
 
-    const confirmOrderResponse = await me.alteaSvc.orderMgmtService.confirmOrder(me.order, option, solutionForOption)
-
-    console.warn(confirmOrderResponse)
-
-    if (confirmOrderResponse?.order) {
-
-      me.refreshOrder(confirmOrderResponse?.order)
-
-      me.orderDirty = false
-      me.dashboardSvc.showToastType(ToastType.saveSuccess)
-    }
-    else
-      me.dashboardSvc.showToastType(ToastType.saveError)
-
-
-    me.plannings = confirmOrderResponse.order?.planning
-
-
-    me.spinner.hide()
-
-    return confirmOrderResponse
   }
 
   /** when an order is saved, we need to refresh all associated objects */
@@ -682,6 +700,33 @@ export class OrderMgrUiService {   // implements OnInit
 
   }
 
+  /**
+   * Consumer might redeem gift, but is using less then the gift,
+   * since the gift payment was already attached from the beginning, we need to adapt this gift payment
+   */
+  adaptGiftPayment(order: Order) {
+
+    if (ArrayHelper.IsEmpty(order.payments))
+      return
+
+    if (order.paid > order.incl) {
+
+      var newGiftPayment = order.payments.find(p => p.type == PaymentType.gift && p.isNew())
+
+      if (newGiftPayment) {
+        var tooMuch = order.paid - order.incl
+
+        if (newGiftPayment.giftId == this.gift?.id)
+          console.warn('We have a match')
+
+        newGiftPayment.amount -= tooMuch
+        order.paid -= tooMuch
+        newGiftPayment.markAsUpdated('amount')
+        order.markAsUpdated('paid')
+      }
+    }
+
+  }
 
   async saveOrder(autoChangeState: boolean = false): Promise<Order> {
 
@@ -691,9 +736,12 @@ export class OrderMgrUiService {   // implements OnInit
 
     console.warn(this.order)
 
-    const newOrder = this.order.isNew()
+
+    //const newOrder = this.order.isNew()
 
     // let autoChangeState = (this.sessionSvc.appMode == AppMode.pos)
+
+    this.adaptGiftPayment(this.order)
 
     const res = await this.alteaSvc.orderMgmtService.saveOrder(this.order, autoChangeState)
 
@@ -912,14 +960,21 @@ export class OrderMgrUiService {   // implements OnInit
 
       for (let item of product.items) {
 
-        const product = await this.productSvc.get$(item.productId)
+        /*
+            query.include('options:orderBy=idx.values:orderBy=idx', 'items:orderBy=idx')
+   // query.include('options:orderBy=idx.values:orderBy=idx', 'resources:orderBy=idx.resource', 'items:orderBy=idx', 'prices')
+   */
+
+
+        const product = await this.productSvc.get$(item.productId, 'options:orderBy=idx.values:orderBy=idx')
 
         if (!product) {
           console.warn(`Product not found!`)
           continue
         }
 
-        let orderLine = this.newOrderLine(product, item.qty, item.getOptionValuesAsMap())
+        let optionValues = item.getOptionValuesAsMap()
+        let orderLine = this.newOrderLine(product, item.qty, optionValues)
         await this.addOrderLine(orderLine)
         orderLines.push(orderLine)
 

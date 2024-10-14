@@ -29,6 +29,8 @@ export class MyOrdersComponent implements OnInit {
 
   mode : 'view' | 'cancel' = 'view'
 
+  enableActions = false
+
 
   constructor(protected orderSvc: OrderService, protected orderMgrSvc: OrderMgrUiService,  protected router: Router,
     protected sessionSvc: SessionService, protected alteaSvc: AlteaService) {

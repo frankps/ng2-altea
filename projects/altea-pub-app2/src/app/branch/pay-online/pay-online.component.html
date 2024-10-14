@@ -5,7 +5,7 @@
         Overzicht van uw reservatie/bestelling:
 
         <div class="my-3 mx-4">
-            <order-mgr-order-summary [order]="orderMgrSvc.order" [pays]="true"></order-mgr-order-summary>
+            <order-mgr-order-summary [order]="orderMgrSvc.order" [pays]="true" [totals]="true"></order-mgr-order-summary>
         </div>
 
     </ng-container>
@@ -14,12 +14,12 @@
         <b>{{ 'app.payment.' + payOption.type | translate }}:</b> €{{payOption?.amount}} <br>
     </ng-container>
     
-
+<!-- 
     <ng-container *ngIf="orderMgrSvc.order.paid > 0">
         <b>Reeds betaald:</b> €{{orderMgrSvc.order.paid}} <br>
-        <b>Nog te betalen:</b> €{{toPay}} <br>
+        <ng-container *ngIf="toPay > 0"><b>Nog te betalen:</b> €{{toPay}} <br></ng-container>
     </ng-container>
-    <br>
+    <br> -->
   
 
 </ng-template>

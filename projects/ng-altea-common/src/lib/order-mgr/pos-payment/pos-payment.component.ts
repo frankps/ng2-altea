@@ -154,6 +154,7 @@ export class PosPaymentComponent implements OnInit {
       gift.used += canUse.amount   // for local client: the back-end will do this also when saving the order
 
       payment.giftId = gift.id
+      payment.info = gift.code
       /* 
             let res = await this.mgrUiSvc.testPaymentProcessing()
             console.warn(res) */

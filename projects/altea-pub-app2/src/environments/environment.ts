@@ -7,7 +7,7 @@ export const environment = {
   defaultauth: 'firebase',
   firebaseConfig: {
     apiKey: "AIzaSyAXPLu6sITIv7sarjwhdCirNXEMHN3Qr_0",
-    authDomain: "altea-24.firebaseapp.com",
+    authDomain: "book.birdy.life",   // altea-24.firebaseapp.com
     projectId: "altea-24",
     storageBucket: "altea-24.appspot.com",
     messagingSenderId: "75363142531",
@@ -15,7 +15,7 @@ export const environment = {
     measurementId: "G-2VD4P10F7W"
   },
   backend: 'https://dvit-477c9.uc.r.appspot.com', //backend: 'http://localhost:8080',
-  app: 'http://localhost:4350'
+  app: 'https://book.birdy.life'
 };
 
 /*

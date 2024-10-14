@@ -1,4 +1,4 @@
-<ng-container *ngIf="order">
+<ng-container *ngIf="order && initialised">
 
     <div class="row mt-2" *ngIf="order.start">
         <div class="col"><b>Afspraak op:</b> {{order.start | intdate}}</div>
@@ -68,21 +68,42 @@
             <div class="row mt-3">
                 <div class="col"><b>Betalingen:</b></div>
             </div>
-    
+
             <ng-container *ngFor="let pay of order.payments">
-    
-    
+
+
                 <div class="row ps-2 mt-1">
                     <div class="col-1"><span *ngIf="pay.type != 'subs'">€{{pay.amount}}</span></div>
                     <div class="col-2">{{'enums.pay-type.' + pay.type | translate}}</div>
                     <div class="col-3">{{pay.info}}</div>
                     <div class="col-3"></div>
                 </div>
-    
+
             </ng-container>
 
 
         </ng-container>
+
+
+    </ng-container>
+
+
+    <ng-container *ngIf="totals">
+
+        <div class="row mt-4">
+            <div class="col-6 d-flex justify-content-end">Totaal:</div>
+            <div class="col-6">{{order.incl| currency:branch.cur}}</div>
+        </div>
+
+        <div class="row" *ngIf="order.depo">
+            <div class="col-6 d-flex justify-content-end">Voorschot:</div>
+            <div class="col-6">{{order.deposit| currency:branch.cur}}</div>
+        </div>
+
+        <div class="row mb-2">
+            <div class="col-6 d-flex justify-content-end">Betaald:</div>
+            <div class="col-6">{{order.paid| currency:branch.cur}}</div>
+        </div>
 
 
     </ng-container>

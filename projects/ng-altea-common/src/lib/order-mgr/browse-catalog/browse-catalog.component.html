@@ -3,8 +3,10 @@
 
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb" style="font-size: 0.7rem;">
-        <li class="breadcrumb-item" (click)="showRoot()">Home</li>
-        <li class="breadcrumb-item" *ngFor="let category of orderMgrSvc.path" (click)="showCategory(category)">{{category.name}}</li>
+        <li class="breadcrumb-item" (click)="showRoot()">
+            <button type="button" class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-house"></i> &nbsp;Home</button>
+        </li>
+        <li class="breadcrumb-item d-flex align-items-center" *ngFor="let category of orderMgrSvc.path" (click)="showCategory(category)">{{category.name}}</li>
         <!-- <li class="breadcrumb-item active">Data</li> -->
     </ol>
 </nav>

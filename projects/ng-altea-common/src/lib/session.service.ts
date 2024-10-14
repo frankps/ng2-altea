@@ -3,6 +3,7 @@ import { ScheduleService } from './data-services/sql/schedule.service';
 import { DbQuery, QueryOperator } from 'ts-common';
 import { AppMode, Branch, Contact, Resource } from 'ts-altea-model';
 import * as Rx from "rxjs";
+// import { LocalService } from 'ng-altea-common';
 
 
 @Injectable({
@@ -53,11 +54,19 @@ export class SessionService implements OnInit {
   /** for consumer app: the contact matching to the currently logged on user (for current branch) */
   public contact: Contact
 
-  public stripEnvironment: 'test' | 'live' = 'test'
+  public stripEnvironment: 'test' | 'live' = 'live'
   
-  ngOnInit() {
 
+  constructor() {
+    let stripeEnv = localStorage.getItem('stripEnvironment')
+
+    if (stripeEnv && (stripeEnv == 'test' || stripeEnv =='live'))
+      this.stripEnvironment = stripeEnv
+  }
+
+  ngOnInit() {
     console.warn('----- SessionService -ee------')
+  
 
   }
 
@@ -71,6 +80,16 @@ export class SessionService implements OnInit {
 
   init(environment: any) {
     this.backend = environment.backend
+  }
+
+  get stripeTest(): boolean {
+    return this.stripEnvironment == 'test'
+  }
+
+  set stripeTest(value: boolean) {
+    this.stripEnvironment = value ? 'test' : 'live'
+    localStorage.setItem('stripEnvironment', this.stripEnvironment)
+    console.log(this.stripEnvironment)
   }
 
   get branch(): Branch | undefined {

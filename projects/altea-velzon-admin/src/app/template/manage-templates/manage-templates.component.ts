@@ -281,11 +281,13 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
 
       const whatsAppTpl = WhatsAppTemplateUpdate.fromTemplate(template)  //WhatsAppTemplate.fromTemplate(template)
 
-      console.warn(whatsAppTpl)
+      console.error(whatsAppTpl)
       /*
             this.spinner.hide()
             return
       */
+
+           // return
 
       const whatsAppResult = await this.messagingSvc.updateWhatsAppTemplate$(whatsAppTpl)
 

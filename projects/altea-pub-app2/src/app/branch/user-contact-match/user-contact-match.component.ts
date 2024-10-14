@@ -143,21 +143,7 @@ export class UserContactMatchComponent implements OnInit {
 
     }
 
-
-    /*
-        if (ArrayHelper.NotEmpty(this.contacts)) {
-    
-          if (this.contacts.length ==  1) {
-            await this.linkContactToUser(this.contacts[0])
-    
-          } 
-          // then we let the user select the best profile
-        }
-    */
-
-
     console.log(this.contacts)
-
   }
 
 

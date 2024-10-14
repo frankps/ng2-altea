@@ -319,7 +319,7 @@ export class OrderMgmtService {
      * @param solution 
      * @returns 
      */
-    async confirmOrder(order: Order, reservationOption: ReservationOption, solution: Solution): Promise<ConfirmOrderResponse | undefined> {
+    async confirmOrder(order: Order, reservationOption: ReservationOption, solution: Solution): Promise<ApiResult<Order>> {   // ConfirmOrderResponse | undefined
 
         order.start = reservationOption.dateNum
         order.m.setDirty('start')
@@ -338,6 +338,10 @@ export class OrderMgmtService {
 
         const orderApiResult = await this.alteaDb.saveOrder(order)
 
+        return orderApiResult
+
+
+        
         if (orderApiResult.status != ApiStatus.ok) {
             console.error(orderApiResult)
             return undefined
@@ -347,7 +351,7 @@ export class OrderMgmtService {
 
         // const planningResult = await this.alteaDb.saveResourcePlannings(response.plannings)
 
-        return response
+        return orderApiResult
 
         /** Save all the resource plannings */
     }

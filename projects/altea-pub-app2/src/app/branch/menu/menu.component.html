@@ -3,5 +3,23 @@
 
  -->
 
-<altea-lib-main-menu [menu]="menu" [loggedIn]="authSvc.loggedOn()" (select)="menuClicked($event)"></altea-lib-main-menu>
+<div class="row my-2">
+    <div class="col">
 
+        Beste klant,<br>
+       
+            Ons reservatiesysteem heeft een upgrade gekregen maar zoals bij elk nieuw systeem kunnen er nog foutjes
+            inzitten. Dus lukt het niet of heeft u vragen, neem dan zeker contact op met team Aquasense op <br> <i class="fa-regular fa-envelope"></i> contact&#64;aquasense.be of <i class="fa-light fa-phone"></i> 0477/267222.
+        <br>
+        Excuses voor enige ongemakken, dank voor uw begrip en tot binnenkort.<br>
+        
+        <b>Team Aquasense</b>
+
+    </div>
+</div>
+
+
+
+
+<altea-lib-main-menu *ngIf="initialized" [menu]="menu" [loggedIn]="authSvc.loggedOn()"
+    (select)="menuClicked($event)"></altea-lib-main-menu>

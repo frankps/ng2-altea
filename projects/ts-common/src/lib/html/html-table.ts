@@ -18,7 +18,7 @@ export class HtmlTable {
         if (ArrayHelper.IsEmpty(this.rows))
             return ''
 
-        const htmlLines : string[] = []
+        const htmlLines: string[] = []
 
         for (let row of this.rows) {
 
@@ -27,7 +27,10 @@ export class HtmlTable {
 
             htmlLines.push('<tr>')
             for (let col of row) {
-                htmlLines.push(`<td>${col}</td>`)
+
+                let colString = col ? col : ''
+
+                htmlLines.push(`<td>${colString}</td>`)
 
             }
             htmlLines.push('</tr>')

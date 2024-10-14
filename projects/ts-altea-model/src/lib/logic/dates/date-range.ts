@@ -34,6 +34,11 @@ export class DateRange {
                     this.toLabels.push(toLabel) */
     }
 
+
+    isValid(): boolean {
+        return (this.from < this.to)
+    }
+
     /**
      * @param from ISO Date string
      * @param to ISO Date string
@@ -89,7 +94,7 @@ export class DateRange {
         return this.duration.seconds
     }
 
-    sameFromDateOtherHour(hour: number, minutes: number = 0) : Date {
+    sameFromDateOtherHour(hour: number, minutes: number = 0): Date {
 
         let newDate = dateFns.setHours(this.from, hour)
         newDate = dateFns.setMinutes(newDate, minutes)

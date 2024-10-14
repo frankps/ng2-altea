@@ -2,7 +2,7 @@ import { Component, Output, EventEmitter, OnInit } from '@angular/core';
 import { OrderMgrUiService } from '../order-mgr-ui.service';
 import { ResourceService } from '../../data-services/sql/resource.service';
 import { ArrayHelper, DbQuery, QueryOperator } from 'ts-common';
-import { Resource, ResourceType } from 'ts-altea-model';
+import { Resource, ResourcePreferences, ResourceType } from 'ts-altea-model';
 
 @Component({
   selector: 'order-mgr-staff-select',
@@ -16,6 +16,8 @@ export class StaffSelectComponent implements OnInit {
   @Output() selected: EventEmitter<string[]> = new EventEmitter<string[]>();
 
   selection = {}
+
+  initialized = false
 
   constructor(protected mgrUiSvc: OrderMgrUiService, protected resourceSvc: ResourceService) {
 
@@ -44,7 +46,30 @@ export class StaffSelectComponent implements OnInit {
 
     this.staff = await this.resourceSvc.query$(query)
 
+
+    // Pre-select already selected
+
+    let currentSelectedStaff = this.mgrUiSvc.order.resPrefs?.humIds
+
+    if (ArrayHelper.NotEmpty(currentSelectedStaff) && ArrayHelper.NotEmpty(this.staff))
+    {
+      let atLeastOne = false
+      for (let human of this.staff) {
+
+        if (currentSelectedStaff.indexOf(human.id) >= 0) {
+          this.selection[human.id] = true
+          atLeastOne = true
+        }
+      }
+
+      if (atLeastOne) {
+        this.preferredStaff = 'preference'
+      }
+    }
+
     console.error(this.staff)
+
+    this.initialized = true
   }
 
   selectedResourceIds(): string[] {
@@ -74,7 +99,13 @@ export class StaffSelectComponent implements OnInit {
 
   continue() {
 
-    const ids = this.selectedResourceIds()
+    const ids = this.preferredStaff == "preference" ? this.selectedResourceIds() : []
+
+    if (!this.mgrUiSvc.order.resPrefs)
+      this.mgrUiSvc.order.resPrefs = new ResourcePreferences()
+
+    this.mgrUiSvc.order.resPrefs.humIds = ids
+
     this.selected.emit(ids)
 
   }

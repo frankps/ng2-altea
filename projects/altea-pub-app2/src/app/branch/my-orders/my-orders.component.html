@@ -24,38 +24,43 @@
 
             </div>
 
-            <div class="row" *ngIf="order.start && order.start > nowNum">
+            <ng-container *ngIf="enableActions">
 
-                <div class="col d-flex justify-content-end">
+                <div class="row" *ngIf="order.start && order.start > nowNum">
 
-                    <button type="button" class="btn btn-primary btn-sm me-3" (click)="checkCancel(order)"
-                        translate>dic.cancel</button>
-
-                    <button type="button" class="btn btn-primary btn-sm" (click)="moveOrder(order)"
-                        translate>dic.move</button>
-
+                    <div class="col d-flex justify-content-end">
+    
+                        <button type="button" class="btn btn-primary btn-sm me-3" (click)="checkCancel(order)"
+                            translate>dic.cancel</button>
+    
+                        <button type="button" class="btn btn-primary btn-sm" (click)="moveOrder(order)"
+                            translate>dic.move</button>
+    
+                    </div>
+    
+                </div>
+    
+                <div class="row my-3" *ngIf="order.id == curOrder?.id">
+    
+                    <div class="col" *ngIf="mode == 'cancel'"></div>
+    
+    
+                    <div class="col" *ngIf="mode == 'cancel' && cancelChecks">
+    
+                        {{'enums.cancel-order-message.' + cancelChecks.message | translate }}
+    
+                        <ng-container *ngIf="cancelChecks.message == 'possible'">
+    
+                            <button type="button" class="btn btn-danger" (click)="confirmCancel(order)">Confirmeer annulatie</button>
+                        </ng-container>
+    
+    
+    
+                    </div>
                 </div>
 
-            </div>
+            </ng-container>
 
-            <div class="row my-3" *ngIf="order.id == curOrder?.id">
-
-                <div class="col" *ngIf="mode == 'cancel'"></div>
-
-
-                <div class="col" *ngIf="mode == 'cancel' && cancelChecks">
-
-                    {{'enums.cancel-order-message.' + cancelChecks.message | translate }}
-
-                    <ng-container *ngIf="cancelChecks.message == 'possible'">
-
-                        <button type="button" class="btn btn-danger" (click)="confirmCancel(order)">Confirmeer annulatie</button>
-                    </ng-container>
-
-
-
-                </div>
-            </div>
 
 
         </li>

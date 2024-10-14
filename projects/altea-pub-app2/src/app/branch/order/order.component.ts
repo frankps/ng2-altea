@@ -276,6 +276,10 @@ export class OrderComponent implements OnInit {
   }
 
   staffSelected(staff: string[]) {
+
+
+    console.log(this.orderMgrSvc.order)
+
     this.gotoNextMode()
 
     //this.mode = 'select-time-slot'

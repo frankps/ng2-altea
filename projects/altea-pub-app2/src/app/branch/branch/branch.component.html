@@ -1,22 +1,41 @@
 <ng-container *ngIf="branch">
 
     <div class="row my-4 ">
-        <div class="col-4">
-            <div style="font-weight: bold;">{{branch.name}} </div>
-        </div>
-        <div class="col-4"> <span *ngIf="authSvc.user" style="font-size: small;">{{authSvc.user.email}}</span> {{orderMgrSvc.mode}}</div>
-        <div class="col-4">
+        <div class="col-5">
+            <div>
 
+                <div class="row">
+                    <div class="col-4 col-md-3 col-lg-2"> <button type="button" class="btn btn-primary ms-1" translate
+                            (click)="gotoMenu()"><i class="fa-solid fa-bars fa-lg"></i></button></div>
+                    <div class="col">
+                        <span style="font-weight: bold;">{{branch.name}}</span>
+                        <ng-container *ngIf="authSvc.user">
+                            <br> <span style="font-size: small;">{{authSvc.user.email}}</span>
+                        </ng-container>
+
+                    </div>
+                </div>
+
+
+
+
+
+
+
+
+            </div>
+        </div>
+
+        <div class="col-7">
 
 
             <button type="button" class="btn btn-primary position-relative btn-sm float-end ms-1" translate
-                [disabled]="basketDisabled()"
-                (click)="gotoBasket()"><i class="fa-solid fa-basket-shopping fa-lg"></i>
+                [disabled]="basketDisabled()" (click)="gotoBasket()"><i class="fa-solid fa-basket-shopping fa-lg"></i>
 
                 <span *ngIf="orderMgrSvc.hasOrderLines()"
                     class="position-absolute top-0 start-100 translate-middle p-2 bg-danger badge rounded-pill">
                     <div style="font-size: xx-small;">{{orderMgrSvc.nrOfOrderLines()}}</div>
-                    
+
                 </span>
 
 
@@ -30,8 +49,6 @@
         -->
 
 
-            <button type="button" class="btn btn-primary btn-sm float-end ms-1" translate (click)="gotoMenu()"><i
-                    class="fa-solid fa-bars fa-lg"></i></button>
 
             <button *ngIf="authSvc.loggedOn()" type="button" class="btn btn-primary btn-sm float-end ms-1" translate
                 (click)="appSignOut()"><i class="fa-duotone fa-person-from-portal fa-lg"></i></button>
@@ -39,8 +56,8 @@
             <button *ngIf="!authSvc.loggedOn()" type="button" class="btn btn-primary btn-sm float-end ms-1" translate
                 (click)="appSignIn()"><i class="fa-duotone fa-person-to-portal fa-lg"></i></button>
 
-            <button type="button" class="btn btn-primary btn-sm float-end ms-1" (click)="gotoProfile()" *ngIf="authSvc.loggedOn()"><i
-                    class="fa-duotone fa-user fa-lg"></i></button>
+            <button type="button" class="btn btn-primary btn-sm float-end ms-1" (click)="gotoProfile()"
+                *ngIf="authSvc.loggedOn()"><i class="fa-duotone fa-user fa-lg"></i></button>
 
             <!--    <i class="fa-solid fa-bars"></i>   <i class="fa-duotone fa-user"></i>    -->
 

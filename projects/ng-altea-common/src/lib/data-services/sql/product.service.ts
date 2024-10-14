@@ -81,7 +81,11 @@ options:orderBy=idx.values:orderBy=idx
     query.and('del', QueryOperator.equals, false)
     query.and('catId', QueryOperator.equals, categoryId)
     query.and('online', QueryOperator.not, OnlineMode.invisible)
-    query.include('options:orderBy=idx.values:orderBy=idx')
+    
+    //productQry.include('options:orderBy=idx.values:orderBy=idx', 'resources:orderBy=idx.resource', 'items:orderBy=idx', 'prices')
+
+    query.include('options:orderBy=idx.values:orderBy=idx', 'items:orderBy=idx')
+   // query.include('options:orderBy=idx.values:orderBy=idx', 'resources:orderBy=idx.resource', 'items:orderBy=idx', 'prices')
     query.take = 200
 
     return query

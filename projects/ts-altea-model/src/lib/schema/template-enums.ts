@@ -27,14 +27,15 @@ export enum TemplateCode {
   resv_no_show = 'resv_no_show',
   resv_satisfaction = 'resv_satisfaction',
   resv_internal_cancel = 'resv_internal_cancel',
-  resv_footer = 'resv_footer'
+  resv_footer = 'resv_footer',
+  gift_online = 'gift_online'
 } 
 
 /*
 cancel
 cancelClient
 cancelProvider
-*/
+*/  
 export enum TemplateRecipient {
   unknown = 'unknown',
   client = 'client',

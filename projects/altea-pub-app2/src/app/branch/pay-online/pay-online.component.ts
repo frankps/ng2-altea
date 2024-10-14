@@ -143,6 +143,7 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
 
         const pay = this.orderMgrSvc.addPayment(takeFromGift, PaymentType.gift, 'app')
         pay.giftId = gift.id
+        pay.info = gift.code
 
         me.usedGifCodes.push(giftCode)
 
@@ -235,8 +236,11 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
 
   calculateToPay(): number {
     this.toPay = this.payOption.amount
+
+    /*
     const paid = this.orderMgrSvc.order.paid
     this.toPay = Math.max(this.toPay - paid, 0)
+*/
 
     return this.toPay
   }
@@ -293,10 +297,10 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
     this.spinner.show()
 
 
-    const stripe: any = new Stripe('pk_test_lTy1ovFLMXISWhS20E268osc');
+
     const branch = await me.sessionSvc.branch$()
 
-    let userInfo = await me.translationSvc.getTrans('app.stripe.gift')
+   // let userInfo = await me.translationSvc.getTrans('app.stripe.gift')
 
     const order = me.orderMgrSvc.order
 
@@ -306,7 +310,10 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
 
     let returnUrl = `${environment.app}/branch/${branch.unique}/pay-finished?orderId=${order.id}&sessionId={CHECKOUT_SESSION_ID}`
 
-    const createCheckout = CreateCheckoutSession.embedded(amount * 100, branch.cur, userInfo, returnUrl, this.sessionSvc.stripEnvironment)
+
+    let stripeShowText = 'Aquasense'
+
+    const createCheckout = CreateCheckoutSession.embedded(amount * 100, branch.cur, stripeShowText, returnUrl, this.sessionSvc.stripEnvironment)
     createCheckout.orderId = order.id
 
     if (this.authSvc?.user?.email)
@@ -319,7 +326,10 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
     console.error(apiResult)
 
     const clientSecret = apiResult.object.clientSecret
+    const publicKey = apiResult.object.publicKey
 
+   // const stripe: any = new Stripe('pk_test_lTy1ovFLMXISWhS20E268osc');
+    const stripe: any = new Stripe(publicKey)
 
     me.checkout = await stripe.initEmbeddedCheckout({
       clientSecret,

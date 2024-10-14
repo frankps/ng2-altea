@@ -18,7 +18,7 @@ export enum OrderTemplate {
 */
 export const orderTemplates = ['resv_wait_deposito', 'resv_remind_deposit', 'resv_confirmation',
   'resv_no_deposit_cancel', 'resv_in_time_cancel', 'resv_late_cancel', 'resv_change_date',
-  'resv_reminder', 'resv_no_show', 'resv_satisfaction', 'resv_internal_cancel']
+  'resv_reminder', 'resv_no_show', 'resv_satisfaction', 'resv_internal_cancel', 'gift_online']
 
 
 
@@ -169,7 +169,7 @@ export class Template extends ObjectWithParameters {
       return text
 
     for (let param of paramNames) {
-      text = text.replaceAll(param, '' + (startAt++))
+      text = text.replaceAll(`{{${param}}}`, `{{${startAt++}}}`)
     }
 
     return text
@@ -369,21 +369,28 @@ export class Template extends ObjectWithParameters {
     message.auto = true   //this is automatic message
     message.fmt = this.format
 
+    const payLinkPath = `branch/aqua/order/${order.id}/pay-online`
+    const payLink = `https://book.birdy.life/${payLinkPath}`
+
+
     const replacements = {
       branch: branch.name,
       'branch-unique': branch.unique,
-      deposit: `€${order.deposit}`,
-      'order.paid': `€${order.paid}`,
+      'deposit': `€${order.deposit}`,
+      'paid': `€${order.paid}`,
       'cancel-time': '',
       'deposit-time': order.depositTime(),
       'deposit-date': order.depositDate(),
-     // term: this.getTerm_old(order),
+      // term: this.getTerm_old(order),
       first: order?.contact?.first,
       'order-id': order?.id,
       'start-date': order.startDateFormat(),
-      'order-lines': order.sumToString(),
+      'order-lines-html': order.sumToString(),
+      'order-lines-text': order.sumToString('\n'),
       'footer': branch.comm?.footer,
-      'product-informs': order.productInforms()
+      'product-informs': order.productInforms(),
+      'pay-link': payLink,
+      'pay-link-path': payLinkPath
       //'start-time': order.start
       //'url-path': 'branch/aqua/order/a420eb76-497d-4b4a-a22d-90f9e78d6113/pos-summary'
       // info: "baby giraffe"

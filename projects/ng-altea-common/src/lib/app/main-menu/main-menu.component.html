@@ -7,7 +7,7 @@
     <ng-container *ngFor="let item of menu">
 
         <a href="javascript: void(0);" class="list-group-item list-group-item-action" 
-        *ngIf="item.showAlways() || (item.showLoggedOn() && loggedIn) || (item.showLoggedOff() && !loggedIn)" (click)="selectMenuItem(item)">
+        *ngIf="item.showAlways(sessionSvc.contact) || (item.showLoggedOn(sessionSvc.contact) && loggedIn) || (item.showLoggedOff(sessionSvc.contact) && !loggedIn)" (click)="selectMenuItem(item)">
             <div class="app-menu-h1" translate>app.menu.{{item.code}}.h1</div>
             <div class="app-menu-inf" translate>app.menu.{{item.code}}.inf</div>
         </a>

@@ -17,6 +17,7 @@ export class SelectTimeSlotComponent {
 
   @Input() otherDateButton: boolean = true
 
+  message: string = ""
 
   constructor(protected orderMgrSvc: OrderMgrUiService) {
 
@@ -36,10 +37,17 @@ export class SelectTimeSlotComponent {
 
   async selectTimeSlot(option: ReservationOption) {
 
-    if (!this.debug)
-      await this.orderMgrSvc.selectTimeSlot(option)
+    this.message = ""
 
-    this.selected.emit(option)
+    var res = await this.orderMgrSvc.selectTimeSlot(option)
+
+    if (res?.isOk)
+      this.selected.emit(option)
+    else {
+
+      this.message = res.message
+    }
+
   }
 
 

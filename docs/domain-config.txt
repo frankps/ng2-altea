@@ -1,0 +1,36 @@
+
+
+
+GOOGLE DOMAIN config
+====================
+
+https://console.cloud.google.com/apis/credentials?authuser=0&hl=en&project=altea-24
+
+
+Info from:
+
+https://stackoverflow.com/questions/76717931/error-400-redirect-uri-mismatch-with-firebase-auth-googleauthprovider-from-fi
+
+
+Solution found!
+
+the problem was when i set up the firebase project i used a different domain and it defaulted to firebases default project domain "{projectname}.firebase.com" . i tried creating a new account not knowing firebase generates a service account for you automatically. this firebase cloud account can be found by going to
+
+project overview ( top left) > project settings > service accounts > manage service account permissions (top right).
+
+this will will take you to the google cloud page associated with your firebase web project from their you will click the 3 lines in the top left of the google cloud developer page and go to
+
+Api's & Services > credentials (left hand vertical bar)
+
+here you should see your google-generated OAuth2.0 settings. With these you can update them from
+
+"{projectname}.firebase.com" to "https://www.{yourdomain}.com"
+
+and for the redirect link from
+
+"{projectname}.firebase.com/__/auth/handler"
+to "https://www.{yourdomain}.com/__/auth/handler"
+
+
+
+

@@ -131,6 +131,8 @@ export class OrderMessagingBase {
 
         const msg = template.mergeWithOrder(order, branch, true)
 
+       // return new ApiResult(msg)
+
         console.warn(msg)
 
         if (!msg.conIds)

@@ -63,6 +63,8 @@ export class OrderDebugInfoComponent {
 
   selectMessage(message: Message) {
 
+    console.warn(message)
+
     if (message?.id == this.selMessage?.id)
       this.selMessage = null
     else

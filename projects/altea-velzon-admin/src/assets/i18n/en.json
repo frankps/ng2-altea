@@ -349,7 +349,8 @@
       "resv_no_show": "No show",
       "resv_satisfaction": "Tevredenheid",
       "resv_internal_cancel": "Interne annulatie (ziekte, etc...)",
-      "resv_footer": "Voettekst"
+      "resv_footer": "Voettekst",
+      "gift_online": "Online cadeaubon"
     }
   },
   "ui": {
@@ -708,6 +709,7 @@
       "use": "Gebruik deze bon",
       "use-specific": "Boek dit arrangement",
       "use-amount": "Boek iets anders",
+      "already-used": "Cadeaubon reeds gebruikt",
       "gift-not-found": "Cadeaubon niet gevonden"
     },
     "stripe": {

@@ -45,55 +45,82 @@
 
                 <!-- <h5 class="card-title">Special title treatment</h5> -->
 
-                <p class="card-text">
 
-                    Waarde van cadeaubon: {{gift.value | currency:branch.cur}}<br/>
-                    <span *ngIf="gift.used">Reeds gebruikt: {{gift.used | currency:branch.cur}}<br/>
-                    Nog beschikbaar: {{gift.value - gift.used | currency:branch.cur}}
-                    </span>
-                </p>
-  
+                <div class="row">
+                    <div class="col-6 d-flex justify-content-end">Waarde van cadeaubon:</div>
+                    <div class="col-6">{{gift.value | currency:branch.cur}}</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-6 d-flex justify-content-end">Reeds gebruikt:</div>
+                    <div class="col-6">{{gift.used | currency:branch.cur}}</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-6 d-flex justify-content-end">Nog beschikbaar:</div>
+                    <div class="col-6">{{gift.value - gift.used | currency:branch.cur}}</div>
+                </div>
+
+
                 <ng-container *ngIf="gift.hasLines()">
 
                     <div class="subSection mt-3" translate>objects.gift.lines</div>
-    
+
                     <div class="row ms-3" *ngFor="let line of gift.lines">
                         <div class="col">
                             {{line.qty}} x {{line.descr}}
                         </div>
                     </div>
-    
-    
-    
+
+
+
                 </ng-container>
 
 
+                <ng-container *ngIf="gift.availableAmount() > 0; else giftNotUsable">
 
-                <ng-container *ngIf="gift.isAmount()">
-                    <div class="d-grid mt-3">
-                        <button type="button" class="btn btn-outline-secondary float-end" (click)="useAmountGift()"
-                          translate>app.redeem.use</button>
-                    </div>
 
-                    <div class="d-grid mt-3">
-                        Hierna kan u de gewenste diensten of producten uit onze cataloog selecteren.
-                    </div>
+                    <ng-container *ngIf="gift.isAmount()">
+                        <div class="d-grid mt-3">
+                            <button type="button" class="btn btn-outline-secondary float-end" (click)="useAmountGift()"
+                                translate>app.redeem.use</button>
+                        </div>
+
+                        <div class="d-grid mt-3">
+                            Hierna kan u de gewenste diensten of producten uit onze cataloog selecteren.
+                        </div>
+                    </ng-container>
+
+
+
+                    <ng-container *ngIf="gift.isSpecific()">
+                        <div class="d-grid mt-3">
+                            <button type="button" class="btn btn-outline-secondary float-end"
+                                (click)="useSpecificGift()" translate>app.redeem.use-specific</button>
+                        </div>
+
+                        <div class="d-grid mt-3">
+                            <button type="button" class="btn btn-outline-secondary float-end" (click)="useAmountGift()"
+                                translate>app.redeem.use-amount</button>
+                        </div>
+
+
+                    </ng-container>
+
                 </ng-container>
 
 
-                <ng-container *ngIf="gift.isSpecific()">
-                    <div class="d-grid mt-3">
-                        <button type="button" class="btn btn-outline-secondary float-end" (click)="useSpecificGift()"
-                        translate>app.redeem.use-specific</button>
-                    </div>
+                <ng-template #giftNotUsable>
 
                     <div class="d-grid mt-3">
-                        <button type="button" class="btn btn-outline-secondary float-end" (click)="useAmountGift()"
-                        translate>app.redeem.use-amount</button>
+                        <button type="button" [disabled]="true" class="btn btn-outline-secondary float-end"
+                            translate>app.redeem.already-used</button>
                     </div>
 
+                </ng-template>
 
-                </ng-container>
+
+
 
             </div>
         </div>

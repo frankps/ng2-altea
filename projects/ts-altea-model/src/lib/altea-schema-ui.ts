@@ -141,6 +141,20 @@ export class OrderLineOptionUi extends ObjectUi {
 
         return optionUi
     }
+
+    shortInfo() {
+
+        let optionVals
+
+        if (ArrayHelper.NotEmpty(this.values)) {
+            let vals = this.values.map(val => val.name).filter(val => val != '0')
+            optionVals = vals.join(', ')
+        }
+
+        if (optionVals)
+            return `${this.name}: ${optionVals}`
+        else return null
+    }
 }
 
 export class OrderLineUi extends ObjectUi {
@@ -150,7 +164,7 @@ export class OrderLineUi extends ObjectUi {
     @Type(() => OrderLineOptionUi)
     options: OrderLineOptionUi[] = []
 
-    shortInfo() : string {
+    shortInfo(options = false, separator: string = ' ', indent = '&nbsp;&nbsp;'): string {
         let info = ''
 
         if (this.qty && this.qty > 1)
@@ -158,6 +172,12 @@ export class OrderLineUi extends ObjectUi {
 
         if (this.descr)
             info += this.descr
+
+        if (options && ArrayHelper.NotEmpty(this.options)) {
+            let optInfos = this.options.map(option => option.shortInfo()).filter(opt => opt != null).map(opt => indent + opt)
+            let optInfo = optInfos.join(separator)
+            info += separator + optInfo
+        }
 
         return info
     }
@@ -209,22 +229,23 @@ export class OrderUi extends ObjectUi {
         return DateHelper.parse(this.end)
     }
 
-    shortInfo() : string {
-        
+    shortInfo(contact = true, pay = true, options = false, separator: string = ' '): string {
+
         let info = ''
-        
-        if (this.contact)
+
+        if (contact && this.contact)
             info += this.contact.name
 
         if (ArrayHelper.NotEmpty(this.lines)) {
 
-            let lineInfos = this.lines.map(line => line.shortInfo())
+            let lineInfos = this.lines.map(line => line.shortInfo(options, separator))
             lineInfos = _.uniq(lineInfos)
-            let lineInfo = lineInfos.join(' ')
+            let lineInfo = lineInfos.join(separator)
             info += ` ${lineInfo}`
         }
 
-        info += ` €${this.paid}/${this.incl}`
+        if (pay)
+            info += ` €${this.paid}/${this.incl}`
 
         return info
 

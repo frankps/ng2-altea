@@ -157,30 +157,43 @@ export class AlteaDb {
         return orders
     }
 
-    async getOrdersToCleanup(): Promise<Order[]> {
+    
+    async getPosOrdersToCleanup(): Promise<Order[]> {
 
         const qry = new DbQueryTyped<Order>('order', Order)
 
-        // for debugging
-        /*        const ids = ['e44f1015-97c1-4cbc-bced-059cdef1f2db']
-                qry.and('id', QueryOperator.in, ids)
-        */
-
         qry.and('state', QueryOperator.equals, OrderState.creation)
         qry.and('contactId', QueryOperator.equals, null)
+        qry.and('src', QueryOperator.equals, 'pos')
 
         let maxCreationDate = new Date()
         maxCreationDate = dateFns.subMinutes(maxCreationDate, 15)
         qry.and('cre', QueryOperator.lessThan, maxCreationDate)
 
-        //    qry.take = 2
+        const orders = await this.db.query$<Order>(qry)
+
+        return orders
+    }
+
+
+    async getAppOrdersToCleanup(): Promise<Order[]> {
+
+        const qry = new DbQueryTyped<Order>('order', Order)
+
+        qry.and('state', QueryOperator.equals, OrderState.creation)
+        //qry.and('contactId', QueryOperator.equals, null)
+        qry.and('src', QueryOperator.equals, 'ngApp')
+       // qry.include('contact')
+
+        let maxCreationDate = new Date()
+        maxCreationDate = dateFns.subMinutes(maxCreationDate, 20)
+        qry.and('cre', QueryOperator.lessThan, maxCreationDate)
 
         const orders = await this.db.query$<Order>(qry)
 
         return orders
-
-
     }
+
 
 
     async updateOrders(orders: Order[], propertiesToUpdate: string[]): Promise<ApiListResult<Order>> {

@@ -11,7 +11,7 @@
                 <ng-container *ngIf="orderMgrSvc.hasOptions()">
                     <ng-container *ngFor="let option of orderMgrSvc.options">
 
-                        <span class="badge bg-danger mt-2" (click)="selectTimeSlot(option)">{{option.date |
+                        <span class="badge bg-success mt-4" (click)="selectTimeSlot(option)">{{option.date |
                             date:"HH:mm"}}</span>
                         &nbsp;
 
@@ -25,7 +25,12 @@
 
 </ng-container>
 
+<div class="row" *ngIf="message">
+    <div class="col">{{message}}</div>
+</div>
+
+
 <div class="d-grid mt-3" *ngIf="otherDateButton">
-    <button type="button" class="btn btn-outline-secondary float-end" (click)="selectOtherDate()"
+    <button type="button" class="btn btn-outline-primary float-end" (click)="selectOtherDate()"
         translate>ui.order-mgr.select-time-slot.other-date</button>
 </div>

@@ -50,12 +50,15 @@ https://ej2.syncfusion.com/angular/documentation/schedule/getting-started
   <ng-template #eventContent let-data="data">
     <div class="e-event-content" style="padding:10px">
       <a [routerLink]="['/aqua/orders/manage',data.OrderId]">Open order </a>
-
-      <div class="subject" style="padding-bottom:10px">Subject: {{data.Subject}}</div>
-      <div class="start-time" style="padding-bottom:10px">Start: {{data.StartTime.toLocaleString()}}</div>
-      <div class="end-time" style="padding-bottom:10px">End: {{data.EndTime.toLocaleString()}}</div>
+<!-- 
+      <div class="subject" style="padding-bottom:10px">Subject: {{data.Subject}}</div> -->
+   <!--    <div class="subject" style="padding-bottom:10px">Opties: {{data.Options}}</div> -->
+      <div [innerHTML]="data.Options"></div>
+      <br>
+      <div class="start-time" style="padding-bottom:10px">Start: {{data.StartTime | date:"dd/MM HH:mm"}}</div>
+      <!-- <div class="end-time" style="padding-bottom:10px">End: {{data.EndTime.toLocaleString()}}</div>
       <div class="location" style="padding-bottom:10px">Location: {{data.Location}}</div>
-      <div class="description" style="padding-bottom:10px">Description: {{data.Description}}</div>
+      <div class="description" style="padding-bottom:10px">Description: {{data.Description}}</div> -->
     </div>
   </ng-template>
 

@@ -149,7 +149,7 @@ export class DateRangeSet {
     getRangeStartingAt(from: Date): DateRange {
 
         return this.ranges.find(r => r.from.getTime() === from.getTime())
-        
+
     }
 
     getRangesForDay(start: Date): DateRange[] {
@@ -265,10 +265,10 @@ export class DateRangeSet {
     }
 
     allAtLeast(time: TimeSpan): boolean {
-        
+
         const idx = this.ranges.findIndex(r => r.duration.seconds < time.seconds)
 
-        return idx == -1 
+        return idx == -1
     }
 
     lessThen(time: TimeSpan): DateRangeSet {
@@ -428,7 +428,12 @@ export class DateRangeSet {
 
         for (let range of this.ranges) {
 
+            if (range.seconds() <= timeSpan.seconds)
+                continue
+
             const newRange = range.subtractTimeSpan(timeSpan)
+
+            //if (newRange.isValid())
             result.addRange(newRange)
         }
 
@@ -438,7 +443,7 @@ export class DateRangeSet {
 
     subtractRange(range: DateRange): DateRangeSet {
 
-        const toSubtract = new DateRangeSet( [ range ])
+        const toSubtract = new DateRangeSet([range])
 
         return this.subtract(toSubtract)
 
