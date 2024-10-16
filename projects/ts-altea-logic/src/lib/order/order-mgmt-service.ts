@@ -292,8 +292,9 @@ export class OrderMgmtService {
 
             case OrderState.confirmed:
 
-                await msgSvc.confirmationMessaging(order)
+                var res = await msgSvc.confirmationMessaging(order)
 
+                console.warn (res)
 
                 break
 
@@ -341,7 +342,7 @@ export class OrderMgmtService {
         return orderApiResult
 
 
-        
+
         if (orderApiResult.status != ApiStatus.ok) {
             console.error(orderApiResult)
             return undefined

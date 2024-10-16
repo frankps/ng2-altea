@@ -47,8 +47,17 @@ export class DetermineReservationOptions {
 
         if (refItem.exactStart)
             possibleStartDates.push(solution.offsetRefDate)
-        else
-            possibleStartDates = refItem.dateRange.getDatesEvery(TimeSpan.minutes(15))
+        else {
+
+            if (refItem.dateRange.from.getTime() == refItem.dateRange.to.getTime()) {
+                possibleStartDates.push(refItem.dateRange.from)
+            } else {
+                possibleStartDates = refItem.dateRange.getDatesEvery(TimeSpan.minutes(15))
+            }
+
+            
+        }
+            
 
         //possibleStartDates = _.sortedUniq(possibleStartDates)   //_.orderBy(possibleStartDates)
 

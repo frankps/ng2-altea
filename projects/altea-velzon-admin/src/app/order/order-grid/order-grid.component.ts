@@ -137,11 +137,17 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
   }
 
   async ngOnInit() {
+
+
     super._ngOnInit()
+
+
+
+     
 
     this.setDate()
 
-    this.startSearch()
+    await this.startSearch()
 
     await this.translationSvc.translateEnum(SearchTypeSelect, 'ui.order.search-type-select.', this.searchTypeSelect)
 
@@ -159,7 +165,11 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
   }
 
 
-  async dateChange(value: Date) {
+  async dateChange(value: Date, nullAllowed: boolean = false) {
+
+    if (!nullAllowed && !value)
+      return
+
 
     const me = this
 
@@ -172,7 +182,7 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
     me.dateRange = []
     me.dateRange.push(value, value)
 
-    this.startSearch()
+    await this.startSearch()
   }
 
   showDetails(uiOrder: UIOrder) {
@@ -187,7 +197,7 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
   }
 
 
-  startSearch() {
+  async startSearch() {
 
     if (this.dateRange?.length == 2) {
       var startDate = this.dateRange[0]
@@ -199,7 +209,7 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
       this.orderSearch.end = endDate ? DateHelper.yyyyMMdd000000(endDate) : undefined
     }
 
-    this.advancedSearch(this.orderSearch)
+    await this.advancedSearch(this.orderSearch)
   }
 
   async advancedSearch(orderSearch: OrderSearch = this.orderSearch) {
@@ -268,7 +278,7 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
     }
 
 
-    query.take = 30
+    query.take = 100
     query.include('lines.planning.resource', 'contact')
     query.orderBy('start', SortOrder.desc)
 

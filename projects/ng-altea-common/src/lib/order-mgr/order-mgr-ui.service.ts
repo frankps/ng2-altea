@@ -232,12 +232,13 @@ export class OrderMgrUiService {   // implements OnInit
     this.orderDirty = false
     this.options = null
     this.loyalty = null
-
+    this.showTimer = false
   }
 
   async newOrder(uiMode: OrderUiMode = OrderUiMode.newOrder, gift?: Gift) {
 
     let me = this
+
 
 
     let branch = await this.sessionSvc.branch$()
@@ -266,6 +267,9 @@ export class OrderMgrUiService {   // implements OnInit
 
 
   }
+
+
+
 
   hasOrderLines() {
 
@@ -612,10 +616,9 @@ export class OrderMgrUiService {   // implements OnInit
 
       console.warn(solutionForOption)
 
-      /*     this.spinner.hide()
-          return */
 
 
+      // determine how much time customer has to pay deposit
       const depositMinutes = me.setMaxWaitForDepositInHours(me.sessionSvc.appMode, option.date)
 
       // pick-up a cancelled order
@@ -636,18 +639,15 @@ export class OrderMgrUiService {   // implements OnInit
 
         me.refreshOrder(order)
 
+        me.startTimer()
+
         me.orderDirty = false
         me.dashboardSvc.showToastType(ToastType.saveSuccess)
       }
       else
         me.dashboardSvc.showToastType(ToastType.saveError)
 
-
       me.plannings = order?.planning
-
-
-
-
 
     } catch (err) {
 
@@ -660,8 +660,46 @@ export class OrderMgrUiService {   // implements OnInit
 
     }
 
-
   }
+
+
+    /** Users  */
+    showTimer = false
+    timeLeft = 10
+    interval
+  
+    /**
+     * https://www.w3schools.com/jsref/met_win_setinterval.asp
+     * https://stackoverflow.com/questions/50455347/how-to-do-a-timer-in-angular-5
+     */
+    startTimer() {
+  
+      this.showTimer = true
+      this.timeLeft = 10
+  
+      this.interval = setInterval(() => {
+  
+        if (this.timeLeft > 0) {
+          this.timeLeft--;
+        } else {
+          clearInterval(this.interval)
+        }
+      }, 60 * 1000)
+  
+    }
+
+    timerColor() : string {
+
+      if (this.timeLeft >= 3)
+        return 'green'
+      else if (this.timeLeft >= 1)
+        return 'orange'
+      else
+        return 'red'
+    }
+
+
+
 
   /** when an order is saved, we need to refresh all associated objects */
   refreshOrder(bdOrder: Order) {

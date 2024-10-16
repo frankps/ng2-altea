@@ -4,6 +4,7 @@ import { TranslateService } from '@ngx-translate/core';
 
 import { MENU } from './menu';
 import { MenuItem } from './menu.model';
+import { SessionService } from 'ng-altea-common';
 
 @Component({
   selector: 'app-sidebar',
@@ -18,13 +19,18 @@ export class SidebarComponent implements OnInit {
   @ViewChild('sideMenu') sideMenu!: ElementRef;
   @Output() mobileMenuButtonClicked = new EventEmitter();
 
-  constructor(private router: Router, public translate: TranslateService) {
+  constructor(private router: Router, public translate: TranslateService, public sessionSvc: SessionService) {
     translate.setDefaultLang('en');
   }
 
   ngOnInit(): void {
     // Menu Items
-    this.menuItems = MENU;
+
+    
+    this.menuItems = MENU.filter(item => item.roles?.indexOf(this.sessionSvc.role) >= 0);
+
+
+
     this.router.events.subscribe((event) => {
       if (document.documentElement.getAttribute('data-layout') != "twocolumn") {
         if (event instanceof NavigationEnd) {

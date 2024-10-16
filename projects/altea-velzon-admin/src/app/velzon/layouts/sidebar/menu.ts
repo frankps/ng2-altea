@@ -4,54 +4,63 @@ export const MENU: MenuItem[] = [
   {
     id: 1,
     label: 'MENUITEMS.MENU.TEXT',
-    isTitle: true
+    isTitle: true,
+    roles: ['staff', 'admin']
   },
   {
     id: 10,
     label: 'menu.order.label',
     icon: 'plus-circle',
     link: '/aqua/orders/manage',
+    roles: ['staff', 'admin']
   },
   {
     id: 7,
     label: 'menu.calendar.label',
     icon: 'calendar',
     link: '/aqua/calendar/syncfusion',
+    roles: ['staff', 'admin']
   },
   {
     id: 6,
     label: 'menu.orders.label',
     icon: 'archive',
     link: '/aqua/orders',
+    roles: ['staff', 'admin']
   },
   {
     id: 16,
     label: 'menu.messaging.label',
     icon: 'message-square',
     link: '/aqua/messaging',
+    roles: ['staff', 'admin']
   },
   {
     id: 5,
     label: 'menu.contacts.label',
     icon: 'users',
     link: '/aqua/contacts',
+    roles: ['staff', 'admin']
   },  
   {
     id: 8,
     label: 'menu.gifts.label',
     icon: 'gift',
     link: '/aqua/gifts',
+    roles: ['staff', 'admin']
   },
   {
     id: 9,
     label: 'menu.subscriptions.label',
     icon: 'refresh-cw',
     link: '/aqua/subscriptions',
+    roles: ['staff', 'admin']
   },
   {
     id: 2,
     label: 'menu.resources.label',
     icon: 'globe',
+    roles: ['admin'],
     subItems: [
       {
         id: 21,
@@ -85,6 +94,7 @@ export const MENU: MenuItem[] = [
     id: 3,
     label: 'menu.catalog.label',
     icon: 'database',
+    roles: ['admin'],
     subItems: [
       {
         id: 32,
@@ -106,12 +116,15 @@ export const MENU: MenuItem[] = [
     label: 'menu.templates.label',
     icon: 'file-text',
     link: '/aqua/templates',
+    roles: ['admin']
   },
+  /*
   {
     id: 7,
     label: 'menu.calendar.label',
     icon: 'calendar',
     link: '/aqua/calendar/syncfusion',
+    roles: ['admin'],
     subItems: [
       {
         id: 71,
@@ -126,7 +139,7 @@ export const MENU: MenuItem[] = [
         parentId: 7
       }
     ]
-  },
+  },*/
   
   
   {
@@ -134,12 +147,14 @@ export const MENU: MenuItem[] = [
     label: 'menu.branch.label',
     icon: 'settings',
     link: '/aqua/branch',
+    roles: ['admin']
   },
   {
     id: 12,
     label: 'menu.tasks.label',
     icon: 'briefcase',
     link: '/aqua/tasks',
+    roles: ['admin'],
     subItems: [
       {
         id: 121,
@@ -160,6 +175,7 @@ export const MENU: MenuItem[] = [
     label: 'menu.accounting.label',
     icon: 'book',
     link: '/aqua/accounting',
+    roles: ['admin'],
     subItems: [
       {
         id: 171,
@@ -180,11 +196,13 @@ export const MENU: MenuItem[] = [
     label: 'menu.loyalty.label',
     icon: 'user-plus',
     link: '/aqua/loyalty',
+    roles: ['admin']
   },
   {
     id: 15,
     label: 'menu.local.label',
     icon: 'share-2',
+    roles: ['admin'],
     subItems: [
       {
         id: 151,
@@ -218,6 +236,7 @@ export const MENU: MenuItem[] = [
     label: 'menu.platform.label',
     icon: 'map',
     link: '/platform/users',
+    roles: ['admin'],
     subItems: [
       {
         id: 301,

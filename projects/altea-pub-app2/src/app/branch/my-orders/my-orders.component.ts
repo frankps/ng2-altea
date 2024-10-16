@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { AlteaService, OrderMgrUiService, OrderService, OrderUiMode, SessionService, SubscriptionService } from 'ng-altea-common';
 import { ConnectableObservable } from 'rxjs';
 import { CancelOrderChecks } from 'ts-altea-logic';
-import { Order, OrderCancel, OrderCancelBy, PaymentType, Subscription } from 'ts-altea-model';
+import { Contact, Order, OrderCancel, OrderCancelBy, PaymentType, Subscription } from 'ts-altea-model';
 import { ArrayHelper, DateHelper, DbQuery, QueryOperator, SortOrder } from 'ts-common';
 
 
@@ -18,8 +18,9 @@ export class MyOrdersComponent implements OnInit {
 
   nowNum: number
 
-    // test
-  contactId = '44f16d0b-a5bc-4a49-9f6d-9805fae2004e'
+  // test
+  //contactId = '44f16d0b-a5bc-4a49-9f6d-9805fae2004e'
+  contact: Contact
 
   orders: Order[]
 
@@ -27,22 +28,25 @@ export class MyOrdersComponent implements OnInit {
   curOrder: Order
   cancelChecks: CancelOrderChecks
 
-  mode : 'view' | 'cancel' = 'view'
+  mode: 'view' | 'cancel' = 'view'
 
   enableActions = false
 
 
-  constructor(protected orderSvc: OrderService, protected orderMgrSvc: OrderMgrUiService,  protected router: Router,
+  constructor(protected orderSvc: OrderService, protected orderMgrSvc: OrderMgrUiService, protected router: Router,
     protected sessionSvc: SessionService, protected alteaSvc: AlteaService) {
 
   }
 
   async ngOnInit() {
 
+    this.contact = this.sessionSvc.contact
+
     const now = new Date()
     this.nowNum = DateHelper.yyyyMMddhhmmss(now)
 
-    await this.loadOrders(this.contactId)
+    if (this.contact)
+      await this.loadOrders(this.contact.id)
 
   }
 
@@ -79,7 +83,7 @@ export class MyOrdersComponent implements OnInit {
     this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'order', order.id, 'select-date'])
 
   }
- 
+
 
   async loadOrders(contactId: string) {
 
@@ -91,10 +95,12 @@ export class MyOrdersComponent implements OnInit {
 
     query.orderBy('start', SortOrder.desc)
 
+    query.take = 20 
+
     this.orders = await this.orderSvc.query$(query)
 
 
     let order: Order
-    
+
   }
 }

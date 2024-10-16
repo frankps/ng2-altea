@@ -18,6 +18,7 @@ import { cartData } from './data';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { DashboardService } from 'ng-common';
+import { SessionService } from 'ng-altea-common';
 
 @Component({
   selector: 'app-topbar',
@@ -50,7 +51,7 @@ export class TopbarComponent implements OnInit {
 
   constructor(@Inject(DOCUMENT) private document: any, private eventService: EventService, public languageService: LanguageService, private modalService: NgbModal,
     public _cookiesService: CookieService, public translate: TranslateService, private authService: AuthenticationService,
-    private router: Router, private TokenStorageService: TokenStorageService, public dashboardSvc: DashboardService) { }
+    private router: Router, private TokenStorageService: TokenStorageService, public dashboardSvc: DashboardService, public sessionSvc: SessionService) { }
 
   ngOnInit(): void {
     this.userData = this.TokenStorageService.getUser();
@@ -327,6 +328,9 @@ export class TopbarComponent implements OnInit {
   searchNow(input: any) {
 
     // console.error()
+
+    if (this.searchString == 'wxc')
+      this.sessionSvc.toggleRole()
 
     this.dashboardSvc.searchFor(this.searchString)
 

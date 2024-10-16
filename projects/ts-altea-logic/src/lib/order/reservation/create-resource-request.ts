@@ -8,6 +8,14 @@ import { IDb } from '../../interfaces/i-db'
 import * as _ from "lodash";
 
 
+export class PersonInfo {
+    offset: TimeSpan = TimeSpan.zero
+
+    staff: ResourceRequestItem = null
+
+
+
+}
 
 export class CreateResourceRequest {
     alteaDb: AlteaDb
@@ -71,17 +79,21 @@ export class CreateResourceRequest {
 
         resourceRequest.schedule = schedule
 
+        // const offsetPerPerson = new Map<string, TimeSpan>()
 
-        const offsetPerPerson = new Map<string, TimeSpan>()
+        const personInfos = new Map<string, PersonInfo>()
 
-        for (const person of persons)
-            offsetPerPerson.set(person.id!, TimeSpan.zero)
+
+        for (const person of persons) {
+            // offsetPerPerson.set(person.id!, TimeSpan.zero)
+
+            personInfos.set(person.id!, new PersonInfo())
+        }
+
 
         for (const orderLine of orderLines) {
 
             const product = orderLine.product!
-
-
 
             //product.preTime
 
@@ -106,7 +118,8 @@ export class CreateResourceRequest {
             // most of the time there will be only 1 personId
             for (const personId of orderLinePersonIds) {
 
-                const personOffset = offsetPerPerson.get(personId)!
+                // const personOffset = offsetPerPerson.get(personId)!
+                const personInfo = personInfos.get(personId)!
 
                 personOffsetToAdd = TimeSpan.zero
 
@@ -131,10 +144,21 @@ export class CreateResourceRequest {
 
                         let childResources = resource.getChildResources()
 
-                        /** check if preferred staff was selected */
-                        if (resource.type == ResourceType.human && ArrayHelper.NotEmpty(order.resPrefs?.humIds)) {
-                            let humanIds = order.resPrefs?.humIds
-                            childResources = childResources.filter(r => humanIds.indexOf(r.id) >= 0)
+
+                        if (resource.type == ResourceType.human) {
+
+                            /** check if preferred staff was selected */
+                            if (ArrayHelper.NotEmpty(order.resPrefs?.humIds)) {
+                                let humanIds = order.resPrefs?.humIds
+                                childResources = childResources.filter(r => humanIds.indexOf(r.id) >= 0)
+                            }
+
+                            /* Check affinity (same staff member for same person): the first request item defines the staff member for a certain person
+                            */
+                            if (personInfo.staff) {
+                                resReqItem.affinity = personInfo.staff
+                            } else
+                                personInfo.staff = resReqItem
                         }
 
                         resReqItem.addResources(childResources)
@@ -145,8 +169,8 @@ export class CreateResourceRequest {
                     resReqItem.personId = personId
                     resReqItem.duration = offsetDuration.duration
 
-
-                    const offset = personOffset.clone()
+                    const offset = personInfo.offset.clone()
+                    // const offset = personOffset.clone()
                     resReqItem.offset = offset.add(offsetDuration.offset)
 
 
@@ -172,7 +196,8 @@ export class CreateResourceRequest {
 
                 }
 
-                personOffset.addInternal(personOffsetToAdd)
+                personInfo.offset.addInternal(personOffsetToAdd)
+                //   personOffset.addInternal(personOffsetToAdd)
 
                 personIdx++
 
@@ -188,8 +213,12 @@ export class CreateResourceRequest {
 
                 for (let idx = personIdx; idx < orderLinePersonIds.length; idx++) {
                     const personId = orderLinePersonIds[idx]
-                    const personOffset = offsetPerPerson.get(personId)!
-                    personOffset.addInternal(personOffsetToAdd)
+
+                    const personInfo = personInfos.get(personId)!
+                    personInfo.offset.addInternal(personOffsetToAdd)
+
+                    //                    const personOffset = offsetPerPerson.get(personId)!
+                    //                  personOffset.addInternal(personOffsetToAdd)
                 }
             }
 

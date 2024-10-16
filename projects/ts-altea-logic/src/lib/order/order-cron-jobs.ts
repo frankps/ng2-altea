@@ -1,5 +1,5 @@
 
-import { Subscription, Order, Gift, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, ConfirmOrderResponse, PaymentType, Payment, OrderType, OrderLine, GiftType, OrderCancel, OrderCancelBy, InternalCancelReasons, MessageAddress, MessageDirection } from 'ts-altea-model'
+import { Subscription, Order, Gift, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, ConfirmOrderResponse, PaymentType, Payment, OrderType, OrderLine, GiftType, OrderCancel, OrderCancelBy, InternalCancelReasons, MessageAddress, MessageDirection, TemplateFormat } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { AlteaDb } from '../general/altea-db'
 import { IDb } from '../interfaces/i-db'
@@ -36,9 +36,11 @@ export class OrderCronJobs {
 
         msg.from = new MessageAddress('info@aquasense.be', 'Aquasense')
         msg.addTo('frank.newsly@gmail.com', 'Frank')
+        msg.addTo('hilde@aquasense.be', 'Hilde')
         msg.type = MsgType.email
         msg.auto = true
-        msg.dir = MessageDirection.int
+        msg.dir = MessageDirection.out
+        msg.fmt = TemplateFormat.html
 
         await this.alteaDb.db.sendMessage$(msg)
 
@@ -60,13 +62,28 @@ export class OrderCronJobs {
             let posOrders = await me.alteaDb.getPosOrdersToCleanup()
             let appOrders = await me.alteaDb.getAppOrdersToCleanup()
 
-            if (ArrayHelper.IsEmpty(posOrders)) {
+            let allOrders = [...posOrders, ...appOrders]
+
+            html.addRow(['<h3>Geen orders om te cleanen!</h3>'])
+
+            const header = []
+            header.push('Order Id')
+            header.push('Gemaakt op')
+            header.push('Klant')
+            header.push('Datum')
+            header.push('Betaald')
+            header.push('Vorige status')
+            header.push('Nieuwe status')
+            html.addRow(header)
+
+
+            if (ArrayHelper.IsEmpty(allOrders)) {
                 return 'No orders to clean up!'
             }
 
-            let allOrders = [...posOrders, ...appOrders]
+            orderCount = allOrders.length
 
-            orderCount = posOrders.length
+            msg.subj = `Cleanup Orders: ${orderCount}`
 
             const orderIds = allOrders.map(o => o.id)
 
@@ -74,9 +91,10 @@ export class OrderCronJobs {
 
                 const cols = []
 
+                let previousState = order.state
                 order.state = OrderState.cancelled
 
-                cols.push(order.id)
+                cols.push(`<a href="https://pos.birdy.life/aqua/orders/manage/${order.id}">${order.id}</a>`)
 
                 order.cancel = new OrderCancel()
                 order.cancel.by = OrderCancelBy.int
@@ -85,6 +103,13 @@ export class OrderCronJobs {
                 cols.push(order.src)
 
                 cols.push(order.for)
+
+                cols.push(order.startDateFormat())
+
+                cols.push(order.paid)
+
+                cols.push(previousState)
+                cols.push(order.state)
 
                 html.addRow(cols)
             }

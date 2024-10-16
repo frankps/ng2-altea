@@ -5,8 +5,9 @@ import { TimeSpan } from "./dates/time-span"
 import { DateRangeSet } from "./dates"
 import * as _ from "lodash";
 import { Type } from "class-transformer";
+import { ArrayHelper, ObjectWithId } from "ts-common";
   
-export class ResourceRequestItem {
+export class ResourceRequestItem extends ObjectWithId {
     //person?: OrderPerson
 
     /** only filled in if request is based on a resource group  */
@@ -23,6 +24,8 @@ export class ResourceRequestItem {
     @Type(() => TimeSpan)
     duration = TimeSpan.zero
 
+    
+
     /** the number of resources that should be allocated from the resourceGroup (or from resources) */
     qty = 1
 
@@ -37,11 +40,18 @@ export class ResourceRequestItem {
     // set to true when processed
     isProcessed = false
 
+    /** if this item should use same resource as othe item (use same staff member) */
+    affinity: ResourceRequestItem = null
+
     /** the availability after applying all rules: schedules, resourcePlannings, etc ... */
     // availability: DateRangeSet = DateRangeSet.empty
 
     constructor(public orderLine: OrderLine, public product: Product, public resourceType: ResourceType) {
+        super()
+    }
 
+    hasAffinity() : boolean {
+        return (this.affinity != null && this.affinity != undefined)
     }
 
     clone(): ResourceRequestItem {
@@ -72,6 +82,21 @@ export class ResourceRequestItem {
         return this.offset.add(this.duration)
     }
     //offsetDuration: OffsetDuration = new OffsetDuration()
+
+    samePersonAndResourceType(personId: string, resType: ResourceType) {
+
+        if (ArrayHelper.IsEmpty(this.resources))
+            return false
+
+        var resIdx = this.resources.findIndex(r => r.type == resType)
+
+        if (resIdx == -1)
+            return false
+
+        // here we already have a resource of same type
+
+        return this.personId == personId
+    }
 
     seconds(): number {
         return this.duration.seconds

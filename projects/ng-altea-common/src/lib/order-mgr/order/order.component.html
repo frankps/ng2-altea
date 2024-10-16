@@ -2,7 +2,12 @@
     <!-- <img src="..." class="card-img-top" alt="..."> -->
     <div class="card-header p-2" [style.background-color]="orderMgrSvc.dirtyColor()">
         <div class="row header">
-            <div class="col-6 px-3"><span *ngIf="order.contact">{{order.contact.name}}</span></div>
+            <div class="col-6 px-3 d-flex align-items-center">
+
+                <i *ngIf="order.src == 'ngApp'" class="fa-solid fa-mobile"></i>
+                <span *ngIf="order.contact"> &nbsp;{{order.contact.name}}</span>
+
+            </div>
             <div class="col-6 px-3 d-flex justify-content-end align-items-center"> {{order.start | intdate}}
                 <span *ngIf="order.giftCode">{{order.giftCode}} &nbsp;<i class="fa-duotone fa-solid fa-gift"></i></span>
             </div>
@@ -321,7 +326,8 @@
                 <div class="col">
 
                     <div class="form-check form-switch float-end">
-                        <input class="form-check-input" type="checkbox" id="msg" name="msg" [(ngModel)]="order.msg" />
+                        <input class="form-check-input" type="checkbox" id="msg" name="msg" [(ngModel)]="order.msg"
+                            (change)="fieldChanged('msg')" />
                         <span class="" translate>objects.order.msg</span>
                     </div>
 
@@ -343,13 +349,15 @@
 
 
 
+        <span *ngIf="orderMgrSvc.showTimer" class="float-end" [style.color]="orderMgrSvc.timerColor()">Gelieve af te werken binnen de {{orderMgrSvc.timeLeft}} minuten.</span>
 
 
 
     </div>
     <div class="card-footer p-2">
         <div class="row text-muted" style="font-size: 80%;">
-            <div class="col-6">Gemaakt op {{order.cre | date: sessionSvc.formats.dateShort}}</div>
+            <div class="col-12">Gemaakt op {{order.cre | date: sessionSvc.formats.dateTimeShort}}
+                           </div>
 
 
             <div class="d-grid mt-3" *ngIf="showConfirm && orderMgrSvc.orderDirty">
@@ -371,6 +379,9 @@
                 <button type="button" class="btn btn-outline-primary float-end" (click)="next()"
                     translate>msg.continue</button>
             </div>
+
+
+
         </div>
 
 

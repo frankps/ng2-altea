@@ -463,11 +463,12 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
     return DateHelper.parse(this.start)
   }
-
+// <i class="fa-regular fa-list"></i>
   stateIcon() {
     switch (this?.state) {
       case OrderState.cancelled: return "fa-solid fa-circle-xmark"
       case OrderState.creation: return "fa-solid fa-pen-circle"
+      case OrderState.created: return "fa-regular fa-list"
       case OrderState.waitDeposit: return "fa-solid fa-credit-card"
       case OrderState.confirmed: return "fa-solid fa-circle-check"
       case OrderState.finished: return "fa-sharp-duotone fa-solid fa-flag-checkered"

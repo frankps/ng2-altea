@@ -29,7 +29,7 @@ export class SlotFinder {
         // we will invalidate some solutions and replace with new solutions to allow breaks for staff
         // const newSolutions: Solution[] = []
 
-        let solutionsToCheck : Solution[] = solutionSet.validSolutions
+        let solutionsToCheck: Solution[] = solutionSet.validSolutions
 
         //solutionsToCheck = solutionsToCheck.splice(1, solutionsToCheck.length - 1)
 
@@ -54,10 +54,17 @@ export class SlotFinder {
                 if (solution.breaksChecked.indexOf(human.id) >= 0)
                     continue
 
-                const breaksForStaffMember = breaksByResourceId.get(human.id)
+                // the outer official break windows wherin we need to forsee a break
+                let breaksForStaffMember = breaksByResourceId.get(human.id)
+
 
                 if (!breaksForStaffMember || breaksForStaffMember.isEmpty())
                     continue
+
+                // we need to subtract what is already booked
+                const alreadyOccupied = ctx.getResourceOccupation2(human.id)
+                breaksForStaffMember = breaksForStaffMember.subtract(alreadyOccupied.unAvailable)
+
 
                 const staffSolItems = humanResourcesItems.getItemsForResource(human.id)
 
@@ -90,16 +97,15 @@ export class SlotFinder {
                     const staffDateRange = staffSolItems.getOuterRange2()
 
                     // if no potential overlap with breaks, then no problem
-                    
+
                     if (!dayBreaksForStaffMember.hasOverlapWith(staffDateRange))
                         continue
 
 
                     // if remaining of break window is still big enough, then no problem
-                
-                    const remainingOfBreaks = dayBreaksForStaffMember.subtractRange(staffDateRange)  
 
-                    if (remainingOfBreaks.count == dayBreaksForStaffMember.count 
+                    const remainingOfBreaks = dayBreaksForStaffMember.subtractRange(staffDateRange)
+                    if (remainingOfBreaks.count == dayBreaksForStaffMember.count
                         && remainingOfBreaks.allAtLeast(staffBreak))
                         continue
 
@@ -109,6 +115,8 @@ export class SlotFinder {
                        then there is never a problem
                     */
                     const staffOccupation: TimeSpan = staffSolItems.totalRequestDuration()
+
+
                     let newBreakWindows = dayBreaksForStaffMember.substractAll(staffOccupation)
                     let compareWith = staffBreak.times(2)
                     const tooSmallBreakWindows = newBreakWindows.lessThen(compareWith)
@@ -130,52 +138,67 @@ export class SlotFinder {
                         const staffOccupationFromStart: TimeSpan = staffSolItems.totalRequestDurationInclOffset()
 
 
-                        const endOfFirstBreak = dateFns.addMinutes(breakWindow.from, breakTimeInMinutes)
+
                         const startOfLastBreak = dateFns.subMinutes(breakWindow.to, breakTimeInMinutes)
 
                         solution.valid = false
-                        solution.addNote(`${human.name} can't have a break within ${breakWindow.toString()}: we will create new solutions before & after possible break`)
+                        solution.addNote(`${human.name} can't have a break within ${breakWindow.toString()}: we will create new solutions (if possible) before & after possible break`)
 
 
                         // Create first solution (before break)
 
                         const lastPossibleStartOfSolution = dateFns.subSeconds(startOfLastBreak, staffOccupationFromStart.seconds)
 
-                        const solutionBeforeBreak = solution.clone()
-                        solutionBeforeBreak.valid = true 
+                        if (lastPossibleStartOfSolution >= solution.offsetRefDate) {
 
-                        // we need te re-evalutae this new solution for other (potential) break problems
-                        solutionSet.add(solutionBeforeBreak)
-                       // solutionsToCheck.splice(0, solutionsToCheck.length)
-                        solutionsToCheck.push(solutionBeforeBreak)
+                            const solutionBeforeBreak = solution.clone()
+                            solutionBeforeBreak.valid = true
+
+                            // we need te re-evalutae this new solution for other (potential) break problems
+                            solutionSet.add(solutionBeforeBreak)
+                            // solutionsToCheck.splice(0, solutionsToCheck.length)
+                            solutionsToCheck.push(solutionBeforeBreak)
 
 
 
-                        solutionBeforeBreak.limitOtherItems(solution.offsetRefDate, lastPossibleStartOfSolution)
+                            solutionBeforeBreak.limitOtherItems(solution.offsetRefDate, lastPossibleStartOfSolution)
 
-                        const lastBreak = new DateRange(startOfLastBreak, breakWindow.to)
-                        solutionBeforeBreak.addNote(`Solution created to enable break for ${human.name}. Last possible break: ${lastBreak.toString()}`)
-                        solutionBeforeBreak.breaksChecked.push(human.id)
+                            const lastBreak = new DateRange(startOfLastBreak, breakWindow.to)
+                            solutionBeforeBreak.addNote(`Solution created to enable break for ${human.name}. Last possible break: ${lastBreak.toString()}`)
+                            solutionBeforeBreak.breaksChecked.push(human.id)
+
+                            newSolutionsCreated = true
+                        }
+
+
 
                         // Create second solution (after break)
 
+                        const endOfFirstBreak = dateFns.addMinutes(breakWindow.from, breakTimeInMinutes)
+
                         //const lastPossibleStartOfSolution = dateFns.subSeconds(startOfLastBreak, staffOccupationFromStart.seconds)
 
-                        const solutionAfterBreak = solution.clone()
-                        solutionAfterBreak.valid = true 
 
-                        // we need te re-evalutae this new solution for other (potential) problems
-                        solutionSet.add(solutionAfterBreak)
-                        solutionsToCheck.push(solutionAfterBreak)
+                        const lastPossibleEndOfSolution = solution.items[0].dateRange.to
+
+                        if (endOfFirstBreak < lastPossibleEndOfSolution) {
+                            const solutionAfterBreak = solution.clone()
+                            solutionAfterBreak.valid = true
+
+                            // we need te re-evalutae this new solution for other (potential) problems
+                            solutionSet.add(solutionAfterBreak)
+                            solutionsToCheck.push(solutionAfterBreak)
+
+                            solutionAfterBreak.limitOtherItems(endOfFirstBreak)
+
+                            const firstBreak = new DateRange(breakWindow.from, endOfFirstBreak)
+                            solutionAfterBreak.addNote(`Solution created to enable break for ${human.name}. First possible break: ${firstBreak.toString()}`)
+                            solutionAfterBreak.breaksChecked.push(human.id)
+
+                            newSolutionsCreated = true
+                        }
 
 
-                        solutionAfterBreak.limitOtherItems(endOfFirstBreak)
-
-                        const firstBreak = new DateRange(breakWindow.from, endOfFirstBreak)
-                        solutionAfterBreak.addNote(`Solution created to enable break for ${human.name}. First possible break: ${firstBreak.toString()}`)
-                        solutionAfterBreak.breaksChecked.push(human.id)
-
-                        newSolutionsCreated = true
 
                         break
 
@@ -201,7 +224,7 @@ export class SlotFinder {
                 break
 
             }
-                
+
 
         }
 
@@ -211,12 +234,46 @@ export class SlotFinder {
 
     }
 
+    addHM(date: Date, hours: number, mins: number = 0): Date {
+
+        let newDate = date
+
+        newDate = dateFns.addHours(newDate, hours)
+
+        newDate = dateFns.addMinutes(newDate, mins)
+
+        return newDate
+    }
+
+    debug() {
+
+        let date = new Date(2024, 10, 19)
+
+        let set1 = new DateRangeSet()
+        set1.addRangeByDates(this.addHM(date, 12, 15), this.addHM(date, 13, 25))
+
+        let set2 = new DateRangeSet()
+        set2.addRangeByDates(this.addHM(date, 9, 30), this.addHM(date, 11, 45))
+        set2.addRangeByDates(this.addHM(date, 12), this.addHM(date, 12, 15))
+        set2.addRangeByDates(this.addHM(date, 13, 25), this.addHM(date, 14))
+        set2.addRangeByDates(this.addHM(date, 14), this.addHM(date, 14, 30))
+        set2.addRangeByDates(this.addHM(date, 14, 30), this.addHM(date, 15, 45))
+        set2.addRangeByDates(this.addHM(date, 16, 30), this.addHM(date, 17, 25))
+
+        let set3 = set1.union(set2)
+
+        console.log(set3)
+
+    }
+
 
     /**
      *  There can be multiple resourceRequests: for instance different requests per branch schedule 
      */
     findSlots(availability2: ResourceAvailability2, ctx: AvailabilityContext, ...resourceRequests: ResourceRequest[]): SolutionSet {
 
+
+        this.debug()
 
 
         const branchModeRanges = ctx.getBranchModeRanges(ctx.request.getDateRange())
@@ -387,7 +444,6 @@ export class SlotFinder {
             const referenceSolutionItem = solution.items[0]
 
 
-
             if (referenceSolutionItem.exactStart) {
                 /* exactStart = true !!! => the first item in the solution has exact start and end */
 
@@ -466,13 +522,28 @@ export class SlotFinder {
                 // const startRange = new DateRange(startFrom, startTo)
                 const checkInRange = new DateRange(startFrom, endsOn)
 
-                const availableResources = availability.getAvailabilityOfResourcesInRange(requestItem.resources, checkInRange, requestItem.duration, solution)
+                let possibleResources = requestItem.resources
+
+                const hasAffinity = requestItem.hasAffinity()
+
+                /** check if this request item is related to previous items */
+                if (hasAffinity) {
+                    let affinitySolutionItem = solution.getSolutionItemForRequestItem(requestItem.affinity.id)
+                    possibleResources = affinitySolutionItem.resources
+                }
+
+                let resourceNames = possibleResources.map(r => r.name).join(',')
+
+                if (hasAffinity)
+                    solution.addNote(`Affinity for: ${resourceNames}`)
+
+                const availableResources = availability.getAvailabilityOfResourcesInRange(possibleResources, checkInRange, requestItem.duration, solution, !hasAffinity)
 
                 // if we have no availabilities for the new requestItem, then we are on a dead-end for this solution
                 if (availableResources.isEmpty()) {
                     solution.valid = false
 
-                    solution.addNote(`No availability found for '${requestItem.resourceNames()}' in range ${checkInRange.toString()} for ${requestItem.duration.toString()}`)
+                    solution.addNote(`No availability found for '${resourceNames}' in range ${checkInRange.toString()} for ${requestItem.duration.toString()}`)
 
 
                     if (trackInvalidSolutions)

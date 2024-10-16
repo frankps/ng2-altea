@@ -188,6 +188,18 @@ export class DateRangeSet {
 
     }
 
+    hasOverlapWithSet(overlapWith: DateRangeSet): boolean {
+
+        for (let range of overlapWith.ranges) {
+
+            if (this.hasOverlapWith(range))
+                return true
+        }
+
+        return false
+
+    }
+
     hasOverlapWith(overlapWith: DateRange): boolean {
 
         if (this.isEmpty() || overlapWith == null)

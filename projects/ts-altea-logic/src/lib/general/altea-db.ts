@@ -25,7 +25,6 @@ export class AlteaDb {
 
     async saveOrder(order: Order): Promise<ApiResult<Order>> {
 
-
         const orderClone = order.clone()
 
         delete orderClone['branch']
@@ -165,6 +164,7 @@ export class AlteaDb {
         qry.and('state', QueryOperator.equals, OrderState.creation)
         qry.and('contactId', QueryOperator.equals, null)
         qry.and('src', QueryOperator.equals, 'pos')
+        qry.and('paid', QueryOperator.equals, 0)
 
         let maxCreationDate = new Date()
         maxCreationDate = dateFns.subMinutes(maxCreationDate, 15)
@@ -181,6 +181,7 @@ export class AlteaDb {
         const qry = new DbQueryTyped<Order>('order', Order)
 
         qry.and('state', QueryOperator.equals, OrderState.creation)
+        qry.and('paid', QueryOperator.equals, 0)
         //qry.and('contactId', QueryOperator.equals, null)
         qry.and('src', QueryOperator.equals, 'ngApp')
        // qry.include('contact')

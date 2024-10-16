@@ -69,6 +69,8 @@ export class OrderMessaging extends OrderMessagingBase {
         if (!order)
             return new ApiResult<Order>(order, ApiStatus.error, 'No order supplied!')
 
+        if (!order.msg) // messaging disabled for order
+            return ApiResult.warning('Messaging disabled for order!')
         /*
         if (order.deposit > 0 && order.paid < order.deposit)
             return await this.depositMessaging(order)
@@ -120,6 +122,9 @@ export class OrderMessaging extends OrderMessagingBase {
     }
 
     async confirmationMessaging(order: Order): Promise<ApiResult<Order>> {
+
+        if (!order.msg) // messaging disabled for order
+            return ApiResult.warning('Messaging disabled for order!')
 
         /*
         if (order.deposit == 0 || order.paid >= order.deposit)

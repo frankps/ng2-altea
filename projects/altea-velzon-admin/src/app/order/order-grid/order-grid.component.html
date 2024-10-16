@@ -10,7 +10,7 @@
                 (bsValueChange)="dateChange($event)">
             </div>
             <div class="col ms-1 ps-0 d-flex align-items-center">
-                <i class="fa-solid fa-circle-xmark" (click)="dateChange(null)"></i>
+                <i class="fa-solid fa-circle-xmark" (click)="dateChange(null, true)"></i>
             </div>
         </div>
 
@@ -60,7 +60,9 @@
                 {{uiOrder.start| intdate}}
             </div>
             <div class="col-2">
-                {{uiOrder.for}}</div>
+                {{uiOrder.for}}
+                <i *ngIf="uiOrder.src == 'ngApp'" class="fa-solid fa-mobile"></i>
+            </div>
 
             <div class="col-2" [style.color]="uiOrder.pay.color">{{uiOrder.pay.info}}</div>
 

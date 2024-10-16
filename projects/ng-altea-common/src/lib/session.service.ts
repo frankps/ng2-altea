@@ -13,13 +13,16 @@ export class SessionService implements OnInit {
 
   formats = {
     date: 'dd/MM/yyyy',
-    dateShort: 'dd/MM'
-  }  
+    dateShort: 'dd/MM',
+    dateTimeShort: 'dd/MM/yy HH:mm',
+  }
 
   colors = {
     green: 'green',
     red: 'red'
   }
+
+  public _role: 'staff' | 'admin' = 'staff'
 
   public currency = 'EUR'
   public currencySymbol = ' €'
@@ -29,14 +32,14 @@ export class SessionService implements OnInit {
   public loc = 'pos'
 
   public devMode = true
-  
+
   public orgId?: string = "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c"
   public branchUnique = "aqua"
   public branchId?: string = "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c"
 
   branchSub: Rx.BehaviorSubject<Branch> = new Rx.BehaviorSubject<Branch>(null)
   public _branch?: Branch
-  
+
   public appMode = AppMode.consum
 
   //public backend = "http://192.168.5.202:8080"
@@ -45,8 +48,8 @@ export class SessionService implements OnInit {
   public backend // = "https://dvit-477c9.uc.r.appspot.com"
   //public backend = "http://localhost:8080"
 
-  // public localServer = "http://altea.dvit.local:3000"
-  public localServer = "http://localhost:3000"
+   public localServer = "http://altea.dvit.local:3000"
+//  public localServer = "http://localhost:3000"
 
   /** for internal use (POS): the current user working with the app */
   public humanResource: Resource
@@ -55,18 +58,25 @@ export class SessionService implements OnInit {
   public contact: Contact
 
   public stripEnvironment: 'test' | 'live' = 'live'
-  
+
 
   constructor() {
     let stripeEnv = localStorage.getItem('stripEnvironment')
 
-    if (stripeEnv && (stripeEnv == 'test' || stripeEnv =='live'))
+    if (stripeEnv && (stripeEnv == 'test' || stripeEnv == 'live'))
       this.stripEnvironment = stripeEnv
+
+    let role = localStorage.getItem('role')
+
+    if (role && (role == 'staff' || role == 'admin')) {
+      this._role = role
+    }
+
   }
 
   ngOnInit() {
     console.warn('----- SessionService -ee------')
-  
+
 
   }
 
@@ -74,7 +84,7 @@ export class SessionService implements OnInit {
    * Is POS (Point Of Sales) = is internal usage of app?
    * @returns 
    */
-  isPos() : boolean{
+  isPos(): boolean {
     return (this.appMode == AppMode.pos)
   }
 
@@ -92,6 +102,24 @@ export class SessionService implements OnInit {
     console.log(this.stripEnvironment)
   }
 
+
+  toggleRole() {
+    this.role = this._role == 'staff' ? 'admin' : 'staff'
+  }
+
+  get role(): 'staff' | 'admin' {
+    return this._role
+  }
+
+  set role(value: 'staff' | 'admin') {
+    this._role = value
+    localStorage.setItem('role', value)
+    console.error(`New role: ${value}`)
+  }
+
+
+
+
   get branch(): Branch | undefined {
     return this._branch
   }
@@ -104,7 +132,7 @@ export class SessionService implements OnInit {
 
   delay(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
-  }  
+  }
 
 
   async branch$(): Promise<Branch> {

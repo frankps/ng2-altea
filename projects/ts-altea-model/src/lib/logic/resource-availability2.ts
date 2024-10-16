@@ -142,7 +142,7 @@ export class ResourceAvailability2 {
 
 
     /** check the availability of given resources inside range (insideRange), only return blocks > minTime */
-    getAvailabilityOfResourcesInRange(resources: Resource[], insideRange: DateRange, minTime: TimeSpan, solution: Solution): DateRangeSets {
+    getAvailabilityOfResourcesInRange(resources: Resource[], insideRange: DateRange, minTime: TimeSpan, solution: Solution, excludeSolutionOccupation: boolean): DateRangeSets {
 
         if (!Array.isArray(resources) || resources.length == 0)
             return DateRangeSets.empty
@@ -157,7 +157,7 @@ export class ResourceAvailability2 {
                 continue
 
 
-            if (solution) {
+            if (solution && excludeSolutionOccupation) {
                 var resourceAlreadyOccupiedInSolution = solution.getOccupationForResource(resource)
 
                 if (resourceAlreadyOccupiedInSolution.notEmpty())

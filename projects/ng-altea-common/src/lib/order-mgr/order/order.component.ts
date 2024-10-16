@@ -85,6 +85,7 @@ export class OrderComponent implements OnInit {
   }
 
   fieldChanged(field: string) {
+    console.warn(`Field changed ${field}`)
     this.order.markAsUpdated(field)
     this.orderMgrSvc.orderDirty = true
   }

@@ -264,6 +264,19 @@ export class Solution extends SolutionItems {
         }
     }
 
+    getSolutionItemForRequestItem(requestId: string) {
+
+        const solItem = this.items.find(item => item.request.id == requestId)
+
+        return solItem
+    }
+
+    getSolutionItemSamePerson(personId: string, resType: ResourceType) : SolutionItem {
+
+        var item = this.items.find(item => item.request.samePersonAndResourceType(personId, resType))
+        return item
+    }
+
     getHumanResourceItems(): SolutionItems {
         let items = this.items.filter(item => item.resources.findIndex(r => r.type == ResourceType.human && !r.isGroup) >= 0)
         return new SolutionItems(items)
