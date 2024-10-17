@@ -138,11 +138,14 @@ export abstract class ObjectWithId extends ManagedObject {
   constructor() {
     super()
 
-    this.id = ObjectHelper.newGuid()
+    this.newId()
     
-
     /** declare this object as new */
     // this.m.n = true
+  }
+
+  newId() {
+    this.id = ObjectHelper.newGuid()
   }
 
   //   @Type(() => ObjectMgmt)

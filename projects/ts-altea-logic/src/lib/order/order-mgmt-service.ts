@@ -50,7 +50,7 @@ export class OrderMgmtService {
 
 
         // 'lines:orderBy=idx.product', 'contact'
-        const order = await this.alteaDb.getOrder(orderId, ...Order.defaultInclude )  // , 'lines:orderBy=idx.product', 'contact', 'payments:orderBy=idx'
+        const order = await this.alteaDb.getOrder(orderId, ...Order.defaultInclude)  // , 'lines:orderBy=idx.product', 'contact', 'payments:orderBy=idx'
 
         if (!order) {
             const msg = `Order not found: ${orderId}: can't add payment!`
@@ -201,14 +201,14 @@ export class OrderMgmtService {
 
 
     determineOrderState(order: Order): OrderState | null {
--
-        console.log(`determineOrderState for ${order?.id}: ${order.state} (deposit=${order.deposit} / paid=${order.paid})`)
+        -
+            console.log(`determineOrderState for ${order?.id}: ${order.state} (deposit=${order.deposit} / paid=${order.paid})`)
 
         if ([OrderState.creation, OrderState.created, OrderState.waitDeposit].indexOf(order.state) >= 0) {
-            
+
 
             if (order.paid >= order.deposit) {
-                
+
                 return OrderState.confirmed
             }
         }
@@ -266,7 +266,7 @@ export class OrderMgmtService {
             case OrderState.created:
 
                 /** if order was created internally (Point Of Sale) and still a deposit to pay */
-                if (order.src == OrderSource.pos && order.depo && order.deposit > 0 && order.paid < order.deposit) {
+                if (!order.gift && order.src == OrderSource.pos && order.depo && order.deposit > 0 && order.paid < order.deposit) {
 
                     // then we calculate depoBy date
                     const now = new Date()
@@ -292,9 +292,11 @@ export class OrderMgmtService {
 
             case OrderState.confirmed:
 
-                var res = await msgSvc.confirmationMessaging(order)
+                if (!order.gift)
+                    var res = await msgSvc.confirmationMessaging(order)
 
-                console.warn (res)
+
+                console.warn(res)
 
                 break
 

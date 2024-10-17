@@ -171,7 +171,7 @@ export class AuthService {
 
           console.error('forwarding user!')
 
-          let originalUrl = me.route.snapshot['_routerState'].url
+          let originalUrl : string = me.route.snapshot['_routerState'].url
           console.error(originalUrl)
 
           let redirected = false
@@ -188,9 +188,8 @@ export class AuthService {
               me.router.navigate(redirect)
               redirected = true
 
-            } else if (originalUrl && originalUrl != "/auth/sign-in") {
+            } else if (originalUrl && originalUrl.indexOf('auth') == -1) {    // != "/auth/sign-in"
 
-            
               // introduced to bring back user to original URL
 
               console.warn(`Redirecting to: ${originalUrl}`)

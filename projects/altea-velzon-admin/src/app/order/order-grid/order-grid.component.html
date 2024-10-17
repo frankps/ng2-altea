@@ -6,8 +6,8 @@
 
         <div class="row">
             <div class="col-10 me-1 pe-0">
-                <input class="form-control" *ngIf="dateRange" placeholder="Datepicker" bsDatepicker [(ngModel)]="dateRange[0]"
-                (bsValueChange)="dateChange($event)">
+                <input class="form-control" *ngIf="dateRange" placeholder="Datepicker" bsDatepicker
+                    [(ngModel)]="dateRange[0]" (bsValueChange)="dateChange($event)">
             </div>
             <div class="col ms-1 ps-0 d-flex align-items-center">
                 <i class="fa-solid fa-circle-xmark" (click)="dateChange(null, true)"></i>
@@ -19,7 +19,7 @@
         <input class="form-control" #drp="bsDaterangepicker" bsDaterangepicker [(ngModel)]="dateRange" [bsConfig]="{useUtc: true}" onkeydown="return false">
  -->
     </div>
-<!--     <div class="col-1">
+    <!--     <div class="col-1">
        
     </div> -->
     <div class="col-3">
@@ -58,10 +58,17 @@
                 &nbsp;
 
                 {{uiOrder.start| intdate}}
+
+                <span *ngIf="uiOrder.gift">{{uiOrder.giftCode}}</span>
+
+                <i *ngIf="uiOrder.src == 'ngApp'" style="color: gray; vertical-align: middle;"
+                    class="fa-solid fa-mobile float-end"></i>
+                <i *ngIf="uiOrder.gift" class="fa-duotone fa-solid fa-gift float-end"></i>
+
+
             </div>
             <div class="col-2">
                 {{uiOrder.for}}
-                <i *ngIf="uiOrder.src == 'ngApp'" class="fa-solid fa-mobile"></i>
             </div>
 
             <div class="col-2" [style.color]="uiOrder.pay.color">{{uiOrder.pay.info}}</div>

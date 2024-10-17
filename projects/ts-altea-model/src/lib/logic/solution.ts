@@ -405,6 +405,7 @@ export class Solution extends SolutionItems {
 
         
         let clone = ObjectHelper.clone(this, Solution) as Solution
+        clone.newId()
         return clone
 
 

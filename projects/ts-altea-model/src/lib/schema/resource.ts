@@ -240,6 +240,11 @@ export enum ResourceType {
       return `${this.groupId}_${this.childId}`
     }
   
+    // was needed, otherwise compiler error
+    newId() {
+     // this.id = ObjectHelper.newGuid()
+    }
+
     groupId?: string;
     childId?: string;
   

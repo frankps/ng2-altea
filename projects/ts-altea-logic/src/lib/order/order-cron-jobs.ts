@@ -64,25 +64,23 @@ export class OrderCronJobs {
 
             let allOrders = [...posOrders, ...appOrders]
 
-            html.addRow(['<h3>Geen orders om te cleanen!</h3>'])
-
-            const header = []
-            header.push('Order Id')
-            header.push('Gemaakt op')
-            header.push('Klant')
-            header.push('Datum')
-            header.push('Betaald')
-            header.push('Vorige status')
-            header.push('Nieuwe status')
-            html.addRow(header)
-
-
             if (ArrayHelper.IsEmpty(allOrders)) {
+                html.addRow(['<h3>Geen orders om te cleanen!</h3>'])
                 return 'No orders to clean up!'
+            }
+            else {
+                const header = []
+                header.push('Order Id')
+                header.push('Gemaakt op')
+                header.push('Klant')
+                header.push('Datum')
+                header.push('Betaald')
+                header.push('Vorige status')
+                header.push('Nieuwe status')
+                html.addRow(header)
             }
 
             orderCount = allOrders.length
-
             msg.subj = `Cleanup Orders: ${orderCount}`
 
             const orderIds = allOrders.map(o => o.id)
@@ -99,7 +97,7 @@ export class OrderCronJobs {
                 order.cancel = new OrderCancel()
                 order.cancel.by = OrderCancelBy.int
                 order.cancel.reason = InternalCancelReasons.clean
-                
+
                 cols.push(order.src)
 
                 cols.push(order.for)
@@ -120,7 +118,7 @@ export class OrderCronJobs {
 
             const updateOrdersRes = await me.alteaDb.updateOrders(allOrders, ['state', 'cancel'])
 
-            html.addRow(['Cancel orders'])
+            html.addRow([`Cancel orders: ${updateOrdersRes.isOk}`])
 
         } catch (error) {
 

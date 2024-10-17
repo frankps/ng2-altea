@@ -42,9 +42,10 @@
 
                 <button type="button" class="btn btn-outline-primary mt-2" (click)="signIn('google')">Google</button>
 
-                <button type="button" class="btn btn-outline-primary mt-2" (click)="signIn('email')">Email</button>
+                <button type="button" class="btn btn-outline-primary mt-2" [routerLink]="['/', 'auth','email-passwd']">Email</button>
 
-<!--                 <button type="button" class="btn btn-outline-primary mt-2" (click)="clearCache()">Clear cache</button> -->
+<!--             (click)="signIn('email')"
+                 <button type="button" class="btn btn-outline-primary mt-2" (click)="clearCache()">Clear cache</button> -->
             </div>
 
         </div>
