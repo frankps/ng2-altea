@@ -1,7 +1,7 @@
 
 import { Component, ViewChild, OnInit } from '@angular/core';
-import { ProductService, PriceService, ProductResourceService, ResourceService, ScheduleService, ContactService, SessionService, GiftService } from 'ng-altea-common'
-import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ResourceType, ResourceTypeIcons, Resource, Schedule, Contact, Language, Gift } from 'ts-altea-model'
+import { ProductService, PriceService, ProductResourceService, ResourceService, ScheduleService, ContactService, SessionService, GiftService, ObjectService } from 'ng-altea-common'
+import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ResourceType, ResourceTypeIcons, Resource, Schedule, Contact, Language, Gift, Message, TemplateCode, GiftTemplateCode } from 'ts-altea-model'
 import { BackendHttpServiceBase, DashboardService, FormCardSectionEventData, NgEditBaseComponent, ToastType, TranslationService } from 'ng-common'
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxModalComponent, DeleteModalComponent } from 'ng-common';
@@ -15,6 +15,7 @@ import { scheduled } from 'rxjs';
 import * as Rx from "rxjs";
 import { NgForm } from '@angular/forms';
 import { SearchContactComponent } from '../../contact/search-contact/search-contact.component';
+import { AlteaDb, GiftMessaging } from 'ts-altea-logic';
 
 
 @Component({
@@ -39,6 +40,12 @@ export class EditGiftComponent extends NgEditBaseComponent<Gift> {
 
   Array = Array
 
+
+  templateCodes: Translation[] = []
+  initialized = false
+
+  templateCode
+
   // gender: Translation[] = []
   // language: Translation[] = []
 
@@ -46,7 +53,7 @@ export class EditGiftComponent extends NgEditBaseComponent<Gift> {
   // public saveScheduling$: Rx.Subject<any> = new Rx.Subject<any>()
 
   constructor(protected giftSvc: GiftService, protected translationSvc: TranslationService, route: ActivatedRoute, router: Router,
-    spinner: NgxSpinnerService, private modalService: NgbModal, dashboardSvc: DashboardService,
+    spinner: NgxSpinnerService, private modalService: NgbModal, dashboardSvc: DashboardService, protected backendSvc: ObjectService,
     protected sessionSvc: SessionService) {
     super('gift', Gift, 'from'
       , giftSvc
@@ -58,6 +65,15 @@ export class EditGiftComponent extends NgEditBaseComponent<Gift> {
 
   }
 
+  override async ngOnInit() {
+    super.ngOnInit()
+
+    await this.translationSvc.translateEnum(GiftTemplateCode, 'enums.template-code.', this.templateCodes)
+
+    this.initialized = true
+
+
+  }
 
   delete() {
     console.error('new delete')
@@ -121,6 +137,48 @@ export class EditGiftComponent extends NgEditBaseComponent<Gift> {
 
   }
 
+  alteaDb: AlteaDb
+  msg: Message
+  sendResult: ApiResult<Message>   // filled in after sending message
+  //msgTo: Message
+
+  clearCommunication() {
+    this.msg = null
+    this.sendResult = null
+  }
+
+  async send() {
+
+    if (!this.alteaDb)
+      this.alteaDb =  new AlteaDb(this.backendSvc)
+
+    this.sendResult = await this.alteaDb.db.sendMessage$(this.msg)
+    console.warn(this.sendResult)
+    return this.sendResult
+  }
+
+
+  async preview() {
+
+    this.sendResult = null
+
+    console.warn(this.templateCode)
+
+    if (!this.alteaDb)
+      this.alteaDb =  new AlteaDb(this.backendSvc)
+
+    let giftMsg = new GiftMessaging(this.alteaDb)
+
+    const branch = await this.sessionSvc.branch$()
+
+    let res = await giftMsg.send(branch, this.object, this.templateCode, false)
+
+    this.msg = res.object
+
+    console.log(res)
+
+
+  }
 
 
 

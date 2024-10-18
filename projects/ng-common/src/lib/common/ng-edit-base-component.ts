@@ -93,8 +93,10 @@ export abstract class NgEditBaseComponent<T extends ObjectWithId> extends NgSect
 
     }
 
-    ngOnInit(): void {
+    ngOnInit() {
         
+
+
         this.route.params.subscribe(params => {
             
             console.error('route.params triggered')

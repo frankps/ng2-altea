@@ -1,5 +1,5 @@
 import { ApiListResult, ApiResult, ApiStatus, DateHelper, DbObject, DbObjectCreate, DbObjectMulti, DbObjectMultiCreate, DbQuery, DbQueryBaseTyped, DbQueryTyped, DbUpdateManyWhere, ObjectHelper, ObjectWithId, QueryOperator } from 'ts-common'
-import { Branch, Gift, Subscription, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template, OrderLine, BankTransaction, Message, LoyaltyProgram, LoyaltyCard, PlanningType, ResourcePlannings, TemplateCode } from 'ts-altea-model'
+import { Branch, Gift, Subscription, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template, OrderLine, BankTransaction, Message, LoyaltyProgram, LoyaltyCard, PlanningType, ResourcePlannings, TemplateCode, MsgType } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { IDb } from '../interfaces/i-db'
 import { AlteaPlanningQueries } from './altea-queries'
@@ -224,6 +224,18 @@ export class AlteaDb {
         const templates = await this.db.query$<Template>(qry)
 
         return templates
+    }
+
+    async getTemplate(branchId: string, code: TemplateCode | string, channel: MsgType): Promise<Template> {
+
+        const qry = new DbQueryTyped<Template>('template', Template)
+        qry.and('branchId', QueryOperator.equals, branchId)
+        qry.and('code', QueryOperator.equals, code)
+        qry.and('channels', QueryOperator.contains, channel)
+
+        const template = await this.db.queryFirst$<Template>(qry)
+
+        return template
     }
 
 

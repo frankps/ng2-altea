@@ -463,7 +463,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
     return DateHelper.parse(this.start)
   }
-// <i class="fa-regular fa-list"></i>
+  // <i class="fa-regular fa-list"></i>
   stateIcon() {
     switch (this?.state) {
       case OrderState.cancelled: return "fa-solid fa-circle-xmark"
@@ -1183,7 +1183,8 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
       return false
 
     // try to find an order line with resources
-    const planningLine = this.lines?.find(ol => ol.product.sub == ProductSubType.basic && ol.product?.planMode != PlanningMode.none)  // .hasResources()
+    const planningLine = this.lines?.find(ol => ol.product.type == ProductType.svc &&
+      ol.product.sub == ProductSubType.basic && ol.product?.planMode != PlanningMode.none)  // .hasResources()
 
     return planningLine ? true : false
   }
@@ -1194,7 +1195,8 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     if (!this.lines || this.lines.length == 0)
       return []
 
-    const orderlinesWithPlanning = this.lines?.filter(ol => ol.product?.planMode != PlanningMode.none) // .hasResources()
+    const orderlinesWithPlanning = this.lines?.filter(ol => ol.product.type == ProductType.svc
+      && ol.product?.planMode != PlanningMode.none) // .hasResources()
     return orderlinesWithPlanning
   }
 

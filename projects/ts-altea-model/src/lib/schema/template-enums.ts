@@ -28,9 +28,15 @@ export enum TemplateCode {
   resv_satisfaction = 'resv_satisfaction',
   resv_internal_cancel = 'resv_internal_cancel',
   resv_footer = 'resv_footer',
-  gift_online = 'gift_online'
+  gift_online = 'gift_online',
+
+
 } 
 
+export enum GiftTemplateCode {
+  gift_online_from = 'gift_online_from',
+  gift_online_to = 'gift_online_to'
+}
 /*
 cancel
 cancelClient

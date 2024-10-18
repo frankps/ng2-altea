@@ -5,7 +5,7 @@
 
     <div class="row">
         <div class="col-9">
-            <h4>{{'objects.gift._single' | translate}} {{object.code}}</h4> 
+            <h4>{{'objects.gift._single' | translate}} {{object.code}}</h4>
         </div>
         <div class="col-3">
 
@@ -36,14 +36,15 @@
             <div class="row">
                 <div class="col-3"> <ngx-altea-label-value label="objects.gift.value" [value]="object.value"
                         valueFormat="currency" [currency]="sessionSvc.currency"></ngx-altea-label-value> </div>
-                        
-                        <div class="col-3"><span class="badge rounded-pill text-bg-primary">{{'enums.gift-type.' + object.type | translate}}</span>
-                        
+
+                <div class="col-3"><span class="badge rounded-pill text-bg-primary">{{'enums.gift-type.' + object.type |
+                        translate}}</span>
+
                 </div>
                 <div class="col-3"> <ngx-altea-label-value label="objects.gift.used" [value]="object.used"
                         valueFormat="currency" [currency]="sessionSvc.currency"></ngx-altea-label-value> </div>
 
-                <div class="col-3"> <ngx-altea-label-value label="objects.gift.isConsumed" valueFormat="yesNo" 
+                <div class="col-3"> <ngx-altea-label-value label="objects.gift.isConsumed" valueFormat="yesNo"
                         [value]="object.isConsumed"></ngx-altea-label-value> </div>
 
             </div>
@@ -82,7 +83,7 @@
                 </div>
             </div>
 
-            
+
 
             <ng-container *ngIf="object.hasLines()">
 
@@ -101,7 +102,7 @@
 
 
 
-   
+
         </ng-container>
         <ng-container edit>
 
@@ -143,16 +144,18 @@
 
 
 
-                
-                <altea-search-contact #searchContactModal [modal]="true" (contactSelected)="setContact($event)"></altea-search-contact>
-        
+
+                <altea-search-contact #searchContactModal [modal]="true"
+                    (contactSelected)="setContact($event)"></altea-search-contact>
+
 
                 <div class="row">
-                    <div class="col-6"><button type="button" class="btn btn-primary btn-sm" (click)="searchContact()">Contact zoeken</button></div>
-                    <div class="col-6">{{object.fromId}}  <span *ngIf="object.from">{{object.from.name}}</span></div>      
-                  </div>
+                    <div class="col-6"><button type="button" class="btn btn-primary btn-sm"
+                            (click)="searchContact()">Contact zoeken</button></div>
+                    <div class="col-6">{{object.fromId}} <span *ngIf="object.from">{{object.from.name}}</span></div>
+                </div>
 
-                  
+
 
                 <div class="row mt-2">
                     <div class="col-6">
@@ -221,6 +224,83 @@
         </ng-container>
 
     </ngx-altea-form-card-section>
+
+    <!-- 
+    (save)="save()" (cancel)="cancel()"  [enableSave]="!generalForm?.form.pristine && generalForm?.form.valid"
+ -->
+
+
+    <ngx-altea-form-card-section sectionName="dic.communication" sectionId="communication"
+        [editSectionId]="editSectionId" (editModeChanged)="editModeChanged($event)">
+
+
+        <ng-container always *ngIf="initialized">
+
+            <div class="row mb-3">
+                <div class="col-4">
+                    <ng-select id="gender" name="gender" [items]="templateCodes" bindLabel="trans" bindValue="key"
+                        [clearable]="false" [multiple]="false" [(ngModel)]="templateCode"></ng-select>
+                </div>
+                <div class="col-4">
+                    <button type="button" class="btn btn-primary" (click)="preview()" translate>dic.preview</button>
+                </div>
+                <div class="col-4">
+
+                    <span *ngIf="sendResult">{{sendResult.status}}</span>
+                    <button type="button" *ngIf="msg" class="btn btn-primary float-end" (click)="send()"
+                        translate>dic.send</button>
+
+                </div>
+            </div>
+
+
+            <div class="mt-3" *ngIf="msg">
+
+                <div class="row" *ngIf="msg.from">
+                    <div class="col-2">{{'dic.from' | translate}}</div>
+                    <div class="col">{{msg.from.addr}}</div>
+                </div>
+                <div class="row" *ngIf="msg.hasTo()">
+                    <div class="col-2">{{'dic.to' | translate}}</div>
+                    <div class="col"><span *ngFor="let to of msg.to">{{to.addr}}&nbsp;</span></div>
+                </div>
+                <div class="row" *ngIf="msg.hasCc()">
+                    <div class="col-2">Cc</div>
+                    <div class="col"><span *ngFor="let to of msg.cc">{{to.addr}}&nbsp;</span></div>
+                </div>
+                <div class="row" *ngIf="msg.hasBcc">
+                    <div class="col-2">Bcc</div>
+                    <div class="col"><span *ngFor="let to of msg.bcc">{{to.addr}}&nbsp;</span></div>
+                </div>
+                <div class="row" *ngIf="msg.subj">
+                    <div class="col-2">{{'dic.subject' | translate}}</div>
+                    <div class="col">{{msg.subj}}</div>
+                </div>
+
+                <div [innerHTML]="msg.body" class="mt-2"></div>
+
+            </div>
+
+
+
+            <!-- 
+
+            <button type="button" class="btn btn-primary btn-sm" (click)="sendGift()" translate>dic.send</button> -->
+
+        </ng-container>
+
+
+
+
+    </ngx-altea-form-card-section>
+
+
+
+
+
+
+
+
 
 
 

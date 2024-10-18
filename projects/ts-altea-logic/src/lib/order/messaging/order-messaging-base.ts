@@ -58,6 +58,7 @@ export class OrderMessagingBase {
             types = [MsgType.email]
         }
 
+        // this can return different templates for email, sms, whatsapp
         let templates = await this.alteaDb.getTemplates(order.branchId, templateCode)
 
         for (let type of types) {
@@ -217,7 +218,7 @@ export class OrderMessagingBase {
 
             const sendRes = await this.alteaDb.db.sendMessage$(msg)
             console.warn(sendRes)
-
+            return sendRes
         }
 
         return new ApiResult(msg)

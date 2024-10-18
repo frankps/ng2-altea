@@ -161,7 +161,7 @@
                             <ng-container *ngSwitchCase="TemplateFormat.html">
 
                                 <div class="NgxEditor__Wrapper">
-                                    <ngx-editor-menu [editor]="editor"> </ngx-editor-menu>
+                                    <ngx-editor-menu [editor]="editor" [toolbar]="toolbar"> </ngx-editor-menu>
                                     <ngx-editor [editor]="editor" [(ngModel)]="template.body" [disabled]="false"
                                         [placeholder]="'Maak template'" (ngModelChange)="updateTemplate(template)"></ngx-editor>
                                 </div>

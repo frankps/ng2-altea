@@ -6,7 +6,7 @@ import { MessagingService, SessionService, TemplateService } from 'ng-altea-comm
 import * as _ from "lodash";
 import { NgxSpinnerService } from "ngx-spinner"
 import { ToastService } from '../../velzon/dashboard/dashboard/toast-service';
-import { Editor } from 'ngx-editor'
+import { Editor, Toolbar } from 'ngx-editor'
 import { TranslationService } from 'ng-common'
 import { Translation } from 'ts-common'
 
@@ -31,6 +31,30 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
 
   // html editor 
   editor: Editor;
+  toolbar: Toolbar = [
+  // default value
+  ['bold', 'italic'],
+  ['underline', 'strike'],
+  ['code', 'blockquote'],
+  ['ordered_list', 'bullet_list'],
+  [{ heading: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] }],
+  ['link', 'image'],
+  // or, set options for link:
+  //[{ link: { showOpenInNewTab: false } }, 'image'],
+  ['text_color', 'background_color'],
+  ['align_left', 'align_center', 'align_right', 'align_justify'],
+  ['horizontal_rule', 'format_clear'],
+
+];
+
+/*
+   ['horizontal_rule', 'format_clear', 'indent', 'outdent'],
+  ['superscript', 'subscript'],
+  ['undo', 'redo'],
+
+  */
+
+
   html = '';
 
 

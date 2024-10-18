@@ -1,7 +1,7 @@
 /* eslint-disable no-case-declarations */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ApiListResult, ArrayHelper, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
-import { DurationMode, Order, AvailabilityContext, OrderLine, OrderPerson, Product, ProductResource, ResourceRequest, ResourceRequestItem, Schedule, SchedulingType, TimeSpan, TimeUnit, OffsetDuration, DurationReference, Resource, ResourceType } from 'ts-altea-model'
+import { DurationMode, Order, AvailabilityContext, OrderLine, OrderPerson, Product, ProductResource, ResourceRequest, ResourceRequestItem, Schedule, SchedulingType, TimeSpan, TimeUnit, OffsetDuration, DurationReference, Resource, ResourceType, OrderLineSummary } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { AlteaDb } from '../../general/altea-db'
 import { IDb } from '../../interfaces/i-db'
@@ -28,6 +28,24 @@ export class CreateResourceRequest {
             this.alteaDb = new AlteaDb(db)
     }
 
+
+    /** after migration we had apparently persons defined on orderLine, that where not in order.persons */
+    getPersonsFromOrderLines(order: Order): OrderPerson[] {
+
+        if (ArrayHelper.IsEmpty(order.lines))
+            return []
+
+        let personIds = order.lines.filter(o => ArrayHelper.NotEmpty(o.persons))
+            .flatMap(o => o.persons)
+
+        personIds = _.uniq(personIds)
+
+        let persons = personIds.map(pId => new OrderPerson(pId, pId))
+
+        return persons
+    }
+
+
     create(availabilityCtx: AvailabilityContext): ResourceRequest[] {
 
         console.error('CreateResourceRequest')
@@ -47,8 +65,19 @@ export class CreateResourceRequest {
 
         if (order.hasPersons())
             persons.push(...order.persons!)
-        else  // if no persons are specified, then we assume order is just for 1 person named 'default'
-            persons.push(new OrderPerson('default', 'default'))
+        else  // if no persons are specified, then we assume order is just for 1 person named '1'
+        {
+            let personsFromLines = this.getPersonsFromOrderLines(order)
+
+            if (ArrayHelper.IsEmpty(personsFromLines))
+                persons.push(new OrderPerson('1', '1'))
+            else
+                persons.push(...personsFromLines)
+
+                order.persons = personsFromLines
+                order.markAsUpdated('persons')
+        }
+
 
 
         const scheduleIds = this.getScheduleIds(orderlinesWithPlanning)
@@ -105,7 +134,7 @@ export class CreateResourceRequest {
                 productResources = product.resources
 
 
-            if (!productResources) continue   // should not happen
+            if (ArrayHelper.IsEmpty(productResources)) continue   // should not happen
 
             const orderLinePersonIds = orderLine.hasPersons() ? orderLine.persons! : [persons[0].id!]  // fall back to 1st specified person id
 

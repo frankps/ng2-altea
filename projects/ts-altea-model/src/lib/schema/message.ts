@@ -14,6 +14,7 @@ export class IEmail {
     from?: MessageAddress
     to: MessageAddress[]
     cc: MessageAddress[]
+    bcc: MessageAddress[]
     subj?: string
     body?: string
 }
@@ -141,9 +142,6 @@ export class MessageAddress {
 
     /** the name of the contact */
     name?: string
-
-
-
 
     constructor(addr: string, name?: string, conId?: string) {
         this.addr = addr
@@ -375,9 +373,21 @@ export class Message extends ObjectWithParameters implements IEmail {
         this.to.push(msgAddr)
     }
 
+    hasTo() : boolean {
+        return ArrayHelper.NotEmpty(this.to)
+    }
+
     addCc(addr: string, name?: string, conId?: string) {
         const msgAddr = new MessageAddress(addr, name, conId)
         this.cc.push(msgAddr)
+    }
+
+    hasCc() : boolean {
+        return ArrayHelper.NotEmpty(this.cc)
+    }
+
+    hasBcc() : boolean {
+        return ArrayHelper.NotEmpty(this.bcc)
     }
 
     addBcc(addr: string, name?: string, conId?: string) {

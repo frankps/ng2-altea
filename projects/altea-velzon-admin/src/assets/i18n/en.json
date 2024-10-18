@@ -40,6 +40,7 @@
     "ok": "OK",
     "passwd": "Paswoord",
     "payOnline": "Online betalen",
+    "preview": "Preview",
     "phone": "Tel",
     "price": "Prijs",
     "qty": "Aantal",
@@ -52,6 +53,7 @@
     "send": "Versturen",
     "spacingAfter": "Kuistijd in minuten",
     "start": "begin",
+    "subject": "Onderwerp",
     "end": "einde",
     "validate": "Valideren"
   },
@@ -350,7 +352,9 @@
       "resv_satisfaction": "Tevredenheid",
       "resv_internal_cancel": "Interne annulatie (ziekte, etc...)",
       "resv_footer": "Voettekst",
-      "gift_online": "Online cadeaubon"
+      "gift_online": "Online cadeaubon",
+      "gift_online_from": "Cadeaubon schenker",
+      "gift_online_to": "Cadeaubon ontvanger"
     }
   },
   "ui": {
