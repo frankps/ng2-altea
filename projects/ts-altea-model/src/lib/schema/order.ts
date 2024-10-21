@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { Exclude, Type, Transform } from "class-transformer";
 import 'reflect-metadata';
-import { ArrayHelper, ConnectTo, DateHelper, DbObjectCreate, IAsDbObject, ManagedObject, ObjectHelper, ObjectMgmt, ObjectReference, ObjectWithId, ObjectWithIdPlus, QueryOperator, TimeHelper } from 'ts-common'
+import { ArrayHelper, ConnectTo, DateHelper, DbObjectCreate, IAsDbObject, ManagedObject, NumberHelper, ObjectHelper, ObjectMgmt, ObjectReference, ObjectWithId, ObjectWithIdPlus, QueryOperator, TimeHelper } from 'ts-common'
 import * as _ from "lodash";
 import { PersonLine } from "../person-line";
 import { DateRange, DateRangeSet, TimeBlock, TimeBlockSet, TimeSpan } from "../logic";
@@ -10,8 +10,9 @@ import * as Handlebars from "handlebars"
 import * as sc from 'stringcase'
 import { OrderPersonMgr } from "../order-person-mgr";
 import { CancelOrderMessage } from "ts-altea-logic";
-import { Branch, Contact, DepositMode, Invoice, OrderLine, OrderLineSummary, OrderType, Organisation, Payment, PaymentType, PlanningMode, Product, ProductSubType, ProductType, Resource, ResourcePlanning, Subscription } from "ts-altea-model";
+import { Branch, Contact, Currency, DepositMode, Invoice, OrderLine, OrderLineSummary, OrderType, Organisation, Payment, PaymentType, PlanningMode, Product, ProductSubType, ProductType, Resource, ResourcePlanning, Subscription } from "ts-altea-model";
 
+//import { numberAttribute } from "@angular/core";
 
 
 
@@ -904,6 +905,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
   }
 
 
+
   makeLineTotals(): number {
 
     if (!this.lines)
@@ -919,6 +921,10 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
       incl += line.incl
       excl += line.excl
     }
+
+    vat = NumberHelper.round(vat)
+    incl = NumberHelper.round(incl)
+    excl = NumberHelper.round(excl)
 
     if (incl != this.incl) {
       this.incl = incl
@@ -1004,7 +1010,11 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
    * 
    *      order.lines[x].product.resources[y].resource 
    * 
+   *  Do not use anymore, because line.product.resources.resource can be OLD version
+   *  use getProductResourceIds(), and then fetch resources! Otherwise you may get an 'old' cached version of that resource
+   * 
    * */
+  /*
   getProductResources(): Resource[] {
 
     const resources = []
@@ -1016,6 +1026,9 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
       if (!line.product || !line.product.resources)
         continue
+
+
+
 
       for (const productResource of line.product.resources) {
 
@@ -1032,19 +1045,32 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
     return resources
   }
+    */
+
+
+  getAllResourceIds(): string[] {
+
+    let resourceIds = this.lines.flatMap(line => line.product.resources.map(pr => pr.resourceId))
+
+    resourceIds = _.uniq(resourceIds)
+
+    return resourceIds
+  }
+
 
   /** Gets the resources that are defined in the configuration for all products (used in this order)   
  * 
  *      order.lines[x].product.resources[y].resource 
  * 
  * */
-  getConfigResourceGroups(): Resource[] {
-
-    const configResources = this.getProductResources()
-    return configResources.filter(r => r.isGroup)
-
-  }
-
+  /*
+    getConfigResourceGroups(): Resource[] {
+  
+      const configResources = this.getProductResources()
+      return configResources.filter(r => r.isGroup)
+  
+    }
+  */
 
   getResources(): Resource[] {
 

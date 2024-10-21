@@ -4,6 +4,7 @@ import { BackendHttpServiceBase } from 'ng-common';
 import { HttpClient } from '@angular/common/http';
 import { SessionService } from '../../session.service';
 import { DbQuery, QueryOperator } from 'ts-common';
+import * as _ from "lodash";
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +14,9 @@ export class ResourceService extends BackendHttpServiceBase<Resource> {
   constructor(http: HttpClient, protected sessionSvc: SessionService) {
     super(Resource, 'Resource', sessionSvc.backend, sessionSvc.branchUnique + '/resources', http)
   }
+
+
+
 
   override async  getAllForBranch$(): Promise<Resource[]> {
 

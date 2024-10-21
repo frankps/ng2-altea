@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
-import { Order, Gift, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, ConfirmOrderResponse, OrderSource, TemplateCode, OrderCancel, OrderCancelBy, CustomerCancelReasons, PaymentType, Payment } from 'ts-altea-model'
+import { Order, Gift, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, ConfirmOrderResponse, OrderSource, TemplateCode, OrderCancel, OrderCancelBy, CustomerCancelReasons, PaymentType, Payment, ResourceRequestItem, Resource, DateRange } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { AlteaDb } from '../general/altea-db'
 import { IDb } from '../interfaces/i-db'
@@ -319,19 +319,28 @@ export class OrderMgmtService {
      * Saves the order, calculates & saves the resource plannings based on previously determined calculated solution
      * @param order 
      * @param reservationOption 
-     * @param solution 
+     * @param solution   only filled in when reservationOption is coming from solution (not a forced/custom date)
+     * @param availabilityResponse: previous response (some calculations will be re-used in case of forcing a certain date)
      * @returns 
      */
-    async confirmOrder(order: Order, reservationOption: ReservationOption, solution: Solution): Promise<ApiResult<Order>> {   // ConfirmOrderResponse | undefined
+    async confirmOrder(order: Order, reservationOption: ReservationOption, solution: Solution, availabilityResponse: AvailabilityResponse): Promise<ApiResult<Order>> {   // ConfirmOrderResponse | undefined
+
+
 
         order.start = reservationOption.dateNum
         order.m.setDirty('start')
 
         const response = new ConfirmOrderResponse()
 
-        response.plannings = this.createResourcePlanningsForNewOrder(order, reservationOption, solution)
+        if (solution)
+            response.plannings = this.createResourcePlanningsForNewOrder(order, reservationOption, solution)
+        else
+            response.plannings = this.forceDateTime(order, reservationOption.date, availabilityResponse)
+
 
         console.info(response.plannings)
+
+       // return new ApiResult(order)
 
         //order.planning.forEach(plan => order.m.r)
 
@@ -360,6 +369,7 @@ export class OrderMgmtService {
     }
 
 
+
     createResourcePlanningsForNewOrder(order: Order, reservationOption: ReservationOption, solution: Solution): ResourcePlanning[] {
 
         const plannings: ResourcePlanning[] = []
@@ -369,6 +379,11 @@ export class OrderMgmtService {
         for (const solItem of solution.items) {
 
             const requestItem = solItem.request
+
+            const newPlannings = this.requestItemToPlannings(requestItem, refDate, order, solItem.resources)
+            plannings.push(...newPlannings)
+
+            continue
 
             const startDate = dateFns.addSeconds(refDate, requestItem.offset.seconds)
             const endDate = dateFns.addSeconds(startDate, requestItem.duration.seconds)
@@ -426,6 +441,119 @@ export class OrderMgmtService {
             for (const resource of solItem.resources) {
 
             }
+        }
+
+        return plannings
+    }
+
+
+    /**
+     * Sometimes we will not use previously calculated options (from solutions),
+     * instead we force a certain date
+     * 
+     * In this case we re-use previously calculated response
+     * 
+     * @param response a previously generated response: in order to re-use
+     */
+    forceDateTime(order: Order, refDate: Date, response: AvailabilityResponse): ResourcePlanning[] {
+
+
+        const plannings: ResourcePlanning[] = []
+
+        let resourceRequest = response.debug.resourceRequests[0]
+        let availability = response.debug.availability
+
+        for (let requestItem of resourceRequest.items) {
+
+            const startDate = dateFns.addSeconds(refDate, requestItem.offset.seconds)
+            const endDate = dateFns.addSeconds(startDate, requestItem.duration.seconds)
+            let range = new DateRange(startDate, endDate)
+
+            //let resources = requestItem.resources
+
+            //availability.getAvailabilityOfResourcesInRange(resources, )
+
+            let result = availability.getAvailableResourcesInRange(requestItem.resources, range, requestItem, null, true)
+            let resources = result.result
+
+            if (!resources)
+                resources = []
+
+            /*
+                if we couldn't find available resources, we just add some resources (probably already occupied)  --> too be investigated !!!
+            */
+            if (resources.length < requestItem.qty) {
+
+                var j = 0
+                for (let i = resources.length; i < requestItem.qty; i++) {
+                    resources.push(requestItem.resources[j++]) 
+                }
+            }
+            
+            const newPlannings = this.requestItemToPlannings(requestItem, refDate, order, resources)
+            plannings.push(...newPlannings)
+
+        }
+
+
+        return plannings
+
+
+    }
+
+    private requestItemToPlannings(requestItem: ResourceRequestItem, refDate: Date, order: Order, resources: Resource[]): ResourcePlanning[] {
+        const plannings: ResourcePlanning[] = []
+
+        const startDate = dateFns.addSeconds(refDate, requestItem.offset.seconds)
+        const endDate = dateFns.addSeconds(startDate, requestItem.duration.seconds)
+
+        const productInfo = new PlanningProductInfo(requestItem.product.name)
+        const contactInfo = new PlanningContactInfo()
+        if (order.contact) {
+            contactInfo.fst = order.contact.first
+            contactInfo.lst = order.contact.last
+        }
+
+
+        /** Sometime we don't allocate the individual resource, but we allocate the resourcegroup  */
+        let groupAlloc = requestItem.productResource.groupAlloc && requestItem.productResource.resource.isGroup
+        let resourceGroup = requestItem.productResource.resource
+
+        for (let i = 0; i < requestItem.qty; i++) {
+
+            const resource = resources[i]
+
+            const resPlan = new ResourcePlanning()
+
+            resPlan.branchId = order.branchId
+            resPlan.start = DateHelper.yyyyMMddhhmmss(startDate)
+            resPlan.end = DateHelper.yyyyMMddhhmmss(endDate)
+
+            let resourceInfo = new PlanningResourceInfo(resource.name, resource.type)
+
+            if (groupAlloc) {
+                resPlan.resourceGroupId = resourceGroup.id
+                resPlan.resourceGroup = resourceGroup
+                resourceInfo = new PlanningResourceInfo(resourceGroup.name, resource.type)
+            }
+            else {
+                resPlan.resourceId = resource.id
+                resPlan.resource = resource
+            }
+
+            /** info will be stored as json inside resourcePlanning */
+            const info = new PlanningInfo(productInfo, contactInfo, resourceInfo)
+
+            resPlan.info = info
+
+            resPlan.orderId = order.id
+            resPlan.orderLineId = requestItem.orderLine.id
+            resPlan.prep = requestItem.productResource.prep
+            resPlan.overlap = requestItem.productResource.prepOverlap
+
+
+            plannings.push(resPlan)
+
         }
 
         return plannings

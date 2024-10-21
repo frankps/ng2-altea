@@ -6,8 +6,9 @@ import { plainToInstance } from "class-transformer";
 import { Observable, map, Subject, take } from "rxjs";
 import { SessionService } from './session.service';
 import { IDb } from 'ts-altea-logic';
-import { CreateCheckoutSession, Message, Order } from 'ts-altea-model';
+import { CreateCheckoutSession, Message, Order, Product } from 'ts-altea-model';
 import { BackendHttpServiceBase } from 'ng-common';
+import { ProductResourceService } from 'ng-altea-common';
 
 
 @Injectable({
@@ -18,7 +19,7 @@ export class ObjectService implements IDb {
   typeCaches = new Map<any, BackendHttpServiceBase<any>>()
 
 
-  constructor(protected http: HttpClient, protected sessionSvc: SessionService) { }
+  constructor(protected http: HttpClient, protected sessionSvc: SessionService, protected prodResSvc: ProductResourceService ) { }
 
 
   async post$<T>(httpServer: string, pageUrl: string, body: any): Promise<T> {
@@ -335,14 +336,24 @@ export class ObjectService implements IDb {
       const cacheSvc = me.typeCaches.get(query.type) as BackendHttpServiceBase<T>
       const objects = cacheSvc.queryFromCache(query)
 
-      console.warn('From cache: ', objects)
+
+      // attach missing objects
+      switch (query.typeName) {
+        case "product":
+          let products = objects as unknown as Product[]
+          await this.prodResSvc.attachResourcesToProducts(products)
+
+
+      }
+
+      console.warn(`From cache "${query.typeName}":`, objects)
 
       return objects
     }
-
+  
 
     return new Promise<T[]>(function (resolve, reject) {
-
+  
       me.query<T>(query).pipe(take(1)).subscribe(res => {
 
         if (res.data)

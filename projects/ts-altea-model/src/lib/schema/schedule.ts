@@ -329,7 +329,8 @@ export class Schedule extends ObjectWithIdPlus {
             let toDate = dateFns.addHours(dayDate, to.hour)
             toDate = dateFns.addMinutes(toDate, to.minute)
   
-            dateRangeSet.addRangeByDates(fromDate, toDate, fromLabel, toLabel)
+            let range = dateRangeSet.addRangeByDates(fromDate, toDate, fromLabel, toLabel)
+            range.schedule = this
   
           }
   

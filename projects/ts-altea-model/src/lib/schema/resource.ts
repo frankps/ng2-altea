@@ -20,6 +20,7 @@ export enum ResourceType {
     //room = 'room',
     location = 'location',
     device = 'device',
+    branch = 'branch'
     //  group = 'group',
   }
   

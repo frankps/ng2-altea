@@ -217,6 +217,17 @@ export class OrderMessaging extends OrderMessagingBase {
 
     }
 
+
+    async reminderMessaging2() {
+
+
+        
+        this.alteaDb.getOrders()
+
+    }
+
+
+
     async reminderMessaging(order: Order): Promise<ApiResult<Order>> {
 
         if (!order.msg) // messaging disabled for order

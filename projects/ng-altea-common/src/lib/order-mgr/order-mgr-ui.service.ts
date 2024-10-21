@@ -302,7 +302,7 @@ export class OrderMgrUiService {   // implements OnInit
   }
 
   // newOrderLine(product)
-  loadProduct$(productId: string): Promise<any> {
+  async loadProduct$(productId: string): Promise<any> {
     const me = this
 
 
@@ -310,23 +310,16 @@ export class OrderMgrUiService {   // implements OnInit
 
     this.spinner.show()
 
-    return new Promise<any>(function (resolve, reject) {
+    if (!productId) {
+      me.prepareProduct(undefined)
+      return
+    }
 
-      if (!productId) {
-        me.prepareProduct(undefined)
-        resolve(undefined)
-        return
-      }
+    let product = await me.productSvc.get$(productId, 'options:orderBy=idx.values:orderBy=idx,resources.resource')
 
-      me.productSvc.get(productId, 'options:orderBy=idx.values:orderBy=idx,resources.resource').subscribe(product => {
-        // 
-        me.prepareProduct(product)
-        // this.orderLine = new OrderLine()
-        resolve(product)
+    me.prepareProduct(product)
 
-        me.spinner.hide()
-      })
-    })
+    me.spinner.hide()
 
   }
 
@@ -544,6 +537,8 @@ export class OrderMgrUiService {   // implements OnInit
 
   }
 
+
+
   setMaxWaitForDepositInHours(appMode: AppMode, bookingStart: Date): number {
 
     const now = new Date()
@@ -602,6 +597,9 @@ export class OrderMgrUiService {   // implements OnInit
   // 8552b3ae-d1fb-494c-9dd1-1425a809ab28
 
 
+
+
+
   async selectTimeSlot(option: ReservationOption): Promise<ApiResult<Order>> {   // ConfirmOrderResponse
 
     let me = this
@@ -612,9 +610,7 @@ export class OrderMgrUiService {   // implements OnInit
 
       this.spinner.show()
 
-      const solutionForOption = me.availabilityResponse.solutionSet.getSolutionById(option.solutionIds[0])
 
-      console.warn(solutionForOption)
 
 
 
@@ -630,7 +626,14 @@ export class OrderMgrUiService {   // implements OnInit
 
       me.adaptGiftPayment(me.order)
 
-      confirmOrderResponse = await me.alteaSvc.orderMgmtService.confirmOrder(me.order, option, solutionForOption)
+      let solutionForOption = null
+
+      if (option.fromSolution()) {
+        solutionForOption = me.availabilityResponse.solutionSet.getSolutionById(option.solutionIds[0])
+        console.warn(solutionForOption)
+      }
+
+      confirmOrderResponse = await me.alteaSvc.orderMgmtService.confirmOrder(me.order, option, solutionForOption, this.availabilityResponse)
 
       console.warn(confirmOrderResponse)
       let order = confirmOrderResponse?.object
@@ -663,40 +666,40 @@ export class OrderMgrUiService {   // implements OnInit
   }
 
 
-    /** Users  */
-    showTimer = false
-    timeLeft = 10
-    interval
-  
-    /**
-     * https://www.w3schools.com/jsref/met_win_setinterval.asp
-     * https://stackoverflow.com/questions/50455347/how-to-do-a-timer-in-angular-5
-     */
-    startTimer() {
-  
-      this.showTimer = true
-      this.timeLeft = 10
-  
-      this.interval = setInterval(() => {
-  
-        if (this.timeLeft > 0) {
-          this.timeLeft--;
-        } else {
-          clearInterval(this.interval)
-        }
-      }, 60 * 1000)
-  
-    }
+  /** Users  */
+  showTimer = false
+  timeLeft = 10
+  interval
 
-    timerColor() : string {
+  /**
+   * https://www.w3schools.com/jsref/met_win_setinterval.asp
+   * https://stackoverflow.com/questions/50455347/how-to-do-a-timer-in-angular-5
+   */
+  startTimer() {
 
-      if (this.timeLeft >= 3)
-        return 'green'
-      else if (this.timeLeft >= 1)
-        return 'orange'
-      else
-        return 'red'
-    }
+    this.showTimer = true
+    this.timeLeft = 10
+
+    this.interval = setInterval(() => {
+
+      if (this.timeLeft > 0) {
+        this.timeLeft--;
+      } else {
+        clearInterval(this.interval)
+      }
+    }, 60 * 1000)
+
+  }
+
+  timerColor(): string {
+
+    if (this.timeLeft >= 3)
+      return 'green'
+    else if (this.timeLeft >= 1)
+      return 'orange'
+    else
+      return 'red'
+  }
 
 
 

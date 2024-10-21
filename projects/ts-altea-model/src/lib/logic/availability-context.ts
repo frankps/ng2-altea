@@ -42,7 +42,10 @@ export class AvailabilityContext {
      */
     schedules: Schedule[] = []
 
-    /** Schedules converted to specific dates monday 09:00 till 17:00 -> [04/12/2022 09:00, 04/12/2022 17:00]. Map is indexed by resourceId.   */
+    /** Schedules converted to specific dates monday 09:00 till 17:00 -> [04/12/2022 09:00, 04/12/2022 17:00]. 
+     * Map is indexed by resourceId !!!
+     * Set by CreateAvailabilityContext.create(...)
+      */
     scheduleDateRanges = new Map<string, DateRangeSet>()
 
     /** Other configs can be dependent upon the branch-mode (example: resource plannings) */
@@ -348,12 +351,59 @@ export class AvailabilityContext {
         return result
     }
 
+    getActiveSchedulesDuring(range: DateRange, scheduleIds: string[]) : string[] {
+
+        if (ArrayHelper.IsEmpty(scheduleIds))
+            return []
+
+        const activeScheduleIds : string[] = []
+
+        // DEBUG
+        let branchSchedules = this.getBranchSchedules(range)
+
+        console.log(branchSchedules)
+
+
+        for (let scheduleId of scheduleIds) {
+
+            let schedule = this.schedules.find(s => s.id == scheduleId)
+
+            if (!schedule?.resourceId)  // should not happen
+                continue
+
+            let resourceId = schedule.resourceId
+
+            let resourceRanges = this.scheduleDateRanges.get(resourceId)
+            let scheduleRanges = resourceRanges.filterBySchedule(scheduleId)
+
+            if (!resourceRanges)
+                continue
+
+            let hasOverlap = scheduleRanges.hasOverlapWith(range)
+
+            if (hasOverlap)
+                activeScheduleIds.push(scheduleId)
+
+        }
+
+        return activeScheduleIds
+    }
 
     getSchedule(scheduleId: string): Schedule | undefined {
         return this.schedules.find(s => s.id == scheduleId)
     }
 
-    getSchedules(resourceId: string): Schedule[] {
+    getSchedules(scheduleIds: string[]): Schedule[] {
+
+        if (ArrayHelper.IsEmpty(scheduleIds))
+            return []
+
+        let schedules = this.schedules.filter(s => scheduleIds.indexOf(s.id) >= 0)
+        return schedules
+    }
+
+
+    getSchedulesByResource(resourceId: string): Schedule[] {
 
         if (!Array.isArray(this.schedules) || this.schedules.length == 0)
             return []

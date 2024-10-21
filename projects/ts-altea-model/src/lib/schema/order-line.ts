@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { Exclude, Type, Transform } from "class-transformer";
 import 'reflect-metadata';
-import { ArrayHelper, ConnectTo, DateHelper, DbObjectCreate, IAsDbObject, ManagedObject, ObjectHelper, ObjectMgmt, ObjectReference, ObjectWithId, ObjectWithIdPlus, QueryOperator, TimeHelper } from 'ts-common'
+import { ArrayHelper, ConnectTo, DateHelper, DbObjectCreate, IAsDbObject, ManagedObject, NumberHelper, ObjectHelper, ObjectMgmt, ObjectReference, ObjectWithId, ObjectWithIdPlus, QueryOperator, TimeHelper } from 'ts-common'
 import * as _ from "lodash";
 import { PersonLine } from "../person-line";
 import { DateRange, DateRangeSet, TimeBlock, TimeBlockSet, TimeSpan } from "../logic";
@@ -529,8 +529,8 @@ export class OrderLine extends ObjectWithIdPlus {
 
     if (this.vatPct) {
       const vatFactor = (1 + this.vatPct / 100)
-      this.excl = this.incl / vatFactor
-      this.vat = this.incl - this.excl
+      this.excl = NumberHelper.round(this.incl / vatFactor)
+      this.vat = NumberHelper.round(this.incl - this.excl)
     } else
       this.excl = this.incl
 

@@ -20,15 +20,32 @@ export class ResourceAvailability2 {
 
     constructor(public ctx: AvailabilityContext) {
 
-        const resources = ctx.getAllNongGroupResources()
+        let resources = ctx.getAllNongGroupResources()
+
+        // make sure the "branch" resource is the first one => determines the outer bounds of other resource availabilities
+
+        let idx = resources.findIndex(r => r.type == ResourceType.branch)
+
+        if (idx == -1)
+            throw new Error('Missing branch resource')
+        if (idx > 0) {
+            let branchResource = resources.splice(idx, 1)
+            resources = [ ...branchResource, ...resources ]
+        }
+
+
+        let branchAvailability : DateRangeSet // = new DateRangeSet()
+
 
         for (const resource of resources) {
 
             const resourceId = resource.id!
 
+            /*
             let frankId = 'cc682b80-6243-4ac5-92a9-5ceed36111a4'
             if (resourceId == frankId)
                 console.error(' FRANK FOUND ----')
+            */
 
             /** get the outer boundaries for this resource */
             let normalScheduleRanges: DateRangeSet //= ctx.scheduleDateRanges.get(resourceId)
@@ -36,7 +53,7 @@ export class ResourceAvailability2 {
             if (resource.customSchedule)
                 normalScheduleRanges = ctx.scheduleDateRanges.get(resourceId)
             else
-                normalScheduleRanges = ctx.scheduleDateRanges.get(ctx.branchId)
+                normalScheduleRanges = branchAvailability   //ctx.scheduleDateRanges.get(ctx.branchId)
 
 
             if (!normalScheduleRanges) {
@@ -66,18 +83,17 @@ export class ResourceAvailability2 {
             }
 
 
-
             let resourceStillAvailable = extendedSchedule.subtract(unavailable)
             resourceStillAvailable = resourceStillAvailable.subtract(resourceOccupation.overlapAllowed)
-
-
-
-
-
 
             let availability = new ResourceAvailabilitySets(resourceStillAvailable, resourceOccupation.overlapAllowed)
 
             this.availability.set(resourceId, availability)
+
+            if (resource.type == ResourceType.branch) {
+                branchAvailability = resourceStillAvailable
+
+            }
 
         }
     }
@@ -242,7 +258,7 @@ export class ResourceAvailability2 {
              */
             var resourceAvailabilities = this.getAvailabilitiesForResource(resource)
 
-            /** The current solution might already occupie this resource */
+            /** The current solution might already occupy this resource */
             if (solution) {
                 var resourceAlreadyOccupiedInSolution = solution.getOccupationForResource(resource)
 

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { ApiListResult, ApiResult, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
-import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, Organisation, ResourceAvailability2 } from 'ts-altea-model'
+import { ApiListResult, ApiResult, DateHelper, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
+import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, Organisation, ResourceAvailability2, ResourcePlanning } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { AlteaDb } from '../../general/altea-db'
 import { IDb } from '../../interfaces/i-db'
@@ -10,6 +10,7 @@ import { SlotFinder } from './slot-finder'
 import { ResourceRequestOptimizer } from './resource-request-optimizer'
 import { SolutionPicker } from './solution-picker'
 import { DetermineReservationOptions } from './determine-reservation-options'
+import * as dateFns from 'date-fns'
 // import { ResourceAvailabilityCache } from './resource-availability-cache'
 
 
@@ -86,11 +87,11 @@ export class AvailabilityService {
          *  Calculate the final availability of all the resources based on all the data previously fetched (availability context)
          */
 
-/*         const availability = new ResourceAvailability(availabilityCtx)
-        if (availabilityRequest.debug) response.debug.availability = availability */
+        /*         const availability = new ResourceAvailability(availabilityCtx)
+                if (availabilityRequest.debug) response.debug.availability = availability */
 
         const availability2 = new ResourceAvailability2(availabilityCtx)
-       if (availabilityRequest.debug) response.debug.availability = availability2
+        if (availabilityRequest.debug) response.debug.availability = availability2
 
         /** Create Resource Request
          *  _______________________
@@ -108,10 +109,10 @@ export class AvailabilityService {
 
 
         /** If an order contains multiple treatments for the same customer, then we will try to allocate same resources (staff & room) for this customer.  */
-/*
-        const optimizedRequests = ResourceRequestOptimizer.I.optimize(...initialResourceRequests)
-        if (availabilityRequest.debug) response.debug.resourceRequests.push(...optimizedRequests)
-*/
+        /*
+                const optimizedRequests = ResourceRequestOptimizer.I.optimize(...initialResourceRequests)
+                if (availabilityRequest.debug) response.debug.resourceRequests.push(...optimizedRequests)
+        */
 
 
         /** Look for possibilities: first we try to find solutions for the optimized resource request,
@@ -128,9 +129,12 @@ export class AvailabilityService {
         response.optionSet = DetermineReservationOptions.I.getAllReservationOptions(response.solutionSet)
 
         console.error(response.optionSet)
-     
+
         return response
     }
+
+
+
 
 
 

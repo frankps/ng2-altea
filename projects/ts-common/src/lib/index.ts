@@ -1,5 +1,6 @@
 export * from './array-helper'
 export * from './date-helper'
+export * from './number-helper'
 export * from './object-helper'
 export * from './object-with-id'
 export * from './translation'

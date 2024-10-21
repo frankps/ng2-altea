@@ -120,7 +120,7 @@ export class AppComponent implements OnInit {
 
     const productQry = new DbQuery()
     productQry.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
-    productQry.include('options:orderBy=idx.values:orderBy=idx', 'resources:orderBy=idx.resource', 'items:orderBy=idx', 'prices')
+    productQry.include('options:orderBy=idx.values:orderBy=idx', 'resources:orderBy=idx', 'items:orderBy=idx', 'prices')   // we previously also fteched the resource: 'resources:orderBy=idx.resource'
     productQry.take = 1000
     this.productSvc.cacheQuery = productQry
     this.productSvc.linkedTypes = ['ProductItem', 'ProductResource']

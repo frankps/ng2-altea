@@ -23,7 +23,31 @@
         </div>
     </div>
 
+
+    <ng-container *ngIf="isPos">
+
+        <div class="row">
+            <div class="col-4"><input type="time" id="forceTime" name="forceTime" required class="form-control"
+                    [(ngModel)]="forceTime" /></div>
+            <div class="col-4">
+    
+                <button type="button" class="btn btn-primary" (click)="customTimeSlot()" translate>dic.force</button>
+    
+            </div>
+            <div class="col-4"></div>
+        </div>
+    
+    </ng-container>
+
+
 </ng-container>
+
+
+
+
+
+
+
 
 <div class="row" *ngIf="message">
     <div class="col">{{message}}</div>

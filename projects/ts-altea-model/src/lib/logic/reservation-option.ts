@@ -1,4 +1,4 @@
-import { DateHelper } from "ts-common"
+import { ArrayHelper, DateHelper } from "ts-common"
 import { SolutionSet } from "./solution"
 import * as dateFns from 'date-fns'
 
@@ -16,6 +16,14 @@ export class ReservationOption {
 
     get date(): Date {
         return DateHelper.parse(this.dateNum)
+    }
+
+    isForcedDate() : boolean {
+        return ArrayHelper.IsEmpty(this.solutionIds)
+    }
+
+    fromSolution() : boolean {
+        return ArrayHelper.NotEmpty(this.solutionIds)
     }
 
     static fromDate(start: Date, solutionId?: string): ReservationOption {

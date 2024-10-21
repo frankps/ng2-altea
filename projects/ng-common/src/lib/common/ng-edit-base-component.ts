@@ -84,7 +84,7 @@ export abstract class NgEditBaseComponent<T extends ObjectWithId> extends NgSect
     sectionProps = new Map<string, string[]>()
 
     constructor(objectType: string, protected type: { new(): T; }, protected includes: string
-        , protected objectSvc: BackendHttpServiceBase<T>, protected router: Router,  protected route: ActivatedRoute, protected spinner: NgxSpinnerService,
+        , protected objectSvc: BackendHttpServiceBase<T>, protected router: Router, protected route: ActivatedRoute, protected spinner: NgxSpinnerService,
         public dashboardSvc: DashboardService) {  //
         super()
 
@@ -94,11 +94,11 @@ export abstract class NgEditBaseComponent<T extends ObjectWithId> extends NgSect
     }
 
     ngOnInit() {
-        
+
 
 
         this.route.params.subscribe(params => {
-            
+
             console.error('route.params triggered')
 
             console.error(params)
@@ -121,7 +121,7 @@ export abstract class NgEditBaseComponent<T extends ObjectWithId> extends NgSect
                     this.getObject(id)
                 }
 
-                
+
 
 
             }
@@ -140,32 +140,32 @@ export abstract class NgEditBaseComponent<T extends ObjectWithId> extends NgSect
 
     abstract objectRetrieved(object: T): void
 
-    getObject(id: string) {
+    async getObject(id: string) {
 
+        let me = this
         console.warn(`getObject('${id}')`)
 
-        this.spinner.show()  
+        this.spinner.show()
+
+        let res = await me.objectSvc.get$(id, this.includes)
+       
+        this.object = res as T
+
+        this.resetOrigObject()
+
+        console.error(this.object)
+
+        console.error(this.origObject)
+
+        this.editSectionId = ''
+
+        await this.objectRetrieved(this.object)
+
+        this.spinner.hide()
+        console.error(res)
 
 
-        // 'prices,options:orderBy=idx.values:orderBy=idx,items:orderBy=idx,resources:orderBy=idx.resource'
-        this.objectSvc.get(id, this.includes).subscribe((res: any) => {
 
-            //  res.gender = Gender.unisex
-            this.object = res as T
-
-            this.resetOrigObject()
-
-            console.error(this.object)
-
-            console.error(this.origObject)
-
-            this.editSectionId = ''
-
-            this.objectRetrieved(this.object)
-
-            this.spinner.hide()
-            console.error(res)
-        })
     }
 
 
@@ -192,8 +192,8 @@ export abstract class NgEditBaseComponent<T extends ObjectWithId> extends NgSect
                     this.isNew = false
                     this.object = res.object
 
-                    this.router.navigate([`../${res.object.id}`], {relativeTo: this.route});
-                   // this.router.navigate([this.sessionSvc.branchUnique, 'tasks', 'manage', '4678e36c-a0c5-4a86-837c-764c099bc5b2'])
+                    this.router.navigate([`../${res.object.id}`], { relativeTo: this.route });
+                    // this.router.navigate([this.sessionSvc.branchUnique, 'tasks', 'manage', '4678e36c-a0c5-4a86-837c-764c099bc5b2'])
 
                 } else {
                     this.dashboardSvc.showToastType(ToastType.saveError)

@@ -64,7 +64,7 @@ export class FormulaTerm {
 
   /** increment/decrement for the value */
   inc = 0
-  
+
   optionId?: string
 }
 
@@ -378,7 +378,7 @@ export class Product extends ObjectWithIdPlus {
   rules?: ProductRule[]
 
   /** min number of hours before reservation for free cancel (undefined/null = take setting from Branch, 0 = always free cancel, 24 = 1 day upfront for free cancel, ...) */
-  
+
   @Type(() => Number)
   cancel?: number
 
@@ -516,6 +516,32 @@ export class Product extends ObjectWithIdPlus {
 
   hasRules() {
     return (this.rules && this.rules.length > 0)
+  }
+
+  attachResources(resources: Resource[]): boolean {
+
+    if (ArrayHelper.IsEmpty(resources) || ArrayHelper.IsEmpty(this.resources))
+      return false
+
+    let ok = true
+
+    this.resources.forEach(res => {
+
+      if (!res?.resourceId)
+        return
+
+      let resource = resources.find(r => r.id == res.resourceId)
+
+      if (!resource) {
+        ok = false
+        return
+      }
+
+      res.resource = resource
+    })
+
+    return ok
+
   }
 
   getResourcesForSchedule(scheduleId: string): ProductResource[] {

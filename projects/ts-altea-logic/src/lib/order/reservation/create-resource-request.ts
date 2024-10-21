@@ -79,8 +79,12 @@ export class CreateResourceRequest {
         }
 
 
+        /**
+         *  get the schudules used in orderLine.product.resources.scheduleIds
+         */
+        const scheduleIds = this.getScheduleIds(orderlinesWithPlanning,availabilityCtx )
 
-        const scheduleIds = this.getScheduleIds(orderlinesWithPlanning)
+
 
         if (scheduleIds.length == 0)
             scheduleIds.push('')  // we can push anything, just to make sure the for loop below is executed once
@@ -260,7 +264,13 @@ export class CreateResourceRequest {
     }
 
 
-    getScheduleIds(orderLines: OrderLine[]): string[] {
+    /**
+     * get the schudules used in orderLine.product.resources.scheduleIds
+     * 
+     * @param orderLines 
+     * @returns 
+     */
+    getScheduleIds(orderLines: OrderLine[], ctx: AvailabilityContext): string[] {
 
         if (!orderLines || orderLines.length == 0)
             return []
@@ -288,9 +298,14 @@ export class CreateResourceRequest {
             }
         }
 
-        return scheduleIds
+        // filter the active schedules
+        const requestRange = ctx.request.getDateRange()
+        const activeScheduleIds = ctx.getActiveSchedulesDuring(requestRange, scheduleIds)
+   
+        return activeScheduleIds
     }
 
+    
     getDuration(line: OrderLine, product: Product, productResource: ProductResource): OffsetDuration {
 
 

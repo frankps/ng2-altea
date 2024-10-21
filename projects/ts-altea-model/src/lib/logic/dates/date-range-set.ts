@@ -70,6 +70,18 @@ export class DateRangeSet {
         return new DateRangeSet()
     }
 
+    filterBySchedule(scheduleId: string) : DateRangeSet {
+
+        const result = new DateRangeSet([], this.resource)
+
+        if (ArrayHelper.IsEmpty(this.ranges))
+            return result
+
+        result.ranges = this.ranges.filter(r => r.schedule?.id == scheduleId)
+
+        return result
+    }
+
     toString(): string {
         if (this.isEmpty())
             return '[]'
@@ -102,10 +114,12 @@ export class DateRangeSet {
         this.ranges.push(range)
     }
 
-    addRangeByDates(from: Date, to: Date, fromLabel?: string, toLabel?: string) {
+    addRangeByDates(from: Date, to: Date, fromLabel?: string, toLabel?: string) : DateRange {
 
         const range = new DateRange(from, to, [fromLabel], [toLabel])
         this.addRange(range)
+
+        return range
 
     }
 

@@ -1,5 +1,5 @@
 import { Component, ViewChild, OnInit } from '@angular/core';
-import { ProductService, PriceService, ProductResourceService, SessionService } from 'ng-altea-common'
+import { ProductService, PriceService, ProductResourceService, SessionService, ResourceService } from 'ng-altea-common'
 import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ProductSubType } from 'ts-altea-model'
 import { DashboardService, FormCardSectionEventData, NgEditBaseComponent, ToastType, TranslationService } from 'ng-common'
 import { ActivatedRoute, Router } from '@angular/router';
@@ -88,7 +88,7 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
   // deleteTransParams = { article: undefined, object_sc: '', object_lc: '', name: '' }
 
   constructor(public manageProductSvc: ManageProductService, protected sessionSvc: SessionService, protected productSvc: ProductService, private priceSvc: PriceService,
-    private productResourceSvc: ProductResourceService,
+    private productResourceSvc: ProductResourceService, protected resourceSvc: ResourceService,
     private translationSvc: TranslationService, route: ActivatedRoute, router: Router,
     spinner: NgxSpinnerService, private modalService: NgbModal,
     dashboardSvc: DashboardService) {
@@ -146,7 +146,8 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
 
   }
 
-  override objectRetrieved(object: Product): void {
+  override async objectRetrieved(object: Product): Promise<void> {
+
 
     object.prices = _.orderBy(object?.prices, ['idx'], ['desc'])
 
@@ -166,7 +167,7 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
     this.initProductResourceChangeTracker(object)
 
 
-    this.manageProductSvc.showPathForProduct(object)
+    await this.manageProductSvc.showPathForProduct(object)
   }
 
 
@@ -208,48 +209,6 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
 
 
 
-
-
-  getObjectOld(id: string) {
-
-
-    this.spinner.show()
-
-    // 'ff2696c8-0c58-477f-b7dd-2ff18cdcaf57'
-    // include=options:orderBy=name.values:orderBy=name,prices
-    this.productSvc.get(id, 'prices,options:orderBy=idx.values:orderBy=idx,items:orderBy=idx,resources:orderBy=idx.resource').subscribe(res => {   // .values
-
-      //  res.gender = Gender.unisex
-      this.object = res as Product
-
-      this.object.prices = _.orderBy(this.object?.prices, ['idx'], ['desc'])
-
-      this.resetOrigObject()
-
-      console.error(this.object)
-
-      console.error(this.origObject)
-
-      //     this.object.prices = _.sortBy(this.object.prices, p => p.start ? p.start : new Date(1900, 0, 1))  // Date(1900,0,1): we need to get null values first!
-
-
-      const priceChangeParams = new CollectionChangeTrackerParams()
-      priceChangeParams.propsToRemove = ['_startDate', '_endDate']
-
-
-      this.priceChanges = new CollectionChangeTracker<Price>(this.object.prices, Price, priceChangeParams)
-
-
-      this.editSectionId = '' // 'timing'
-      // TO REMOVE
-      this.initProductResourceChangeTracker(this.object)
-
-      this.manageProductSvc.showPathForProduct(this.object)
-
-      this.spinner.hide()
-      console.error(res)
-    })
-  }
 
   /** origObject is used to retrieve previous values when user cancels an edit */
   // resetOrigObject() {

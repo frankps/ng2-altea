@@ -1,6 +1,9 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { OrderMgrUiService } from '../order-mgr-ui.service';
 import { ReservationOption } from 'ts-altea-model';
+import { SessionService } from 'ng-altea-common';
+import * as _ from "lodash"
+import * as dateFns from 'date-fns'
 
 @Component({
   selector: 'order-mgr-select-time-slot',
@@ -19,7 +22,11 @@ export class SelectTimeSlotComponent {
 
   message: string = ""
 
-  constructor(protected orderMgrSvc: OrderMgrUiService) {
+
+  isPos: boolean
+  forceTime: string = "15:00"
+
+  constructor(protected orderMgrSvc: OrderMgrUiService, protected sessionSvc: SessionService) {
 
   }
 
@@ -28,12 +35,37 @@ export class SelectTimeSlotComponent {
 
     console.error('From date: ', from)
 
+    this.isPos = this.sessionSvc.isPos()
+
   }
 
   selectOtherDate() {
     this.changeDate.emit()
   }
 
+  async customTimeSlot() {
+
+    let date = this.orderMgrSvc.availabilityRequestFromDate()
+
+    console.warn(this.forceTime)
+  
+    let timeItems = this.forceTime.split(':')
+    let hour = 0, minute = 0
+
+    if (timeItems.length == 2) {
+      hour = + timeItems[0]
+      minute = + timeItems[1]
+    }
+
+    date = dateFns.addHours(date, hour)
+    date = dateFns.addMinutes(date, minute)
+  
+    console.log(date)
+
+    let customOption = ReservationOption.fromDate(date)
+    var res = await this.selectTimeSlot(customOption)
+
+  }
 
   async selectTimeSlot(option: ReservationOption) {
 
@@ -44,9 +76,10 @@ export class SelectTimeSlotComponent {
     if (res?.isOk)
       this.selected.emit(option)
     else {
-
       this.message = res.message
     }
+
+
 
   }
 

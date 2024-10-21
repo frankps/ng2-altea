@@ -155,7 +155,7 @@ export class ResourcePlannings {
   
     filterByAvailable(available = true): ResourcePlannings {
   
-      const result = this.plannings.filter(rp => rp.available == available && !rp.scheduleId)
+      const result = this.plannings.filter(rp => rp.available == available && !rp.scheduleId && rp.start && rp.end && rp.end >= rp.start)
   
       if (!Array.isArray(result))
         return new ResourcePlannings()

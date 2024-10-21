@@ -55,7 +55,7 @@ https://ej2.syncfusion.com/angular/documentation/schedule/getting-started
    <!--    <div class="subject" style="padding-bottom:10px">Opties: {{data.Options}}</div> -->
       <div [innerHTML]="data.Options"></div>
       <br>
-      <div class="start-time" style="padding-bottom:10px">Start: {{data.StartTime | date:"dd/MM HH:mm"}}</div>
+      <div class="start-time" style="padding-bottom:10px">Start: {{data.StartTime | date:"dd/MM HH:mm"}} - {{data.EndTime | date:"HH:mm"}}</div>
       <!-- <div class="end-time" style="padding-bottom:10px">End: {{data.EndTime.toLocaleString()}}</div>
       <div class="location" style="padding-bottom:10px">Location: {{data.Location}}</div>
       <div class="description" style="padding-bottom:10px">Description: {{data.Description}}</div> -->

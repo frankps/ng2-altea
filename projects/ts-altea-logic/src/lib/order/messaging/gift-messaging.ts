@@ -52,7 +52,6 @@ export class GiftMessaging {
 <img width='600' class='max-width' style='display:block;color:#000000;text-decoration:none;font-family:Helvetica, arial, sans-serif;font-size:16px;max-width:100% !important;width:100%;height:auto !important;' alt='' src='https://marketing-image-production.s3.amazonaws.com/uploads/d6b0d9a36c6e84c82a2d2e9da76de0bc99f33b12cbf4c075613f8088d59eea09a5e7ae93967a647fb99b0e6e50d90a470621ad1dd07d484079cf6aa480aa3ca1.jpg' border='0'>
 ";
 
-
     */
 
     merge(branch: Branch, template: Template, gift: Gift): Message {
@@ -98,7 +97,6 @@ export class GiftMessaging {
 
             giftContents = contentLines.join(lineSeparator)
         }
-
 
         const headerImage = `<img width='600' class='max-width' style='display:block;color:#000000;text-decoration:none;font-family:Helvetica, arial, sans-serif;font-size:16px;max-width:100% !important;width:100%;height:auto !important;' alt='' src='https://marketing-image-production.s3.amazonaws.com/uploads/17ae7951ff4ef38519fa1a715981599a402f7e4d4b05f8508a5bdf2ff5f738656a4b382fde86d71f28e68b0f9b2124d322ce2b1afdd6028244e8ce986823557f.jpg' border='0'>
 <div>&nbsp;</div>`

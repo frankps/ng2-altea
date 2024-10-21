@@ -40,9 +40,11 @@ export class CreateAvailabilityContext {
 
         ctx.products = await this.attachProductsToOrderLines(ctx.order!)
 
-        ctx.configResources = ctx.order!.getProductResources()
 
+        // ctx.configResources = ctx.order!.getProductResources()
 
+        let resourceIds = ctx.order!.getAllResourceIds()
+        ctx.configResources = await this.alteaDb.getResources(resourceIds)
 
         ctx.branchId = ctx.order!.branchId!
 
@@ -65,6 +67,10 @@ export class CreateAvailabilityContext {
 
         /* Load schedules of resources that have custom scheduling */
         const resourcesWithCustomSchedules = ctx.allResources.filter(r => r.customSchedule)
+
+        const debugResNames = resourcesWithCustomSchedules.map(r => r.name)
+
+
         const resourceIdsWithCustomSchedules = resourcesWithCustomSchedules.map(r => r.id!)
         //resourceIdsWithCustomSchedules.push(ctx.branchId)
         ctx.schedules = await this.loadSchedules(resourceIdsWithCustomSchedules, ctx.allResources)    // this.alteaDb.schedules(ctx.allResourceIds)
@@ -187,7 +193,7 @@ export class CreateAvailabilityContext {
 
             const defaultSchedule = resourceSchedules.find(s => s.default)
             let dateRanges = defaultSchedule.toDateRangeSet(from, to, 'START', 'END')
-
+          
             const otherSchedules = resourceSchedules.filter(s => !s.default)
 
             for (const otherSchedule of otherSchedules) {
@@ -209,6 +215,7 @@ export class CreateAvailabilityContext {
                     dateRanges = dateRanges.subtractByDates(planning.start, planning.end)
 
                     let otherSet = otherSchedule.toDateRangeSet(from, to, 'START', 'END')
+                    
 
                     dateRanges = dateRanges.add(otherSet)
                 }

@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { SessionService } from '../../session.service';
 import { DbQuery, QueryOperator } from 'ts-common';
 import { Observable, map, Subject, take } from "rxjs";
+import { ProductResourceService } from 'ng-altea-common';
 
 
 @Injectable({
@@ -12,7 +13,7 @@ import { Observable, map, Subject, take } from "rxjs";
 })
 export class ProductService extends BackendHttpServiceBase<Product> {
 
-  constructor(http: HttpClient, protected sessionSvc: SessionService) {
+  constructor(http: HttpClient, protected sessionSvc: SessionService, protected prodResSvc: ProductResourceService) {
     /**
      * https://altea-1.ew.r.appspot.com
      * http://192.168.5.202:8080
@@ -22,7 +23,7 @@ export class ProductService extends BackendHttpServiceBase<Product> {
     super(Product, 'Product', sessionSvc.backend, sessionSvc.branchUnique + '/products', http)
 
     this.softDelete = true
-  }
+  }  
 
 
   /*
@@ -34,6 +35,21 @@ options:orderBy=idx.values:orderBy=idx
 
 
 
+  override async get$(id: string, includes?: string | string[] | null): Promise<Product> {
+
+    let me = this
+
+    let product = await super.get$(id, includes)
+
+    if (this.caching) {
+      // we only need to do this in case of caching, because resources are NOT cached inside products
+      await me.prodResSvc.attachResourcesToProduct(product)
+    }
+
+    return product
+
+
+  }
 
 
 
@@ -81,11 +97,11 @@ options:orderBy=idx.values:orderBy=idx
     query.and('del', QueryOperator.equals, false)
     query.and('catId', QueryOperator.equals, categoryId)
     query.and('online', QueryOperator.not, OnlineMode.invisible)
-    
+
     //productQry.include('options:orderBy=idx.values:orderBy=idx', 'resources:orderBy=idx.resource', 'items:orderBy=idx', 'prices')
 
     query.include('options:orderBy=idx.values:orderBy=idx', 'items:orderBy=idx')
-   // query.include('options:orderBy=idx.values:orderBy=idx', 'resources:orderBy=idx.resource', 'items:orderBy=idx', 'prices')
+    // query.include('options:orderBy=idx.values:orderBy=idx', 'resources:orderBy=idx.resource', 'items:orderBy=idx', 'prices')
     query.take = 200
 
     return query

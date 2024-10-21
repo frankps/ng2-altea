@@ -146,6 +146,10 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
     
     return {
       Id: eventBase.id,
+
+      // always copy over the type
+      type: eventBase.type,
+
       Contact: eventBase.contact,
       Subject: eventBase.subject,
       StartTime: eventBase.from,
@@ -153,8 +157,8 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
       CategoryColor: eventBase.color,
       OrderId: eventBase.order?.id,
       Options: eventBase.order?.shortInfo(false, false, true, '<br>'),
-      // always copy over the type
-      type: eventBase.type
+
+      
     }
   }
 

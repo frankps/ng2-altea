@@ -3,6 +3,7 @@ import { DateBorder } from './date-border';
 import { DateHelper } from 'ts-common';
 import { TimeSpan } from './time-span';
 import { DateRangeSet } from './date-range-set';
+import { Schedule } from 'ts-altea-model';
 
 // Source: https://github.com/gund/time-slots/blob/master/packages/time-slots/src/lib
 
@@ -19,6 +20,10 @@ export class DateRange {
 
     /** quantity is used for resources with multiple instances (multi-cabine) */
     public qty = 1
+
+
+    /** if ranges belong to schedule */
+    public schedule?: Schedule
 
     constructor(public from: Date, public to: Date, public fromLabels: string[] = [], public toLabels: string[] = []) {
         if (to < from) {

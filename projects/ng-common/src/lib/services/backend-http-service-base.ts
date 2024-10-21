@@ -142,6 +142,24 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
     })
   }
 
+  async httpGet$<T>(httpServer: string, pageUrl: string): Promise<T> {
+
+    const me = this
+
+    return new Promise<any>(function (resolve, reject) {
+
+      const fullUrl = `${httpServer}/${pageUrl}`
+
+      me.http.get<any>(fullUrl).pipe(take(1)).subscribe(res => {
+        resolve(res)
+      })
+
+    })
+
+  }
+
+
+
   get(id: string, includes: string | null = null): Observable<T> {
 
     if (this.caching) {
@@ -197,8 +215,28 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
     })
   }
 
+  getMany$(ids: string[], includes: string[] = null): Promise<T[]> {
+
+    let qry = new DbQuery()
+    qry.and('id', QueryOperator.in, ids)
+
+    if (ArrayHelper.NotEmpty(includes))
+      qry.includes = includes
+
+    return this.query$(qry)
+  }
 
 
+  /*
+  async getMany$(take: number = 100): Promise<T[]> {
+    let res = await this.httpGet$<ApiListResult<T>>(this.host, `${this.urlDifferentiator}?take=${take}`)
+
+    if (res.status == ApiStatus.ok)
+      return res.data
+    else
+      throw res.message
+  }
+      */
 
 
   getMany(take: number = 100): Observable<ApiListResult<T>> {
