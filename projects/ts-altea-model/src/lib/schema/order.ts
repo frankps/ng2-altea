@@ -584,13 +584,13 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     return (Array.isArray(this.lines) && this.lines.length > 0)
   }
 
-  sumToString(separator: string = '\<br\>\n'): string {
+  sumToString(includeOptions = true, separator: string = '\<br>\n'): string {
 
     if (ArrayHelper.IsEmpty(this.sum))
       return ''
 
 
-    const lines = this.sum.map(lineSum => lineSum.toString())
+    const lines = this.sum.map(lineSum => lineSum.toString(includeOptions))
 
     let res: string = lines.join(separator)
 

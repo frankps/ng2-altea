@@ -14,7 +14,8 @@ export enum QueryOperator {
   lessThanOrEqual = 'lte',
   lessThan = 'lt',
   in = 'in',
-  hasSome = 'hasSome'
+  hasSome = 'hasSome',
+  has = 'has'
 }
 
 export class QueryCondition {

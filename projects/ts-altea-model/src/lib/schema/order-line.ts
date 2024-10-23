@@ -21,7 +21,38 @@ export class OrderLineOptionSummary {
   v?: string
 
   toString(): string {
-    return `${this.o}: ${this.v}`
+    return `${this.o}: ${this.formatValue()}`
+  }
+
+  formatValue(): string {
+
+    if (!this.v)
+      return ''
+
+    let value = this.v.replace(',','.')
+
+    let num = +value
+
+    if (isNaN(num))
+      return value
+    else
+      return '' + _.round(num)
+  }
+
+  isZeroOrEmpty() {
+
+    if (!this.v)
+      return true
+
+    let value = this.v.replace(',','.')
+
+    let num = +value
+
+    if (isNaN(num))
+      return false
+    else
+      return num == 0
+
   }
 }
 
@@ -37,19 +68,26 @@ export class OrderLineSummary {
   @Type(() => OrderLineOptionSummary)
   o?: OrderLineOptionSummary[] = []
 
-  toString() {
+  toString(includeOptions = true) {
 
-    let optionStr: string = undefined
 
-    if (ArrayHelper.NotEmpty(this.o)) {
-      let options = this.o.map(o => o.toString())
-      optionStr = options.join(', ')
-    }
 
     let str = `${this.q} x ${this.d}`
 
-    if (optionStr)
-      str += `: ${optionStr}`
+    if (includeOptions) {
+
+      let optionStr: string = undefined
+
+      if (ArrayHelper.NotEmpty(this.o)) {
+        let options = this.o.filter(o => o && !o.isZeroOrEmpty()).map(o => o.toString())
+        optionStr = options.join(', ')
+      }
+
+      if (optionStr)
+        str += `: ${optionStr}`
+
+    }
+
 
     return str
   }

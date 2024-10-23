@@ -23,7 +23,7 @@ export class SelectTimeSlotComponent {
   message: string = ""
 
 
-  isPos: boolean
+  isPosAdmin: boolean
   forceTime: string = "15:00"
 
   constructor(protected orderMgrSvc: OrderMgrUiService, protected sessionSvc: SessionService) {
@@ -35,7 +35,7 @@ export class SelectTimeSlotComponent {
 
     console.error('From date: ', from)
 
-    this.isPos = this.sessionSvc.isPos()
+    this.isPosAdmin = this.sessionSvc.isPos() && this.sessionSvc.isAdmin()
 
   }
 

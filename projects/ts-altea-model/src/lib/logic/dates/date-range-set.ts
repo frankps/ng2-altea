@@ -70,7 +70,15 @@ export class DateRangeSet {
         return new DateRangeSet()
     }
 
-    filterBySchedule(scheduleId: string) : DateRangeSet {
+    setQty(qty: number) {
+        if (ArrayHelper.IsEmpty(this.ranges))
+            return
+
+        this.ranges.forEach(range => range.qty = qty)
+    }
+
+
+    filterBySchedule(scheduleId: string): DateRangeSet {
 
         const result = new DateRangeSet([], this.resource)
 
@@ -114,7 +122,7 @@ export class DateRangeSet {
         this.ranges.push(range)
     }
 
-    addRangeByDates(from: Date, to: Date, fromLabel?: string, toLabel?: string) : DateRange {
+    addRangeByDates(from: Date, to: Date, fromLabel?: string, toLabel?: string): DateRange {
 
         const range = new DateRange(from, to, [fromLabel], [toLabel])
         this.addRange(range)
@@ -475,7 +483,13 @@ export class DateRangeSet {
 
     }
 
-    subtract(toSubtract: DateRangeSet): DateRangeSet {
+    /**
+     * 
+     * @param toSubtract 
+     * @param substractFromSingleRange   if range.qty > 1 (=multiple ranges), then we subtract from single range 
+     * @returns 
+     */
+    subtract(toSubtract: DateRangeSet, substractFromSingleRange: boolean = true): DateRangeSet {
 
         if (this.isEmpty())
             return DateRangeSet.empty
@@ -485,9 +499,8 @@ export class DateRangeSet {
 
         const source = _.orderBy(this.ranges, ['from', 'to'])
 
-        const substractFromRanges = []
+        const substractFromRanges: DateRange[] = []
         for (const range of source) substractFromRanges.push(range)
-
 
         const toSubtractRanges = _.orderBy(toSubtract.ranges, ['from', 'to'])
 
@@ -498,6 +511,18 @@ export class DateRangeSet {
 
 
         let subtractFrom: DateRange = substractFromRanges.pop()
+
+        // is qty > 1, then we only subtract from the first
+        if (subtractFrom.qty > 1) {
+
+            let untouched = subtractFrom.clone()
+            untouched.qty = untouched.qty - 1
+            subtractResults.push(untouched)
+
+            // we continue with just 1
+            subtractFrom = subtractFrom.clone()
+            subtractFrom.qty = 1
+        }
 
         while (subtractFrom) {
 

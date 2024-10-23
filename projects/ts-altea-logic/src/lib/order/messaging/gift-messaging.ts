@@ -18,6 +18,67 @@ export class GiftMessaging {
     }
 
 
+    async fulfillGiftOrder(order: Order): Promise<ApiResult<any>> {
+
+        let allOk = true
+
+        let results = []
+
+        try {
+
+            let branch: Branch = await this.alteaDb.getBranch(order.branchId)
+            let gift: Gift = await this.alteaDb.getGiftByOrderId(order.id)
+
+            if (!gift) {
+                let msg = `Gift not found for order ${order.id}`
+                results.push(msg)
+                return ApiResult.error(msg)
+            }
+
+            if (gift.methods.emailFrom) {
+
+                let res = await this.send(branch, gift, GiftTemplateCode.gift_online_from, true)
+
+                if (res.isOk) {
+
+                    results.push(`Gift email to fromEmail:${gift.fromEmail} send successfully (template: gift_online_from)`)
+                }
+                else {
+                    allOk = false
+                    results.push(`Problem sending email to fromEmail:${gift.fromEmail} (template: gift_online_from)`)
+
+                    if (res.message)
+                        results.push(`<i>${res.message}</i>`)
+                }
+
+
+            } else if (gift.methods.emailTo) {
+
+                let res = await this.send(branch, gift, GiftTemplateCode.gift_online_to, true)
+
+                if (res.isOk) {
+                    results.push(`Gift email to toEmail:${gift.toEmail} send successfully (template: gift_online_to)`)
+                }
+                else {
+                    allOk = false
+                    results.push(`Problem sending email to toEmail:${gift.toEmail} send successfully (template: gift_online_to)`)
+
+                    if (res.message)
+                        results.push(`<i>${res.message}</i>`)
+                }
+
+            }
+
+        } catch (err) {
+            results.push(`<i>${err}</i>`)
+        }
+
+
+        return new ApiResult(this)
+
+
+    }
+
     async send(branch: Branch, gift: Gift, templateCode: GiftTemplateCode, send: boolean = true): Promise<ApiResult<Message>> {
 
         let template = await this.alteaDb.getTemplate(gift.branchId, templateCode, MsgType.email)
@@ -36,23 +97,7 @@ export class GiftMessaging {
 
     }
 
-    /*
 
-            //------------------------------ headerPicture ---------------------------------------------------------------------------------------------
-        static string headerPicture = @"
-<img width='600' class='max-width' style='display:block;color:#000000;text-decoration:none;font-family:Helvetica, arial, sans-serif;font-size:16px;max-width:100% !important;width:100%;height:auto !important;' alt='' src='https://marketing-image-production.s3.amazonaws.com/uploads/17ae7951ff4ef38519fa1a715981599a402f7e4d4b05f8508a5bdf2ff5f738656a4b382fde86d71f28e68b0f9b2124d322ce2b1afdd6028244e8ce986823557f.jpg' border='0'>
-<div>&nbsp;</div>
-";
-        //------------------------------ headerPicture ---------------------------------------------------------------------------------------------
-        static string coronaRulesPicture = @"
-<img width='600' class='max-width' style='display:block;color:#000000;text-decoration:none;font-family:Helvetica, arial, sans-serif;font-size:16px;max-width:100% !important;width:100%;height:auto !important;' alt='' src='https://marketing-image-production.s3.amazonaws.com/uploads/4305a9e1e39f03d739a47eedc5b73f6ec3e33cf2681eded7a45d3b268d83d5512b86f08b040d0bbd202aa3831583cf28fdf82d94f6a79f58e339d6804a973f5d.JPG' border='0'>
-";
-        //------------------------------ giftPicture ---------------------------------------------------------------------------------------------
-        static string giftPicture = @"
-<img width='600' class='max-width' style='display:block;color:#000000;text-decoration:none;font-family:Helvetica, arial, sans-serif;font-size:16px;max-width:100% !important;width:100%;height:auto !important;' alt='' src='https://marketing-image-production.s3.amazonaws.com/uploads/d6b0d9a36c6e84c82a2d2e9da76de0bc99f33b12cbf4c075613f8088d59eea09a5e7ae93967a647fb99b0e6e50d90a470621ad1dd07d484079cf6aa480aa3ca1.jpg' border='0'>
-";
-
-    */
 
     merge(branch: Branch, template: Template, gift: Gift): Message {
 

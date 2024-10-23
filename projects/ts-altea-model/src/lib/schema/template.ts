@@ -358,6 +358,13 @@ export class Template extends ObjectWithParameters {
     return map
   }
 
+  /**
+   * 
+   * @param order 
+   * @param branch 
+   * @param addParamsForRemoteTemplating some services (like WhatsApp) do the templating themselves => we need to prepare the params to send over
+   * @returns 
+   */
   mergeWithOrder(order: Order, branch: Branch, addParamsForRemoteTemplating: boolean = false): Message {
 
     const message = new Message()
@@ -372,9 +379,12 @@ export class Template extends ObjectWithParameters {
     const payLinkPath = `branch/aqua/order/${order.id}/pay-online`
     const payLink = `https://book.birdy.life/${payLinkPath}`
 
+    const headerImage = `<img width='600' class='max-width' style='display:block;color:#000000;text-decoration:none;font-family:Helvetica, arial, sans-serif;font-size:16px;max-width:100% !important;width:100%;height:auto !important;' alt='' src='https://marketing-image-production.s3.amazonaws.com/uploads/17ae7951ff4ef38519fa1a715981599a402f7e4d4b05f8508a5bdf2ff5f738656a4b382fde86d71f28e68b0f9b2124d322ce2b1afdd6028244e8ce986823557f.jpg' border='0'>
+<div>&nbsp;</div>`
 
     const replacements = {
-      branch: branch.name,
+      'header-image': headerImage,
+      'branch': branch.name,
       'branch-unique': branch.unique,
       'deposit': `€${order.deposit}`,
       'paid': `€${order.paid}`,
@@ -382,11 +392,11 @@ export class Template extends ObjectWithParameters {
       'deposit-time': order.depositTime(),
       'deposit-date': order.depositDate(),
       // term: this.getTerm_old(order),
-      first: order?.contact?.first,
+      'first': order?.contact?.first,
       'order-id': order?.id,
       'start-date': order.startDateFormat(),
       'order-lines-html': order.sumToString(),
-      'order-lines-text': order.sumToString('\n'),
+      'order-lines-text': order.sumToString(true, '\n'),
       'footer': branch.comm?.footer,
       'product-informs': order.productInforms(),
       'pay-link': payLink,

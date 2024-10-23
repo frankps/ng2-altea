@@ -142,7 +142,24 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
     })
   }
 
-  async httpGet$<T>(httpServer: string, pageUrl: string): Promise<T> {
+
+  async httpGet$<T>(urlSuffix: string): Promise<T> {
+
+    const me = this
+
+    return new Promise<any>(function (resolve, reject) {
+
+      const fullUrl = `${me.host}/${me.urlDifferentiator}/${urlSuffix}`
+
+      me.http.get<any>(fullUrl).pipe(take(1)).subscribe(res => {
+        resolve(res)
+      })
+
+    })
+
+  }
+
+  async httpGetOrig$<T>(httpServer: string, pageUrl: string): Promise<T> {
 
     const me = this
 
@@ -702,6 +719,15 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
       case QueryOperator.endsWith:
         leftString = left as string
         return leftString.endsWith(condition.value)
+
+        case QueryOperator.has:
+
+          if (ArrayHelper.IsEmpty(left))
+            return false
+
+          let arr = left as string[]
+
+          return arr.indexOf(condition.value) >= 0
 
       case QueryOperator.in:
 

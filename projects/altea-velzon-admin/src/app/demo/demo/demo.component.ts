@@ -1,8 +1,8 @@
 import { Component, ViewChild, inject } from '@angular/core';
 import { Contact, Order, PaymentType, SmsMessage, User } from 'ts-altea-model';
 import { SearchContactComponent } from '../../contact/search-contact/search-contact.component';
-import { AlteaService, BranchService, ObjectService, ProductService, ResourceService, ScheduleService, SessionService, TemplateService, UserService } from 'ng-altea-common';
-import { CheckDeposists, OrderCronJobs, OrderMgmtService } from 'ts-altea-logic';
+import { AlteaService, BranchService, ObjectService, OrderService, ProductService, ResourceService, ScheduleService, SessionService, TemplateService, UserService } from 'ng-altea-common';
+import { AlteaDb, CheckDeposists, OrderCronJobs, OrderMessaging, OrderMgmtService } from 'ts-altea-logic';
 import { TranslationService } from 'ng-common'
 import { Country } from 'ts-altea-model'
 import { DbQuery, ObjectHelper, QueryOperator, Translation } from 'ts-common';
@@ -41,7 +41,7 @@ export class DemoComponent {
   giftCode: string
 
   constructor(private http: HttpClient, public dbSvc: ObjectService, protected translationSvc: TranslationService, protected backEndSvc: ObjectService
-    , protected userSvc: UserService, protected resourceSvc: ResourceService, protected anySvc: ScheduleService, protected productSvc: ProductService,
+    , protected userSvc: UserService, protected resourceSvc: ResourceService, protected anySvc: ScheduleService, protected productSvc: ProductService, protected orderSvc: OrderService,
     protected messagingSvc: MessagingService, protected stripeSvc: StripeService, protected sessionSvc: SessionService) {
 
   }
@@ -76,6 +76,17 @@ export class DemoComponent {
   }
 
 
+
+  async demoOrder() {
+    let id = 'f2b9132b-b1cb-4190-ba8a-69dff26116b5'
+
+    let order = await this.orderSvc.get$(id)
+
+    console.log(order)
+    
+    console.log(order.sumToString())
+  }
+
   postToStripeWebhook(event: any) {
 
 
@@ -92,6 +103,23 @@ export class DemoComponent {
     console.warn('cancelExpiredDeposistOrders')
 
     orderMgmtSvc.cancelExpiredDeposistOrders()
+  }
+
+
+  async sendReminders() {
+
+    let alteaDb = new AlteaDb(this.dbSvc)
+
+    let msgSvc = new OrderMessaging(alteaDb)
+
+    console.log('sendReminders')
+
+
+    let res = await msgSvc.reminderMessaging2()
+
+    console.log(res)
+
+
   }
 
 

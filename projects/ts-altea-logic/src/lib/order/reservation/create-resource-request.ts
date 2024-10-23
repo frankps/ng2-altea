@@ -11,9 +11,12 @@ import * as _ from "lodash";
 export class PersonInfo {
     offset: TimeSpan = TimeSpan.zero
 
+    // affinity for staff (same person should be treated by same staff member)
     staff: ResourceRequestItem = null
 
 
+    // affinity for other resources (same location, etc...)
+    resourceGroups: Map<string, ResourceRequestItem> = new Map<string, ResourceRequestItem>()
 
 }
 
@@ -192,6 +195,15 @@ export class CreateResourceRequest {
                                 resReqItem.affinity = personInfo.staff
                             } else
                                 personInfo.staff = resReqItem
+                        } else { // non-staff resource group (ex room)
+
+                            if (personInfo.resourceGroups.has(resource.id)) {
+                                let previousRequestItem = personInfo.resourceGroups.get(resource.id)
+                                resReqItem.affinity = previousRequestItem
+                            } else {
+                                personInfo.resourceGroups.set(resource.id, resReqItem)
+                            }
+
                         }
 
                         resReqItem.addResources(childResources)
@@ -305,7 +317,7 @@ export class CreateResourceRequest {
         return activeScheduleIds
     }
 
-    
+
     getDuration(line: OrderLine, product: Product, productResource: ProductResource): OffsetDuration {
 
 

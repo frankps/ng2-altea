@@ -44,6 +44,8 @@ export class SolutionItem {
     @Type(() => DateRange)
     dateRange: DateRange
 
+    count = 0
+
     constructor(request: ResourceRequestItem, dateRange: DateRange, public exactStart = false, ...resources: Resource[]) {
 
         this.request = request
@@ -253,6 +255,8 @@ export class Solution extends SolutionItems {
     /** resource ids for which the breaks have been checked */
     breaksChecked: string[] = []
 
+    count = 0
+
     constructor(...items: SolutionItem[]) {
         super(items)
 
@@ -282,12 +286,12 @@ export class Solution extends SolutionItems {
         return new SolutionItems(items)
     }
 
-    getOccupationForResource(resource: Resource): DateRangeSet {
+    getOccupationForResource(resource: Resource, excludePersonId?: string): DateRangeSet {
 
         if (this.isEmpty())
             return DateRangeSet.empty
 
-        var itemsForResource = this.items.filter(item => item.resources.find(res => res.id == resource.id))
+        var itemsForResource = this.items.filter(item => item.resources.find(res => res.id == resource.id) && (!excludePersonId || item.request.personId != excludePersonId))
 
         if (ArrayHelper.IsEmpty(itemsForResource))
             return DateRangeSet.empty
@@ -322,6 +326,8 @@ export class Solution extends SolutionItems {
 
         this.items.push(item)
         item.num = this.items.length // keep track when item is added (items can be re-ordered)
+        item.count = this.count++
+
 
         if (!this.hasExactStart() && limitOtherItems) {
             const offsetSeconds = item.request.offset.seconds
@@ -330,6 +336,10 @@ export class Solution extends SolutionItems {
 
             // important: the to refers to the last possible start of this item (and not to the finished end of this item)
             const refTo = dateFns.addSeconds(item.dateRange.to, -offsetSeconds)
+
+            if (this.offsetRefDate.getTime() != refFrom.getTime()) {
+                item.addNote(`Reference date changed: ${dateFns.format(this.offsetRefDate, 'HH:mm')} -> ${dateFns.format(refFrom, 'HH:mm')}`)
+            }
 
             this.limitOtherItems(refFrom, refTo)
         }
@@ -345,14 +355,30 @@ export class Solution extends SolutionItems {
         if (ArrayHelper.IsEmpty(this.items))
             return
 
+
+
         this.offsetRefDate = refFrom
 
         for (let item of this.items) {
 
             const offsetSeconds = item.request.offset.seconds
 
-            if (refFrom)
-                item.dateRange.from = dateFns.addSeconds(refFrom, offsetSeconds)
+            if (refFrom) {
+                let origFrom = item.dateRange.from
+                let newFrom = dateFns.addSeconds(refFrom, offsetSeconds)
+
+                if (origFrom.getTime() != newFrom.getTime()) {
+                    item.dateRange.from = newFrom
+                    let toStr = dateFns.format(newFrom, 'HH:mm')
+                    item.addNote(`Changed from: ${dateFns.format(origFrom, 'HH:mm')} -> ${toStr}`)
+
+                    if (toStr == '15:45' || offsetSeconds / 60 == 135)
+                        console.log('Here it is!!')
+                }
+                
+
+
+            }
 
             if (refTo)
                 item.dateRange.to = dateFns.addSeconds(refTo, offsetSeconds)

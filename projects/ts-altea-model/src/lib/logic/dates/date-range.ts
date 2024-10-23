@@ -126,6 +126,7 @@ export class DateRange {
 
     clone() {
         let clone = new DateRange(new Date(this.from), new Date(this.to));
+        clone.qty = this.qty
         clone.fromLabels.push(...this.fromLabels)
         clone.toLabels.push(...this.toLabels)
         return clone

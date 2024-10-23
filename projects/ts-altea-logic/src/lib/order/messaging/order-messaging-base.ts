@@ -145,6 +145,7 @@ export class OrderMessagingBase {
         msg.addTo(contact.mobile, contact.name, contact.id)  // contact.email
 
         msg.type = MsgType.wa
+        msg.orderId = order?.id
 
         if (send) {
 
@@ -189,6 +190,7 @@ export class OrderMessagingBase {
         //msg.addTo('frank@dvit.eu', contact.name, contact.id)  // contact.email
 
         msg.type = MsgType.email
+        msg.orderId = order?.id
 
         if (send) {
 
@@ -213,6 +215,7 @@ export class OrderMessagingBase {
 
         msg.addTo(order.contact.mobile, order.contact.getName(), order.contact.id)
         msg.type = MsgType.sms
+        msg.orderId = order?.id
 
         if (send) {
 

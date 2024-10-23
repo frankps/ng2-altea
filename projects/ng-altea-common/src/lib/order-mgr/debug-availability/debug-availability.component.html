@@ -1,7 +1,7 @@
-<button type="button" class="btn btn-primary btn-sm" (click)="deleteTestData()">Verwijder orders maart '24</button>
+<!-- <button type="button" class="btn btn-primary btn-sm" (click)="deleteTestData()">Verwijder orders maart '24</button>
 
 <button type="button" class="btn btn-primary btn-sm" (click)="testMessaging()">Messaging</button>
-
+ -->
 <h4>Availability Request</h4>
 <ng-container *ngIf="request">
 
@@ -329,8 +329,8 @@
                             - <span class="badge bg-secondary">{{solutionItem.dateRange.to | date:"HH:mm"}}</span>
 
                         </div>
-                        <div class="col-1">
-                            {{solutionItem.request.qty}}x
+                        <div class="col-2">
+                            {{solutionItem.request.qty}}x  dur={{solutionItem.request.duration.toString()}}
                         </div>
                         <div class="col-3">
 

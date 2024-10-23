@@ -20,6 +20,10 @@ export class SlotFinder {
         return SlotFinder._I
     }
 
+
+    debug = false
+    
+
     checkStaffBreaks(solutionSet: SolutionSet, ctx: AvailabilityContext, breakTimeInMinutes: number = 40) {
 
         /** can contain breaks for multiple days! */
@@ -118,6 +122,13 @@ export class SlotFinder {
 
 
                     let newBreakWindows = dayBreaksForStaffMember.substractAll(staffOccupation)
+
+                    if (newBreakWindows.isEmpty()) {
+                        solution.valid = false
+                        solution.addNote(`${human.name} can't have a break within ${dayBreaksForStaffMember.toString()}`)
+                        break   // quit checking staff rbeaks for this solution, goto next solution
+                    }
+
                     let compareWith = staffBreak.times(2)
                     const tooSmallBreakWindows = newBreakWindows.lessThen(compareWith)
 
@@ -245,7 +256,7 @@ export class SlotFinder {
         return newDate
     }
 
-    debug() {
+    debugRanges() {
 
         let date = new Date(2024, 10, 19)
 
@@ -273,7 +284,7 @@ export class SlotFinder {
     findSlots(availability2: ResourceAvailability2, ctx: AvailabilityContext, ...resourceRequests: ResourceRequest[]): SolutionSet {
 
 
-        this.debug()
+       // this.debug()
 
 
         const branchModeRanges = ctx.getBranchModeRanges(ctx.request.getDateRange())
@@ -377,11 +388,15 @@ export class SlotFinder {
 
         const firstItemAvailabilities = availability2.getAvailabilities(firstRequestItem.resources)
 
+
+        let i = 0
+
         /** a set typically contains the availability for 1 resource */
         for (const set of firstItemAvailabilities.sets) {
             for (const range of set.ranges) {
 
                 const availableRange = range.clone()
+                availableRange.qty = firstRequestItem.qty
 
                 let possibleDateRanges = DateRangeSet.empty
 
@@ -393,11 +408,22 @@ export class SlotFinder {
 
                 possibleDateRanges.addRange(availableRange)
 
+                // possibleDateRanges only contains 1 range
                 const solutions = possibleDateRanges.toSolutions(resourceRequest, firstRequestItem, false, set.resource)
+
+                for (let solution of solutions) {
+                    for (let solItem of solution.items)
+                        solItem.addNote(`Initial range ${solItem.dateRange.toString()}`)
+                }
+
                 solutionSet.add(...solutions)
 
+                if (this.debug && i == 0)
+                    break
 
+                i++
             }
+
         }
 
         firstRequestItem.isProcessed = true
@@ -537,7 +563,14 @@ export class SlotFinder {
                 if (hasAffinity)
                     solution.addNote(`Affinity for: ${resourceNames}`)
 
-                const availableResources = availability.getAvailabilityOfResourcesInRange(possibleResources, checkInRange, requestItem.duration, solution, !hasAffinity)
+                
+
+                const availableResources = availability.getAvailabilityOfResourcesInRange(possibleResources, checkInRange, requestItem.duration, solution, !hasAffinity, requestItem.personId)
+
+                /*
+                    below we check resourceQuantityEquals=1 -> quick fix, because if resource.qty > 1 algo not correct yet!!
+                    this.resourceQuantityEquals(possibleResources, 1) && 
+                */
 
                 // if we have no availabilities for the new requestItem, then we are on a dead-end for this solution
                 if (availableResources.isEmpty()) {
@@ -554,6 +587,8 @@ export class SlotFinder {
 
                 /* Create a new solution for each possible availability
                 */
+                let i = 0
+                
                 for (const availabilitiesForResource of availableResources.sets) {
 
                     const resources = []
@@ -567,14 +602,25 @@ export class SlotFinder {
                         let availableRange = availabilityForResource.clone()
 
 
+                        if (this.debug && dateFns.format(availableRange.from,'HH:mm') == '17:10')
+                            console.log(availableRange.from)
+
                         availableRange.to = dateFns.subSeconds(availableRange.to, requestItem.duration.seconds)
 
                         const solutionItem = new SolutionItem(requestItem, availableRange, false, ...resources)
                         newSolution.add(solutionItem)
+                        solutionItem.addNote(`Limiting available range: ${availableRange.toString()}`)
 
                         resultSolutions.add(newSolution)
 
+                        if (this.debug && i == 0)
+                            break
+
+                        i++
                     }
+
+                    if (this.debug && i == 0)
+                        break
                 }
 
                 console.warn(availableResources)
@@ -586,6 +632,19 @@ export class SlotFinder {
 
         return resultSolutions
 
+    }
+
+    resourceQuantityEquals(resources: Resource[], num = 1) : boolean {
+
+        if (ArrayHelper.IsEmpty(resources))
+            return false
+
+        for (let resource of resources) {
+            if (resource.qty != num)
+                return false
+        }
+
+        return true
     }
 
 

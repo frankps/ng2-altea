@@ -890,6 +890,7 @@
       "gift": "Is cadeaubon",
       "giftCode": "Cadeaubon code",
       "state": "Status",
+      "privNote": "Interne notitie",
       "msg": "Communicatie"
     },
     "user": {

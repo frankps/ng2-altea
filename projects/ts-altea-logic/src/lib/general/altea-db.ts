@@ -125,6 +125,24 @@ export class AlteaDb {
         return orders
     }
 
+    async getOrdersStartingBetween(from: number, to: number) {
+
+        const qry = new DbQueryTyped<Order>('order', Order)
+
+        qry.include('contact')
+
+        qry.and('start', QueryOperator.greaterThanOrEqual, from)
+        qry.and('start', QueryOperator.lessThanOrEqual, to)
+        qry.and('msg', QueryOperator.equals, true)
+        qry.and('act', QueryOperator.equals, true)
+        qry.and('state', QueryOperator.in, [OrderState.created, OrderState.waitDeposit, OrderState.confirmed])
+        
+        const orders = await this.db.query$<Order>(qry)
+
+        return orders
+
+    }
+
 
     async getOrdersNeedingCommunication(date: Date = new Date()) {
 
@@ -231,7 +249,7 @@ export class AlteaDb {
         const qry = new DbQueryTyped<Template>('template', Template)
         qry.and('branchId', QueryOperator.equals, branchId)
         qry.and('code', QueryOperator.equals, code)
-        qry.and('channels', QueryOperator.contains, channel)
+        qry.and('channels', QueryOperator.has, channel)
 
         const template = await this.db.queryFirst$<Template>(qry)
 

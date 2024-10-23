@@ -53,8 +53,14 @@ export class ResourceAvailability2 {
             if (resource.customSchedule)
                 normalScheduleRanges = ctx.scheduleDateRanges.get(resourceId)
             else
-                normalScheduleRanges = branchAvailability   //ctx.scheduleDateRanges.get(ctx.branchId)
+                normalScheduleRanges = branchAvailability.clone()   //ctx.scheduleDateRanges.get(ctx.branchId)
 
+
+            // for resources with multiple instances
+            if (resource.qty > 1) {
+                normalScheduleRanges.setQty(resource.qty)
+            }
+            
 
             if (!normalScheduleRanges) {
                 console.error(`No schedule date ranges found for ${resource.name}`)
@@ -158,7 +164,7 @@ export class ResourceAvailability2 {
 
 
     /** check the availability of given resources inside range (insideRange), only return blocks > minTime */
-    getAvailabilityOfResourcesInRange(resources: Resource[], insideRange: DateRange, minTime: TimeSpan, solution: Solution, excludeSolutionOccupation: boolean): DateRangeSets {
+    getAvailabilityOfResourcesInRange(resources: Resource[], insideRange: DateRange, minTime: TimeSpan, solution: Solution, excludeSolutionOccupation: boolean, personId?: string): DateRangeSets {
 
         if (!Array.isArray(resources) || resources.length == 0)
             return DateRangeSets.empty
@@ -174,7 +180,7 @@ export class ResourceAvailability2 {
 
 
             if (solution && excludeSolutionOccupation) {
-                var resourceAlreadyOccupiedInSolution = solution.getOccupationForResource(resource)
+                var resourceAlreadyOccupiedInSolution = solution.getOccupationForResource(resource, personId)
 
                 if (resourceAlreadyOccupiedInSolution.notEmpty())
                     availabilitiesForResource = availabilitiesForResource.subtract(resourceAlreadyOccupiedInSolution)

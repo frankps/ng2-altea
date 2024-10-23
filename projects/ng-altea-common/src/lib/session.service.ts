@@ -88,6 +88,11 @@ export class SessionService implements OnInit {
     return (this.appMode == AppMode.pos)
   }
 
+
+  isAdmin(): boolean {
+    return (this.role == 'admin')
+  }
+
   init(environment: any) {
     this.backend = environment.backend
   }

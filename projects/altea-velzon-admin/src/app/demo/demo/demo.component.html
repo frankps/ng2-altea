@@ -38,14 +38,17 @@
 
     <div class="col-4">
 
-        <button type="button" class="btn btn-primary btn-sm mx-3"
+        <button type="button" class="btn btn-primary btn-sm mx-3 my-3"
             (click)="cancelExpiredDeposits()">cancelExpiredDeposits</button>
 
+            <button type="button" class="btn btn-primary btn-sm mx-3 my-3" (click)="sendReminders()">Send reminders</button>
 
 
-        <button type="button" class="btn btn-primary btn-sm mx-3" (click)="orderCleanup()">Order cleanup</button>
+            <button type="button" class="btn btn-primary btn-sm mx-3 my-3" (click)="demoOrder()">Demo order</button>
 
-        <button type="button" class="btn btn-primary btn-sm mx-3" (click)="loadStripeEvents()">Load stripe
+        <button type="button" class="btn btn-primary btn-sm mx-3 my-3" (click)="orderCleanup()">Order cleanup</button>
+
+        <button type="button" class="btn btn-primary btn-sm mx-3 my-3" (click)="loadStripeEvents()">Load stripe
             events</button>
 
 

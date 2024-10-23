@@ -14,6 +14,7 @@ import * as dateFns from 'date-fns'
 import * as Handlebars from "handlebars"
 import * as _ from "lodash"
 import { OrderMessaging } from './messaging/order-messaging'
+import { GiftMessaging } from './messaging/gift-messaging'
 
 
 export class AddPaymentToOrderParams {
@@ -260,7 +261,6 @@ export class OrderMgmtService {
         order.state = newState
         order.m.setDirty('state')
 
-        const result = await this.alteaDb.saveOrder(order)
 
         switch (newState) {
             case OrderState.created:
@@ -294,16 +294,17 @@ export class OrderMgmtService {
 
                 if (!order.gift)
                     var res = await msgSvc.confirmationMessaging(order)
-
+                else {
+                    const giftMsg = new GiftMessaging(this.alteaDb) // GiftMes(this.alteaDb)
+                    await giftMsg.fulfillGiftOrder(order)
+                }
 
                 console.warn(res)
 
                 break
-
-
-
         }
 
+        const result = await this.alteaDb.saveOrder(order)
         console.warn(order)
 
         return result

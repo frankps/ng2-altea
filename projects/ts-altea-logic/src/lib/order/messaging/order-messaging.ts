@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbQuery, DbQueryTyped, HtmlTable, ObjectHelper, QueryOperator } from 'ts-common'
-import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, TemplateCode, CustomerCancelReasons } from 'ts-altea-model'
+import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, TemplateCode, CustomerCancelReasons, MessageAddress, MessageDirection, TemplateFormat } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import * as dateFns from 'date-fns'
 import * as Handlebars from "handlebars"
@@ -218,13 +218,7 @@ export class OrderMessaging extends OrderMessagingBase {
     }
 
 
-    async reminderMessaging2() {
 
-
-        
-        this.alteaDb.getOrders()
-
-    }
 
 
 
@@ -450,6 +444,159 @@ export class OrderMessaging extends OrderMessagingBase {
         const res = await this.alteaDb.db.sendMessage$(msg)
 
         return res
+
+    }
+
+
+    // get non active orders: state=creation, older then 15min,
+    async sendAdminMessage(subject: string, body: string) {
+
+        const msg = new Message()
+
+        msg.subj = subject
+        msg.body = body
+
+        msg.from = new MessageAddress('info@aquasense.be', 'Aquasense')
+        msg.addTo('frank.newsly@gmail.com', 'Frank')
+        msg.addTo('hilde@aquasense.be', 'Hilde')
+        msg.type = MsgType.email
+        msg.auto = true
+        msg.dir = MessageDirection.out
+        msg.fmt = TemplateFormat.html
+
+        await this.alteaDb.db.sendMessage$(msg)
+    }
+
+
+
+    async reminderMessaging2(dayMin: number = 2, msgType: MsgType = MsgType.email): Promise<string> {
+
+        const htmlBody: string[] = []
+
+        const templateCode = TemplateCode.resv_reminder
+
+        let reminderCount = 0
+
+        let today = new Date()
+        today = dateFns.startOfDay(today)
+
+        let from = dateFns.addDays(today, dayMin)
+        let to = dateFns.addDays(from, 1)
+
+        let fromNum = DateHelper.yyyyMMdd000000(from)
+        let toNum = DateHelper.yyyyMMdd000000(to)
+
+        const orders = await this.alteaDb.getOrdersStartingBetween(fromNum, toNum)
+        /*let demoOrder = await this.alteaDb.getOrder('aac87736-7e46-440d-9e13-faad00faf1e0', 'contact')
+        const orders = [demoOrder]
+*/
+        let branchIds = orders.map(o => o.branchId)
+        branchIds = _.uniq(branchIds)
+
+        const branches = await this.alteaDb.getBranches(branchIds)
+
+        let errorCount = 0
+
+        try {
+
+
+            htmlBody.push(`<h2>Reminder messaging</h2>`)
+
+            htmlBody.push(`<p>Voor boekingen tussen ${dateFns.format(from, 'dd/MM')} en ${dateFns.format(to, 'dd/MM')}</p>`)
+
+            for (let branch of branches) {
+
+                htmlBody.push(`<h4>${branch.name}</h4>`)
+
+
+                const reminderTable = new HtmlTable()
+
+
+                const template = await this.alteaDb.getTemplate(branch.id, templateCode, msgType)
+
+                if (!template)
+                    console.warn(`Branch '${branch.name}'has no template '${templateCode}' for '${msgType}'`)
+
+                let branchOrders = orders.filter(o => o.branchId == branch.id)
+
+                const header = []
+                header.push('Klant')
+                header.push('Aanvang')
+                header.push('Status')
+                header.push('Voorschot')
+                header.push('Betaald')
+
+
+                for (let order of branchOrders) {
+
+                    const cols = []
+                    reminderTable.addRow(cols)
+
+                    cols.push(order.for)
+                    cols.push(DateHelper.dateToString_DM_HHmm(order.startDate))
+                    cols.push(order.state)
+                    cols.push(order.depo ? order.deposit : '')
+                    cols.push(order.paid)
+                    cols.push(order.sumToString(false))
+
+                    try {
+                        let res = await this.sendEmailMessage(template, order, branch, true)
+
+                        if (!res.isOk) {
+                            errorCount++
+
+                            cols.push(`Problem: ${res.message}`)
+                        } else {
+                            cols.push('OK')
+                            reminderCount++
+                        }
+
+                    } catch (error) {
+
+                        cols.push(`exception: ${error}`)
+                    }
+
+
+
+                }
+
+                htmlBody.push(reminderTable.toString())
+
+            }
+
+
+
+
+        } catch (err) {
+
+            htmlBody.push(err)
+            errorCount++
+
+        } finally {
+
+            let html = htmlBody.join('<br>\n')
+
+            let errorMsg = 'OK'
+            if (errorCount > 0)
+                errorMsg = `! Problems=${errorCount} !`
+
+            let subject = `Reminders day-${dayMin} ${msgType}: ${reminderCount} (${errorMsg})`
+
+            await this.sendAdminMessage(subject, html)
+
+            return `<h1>${subject}</h1><br><br>${html}`
+
+        }
+
+
+
+
+
+
+
+
+
+
 
     }
 

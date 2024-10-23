@@ -4,14 +4,27 @@
     <div class="col-2">{{plan.startDate | date:"dd/MM HH:mm"}}</div>
     <div class="col-1">{{plan.endDate | date:"HH:mm"}}</div>
     <div class="col-1">{{plan.act}}</div>
-    <div class="col-2">
+    <div class="col-1">
         <span *ngIf="plan.resourceGroup">{{plan.resourceGroup.shortOrName()}}</span>
     </div>
-    <div class="col-2">
+    <div class="col-1">
         <span *ngIf="plan.resource">{{plan.resource.shortOrName()}}</span>
+    </div>
+    <div class="col-3">
+        <ng-select *ngIf="resources" id="resourceId_{{plan.id}}" name="resourceId_{{plan.id}}" [items]="resources" bindLabel="name" bindValue="id"
+            [clearable]="false" [multiple]="false" [(ngModel)]="plan.resourceId" (change)="resourceChanged(plan, 'resourceId')">
+        </ng-select>
 
     </div>
-    <div class="col-1">
+    <div class="col-2">
+        <!-- <button type="button" class="btn btn-primary btn-sm" (click)="savePlanning(plan)" translate>dic.add</button>
+ -->
         <span class="badge text-bg-primary" *ngIf="plan.prep">Prep</span>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-9">
+        <button type="button" class="btn btn-primary btn-sm float-end" (click)="savePlannings()" translate>dic.save</button>
     </div>
 </div>

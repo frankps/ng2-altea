@@ -106,6 +106,7 @@ export class DebugAvailabilityComponent implements OnInit {
   }
 
   async deleteTestData() {
+    return
 
     /*     const startNum = 20240201000000
         const endNum = 20240401000000
