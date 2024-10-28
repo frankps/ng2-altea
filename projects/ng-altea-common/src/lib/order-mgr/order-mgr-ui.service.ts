@@ -169,13 +169,16 @@ export class OrderMgrUiService {   // implements OnInit
 
   async calculateLoyalty() {
 
+    // currently we only manage loyalty in shop (not in consumer app)
+    if (!this.sessionSvc.isPos())
+      return
+
     console.warn('-- calculateLoyalty --')
 
     this.loyalty = await this.alteaSvc.loyaltyMgmtService.getOverview(this.order)
     console.error(this.loyalty)
 
   }
-
 
   dirtyColor() {
     return this.orderDirty ? 'red' : 'green'
@@ -233,6 +236,7 @@ export class OrderMgrUiService {   // implements OnInit
     this.options = null
     this.loyalty = null
     this.showTimer = false
+    this.loyalty = null
   }
 
   async newOrder(uiMode: OrderUiMode = OrderUiMode.newOrder, gift?: Gift) {
@@ -321,6 +325,8 @@ export class OrderMgrUiService {   // implements OnInit
 
     me.spinner.hide()
 
+    return product
+
   }
 
 
@@ -379,7 +385,7 @@ export class OrderMgrUiService {   // implements OnInit
       }
     }
 
-    const giftPay = me.addPayment(availableAmount, PaymentType.gift, this.sessionSvc.loc)
+    const giftPay = await me.addPayment(availableAmount, PaymentType.gift, this.sessionSvc.loc)
     giftPay.giftId = gift.id
     giftPay.info = gift.code
 
@@ -468,8 +474,9 @@ export class OrderMgrUiService {   // implements OnInit
 
 
     this.resources = order.getResources()
-    this.setContact
+    //this.setContact
 
+    await this.calculateLoyalty()
 
 
     this.spinner.hide()
@@ -972,6 +979,24 @@ export class OrderMgrUiService {   // implements OnInit
 
   }
 
+  /** checks if current order contains given product */
+  containsProduct(productId: string): boolean {
+    if (!this.order)
+      return false
+
+    const idx = this.order.lines?.findIndex(l => l.productId == productId)
+
+    return idx >= 0
+  }
+
+  getOrderLines(productId: string): OrderLine[] {
+    if (!this.order)
+      return []
+
+    return this.order.lines.filter(l => l.productId == productId)
+
+  }
+
   async addProductById(productId: string, qty = 1): Promise<OrderLine[]> {
 
     const product = await this.loadProduct$(productId)
@@ -1191,7 +1216,7 @@ export class OrderMgrUiService {   // implements OnInit
 
 
 
-  addPayment(amount: number, type: PaymentType, location: string): Payment {
+  async addPayment(amount: number, type: PaymentType, location: string): Promise<Payment> {
 
     const payment = new Payment()
     payment.amount = amount
@@ -1200,6 +1225,8 @@ export class OrderMgrUiService {   // implements OnInit
 
     this.order.addPayment(payment)
     this.orderDirty = true
+
+    await this.calculateLoyalty()
 
     return payment
   }

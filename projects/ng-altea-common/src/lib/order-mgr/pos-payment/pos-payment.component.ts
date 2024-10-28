@@ -149,7 +149,7 @@ export class PosPaymentComponent implements OnInit {
     console.warn(canUse)
 
     if (canUse.valid && canUse.amount > 0) {
-      const payment = this.mgrUiSvc.addPayment(canUse.amount, PaymentType.gift, 'pos')
+      const payment = await this.mgrUiSvc.addPayment(canUse.amount, PaymentType.gift, 'pos')
       
       gift.used += canUse.amount   // for local client: the back-end will do this also when saving the order
 
@@ -177,7 +177,7 @@ export class PosPaymentComponent implements OnInit {
     if (orderLine) {
 
       /** The back-end will update the subscription when saving the order */
-      const payment = this.mgrUiSvc.addPayment(orderLine.product.salesPrice, PaymentType.subs, 'pos')
+      const payment = await this.mgrUiSvc.addPayment(orderLine.product.salesPrice, PaymentType.subs, 'pos')
       payment.subsId = subs.id
 
     }

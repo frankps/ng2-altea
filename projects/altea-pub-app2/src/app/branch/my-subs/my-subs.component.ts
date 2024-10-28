@@ -58,7 +58,7 @@ export class MySubsComponent implements OnInit {
       const turn = subscription.usedQty + 1
 
       /** The back-end will update the subscription when saving the order */
-      const payment = this.orderMgrSvc.addPayment(this.orderMgrSvc.order.incl, PaymentType.subs, 'app')
+      const payment = await this.orderMgrSvc.addPayment(this.orderMgrSvc.order.incl, PaymentType.subs, 'app')
       payment.subsId = subscription.id
       payment.info = `Beurt ${turn} van ${subscription.totalQty}`
     }

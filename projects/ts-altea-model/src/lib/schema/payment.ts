@@ -21,6 +21,19 @@ export enum PaymentType {
     stripe = 'stripe',
     /** subscription */
     subs = 'subs',
+    /** loyalty */
+    loyal = 'loyal',
+  }
+  
+
+  export class LoyaltyPayInfo {
+    
+    
+
+    constructor(public cardId: string, public rewardId: string) {
+
+    }
+
   }
   
   export class Payment extends ObjectWithIdPlus {
@@ -47,6 +60,12 @@ export enum PaymentType {
     subs?: Subscription
     subsId?: string
   
+    /** id of loyalty card that was used for payment */
+    loyalId?: string
+
+    @Type(() => LoyaltyPayInfo)
+    loyal?: LoyaltyPayInfo
+
     bankTxId?: string
     bankTxNum?: string
   

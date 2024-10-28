@@ -1,4 +1,4 @@
-import { LoyaltyCard, LoyaltyLine, LoyaltyProgram, LoyaltyReward, LoyaltyUnit, Order, OrderLine, Product, ProductSubType, ProductType, RegisterLoyalty } from "ts-altea-model";
+import { LoyaltyCard, LoyaltyCardChange, LoyaltyLine, LoyaltyProgram, LoyaltyReward, LoyaltyUnit, Order, OrderLine, PaymentType, Product, ProductSubType, ProductType, RegisterLoyalty } from "ts-altea-model";
 import { AlteaDb } from "../general/altea-db";
 import { ArrayHelper } from "ts-common";
 import { IDb } from "../interfaces/i-db";
@@ -14,10 +14,13 @@ export class LoyaltyUi {
     /** true if there is new loyalty */
     newLoyalty = false
 
+    constructor(public order: Order) {
 
-    getApiObject(contactId: string): RegisterLoyalty {
+    }
 
-        const register = new RegisterLoyalty(contactId)
+    getApiObject(): RegisterLoyalty {
+
+        const register = new RegisterLoyalty(this.order)
 
         if (ArrayHelper.IsEmpty(this.cards))
             return register
@@ -88,6 +91,20 @@ export class LoyaltyByProgram {
     values = new Map<string, number>()
     programs: LoyaltyProgram[]
 
+    setPrograms(programs: LoyaltyProgram[]) {
+
+        this.programs = programs
+        this.values = new Map<string, number>()
+
+        if (ArrayHelper.IsEmpty(programs))
+            return
+
+        for (let program of this.programs) {
+            this.values.set(program.id, 0)
+        }
+    }
+
+
     addLoyalty(programId: string, value: number): number {
 
         let newValue = value
@@ -132,11 +149,12 @@ export class LoyaltyMgmtService {
 
     async saveLoyalty(register: RegisterLoyalty): Promise<LoyaltyCard[]> {
 
-        const existingCards: LoyaltyCard[] = await this.alteaDb.getLoyaltyCards(register.contactId)
+        const existingCards: LoyaltyCard[] = await this.alteaDb.getLoyaltyCards(register.order.contactId)
         let existingProgramIds: string[] = []
 
         existingProgramIds = existingCards.map(card => card.programId)
 
+        const cardChanges: LoyaltyCardChange[] = []
 
 
         if (ArrayHelper.AtLeastOneItem(existingCards)) {
@@ -149,6 +167,8 @@ export class LoyaltyMgmtService {
 
                 const card = existingCards.find(c => c.programId == line.programId)
                 card.value += line.extra
+
+                cardChanges.push(LoyaltyCardChange.newValue(register.order.id, card.id, line.extra))
 
                 cardsToUpdate.push(card)
             }
@@ -163,15 +183,18 @@ export class LoyaltyMgmtService {
 
         const cardsToCreate: LoyaltyCard[] = []
 
+        // non existing cards for customer/contact
         const newCardLines = register.getLinesForOtherPrograms(existingProgramIds)
 
         for (let line of newCardLines) {
 
             const newCard = new LoyaltyCard()
-            newCard.contactId = register.contactId
+            newCard.contactId = register.order.contactId
             newCard.programId = line.programId
             newCard.name = line.name  // the program name
             newCard.value = line.extra
+
+            cardChanges.push(LoyaltyCardChange.newValue(register.order.id, newCard.id, line.extra))
 
             cardsToCreate.push(newCard)
         }
@@ -181,10 +204,19 @@ export class LoyaltyMgmtService {
             console.log(createResult)
         }
 
+        if (cardChanges.length > 0) {
+            const cardChangesResult = await this.alteaDb.createLoyaltyCardChanges(cardChanges)
+            console.log(cardChanges)
+        }
+
+        let order = register.order
+        order.loyal = true
+        //order.markAsUpdated('loyal')
+
+        const updateOrderResult = await this.alteaDb.updateOrder(order, ['loyal'])
+        console.log(updateOrderResult)
 
         return [...existingCards, ...cardsToCreate]
-
-
     }
 
     async getOverview(order: Order): Promise<LoyaltyUi> {
@@ -193,7 +225,7 @@ export class LoyaltyMgmtService {
 
         const result = await this.calculateLoyalty(order)
 
-        const loyalty = new LoyaltyUi()
+        const loyalty = new LoyaltyUi(order)
 
         loyalty.programs = result.programs
         let cards: LoyaltyCard[] = []
@@ -208,12 +240,12 @@ export class LoyaltyMgmtService {
 
         for (let loyaltyProgram of result.programs) {
 
-
             const existingCard = cards.find(c => c.programId == loyaltyProgram.id)
 
             const uiCard = new LoyaltyUiCard(loyaltyProgram, existingCard)
             loyalty.cards.push(uiCard)
 
+            // the extra amount that can be added coming from this order
             uiCard.extra = result.getValue(loyaltyProgram.id)
 
             if (uiCard.extra > 0)
@@ -241,12 +273,13 @@ export class LoyaltyMgmtService {
 
 
 
+    /** Calculates new loyalty points per program */
     async calculateLoyalty(order: Order): Promise<LoyaltyByProgram> {
 
-        const result = new LoyaltyByProgram()
+        if (!order.allPaid())
+            return null
 
-        if (!order.hasLines())
-            return result
+        const result = new LoyaltyByProgram()
 
         var loyaltyPrograms = await this.alteaDb.getLoyaltyPrograms(order.branchId)
 
@@ -255,7 +288,10 @@ export class LoyaltyMgmtService {
             return result
         }
 
-        result.programs = loyaltyPrograms
+        result.setPrograms(loyaltyPrograms)
+
+        if (!order.hasLines())
+            return result
 
         for (var line of order.lines) {
 
@@ -282,6 +318,21 @@ export class LoyaltyMgmtService {
 
             }
         }
+
+
+        // if there are loyalty payments (used loyalty), then this should NOT cause new loyalty
+        var nonLoyaltyPays = order.getPaymentsByTypes(PaymentType.loyal, PaymentType.gift, PaymentType.subs)
+
+        if (ArrayHelper.NotEmpty(nonLoyaltyPays)) {
+            
+            for (let pay of nonLoyaltyPays) {
+
+                // check if qty based loyalty !!!
+                result.addLoyalty(pay.loyalId, -pay.amount)
+            }
+        }
+
+        
 
         return result
     }

@@ -85,9 +85,9 @@
 
         </ng-container>
 
-        <ng-container *ngIf="mode == 'plan'">
+        <ng-container *ngIf="mode == 'plan' && orderMgrSvc.order">
         
-            <div class="row" *ngIf="orderMgrSvc.order.hasPlanningLines()">
+            <div class="row" *ngIf="orderMgrSvc.order?.hasPlanningLines()">
 
                 <div class="col-6">
                     <order-mgr-select-date></order-mgr-select-date>

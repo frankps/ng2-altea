@@ -273,12 +273,14 @@ export class DateRangeSet {
         if (this.isEmpty())
             return DateRangeSet.empty
 
+
         const outsideRanges = insideRange.invert()
 
         //const result = new DateRangeSet()
 
+        let result = this.subtract(outsideRanges, true)
 
-        return this.subtract(outsideRanges)
+        return result
     }
 
     atLeast(time: TimeSpan): DateRangeSet {
@@ -486,10 +488,10 @@ export class DateRangeSet {
     /**
      * 
      * @param toSubtract 
-     * @param substractFromSingleRange   if range.qty > 1 (=multiple ranges), then we subtract from single range 
+     * @param substractFromAllRanges   if range.qty > 1 (=multiple ranges), then we subtract from all ranges if true, else from single range 
      * @returns 
      */
-    subtract(toSubtract: DateRangeSet, substractFromSingleRange: boolean = true): DateRangeSet {
+    subtract(toSubtract: DateRangeSet, substractFromAllRanges: boolean = false): DateRangeSet {
 
         if (this.isEmpty())
             return DateRangeSet.empty
@@ -513,7 +515,7 @@ export class DateRangeSet {
         let subtractFrom: DateRange = substractFromRanges.pop()
 
         // is qty > 1, then we only subtract from the first
-        if (subtractFrom.qty > 1) {
+        if (!substractFromAllRanges && subtractFrom.qty > 1) {
 
             let untouched = subtractFrom.clone()
             untouched.qty = untouched.qty - 1

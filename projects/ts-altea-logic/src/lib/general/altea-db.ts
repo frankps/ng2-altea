@@ -1,5 +1,5 @@
 import { ApiListResult, ApiResult, ApiStatus, DateHelper, DbObject, DbObjectCreate, DbObjectMulti, DbObjectMultiCreate, DbQuery, DbQueryBaseTyped, DbQueryTyped, DbUpdateManyWhere, ObjectHelper, ObjectWithId, QueryOperator } from 'ts-common'
-import { Branch, Gift, Subscription, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template, OrderLine, BankTransaction, Message, LoyaltyProgram, LoyaltyCard, PlanningType, ResourcePlannings, TemplateCode, MsgType } from 'ts-altea-model'
+import { Branch, Gift, Subscription, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template, OrderLine, BankTransaction, Message, LoyaltyProgram, LoyaltyCard, PlanningType, ResourcePlannings, TemplateCode, MsgType, LoyaltyCardChange } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { IDb } from '../interfaces/i-db'
 import { AlteaPlanningQueries } from './altea-queries'
@@ -213,7 +213,10 @@ export class AlteaDb {
         return orders
     }
 
-
+    async updateOrder(order: Order, propertiesToUpdate: string[]): Promise<ApiResult<Order>> {
+        let updateResult = await this.updateObject('order', Order, order, propertiesToUpdate)
+        return updateResult
+    }
 
     async updateOrders(orders: Order[], propertiesToUpdate: string[]): Promise<ApiListResult<Order>> {
         let updateResult = await this.updateObjects('order', Order, orders, propertiesToUpdate)
@@ -273,6 +276,20 @@ export class AlteaDb {
         return messages
     }
 
+
+    async getProduct(productId: string, ...includes: string[]): Promise<Product> {
+
+        const qry = new DbQueryTyped<Product>('product', Product)
+
+        qry.and('id', QueryOperator.equals, productId)
+
+        if (Array.isArray(includes) && includes.length > 0)
+            qry.include(...includes)
+
+        const product = await this.db.queryFirst$<Product>(qry)
+
+        return product
+    }
 
 
     async getProducts(productIds: string[], ...includes: string[]): Promise<Product[]> {
@@ -778,8 +795,10 @@ export class AlteaDb {
         return updateResult
     }
 
-
-
+    async createLoyaltyCardChanges(cardChanges: LoyaltyCardChange[]): Promise<ApiListResult<LoyaltyCardChange>> {
+        let createResult = await this.createObjects('loyaltyCardChange', LoyaltyCardChange, cardChanges)
+        return createResult
+    }
 
     async getLoyaltyPrograms(branchId?: string): Promise<LoyaltyProgram[]> {
 

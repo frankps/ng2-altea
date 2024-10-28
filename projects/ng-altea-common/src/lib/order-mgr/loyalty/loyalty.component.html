@@ -7,17 +7,19 @@
 -->
 
 
-LOYALTY 1
-
 <ng-container *ngIf="loyalty">
 
-    LOYALTY 2
+    <div class="row">
+        <div class="col-6"></div>
+        <div class="col-3 d-flex justify-content-center">Opgespaard</div>      
+        <div class="col-3 d-flex justify-content-center">Nieuw</div>      
+    </div> 
 
     <ng-container  *ngFor="let uiCard of loyalty.cards">
         <div class="row">
             <div class="col-6">{{uiCard.program.name}}</div>
-            <div class="col-3">{{uiCard.current}}</div>      
-            <div class="col-3">{{uiCard.extra}}</div>      
+            <div class="col-3 d-flex justify-content-center">{{uiCard.current}}</div>      
+            <div class="col-3 d-flex justify-content-center" *ngIf="!order.loyal">{{uiCard.extra}}</div>      
         </div> 
 
         <div class="row" *ngIf="uiCard.hasOpenRewards()">
@@ -25,19 +27,15 @@ LOYALTY 1
 
             <div class="col-6 d-grid mt-2" *ngFor="let reward of uiCard.openRewards">
 
-                <button type="button" class="btn btn-primary btn-sm" (click)="addLoyalty()">{{reward.label()}}</button>
+                <button type="button" class="btn btn-primary btn-sm" (click)="useReward(reward, uiCard)">{{reward.label()}}</button>
     
             </div>
     
-        </div>
+        </div>   
 
     </ng-container>
 
-
-
-
-
-    <div *ngIf="loyalty.newLoyalty">
+    <div *ngIf="!order.loyal && loyalty.newLoyalty && !order.isNew()">
         <div class="col d-grid mt-2">
             <button type="button" [disabled]="!loyalty?.newLoyalty || !order?.contactId" class="btn btn-primary btn-sm" (click)="addLoyalty()" translate>dic.add</button>
 

@@ -1,6 +1,6 @@
 <div class="card">
     <div class="card-header" translate>
-      ui.order-mgr.contacts.title
+        ui.order-mgr.contacts.title
     </div>
     <div class="card-body">
 
@@ -8,7 +8,7 @@
         <div class="row">
             <div class="col-10">
                 <input type="search" class="form-control" id="searchFor" placeholder="search" [(ngModel)]="search">
-    
+
             </div>
             <div class="col-2">
                 <button type="button" class="btn btn-primary" (click)="searchContact()">
@@ -16,30 +16,32 @@
                 </button>
             </div>
         </div>
-    
-    
+
+
         <ng-container *ngIf="contacts">
-    
+
             <ul class="list-group mt-3">
                 <li class="list-group-item" (click)="selectContact(contact)" *ngFor="let contact of contacts">
-                    
-                    <div class="row">
-                        <div class="col-12">{{contact.name}}  <span *ngIf="contact?.mobile" class="float-end"><i class="fa-light fa-mobile"></i> &nbsp;{{contact?.mobile}}</span></div>
-                    
-                      </div>
-                  
-                      <div class="row">
-                        <div class="col-12">
-                            <span *ngIf="contact?.email"><i class="fa-duotone fa-solid fa-envelope"></i> &nbsp;{{contact?.email}}</span>
-                        </div>
-                            
-                      </div>
-                  
 
-                
+                    <div class="row">
+                        <div class="col-12">{{contact.name}} <span *ngIf="contact?.mobile" class="float-end"><i
+                                    class="fa-light fa-mobile"></i> &nbsp;{{contact?.mobile}}</span></div>
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <span *ngIf="contact?.email"><i class="fa-duotone fa-solid fa-envelope"></i>
+                                &nbsp;{{contact?.email}}</span>
+                        </div>
+
+                    </div>
+
+
+
                 </li>
             </ul>
-    
+
         </ng-container>
 
 

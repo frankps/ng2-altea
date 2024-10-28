@@ -141,7 +141,7 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
 
         this.giftCode = ''
 
-        const pay = this.orderMgrSvc.addPayment(takeFromGift, PaymentType.gift, 'app')
+        const pay = await this.orderMgrSvc.addPayment(takeFromGift, PaymentType.gift, 'app')
         pay.giftId = gift.id
         pay.info = gift.code
 

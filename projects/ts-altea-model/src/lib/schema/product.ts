@@ -303,8 +303,13 @@ export class PlanningBlockSeries {
 }
 
 
+// 'options:orderBy=idx.values:orderBy=idx', 'resources:orderBy=idx', 'items:orderBy=idx', 'prices'
+
 
 export class Product extends ObjectWithIdPlus {
+
+  static defaultInclude = ['options:orderBy=idx.values:orderBy=idx', 'resources:orderBy=idx', 'items:orderBy=idx', 'prices']
+
   // new
   customers?: number
   staff?: number

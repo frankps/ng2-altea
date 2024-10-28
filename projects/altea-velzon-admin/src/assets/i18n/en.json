@@ -47,6 +47,7 @@
     "qty": "Aantal",
     "reply": "Antwoorden",
     "reset-password": "Wachtwoord opnieuw instellen",
+    "select": "Selecteer",
     "timeUnit": "Tijdseenheid",
     "to": "Aan",
     "save": "Opslaan",
@@ -179,7 +180,8 @@
       "debit": "Bancontact",
       "gift": "Cadeaubon",
       "subs": "Abonnement",
-      "stripe": "Stripe"
+      "stripe": "Stripe",
+      "loyal": "Klantenkaart"
     },
     "msg-type": {
       "email": "E-mail",
@@ -883,6 +885,7 @@
       "incl": "Totaal",
       "deposit": "Voorschot",
       "paid": "Betaald",
+      "to-pay": "Te betalen",
       "nrOfPersons": "Betaald",
       "toInvoice": "Te factureren",
       "invoiced": "Gefactureerd",

@@ -1,9 +1,9 @@
 
 
 //import { PrismaClient, Organisation as OrganisationModel, Prisma } from '@prisma/client'
-import { ApiBatchItemResult, ApiBatchProcess, ApiBatchResult, ApiListResult, ApiResult, ApiStatus, DbObjectCreate, DbObjectMulti, DbQueryTyped, ManagedObject, ObjectHelper, ObjectWithId, QueryOperator } from 'ts-common';
+import { ApiBatchItemResult, ApiBatchProcess, ApiBatchResult, ApiListResult, ApiResult, ApiStatus, ArrayHelper, DbObjectCreate, DbObjectMulti, DbQueryTyped, ManagedObject, ObjectHelper, ObjectWithId, QueryOperator } from 'ts-common';
 import { plainToClass, instanceToPlain, plainToInstance } from "class-transformer"
-import { CanUseGift, Gift, Message, MsgType, Order, OrderLine, Payment, PaymentType, Subscription } from 'ts-altea-model';
+import { CanUseGift, Gift, LoyaltyCardChange, LoyaltyRewardType, Message, MsgType, Order, OrderLine, Payment, PaymentType, Subscription } from 'ts-altea-model';
 import { AlteaDb } from '../general/altea-db';
 import { IDb } from '../interfaces/i-db';
 
@@ -19,6 +19,82 @@ export class PaymentProcessing {
         else
             this.alteaDb = new AlteaDb(db)
     }
+
+
+    addMessage(msg: string, to: string[]) {
+        to.push(msg)
+        console.error(msg)
+    }
+
+    async doLoyaltyPayments(orderId: string, payments: Payment[]): Promise<ApiListResult<any>> {
+
+        if (ArrayHelper.IsEmpty(payments))
+            return ApiListResult.ok('No loyalty payments to process')
+
+        const newLoyaltyPayments = payments.filter(pay => pay?.m?.n === true && pay.type == PaymentType.loyal)
+
+        if (ArrayHelper.IsEmpty(newLoyaltyPayments))
+            return ApiListResult.ok('No new loyalty payments to process')
+
+        let allOk = true
+        let messages: string[] = []
+
+        let result = new ApiListResult()
+        let cardChanges: LoyaltyCardChange[] = []
+
+        for (let loyaltyPay of newLoyaltyPayments) {
+
+            const loyalPayInfo = loyaltyPay.loyal
+
+            if (!loyalPayInfo) {
+                allOk = false
+                this.addMessage(`Missing loyalty info on payment: payment.loyal`, messages)
+                continue
+            }
+
+            let cardId = loyalPayInfo.cardId
+            let card = await this.alteaDb.getLoyaltyCardById(cardId)
+
+            if (!card) {
+                allOk = false
+                this.addMessage(`Loyalty card ${cardId} not found!`, messages)
+                continue
+            } 
+
+            let program = await this.alteaDb.getLoyaltyProgramById(card.programId)
+
+            if (!program) {
+                allOk = false
+                this.addMessage(`Loyalty program ${card.programId} for card ${cardId} not found!`, messages)
+                continue
+            } 
+
+            let reward = program.getRewardById(loyalPayInfo.rewardId)
+            
+            if (!reward) {
+                allOk = false
+                this.addMessage(`Loyalty reward ${loyalPayInfo.rewardId} for program ${card.programId} not found!`, messages)
+                continue
+            } 
+
+            card.value -= reward.amount
+            await this.alteaDb.updateLoyaltyCard(card, ['value'])
+
+            const loyaltyChange = LoyaltyCardChange.newReward(orderId, cardId, reward.id, reward.amount)
+            cardChanges.push(loyaltyChange)
+            
+        }
+
+        const res = await this.alteaDb.createLoyaltyCardChanges(cardChanges)
+
+        let msg = messages.join(`\n`)
+
+        if (!allOk)
+            return ApiListResult.error(msg)
+        else
+            return ApiListResult.ok(msg)
+    }
+
 
 
     async doGiftPayments(payments: Payment[]): Promise<ApiListResult<Gift | CanUseGift>> {
@@ -117,5 +193,8 @@ export class PaymentProcessing {
 
         return updateGiftResult
     }
+
+
+
 
 }

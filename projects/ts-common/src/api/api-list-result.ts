@@ -29,6 +29,13 @@ export class ApiListResult<T> extends ApiResultBase {
     return res
   }
 
+  static ok(message?: string) : ApiListResult<any> {
+
+    let res = new ApiListResult([], ApiStatus.ok, message)
+   // res.error = error
+
+    return res
+  }
 
   get hasData(): boolean {
 

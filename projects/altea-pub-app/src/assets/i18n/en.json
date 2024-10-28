@@ -24,6 +24,7 @@
     "email": "Email",
     "edit": "Aanpassen",
     "footer": "Voettekst",
+    "force": "Forceer",
     "from": "Van",
     "language": "Taal",
     "mobile": "GSM",
@@ -40,6 +41,7 @@
     "ok": "OK",
     "passwd": "Paswoord",
     "payOnline": "Online betalen",
+    "preview": "Preview",
     "phone": "Tel",
     "price": "Prijs",
     "qty": "Aantal",
@@ -52,6 +54,7 @@
     "send": "Versturen",
     "spacingAfter": "Kuistijd in minuten",
     "start": "begin",
+    "subject": "Onderwerp",
     "end": "einde",
     "validate": "Valideren"
   },
@@ -176,7 +179,8 @@
       "debit": "Bancontact",
       "gift": "Cadeaubon",
       "subs": "Abonnement",
-      "stripe": "Stripe"
+      "stripe": "Stripe",
+      "loyal": "Klantenkaart"
     },
     "msg-type": {
       "email": "E-mail",
@@ -349,7 +353,10 @@
       "resv_no_show": "No show",
       "resv_satisfaction": "Tevredenheid",
       "resv_internal_cancel": "Interne annulatie (ziekte, etc...)",
-      "resv_footer": "Voettekst"
+      "resv_footer": "Voettekst",
+      "gift_online": "Online cadeaubon",
+      "gift_online_from": "Cadeaubon schenker",
+      "gift_online_to": "Cadeaubon ontvanger"
     }
   },
   "ui": {
@@ -877,6 +884,7 @@
       "incl": "Totaal",
       "deposit": "Voorschot",
       "paid": "Betaald",
+      "to-pay": "Te betalen",
       "nrOfPersons": "Betaald",
       "toInvoice": "Te factureren",
       "invoiced": "Gefactureerd",
@@ -884,6 +892,7 @@
       "gift": "Is cadeaubon",
       "giftCode": "Cadeaubon code",
       "state": "Status",
+      "privNote": "Interne notitie",
       "msg": "Communicatie"
     },
     "user": {

@@ -109,6 +109,8 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
 
     this.mode = 'compose'
 
+   // this.orderMgrSvc.order.hasPlanningLines()
+
   }
 
 

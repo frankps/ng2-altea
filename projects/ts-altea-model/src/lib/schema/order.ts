@@ -274,6 +274,9 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
   /** The device/location where app was created (needed for deposit handling) */
   src?: OrderSource = OrderSource.pos
 
+  /** Loyalty is/is not applied for this order */
+  loyal: boolean = false
+
   /** external ids for this order (for instance: used for Stripe payment intends) */
   //extIds?: string[] = []
 
@@ -634,6 +637,24 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     return this.lines?.find(l => l.productId == productId)
   }
 
+
+  getPaymentsByType(type: PaymentType) : Payment[] {
+
+    if (ArrayHelper.IsEmpty(this.payments))
+      return []
+
+
+    return this.payments.filter(pay => pay.type == type)
+    
+  }
+
+  getPaymentsByTypes(...types: PaymentType[]) : Payment[] {
+
+    if (ArrayHelper.IsEmpty(this.payments))
+      return []
+
+    return this.payments.filter(pay => types.indexOf(pay.type) >= 0)    
+  }
 
 
   /**
