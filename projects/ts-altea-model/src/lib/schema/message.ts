@@ -223,6 +223,7 @@ export class Message extends ObjectWithParameters implements IEmail {
 
     branchId?: string
     orderId?: string
+    giftId?: string
 
     type: MsgType = MsgType.email
 

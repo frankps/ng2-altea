@@ -357,7 +357,11 @@
       "resv_footer": "Voettekst",
       "gift_online": "Online cadeaubon",
       "gift_online_from": "Cadeaubon schenker",
-      "gift_online_to": "Cadeaubon ontvanger"
+      "gift_online_to": "Cadeaubon ontvanger",
+      "order_compensate_gift": "Compensatie cadeaubon"
+    },
+    "compensation-gift-reason": {
+      "overpaid": "Omzetting teveel betaald naar cadeaubon"
     }
   },
   "ui": {
@@ -528,7 +532,8 @@
         "lst-pref": "Wie heeft jouw voorkeur?"
       },
       "pays": {
-        "title": "Betalingen"
+        "title": "Betalingen",
+        "compensate": "Compenseren"
       }
     },
     "resource": {
@@ -886,6 +891,7 @@
       "deposit": "Voorschot",
       "paid": "Betaald",
       "to-pay": "Te betalen",
+      "to-return": "Terug te geven",
       "nrOfPersons": "Betaald",
       "toInvoice": "Te factureren",
       "invoiced": "Gefactureerd",

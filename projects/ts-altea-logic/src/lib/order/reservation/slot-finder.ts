@@ -155,7 +155,7 @@ export class SlotFinder {
                 if (availableRange.to < availableRange.from)
                     continue
 
-                possibleDateRanges.addRange(availableRange)
+                possibleDateRanges.addRanges(availableRange)
 
                 // possibleDateRanges only contains 1 range
                 const solutions = possibleDateRanges.toSolutions(resourceRequest, firstRequestItem, false, set.resource)
@@ -538,7 +538,7 @@ export class SlotFinder {
                     const staffOccupation: TimeSpan = staffSolItems.totalRequestDuration()
 
 
-                    let newBreakWindows = dayBreaksForStaffMember.substractAll(staffOccupation)
+                    let newBreakWindows = dayBreaksForStaffMember.subtractAll(staffOccupation)
 
 
                     let fullOverlap = newBreakWindows.isEmpty()

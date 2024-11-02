@@ -180,7 +180,10 @@ export abstract class CalendarBase {
         var humanResourceIds = humanResources.map(hr => hr.id)
 
 
-        var absencePlannings = await this.alteaDb.getPlanningsByTypes(humanResourceIds, start, end, AlteaPlanningQueries.absenceTypes(), this.sessionSvc.branchId)
+        var extraPlannings = await this.alteaDb.getPlanningsByTypes(humanResourceIds, start, end, AlteaPlanningQueries.extraTypes(), this.sessionSvc.branchId)
+
+        var absencePlannings = extraPlannings.filterByType(...AlteaPlanningQueries.absenceTypes())
+        var availablePlannings = extraPlannings.filterByType(...AlteaPlanningQueries.availableTypes())
 
         console.warn(humanResources)
 
@@ -199,11 +202,21 @@ export abstract class CalendarBase {
             dateRangeSet.resource = humanResource
 
             var absencesForResource = absencePlannings.filterByResource(humanResource.id).toDateRangeSet()
+            var extraAvailableForResource = availablePlannings.filterByResource(humanResource.id).toDateRangeSet()
+
+             if (!extraAvailableForResource.isEmpty()) {
+                dateRangeSet = dateRangeSet.add(extraAvailableForResource) 
+
+                console.warn('EXTRA AVAILABLE')
+                console.error(dateRangeSet)
+             }
 
             if (!absencesForResource.isEmpty())
                 dateRangeSet = dateRangeSet.subtract(absencesForResource)
 
             if (!dateRangeSet.isEmpty()) {
+
+                dateRangeSet = dateRangeSet.union()
 
                 const events = dateRangeSet.ranges.map(range => BaseEvent.newResourceSchedule(humanResource, range.from, range.to))
 

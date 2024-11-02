@@ -656,6 +656,14 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     return this.payments.filter(pay => types.indexOf(pay.type) >= 0)    
   }
 
+  getPaymentsNotOfTypes(...types: PaymentType[]) : Payment[] {
+
+    if (ArrayHelper.IsEmpty(this.payments))
+      return []
+
+    return this.payments.filter(pay => types.indexOf(pay.type) == -1)    
+  }
+
 
   /**
    * The default cancel time is defined on branch (branch.cancel in hours = number of hours before start of booking where free cancellation is not allowed anymore)

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
-import { Order, Gift, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, ConfirmOrderResponse, OrderSource, TemplateCode, OrderCancel, OrderCancelBy, CustomerCancelReasons, PaymentType, Payment, ResourceRequestItem, Resource, DateRange } from 'ts-altea-model'
+import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbQuery, DbQueryBaseTyped, DbQueryTyped, DeleteManyResult, QueryOperator } from 'ts-common'
+import { Order, Gift, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, ConfirmOrderResponse, OrderSource, TemplateCode, OrderCancel, OrderCancelBy, CustomerCancelReasons, PaymentType, Payment, ResourceRequestItem, Resource, DateRange, OrderLine } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { AlteaDb } from '../general/altea-db'
 import { IDb } from '../interfaces/i-db'
@@ -25,6 +25,16 @@ export class AddPaymentToOrderParams {
 }
 
 
+export class OrderDeleteResult {
+    ok: boolean = true
+
+    messages: string[] = []
+
+    error(msg: string) {
+        this.ok = false
+        this.messages.push(msg)
+    }
+}
 
 
 
@@ -44,6 +54,94 @@ export class OrderMgmtService {
             this.alteaDb = db
         else
             this.alteaDb = new AlteaDb(db)
+    }
+
+    async deleteOrderLinesForOrder(orderId: string): Promise<ApiResult<DeleteManyResult>> {
+        const qry = new DbQueryBaseTyped<OrderLine>('orderLine', OrderLine)
+        qry.and('orderId', QueryOperator.equals, orderId)
+        var res = this.alteaDb.db.deleteMany$(qry)
+        return res
+    }
+
+    async deletePaymentsForOrder(orderId: string): Promise<ApiResult<DeleteManyResult>> {
+        const qry = new DbQueryBaseTyped<Payment>('payment', Payment)
+        qry.and('orderId', QueryOperator.equals, orderId)
+        var res = this.alteaDb.db.deleteMany$(qry)
+        return res
+    }
+
+
+    async deleteGiftForOrder(orderId: string): Promise<ApiResult<DeleteManyResult>> {
+        const qry = new DbQueryBaseTyped<Gift>('gift', Gift)
+        qry.and('orderId', QueryOperator.equals, orderId)
+        var res = this.alteaDb.db.deleteMany$(qry)
+        return res
+    }
+
+    async deletePlanningsForOrder(orderId: string): Promise<ApiResult<DeleteManyResult>> {
+        const qry = new DbQueryBaseTyped<ResourcePlanning>('resourcePlanning', ResourcePlanning)
+        qry.and('orderId', QueryOperator.equals, orderId)
+        var res = this.alteaDb.db.deleteMany$(qry)
+        return res
+    }
+
+    async deleteOrder(orderId: string): Promise<OrderDeleteResult> {  // ApiResult<Order>
+
+        const order = await this.alteaDb.getOrder(orderId, ...Order.defaultInclude)
+
+        let orderDeleteResult = new OrderDeleteResult()
+
+        //let allOk = true
+
+        if (order.gift) {
+            let res = await this.deleteGiftForOrder(orderId)
+
+            if (res.notOk) {
+                orderDeleteResult.error(`Problem deleting gifts: ${res.message}`)
+                return orderDeleteResult
+            }
+
+
+        }
+
+        if (ArrayHelper.NotEmpty(order.lines)) {
+            let res = await this.deleteOrderLinesForOrder(orderId)
+
+            if (res.notOk) {
+                orderDeleteResult.error(`Problem deleting order lines: ${res.message}`)
+                return orderDeleteResult
+            }
+        }
+
+        if (ArrayHelper.NotEmpty(order.payments)) {
+            let res = await this.deletePaymentsForOrder(orderId)
+            
+            if (res.notOk) {
+                orderDeleteResult.error(`Problem deleting payments: ${res.message}`)
+                return orderDeleteResult
+            }
+
+        }
+
+        if (ArrayHelper.NotEmpty(order.planning)) {
+            let res = await this.deletePlanningsForOrder(orderId)
+
+            if (res.notOk) {
+                orderDeleteResult.error(`Problem deleting plannings: ${res.message}`)
+                return orderDeleteResult
+            }
+        }
+
+        const qry = new DbQueryBaseTyped<Order>('order', Order)
+        qry.and('id', QueryOperator.equals, orderId)
+        var res = await this.alteaDb.db.deleteMany$(qry)
+
+        if (res.notOk) {
+            orderDeleteResult.error(`Problem deleting order: ${res.message}`)
+        }
+
+        return orderDeleteResult
+
     }
 
 
@@ -341,7 +439,7 @@ export class OrderMgmtService {
 
         console.info(response.plannings)
 
-       // return new ApiResult(order)
+        // return new ApiResult(order)
 
         //order.planning.forEach(plan => order.m.r)
 
@@ -487,10 +585,10 @@ export class OrderMgmtService {
 
                 var j = 0
                 for (let i = resources.length; i < requestItem.qty; i++) {
-                    resources.push(requestItem.resources[j++]) 
+                    resources.push(requestItem.resources[j++])
                 }
             }
-            
+
             const newPlannings = this.requestItemToPlannings(requestItem, refDate, order, resources)
             plannings.push(...newPlannings)
 

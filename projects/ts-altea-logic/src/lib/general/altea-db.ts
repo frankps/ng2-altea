@@ -718,7 +718,7 @@ export class AlteaDb {
         return updateResult
     }
 
-    async deletePlanningsForOrder(orderId: string, softDelete: boolean = true) {
+    async deletePlanningsForOrder(orderId: string, softDelete: boolean = true)  {
 
 
         try {

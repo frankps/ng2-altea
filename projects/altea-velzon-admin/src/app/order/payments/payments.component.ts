@@ -80,6 +80,11 @@ export class PaymentsComponent implements OnInit {
   }
 
 
+  deletePayment(payment: Payment) {
+
+  }
+
+
   async refreshPayments(date: Date = null) {
 
     if (!date)

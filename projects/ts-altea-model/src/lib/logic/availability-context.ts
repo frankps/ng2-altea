@@ -181,7 +181,7 @@ export class AvailabilityContext {
                     }
 
                     const breakRange = new DateRange(from, to)
-                    breakRangesForResource.addRange(breakRange)
+                    breakRangesForResource.addRanges(breakRange)
 
                 }
 

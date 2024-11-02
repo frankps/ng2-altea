@@ -356,7 +356,8 @@
       "resv_footer": "Voettekst",
       "gift_online": "Online cadeaubon",
       "gift_online_from": "Cadeaubon schenker",
-      "gift_online_to": "Cadeaubon ontvanger"
+      "gift_online_to": "Cadeaubon ontvanger",
+      "order_compensate_gift": "Compensatie cadeaubon"
     }
   },
   "ui": {

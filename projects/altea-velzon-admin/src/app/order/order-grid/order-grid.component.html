@@ -73,7 +73,12 @@
 
             <div class="col-2" [style.color]="uiOrder.pay.color">{{uiOrder.pay.info}}</div>
 
-            <div class="col" *ngIf="selected?.id != uiOrder.id">{{uiOrder.summary}}</div>
+            <div class="col" *ngIf="selected?.id != uiOrder.id">
+
+                <!-- <i class="fas fa-trash" (click)="deleteOrder(uiOrder)"></i>&nbsp; -->
+
+                {{uiOrder.summary}}
+            </div>
 
             <div class="col" *ngIf="selected?.id == uiOrder.id">
 
@@ -82,7 +87,14 @@
                 </div>
 
 
+
+
             </div>
+
+
+
+
+
             <!-- 
             <div class="col-1">
                 <button type="button" class="btn btn-primary btn-sm" (click)="openOrder(uiOrder)" translate>dic.show</button>

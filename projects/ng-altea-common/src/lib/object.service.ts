@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { ObjectWithId, BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, ApiBatchResult, DbQuery, ObjectHelper, ApiStatus, ConnectTo, DbQueryTyped, DbObjectCreate, DbObjectMulti, DbObject, DbObjectMultiCreate, DbQueryBaseTyped, DbUpdateManyWhere } from 'ts-common'
+import { ObjectWithId, BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, ApiBatchResult, DbQuery, ObjectHelper, ApiStatus, ConnectTo, DbQueryTyped, DbObjectCreate, DbObjectMulti, DbObject, DbObjectMultiCreate, DbQueryBaseTyped, DbUpdateManyWhere, DeleteManyResult } from 'ts-common'
 import { plainToInstance } from "class-transformer";
 import { Observable, map, Subject, take } from "rxjs";
 import { SessionService } from './session.service';
@@ -129,11 +129,18 @@ export class ObjectService implements IDb {
   }
 
 
-  async deleteMany$<T extends ObjectWithId>(query: DbQueryBaseTyped<T>): Promise<any> {
+  async deleteMany$<T extends ObjectWithId>(query: DbQueryBaseTyped<T>): Promise<ApiResult<DeleteManyResult>> {
 
     let res = await this.post$(this.sessionSvc.backend, `${this.sessionSvc.branchUnique}/objects/deleteMany`, query)
 
-    return res
+    let typedRes: ApiResult<any> = plainToInstance(ApiResult<any>, res)
+
+    if (typedRes && typedRes.object) {
+
+      typedRes.object = plainToInstance(DeleteManyResult, typedRes.object)
+    }
+
+    return typedRes
 
   }
 

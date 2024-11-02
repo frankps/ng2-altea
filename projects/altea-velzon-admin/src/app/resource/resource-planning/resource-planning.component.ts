@@ -115,6 +115,7 @@ export class ResourcePlanningComponent implements OnInit {
     // query.and('type', QueryOperator.in, this.types)
     // query.and('act', QueryOperator.equals, true)
     query.take = 200
+    query.orderByDesc('start')
     //query.select('id', 'catId', 'name', 'type')
 
     this.planningSvc.query(query).subscribe(res => {

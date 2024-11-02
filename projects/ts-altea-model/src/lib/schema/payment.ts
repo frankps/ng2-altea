@@ -38,6 +38,15 @@ export enum PaymentType {
   
   export class Payment extends ObjectWithIdPlus {
   
+    static cash(amount: number) : Payment {
+
+      const pay = new Payment()
+      pay.type = PaymentType.cash
+      pay.amount = amount
+
+      return pay
+    }
+
     idx = 0
   
     @Type(() => Order)

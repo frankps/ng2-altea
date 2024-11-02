@@ -7,6 +7,15 @@ export class AlteaPlanningQueries {
         return [PlanningType.hol, PlanningType.bnk, PlanningType.ill, PlanningType.abs, PlanningType.edu]
     }
 
+    static availableTypes() {
+        return [PlanningType.avl]
+    }
+
+    static extraTypes() {
+        return [...this.absenceTypes(), ...this.availableTypes()]
+    }
+
+
     static getByTypes(resourceIds: string[], from: Date, to: Date, types: PlanningType[], branchId?: string) : DbQueryTyped<ResourcePlanning> {
         const qry = new DbQueryTyped<ResourcePlanning>('resourcePlanning', ResourcePlanning)
 

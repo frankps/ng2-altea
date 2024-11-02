@@ -5,6 +5,12 @@ import { IDb } from '../../interfaces/i-db'
 import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, StringHelper } from 'ts-common'
 import * as Handlebars from "handlebars"
 
+
+export class DefaultGiftText {
+    toMessagePrefix = `Mijn boodschap aan jou:`
+}
+
+
 export class GiftMessaging {
 
     alteaDb: AlteaDb
@@ -99,7 +105,7 @@ export class GiftMessaging {
 
 
 
-    merge(branch: Branch, template: Template, gift: Gift): Message {
+    merge(branch: Branch, template: Template, gift: Gift, defaultText = new DefaultGiftText()): Message {
 
         const msg = new Message()
 
@@ -112,10 +118,11 @@ export class GiftMessaging {
 
         msg.from = new MessageAddress(branch.emailFrom, branch.name)
 
-        if (template.code == GiftTemplateCode.gift_online_from && gift.fromEmail)
+        if (template.code == GiftTemplateCode.gift_online_from && gift.fromEmail) {
             msg.addTo(gift.fromEmail, gift.fromName)
+        } else {
 
-        if (template.code == GiftTemplateCode.gift_online_to && gift.toEmail) {
+        //if (template.code == GiftTemplateCode.gift_online_to && gift.toEmail) {
             msg.addTo(gift.toEmail, gift.toName)
 
             if (gift.fromEmail)
@@ -153,13 +160,14 @@ export class GiftMessaging {
 
         if (!StringHelper.isEmptyOrSpaces(gift.toMessage)) {
 
-            let msgLines = ['Mijn boodschap aan jou:', '']
+            let msgLines = [defaultText.toMessagePrefix, '']
 
             msgLines.push(gift.toMessage)
 
             toMessage = msgLines.join(lineSeparator)
 
         }
+
 
         const replacements = {
             'header-image': headerImage,
@@ -170,7 +178,9 @@ export class GiftMessaging {
             'to-message': toMessage,
             'gift-code': gift.code,
             'gift-contents': giftContents,
-            'gift-image': giftImage
+            'gift-image': giftImage,
+            'gift-value': `€${gift.value}`,
+            'footer': branch.comm?.footer,
         }
 
         console.warn(replacements)
@@ -187,27 +197,11 @@ export class GiftMessaging {
 
         return msg
     }
+
     /*
-    
-    Beste {{from-name}}
-    Bedankt voor de aankoop van een cadeaubon bij {{branch}}. Hieronder vindt U meer informatie omtrent uw cadeaubon.
-    Gelieve deze details na te kijken en ons te melden indien er foutjes zijn ingeslopen.
-    Indien alles correct is, kan je dit mailtje doorsturen naar de persoon die je wenst te verrassen.
-    Verwijder dan gewoon bovenstaande regels.
-    
-    Beste {{to-name}},
-    
-    Graag geef ik jou deze cadeaubon te besteden bij {{branch}}!
-    Jouw cadeau omvat:
-    {{order-lines}}
-    De code van de bon is {{gift-code}}, je kan deze gebruiken om online te reserveren.
-    Online reserveren kan via https://book.birdy.life/branch/aqua/menu.
-    Er staat geen einddatum op mijn cadeau'tje aan jou, maar laat hem zeker niet liggen en ga even ontspannen bij {{branch}}!
-    Mijn boodschap aan jou:
-    {{to-message}}
-    
-    {{from-name}}
-    
+{{{header-image}}}
+
+{{{gift-image}}}
     */
 
 }

@@ -1,10 +1,10 @@
 
-import { OrderService } from 'ng-altea-common'
+import { ObjectService, OrderService } from 'ng-altea-common'
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Order, OrderLine, OrderState, Product, ProductType, ProductTypeIcons, Resource } from 'ts-altea-model'
 import { ApiListResult, DbQuery, QueryOperator, Translation, ApiResult, ApiStatus, DateHelper, SortOrder, ArrayHelper } from 'ts-common'
 import { ProductService } from 'ng-altea-common'
-import { DashboardService, TranslationService, NgBaseListComponent } from 'ng-common'
+import { DashboardService, TranslationService, NgBaseListComponent, ToastType } from 'ng-common'
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgTemplateOutlet } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -14,6 +14,7 @@ import * as dateFns from 'date-fns'
 
 import { Observable, take, takeUntil } from 'rxjs';
 import { plainToInstance } from 'class-transformer';
+import { OrderMgmtService } from 'ts-altea-logic';
 
 export class UIOrder extends Order {
   order: Order
@@ -120,7 +121,8 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
 
 
   constructor(private orderSvc: OrderService, private translationSvc: TranslationService, private modalService: NgbModal,
-    dashboardSvc: DashboardService, protected route: ActivatedRoute, router: Router, spinner: NgxSpinnerService) {
+    dashboardSvc: DashboardService, protected route: ActivatedRoute, router: Router, spinner: NgxSpinnerService,
+    public dbSvc: ObjectService) {
     super(['name'], { searchEnabled: true, addEnabled: true, path: 'orders' }
       , orderSvc, dashboardSvc, spinner, router)
 
@@ -143,7 +145,7 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
 
 
 
-     
+
 
     this.setDate()
 
@@ -164,6 +166,29 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
     this.initialized = true
   }
 
+
+
+  async deleteOrder(order: UIOrder) {
+
+    const orderMgmtSvc = new OrderMgmtService(this.dbSvc)
+    var res = await orderMgmtSvc.deleteOrder(order.id)
+
+    if (res.ok) {
+      this.dashboardSvc.showToastType(ToastType.saveSuccess)
+
+       _.remove(this.uiOrders, order)
+
+    }
+    else {
+      this.dashboardSvc.showToastType(ToastType.saveError)
+      console.log(res)
+    }
+
+
+
+
+    
+  }
 
   async dateChange(value: Date, nullAllowed: boolean = false) {
 

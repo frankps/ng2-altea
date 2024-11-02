@@ -55,6 +55,11 @@ export class DateRangeSets {
 
 }
 
+export enum subtractManyMode {
+    onlyFullWithin,
+    biggestOverlap
+}
+
 /** A set contains multiple date ranges */
 export class DateRangeSet {
 
@@ -68,6 +73,45 @@ export class DateRangeSet {
 
     static get empty() {
         return new DateRangeSet()
+    }
+
+    static init(from: number, to: number, qty: number): DateRangeSet {
+
+        const range = DateRange.init(from, to, qty)
+
+        const set = new DateRangeSet()
+        set.addRanges(range)
+
+        return set
+    }
+
+    /**
+     * If there are ranges with qty > 1, then individual ranges will be returned (qty times) with each qty=1
+     * @returns 
+     */
+    deduplicate(): DateRangeSet {
+
+        const deduplicated: DateRange[] = []
+
+        for (let range of this.ranges) {
+
+            if (!range || range.qty == 0)
+                continue
+
+            if (range.qty == 1) {
+                deduplicated.push(range.clone())
+            } else {
+
+                for (let i = 0; i < range.qty; i++) {
+                    let copy = range.clone()
+                    copy.qty = 1
+                    deduplicated.push(copy)
+                }
+
+            }
+        }
+
+        return new DateRangeSet(deduplicated)
     }
 
     setQty(qty: number) {
@@ -115,17 +159,20 @@ export class DateRangeSet {
 
 
         const clones = this.ranges.map(r => r.clone())
-        return new DateRangeSet(clones)
+        const set = new DateRangeSet(clones)
+        set.resource = this.resource
+
+        return set
     }
 
-    addRange(range: DateRange) {
-        this.ranges.push(range)
+    addRanges(...ranges: DateRange[]) {
+        this.ranges.push(...ranges)
     }
 
     addRangeByDates(from: Date, to: Date, fromLabel?: string, toLabel?: string): DateRange {
 
         const range = new DateRange(from, to, [fromLabel], [toLabel])
-        this.addRange(range)
+        this.addRanges(range)
 
         return range
 
@@ -250,7 +297,7 @@ export class DateRangeSet {
             let mode = range.overlapWith(overlapWith)
 
             if (mode != OverlapMode.noOverlap)
-                overlaps.addRange(range)
+                overlaps.addRanges(range)
         }
 
         return overlaps
@@ -379,7 +426,7 @@ export class DateRangeSet {
             let newRange = new DateRange(from, to)
             newRange.qty = qtyInRange
 
-            result.addRange(newRange)
+            result.addRanges(newRange)
 
         }
 
@@ -396,7 +443,7 @@ export class DateRangeSet {
         return new DateRangeSet(ranges)
     }
 
-    union(set: DateRangeSet): DateRangeSet {
+    union(set?: DateRangeSet): DateRangeSet {
 
         //to implement !!
         let allRanges: DateRange[] = []
@@ -405,7 +452,7 @@ export class DateRangeSet {
         if (Array.isArray(this.ranges))
             allRanges.push(...this.ranges)
 
-        if (Array.isArray(set.ranges))
+        if (set && Array.isArray(set.ranges))
             allRanges.push(...set.ranges)
 
         if (allRanges.length == 0)
@@ -455,7 +502,7 @@ export class DateRangeSet {
 
     }
 
-    substractAll(timeSpan: TimeSpan): DateRangeSet {
+    subtractAll(timeSpan: TimeSpan): DateRangeSet {
 
         if (this.isEmpty())
             return new DateRangeSet()
@@ -470,7 +517,7 @@ export class DateRangeSet {
             const newRange = range.subtractTimeSpan(timeSpan)
 
             //if (newRange.isValid())
-            result.addRange(newRange)
+            result.addRanges(newRange)
         }
 
         return result
@@ -484,6 +531,102 @@ export class DateRangeSet {
         return this.subtract(toSubtract)
 
     }
+
+    indexOfRangeContaining(other: DateRange): number {
+
+        if (ArrayHelper.IsEmpty(this.ranges))
+            return -1
+
+        let idx = 0
+        for (let range of this.ranges) {
+            if (range.contains(other))
+                return idx
+            idx++
+        }
+
+        return -1
+    }
+
+    indexOfRangeBiggestOverlap(other: DateRange): number {
+        if (ArrayHelper.IsEmpty(this.ranges))
+            return -1
+
+
+        let overlapsInSeconds = this.ranges.map(range => range.section(other)?.duration.seconds)
+
+        // replace undefined by 0
+        overlapsInSeconds = overlapsInSeconds.map(sec => sec?sec:0)
+
+        const maxValue = Math.max(...overlapsInSeconds);
+
+        if (!maxValue || maxValue <= 0)
+            return -1
+
+        const idxMaxValue = overlapsInSeconds.indexOf(maxValue); 
+
+        return idxMaxValue
+    }
+
+    removeRangeAtIndex(idx: number) {
+
+        if (ArrayHelper.IsEmpty(this.ranges))
+            return null
+
+        let length = this.ranges.length
+
+        if (idx < 0 || idx >= length)
+            return null
+
+        let removed = this.ranges.splice(idx, 1)
+
+        if (removed?.length == 1)
+            return removed[0]
+        else
+            return null
+    }
+
+    subtractMany(setToSubtract: DateRangeSet, mode: subtractManyMode = subtractManyMode.biggestOverlap) : DateRangeSet {
+
+        let subtractFrom = this.clone()
+
+        let toSubtractDedup = setToSubtract.deduplicate()
+
+        for (let rangeToSubtract of toSubtractDedup.ranges) {
+
+            let idx = subtractFrom.indexOfRangeContaining(rangeToSubtract)
+
+
+            if (idx == -1 && mode == subtractManyMode.biggestOverlap) {
+                idx = subtractFrom.indexOfRangeBiggestOverlap(rangeToSubtract)
+            }
+
+            if (idx == -1)
+                continue
+
+            let substractFrom = subtractFrom.ranges[idx]
+            subtractFrom.removeRangeAtIndex(idx)
+
+            // if qty > 1, then we need to keep all but one
+            if (substractFrom.qty > 1) {
+                let substractFromQtyMinus1 = substractFrom.clone()
+                substractFromQtyMinus1.qty--
+                subtractFrom.addRanges(substractFromQtyMinus1)
+            }
+
+            if (!substractFrom.equals(rangeToSubtract)) {
+
+                let diff = substractFrom.subtract(rangeToSubtract)
+                subtractFrom.addRanges(...diff)
+
+            }
+        }
+
+        return subtractFrom
+
+
+    }
+
+
 
     /**
      * 
@@ -516,6 +659,8 @@ export class DateRangeSet {
 
         // is qty > 1, then we only subtract from the first
         if (!substractFromAllRanges && subtractFrom.qty > 1) {
+
+            //if (subtractFrom.qty > )
 
             let untouched = subtractFrom.clone()
             untouched.qty = untouched.qty - 1

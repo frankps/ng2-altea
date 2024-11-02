@@ -20,6 +20,11 @@ export class GiftConfigMethods {
   app = false
 }
 
+export enum CompensationGiftReason {
+  overpaid,
+  canceledOrder
+}
+
 export class GiftTypes {
   // an amount can be gifted
   amount = true

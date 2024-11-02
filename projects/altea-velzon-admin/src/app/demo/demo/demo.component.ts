@@ -1,5 +1,5 @@
 import { Component, ViewChild, inject } from '@angular/core';
-import { Contact, Order, PaymentType, SmsMessage, User } from 'ts-altea-model';
+import { Contact, DateRangeTests, Order, PaymentType, SmsMessage, User } from 'ts-altea-model';
 import { SearchContactComponent } from '../../contact/search-contact/search-contact.component';
 import { AlteaService, BranchService, ObjectService, OrderService, ProductService, ResourceService, ScheduleService, SessionService, TemplateService, UserService } from 'ng-altea-common';
 import { AlteaDb, CheckDeposists, OrderCronJobs, OrderMessaging, OrderMgmtService } from 'ts-altea-logic';
@@ -76,6 +76,32 @@ export class DemoComponent {
   }
 
 
+  async deleteOrder() {
+
+    //let alteaDb = new AlteaDb(this.dbSvc)
+
+    const orderMgmtSvc = new OrderMgmtService(this.dbSvc)
+
+
+    var res = await orderMgmtSvc.deleteOrder('f9605132-2ca5-4132-b078-4fac5fa72d59')
+
+
+    console.log(res)
+
+  }
+
+  dateRangeTest() {
+
+    let tests = new DateRangeTests()
+
+    // tests.test1()
+    //tests.test2()
+
+    tests.unionTests()
+
+
+  }
+
 
   async demoOrder() {
     let id = 'f2b9132b-b1cb-4190-ba8a-69dff26116b5'
@@ -83,7 +109,7 @@ export class DemoComponent {
     let order = await this.orderSvc.get$(id)
 
     console.log(order)
-    
+
     console.log(order.sumToString())
   }
 

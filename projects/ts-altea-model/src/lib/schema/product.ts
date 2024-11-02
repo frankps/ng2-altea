@@ -289,7 +289,7 @@ export class PlanningBlockSeries {
 
       if (loop >= inRange.from && end <= inRange.to) {
         const range = new DateRange(loop, end)
-        result.addRange(range)
+        result.addRanges(range)
       }
 
       loop = dateFns.addMinutes(end, this.post)

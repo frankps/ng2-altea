@@ -1,6 +1,7 @@
 export * from './date-border'
 export * from './date-range'
 export * from './date-range-set'
+export * from './date-range-tests'
 export * from './time-interval'
 export * from './time-range'
 export * from './time-span'

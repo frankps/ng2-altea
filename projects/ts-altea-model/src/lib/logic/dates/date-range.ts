@@ -40,6 +40,18 @@ export class DateRange {
     }
 
 
+    static init(from: number, to: number, qty: number = 1): DateRange {
+
+        const fromDate = DateHelper.parse(from)
+        const toDate = DateHelper.parse(to)
+
+        const range = new DateRange(fromDate, toDate)
+        range.qty = qty
+
+        return range
+    }
+
+
     isValid(): boolean {
         return (this.from < this.to)
     }
@@ -108,6 +120,11 @@ export class DateRange {
 
     }
 
+    equals(other: DateRange): boolean {
+
+        return (this.from && this.to && this.from.getTime() == this.to.getTime())
+
+    }
 
     // existingPrepBlockEqualOrLonger
 
@@ -135,8 +152,8 @@ export class DateRange {
     invert(): DateRangeSet {
 
         const inverted = new DateRangeSet()
-        inverted.addRange(new DateRange(DateHelper.minDate, this.from))
-        inverted.addRange(new DateRange(this.to, DateHelper.maxDate))
+        inverted.addRanges(new DateRange(DateHelper.minDate, this.from))
+        inverted.addRanges(new DateRange(this.to, DateHelper.maxDate))
 
         return inverted
     }
@@ -313,6 +330,43 @@ export class DateRange {
         return new DateRange(this.from, newTo)
 
     }
+
+    section(other: DateRange): DateRange {
+
+        const overlapMode = this.overlapWith(other)
+
+        switch (overlapMode) {
+            case OverlapMode.noOverlap:  // nothing to subtract
+                return null
+
+            case OverlapMode.otherOverlapsFull: // this range is full within the other range => nothing remains
+            case OverlapMode.exact: {
+                let section = this.clone()
+                return section
+            }
+            case OverlapMode.otherFullWithin: // full overlap => the other range is within ours => this range will be cut into 2 pieces
+                {
+                    let section = other.clone()
+                    return section
+                }
+            case OverlapMode.otherOverlapsLeft:  // this range overlaps the other at the end (of this range)
+                {
+                    let section = this.clone()
+                    section.to = other.to
+                    return section
+                }
+            case OverlapMode.otherOverlapsRight:  // this range overlaps the other at the start (of this range)
+            {
+                let section = this.clone()
+                section.from = other.from
+            
+                return section
+            }
+        }
+
+        return null
+    }
+
 
     static subtract(source: DateRange, other: DateRange): DateRange[] {
 

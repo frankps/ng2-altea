@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { OrderMgrUiService } from '../order-mgr-ui.service';
-import { Gift, LoyaltyReward, Payment, PaymentType, Subscription } from 'ts-altea-model';
+import { CompensationGiftReason, Gift, LoyaltyReward, Payment, PaymentType, Subscription, TemplateCode } from 'ts-altea-model';
 import { GiftService } from '../../data-services/sql/gift.service';
 import { SessionService } from '../../session.service';
 import { SubscriptionService } from '../../data-services/sql/subscription.service';
 import { ArrayHelper, DbQuery, QueryOperator } from 'ts-common';
 import { AlteaService } from '../../altea.service';
+import * as _ from "lodash";
 
 export enum PosPaymentMessage {
   none = 'none',
@@ -23,7 +24,9 @@ export class PosPaymentComponent implements OnInit {
 
   amount: number
 
-  giftCode: string = 'BB'
+  compensation: number = 0
+
+  giftCode: string = ''
 
   showGifts = false
   gifts: Gift[]
@@ -35,7 +38,7 @@ export class PosPaymentComponent implements OnInit {
   PosPaymentMessage = PosPaymentMessage
   message: PosPaymentMessage = PosPaymentMessage.none
 
-  constructor(protected mgrUiSvc: OrderMgrUiService, protected giftSvc: GiftService, protected sessionSvc: SessionService, 
+  constructor(protected mgrUiSvc: OrderMgrUiService, protected giftSvc: GiftService, protected sessionSvc: SessionService,
     protected subSvc: SubscriptionService, protected alteaSvc: AlteaService) {
   }
 
@@ -44,6 +47,8 @@ export class PosPaymentComponent implements OnInit {
     console.warn('ngOnInit')
 
     await this.getRewards()
+
+    this.calculateCompensation()
   }
 
   async addPayment(type: PaymentType) {
@@ -63,13 +68,37 @@ export class PosPaymentComponent implements OnInit {
       default:
         this.mgrUiSvc.addPayment(this.amount, type, 'pos')
     }
+  }
 
+  calculateCompensation() {
 
+    let order = this.mgrUiSvc.order
 
+    let compensation = _.round(order.paid - order.incl, 2)
+
+    if (compensation > 0)
+      this.compensation = compensation
+  }
+
+  async doCompensation() {
+
+    let order = this.mgrUiSvc.order
+    let cancelOrderSvc = this.alteaSvc.cancelOrder
+
+    let actions = await cancelOrderSvc.compensateOrder(order, this.compensation, CompensationGiftReason.overpaid, TemplateCode.order_compensate_gift)
+
+    /*
+    let pay = Payment.cash(-this.compensation)
+    order.addPayment(pay)
+*/
+
+    await this.mgrUiSvc.saveOrder()
+
+    console.warn(actions)
 
   }
 
-  canDoSubscription() : boolean {
+  canDoSubscription(): boolean {
     let productIds = this.mgrUiSvc.order.getProductIds()
 
     return (this.mgrUiSvc.order?.contactId && ArrayHelper.AtLeastOneItem(productIds))
@@ -95,16 +124,12 @@ export class PosPaymentComponent implements OnInit {
     query.and('act', QueryOperator.equals, true)
     query.and('contactId', QueryOperator.equals, contactId)
 
-    /*     if (contactId)
-          query.and('contactId', QueryOperator.equals, contactId)
-        else
-        query.and('contactId', QueryOperator.equals, null) */
 
     this.subscriptions = await this.subSvc.query$(query)
 
     if (ArrayHelper.AtLeastOneItem(this.subscriptions)) {
       this.showSubscriptions = true
-      
+
     } else {
       return PosPaymentMessage.noSubscription
     }
@@ -127,13 +152,7 @@ export class PosPaymentComponent implements OnInit {
     if (this.gifts.length >= 1) {
       this.showGifts = true
     }
-    /*
-    else if (this.gifts.length == 1) {
 
-      let gift = this.gifts[0]
-
-      this.useGift(gift)
-    } */
 
     console.warn(this.gifts)
   }
@@ -150,7 +169,7 @@ export class PosPaymentComponent implements OnInit {
 
     if (canUse.valid && canUse.amount > 0) {
       const payment = await this.mgrUiSvc.addPayment(canUse.amount, PaymentType.gift, 'pos')
-      
+
       gift.used += canUse.amount   // for local client: the back-end will do this also when saving the order
 
       payment.giftId = gift.id
@@ -204,7 +223,7 @@ export class PosPaymentComponent implements OnInit {
     const order = this.mgrUiSvc.order
 
     if (!order)
-      return  
+      return
 
     const loyalty = await this.alteaSvc.loyaltyMgmtService.getOverview(order)
 

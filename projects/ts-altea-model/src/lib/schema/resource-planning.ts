@@ -39,6 +39,15 @@ export class ResourcePlannings {
     notEmpty(): boolean {
       return ArrayHelper.NotEmpty(this.plannings)
     }
+
+    filterByType(...types: PlanningType[]): ResourcePlannings {
+      const plannings = this.plannings.filter(rp => types.indexOf(rp.type) >= 0)
+  
+      if (!Array.isArray(plannings))
+        return new ResourcePlannings()
+  
+      return new ResourcePlannings(plannings)
+    }
   
     filterByResource(resourceId: string): ResourcePlannings {
       const planningsForResource = this.plannings.filter(rp => rp.resourceId == resourceId && !rp.scheduleId)

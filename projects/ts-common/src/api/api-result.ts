@@ -1,6 +1,10 @@
 import { ApiStatus } from "./api-status"
 
 
+export class DeleteManyResult {
+  count: number
+}
+
 export class ApiResultBase {
   status: ApiStatus = ApiStatus.notProcessed
 
@@ -12,6 +16,9 @@ export class ApiResultBase {
     return this.status == ApiStatus.ok
   }
 
+  get notOk(): boolean {
+    return this.status != ApiStatus.ok
+  }
 
 }
 

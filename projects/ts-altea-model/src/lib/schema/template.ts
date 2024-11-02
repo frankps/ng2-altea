@@ -18,13 +18,9 @@ export enum OrderTemplate {
 */
 export const orderTemplates = ['resv_wait_deposito', 'resv_remind_deposit', 'resv_confirmation',
   'resv_no_deposit_cancel', 'resv_in_time_cancel', 'resv_late_cancel', 'resv_change_date',
-  'resv_reminder', 'resv_no_show', 'resv_satisfaction', 'resv_internal_cancel', 'gift_online', 'gift_online_from', 'gift_online_to']
+  'resv_reminder', 'resv_no_show', 'resv_satisfaction', 'resv_internal_cancel', 'gift_online', 'gift_online_from', 'gift_online_to', 'order_compensate_gift']
 
-
-
-
-
-
+  
 export class Template extends ObjectWithParameters {
 
   orgId?: string
@@ -33,7 +29,7 @@ export class Template extends ObjectWithParameters {
 
   to: string[] = []
   channels: string[] = []
-
+   
   /** category (example: order) */
   cat?: string
 

@@ -60,7 +60,7 @@ export class ResourceAvailability2 {
             if (resource.qty > 1) {
                 normalScheduleRanges.setQty(resource.qty)
             }
-            
+
 
             if (!normalScheduleRanges) {
                 console.error(`No schedule date ranges found for ${resource.name}`)
@@ -75,7 +75,7 @@ export class ResourceAvailability2 {
 
             let unavailable = resourceOccupation.unAvailable
 
-
+/*
             if (resource.qty > 1) {
 
                 console.warn('SUM UP Resource usage')
@@ -83,14 +83,15 @@ export class ResourceAvailability2 {
                 unavailable = resourceOccupation.unAvailable.sumUp()
 
                 // removeRangesWithQtyLowerThen => for these ranges there is at least 1 resource over
-                unavailable = unavailable.removeRangesWithQtyLowerThen(resource.qty)
-                console.error(unavailable)
+                // unavailable = unavailable.removeRangesWithQtyLowerThen(resource.qty)
+                //console.error(unavailable)
 
             }
+*/
 
-
-            let resourceStillAvailable = extendedSchedule.subtract(unavailable)
-            resourceStillAvailable = resourceStillAvailable.subtract(resourceOccupation.overlapAllowed)
+            /** switch to new subtract */
+            let resourceStillAvailable = extendedSchedule.subtractMany(unavailable)
+            resourceStillAvailable = resourceStillAvailable.subtractMany(resourceOccupation.overlapAllowed)
 
             let availability = new ResourceAvailabilitySets(resourceStillAvailable, resourceOccupation.overlapAllowed)
 
@@ -183,7 +184,7 @@ export class ResourceAvailability2 {
                 var resourceAlreadyOccupiedInSolution = solution.getOccupationForResource(resource, personId)
 
                 if (resourceAlreadyOccupiedInSolution.notEmpty())
-                    availabilitiesForResource = availabilitiesForResource.subtract(resourceAlreadyOccupiedInSolution)
+                    availabilitiesForResource = availabilitiesForResource.subtractMany(resourceAlreadyOccupiedInSolution)
             }
 
 

@@ -1,7 +1,8 @@
-import { LoyaltyCard, LoyaltyCardChange, LoyaltyLine, LoyaltyProgram, LoyaltyReward, LoyaltyUnit, Order, OrderLine, PaymentType, Product, ProductSubType, ProductType, RegisterLoyalty } from "ts-altea-model";
+import { LoyaltyCard, LoyaltyCardChange, LoyaltyLine, LoyaltyProgram, LoyaltyReward, LoyaltyUnit, Order, OrderLine, Payment, PaymentType, Product, ProductSubType, ProductType, RegisterLoyalty } from "ts-altea-model";
 import { AlteaDb } from "../general/altea-db";
 import { ArrayHelper } from "ts-common";
 import { IDb } from "../interfaces/i-db";
+import * as _ from "lodash";
 
 
 
@@ -225,6 +226,9 @@ export class LoyaltyMgmtService {
 
         const result = await this.calculateLoyalty(order)
 
+        if (!result)
+            return null
+
         const loyalty = new LoyaltyUi(order)
 
         loyalty.programs = result.programs
@@ -276,10 +280,17 @@ export class LoyaltyMgmtService {
     /** Calculates new loyalty points per program */
     async calculateLoyalty(order: Order): Promise<LoyaltyByProgram> {
 
-        if (!order.allPaid())
-            return null
-
         const result = new LoyaltyByProgram()
+
+        if (!order.allPaid()) {
+            result.msg = `Order not fully paid!`
+            return result
+        }
+
+        if (order.loyal) {
+            result.msg = `Loyalty already applied!`
+            return result
+        }
 
         var loyaltyPrograms = await this.alteaDb.getLoyaltyPrograms(order.branchId)
 
@@ -293,6 +304,19 @@ export class LoyaltyMgmtService {
         if (!order.hasLines())
             return result
 
+
+        var validLoyaltyPays = order.getPaymentsNotOfTypes(PaymentType.loyal, PaymentType.gift, PaymentType.subs)
+
+        if (!validLoyaltyPays)
+            validLoyaltyPays = []
+
+        var validTotal = _.sumBy(validLoyaltyPays, 'amount')
+
+        if (validTotal == 0) {
+            result.msg = `No payments that cause loyalty`
+            return result
+        }
+
         for (var line of order.lines) {
 
             if (!line.product)
@@ -304,16 +328,26 @@ export class LoyaltyMgmtService {
 
                     switch (loyaltyProgram.track) {
                         case LoyaltyUnit.qty:
-                            result.addLoyalty(loyaltyProgram.id, line.qty)
+                            if (line.incl >= validTotal) {
+                                validTotal -= line.incl
+                                result.addLoyalty(loyaltyProgram.id, line.qty)
+                            }
+                            
                             break
-                        default:
-                            result.addLoyalty(loyaltyProgram.id, line.incl)
+                        default: {
+                            let extraLoyalty = Math.min(validTotal, line.incl)
+                            validTotal -= extraLoyalty
+                            result.addLoyalty(loyaltyProgram.id, extraLoyalty)
                             break
+                        }
                     }
 
 
                     break  // every orderline can only be allocated to 1 loyalty program 
                 }
+
+                if (validTotal <= 0)
+                    break
 
 
             }
@@ -321,6 +355,7 @@ export class LoyaltyMgmtService {
 
 
         // if there are loyalty payments (used loyalty), then this should NOT cause new loyalty
+        /*
         var nonLoyaltyPays = order.getPaymentsByTypes(PaymentType.loyal, PaymentType.gift, PaymentType.subs)
 
         if (ArrayHelper.NotEmpty(nonLoyaltyPays)) {
@@ -331,8 +366,8 @@ export class LoyaltyMgmtService {
                 result.addLoyalty(pay.loyalId, -pay.amount)
             }
         }
+        */
 
-        
 
         return result
     }
