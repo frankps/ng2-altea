@@ -4,6 +4,8 @@ import { DashboardService, ToastType } from 'ng-common';
 import { Resource, ResourcePlanning, ResourceSet } from 'ts-altea-model';
 import { ApiStatus, ArrayHelper, CollectionChangeTracker } from 'ts-common';
 import * as _ from "lodash";
+import { NgxSpinnerService } from "ngx-spinner"
+
 
 @Component({
   selector: 'order-mgr-debug-plannings',
@@ -12,13 +14,15 @@ import * as _ from "lodash";
 })
 export class DebugPlanningsComponent implements OnInit {
 
+  edit: boolean = false
+
   _plannings: ResourcePlanning[]
   planningChanges: CollectionChangeTracker<ResourcePlanning>
 
   @Input() set plannings(value: ResourcePlanning[]) {
     this._plannings = value
     this.planningChanges = new CollectionChangeTracker<ResourcePlanning>(this.plannings, ResourcePlanning, {
-      propsToUpdate: ['resourceId']
+      propsToUpdate: ['resourceId', 'start', 'end']
     })
   }
 
@@ -29,8 +33,10 @@ export class DebugPlanningsComponent implements OnInit {
 
   resources: Resource[]
 
+  resourceGroups: Resource[]
+
   constructor(protected resPlanSvc: ResourcePlanningService, protected resSvc: ResourceService, protected sessionSvc: SessionService,
-    protected orderSvc: OrderService, protected dashboardSvc: DashboardService
+    protected orderSvc: OrderService, protected dashboardSvc: DashboardService, protected spinner: NgxSpinnerService
   ) {
 
   }
@@ -43,46 +49,96 @@ export class DebugPlanningsComponent implements OnInit {
     let resources = await this.resSvc.getAllForBranch$()
     this.resources = _.sortBy(resources, 'name')
 
+    this.resourceGroups = this.resources.filter(r => r.isGroup)
+    this.resources = this.resources.filter(r => !r.isGroup)
+
     console.warn(this.resources)
   }
 
-  resourceChanged(plan: ResourcePlanning, property: string) {
+  changeStartHour(plan: ResourcePlanning, event) {
+
+    let startHour = event.srcElement.value
+    console.log(startHour)
+
+    plan.changeStartHour(startHour)
 
     this.planningChanges.update(plan)
 
+  }
+
+  resourceChanged(plan: ResourcePlanning, property: string, newResource: Resource) {
+
+    //console.log(event)
+    if (property == 'resourceId')
+      plan.resource = newResource
+    else
+      plan.resourceGroup = newResource
+
+    this.planningChanges.update(plan)
     plan.markAsUpdated(property)
   }
 
   async savePlannings() {
 
-    const batch = this.planningChanges?.getApiBatch()
+    let error
 
-    if (!batch.hasChanges()) {
-      console.log('No changes')
-      return
-    }
+    try {
+      this.spinner.show()
 
 
-    const res = await this.resPlanSvc.batchProcess$(batch, this.dashboardSvc.resourceId)
+      const batch = this.planningChanges?.getApiBatch()
 
-    if (res.status == ApiStatus.ok) {
-
-      let orderId = this.plannings?.[0]?.orderId
-
-      if (orderId) {
-        const pushRes = await this.orderSvc.pushOrderToFirebase(orderId)
-        console.log('pushOrderToFirebase', pushRes)
+      if (!batch.hasChanges()) {
+        console.log('No changes')
+        return
       }
 
 
-      this.dashboardSvc.showToastType(ToastType.saveSuccess)
-      //await this.resPlanSvc.refreshCachedObjectFromBackend(this.resource.id)
+      const res = await this.resPlanSvc.batchProcess$(batch, this.dashboardSvc.resourceId)
 
-    } else {
+      if (res.status == ApiStatus.ok) {
 
-      this.dashboardSvc.showToastType(ToastType.saveError)
+        let orderId = this.plannings?.[0]?.orderId
+
+        if (orderId) {
+          const pushRes = await this.orderSvc.pushOrderToFirebase(orderId)
+          console.log('pushOrderToFirebase', pushRes)
+        }
+
+        this.edit = false
+
+      } else {
+
+        if (res.message)
+          error = res.message
+        else
+          error = 'There was a problem!'
+        // this.dashboardSvc.showToastType(ToastType.saveError)
+
+      }
+
+
+
+    } catch (err) {
+
+      console.error(err)
+      error = 'Problem updating WhatsApp template!'
+
+    } finally {
+
+      this.spinner.hide()
+
+      if (error)
+        this.dashboardSvc.showErrorToast(error)
+      else
+        this.dashboardSvc.showSuccessToast('Bewaard')
 
     }
+
+
+
+
+
 
 
   }

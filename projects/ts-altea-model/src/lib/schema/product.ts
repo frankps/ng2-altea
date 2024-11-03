@@ -128,6 +128,15 @@ export class ProductOption extends ObjectWithIdPlus {
     return this.values.filter(v => v.default)
   }
 
+  getValue(id: string): ProductOptionValue {
+
+    if (ArrayHelper.IsEmpty(this.values))
+      return null
+
+    return this.values.find(v => v.id == id)
+
+  }
+
   getValues(ids: String[]): ProductOptionValue[] {
 
     if (!Array.isArray(this.values) || !Array.isArray(ids))

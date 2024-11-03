@@ -114,14 +114,22 @@ export class OrderLineOption extends ObjectWithId {
     this.id = productOption.id
     this.name = productOption.name
 
-    if (productOption.hasFormula && productOption.formula && productOption.formula.length > 0)
-      this.formula = productOption.formula
 
+    this.setFormula(productOption)
+    
     if (Array.isArray(productOptionValues) && productOptionValues.length > 0) {
       let lineOptionVals = productOptionValues.map(prodVal => new OrderLineOptionValue(prodVal))
       this.values.push(...lineOptionVals)
     }
 
+  }
+
+  /** Copy over formula from product option
+   * To do: 
+   */
+  setFormula(productOption?: ProductOption) {
+    if (productOption.hasFormula && productOption.formula && productOption.formula.length > 0)
+      this.formula = productOption.formula
   }
 
 
@@ -528,7 +536,7 @@ export class OrderLine extends ObjectWithIdPlus {
    */
   getNrOfPersonsDefinedOnOptions(): number {
 
-    if (!this.product.hasOptions())
+    if (!this.product || !this.product.hasOptions())
       return 1
 
 
@@ -584,6 +592,7 @@ export class OrderLine extends ObjectWithIdPlus {
 
     console.warn('makeTotals')
 
+    let previousUnit = this.unit
 
 
     let unitPrice = this.base
@@ -591,6 +600,7 @@ export class OrderLine extends ObjectWithIdPlus {
 
     if (ArrayHelper.IsEmpty(this.options)) {
       this.unit = unitPrice
+      if (previousUnit != this.unit) this.markAsUpdated('unit')
       return
     }
 
@@ -615,7 +625,7 @@ export class OrderLine extends ObjectWithIdPlus {
 
 
     this.unit = unitPrice
-
+    if (previousUnit != this.unit) this.markAsUpdated('unit')
     //this.incl = unitPrice * this.qty
 
 

@@ -1,30 +1,51 @@
 <p>Resource plannings</p>
 
-<div class="row" *ngFor="let plan of plannings">
-    <div class="col-2">{{plan.startDate | date:"dd/MM HH:mm"}}</div>
-    <div class="col-1">{{plan.endDate | date:"HH:mm"}}</div>
-    <div class="col-1">{{plan.act}}</div>
-    <div class="col-1">
-        <span *ngIf="plan.resourceGroup">{{plan.resourceGroup.shortOrName()}}</span>
-    </div>
-    <div class="col-1">
-        <span *ngIf="plan.resource">{{plan.resource.shortOrName()}}</span>
-    </div>
-    <div class="col-3">
-        <ng-select *ngIf="resources" id="resourceId_{{plan.id}}" name="resourceId_{{plan.id}}" [items]="resources" bindLabel="name" bindValue="id"
-            [clearable]="false" [multiple]="false" [(ngModel)]="plan.resourceId" (change)="resourceChanged(plan, 'resourceId')">
-        </ng-select>
+<div class="row mt-1" *ngFor="let plan of plannings">
+    <div class="col-1">{{plan.startDate | date:"dd/MM"}}
 
     </div>
     <div class="col-2">
+        <span *ngIf="!edit">{{plan.startDate | date:"HH:mm"}}</span>
+        <input *ngIf="edit" type="time" id="start" name="start" required class="form-control form-control-sm"
+            [value]="plan.startHour" (change)="changeStartHour(plan, $event)" />
+    </div>
+    <div class="col-1">{{plan.endDate | date:"HH:mm"}}</div>
+    <div class="col-1">{{plan.act}}</div>
+    <div class="col-3">
+      <!--   <span *ngIf="!edit && plan.resourceGroup">{{plan.resourceGroup.shortOrName()}}</span>
+ -->
+        <ng-select *ngIf="resourceGroups" id="resourceGroupId_{{plan.id}}" name="resourceGroupId_{{plan.id}}"
+            [disabled]="!edit"
+            [items]="resourceGroups" bindLabel="name" bindValue="id" [clearable]="true" [multiple]="false"
+            [(ngModel)]="plan.resourceGroupId" (change)="resourceChanged(plan, 'resourceGroupId', $event)">
+        </ng-select>
+
+    </div>
+
+    <div class="col-3">
+<!-- 
+        <span *ngIf="!edit && plan.resource">{{plan.resource.shortOrName()}}</span> -->
+
+        <ng-select *ngIf="resources" id="resourceId_{{plan.id}}" name="resourceId_{{plan.id}}" [disabled]="!edit"
+            [items]="resources" bindLabel="name" bindValue="id" [clearable]="false" [multiple]="false"
+            [(ngModel)]="plan.resourceId" (change)="resourceChanged(plan, 'resourceId', $event)">
+        </ng-select>
+
+    </div>
+    <div class="col-1">
         <!-- <button type="button" class="btn btn-primary btn-sm" (click)="savePlanning(plan)" translate>dic.add</button>
  -->
         <span class="badge text-bg-primary" *ngIf="plan.prep">Prep</span>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-9">
-        <button type="button" class="btn btn-primary btn-sm float-end" (click)="savePlannings()" translate>dic.save</button>
+<div class="row mt-1">
+    <div class="col-12">
+
+        <button type="button" *ngIf="edit" class="btn btn-primary btn-sm float-end" (click)="savePlannings()"
+            translate>dic.save</button>
+
+        <button type="button" class="btn btn-primary btn-sm float-end me-2" (click)="edit = !edit"><i
+                class="fa-solid fa-pen"></i></button>
     </div>
 </div>

@@ -83,6 +83,8 @@ export class OrderLineComponent {
     console.error(optionValue)
 
 
+    this.updateOldOrders()
+
 
     this.orderLine.markAsUpdated("options")
 
@@ -93,14 +95,71 @@ export class OrderLineComponent {
     this.orderMgrSvc.calculateAll()
 
 
+
+
     const productOption = this.product.getOption(option.id)
 
-    if (productOption?.persons) 
+    if (productOption?.persons)
       this.orderMgrSvc.updateNrOfPersons()
 
     this.orderMgrSvc.orderDirty = true
 
+    console.error(this.orderLine)
+    console.error(this.orderMgrSvc.order)
   }
+
+
+  updateOldOrders() {
+
+    if (this.orderMgrSvc.order?.cre > new Date(2024, 9, 16))
+      return
+
+    if (this.product?.hasOptions()) {
+
+      let lineOptionChanged = false
+
+      for (let productOption of this.product.options) {
+
+        let lineOption = this.orderLine.getOptionById(productOption.id)
+
+        if (productOption.hasPrice) {
+
+          if (lineOption.hasValues()) {
+            for (let lineOptionValue of lineOption.values) {
+
+              let productOptionValue = productOption.getValue(lineOptionValue.id)
+
+              if (productOptionValue?.price && lineOptionValue.prc != productOptionValue.price) {
+                lineOptionValue.prc = productOptionValue.price
+                lineOptionChanged = true
+              }
+
+            }
+          }
+
+        }
+
+        if (productOption.hasFormula && !lineOption.hasFormula()) {
+          lineOption.setFormula(productOption)
+          lineOptionChanged = true          
+        }
+
+      }
+
+      if (lineOptionChanged) {
+        this.orderLine.markAsUpdated("options")
+        this.orderLine.calculateAll()
+      }
+
+
+    }
+
+
+
+
+
+  }
+
 
   multiOptionValueChanged(option: OrderLineOption, value: OrderLineOptionValue, selected: boolean) {
 

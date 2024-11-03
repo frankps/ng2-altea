@@ -277,6 +277,9 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
   /** Loyalty is/is not applied for this order */
   loyal: boolean = false
 
+  /** Order needs special attention (use privNote for more details) */
+  attn: boolean = false
+
   /** external ids for this order (for instance: used for Stripe payment intends) */
   //extIds?: string[] = []
 

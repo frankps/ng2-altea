@@ -1133,9 +1133,26 @@ export class OrderMgrUiService {   // implements OnInit
     console.warn('nrOfPersons', nrOfPersons)
 
     /** to support a duo-massage for instance: 2 persons same service at same time */
-    if (orderLine.qty > 1) {
+/*     if (orderLine.qty > 1) {
+      nrOfPersons *= orderLine.qty
+    } */
+
+
+    /** check if same service is added multiple times and/or orderline.qty > 1 => probably different persons */
+    let productId = orderLine?.productId
+
+    let orderLinesSameProduct = []
+
+    if (productId) {
+      orderLinesSameProduct = this.order.lines.filter(line => line.productId == productId)
+      var sameProducts = orderLinesSameProduct.map(line => line.qty)
+      var productQty = _.sum(sameProducts)
+      nrOfPersons *= productQty
+    } else {
       nrOfPersons *= orderLine.qty
     }
+    
+
 
 
     if (nrOfPersons > 0) {
@@ -1144,11 +1161,6 @@ export class OrderMgrUiService {   // implements OnInit
         this.order.nrOfPersons = nrOfPersons
         this.order.updatePersons()
       }
-
-      /*       for (let idx = 0; idx < nrOfPersons; idx++) {
-              let person = this.order.persons[idx]
-              orderLine.persons.push(person.id)
-            } */
 
     }
 

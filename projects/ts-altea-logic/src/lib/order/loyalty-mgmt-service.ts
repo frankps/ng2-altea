@@ -19,6 +19,10 @@ export class LoyaltyUi {
 
     }
 
+    hasCards(): boolean {
+        return ArrayHelper.NotEmpty(this.cards)
+    }
+
     getApiObject(): RegisterLoyalty {
 
         const register = new RegisterLoyalty(this.order)

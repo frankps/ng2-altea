@@ -51,7 +51,7 @@ export class OrderComponent implements OnInit {
 
   orderStates: Translation[] = []
 
-  constructor(protected orderMgrSvc: OrderMgrUiService, protected sessionSvc: SessionService, protected stripeSvc: ObjectService, 
+  constructor(protected orderMgrSvc: OrderMgrUiService, protected sessionSvc: SessionService, protected stripeSvc: ObjectService,
     protected resourceSvc: ResourceService, protected translationSvc: TranslationService) {
 
   }
@@ -67,7 +67,7 @@ export class OrderComponent implements OnInit {
 
       case AppMode.pos: // point of sale
         this.show.next = true
-       // this.show.save = true
+        // this.show.save = true
         this.show.posOnly = true
         this.show.deposit = true
         this.show.contact = true
@@ -80,9 +80,25 @@ export class OrderComponent implements OnInit {
 
     await this.translationSvc.translateEnum(OrderState, 'enums.order-state.', this.orderStates)
 
-
-
   }
+
+
+  toggleAttention() {
+    this.fieldChanged('attn')
+    this.order.attn = !this.order.attn
+  }
+
+  attentionColor() : string {
+
+   // 
+
+    if (this.order.attn)
+      return 'btn-danger' 
+    else
+      return 'btn-light'
+  
+  }
+
 
   fieldChanged(field: string) {
     console.warn(`Field changed ${field}`)
@@ -95,7 +111,7 @@ export class OrderComponent implements OnInit {
     console.warn(newState)
 
     this.fieldChanged('state')
-  
+
   }
 
   /** Is Point Of Sale (=> internal use of app) => more functionalities */
@@ -166,7 +182,7 @@ export class OrderComponent implements OnInit {
   async confirm() {
 
     const autoChangeState = true
-    await this.orderMgrSvc.saveOrder(autoChangeState)  
+    await this.orderMgrSvc.saveOrder(autoChangeState)
   }
 
 
@@ -203,7 +219,7 @@ export class OrderComponent implements OnInit {
     if (!line || !person)
       return
 
-  
+
 
     let idx = -1
 
