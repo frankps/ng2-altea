@@ -1,4 +1,46 @@
-<h2>Messages</h2>
+<div class="row mb-2">
+    <div class="col-6">
+        <h2>Messages</h2>
+    </div>
+    <div class="col-6  d-flex justify-content-end">
+
+        <div>
+            <button type="button" class="btn {{filterColor('direction','in')}} btn-sm mx-1"
+                (click)="filters.direction.in = !filters.direction.in"><i class="fa-solid fa-circle-arrow-down"></i>
+                In</button>
+            <button type="button" class="btn {{filterColor('direction','out')}} btn-sm mx-1"
+                (click)="filters.direction.out= !filters.direction.out"><i class="fa-solid fa-circle-arrow-up"></i>
+                Uit</button>
+
+
+            <button type="button" class="btn {{filterColor('type','email')}} btn-sm mx-1"
+                (click)="filters.type.email = !filters.type.email"><i class="fa-solid fa-envelope"></i>
+                Email</button>
+            <button type="button" class="btn {{filterColor('type','wa')}} btn-sm mx-1"
+                (click)="filters.type.wa= !filters.type.wa"><i class="fa-brands fa-whatsapp"></i>
+                Whatsapp</button>
+
+
+            <button type="button" class="btn btn-primary btn-sm mx-1" (click)="getMessages()"><i
+                    class="fa-solid fa-arrows-rotate"></i></button>
+        </div>
+
+
+    </div>
+</div>
+
+
+<!-- 
+export enum MsgTypeIcon {
+    email = 'fa-solid fa-envelope',
+    sms = 'fa-solid fa-comment-sms',
+    wa = 'fa-brands fa-whatsapp'
+}
+-->
+
+
+
+
 
 
 <ul class="list-group">
@@ -37,7 +79,10 @@
                 </h5>
 
 
-                <b>Onderwerp</b>: {{message.subj}}
+                <ng-container *ngIf="message.type == 'email'">
+                    <b>Onderwerp</b>: {{message.subj}}
+                </ng-container>
+
 
 
 
@@ -47,10 +92,10 @@
             </div>
             <div class="col-4">
 
-                
+
 
                 <h5 class="float-end">
-                    
+
 
                     <i *ngIf="message.auto" class="fa-duotone fa-car"
                         [ngbTooltip]="'objects.message.auto' | translate"></i> &nbsp;
@@ -63,7 +108,7 @@
                     <i class="fa-duotone fa-reply" (click)="toggle(message)"></i>
                 </h5>
 
-                
+
 
             </div>
         </div>

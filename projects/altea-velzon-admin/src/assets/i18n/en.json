@@ -172,6 +172,13 @@
       "amount": "Bedrag",
       "specific": "Specifiek"
     },
+    "gift-method": {
+      "emailFrom": "Email schenker",
+      "emailTo": "Email ontvanger",
+      "postal": "Per post",
+      "pos": "Afhalen winkel",
+      "app": "Mobiele app"
+    },
     "pay-type": {
       "all": "Totaal",
       "cash": "Cash",
@@ -459,8 +466,8 @@
           "subscriptions": {
             "title": "Abonnementen"
           },
-          "giftsIn": {
-            "title": "Ontvangen cadeaubonnen"
+          "gifts": {
+            "title": "Cadeaubonnen"
           },
           "loyalty": {
             "title": "Klantenkaarten"
@@ -477,6 +484,9 @@
         "gifts": "Cadeaubonnen",
         "nonAppointments": "Enkel producten",
         "none": "Alles"
+      },
+      "delete": {
+        "title": "Order verwijderen"
       }
     },
     "order-mgr": {

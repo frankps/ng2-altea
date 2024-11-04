@@ -27,7 +27,7 @@ export class UseGiftComponent {
 
     console.log(me.orderMgrSvc.order)
 
-    this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'order'])
+    this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'orderMode', 'browse-catalog'])
 
     
   }

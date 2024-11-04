@@ -1,5 +1,5 @@
 import { Component, ViewChild, inject } from '@angular/core';
-import { Contact, DateRangeTests, Order, PaymentType, SmsMessage, User } from 'ts-altea-model';
+import { Contact, DateRangeTests, Message, Order, PaymentType, SmsMessage, User } from 'ts-altea-model';
 import { SearchContactComponent } from '../../contact/search-contact/search-contact.component';
 import { AlteaService, BranchService, ObjectService, OrderService, ProductService, ResourceService, ScheduleService, SessionService, TemplateService, UserService } from 'ng-altea-common';
 import { AlteaDb, CheckDeposists, OrderCronJobs, OrderMessaging, OrderMgmtService } from 'ts-altea-logic';
@@ -281,7 +281,15 @@ Datum: 1 april 2024 om 19h00
   }
 
 
+  async saveMessage() {
 
+    let msg = new Message()
+
+    let res = await this.messagingSvc.saveMessage$(msg)
+
+    console.log(res)
+
+  }
 
 
   setContact(contact: Contact) {

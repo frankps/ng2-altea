@@ -3,7 +3,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DemoOrdersComponent, GiftService, OrderMgrUiService, OrderUiMode, SessionService } from 'ng-altea-common';
 import { StripeService } from 'projects/ng-altea-common/src/lib/stripe.service';
-import { CreateCheckoutSession, PaymentType } from 'ts-altea-model';
+import { CreateCheckoutSession, OrderState, PaymentType } from 'ts-altea-model';
 import { TranslationService } from 'ng-common'
 import { AuthService } from '../../auth/auth.service';
 import { environment } from '../../../environments/environment';
@@ -147,12 +147,13 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
 
         me.usedGifCodes.push(giftCode)
 
-        this.calculateToPay()
+        this.toPay -= takeFromGift
+        //this.calculateToPay()
 
         // nothing left to pay
         if (this.toPay == 0) {
 
-          const savedOrder = this.orderMgrSvc.saveOrder()
+          const savedOrder = await this.orderMgrSvc.saveOrder(true)
           console.log(savedOrder)
 
           this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'orderMode', 'order-finished']) //])

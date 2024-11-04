@@ -93,6 +93,15 @@ export class MessagingService {
 
   }
 
+  async saveMessage$(msg: Message): Promise<any> {
+
+    let res = await this.post$<any>(`${this.sessionSvc.backend}/messaging/saveMessage`, msg)
+
+    return res
+
+  }
+
+
   async webPushToUsers$(msg: WebPushToUsers): Promise<ApiListResult<any>> {
 
     let res = await this.post$<ApiListResult<any>>(`${this.sessionSvc.backend}/messaging/webPushToUsers`, msg)

@@ -47,6 +47,7 @@
     "qty": "Aantal",
     "reply": "Antwoorden",
     "reset-password": "Wachtwoord opnieuw instellen",
+    "select": "Selecteer",
     "timeUnit": "Tijdseenheid",
     "to": "Aan",
     "save": "Opslaan",
@@ -358,6 +359,9 @@
       "gift_online_from": "Cadeaubon schenker",
       "gift_online_to": "Cadeaubon ontvanger",
       "order_compensate_gift": "Compensatie cadeaubon"
+    },
+    "compensation-gift-reason": {
+      "overpaid": "Omzetting teveel betaald naar cadeaubon"
     }
   },
   "ui": {
@@ -473,6 +477,9 @@
         "gifts": "Cadeaubonnen",
         "nonAppointments": "Enkel producten",
         "none": "Alles"
+      },
+      "delete": {
+        "title": "Order verwijderen"
       }
     },
     "order-mgr": {
@@ -528,7 +535,8 @@
         "lst-pref": "Wie heeft jouw voorkeur?"
       },
       "pays": {
-        "title": "Betalingen"
+        "title": "Betalingen",
+        "compensate": "Compenseren"
       }
     },
     "resource": {
@@ -886,6 +894,7 @@
       "deposit": "Voorschot",
       "paid": "Betaald",
       "to-pay": "Te betalen",
+      "to-return": "Terug te geven",
       "nrOfPersons": "Betaald",
       "toInvoice": "Te factureren",
       "invoiced": "Gefactureerd",

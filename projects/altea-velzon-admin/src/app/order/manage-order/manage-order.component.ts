@@ -173,6 +173,8 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
 
     this.editContact.contact = contact
 
+    //if (this.newGift)
+
     this.showConfirm = this.showConfirmButton()
   }
 

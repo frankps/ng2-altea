@@ -28,7 +28,8 @@ export class BranchComponent implements OnInit {
   // 'order-finished'
 
   basketDisabled() {
-    return this.orderMgrSvc.mode == 'order-finished'
+    let mode = this.orderMgrSvc.mode
+    return mode == 'order-finished' || mode == 'summary'
   }
 
   async ngOnInit() {

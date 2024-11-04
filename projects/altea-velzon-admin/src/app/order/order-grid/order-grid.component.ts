@@ -1,5 +1,5 @@
 
-import { ObjectService, OrderService } from 'ng-altea-common'
+import { ObjectService, OrderService, SessionService } from 'ng-altea-common'
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Order, OrderLine, OrderState, Product, ProductType, ProductTypeIcons, Resource } from 'ts-altea-model'
 import { ApiListResult, DbQuery, QueryOperator, Translation, ApiResult, ApiStatus, DateHelper, SortOrder, ArrayHelper } from 'ts-common'
@@ -16,7 +16,9 @@ import { Observable, take, takeUntil } from 'rxjs';
 import { plainToInstance } from 'class-transformer';
 import { OrderMgmtService } from 'ts-altea-logic';
 
+
 export class UIOrder extends Order {
+
   order: Order
 
   resources: Resource[] = []
@@ -120,9 +122,12 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
   OrderState = OrderState
 
 
+  @ViewChild('deleteModal') public deleteModal?: NgbModal;
+
+
   constructor(private orderSvc: OrderService, private translationSvc: TranslationService, private modalService: NgbModal,
     dashboardSvc: DashboardService, protected route: ActivatedRoute, router: Router, spinner: NgxSpinnerService,
-    public dbSvc: ObjectService) {
+    public dbSvc: ObjectService, protected sessionSvc: SessionService) {
     super(['name'], { searchEnabled: true, addEnabled: true, path: 'orders' }
       , orderSvc, dashboardSvc, spinner, router)
 
@@ -161,14 +166,21 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
 
 
 
+
     console.warn(this.searchTypeSelect)
 
     this.initialized = true
   }
 
 
+  cancelDelete(modal: any) {
+    this.orderToDelete = null
+    modal.close()
+  }
 
-  async deleteOrder(order: UIOrder) {
+  async confirmDelete(modal: any) {
+
+    let order = this.orderToDelete
 
     const orderMgmtSvc = new OrderMgmtService(this.dbSvc)
     var res = await orderMgmtSvc.deleteOrder(order.id)
@@ -176,7 +188,7 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
     if (res.ok) {
       this.dashboardSvc.showToastType(ToastType.saveSuccess)
 
-       _.remove(this.uiOrders, order)
+      _.remove(this.uiOrders, order)
 
     }
     else {
@@ -184,10 +196,19 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
       console.log(res)
     }
 
+    modal.close()
 
+  }
 
+  orderToDelete: UIOrder
 
-    
+  async startDeleteOrder(order: UIOrder) {
+
+    this.orderToDelete = order
+    this.modalService.open(this.deleteModal)
+
+    return
+
   }
 
   async dateChange(value: Date, nullAllowed: boolean = false) {
@@ -210,9 +231,22 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
     await this.startSearch()
   }
 
-  showDetails(uiOrder: UIOrder) {
+  toggleSelected(uiOrder: UIOrder) {
 
-    this.selected = uiOrder
+    console.log(uiOrder)
+
+    if (uiOrder?.id == this.selected?.id)
+      this.selected = null
+    else
+      this.selected = uiOrder
+  }
+
+  isSelected(uiOrder: UIOrder) {
+    return (uiOrder?.id == this.selected?.id)
+  }
+
+  notSelected(uiOrder: UIOrder) {
+    return (uiOrder?.id != this.selected?.id)
   }
 
   openOrder(uiOrder: UIOrder) {
@@ -235,6 +269,34 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
     }
 
     await this.advancedSearch(this.orderSearch)
+  }
+
+  async cancelProblems() {
+
+
+
+    this.spinner.show()
+
+    this.objects$ = null
+
+    const query = new DbQuery()
+    query.and('state', QueryOperator.equals, OrderState.cancelled)
+
+    query.or('paid', QueryOperator.greaterThan, 0)
+    query.or('contactId', QueryOperator.not, null)
+
+    query.take = 200
+
+    this.objects = await this.orderSvc.query$(query)
+
+    this.uiOrders = this.objects.map(order => UIOrder.fromOrder(order))
+
+
+    console.error(this.objects)
+
+    this.spinner.hide()
+
+
   }
 
   async advancedSearch(orderSearch: OrderSearch = this.orderSearch) {
@@ -303,10 +365,11 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
     }
 
 
-    query.take = 100
+    query.take = 50
     query.include('lines.planning.resource', 'contact')
     query.orderBy('start', SortOrder.desc)
 
+    console.log(query)
 
 
     this.objects = await this.orderSvc.query$(query)

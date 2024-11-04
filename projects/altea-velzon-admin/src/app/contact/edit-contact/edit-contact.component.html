@@ -282,12 +282,15 @@
     </ngx-altea-form-card-section>
 
 
-    <ngx-altea-form-card-section sectionName="ui.contact.edit.sections.giftsIn.title" sectionId="giftsIn"
+    <ngx-altea-form-card-section sectionName="ui.contact.edit.sections.gifts.title" sectionId="gifts"
         [editSectionId]="editSectionId" [showButtons]="false">
 
         <ng-container always>
 
-            <ng-container *ngIf="object.giftsIn">
+            <ng-container *ngIf="object.hasGiftsIn()">
+
+                
+                <span style="font-weight: bolder;">Ontvangen</span>
 
                 <div class="row">
                     <div class="col-3 d-flex justify-content-center">Code</div>
@@ -299,6 +302,31 @@
 
 
                 <div class="row" *ngFor="let gift of object.giftsIn">
+
+                    <div class="col-3 d-flex justify-content-center">{{gift.code}}</div>
+                    <div class="col-3 d-flex justify-content-center">{{gift.used}}/{{gift.value}}</div>
+                    <div class="col-3 d-flex justify-content-center">{{gift.cre| date:"dd/MM/yyyy"}}</div>
+
+                </div>
+
+
+            </ng-container>
+
+
+            <ng-container *ngIf="object.hasGiftsOut()">
+
+                <span style="font-weight: bolder;">Gekocht</span>
+
+                <div class="row">
+                    <div class="col-3 d-flex justify-content-center">Code</div>
+                    <div class="col-3 d-flex justify-content-center">Gebruikt/Totaal</div>
+                    <div class="col-3 d-flex justify-content-center">Gemaakt op</div>
+
+                    <!-- <div class="col-2 d-flex justify-content-center">Eerste gebruik</div> -->
+                </div>
+
+
+                <div class="row" *ngFor="let gift of object.giftsOut">
 
                     <div class="col-3 d-flex justify-content-center">{{gift.code}}</div>
                     <div class="col-3 d-flex justify-content-center">{{gift.used}}/{{gift.value}}</div>

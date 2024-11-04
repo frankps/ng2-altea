@@ -1,6 +1,20 @@
 <!-- 
 (bsValueChange)="rangePickerChanged($event)" -->
 
+<ng-template #deleteModal let-modal>
+
+    <div class="modal-header">
+        <h4>{{ 'ui.order.delete.title' | translate }}</h4>
+    </div>
+    <div class="modal-body">
+
+        <button type="button" class="btn btn-primary float-end" (click)="confirmDelete(modal)" translate>dic.confirm</button>
+
+        <button type="button" class="btn btn-primary float-end me-2" (click)="cancelDelete(modal)" translate>dic.cancel</button>
+    </div>
+</ng-template>
+
+
 <div class="row mb-4" *ngIf="initialized">
     <div class="col-2">
 
@@ -22,14 +36,14 @@
     <!--     <div class="col-1">
        
     </div> -->
-    <div class="col-3">
+    <div class="col-2">
         <ng-select *ngIf="searchTypeSelect && searchTypeSelect.length > 0" id="searchTypeSelect" name="searchTypeSelect"
             [items]="searchTypeSelect" bindLabel="trans" bindValue="key" [clearable]="false" [multiple]="false"
             [(ngModel)]="orderSearch.typeSelect">
         </ng-select>
     </div>
 
-    <div class="col-3">
+    <div class="col-2">
 
         <ng-select id="orderState" name="orderState" [items]="orderState" bindLabel="trans" bindValue="key"
             [clearable]="false" [multiple]="true" [(ngModel)]="orderSearch.states"></ng-select>
@@ -37,9 +51,16 @@
 
     </div>
 
+    <div class="col-2">
+        <input type="text" id="searchFor" name="searchFor" class="form-control" [(ngModel)]="orderSearch.searchFor" />
+    </div>
+
+   
 
     <div class="col-2">
         <button type="button" class="btn btn-primary btn-sm" (click)="startSearch()" translate>dic.search</button>
+
+        <button type="button" class="btn btn-primary btn-sm mx-2" (click)="cancelProblems()" translate>Cancels</button>
     </div>
 </div>
 
@@ -73,20 +94,31 @@
                 {{uiOrder.for}}
             </div>
 
-            <div class="col-2" [style.color]="uiOrder.pay.color">{{uiOrder.pay.info}}</div>
+            <div class="col-2" [style.color]="uiOrder.pay.color">{{uiOrder.pay.info}}
 
-            <div class="col" *ngIf="selected?.id != uiOrder.id">
+
+
+                <i class="fa-sharp fa-solid float-end fa-grip-dots" (click)="toggleSelected(uiOrder)"></i>
+                <i class="fa-solid fa-trash float-end  me-2" *ngIf="sessionSvc.isAdmin() && isSelected(uiOrder)"
+                    (click)="startDeleteOrder(uiOrder)"></i>
+
+            </div>
+
+            <div class="col" *ngIf="notSelected(uiOrder)">
 
                 <!-- <i class="fas fa-trash" (click)="deleteOrder(uiOrder)"></i>&nbsp; -->
 
                 {{uiOrder.summary}}
+
+
             </div>
 
-            <div class="col" *ngIf="selected?.id == uiOrder.id">
+            <div class="col" *ngIf="isSelected(uiOrder)">
 
                 <div *ngFor="let line of uiOrder.lines">
                     {{line.qty}} x {{line.descr}}
                 </div>
+
 
 
 

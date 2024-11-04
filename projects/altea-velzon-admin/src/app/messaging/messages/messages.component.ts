@@ -1,6 +1,6 @@
 import { Component, ViewChild, OnInit, inject, OnDestroy } from '@angular/core';
 import { Firestore, collection, collectionData, addDoc, CollectionReference, updateDoc, serverTimestamp, doc, docData, DocumentChange, DocumentData } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { deleteDoc, getDocs, limit, or, orderBy, query, where } from 'firebase/firestore';
 import { SessionService } from 'ng-altea-common';
 import { Message, MessageAddress, MsgDirColor, MsgDirIcon, MsgStateIcon, MsgType, MsgTypeIcon, TemplateFormat, WhatsAppMessage, WhatsAppProviderInfo } from 'ts-altea-model';
@@ -37,6 +37,20 @@ export class MessagesComponent implements OnInit, OnDestroy {
 
   html: string = this.htmlInit
 
+  filters = {
+    direction: {
+      out: false,
+      in: true
+    },
+    type: {
+      email: false,
+      wa: true   // Whatsapp
+    }
+
+  }
+
+
+
   editorChange(event: any) {
     console.error(event)
     console.error(this.html)
@@ -48,6 +62,16 @@ export class MessagesComponent implements OnInit, OnDestroy {
   }
 
   constructor(protected sessionSvc: SessionService, protected msgSvc: MessagingService) {
+
+  }
+
+  filterColor(property: string, value: string) {
+
+    if (this.filters[property][value])
+      return 'btn-primary'
+    else
+      return 'btn-light'
+
 
   }
 
@@ -63,20 +87,39 @@ export class MessagesComponent implements OnInit, OnDestroy {
     this.editor.destroy();
   }
 
-  
+  messageSubscription: Subscription
 
   async getMessages() {
+
+    if (this.messageSubscription)
+      this.messageSubscription.unsubscribe()
+
     const msgCol = collection(this.firestore, "branches", this.sessionSvc.branchId, "msg")
 
-    const qry = query(msgCol, null, orderBy('cre', 'desc'))  // , limit(10)
+    const directions = []
+    if (this.filters.direction.in) directions.push('in')
+    if (this.filters.direction.out) directions.push('out')
 
-    collectionData(qry).subscribe(dataSet => {
+    const directionFilter = where('dir', 'in', directions)
+
+    const types = []
+    if (this.filters.type.email) types.push('email')
+    if (this.filters.type.wa) types.push('wa')
+
+    const typeFilter = where('type', 'in', types)
+
+    const AND = [directionFilter, typeFilter]  // 
+
+    const qry = query(msgCol, ...AND, orderBy('sent', 'desc'), limit(20))  // 
+
+    this.messageSubscription = collectionData(qry).subscribe(dataSet => {
 
       this.messages = dataSet.map(data => plainToInstance(Message, data))
-      //console.log(res)
+      console.log(this.messages)
+
 
     })
-    
+
   }
 
   toggle(msg: Message) {

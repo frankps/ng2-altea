@@ -161,7 +161,7 @@
 
                 <div class="row">
                     <div class="col">
-                        <button type="button" *ngIf="!line.subscriptionsCreated()"
+                        <button type="button" *ngIf="sessionSvc.isPos() && !line.subscriptionsCreated()"
                             class="btn btn-secondary btn-sm float-end"
                             [disabled]="!orderMgrSvc.order.contact || orderMgrSvc.orderDirty"
                             (click)="orderMgrSvc.createSubscriptions(line)">Maak abonnement</button>
@@ -203,40 +203,45 @@
             <div class="col-4 d-flex justify-content-end">€ {{order.incl}}</div>
         </div>
 
-        <div class="row mt-1" style="font-size: 80%;" *ngIf="order.paid < order.deposit">
-            <div class="col-8">
-                <div class="form-check form-switch float-end">
-                    <input *ngIf="show.posOnly" class="form-check-input" type="checkbox" id="depo" name="depo"
-                        [(ngModel)]="order.depo" (change)="toggleDeposit()" />
-                    <span class="" translate>objects.order.deposit</span>
+        <ng-container *ngIf="!appInProgress()">
+
+            <div class="row mt-1" style="font-size: 80%;" *ngIf="order.paid < order.deposit">
+                <div class="col-8">
+                    <div class="form-check form-switch float-end">
+                        <input *ngIf="show.posOnly" class="form-check-input" type="checkbox" id="depo" name="depo"
+                            [(ngModel)]="order.depo" (change)="toggleDeposit()" />
+                        <span class="" translate>objects.order.deposit</span>
+                    </div>
+                </div>
+
+
+
+                <div class="col-4 d-flex justify-content-end">
+                    <span *ngIf="order.depo">€ {{order.deposit}}</span>
+                    <s *ngIf="!order.depo">€ {{order.deposit}}</s>
                 </div>
             </div>
 
-
-
-            <div class="col-4 d-flex justify-content-end">
-                <span *ngIf="order.depo">€ {{order.deposit}}</span>
-                <s *ngIf="!order.depo">€ {{order.deposit}}</s>
+            <div class="row mt-1">
+                <div class="col-8"><span class="float-end" translate>objects.order.paid</span> </div>
+                <div class="col-4 d-flex justify-content-end">€ {{order.paid}}</div>
             </div>
-        </div>
+            <div class="row" style="color: red;" *ngIf="order.toPay() > 0">
+                <div class="col-8"><span class="float-end" translate>objects.order.to-pay</span> </div>
+                <div class="col-4 d-flex justify-content-end">€ {{order.toPay()}}</div>
+            </div>
 
-        <div class="row mt-1">
-            <div class="col-8"><span class="float-end" translate>objects.order.paid</span> </div>
-            <div class="col-4 d-flex justify-content-end">€ {{order.paid}}</div>
-        </div>
-        <div class="row" style="color: red;" *ngIf="order.toPay() > 0">
-            <div class="col-8"><span class="float-end" translate>objects.order.to-pay</span> </div>
-            <div class="col-4 d-flex justify-content-end">€ {{order.toPay()}}</div>
-        </div>
-
-        <div class="row" style="color: red;" *ngIf="order.toPay() < 0">
-            <div class="col-8"><span class="float-end" translate>objects.order.to-return</span> </div>
-            <div class="col-4 d-flex justify-content-end">€ {{-order.toPay()}}</div>
-        </div>
+            <div class="row" style="color: red;" *ngIf="order.toPay() < 0">
+                <div class="col-8"><span class="float-end" translate>objects.order.to-return</span> </div>
+                <div class="col-4 d-flex justify-content-end">€ {{-order.toPay()}}</div>
+            </div>
 
 
 
-        <ng-container *ngIf="order.hasPayments()">
+        </ng-container>
+
+
+        <ng-container *ngIf="order.hasPayments() && !appInProgress()">
 
             Betalingen
 

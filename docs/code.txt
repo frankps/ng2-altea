@@ -1,0 +1,26 @@
+
+<ng-template #deleteModal let-modal>
+
+  <div class="modal-header">
+      <h4>{{ 'ui.product.move-modal.title' | translate }}</h4>
+  </div>
+  <div class="modal-body">
+
+  </div>
+</ng-template>
+
+Init
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+ @ViewChild('deleteModal') public deleteModal?: NgbModal;
+constructor(private modalService: NgbModal)
+
+Open
+this.modalService.open(this.deleteModal)
+
+Close
+HTML: (click)="confirmDelete(modal)"
+
+confirmDelete(modal: any) {
+  modal.close()
+}

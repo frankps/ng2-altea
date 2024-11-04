@@ -249,6 +249,13 @@ export class Contact extends UserBase {
     super()
   }
 
+  hasGiftsIn(): boolean {
+    return ArrayHelper.NotEmpty(this.giftsIn)
+  }
+
+  hasGiftsOut(): boolean {
+    return ArrayHelper.NotEmpty(this.giftsOut)
+  }
 
   setName() {
 

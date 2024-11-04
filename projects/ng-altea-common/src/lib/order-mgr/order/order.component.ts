@@ -3,7 +3,7 @@ import { OrderMgrUiService } from '../order-mgr-ui.service';
 import { ObjectService, ResourceService, SessionService } from 'ng-altea-common';
 import { AppMode, CreateCheckoutSession, Order, OrderLine, OrderPerson, OrderState, Resource, ResourcePreferences, ResourceType } from 'ts-altea-model';
 import { TranslationService } from 'ng-common'
-import { Translation } from 'ts-common'
+import { ArrayHelper, Translation } from 'ts-common'
 
 
 @Component({
@@ -112,6 +112,16 @@ export class OrderComponent implements OnInit {
 
     this.fieldChanged('state')
 
+  }
+
+  /**
+   * Introduced when redeeming gift in consumer app: user should not see payment info 
+   * (gift payment is first using full gift amount, only at end changed into correct amount) => do not show intermediate
+   * @returns 
+   */
+  appInProgress() {
+    let order = this.order
+    return this.appMode == AppMode.consum && (ArrayHelper.NotEmpty(this.orderMgrSvc.payGifts))
   }
 
   /** Is Point Of Sale (=> internal use of app) => more functionalities */

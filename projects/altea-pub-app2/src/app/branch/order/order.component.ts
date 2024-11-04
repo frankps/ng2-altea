@@ -296,7 +296,7 @@ export class OrderComponent implements OnInit {
     if (!contact)   // should not happen
       return
 
-    await this.orderMgrSvc.saveOrder()
+    await this.orderMgrSvc.saveOrder(true)
 
     this.gotoNextMode()
   }

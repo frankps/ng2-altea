@@ -64,6 +64,10 @@ export class OrderMgrUiService {   // implements OnInit
   /** when user is creating a new gift  */
   gift: Gift
 
+  /** when user is paying with gifts */
+  payGifts: Gift[] = []
+
+
   resources: Resource[]
 
   allHumanResources: Resource[]
@@ -230,6 +234,7 @@ export class OrderMgrUiService {   // implements OnInit
   }
 
   clearData() {
+    this.order = null
     this.orderLineOptions = null
     this.orderLine = null
     this.orderDirty = false
@@ -237,6 +242,9 @@ export class OrderMgrUiService {   // implements OnInit
     this.loyalty = null
     this.showTimer = false
     this.loyalty = null
+
+    this.gift = null
+    this.payGifts = []
   }
 
   async newOrder(uiMode: OrderUiMode = OrderUiMode.newOrder, gift?: Gift) {
@@ -363,9 +371,13 @@ export class OrderMgrUiService {   // implements OnInit
 
     const gift = redeemGift.gift
 
+    console.error('== redeemGift ==',this.payGifts)
+
     const availableAmount = gift.availableAmount()
 
     await this.newOrder()
+
+    this.payGifts.push(gift)
 
     /** if specific gift: gift contains specific products/services */
     if (redeemGift.mode == GiftType.specific && gift.hasLines()) {
@@ -726,11 +738,11 @@ export class OrderMgrUiService {   // implements OnInit
   }
 
 
-  async changeState() {
+  async changeState(newState: OrderState = OrderState.created) {
 
     try {
 
-      const res = await this.alteaSvc.orderMgmtService.changeState(this.order, OrderState.created)
+      const res = await this.alteaSvc.orderMgmtService.changeState(this.order, newState)
 
       if (res.isOk)
         this.dashboardSvc.showToastType(ToastType.saveSuccess)
@@ -1248,6 +1260,12 @@ export class OrderMgrUiService {   // implements OnInit
     if (contact) {
       this.order.contactId = contact.id
       this.order.for = contact.name
+
+      if (this.gift) {
+        this.gift.fromId = contact.id
+        this.gift.fromName = contact.name
+      }
+
     }
     else {
       this.order.contactId = null
