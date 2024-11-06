@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbQuery, DbQueryBaseTyped, DbQueryTyped, DeleteManyResult, QueryOperator } from 'ts-common'
-import { Order, Gift, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, ConfirmOrderResponse, OrderSource, TemplateCode, OrderCancel, OrderCancelBy, CustomerCancelReasons, PaymentType, Payment, ResourceRequestItem, Resource, DateRange, OrderLine } from 'ts-altea-model'
+import { Order, Gift, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, ConfirmOrderResponse, OrderSource, TemplateCode, OrderCancel, OrderCancelBy, CustomerCancelReasons, PaymentType, Payment, ResourceRequestItem, Resource, DateRange, OrderLine, SolutionItem } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { AlteaDb } from '../general/altea-db'
 import { IDb } from '../interfaces/i-db'
@@ -115,7 +115,7 @@ export class OrderMgmtService {
 
         if (ArrayHelper.NotEmpty(order.payments)) {
             let res = await this.deletePaymentsForOrder(orderId)
-            
+
             if (res.notOk) {
                 orderDeleteResult.error(`Problem deleting payments: ${res.message}`)
                 return orderDeleteResult
@@ -557,10 +557,18 @@ export class OrderMgmtService {
     forceDateTime(order: Order, refDate: Date, response: AvailabilityResponse): ResourcePlanning[] {
 
 
+
         const plannings: ResourcePlanning[] = []
 
         let resourceRequest = response.debug.resourceRequests[0]
         let availability = response.debug.availability
+
+        /* we maintain a solution for this custom time-slot => to avoid usage of same resources at the same time (when calling availability.getAvailableResourcesInRange(...))
+        Normally solutions are created first, and from there we derive possible start dates
+
+        Here we have a start date, and we force a solution
+        */
+        let solution = new Solution()
 
         for (let requestItem of resourceRequest.items) {
 
@@ -572,7 +580,7 @@ export class OrderMgmtService {
 
             //availability.getAvailabilityOfResourcesInRange(resources, )
 
-            let result = availability.getAvailableResourcesInRange(requestItem.resources, range, requestItem, null, true)
+            let result = availability.getAvailableResourcesInRange(requestItem.resources, range, requestItem, solution, true)
             let resources = result.result
 
             if (!resources)
@@ -588,6 +596,8 @@ export class OrderMgmtService {
                     resources.push(requestItem.resources[j++])
                 }
             }
+
+            solution.add(new SolutionItem(requestItem, range, true, ...resources))
 
             const newPlannings = this.requestItemToPlannings(requestItem, refDate, order, resources)
             plannings.push(...newPlannings)
