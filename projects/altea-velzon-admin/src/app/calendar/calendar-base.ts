@@ -43,7 +43,7 @@ export class BaseEvent {
         return event
     }
 
-    static newResourceSchedule(resource: Resource, from: Date, to: Date) {
+    static newResourceSchedule(resource: Resource, from: Date, to: Date, tag: any) {
         const event = new BaseEvent()
 
         event.type = BaseEventType.ResourceSchedule
@@ -52,6 +52,10 @@ export class BaseEvent {
         event.to = to
 
         event.subject = resource?.name
+
+        if (tag)
+            event.subject += ' ' + tag
+
         event.color = resource?.color
 
         return event
@@ -185,6 +189,8 @@ export abstract class CalendarBase {
         var absencePlannings = extraPlannings.filterByType(...AlteaPlanningQueries.absenceTypes())
         var availablePlannings = extraPlannings.filterByType(...AlteaPlanningQueries.availableTypes())
 
+        var specialPlannings = extraPlannings.filterByType(PlanningType.edu)
+
         console.warn(humanResources)
 
         console.warn(absencePlannings)
@@ -218,7 +224,14 @@ export abstract class CalendarBase {
 
                 dateRangeSet = dateRangeSet.union()
 
-                const events = dateRangeSet.ranges.map(range => BaseEvent.newResourceSchedule(humanResource, range.from, range.to))
+                if (specialPlannings.notEmpty()) {
+                    var special = specialPlannings.filterByResource(humanResource.id).toDateRangeSet()
+                    console.warn('SPECIAL ---> ', special)
+                    dateRangeSet = dateRangeSet.add(special)
+                }
+
+
+                const events = dateRangeSet.ranges.map(range => BaseEvent.newResourceSchedule(humanResource, range.from, range.to, range.tag))
 
 
                 allEvents.push(...events)
@@ -388,15 +401,6 @@ export abstract class CalendarBase {
         console.log(events)
 
         await context.updateEvents(BaseEventType.OrderPlanning, events)
-        /* 
-                if (!context.events)
-                    context.events = []
-                else
-                    context.events.splice(0, context.events.length)
-        
-        
-                context.events.push(...events)
-         */
 
         console.log(context.events)
 

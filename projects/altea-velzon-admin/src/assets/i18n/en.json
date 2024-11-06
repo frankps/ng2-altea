@@ -1217,7 +1217,8 @@
       "label": "Platform",
       "sub": {
         "users": "Gebruikers",
-        "orderDebug": "Order Details"
+        "orderDebug": "Order Details",
+        "stripeEvents": "Stripe Events"
       }
     }
   },

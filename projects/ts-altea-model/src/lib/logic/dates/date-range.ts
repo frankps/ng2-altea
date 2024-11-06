@@ -16,14 +16,15 @@ export enum OverlapMode {
     otherOverlapsLeft
 }
 
-export class DateRange {
+export class DateRange<T = any> {
 
     /** quantity is used for resources with multiple instances (multi-cabine) */
     public qty = 1
 
-
     /** if ranges belong to schedule */
     public schedule?: Schedule
+
+    public tag: T
 
     constructor(public from: Date, public to: Date, public fromLabels: string[] = [], public toLabels: string[] = []) {
         if (to < from) {

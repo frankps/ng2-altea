@@ -84,7 +84,10 @@ export class MessagesComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.editor.destroy();
+    this.editor.destroy()
+    
+    if (this.messageSubscription)
+      this.messageSubscription.unsubscribe()
   }
 
   messageSubscription: Subscription

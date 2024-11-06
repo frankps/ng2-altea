@@ -4,6 +4,7 @@ import { UserListComponent } from './user-list/user-list.component';
 import { EditUserComponent } from './edit-user/edit-user.component';
 import { ManageUsersComponent } from './manage-users/manage-users.component';
 import { OrderDebugPageComponent } from './order-debug-page/order-debug-page.component';
+import { StripeEventsComponent } from './stripe-events/stripe-events.component';
 
 const routes: Routes = [
   {
@@ -20,7 +21,7 @@ const routes: Routes = [
       { path: "list", component: UserListComponent }]
   },
   { path: "order-debug", component: OrderDebugPageComponent },
-
+  { path: "stripe-events", component: StripeEventsComponent }
 ];
 
 @NgModule({

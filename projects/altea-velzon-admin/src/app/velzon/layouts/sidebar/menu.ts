@@ -245,13 +245,19 @@ export const MENU: MenuItem[] = [
         parentId: 30
       },
       {
-        id: 301,
+        id: 302,
         label: 'menu.platform.sub.orderDebug',
         link: '/platform/order-debug',
         parentId: 30
       },
       {
-        id: 301,
+        id: 303,
+        label: 'menu.platform.sub.stripeEvents',
+        link: '/platform/stripe-events',
+        parentId: 30
+      },
+      {
+        id: 304,
         label: 'menu.demo.label',
         link: '/aqua/demo',
         parentId: 30

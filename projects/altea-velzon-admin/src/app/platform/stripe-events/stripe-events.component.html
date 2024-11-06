@@ -1,0 +1,27 @@
+<div class="row" style="height: 100%;">
+    <div class="col-6">
+
+        <ul class="list-group">
+            <li class="list-group-item" *ngFor="let event of stripeEvents" (click)="selectEvent(event)">
+                {{event.src}}
+
+                <span class="float-end" style="font-size: smaller;">{{event.date | date:"dd/MM HH:mm" }}</span>
+
+                <i *ngIf="event.src == 'webhook'" class="fa-solid fa-paper-plane" (click)="postToWebhook(event)"></i>
+
+                <br>
+                <span *ngIf="event?.event['type']">{{event?.event['type']}}</span>
+
+            </li>
+        </ul>
+
+
+    </div>
+    <div class="col-6" style="height: 100%;">
+
+        <textarea *ngIf="eventJson" rows="40" class="form-control" id="event" name="event" style="height: 100%"
+            [(ngModel)]="eventJson"></textarea>
+
+
+    </div>
+</div>

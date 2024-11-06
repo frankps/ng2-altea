@@ -421,6 +421,8 @@ export class ResourcePlanning extends ObjectWithIdPlus implements IAsDbObject<Re
 
     const range = DateRange.fromNumbers(this.start!, this.end!)
 
+    range.tag = this.type
+   
     return range
   }
 

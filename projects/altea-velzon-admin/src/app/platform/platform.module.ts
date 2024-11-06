@@ -19,13 +19,15 @@ import { NgxSpinnerModule } from 'ngx-spinner';
 import { OrderDebugPageComponent } from './order-debug-page/order-debug-page.component';
 import { NgAlteaCommonModule } from "../../../../ng-altea-common/src/lib/ng-altea-common.module";
 import { OrderMgrModule } from "../../../../ng-altea-common/src/lib/order-mgr/order-mgr.module";
+import { StripeEventsComponent } from './stripe-events/stripe-events.component';
 
 @NgModule({
   declarations: [
     ManageUsersComponent,
     EditUserComponent,
     UserListComponent,
-    OrderDebugPageComponent],
+    OrderDebugPageComponent,
+    StripeEventsComponent],
   imports: [
     CommonModule,
     PlatformRoutingModule,

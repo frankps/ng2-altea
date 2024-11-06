@@ -79,6 +79,7 @@ ng generate component platform/user-list --project=altea-velzon-admin
 
 ng generate component platform/order-debug --project=altea-velzon-admin
 
+ng generate component platform/stripe-events --project=altea-velzon-admin
 
 
 ng generate module bank --project=altea-velzon-admin --routing

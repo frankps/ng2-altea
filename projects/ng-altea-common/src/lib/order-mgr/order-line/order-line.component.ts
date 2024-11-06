@@ -95,7 +95,7 @@ export class OrderLineComponent {
     this.orderMgrSvc.calculateAll()
 
 
-
+    this.orderMgrSvc.order.refreshSummary()
 
     const productOption = this.product.getOption(option.id)
 
