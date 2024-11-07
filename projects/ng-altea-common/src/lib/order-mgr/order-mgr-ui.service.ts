@@ -1140,6 +1140,9 @@ export class OrderMgrUiService {   // implements OnInit
 
   updateNrOfPersons(orderLine: OrderLine = this.orderLine) {
 
+    if (orderLine?.product?.type != ProductType.svc)
+      return
+
     /** service 'Wellness' has options 'adults' & 'children' => these options define persons */
     let nrOfPersons = orderLine.getNrOfPersonsDefinedOnOptions()
     console.warn('nrOfPersons', nrOfPersons)

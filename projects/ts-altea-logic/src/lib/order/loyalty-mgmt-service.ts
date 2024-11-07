@@ -117,6 +117,8 @@ export class LoyaltyByProgram {
         if (this.values.has(programId))
             newValue += this.values.get(programId)
 
+        newValue = _.round(newValue, 2)
+
         this.values.set(programId, newValue)
 
         return newValue
@@ -340,6 +342,7 @@ export class LoyaltyMgmtService {
                             break
                         default: {
                             let extraLoyalty = Math.min(validTotal, line.incl)
+                            extraLoyalty = _.round(extraLoyalty, 2)
                             validTotal -= extraLoyalty
                             result.addLoyalty(loyaltyProgram.id, extraLoyalty)
                             break

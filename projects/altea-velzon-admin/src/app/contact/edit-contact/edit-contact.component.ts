@@ -1,11 +1,11 @@
 
 import { Component, ViewChild, OnInit, inject } from '@angular/core';
-import { ProductService, PriceService, ProductResourceService, ResourceService, ScheduleService, ContactService, SessionService } from 'ng-altea-common'
-import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ResourceType, ResourceTypeIcons, Resource, Schedule, Contact, Language, DepositMode } from 'ts-altea-model'
+import { ProductService, PriceService, ProductResourceService, ResourceService, ScheduleService, ContactService, SessionService, OrderService } from 'ng-altea-common'
+import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ResourceType, ResourceTypeIcons, Resource, Schedule, Contact, Language, DepositMode, LoyaltyCard, Order } from 'ts-altea-model'
 import { BackendHttpServiceBase, DashboardService, FormCardSectionEventData, NgEditBaseComponent, ToastType, TranslationService } from 'ng-common'
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxModalComponent, DeleteModalComponent } from 'ng-common';
-import { BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, Translation, ObjectHelper, ObjectWithId, CollectionChangeTracker, ApiStatus, DateHelper } from 'ts-common'
+import { BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, Translation, ObjectHelper, ObjectWithId, CollectionChangeTracker, ApiStatus, DateHelper, DbQuery, QueryOperator, ArrayHelper } from 'ts-common'
 import * as _ from "lodash";
 import { NgxSpinnerService } from "ngx-spinner"
 import { NgTemplateOutlet } from '@angular/common';
@@ -18,6 +18,8 @@ import { Firestore, collection, collectionData, addDoc, CollectionReference, upd
 import { Observable } from 'rxjs';
 import { getDocs, limit, or, orderBy, query, where } from 'firebase/firestore';
 import * as countryLib from 'country-list-js';
+import { LoyaltyCardChangeService } from 'ng-altea-common';
+import { UIOrder } from '../../order/order-grid/order-grid.component';
 
 
 @Component({
@@ -57,6 +59,8 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
     colLocalNum: 'col-4'
   }
 
+  orders: UIOrder[] = []
+  ordersCreateBefore: Date = new Date(2050, 0, 1)
 
   test = "31478336034"
 
@@ -64,7 +68,7 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
 
   constructor(protected contactSvc: ContactService, protected translationSvc: TranslationService, route: ActivatedRoute, router: Router,
     spinner: NgxSpinnerService, private modalService: NgbModal, dashboardSvc: DashboardService,
-    protected scheduleSvc: ScheduleService, protected sessionSvc: SessionService) {
+    protected scheduleSvc: ScheduleService, protected sessionSvc: SessionService, protected loyaltyCardChangeSvc: LoyaltyCardChangeService, protected orderSvc: OrderService) {
     super('contact', Contact, 'subscriptions,giftsIn,giftsOut,cards'
       , contactSvc
       , router, route, spinner, dashboardSvc)
@@ -95,8 +99,22 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
 */
   }
 
+  override async objectRetrieved(contact: Contact) {
+
+    console.error('objectRetrieved')
+    console.error(contact)
+
+    await this.getMessages(contact)
+
+    this.orders = []
+    this.ordersCreateBefore = new Date(2050, 0, 1)
+    await this.getOrders()
+
+  }
+
 
   async getMessages(contact: Contact) {
+
 
     console.error('getMessages =============', contact)
 
@@ -128,16 +146,7 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
     this.deleteModal?.delete()
   }
 
-  override async objectRetrieved(contact: Contact) {
 
-    console.error('objectRetrieved')
-    console.error(contact)
-
-
-    await this.getMessages(contact)
-
-
-  }
 
   formChanged(sectionId: string) {
 
@@ -194,6 +203,63 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
     this.generalForm.form.markAsDirty()
 
     console.warn(this.object)
+
+  }
+
+
+
+  async showCardDetails(card: LoyaltyCard) {
+
+    if (!card)
+      return
+
+    const query = new DbQuery()
+    query.and('cardId', QueryOperator.equals, card.id)
+    query.orderByDesc('date')
+
+    var cardChanges = await this.loyaltyCardChangeSvc.query$(query)
+
+    card.changes = cardChanges
+
+    console.warn(cardChanges)
+
+  }
+
+  openOrder(uiOrder: UIOrder) {
+    this.router.navigate(['aqua', 'orders', 'manage', uiOrder.id])
+  }
+
+
+
+
+  async getOrders() {
+
+
+    let contact = this.object
+    let take = 10
+
+    if (!contact)
+      return
+
+    const query = new DbQuery()
+    query.and('contactId', QueryOperator.equals, contact.id)
+    query.and('cre', QueryOperator.lessThan, this.ordersCreateBefore)
+    query.orderByDesc('cre')
+    query.include('lines')
+    query.take = take
+
+    let orders = await this.orderSvc.query$(query)
+
+    if (ArrayHelper.NotEmpty(orders)) {
+      this.ordersCreateBefore = orders[orders.length - 1].cre
+      this.orders.push(...orders.map(order => UIOrder.fromOrder(order)))
+    } 
+
+    if (ArrayHelper.IsEmpty(orders) || orders.length < take)
+      this.ordersCreateBefore = null
+    
+
+    console.log(this.orders)
 
   }
 

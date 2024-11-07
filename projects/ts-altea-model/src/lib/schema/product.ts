@@ -647,6 +647,11 @@ export class ProductResource extends ObjectWithIdPlus {
   /** the preparation time after a booking/treatment can overlap with prep time before next booking (the max of before/after will be used) */
   prepOverlap: boolean = false
 
+  /** duo-treatments sometime require a single device/machine that can be shared => the second reservation of this resource can be place after/before the first */
+  flex: boolean = false
+
+  /** the second device reservation will be placed AFTER the first if true, otherwise (false) placed BEFORE */
+  flexAfter: boolean = true
 
 }
 

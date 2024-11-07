@@ -161,6 +161,8 @@ export class CreateResourceRequest {
 
                 for (const productResource of productResources) {
 
+
+
                     let resource = availabilityCtx.getResource(productResource.resourceId!)
 
                     if (!resource)
@@ -218,7 +220,22 @@ export class CreateResourceRequest {
                     // const offset = personOffset.clone()
                     resReqItem.offset = offset.add(offsetDuration.offset)
 
+                    if (productResource.flex) {
+                        
+                        // check if we already have items
+                        let items = resourceRequest.getItemsForResource(resource.id)
 
+                        if (ArrayHelper.NotEmpty(items)) {
+
+                            if (productResource.flexAfter) {
+                                let item = items[0]
+                                resReqItem.offset = item.offset.add(item.duration)
+                            } else {
+                                let item = items[items.length - 1]
+                                resReqItem.offset = item.offset.subtract(resReqItem.duration)
+                            }
+                        }
+                    }
 
                     resReqItem.isPrepTime = productResource.prep
                     resReqItem.prepOverlap = productResource.prepOverlap

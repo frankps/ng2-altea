@@ -250,8 +250,6 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
   }
 
   openOrder(uiOrder: UIOrder) {
-
-    // ['/aqua/orders/manage', orderId]
     this.router.navigate(['aqua', 'orders', 'manage', uiOrder.id])
   }
 

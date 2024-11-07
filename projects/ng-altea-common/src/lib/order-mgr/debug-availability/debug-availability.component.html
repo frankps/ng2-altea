@@ -309,11 +309,11 @@
         <div class="row">
             <div class="col-1">
                 <ng-container *ngIf="solution.valid; else invalidSolution">
-                    Solution:
+                    Solution {{solution.num}}:
                 </ng-container>
 
                 <ng-template #invalidSolution>
-                    <s style="color: red;">Invalid:</s>
+                    <s style="color: red;">Invalid {{solution.num}}:</s>
                 </ng-template>
 
             </div>

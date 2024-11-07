@@ -44,6 +44,9 @@ export class OrderLineComponent {
 
     this.orderMgrSvc.orderDirty = true
     this.orderMgrSvc.orderLine.markAsUpdated('qty')
+
+    this.orderMgrSvc.updateNrOfPersons()
+
     this.orderMgrSvc.calculateAll()
   }
 

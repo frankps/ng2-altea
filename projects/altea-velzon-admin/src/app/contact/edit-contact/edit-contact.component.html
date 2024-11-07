@@ -84,6 +84,16 @@
 
             </div>
 
+
+
+            <div class="row">
+                <div class="col-6"> <ngx-altea-label-value label="dic.created"
+                        [value]="object.cre" valueFormat="date"></ngx-altea-label-value> </div>
+                <div class="col-6"> <ngx-altea-label-value label="dic.updated"
+                        [value]="object.upd" valueFormat="date"></ngx-altea-label-value> </div>
+            </div>
+
+
             <!-- 
         <ngx-altea-label-value label="objects.product.salesPrice" [value]="object.salesPrice"></ngx-altea-label-value>
   
@@ -289,7 +299,7 @@
 
             <ng-container *ngIf="object.hasGiftsIn()">
 
-                
+
                 <span style="font-weight: bolder;">Ontvangen</span>
 
                 <div class="row">
@@ -361,13 +371,36 @@
                 </div>
 
 
-                <div class="row" *ngFor="let card of object.cards">
+                <ng-container *ngFor="let card of object.cards">
 
-                    <div class="col-3 d-flex justify-content-center">{{card.name}}</div>
-                    <div class="col-3 d-flex justify-content-center">{{card.value}}</div>
-                    <div class="col-3 d-flex justify-content-center">{{card.cre | date:"dd/MM/yyyy"}}</div>
 
-                </div>
+                    <div class="row">
+
+                        <div class="col-3 d-flex justify-content-center">{{card.name}}</div>
+                        <div class="col-3 d-flex justify-content-center">{{card.value}}</div>
+                        <div class="col-3 d-flex justify-content-center">{{card.cre | date:"dd/MM/yy"}}</div>
+                        <div class="col"><i class="fa-solid fa-eye" (click)="showCardDetails(card)"></i></div>
+
+                    </div>
+
+                    <ng-container *ngIf="card.hasChanges()">
+
+                        <div class="row" *ngFor="let change of card.changes">
+
+                            <div class="col-2"></div>
+                            <div class="col-3 d-flex justify-content-center">{{change.value}}</div>
+                            <div class="col-3 d-flex justify-content-center">{{change.info}}</div>
+                            <div class="col-3 d-flex justify-content-center">{{change.date | date:"dd/MM/yy"}}</div>
+
+                        </div>
+
+                    </ng-container>
+
+
+
+
+                </ng-container>
+
 
 
             </ng-container>
@@ -377,6 +410,79 @@
         </ng-container>
 
     </ngx-altea-form-card-section>
+
+
+
+
+    <ngx-altea-form-card-section sectionName="ui.contact.edit.sections.order.title" sectionId="order"
+        [editSectionId]="editSectionId" [showButtons]="false">
+
+        <ng-container always>
+
+            <ng-container *ngIf="orders">
+
+
+                <ng-container *ngFor="let uiOrder of orders">
+                    <!-- 
+                    (click)="openOrder(uiOrder)"
+ -->
+                    <div class="row mb-1">
+                        <div class="col-4" (click)="openOrder(uiOrder)">
+
+                            <i *ngIf="uiOrder.stateIcon()" placement="top" [ngbTooltip]="uiOrder.state"
+                                [style.color]="uiOrder.stateColor()" [class]="uiOrder.stateIcon()"></i>
+                            &nbsp;
+
+                            {{uiOrder.start| intdate}}
+
+                            <span *ngIf="uiOrder.gift">{{uiOrder.giftCode}}</span>
+
+                            <i *ngIf="uiOrder.attn" class="ms-2 fa-sharp fa-solid fa-circle-exclamation"
+                                style="color: red"></i>
+
+                            <i *ngIf="uiOrder.src == 'ngApp'" style="color: gray; vertical-align: middle;"
+                                class="fa-solid fa-mobile float-end"></i>
+                            <i *ngIf="uiOrder.gift" class="fa-duotone fa-solid fa-gift float-end"></i>
+
+
+                        </div>
+
+                        <div class="col-3" [style.color]="uiOrder.pay.color">{{uiOrder.pay.info}}
+
+
+
+                            <!--                             <i class="fa-sharp fa-solid float-end fa-grip-dots" (click)="toggleSelected(uiOrder)"></i>
+                            <i class="fa-solid fa-trash float-end  me-2" *ngIf="sessionSvc.isAdmin() && isSelected(uiOrder)"
+                                (click)="startDeleteOrder(uiOrder)"></i> -->
+
+                        </div>
+
+                        <div class="col">
+                            {{uiOrder.summary}}
+                        </div>
+                    </div>
+
+                </ng-container>
+
+
+
+
+            </ng-container>
+
+            <div class="row my-2" *ngIf="ordersCreateBefore">
+                <div class="col-12 d-flex justify-content-center">
+                    <i class="fa-duotone fa-solid fa-arrows-rotate fa-lg" (click)="getOrders()"></i>
+                </div>
+            </div>
+
+
+
+
+        </ng-container>
+
+    </ngx-altea-form-card-section>
+
+
 
 
 </ng-container>

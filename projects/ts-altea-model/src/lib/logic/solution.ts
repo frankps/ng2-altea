@@ -257,6 +257,8 @@ export class Solution extends SolutionItems {
 
     count = 0
 
+    num: number = -1
+
     constructor(...items: SolutionItem[]) {
         super(items)
 
@@ -275,7 +277,7 @@ export class Solution extends SolutionItems {
         return solItem
     }
 
-    getSolutionItemSamePerson(personId: string, resType: ResourceType) : SolutionItem {
+    getSolutionItemSamePerson(personId: string, resType: ResourceType): SolutionItem {
 
         var item = this.items.find(item => item.request.samePersonAndResourceType(personId, resType))
         return item
@@ -375,7 +377,7 @@ export class Solution extends SolutionItems {
                     if (toStr == '15:45' || offsetSeconds / 60 == 135)
                         console.log('Here it is!!')
                 }
-                
+
 
 
             }
@@ -429,7 +431,7 @@ export class Solution extends SolutionItems {
 
     clone(): Solution {
 
-        
+
         let clone = ObjectHelper.clone(this, Solution) as Solution
         clone.newId()
         return clone
@@ -544,10 +546,17 @@ export class SolutionSet {
 
     add(...solutions: Solution[]) {
 
+        if (ArrayHelper.IsEmpty(solutions))
+            return
+
         if (!Array.isArray(this.solutions))
             this.solutions = []
 
+        let solutionMaxNum = _.maxBy(this.solutions, 'num')
 
+        let newNum = solutionMaxNum ? solutionMaxNum.num + 1 : 0
+
+        solutions.forEach(sol => sol.num = newNum++)
 
         this.solutions.push(...solutions)
     }

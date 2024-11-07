@@ -144,6 +144,24 @@
         </div>
     </div>
 
+    <div class="row {{css_cls_row}}">
+        <div class="col-6">
+            <div class="form-check form-switch">
+                <input type="checkbox" class="form-check-input" id="flex" name="flex"
+                    [(ngModel)]="object.flex">
+                <label class="form-check-label" for="flex" translate="objects.prodRes.flex"></label>
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="form-check form-switch" *ngIf="object.flex">
+                <input type="checkbox" class="form-check-input" id="flexAfter" name="flexAfter"
+                    [(ngModel)]="object.flexAfter">
+                <label class="form-check-label" for="flexAfter"
+                    translate="objects.prodRes.flexAfter"></label>
+            </div>
+        </div>
+    </div>
 
 
     <div class="row my-3">

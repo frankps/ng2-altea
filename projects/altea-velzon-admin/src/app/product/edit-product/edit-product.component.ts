@@ -81,7 +81,7 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
   resourceChanges?: CollectionChangeTracker<ProductResource>
 
 
-  productResourcePropsToUpdate = ['offset', 'duration', 'resourceId', 'idx', 'durationMode', 'reference', 'scheduleIds', 'groupQty', 'groupAlloc', 'prep', 'prepOverlap']
+  productResourcePropsToUpdate = ['offset', 'duration', 'resourceId', 'idx', 'durationMode', 'reference', 'scheduleIds', 'groupQty', 'groupAlloc', 'prep', 'prepOverlap', 'flex', 'flexAfter']
 
   OnlineMode = OnlineMode
 

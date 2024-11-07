@@ -273,7 +273,7 @@ export class LoyaltyProgram extends ObjectWithIdPlus {
         inProgram = true
       else if (this.svc_bundle && product.sub == ProductSubType.bundle) // if loyalty program is enabled for bundled services 
         inProgram = true
-      else if (this.svc_bundle && product.sub == ProductSubType.subs) // if loyalty program is enabled for subscription services 
+      else if (this.svc_subs && product.sub == ProductSubType.subs) // if loyalty program is enabled for subscription services 
         inProgram = true
     }
 
@@ -325,8 +325,8 @@ export class LoyaltyLine {
 }
 
 
-export class LoyaltyCardChange {
-  public id?: string;
+export class LoyaltyCardChange extends ObjectWithId {
+ // public id?: string;
 
   public static newValue(orderId: string, cardId: string, value: number) {
     const change = new LoyaltyCardChange()
@@ -359,13 +359,15 @@ export class LoyaltyCardChange {
   orderId?: string
   rewardId?: string
 
+  info?: string
+
   @Type(() => Date)
   public date: Date = new Date()
 }
 
 export class LoyaltyCard extends ObjectWithIdPlus {
 
-
+  
 
   contact?: Contact
   contactId?: string
@@ -377,5 +379,11 @@ export class LoyaltyCard extends ObjectWithIdPlus {
 
   name?: string
   value: number = 0
+
+  hasChanges() {
+
+    return ArrayHelper.NotEmpty(this.changes)
+
+  }
 
 }

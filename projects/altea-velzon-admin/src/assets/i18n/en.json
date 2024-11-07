@@ -18,6 +18,7 @@
     "create": "Maak",
     "create-account": "Account maken",
     "communication": "Communicatie",
+    "created": "Aangemaakt op",
     "currency": "Munteenheid",
     "delete": "Verwijder",
     "descr": "Omschrijving",
@@ -50,6 +51,7 @@
     "select": "Selecteer",
     "timeUnit": "Tijdseenheid",
     "to": "Aan",
+    "updated": "Veranderd op",
     "save": "Opslaan",
     "search": "Zoeken",
     "send": "Versturen",
@@ -471,6 +473,9 @@
           },
           "loyalty": {
             "title": "Klantenkaarten"
+          },
+          "order": {
+            "title": "Orders"
           }
         }
       }
@@ -1055,6 +1060,8 @@
       "groupAlloc": "Reserveren op groep",
       "prep": "Is voorbereidings- of opkuistijd",
       "prepOverlap": "Voorbereiding & opkuis overlappen elkaar",
+      "flex": "Flexibele start (bij duo's)",
+      "flexAfter": "Start na vorige inplanning",
       "help": {
         "offset": "Je kan ervoor kiezen om de bezetting van deze resource niet exact te laten aanvangen vanaf het begin of einde (bovenstaande keuze), maar wel met een correctie (in minuten)",
         "duration": "Gedurende deze tijd (minuten) wordt de resource bezet gehouden",

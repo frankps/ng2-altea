@@ -280,6 +280,8 @@ export class SlotFinder {
                 => we need to check the availability of the new requestItem relativly to the above range (see what is possible)
                 */
 
+                let possibleResources = requestItem.resources
+                let resourceNames = possibleResources.map(r => r.name).join(',')
 
                 // IMPORTANT: maybe convert refFrom to solution.offsetRefDate (same as done in if then statement above)
 
@@ -297,7 +299,7 @@ export class SlotFinder {
                 // const startRange = new DateRange(startFrom, startTo)
                 const checkInRange = new DateRange(startFrom, endsOn)
 
-                let possibleResources = requestItem.resources
+                
 
                 const hasAffinity = requestItem.hasAffinity()
 
@@ -307,14 +309,23 @@ export class SlotFinder {
                     possibleResources = affinitySolutionItem.resources
                 }
 
-                let resourceNames = possibleResources.map(r => r.name).join(',')
+                
 
                 if (hasAffinity)
                     solution.addNote(`Affinity for: ${resourceNames}`)
 
 
+                let excludeSolutionOccupation = !hasAffinity 
 
-                const availableResources = availability.getAvailabilityOfResourcesInRange(possibleResources, checkInRange, requestItem.duration, solution, !hasAffinity, requestItem.personId)
+                /*
+                * flex was introduced to have same resource (Cerefinodevice) be re-used in the same order for other person (duo threatment)
+                * => usage of first person should not block re-usage of second person => exclude checks within current solution
+                */
+
+                if (requestItem.productResource.flex)
+                    excludeSolutionOccupation = false
+
+                const availableResources = availability.getAvailabilityOfResourcesInRange(possibleResources, checkInRange, requestItem.duration, solution, excludeSolutionOccupation, requestItem.personId)
 
                 /*
                     below we check resourceQuantityEquals=1 -> quick fix, because if resource.qty > 1 algo not correct yet!!
@@ -328,7 +339,7 @@ export class SlotFinder {
                     solution.addNote(`No availability found for '${resourceNames}' in range ${checkInRange.toString()} for ${requestItem.duration.toString()}`)
 
 
-                    const forDebuggingAgain = availability.getAvailabilityOfResourcesInRange(possibleResources, checkInRange, requestItem.duration, solution, !hasAffinity, requestItem.personId)
+                    const forDebuggingAgain = availability.getAvailabilityOfResourcesInRange(possibleResources, checkInRange, requestItem.duration, solution, excludeSolutionOccupation, requestItem.personId)
 
                     solution.valid = false
 
