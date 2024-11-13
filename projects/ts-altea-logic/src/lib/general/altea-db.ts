@@ -136,7 +136,7 @@ export class AlteaDb {
         qry.and('msg', QueryOperator.equals, true)
         qry.and('act', QueryOperator.equals, true)
         qry.and('state', QueryOperator.in, [OrderState.created, OrderState.waitDeposit, OrderState.confirmed])
-        
+
         const orders = await this.db.query$<Order>(qry)
 
         return orders
@@ -174,7 +174,7 @@ export class AlteaDb {
         return orders
     }
 
-    
+
     async getPosOrdersToCleanup(): Promise<Order[]> {
 
         const qry = new DbQueryTyped<Order>('order', Order)
@@ -202,7 +202,7 @@ export class AlteaDb {
         qry.and('paid', QueryOperator.equals, 0)
         //qry.and('contactId', QueryOperator.equals, null)
         qry.and('src', QueryOperator.equals, 'ngApp')
-       // qry.include('contact')
+        // qry.include('contact')
 
         let maxCreationDate = new Date()
         maxCreationDate = dateFns.subMinutes(maxCreationDate, 20)
@@ -306,6 +306,22 @@ export class AlteaDb {
         return products
     }
 
+    async getAllResourceGroupsForBranch(branchId: string, ...includes: string[]) {
+
+        const qry = new DbQueryTyped<Resource>('resource', Resource)
+
+        qry.and('branchId', QueryOperator.equals, branchId)
+        qry.and('isGroup', QueryOperator.equals, true)
+
+        if (Array.isArray(includes) && includes.length > 0)
+            qry.include(...includes)
+
+        const resources = await this.db.query$<Resource>(qry)
+
+        return resources
+
+    }
+
     async getResources(resourceIds: string[], ...includes: string[]): Promise<Resource[]> {
 
         const qry = new DbQueryTyped<Resource>('resource', Resource)
@@ -361,7 +377,7 @@ export class AlteaDb {
      * @param excludeOrderId sometimes we need to exclude current order id in order to be able to re-plan current order 
      * @returns 
      */
-    async resourcePlannings(from: number, to: number, resourceIds: string[], excludeOrderId?: string): Promise<ResourcePlanning[]> {
+    async resourcePlannings(from: number, to: number, resourceIds: string[], includeGroupPlannings: boolean, excludeOrderId?: string, excludeClientId?: string): Promise<ResourcePlanning[]> {
 
         console.warn('Loading resource plannings ... ')
 
@@ -371,12 +387,31 @@ export class AlteaDb {
         qry.and('start', QueryOperator.lessThanOrEqual, to)
         qry.and('act', QueryOperator.equals, true)
 
+        if (includeGroupPlannings) {
+            let resourceFilter = qry.and()
+            resourceFilter.or('resourceId', QueryOperator.in, resourceIds)
+            resourceFilter.or('resourceId', QueryOperator.equals, null)
+        } else {
+            qry.and('resourceId', QueryOperator.in, resourceIds)
+        }
+
+        /** consumers are sometimes creating new orders from same device (without finishing previous order) 
+         *  => exclude plannings coming from same device
+         */
+        if (excludeClientId) {
+
+            let lockCheck = qry.and()
+            lockCheck.or('orderId', QueryOperator.equals, null)
+            lockCheck.or('order.lock', QueryOperator.not, excludeClientId)
+
+        }
+
         if (excludeOrderId) {
             qry.or('orderId', QueryOperator.not, excludeOrderId)
             qry.or('orderId', QueryOperator.equals, null)
         }
 
-        qry.and('resourceId', QueryOperator.in, resourceIds)
+
 
         const resourcePlannings = await this.db.query$<ResourcePlanning>(qry)
 
@@ -718,7 +753,7 @@ export class AlteaDb {
         return updateResult
     }
 
-    async deletePlanningsForOrder(orderId: string, softDelete: boolean = true)  {
+    async deletePlanningsForOrder(orderId: string, softDelete: boolean = true) {
 
 
         try {

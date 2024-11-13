@@ -48,7 +48,7 @@ export class ResourceAvailabilityCacheToRemove {
         */
 
 
-        const resourcePlannings = await this.alteaDb.resourcePlannings(availabilityRequest.from, availabilityRequest.to, resourceIds)
+        const resourcePlannings = await this.alteaDb.resourcePlannings(availabilityRequest.from, availabilityRequest.to, resourceIds, false)
 
         return resourcePlannings
 

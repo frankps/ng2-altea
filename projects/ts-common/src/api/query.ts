@@ -1,5 +1,6 @@
 import { extend } from "lodash"
 import { ObjectWithId } from "../lib"
+import { Type } from "class-transformer"
 
 
 
@@ -23,16 +24,40 @@ export class QueryCondition {
   operator: QueryOperator = QueryOperator.equals
   value?: any
 
-  constructor(field?: string, operator: QueryOperator = QueryOperator.equals, value?: any) {
+  /*
+  @Type(() => QueryCondition)
+  or: Array<QueryCondition> = Array<QueryCondition>()
+*/
 
-    this.field = field
-    this.operator = operator
-    this.value = value
+  where: QueryWhere
 
+  constructor() {
   }
+
+  static filter(field?: string, operator: QueryOperator = QueryOperator.equals, value?: any): QueryCondition {
+
+    let condition = new QueryCondition()
+
+    condition.field = field
+    condition.operator = operator
+    condition.value = value
+
+    return condition
+  }
+
+  or(field: string, operator: QueryOperator, value?: any): QueryCondition {
+    const condition = QueryCondition.filter(field, operator, value)
+
+    if (!this.where)
+      this.where = new QueryWhere()
+
+    this.where.or.push(condition)
+    return this
+  }
+
 }
 
-export class OrQuery {
+export class OrQuery { 
   conditions: QueryCondition[] = []
 }
 
@@ -61,20 +86,36 @@ export class PrismaWhere {
   OR?: any[]
 }
 
+export class QueryWhere {
+  or: Array<QueryCondition> = Array<QueryCondition>()
+  and: Array<QueryCondition> = new Array<QueryCondition>()
+}
+
 export class DbQueryBase {
+  /*
   where = {
     or: new Array<QueryCondition>(),
-    and: new Array<QueryCondition>()
-  }
+    and: new Array<QueryCondition | PrismaWhere>()
+  }*/
 
-  and(field: string, operator: QueryOperator, value?: any): DbQueryBase {
-    const condition = new QueryCondition(field, operator, value)
+  @Type(() => QueryWhere)
+  where: QueryWhere = new QueryWhere()
+
+
+  and(field?: string, operator: QueryOperator = QueryOperator.equals, value?: any): QueryCondition {
+    let condition: QueryCondition
+
+    if (field)
+      condition = QueryCondition.filter(field, operator, value)
+    else
+      condition = new QueryCondition()
+
     this.where.and.push(condition)
-    return this
+    return condition
   }
 
   or(field: string, operator: QueryOperator, value?: any): DbQueryBase {
-    const condition = new QueryCondition(field, operator, value)
+    const condition = QueryCondition.filter(field, operator, value)
     this.where.or.push(condition)
     return this
   }
@@ -181,6 +222,9 @@ export class DbQuery extends DbQueryBase {
     const array: any[] = []
 
     list.forEach(condition => {
+
+      /*       if (!(condition instanceof QueryCondition))
+              return */
 
       const comparison: any = {}
       comparison[condition.operator] = condition.value

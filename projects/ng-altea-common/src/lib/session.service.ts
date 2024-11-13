@@ -1,6 +1,6 @@
 import { Injectable, OnInit } from '@angular/core';
 import { ScheduleService } from './data-services/sql/schedule.service';
-import { DbQuery, QueryOperator } from 'ts-common';
+import { DbQuery, ObjectHelper, QueryOperator } from 'ts-common';
 import { AppMode, Branch, Contact, Resource } from 'ts-altea-model';
 import * as Rx from "rxjs";
 // import { LocalService } from 'ng-altea-common';
@@ -123,6 +123,24 @@ export class SessionService implements OnInit {
   }
 
 
+  private uniqueClientId: string
+
+  clientId() : string {
+
+    if (this.uniqueClientId)
+      return this.uniqueClientId
+
+    let clientId = localStorage.getItem('clientId')
+
+    if (clientId) {
+      this.uniqueClientId = clientId
+    } else {
+      this.uniqueClientId = ObjectHelper.newGuid()
+      localStorage.setItem('clientId', this.uniqueClientId)
+    }
+
+    return this.uniqueClientId
+  }
 
 
   get branch(): Branch | undefined {

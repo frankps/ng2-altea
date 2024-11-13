@@ -11,4 +11,20 @@ export class ArrayHelper {
     static IsEmpty(array: any): boolean {
         return (!Array.isArray(array) || array.length == 0)
     }
+
+
+    static removeItems(source: string[], toRemove: string[]): string[] {
+        if (ArrayHelper.IsEmpty(toRemove))
+            return source
+
+        //    let res = source.filter(item => toRemove.indexOf(item) == -1)
+
+        let res = source.filter(item => {
+           let idx = toRemove.indexOf(item) 
+           
+           return (idx == -1)
+        })
+
+        return res
+    }
 }

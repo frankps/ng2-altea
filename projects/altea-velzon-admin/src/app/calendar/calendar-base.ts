@@ -177,14 +177,17 @@ export abstract class CalendarBase {
 
     async getHrPlannings(start: Date, end: Date): Promise<BaseEvent[]> {
 
+        let branchId = this.sessionSvc.branchId
+
         var humanResources = await this.resourceSvc.getHumanResourcesInclGroups()
         humanResources = humanResources.filter(hr => !hr.isGroup && hr.online)
 
-
         var humanResourceIds = humanResources.map(hr => hr.id)
 
+        var getResourceIds = [ ...humanResourceIds, branchId]
 
-        var extraPlannings = await this.alteaDb.getPlanningsByTypes(humanResourceIds, start, end, AlteaPlanningQueries.extraTypes(), this.sessionSvc.branchId)
+        var extraPlannings = await this.alteaDb.getPlanningsByTypes(getResourceIds, start, end, AlteaPlanningQueries.extraTypes(), branchId)
+
 
         var absencePlannings = extraPlannings.filterByType(...AlteaPlanningQueries.absenceTypes())
         var availablePlannings = extraPlannings.filterByType(...AlteaPlanningQueries.availableTypes())
@@ -196,6 +199,10 @@ export abstract class CalendarBase {
         console.warn(absencePlannings)
 
         const allEvents: BaseEvent[] = []
+
+
+        var branchClosed = absencePlannings.filterByResource(branchId).toDateRangeSet()
+
 
         for (let humanResource of humanResources) {
 
@@ -219,6 +226,8 @@ export abstract class CalendarBase {
 
             if (!absencesForResource.isEmpty())
                 dateRangeSet = dateRangeSet.subtract(absencesForResource)
+
+            dateRangeSet = dateRangeSet.subtract(branchClosed)
 
             if (!dateRangeSet.isEmpty()) {
 

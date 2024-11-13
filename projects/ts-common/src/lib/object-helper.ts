@@ -5,6 +5,15 @@ import { ArrayHelper } from "./array-helper";
 
 export class StringHelper {
 
+    static isNullOrUndefined(str) : boolean {
+        return str === undefined || str === null
+    }
+
+    static isDefined(str) : boolean {
+        return str !== undefined && str !== null
+    }
+
+
     static isEmptyOrSpaces(str) : boolean {
         return str === undefined || str === null || str.match(/^ *$/) !== null;
     }

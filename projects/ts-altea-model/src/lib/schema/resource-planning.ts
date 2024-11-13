@@ -1,7 +1,7 @@
 import { Branch, Contact, DepositMode, Gift, Invoice, Order, OrderLine, OrderType, Organisation, PlanningMode, Product, ProductResource, ProductType, Resource, ResourceType, Schedule, User } from "ts-altea-model";
 import { Exclude, Type, Transform } from "class-transformer";
 import 'reflect-metadata';
-import { ArrayHelper, ConnectTo, DateHelper, DbObjectCreate, IAsDbObject, ManagedObject, ObjectHelper, ObjectMgmt, ObjectReference, ObjectWithId, ObjectWithIdPlus, QueryOperator, TimeHelper } from 'ts-common'
+import { ArrayHelper, ConnectTo, DateHelper, DbObjectCreate, IAsDbObject, ManagedObject, ObjectHelper, ObjectMgmt, ObjectReference, ObjectWithId, ObjectWithIdPlus, QueryOperator, StringHelper, TimeHelper } from 'ts-common'
 import * as _ from "lodash";
 import { PersonLine } from "../person-line";
 import { DateRange, DateRangeSet, TimeBlock, TimeBlockSet, TimeSpan } from "../logic";
@@ -32,6 +32,40 @@ export class ResourcePlannings {
 
   }
 
+
+  add(extraPlannings: ResourcePlannings) {
+
+
+    if (!extraPlannings || extraPlannings.isEmpty())
+      return
+
+    this.plannings.push(...extraPlannings.plannings)
+
+  }
+
+  minTime(): TimeSpan {
+
+    if (ArrayHelper.IsEmpty(this.plannings))
+      return TimeSpan.zero
+
+    let durSeconds : number[] = this.plannings.map(plan => {
+
+      if (!plan.start || !plan.end)
+        return null
+
+      let durationSeconds = dateFns.differenceInSeconds(plan.endDate, plan.startDate)
+
+      return durationSeconds
+    }).filter(dur => dur && dur > 0)
+
+
+    let minSeconds = _.min(durSeconds)
+
+    return TimeSpan.seconds(minSeconds)
+
+
+  }
+
   isEmpty(): boolean {
     return ArrayHelper.IsEmpty(this.plannings)
   }
@@ -49,6 +83,8 @@ export class ResourcePlannings {
     return new ResourcePlannings(plannings)
   }
 
+
+
   filterByResource(resourceId: string): ResourcePlannings {
     const planningsForResource = this.plannings.filter(rp => rp.resourceId == resourceId && !rp.scheduleId)
 
@@ -62,6 +98,25 @@ export class ResourcePlannings {
   filterByResourceOverlapAllowed(resourceId: string, overlap: boolean = false): ResourcePlannings {
 
     const planningsForResource = this.plannings.filter(rp => rp.resourceId == resourceId && rp.overlap == overlap && !rp.scheduleId)
+
+    if (!Array.isArray(planningsForResource))
+      return new ResourcePlannings()
+
+    return new ResourcePlannings(planningsForResource)
+  }
+
+  filterByDateRangeResourceGroupsOnly(groupResourceIds: string[], from: Date | number, to: Date | number): ResourcePlannings {
+
+    let fromNum = from instanceof Date ? DateHelper.yyyyMMddhhmmss(from) : from
+    let toNum = to instanceof Date ? DateHelper.yyyyMMddhhmmss(to) : to
+
+    const debug = this.plannings.filter(rp => rp.resourceGroupId && !rp.resourceId &&
+      rp.end > fromNum && rp.start < toNum)
+
+    console.error(debug)
+
+    const planningsForResource = this.plannings.filter(rp => rp.resourceGroupId && !rp.resourceId &&
+      groupResourceIds.indexOf(rp.resourceGroupId) >= 0 && rp.end > fromNum && rp.start < toNum)
 
     if (!Array.isArray(planningsForResource))
       return new ResourcePlannings()
@@ -181,6 +236,19 @@ export class ResourcePlannings {
     const set = new DateRangeSet(dateRanges)
     return set
 
+  }
+
+  /** get resource group ids that are not allocated to specific resource */
+  getGroupOnlyPlanningIds(): string[] {
+
+    if (ArrayHelper.IsEmpty(this.plannings))
+      return []
+
+    let groupIds = this.plannings.filter(pl => StringHelper.isDefined(pl.resourceGroupId) && StringHelper.isNullOrUndefined(pl.resourceId)).map(pl => pl.resourceGroupId)
+
+    groupIds = _.uniq(groupIds)
+
+    return groupIds
   }
 
   groupByResource(): _.Dictionary<ResourcePlanning[]> {
@@ -422,7 +490,7 @@ export class ResourcePlanning extends ObjectWithIdPlus implements IAsDbObject<Re
     const range = DateRange.fromNumbers(this.start!, this.end!)
 
     range.tag = this.type
-   
+
     return range
   }
 

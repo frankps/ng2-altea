@@ -196,7 +196,7 @@ export class DemoOrdersComponent implements OnInit {
       const product = products.find(p => p.id == line.productId)
 
       if (product)
-        this.orderMgrSvc.addProduct(product, line.qty)
+        await this.orderMgrSvc.addProduct(product, line.qty)
       // line.productId
 
     }

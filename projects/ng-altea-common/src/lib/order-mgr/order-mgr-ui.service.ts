@@ -265,6 +265,8 @@ export class OrderMgrUiService {   // implements OnInit
     // register source of order (pos=point of sale or consumer app)
     this.order.src = this.sessionSvc.appMode == AppMode.pos ? OrderSource.pos : OrderSource.ngApp
 
+    this.order.lock = this.sessionSvc.clientId()
+
     this.uiMode = uiMode
 
     if (gift) {
@@ -419,35 +421,7 @@ export class OrderMgrUiService {   // implements OnInit
     this.spinner.hide()
   }
 
-  /*
-  loadOrder(orderId: string) {
 
-    this.spinner.show()
-
-    // .resources.resourcewxs
-    this.orderSvc.get(orderId, "planning.resource,lines:orderBy=idx.product,contact.cards,payments:orderBy=idx").subscribe(order => {
-
-      this.order = order
-
-      //let depoDate = order.calculateDepositByDate()
-
-      this.order.branch = this.sessionSvc.branch
-
-      if (!this.order.branch || order.branchId != order.branch.id)
-        throw new Error('Wrong branch on order!')
-
-      this.orderLineOptions = null
-      this.orderLine = null
-      this.resources = order.getResources()
-      this.orderDirty = false
-
-      this.spinner.hide()
-
-      console.error(order)
-    })
-
-  }
-    */
 
 
 
@@ -1288,6 +1262,33 @@ export class OrderMgrUiService {   // implements OnInit
 
   }
 
+
+  async copyOrder() {
+
+    this.spinner.show()
+
+    let orderToCopy = this.order
+
+    await this.newOrder()
+
+    const products = await this.loadProducts$(...orderToCopy.productIds())
+
+
+    for (let line of orderToCopy.lines) {
+
+      const product = products.find(p => p.id == line.productId)
+
+      if (!product)
+        continue
+
+      let optionValues = line.getOptionValueMap()
+      await this.addProduct(product, line.qty, optionValues)
+    }
+
+    await this.setContact(orderToCopy.contact)
+
+    this.spinner.hide()
+  }
 
   /** to be moved to external logic */
   createSubscriptions(orderLine: OrderLine) {

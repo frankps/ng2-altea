@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { AvailabilityContext, DateRange, DateRangeSet, PlanningBlockSeries, PlanningMode, PossibleSlots, Product, Resource, ResourceAvailability, ResourceAvailability2, ResourcePlanning, ResourceRequest, ResourceRequestItem, ResourceType, SlotInfo, Solution, SolutionItem, SolutionNoteLevel, TimeSpan } from "ts-altea-model";
+import { AvailabilityContext, DateRange, DateRangeSet, DateRangeSets, PlanningBlockSeries, PlanningMode, PossibleSlots, Product, Resource, ResourceAvailability, ResourceAvailability2, ResourcePlanning, ResourceRequest, ResourceRequestItem, ResourceType, SlotInfo, Solution, SolutionItem, SolutionNoteLevel, TimeSpan } from "ts-altea-model";
 import * as _ from "lodash"
 import { ResourceRequestOptimizer } from "./resource-request-optimizer";
 import { scheduled } from "rxjs";
@@ -102,7 +102,7 @@ export class SlotFinder {
         while (resourceRequest.hasItemsToProcess()) {
             const requestItem = resourceRequest.nextItemToProcess()
 
-            solutionSet = this.handleResourceRequestItem(requestItem, solutionSet, availability2)
+            solutionSet = this.handleResourceRequestItem(requestItem, solutionSet, availability2, ctx)
         }
 
         this.checkStaffBreaks(solutionSet, ctx)
@@ -191,7 +191,7 @@ export class SlotFinder {
      * @param requestItem 
      * @param solutionSet 
      */
-    handleResourceRequestItem(requestItem: ResourceRequestItem, solutionSet: SolutionSet, availability: ResourceAvailability2, trackInvalidSolutions = true): SolutionSet {
+    handleResourceRequestItem(requestItem: ResourceRequestItem, solutionSet: SolutionSet, availability: ResourceAvailability2, ctx: AvailabilityContext, trackInvalidSolutions = true): SolutionSet {
 
 
         /**
@@ -231,7 +231,8 @@ export class SlotFinder {
 
 
                 // the notes are for extra debug info
-                const resourcesWithNotes = availability.getAvailableResourcesInRange(requestItem.resources, range, requestItem, solution, true)
+                let durationIncluded = true
+                const resourcesWithNotes = availability.getAvailableResourcesInRange(requestItem.resources, range, requestItem, solution, durationIncluded, true)
                 const availableResources = resourcesWithNotes.result
                 solution.addNotes(resourcesWithNotes.notes)
 
@@ -299,7 +300,7 @@ export class SlotFinder {
                 // const startRange = new DateRange(startFrom, startTo)
                 const checkInRange = new DateRange(startFrom, endsOn)
 
-                
+
 
                 const hasAffinity = requestItem.hasAffinity()
 
@@ -309,13 +310,13 @@ export class SlotFinder {
                     possibleResources = affinitySolutionItem.resources
                 }
 
-                
+
 
                 if (hasAffinity)
                     solution.addNote(`Affinity for: ${resourceNames}`)
 
 
-                let excludeSolutionOccupation = !hasAffinity 
+                let excludeSolutionOccupation = !hasAffinity
 
                 /*
                 * flex was introduced to have same resource (Cerefinodevice) be re-used in the same order for other person (duo threatment)
@@ -325,7 +326,7 @@ export class SlotFinder {
                 if (requestItem.productResource.flex)
                     excludeSolutionOccupation = false
 
-                const availableResources = availability.getAvailabilityOfResourcesInRange(possibleResources, checkInRange, requestItem.duration, solution, excludeSolutionOccupation, requestItem.personId)
+                let availableResources = availability.getAvailabilityOfResourcesInRange(possibleResources, checkInRange, requestItem.duration, solution, excludeSolutionOccupation, false, requestItem.personId)
 
                 /*
                     below we check resourceQuantityEquals=1 -> quick fix, because if resource.qty > 1 algo not correct yet!!
@@ -339,7 +340,7 @@ export class SlotFinder {
                     solution.addNote(`No availability found for '${resourceNames}' in range ${checkInRange.toString()} for ${requestItem.duration.toString()}`)
 
 
-                    const forDebuggingAgain = availability.getAvailabilityOfResourcesInRange(possibleResources, checkInRange, requestItem.duration, solution, excludeSolutionOccupation, requestItem.personId)
+                    // const forDebuggingAgain = availability.getAvailabilityOfResourcesInRange(possibleResources, checkInRange, requestItem.duration, solution, excludeSolutionOccupation, false, requestItem.personId)
 
                     solution.valid = false
 
@@ -348,6 +349,8 @@ export class SlotFinder {
                     continue
                 }
 
+                // tempory disabled
+                // availableResources = this.subtractGroupLevelReservations(possibleResources, availableResources, ctx, availability, solution)
 
                 /* Create a new solution for each possible availability
                 */
@@ -397,6 +400,93 @@ export class SlotFinder {
         return resultSolutions
 
     }
+
+
+    /**
+     * Some resource plannings are not for specific resources, but on resource group level
+     * (=> it is not so important which exact resource is reserved, as long we have 1 or more available from a group) 
+     * @param resourcesChecked the resources previously checked upon availability
+     * @param availabilityForResources the availability for these resources
+     * @param ctx 
+     * @param availability 
+     * @returns 
+     */
+    subtractGroupLevelReservations(resourcesChecked: Resource[], availabilityForResources: DateRangeSets, ctx: AvailabilityContext, availability: ResourceAvailability2, solution: Solution) : DateRangeSets {
+
+        let origResourceIds = resourcesChecked.map(res => res.id)
+
+        let outerRange = availabilityForResources.outerRange()
+
+        if (!outerRange)
+            return availabilityForResources
+
+        /** what resources are finally avaialble (subset of resourcesChecked) */
+        let resources = availabilityForResources.resources()
+        let childResourceIds = resources.map(res => res.id)
+
+        /** there can be plannings on group-level (a resource group is planned instead of effective resource) => we don't care which exact resource, as long 1 (or more) are available
+         * => we need to make sure that if we use  availabilityForResources, that we also still can fullfil possible group level plannings
+         * => we need to find the groups 
+         */
+        let groupResourceIds = ctx.getResourceGroupIds(...childResourceIds)
+
+        let groupLevelPlannings = ctx.resourcePlannings.filterByDateRangeResourceGroupsOnly(groupResourceIds, outerRange.from, outerRange.to)
+
+        if (!groupLevelPlannings || groupLevelPlannings.isEmpty())
+            return availabilityForResources
+
+
+
+        /* the group level plannings will always overlap the outer range, but can go over boundaries of outerRange
+        => we need to define the new outer range
+        */
+        let groupPlanningsOuterRange = groupLevelPlannings.toDateRangeSet().outerRange()
+
+        let outerRanges = new DateRangeSet([outerRange, groupPlanningsOuterRange])
+        outerRange = outerRanges.outerRange()
+
+        let resourceGroupIds = groupLevelPlannings.getGroupOnlyPlanningIds()
+        let allChildResourceIds = ctx.getChildResourceIds(...resourceGroupIds)
+        
+        let otherPossibleResourceIds = ArrayHelper.removeItems(allChildResourceIds, origResourceIds)
+        let otherPossibleResources = ctx.getResources(otherPossibleResourceIds)
+        let groupPlanningMinTime = groupLevelPlannings.minTime()
+
+        let otherAvailableResources = availability.getAvailabilityOfResourcesInRange(otherPossibleResources,  outerRange, groupPlanningMinTime, solution, false, false)
+
+        for (let planning of groupLevelPlannings.plannings) {
+            let dateRange = planning.toDateRange()
+
+            let groupId = planning.resourceGroupId
+
+
+            otherAvailableResources = otherAvailableResources.reduce(otherPossibleResourceIds, dateRange, 1, ctx.allResources)
+
+            if (otherAvailableResources.reduced > 0) { // then somebody else (from otherPossibleResources) can fulfill this group planning
+                solution.addNotes(otherAvailableResources.notes)
+                continue
+            }
+
+
+            let childResourceIds = ctx.getChildResourceIds(groupId)
+
+            let childResourceIdsNotYetChecked = childResourceIds.filter(id => resourcesChecked.findIndex(res => res.id == id) == -1)
+            
+            availabilityForResources = availabilityForResources.reduce(childResourceIds, dateRange, 1, ctx.allResources)
+
+            solution.addNotes(availabilityForResources.notes)
+
+            //console.warn(childResourceIds)
+        }
+
+
+        console.warn(groupLevelPlannings)
+
+        return availabilityForResources
+
+    }
+
+
 
     resourceQuantityEquals(resources: Resource[], num = 1): boolean {
 
@@ -502,10 +592,21 @@ export class SlotFinder {
                 let dayBreaksForStaffMember = breaksForStaffMember.getRangesForSameDay(solution.offsetRefDate)
 
                 // remove parts of break (caused by other bookings in middle of break) that are too small 
-                dayBreaksForStaffMember = dayBreaksForStaffMember.minimum(TimeSpan.minutes(breakTimeInMinutes))
+                let minDayBreaksForStaffMember = dayBreaksForStaffMember.minimum(TimeSpan.minutes(breakTimeInMinutes))
 
-                if (!dayBreaksForStaffMember || dayBreaksForStaffMember.isEmpty())
-                    continue
+                if (!minDayBreaksForStaffMember || minDayBreaksForStaffMember.isEmpty()) {
+                    // we don't have a minimum break window => we continue with the biggest window (knowing it is officially not enough)
+
+                    dayBreaksForStaffMember = dayBreaksForStaffMember.max()
+
+                    if (dayBreaksForStaffMember.isEmpty())
+                        continue
+
+                } else {
+                    // we have at least 1 break window with minimum length
+                    dayBreaksForStaffMember = minDayBreaksForStaffMember
+                }
+
 
                 if (solution.hasExactStart()) {
 
@@ -571,7 +672,7 @@ export class SlotFinder {
 
                         let compareWith = staffBreak.times(2)
                         tooSmallBreakWindows = newBreakWindows.lessThen(compareWith)
-    
+
                         if (tooSmallBreakWindows.isEmpty()) {
                             // no too small breaks => no risk with this solution
                             continue

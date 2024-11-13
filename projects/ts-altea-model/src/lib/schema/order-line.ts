@@ -189,6 +189,15 @@ export class OrderLineOption extends ObjectWithId {
     return this.values.find(o => o.id == valueId)
   }
 
+  getValueIds() : string[] {
+
+    if (!this.hasValues())
+      return []
+
+    return this.values.map(v => v.id)
+
+  }
+
   removeValueById(valueId: string) {
     _.remove(this.values, v => v.id === valueId)
   }
@@ -445,6 +454,24 @@ export class OrderLine extends ObjectWithIdPlus {
 
     return line
 
+  }
+
+  hasOptions(): boolean {
+    return (ArrayHelper.NotEmpty(this.options))
+  }
+
+  getOptionValueMap(): Map<string, string[]> {
+
+    let map = new Map<string, string[]>()
+
+    if (!this.hasOptions())
+      return map
+
+    for (let option of this.options) {
+      map.set(option.id, option.getValueIds())
+    }
+
+    return map
   }
 
 

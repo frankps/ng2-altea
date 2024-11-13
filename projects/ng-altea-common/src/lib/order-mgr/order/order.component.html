@@ -334,8 +334,18 @@
                     <button type="button" class="btn {{attentionColor()}} btn-sm ms-2" (click)="toggleAttention()"><i
                             class="fa-sharp fa-solid fa-circle-exclamation"></i></button>
 
-                    <button type="button" *ngIf="isPOS()" class="btn btn-primary btn-sm ms-2"
-                        (click)="show.extra = !show.extra"><i class="fa-solid fa-pen"></i></button>
+                    <ng-container *ngIf="isPOS()">
+
+                        <button type="button" class="btn btn-primary btn-sm ms-2" (click)="show.extra = !show.extra"><i
+                                class="fa-solid fa-pen"></i></button>
+
+                        <button type="button" class="btn btn-primary btn-sm ms-2" (click)="copyOrder()"><i
+                                class="fa-solid fa-copy"></i></button>
+
+                    </ng-container>
+
+
+
 
                 </div>
             </div>

@@ -4,7 +4,7 @@ import { DateRange, OverlapMode } from "./date-range"
 import * as _ from "lodash"
 import * as dateFns from 'date-fns'
 import { ResourceRequest, ResourceRequestItem } from "../resource-request"
-import { Solution, SolutionItem, SolutionSet } from "../solution"
+import { Solution, SolutionItem, SolutionNotes, SolutionSet } from "../solution"
 import { Resource, ResourcePlanning } from "ts-altea-model"
 import { TimeSpan } from "./time-span"
 import { ArrayHelper, DateHelper } from "ts-common"
@@ -33,9 +33,12 @@ export class ResourceAvailabilitySets {
     }
 }
 
-export class DateRangeSets {
+export class DateRangeSets extends SolutionNotes {
+
+    reduced = 0
 
     constructor(public sets: DateRangeSet[] = []) {
+        super()
 
     }
 
@@ -52,6 +55,137 @@ export class DateRangeSets {
         this.sets.push(set)
 
     }
+
+    merge() : DateRangeSet {
+
+        let mergedSet = new DateRangeSet()
+
+        if (ArrayHelper.IsEmpty(this.sets))
+            return mergedSet
+
+        mergedSet.ranges = this.sets.flatMap(set => set.ranges)
+
+        return mergedSet
+
+    }
+
+    outerRange() : DateRange {
+        let merged = this.merge()
+        return merged.outerRange()
+    }
+
+    resources() : Resource[] {
+
+        if (ArrayHelper.IsEmpty(this.sets))
+            return []
+
+        return this.sets.map(set => set.resource)
+
+    }
+
+
+    reduce(possibleResourceIds: string[], range: DateRange, qty: number = 1, resources?: Resource[]) : DateRangeSets {
+
+        if (ArrayHelper.IsEmpty(this.sets))
+            return this
+
+        const resultSets = new DateRangeSets()
+        resultSets.reduced = 0
+
+        let nrOfSetsReduced = 0
+        let workFinished = false
+
+        for (let set of this.sets) {
+
+            if (workFinished) {  // then we just copy the sets to the new result
+                resultSets.sets.push(set)
+                continue
+            }
+
+            let resourceId = set.resource?.id
+
+            let match = true
+
+            if (!resourceId)
+                match = false
+
+            if (possibleResourceIds.indexOf(resourceId) == -1)
+                match = false
+
+            if (!set.contains(range))
+                match = false
+
+            if (!match) {
+                resultSets.sets.push(set)
+                continue
+            }
+
+            let reducedSet = set.subtractRange(range)
+            resultSets.sets.push(reducedSet)
+
+            // add a note
+            let resourceInfo = resourceId
+            if (resources) {
+
+                let resource = resources.find(r => r.id == resourceId)
+
+                if (resource)
+                    resourceInfo = resource.shortOrName()
+            }
+
+            resultSets.addNote(`Group level planning => removed ${range.toString()} for resource ${resourceInfo}`)
+
+            resultSets.reduced++
+           
+
+            if (resultSets.reduced == qty) {
+                workFinished = true
+            }
+                
+        }
+
+        return resultSets
+
+
+/*
+        let setsForResourceRanges = this.sets.filter(set => possibleResourceIds.indexOf(set.resource?.id))
+
+        setsForResourceRanges = setsForResourceRanges.filter(set => set.contains(range))
+
+        if (!setsForResourceRanges || setsForResourceRanges.length == 0)
+            return false
+
+        let minPossible = Math.min(qty, setsForResourceRanges.length)
+
+        for (let i = 0; i < minPossible; i++) {
+
+            let set = setsForResourceRanges[i]
+            let newRange = set.subtractRange(range)
+
+
+        }
+
+
+        return true
+*/
+
+
+    }
+
+    /*
+
+        outerRange(): DateRange {
+
+        if (ArrayHelper.IsEmpty(this.ranges))
+            return null
+
+        const min = _.minBy(this.ranges, 'from')
+        const max = _.minBy(this.ranges, 'to')
+
+        return new DateRange(min.from, max.to)
+    }
+        */
+
 
 }
 
@@ -185,7 +319,7 @@ export class DateRangeSet {
             return null
 
         const min = _.minBy(this.ranges, 'from')
-        const max = _.minBy(this.ranges, 'to')
+        const max = _.maxBy(this.ranges, 'to')
 
         return new DateRange(min.from, max.to)
     }
@@ -365,9 +499,21 @@ export class DateRangeSet {
     }
 
 
+    max() : DateRangeSet {
+
+        if (ArrayHelper.IsEmpty(this.ranges))
+            return new DateRangeSet()
+
+        const maxRange = _.maxBy(this.ranges, 'duration.seconds')
+
+        return new DateRangeSet([maxRange])
+    }
+
     minimum(minTime: TimeSpan): DateRangeSet {
 
-        const minRanges = this.ranges.filter(r => r.duration.seconds >= minTime.seconds)
+        const minSeconds = minTime.seconds
+
+        const minRanges = this.ranges.filter(r => r.duration.seconds >= minSeconds)
 
         if (!Array.isArray(minRanges) || minRanges.length == 0)
             return DateRangeSet.empty

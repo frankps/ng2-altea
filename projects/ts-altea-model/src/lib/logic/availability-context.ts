@@ -34,6 +34,9 @@ export class AvailabilityContext {
     /** all resources combined: union of configResources and resourceGroups */
     allResources: Resource[] = []
 
+    groupToChildResources: Map<string, string[]>
+    childToGroupResources: Map<string, string[]>
+
     /** current planning of all the resources (during interval [request.from, request.to] ) */
     resourcePlannings: ResourcePlannings = new ResourcePlannings() // empty set
 
@@ -107,6 +110,17 @@ export class AvailabilityContext {
         return this.allResources.find(r => r.id == resourceId)
     }
 
+    getResources(resourceIds: string[]): Resource[] {
+
+        if (ArrayHelper.IsEmpty(resourceIds))
+            return []
+
+
+        let resources = this.allResources.filter(res => resourceIds.indexOf(res.id) >= 0)
+
+        return resources
+    }
+
     /** Get all resources that are NOT a group (of other resources). So, these are the real resources: human, room, device */
     getAllNongGroupResources(): Resource[] {
 
@@ -114,6 +128,17 @@ export class AvailabilityContext {
             return []
 
         return this.allResources.filter(r => !r.isGroup)
+
+    }
+
+    getResourceGroups(resourceIds: Resource[]) {
+
+        // this.resourceGroups
+
+        /*
+        let resource: Resource
+        resource.children
+        */
 
     }
 
@@ -351,12 +376,12 @@ export class AvailabilityContext {
         return result
     }
 
-    getActiveSchedulesDuring(range: DateRange, scheduleIds: string[]) : string[] {
+    getActiveSchedulesDuring(range: DateRange, scheduleIds: string[]): string[] {
 
         if (ArrayHelper.IsEmpty(scheduleIds))
             return []
 
-        const activeScheduleIds : string[] = []
+        const activeScheduleIds: string[] = []
 
         // DEBUG
         let branchSchedules = this.getBranchSchedules(range)
@@ -551,7 +576,7 @@ export class AvailabilityContext {
         const availablePlannings = exclusivePlannings.filterByAvailable()
         const unavailable = exclusivePlannings.filterByAvailable(false)
 
-   
+
 
         const result = new ResourceOccupationSets(
             availablePlannings.toDateRangeSet(),
@@ -562,6 +587,52 @@ export class AvailabilityContext {
 
         return result
 
+    }
+
+    getChildResourceIds(...groupIds: string[]): string[] {
+
+        if (!this.groupToChildResources || ArrayHelper.IsEmpty(groupIds))
+            return []
+
+        let resourceIds : string[] = []
+
+        for (let groupId of groupIds) {
+            if (!this.groupToChildResources.has(groupId))
+                continue
+
+            let childIds = this.groupToChildResources.get(groupId)
+
+            if (ArrayHelper.NotEmpty(childIds))
+                resourceIds.push(...childIds)
+        }
+
+        resourceIds = _.uniq(resourceIds)
+
+        return resourceIds
+    }
+
+    getResourceGroupIds(...childResourceIds: string[]): string[] {
+
+        if (ArrayHelper.IsEmpty(childResourceIds) || !this.childToGroupResources)
+            return []
+
+        let allGroupIds: string[] = []
+
+        for (let childId of childResourceIds) {
+            let groupIds = this.childToGroupResources.get(childId)
+
+            if (ArrayHelper.IsEmpty(groupIds))
+                continue
+
+            for (let groupId of groupIds) {
+                if (allGroupIds.indexOf(groupId) == -1)
+                    allGroupIds.push(groupId)
+
+            }
+
+        }
+
+        return allGroupIds
     }
 
 

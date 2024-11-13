@@ -360,6 +360,13 @@ export class OrderMgmtService {
         order.m.setDirty('state')
 
 
+
+        /** we remove the lock (used by client to be able to plan again on same hours as previously created temp orders) */
+        if (newState != OrderState.creation && newState != OrderState.created) {
+            order.lock = ''
+            order.m.setDirty('lock')
+        }
+
         switch (newState) {
             case OrderState.created:
 
@@ -372,13 +379,17 @@ export class OrderMgmtService {
                     order.depoBy = DateHelper.yyyyMMddhhmmss(depoByDate)
                     order.m.setDirty('depoBy')
 
+                    order.lock = ''
+                    order.m.setDirty('lock')
+
                     await msgSvc.depositMessaging(order, true)
                     order.state = OrderState.waitDeposit
 
 
                 } else {
 
-                    this.changeState(order, OrderState.confirmed)
+                    let result = await this.changeState(order, OrderState.confirmed)
+                    return result
 
                 }
                 break
@@ -389,6 +400,9 @@ export class OrderMgmtService {
                 break
 
             case OrderState.confirmed:
+
+                order.lock = ''
+                order.m.setDirty('lock')
 
                 if (!order.gift)
                     var res = await msgSvc.confirmationMessaging(order)
@@ -580,7 +594,7 @@ export class OrderMgmtService {
 
             //availability.getAvailabilityOfResourcesInRange(resources, )
 
-            let result = availability.getAvailableResourcesInRange(requestItem.resources, range, requestItem, solution, true)
+            let result = availability.getAvailableResourcesInRange(requestItem.resources, range, requestItem, solution, true, true)
             let resources = result.result
 
             if (!resources)

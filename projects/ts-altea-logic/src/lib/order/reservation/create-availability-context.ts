@@ -11,8 +11,6 @@ export class CreateAvailabilityContext {
     alteaDb: AlteaDb
 
 
-
-
     //  Next to do: load all active schedules in period (via scheduling)
 
 
@@ -44,25 +42,67 @@ export class CreateAvailabilityContext {
         // ctx.configResources = ctx.order!.getProductResources()
 
         let resourceIds = ctx.order!.getAllResourceIds()
-        ctx.configResources = await this.alteaDb.getResources(resourceIds)
 
         ctx.branchId = ctx.order!.branchId!
+        resourceIds.push(ctx.branchId)
 
-        ctx.resourceGroups = await this.loadResourceGroupsWithChildren(ctx.configResources, ctx.branchId)
+        ctx.configResources = await this.alteaDb.getResources(resourceIds)
+
+
+        ctx.resourceGroups = await this.loadResourceGroupsWithChildren(ctx.configResources)
+
+        /**
+         * To do: only load groups where childeren are part of
+         */
+        //ctx.resourceGroups = await this.loadResourceGroupsForBranchWithChildren(ctx.branchId)
 
         ctx.allResources = this.unionOfResources(ctx.resourceGroups, ctx.configResources)
 
         ctx.allResourceIds = this.getResourceIds(ctx.configResources, true, ctx.resourceGroups)
 
+
         // Every branch has also a corresponding resource (to manage holidays, opening hours, etc of the branch)       
-        ctx.allResourceIds.push(ctx.branchId)
 
-
+        // Already added before: re-check!
+        // ctx.allResourceIds.push(ctx.branchId)
 
         let excludeOrderId = ctx.order.id
+        let clientId = ctx.order.lock
 
-        ctx.resourcePlannings = await this.loadResourcePlannings(ctx.allResourceIds, availabilityRequest, excludeOrderId)
+        let includeGroupPlannings = true
+        ctx.resourcePlannings = await this.loadResourcePlannings(ctx.allResourceIds, availabilityRequest, includeGroupPlannings, excludeOrderId, clientId)
 
+        /* get resource groups not previously loaded 
+        */
+
+        let resourceGroupIdsUsedInPlanning = ctx.resourcePlannings.getGroupOnlyPlanningIds()
+
+        let newResourceGroupIdsUsedInPlanning = ArrayHelper.removeItems(resourceGroupIdsUsedInPlanning, ctx.allResourceIds)
+        //resourceGroupIdsUsedInPlanning.filter(groupId => !ctx.allResourceIds.includes(groupId))
+
+        if (ArrayHelper.NotEmpty(newResourceGroupIdsUsedInPlanning)) {
+
+            const newResourceGroups = await this.alteaDb.getResources(newResourceGroupIdsUsedInPlanning, 'children.child')
+            ctx.resourceGroups.push(...newResourceGroups)
+            ctx.allResources.push(...newResourceGroups)
+            const childResources = this.getChildResources(newResourceGroups)
+            const childResourceIds = this.getChildResourceIds(newResourceGroups)
+            const newChildResourceIds = ArrayHelper.removeItems(childResourceIds, ctx.allResourceIds)
+
+            if (ArrayHelper.NotEmpty(newChildResourceIds)) {
+                ctx.allResourceIds.push(...newChildResourceIds)
+                const newChildResources = childResources.filter(res => newChildResourceIds.indexOf(res.id) >= 0)
+                ctx.allResources.push(...newChildResources)
+                let doNotIncludeGroupPlannings = false
+                let extraPlannings = await this.loadResourcePlannings(newChildResourceIds, availabilityRequest, doNotIncludeGroupPlannings)
+                ctx.resourcePlannings.add(extraPlannings)
+            }
+
+            ctx.allResourceIds.push(...newResourceGroupIdsUsedInPlanning)
+        }
+
+
+        this.createResourcesMaps(ctx)
 
 
         /* Load schedules of resources that have custom scheduling */
@@ -193,7 +233,7 @@ export class CreateAvailabilityContext {
 
             const defaultSchedule = resourceSchedules.find(s => s.default)
             let dateRanges = defaultSchedule.toDateRangeSet(from, to, 'START', 'END')
-          
+
             const otherSchedules = resourceSchedules.filter(s => !s.default)
 
             for (const otherSchedule of otherSchedules) {
@@ -215,7 +255,7 @@ export class CreateAvailabilityContext {
                     dateRanges = dateRanges.subtractByDates(planning.start, planning.end)
 
                     let otherSet = otherSchedule.toDateRangeSet(from, to, 'START', 'END')
-                    
+
 
                     dateRanges = dateRanges.add(otherSet)
                 }
@@ -307,6 +347,15 @@ export class CreateAvailabilityContext {
 
     }
 
+    async loadResourceGroupsForBranchWithChildren(branchId: string) {
+
+
+        const resourceGroupsExtra = await this.alteaDb.getAllResourceGroupsForBranch(branchId, 'children.child')
+
+        return resourceGroupsExtra
+
+    }
+
 
     getChildResources(resourceGroups: Resource[]): Resource[] {
         if (!resourceGroups)
@@ -344,6 +393,53 @@ export class CreateAvailabilityContext {
         return ids
     }
 
+    createResourcesMaps(ctx: AvailabilityContext) {
+
+        let childToGroup = new Map<string, string[]>()
+        let groupToChild = new Map<string, string[]>()
+
+        if (ArrayHelper.IsEmpty(ctx.resourceGroups))
+            return
+
+        for (let group of ctx.resourceGroups) {
+
+            if (!group.isGroup)
+                continue
+
+            let childResources = group.getChildResources()
+
+            if (ArrayHelper.IsEmpty(childResources))
+                continue
+
+            let childResourceIds = childResources.map(res => res.id)
+            groupToChild.set(group.id, childResourceIds)
+
+            for (let childResourceId of childResourceIds) {
+                if (childToGroup.has(childResourceId)) {
+                    let groupIds = childToGroup.get(childResourceId)
+
+                    if (groupIds.indexOf(group.id) == -1)
+                        groupIds.push(group.id)
+
+                } else {
+                    childToGroup.set(childResourceId, [group.id])
+                }
+
+            }
+
+        }
+
+        ctx.childToGroupResources = childToGroup
+        ctx.groupToChildResources = groupToChild
+
+
+
+        return
+    }
+
+
+
+
     /**
      * 
      * @param resourceIds 
@@ -351,49 +447,20 @@ export class CreateAvailabilityContext {
      * @param excludeOrderId sometimes we need to exclude current order id in order to be able to re-plan current order
      * @returns 
      */
-    async loadResourcePlannings(resourceIds: string[], availabilityRequest: AvailabilityRequest, excludeOrderId?: string): Promise<ResourcePlannings> {
-
-        /*
-Old Logic:
-Possible issues: we don't check OrderStatus anymore
-
-        List<ResourcePlanning> planning = this.Ctx.ResourcePlanning.Where(rp => ids.Contains(rp.ResourceId)
-        && rp.End >= Context.justThisOneDay
-        //      && rp.End >= now
-        && rp.Start <= end
-        && rp.IsActive
-        && rp.OrderLine.Order.OrderStatus != OrderStatus.Cancelled
-        && rp.OrderLine.Order.OrderStatus != OrderStatus.TimedOut
-        && ((rp.OrderLine.Order.OrderStatus == OrderStatus.Confirmed && (Context.orderId != rp.OrderLine.OrderId)) || Context.lockId == "" || rp.OrderLine.Order.Lock != Context.lockId))
-        .OrderBy(rp => rp.Start).ToList();
-*/
+    async loadResourcePlannings(resourceIds: string[], availabilityRequest: AvailabilityRequest, includeGroupPlannings: boolean, excludeOrderId?: string, clientId?: string): Promise<ResourcePlannings> {
 
 
-        const resourcePlannings = await this.alteaDb.resourcePlannings(availabilityRequest.from, availabilityRequest.to, resourceIds, excludeOrderId)
+        const resourcePlannings = await this.alteaDb.resourcePlannings(availabilityRequest.from, availabilityRequest.to, resourceIds, includeGroupPlannings, excludeOrderId, clientId)
 
 
-        const debug = resourcePlannings.filter(rp => rp.resourceId == "3d841573-7667-46f0-a4b2-b496ed027740")
-        console.error(debug)
+        /*         const debug = resourcePlannings.filter(rp => rp.resourceId == "3d841573-7667-46f0-a4b2-b496ed027740")
+                console.error(debug) */
 
         return new ResourcePlannings(resourcePlannings)
 
 
 
     }
-
-    // resourceIds: string[]
-
-    // async loadSchedules(resourceIds: string[]): Promise<Schedule[]> {
-
-    //     const schedules = await this.alteaDb.schedules(resourceIds)
-
-    //     return schedules
-    // }
-
-
-    // async loadScheduling(availabilityRequest: AvailabilityRequest) {
-
-    // }
 
 
 

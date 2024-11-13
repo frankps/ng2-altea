@@ -165,7 +165,7 @@ export class ResourceAvailability2 {
 
 
     /** check the availability of given resources inside range (insideRange), only return blocks > minTime */
-    getAvailabilityOfResourcesInRange(resources: Resource[], insideRange: DateRange, minTime: TimeSpan, solution: Solution, excludeSolutionOccupation: boolean, personId?: string): DateRangeSets {
+    getAvailabilityOfResourcesInRange(resources: Resource[], insideRange: DateRange, minTime: TimeSpan, solution: Solution, excludeSolutionOccupation: boolean, durationAlreadyIncluded: boolean, personId?: string): DateRangeSets {
 
         if (!Array.isArray(resources) || resources.length == 0)
             return DateRangeSets.empty
@@ -181,7 +181,7 @@ export class ResourceAvailability2 {
 
 
             if (solution && excludeSolutionOccupation) {
-                var resourceAlreadyOccupiedInSolution = solution.getOccupationForResource(resource, personId)
+                var resourceAlreadyOccupiedInSolution = solution.getOccupationForResource(resource, durationAlreadyIncluded, personId)
 
                 if (resourceAlreadyOccupiedInSolution.notEmpty())
                     availabilitiesForResource = availabilitiesForResource.subtractMany(resourceAlreadyOccupiedInSolution)
@@ -237,7 +237,7 @@ export class ResourceAvailability2 {
     }
 
 
-    getAvailableResourcesInRange(resources: Resource[], dateRange: DateRange, requestItem: ResourceRequestItem, solution: Solution, stopWhenFound = false): ResultWithSolutionNotes<Resource[]> {
+    getAvailableResourcesInRange(resources: Resource[], dateRange: DateRange, requestItem: ResourceRequestItem, solution: Solution, durationAlreadyIncluded: boolean, stopWhenFound = false): ResultWithSolutionNotes<Resource[]> {
 
         let isPrepTime = requestItem.isPrepTime
 
@@ -267,7 +267,7 @@ export class ResourceAvailability2 {
 
             /** The current solution might already occupy this resource */
             if (solution) {
-                var resourceAlreadyOccupiedInSolution = solution.getOccupationForResource(resource)
+                var resourceAlreadyOccupiedInSolution = solution.getOccupationForResource(resource, durationAlreadyIncluded)
 
                 if (resourceAlreadyOccupiedInSolution.notEmpty())
                     resourceAvailabilities = resourceAvailabilities.subtract(resourceAlreadyOccupiedInSolution)

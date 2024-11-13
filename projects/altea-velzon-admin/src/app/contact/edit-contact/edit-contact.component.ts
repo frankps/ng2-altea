@@ -230,10 +230,7 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
   }
 
 
-
-
   async getOrders() {
-
 
     let contact = this.object
     let take = 10

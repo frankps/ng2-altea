@@ -188,6 +188,12 @@ export class OrderComponent implements OnInit {
     await this.orderMgrSvc.saveOrder()
   }
 
+  async copyOrder() {
+
+    await this.orderMgrSvc.copyOrder()
+
+  }
+
 
   async confirm() {
 

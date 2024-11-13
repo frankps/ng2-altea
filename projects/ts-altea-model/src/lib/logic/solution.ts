@@ -238,6 +238,23 @@ export class SolutionItems extends ObjectWithId {
     }
 }
 
+export class SolutionNotes {
+    @Type(() => SolutionNote)
+    notes: SolutionNote[] = []
+
+    hasNotes(): boolean {
+        return ArrayHelper.NotEmpty(this.notes)
+    }
+
+    addNote(content: string, level: SolutionNoteLevel = SolutionNoteLevel.info) {
+
+        const note = new SolutionNote(content, level)
+        this.notes.push(note)
+
+    }
+
+
+}
 
 /** Short for reservation solution. */
 export class Solution extends SolutionItems {
@@ -288,7 +305,7 @@ export class Solution extends SolutionItems {
         return new SolutionItems(items)
     }
 
-    getOccupationForResource(resource: Resource, excludePersonId?: string): DateRangeSet {
+    getOccupationForResource(resource: Resource, durationAlreadyIncluded: boolean, excludePersonId?: string): DateRangeSet {
 
         if (this.isEmpty())
             return DateRangeSet.empty
@@ -301,11 +318,14 @@ export class Solution extends SolutionItems {
         var dateRangesForResource = itemsForResource.map(item => {
             let dateRange = item.dateRange.clone()
 
-            /* the date range is the range with possible start dates
-            => possible occupation of this solution is this range extended by actual duration of service (that starts on latest possible date)
-            */
+            if (!durationAlreadyIncluded) {
+                /* the date range is the range with possible start dates
+                => possible occupation of this solution is this range extended by actual duration of service (that starts on latest possible date)
+                */
 
-            dateRange.increaseToWithSeconds(item.request.duration.seconds)
+                dateRange.increaseToWithSeconds(item.request.duration.seconds)
+            }
+
             return dateRange
         })
 
@@ -397,7 +417,7 @@ export class Solution extends SolutionItems {
     }
 
     addNotes(notes: SolutionNote[]) {
-        if (Array.isArray(notes) && notes.length > 0)
+        if (ArrayHelper.NotEmpty(notes))
             this.notes.push(...notes)
     }
 

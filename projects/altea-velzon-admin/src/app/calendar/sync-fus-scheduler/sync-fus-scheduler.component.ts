@@ -98,7 +98,6 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
 
     console.warn(event)
 
-
     switch (this.currentView) {
 
       case "Day":

@@ -280,6 +280,12 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
   /** Order needs special attention (use privNote for more details) */
   attn: boolean = false
 
+  /** locked by: during creation, a customer should be able to pick up same time slots (from previous not finished orders),
+   * therefor plannings from other orders with same lock (same unique client id) will be ignored
+   * we use a client generated guid that is stored in local client storage
+   */
+  lock?: string = ''
+
   /** external ids for this order (for instance: used for Stripe payment intends) */
   //extIds?: string[] = []
 
@@ -590,6 +596,14 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     return (Array.isArray(this.lines) && this.lines.length > 0)
   }
 
+  productIds(): string[] {
+    if (ArrayHelper.IsEmpty(this.lines))
+      return []
+
+    return this.lines.map(l => l.productId)
+  }
+
+
   sumToString(includeOptions = true, separator: string = '\<br>\n'): string {
 
     if (ArrayHelper.IsEmpty(this.sum))
@@ -641,30 +655,30 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
   }
 
 
-  getPaymentsByType(type: PaymentType) : Payment[] {
+  getPaymentsByType(type: PaymentType): Payment[] {
 
     if (ArrayHelper.IsEmpty(this.payments))
       return []
 
 
     return this.payments.filter(pay => pay.type == type)
-    
+
   }
 
-  getPaymentsByTypes(...types: PaymentType[]) : Payment[] {
+  getPaymentsByTypes(...types: PaymentType[]): Payment[] {
 
     if (ArrayHelper.IsEmpty(this.payments))
       return []
 
-    return this.payments.filter(pay => types.indexOf(pay.type) >= 0)    
+    return this.payments.filter(pay => types.indexOf(pay.type) >= 0)
   }
 
-  getPaymentsNotOfTypes(...types: PaymentType[]) : Payment[] {
+  getPaymentsNotOfTypes(...types: PaymentType[]): Payment[] {
 
     if (ArrayHelper.IsEmpty(this.payments))
       return []
 
-    return this.payments.filter(pay => types.indexOf(pay.type) == -1)    
+    return this.payments.filter(pay => types.indexOf(pay.type) == -1)
   }
 
 

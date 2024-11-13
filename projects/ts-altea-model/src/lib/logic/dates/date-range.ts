@@ -407,7 +407,7 @@ export class DateRange<T = any> {
 
         const dates = []
 
-        for (let date = this.from; date < this.to; date = time.addToDate(date)) {
+        for (let date = this.from; date <= this.to; date = time.addToDate(date)) {
             dates.push(date)
         }
 

@@ -29,6 +29,10 @@ export class TimeSpan {
         return new TimeSpan(minutes * 60 + seconds)
     }
 
+    static seconds(seconds = 0): TimeSpan {
+        return new TimeSpan(seconds, TimeUnit.seconds)
+    }
+
     add(timeSpan: TimeSpan): TimeSpan {
         return new TimeSpan(this.seconds + timeSpan.seconds)
     }
