@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { Order, OrderLine, PlanningBlockSeries, PlanningMode, Product, ProductResource, Resource, ResourcePlanning, ResourcePlannings, ResourceType, Schedule, TimeUnit } from "ts-altea-model"
+import { Order, OrderLine, PlanningBlockSeries, PlanningMode, PlanningType, Product, ProductResource, Resource, ResourceAvailability2, ResourcePlanning, ResourcePlannings, ResourceType, Schedule, TimeUnit } from "ts-altea-model"
 import * as _ from "lodash";
 import { TimeSpan } from "./dates/time-span";
 import { AvailabilityRequest } from "./availability-request";
 import { ResourceOccupationSets, DateRange, DateRangeSet } from "./dates";
 import { BranchModeRange } from "./branch-mode";
 import { ArrayHelper, DateHelper } from "ts-common";
+import { AlteaPlanningQueries } from "ts-altea-logic";
 
 
 export class BranchSchedule {
@@ -159,7 +160,8 @@ export class AvailabilityContext {
      * 
      * @returns 
      */
-    getStaffBreakRanges(): Map<string, DateRangeSet> {
+    getStaffBreakRanges(availability2: ResourceAvailability2): Map<string, DateRangeSet> {
+
 
         const breaksByResourceId = new Map<string, DateRangeSet>()
 
@@ -173,10 +175,14 @@ export class AvailabilityContext {
 
         for (let human of humanResources) {
 
+            var schedule = availability2.getWorkingTime(human.id)
+
+            /*
             var schedule = this.scheduleDateRanges.get(human.id)
 
             if (!schedule || schedule.isEmpty())
                 continue
+            */
 
             let breakRangesForResource = new DateRangeSet()
             breaksByResourceId.set(human.id, breakRangesForResource)
@@ -576,12 +582,16 @@ export class AvailabilityContext {
         const availablePlannings = exclusivePlannings.filterByAvailable()
         const unavailable = exclusivePlannings.filterByAvailable(false)
 
+        const absent = exclusivePlannings.filterByType(...AlteaPlanningQueries.absenceTypes())
 
+        
 
         const result = new ResourceOccupationSets(
             availablePlannings.toDateRangeSet(),
             unavailable.toDateRangeSet(),
-            overlapAllowedPlannings.toDateRangeSet())
+            overlapAllowedPlannings.toDateRangeSet(),
+            absent.toDateRangeSet()
+        )
 
         console.warn('AVAILABILITY', result)
 

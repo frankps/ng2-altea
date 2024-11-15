@@ -64,7 +64,11 @@ export class ContactListComponent extends NgBaseListComponent<Contact> implement
   override getSearchDbQuery(searchFor: string): DbQuery | null {
     const query = new DbQuery()
 
-    query.and('name', QueryOperator.contains, searchFor)
+    let filters = query.and()
+
+    filters.or('name', QueryOperator.contains, searchFor)
+    filters.or('mobile', QueryOperator.contains, searchFor)
+
     query.and('del', QueryOperator.equals, false)
 
     return query

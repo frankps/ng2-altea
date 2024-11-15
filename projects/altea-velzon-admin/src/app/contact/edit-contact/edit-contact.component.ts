@@ -1,7 +1,8 @@
 
 import { Component, ViewChild, OnInit, inject } from '@angular/core';
-import { ProductService, PriceService, ProductResourceService, ResourceService, ScheduleService, ContactService, SessionService, OrderService } from 'ng-altea-common'
-import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ResourceType, ResourceTypeIcons, Resource, Schedule, Contact, Language, DepositMode, LoyaltyCard, Order } from 'ts-altea-model'
+import { ProductService, PriceService, ProductResourceService, ResourceService, ScheduleService, ContactService, SessionService, OrderService, MessagingService } from 'ng-altea-common'
+import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ResourceType, ResourceTypeIcons, Resource, Schedule, Contact, 
+  Language, DepositMode, LoyaltyCard, Order, Message, MsgType, MsgDirIcon, MsgDirColor, MsgTypeIcon, MsgStateIcon  } from 'ts-altea-model'
 import { BackendHttpServiceBase, DashboardService, FormCardSectionEventData, NgEditBaseComponent, ToastType, TranslationService } from 'ng-common'
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxModalComponent, DeleteModalComponent } from 'ng-common';
@@ -20,6 +21,7 @@ import { getDocs, limit, or, orderBy, query, where } from 'firebase/firestore';
 import * as countryLib from 'country-list-js';
 import { LoyaltyCardChangeService } from 'ng-altea-common';
 import { UIOrder } from '../../order/order-grid/order-grid.component';
+import { plainToInstance } from 'class-transformer';
 
 
 @Component({
@@ -52,6 +54,15 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
 
   depositPctgs = [...Array(21).keys()].map(i => { return { pct: (i * 5), label: `${i * 5} %` } })
   //depositMode: 'default' | 'custom' = "default"   // default or custom
+
+
+  MsgType = MsgType
+
+  MsgDirIcon = MsgDirIcon
+  MsgDirColor = MsgDirColor
+  MsgTypeIcon = MsgTypeIcon
+  MsgStateIcon = MsgStateIcon
+
 
   mobilePhoneCss = {
     row: 'row mt-3',
@@ -104,6 +115,8 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
     console.error('objectRetrieved')
     console.error(contact)
 
+    this.messages = []
+
     await this.getMessages(contact)
 
     this.orders = []
@@ -112,6 +125,7 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
 
   }
 
+  messages: Message[]
 
   async getMessages(contact: Contact) {
 
@@ -126,14 +140,29 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
 
     const msgCol = collection(this.firestore, "branches", this.sessionSvc.branchId, "msg");
 
-    const qry = query(msgCol, or(where("from", "==", contact.mobile), where("to", "array-contains", contact.mobile)), orderBy('cre', 'desc'), limit(10))
+    //    const qry = query(msgCol, or(where("from", "==", contact.mobile), where("to", "array-contains", contact.mobile)), orderBy('cre', 'desc'), limit(10))
+
+    const qry = query(msgCol, where("conIds", "array-contains", contact.id), orderBy('cre', 'desc'), limit(20))    
 
     const querySnapshot = await getDocs(qry);
 
+
+
     querySnapshot.forEach((doc) => {
       // doc.data() is never undefined for query doc snapshots
-      console.log(doc.id, " => ", doc.data());
+      // console.log(doc.id, " => ", doc.data());
+
+      let msg = doc.data()
+
+      let typesMsg = plainToInstance(Message, msg)
+
+      if (msg)
+        this.messages.push(typesMsg)
+
     });
+
+    console.log(this.messages)
+
   }
 
 
@@ -250,11 +279,11 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
     if (ArrayHelper.NotEmpty(orders)) {
       this.ordersCreateBefore = orders[orders.length - 1].cre
       this.orders.push(...orders.map(order => UIOrder.fromOrder(order)))
-    } 
+    }
 
     if (ArrayHelper.IsEmpty(orders) || orders.length < take)
       this.ordersCreateBefore = null
-    
+
 
     console.log(this.orders)
 

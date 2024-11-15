@@ -69,8 +69,20 @@ export class ResourceAvailability2 {
 
             // get both the available & un-available date ranges
             const resourceOccupation = ctx.getResourceOccupation2(resourceId)
+            console.error(resourceOccupation)
 
             const extendedSchedule = normalScheduleRanges.union(resourceOccupation.available)
+
+         //   let notWorking = 
+            let workingHours = extendedSchedule.subtract(resourceOccupation.absent)
+
+            if (workingHours.notEmpty()) {
+                workingHours.sortRanges()
+                workingHours.ranges[0].addFromLabel('START')
+                workingHours.ranges[workingHours.ranges.length - 1].addToLabel('END')
+            }
+            //workingHours
+
 
 
             let unavailable = resourceOccupation.unAvailable
@@ -93,7 +105,9 @@ export class ResourceAvailability2 {
             let resourceStillAvailable = extendedSchedule.subtractMany(unavailable)
             resourceStillAvailable = resourceStillAvailable.subtractMany(resourceOccupation.overlapAllowed)
 
-            let availability = new ResourceAvailabilitySets(resourceStillAvailable, resourceOccupation.overlapAllowed)
+            
+
+            let availability = new ResourceAvailabilitySets(resourceStillAvailable, resourceOccupation.overlapAllowed, workingHours)
 
             this.availability.set(resourceId, availability)
 
@@ -204,20 +218,35 @@ export class ResourceAvailability2 {
         return allSets
     }
 
+    getWorkingTime(resourceId: string): DateRangeSet {
+
+        if (!resourceId || !this.availability) 
+            return DateRangeSet.empty
+
+        if (!this.availability.has(resourceId))
+            return DateRangeSet.empty
+
+
+        let availability = this.availability.get(resourceId)
+
+        return availability.workingTime
+
+
+    }
+
 
     getAvailabilitiesForResource(resource: Resource, minTime?: TimeSpan): DateRangeSet {
 
         // console.warn(`getAvailabilitiesForResource(${resource})`)
 
 
-        if (!resource?.id || !this.availability)  //  || !this.availability.has(resource.id)
+        if (!resource?.id || !this.availability) 
             return DateRangeSet.empty
 
-        // | undefined
 
         if (!this.availability.has(resource.id))
             return DateRangeSet.empty
-        //        throw new Error(`resource ${resource.name} has NO availabilities!  ${resource.id}`)
+
 
         let availability = this.availability.get(resource.id)
 

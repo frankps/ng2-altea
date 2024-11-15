@@ -87,10 +87,10 @@
 
 
             <div class="row">
-                <div class="col-6"> <ngx-altea-label-value label="dic.created"
-                        [value]="object.cre" valueFormat="date"></ngx-altea-label-value> </div>
-                <div class="col-6"> <ngx-altea-label-value label="dic.updated"
-                        [value]="object.upd" valueFormat="date"></ngx-altea-label-value> </div>
+                <div class="col-6"> <ngx-altea-label-value label="dic.created" [value]="object.cre"
+                        valueFormat="date"></ngx-altea-label-value> </div>
+                <div class="col-6"> <ngx-altea-label-value label="dic.updated" [value]="object.upd"
+                        valueFormat="date"></ngx-altea-label-value> </div>
             </div>
 
 
@@ -483,6 +483,93 @@
     </ngx-altea-form-card-section>
 
 
+    <ngx-altea-form-card-section sectionName="ui.contact.edit.sections.comm.title" sectionId="comm"
+        [editSectionId]="editSectionId" [showButtons]="false">
+
+        <ng-container always>
+
+            <ul class="list-group list-group-flush">
+
+                <!-- $ | async-->
+                <li class="list-group-item" *ngFor="let message of messages">
+            
+                    <div class="row">
+                        <div class="col-6">
+            
+                            <h5>
+            
+                                <i [class]="MsgDirIcon[message.dir]" [style.color]="MsgDirColor[message.dir]"></i> &nbsp;
+                                <i [class]="MsgTypeIcon[message.type]" [style.color]="MsgDirColor[message.dir]"></i> &nbsp;
+            
+                                <ng-container [ngSwitch]="message.dir">
+                                    <ng-container *ngSwitchCase="'in'">
+                                        <ng-container *ngIf="message.from">
+                                            {{'dic.from' | translate}}: {{message.from.name}} <i
+                                                style="font-size: small;">[{{message.from.addr}}]</i></ng-container>
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'out'">
+                                        {{'dic.to' | translate}}:
+                                        <ng-container *ngFor="let to of message?.to">
+                                            {{to.name}} <i style="font-size: small;">[{{to.addr}}]</i>
+                                        </ng-container>
+            
+            
+            
+            
+                                    </ng-container>
+                                </ng-container>
+            
+            
+            
+                            </h5>
+            
+            
+                            <ng-container *ngIf="message.type == 'email'">
+                                <b>Onderwerp</b>: {{message.subj}}
+                            </ng-container>
+            
+            
+            
+            
+                        </div>
+                        <div class="col-2">
+                            <small class="float-end">{{message.sent | intdate}}</small>
+                        </div>
+                        <div class="col-4">
+            
+            
+            
+                            <h5 class="float-end">
+            
+            
+                                <i *ngIf="message.auto" class="fa-duotone fa-car"
+                                    [ngbTooltip]="'objects.message.auto' | translate"></i> &nbsp;
+            
+                                <i *ngIf="MsgStateIcon[message.state]" [class]="MsgStateIcon[message.state]"
+                                    [style.color]="message.stateColor()"></i> &nbsp;
+                                &nbsp;
+
+
+                            </h5>
+            
+            
+            
+                        </div>
+                    </div>
+            
+            
+                    <div class="mt-2" [innerHTML]="message.body"></div>
+            
+
+            
+                </li>
+            </ul>
+
+
+
+        </ng-container>
+
+    </ngx-altea-form-card-section>
 
 
 </ng-container>

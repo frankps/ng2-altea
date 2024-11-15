@@ -178,6 +178,7 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
     modal.close()
   }
 
+
   async confirmDelete(modal: any) {
 
     let order = this.orderToDelete
@@ -297,6 +298,27 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
 
   }
 
+
+  async showAttentionOrders() {
+
+    this.spinner.show()
+
+    const query = new DbQuery()
+    query.and('attn', QueryOperator.equals, true)
+
+    query.take = 50
+    query.include('lines.planning.resource', 'contact')
+    query.orderBy('start', SortOrder.desc)
+
+    this.objects = await this.orderSvc.query$(query)
+
+    if (this.objects)
+      this.uiOrders = this.objects.map(order => UIOrder.fromOrder(order))
+
+    this.spinner.hide()
+
+  }
+
   async advancedSearch(orderSearch: OrderSearch = this.orderSearch) {
 
     console.warn('Searching...')
@@ -314,8 +336,12 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
 
       if (orderSearch.searchFor.length == 36)
         query.and('id', QueryOperator.equals, orderSearch.searchFor)
-      else
-        query.and('contact.name', QueryOperator.contains, orderSearch.searchFor)
+      else {
+        let filter = query.and()
+        filter.or('contact.name', QueryOperator.contains, orderSearch.searchFor)
+        filter.or('contact.mobile', QueryOperator.contains, orderSearch.searchFor)
+        filter.or('contact.email', QueryOperator.contains, orderSearch.searchFor)
+      }
     }
 
 

@@ -476,6 +476,9 @@
           },
           "order": {
             "title": "Orders"
+          },
+          "comm": {
+            "title": "Communicatie"
           }
         }
       }

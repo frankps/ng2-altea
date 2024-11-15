@@ -18,7 +18,8 @@ import { ArrayHelper, DateHelper } from "ts-common"
 export class ResourceOccupationSets {
     constructor(public available: DateRangeSet = DateRangeSet.empty,
         public unAvailable: DateRangeSet = DateRangeSet.empty,
-        public overlapAllowed: DateRangeSet = DateRangeSet.empty
+        public overlapAllowed: DateRangeSet = DateRangeSet.empty,
+        public absent: DateRangeSet = DateRangeSet.empty
     ) {
     }
 }
@@ -28,7 +29,8 @@ export class ResourceOccupationSets {
  */
 export class ResourceAvailabilitySets {
     constructor(public available: DateRangeSet = DateRangeSet.empty,
-        public overlapAllowed: DateRangeSet = DateRangeSet.empty
+        public overlapAllowed: DateRangeSet = DateRangeSet.empty,
+        public workingTime: DateRangeSet = DateRangeSet.empty
     ) {
     }
 }
@@ -217,6 +219,15 @@ export class DateRangeSet {
         set.addRanges(range)
 
         return set
+    }
+
+    sortRanges() {
+
+        if (ArrayHelper.IsEmpty(this.ranges))
+            return
+
+        this.ranges = _.sortBy(this.ranges, 'from')
+
     }
 
     /**

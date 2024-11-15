@@ -105,7 +105,7 @@ export class SlotFinder {
             solutionSet = this.handleResourceRequestItem(requestItem, solutionSet, availability2, ctx)
         }
 
-        this.checkStaffBreaks(solutionSet, ctx)
+        this.checkStaffBreaks(solutionSet, availability2, ctx)
 
         this.orderSolutionSet(solutionSet)
 
@@ -536,10 +536,11 @@ export class SlotFinder {
     }
 
 
-    checkStaffBreaks(solutionSet: SolutionSet, ctx: AvailabilityContext, breakTimeInMinutes: number = 40) {
+    checkStaffBreaks(solutionSet: SolutionSet, availability2: ResourceAvailability2, ctx: AvailabilityContext, breakTimeInMinutes: number = 40) {
 
         /** can contain breaks for multiple days! */
-        const breaksByResourceId = ctx.getStaffBreakRanges()
+        const breaksByResourceId = ctx.getStaffBreakRanges(availability2)
+        
         const staffBreak = TimeSpan.minutes(breakTimeInMinutes)
 
         // we will invalidate some solutions and replace with new solutions to allow breaks for staff

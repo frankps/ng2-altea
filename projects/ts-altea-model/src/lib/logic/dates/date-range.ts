@@ -182,6 +182,40 @@ export class DateRange<T = any> {
         return dateBorders
     }
 
+    addFromLabel(label: string) {
+
+        if (!label)
+            return
+
+        if (!this.fromLabels)
+            this.fromLabels = []
+
+        let idx = this.fromLabels.indexOf(label)
+
+        if (idx >= 0)
+            return
+
+        this.fromLabels.push(label)
+
+    }
+
+    addToLabel(label: string) {
+
+        if (!label)
+            return
+
+        if (!this.toLabels)
+            this.toLabels = []
+
+        let idx = this.toLabels.indexOf(label)
+
+        if (idx >= 0)
+            return
+
+        this.toLabels.push(label)
+    }
+
+
     containsLabels(fromLabel: string, toLabel?: string) {
 
         const fromOk = fromLabel ? this.fromLabels.indexOf(fromLabel) >= 0 : true

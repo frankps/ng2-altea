@@ -36,7 +36,8 @@ export enum TemplateCode {
 
 export enum GiftTemplateCode {
   gift_online_from = 'gift_online_from',
-  gift_online_to = 'gift_online_to'
+  gift_online_to = 'gift_online_to',
+  order_compensate_gift = 'order_compensate_gift'
 }
 /*
 cancel
