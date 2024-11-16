@@ -818,9 +818,32 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     return (Array.isArray(removed) && removed.length > 0)
   }
 
+
+  setBackLinks() {
+
+    if (ArrayHelper.NotEmpty(this.lines)) {
+      this.lines.forEach(line => {
+        line.order = this
+      })
+    }
+  }
+
+
+  removeBackLinks() {
+
+    if (ArrayHelper.NotEmpty(this.lines)) {
+      this.lines.forEach(line => {
+        line.order = undefined
+      })
+    }
+
+  }
+
   calculateAll() {
 
     console.warn('calculateAll')
+
+    this.setBackLinks()
 
     this.makeLineTotals()
     this.calculateVat()
@@ -831,6 +854,8 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
       this.deposit = deposit
       this.markAsUpdated('deposit')
     }
+
+    this.removeBackLinks()
   }
 
 

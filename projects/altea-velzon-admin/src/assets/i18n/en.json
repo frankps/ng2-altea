@@ -282,7 +282,14 @@
       "4": "Do",
       "5": "Vr",
       "6": "Za",
-      "7": "Zo"
+      "7": "Zo",
+      "mo": "Ma",
+      "tu": "Di",
+      "we": "Wo",
+      "th": "Do",
+      "fr": "Vr",
+      "sa": "Za",
+      "su": "Zo"
     },
     "days-of-week": {
       "1": "Maandag",
@@ -1032,6 +1039,9 @@
     "formulaTerm": {
       "value": "Waarde"
     },
+    "productItem": {
+      "optionQty": "Aantal via product optie"
+    },
     "productOption": {
       "public": "Klant kan optie zien & selecteren",
       "required": "Een waarde moet geselecteerd worden",
@@ -1078,6 +1088,7 @@
       "end": "Tot",
       "qty": "Vanaf aantal",
       "sameBasePrice": "Zelfde basisprijs",
+      "addition": "Toeslag",
       "isPromo": "Is promotie",
       "title": "Promotie titel",
       "title-tpl": "* promotie",

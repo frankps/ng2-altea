@@ -43,7 +43,7 @@ export class ProductItemsComponent {
         value.items = []
 
       this.itemChanges = new CollectionChangeTracker<ProductItem>(value.items, ProductItem, {
-        propsToUpdate: ['idx', 'name', 'qty', 'options']
+        propsToUpdate: ['idx', 'name', 'qty', 'options', 'optionQty', 'optionId']
         //   propsToRemove: ['values']
       })
     }
@@ -79,6 +79,8 @@ export class ProductItemsComponent {
 
   }
 
+
+
   editModeChanged(event: FormCardSectionEventData) {
     this.parent.editModeChanged(event)
 
@@ -91,6 +93,23 @@ export class ProductItemsComponent {
 
   }
 
+  getQty(item: ProductItem) {
+
+    if (item.optionQty) {
+
+      let option = this.product.getOption(item?.optionId)
+
+      if (!option)
+        return `[???]`
+      else
+        return `[${option.name}]`
+
+    } else
+      return item.qty
+
+
+
+  }
 
   getDependingProducts() {
 
@@ -312,9 +331,9 @@ export class ProductItemsComponent {
       this.itemChanges.reset()
       this.parent.dashboardSvc.showToastType(ToastType.saveSuccess)
 
-      
+
       await this.productSvc.refreshCachedObjectFromBackend(this._product.id)
-      
+
       this.stopEditMode()
     } else {
       this.parent.dashboardSvc.showToastType(ToastType.saveError)

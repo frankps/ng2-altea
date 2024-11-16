@@ -57,6 +57,18 @@
     </div>
   </div>
 
+  <div class="row">
+    <div class="col-12">
+
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" id="isAddition" [(ngModel)]="object.isAddition"
+          (change)="changePriceMode($event)" />
+        <label class="form-check-label" for="isAddition" translate="objects.price.addition"></label>
+      </div>
+
+    </div>
+  </div>
+
   <div class="row mt-2" *ngIf="object.isAbsolute">
     <div class="col-2"></div>
     <div class="col-3">
@@ -68,6 +80,17 @@
     </div>
   </div>
 
+  <div class="row mt-2" *ngIf="object.isAddition">
+
+    <div class="col-2"></div>
+    <div class="col-3">
+
+      <ngx-altea-label-control label="objects.price.addition" for="addition">
+        <input type="number" id="addition" name="addition" class="form-control" [(ngModel)]="object.value" />
+      </ngx-altea-label-control>
+
+    </div>
+  </div>
 
 
 

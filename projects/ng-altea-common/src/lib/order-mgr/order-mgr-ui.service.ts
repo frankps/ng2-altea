@@ -373,7 +373,7 @@ export class OrderMgrUiService {   // implements OnInit
 
     const gift = redeemGift.gift
 
-    console.error('== redeemGift ==',this.payGifts)
+    console.error('== redeemGift ==', this.payGifts)
 
     const availableAmount = gift.availableAmount()
 
@@ -415,8 +415,13 @@ export class OrderMgrUiService {   // implements OnInit
 
 
     await this.loadProduct$(line.productId)
+
+    // when we calculate special pricing, we need to hace access to order.start
+    line.order = this.order
     this.orderLine = line
     this.orderLineIsNew = false
+
+    line.order = null
 
     this.spinner.hide()
   }
@@ -607,6 +612,7 @@ export class OrderMgrUiService {   // implements OnInit
 
 
 
+
       // determine how much time customer has to pay deposit
       const depositMinutes = me.setMaxWaitForDepositInHours(me.sessionSvc.appMode, option.date)
 
@@ -626,6 +632,12 @@ export class OrderMgrUiService {   // implements OnInit
         console.warn(solutionForOption)
       }
 
+
+      // we might have special pricing for specific dates/times
+      this.order.start = option.dateNum
+      await this.calculateAll()
+
+      
       confirmOrderResponse = await me.alteaSvc.orderMgmtService.confirmOrder(me.order, option, solutionForOption, this.availabilityResponse)
 
       console.warn(confirmOrderResponse)
@@ -1122,9 +1134,9 @@ export class OrderMgrUiService {   // implements OnInit
     console.warn('nrOfPersons', nrOfPersons)
 
     /** to support a duo-massage for instance: 2 persons same service at same time */
-/*     if (orderLine.qty > 1) {
-      nrOfPersons *= orderLine.qty
-    } */
+    /*     if (orderLine.qty > 1) {
+          nrOfPersons *= orderLine.qty
+        } */
 
 
     /** check if same service is added multiple times and/or orderline.qty > 1 => probably different persons */
@@ -1140,7 +1152,7 @@ export class OrderMgrUiService {   // implements OnInit
     } else {
       nrOfPersons *= orderLine.qty
     }
-    
+
 
 
 
@@ -1291,12 +1303,12 @@ export class OrderMgrUiService {   // implements OnInit
   }
 
   /** to be moved to external logic */
-  createSubscriptions(orderLine: OrderLine) {
+  async createSubscriptions(orderLine: OrderLine) {
 
     if (!orderLine.product.isSubscription())
       throw `Can't create subscription!`
 
-    const subscriptions = this.alteaSvc.subscriptionMgmtService.createSubscriptions(this.order, orderLine, true)
+    const subscriptions = await this.alteaSvc.subscriptionMgmtService.createSubscriptions(this.order, orderLine, true)
 
     console.error(subscriptions)
   }

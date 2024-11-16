@@ -31,10 +31,12 @@
 
                 <li class="list-group-item" *ngFor="let item of product.items; let idx = index">
 
-                    <div class="row">
 
-                        <ng-container *ngIf="item !== itemInEdit; else editItem">
-                            <div class="col">{{item.qty}} x {{item.name}}</div>
+                    <ng-container *ngIf="item !== itemInEdit; else editItem">
+
+                        <div class="row">
+
+                            <div class="col">{{getQty(item)}} x {{item.name}}</div>
 
                             <div class="col">
                                 <ul>
@@ -47,12 +49,12 @@
                                                 <span
                                                     *ngFor="let val of option.values; let idx3 = index">{{val.name}}</span>
                                             </ng-container>
-<!-- 
+                                            <!-- 
                                             <ng-container *ngIf="!Array.isArray(option.values)">
                                                 {{<option value="" class="values"></option>.name}}
                                             </ng-container>
  -->
-                                            
+
                                         </ng-container>
 
 
@@ -60,34 +62,65 @@
                                 </ul>
 
                             </div>
-                        </ng-container>
 
-                        <ng-template #editItem>
+                            <ng-container *ngTemplateOutlet="editControls">
+                            </ng-container>
+                        </div>
+                    </ng-container>
+
+                    <ng-template #editItem>
+
+                        <div class="row">
+                            <div class="col-5">
+
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="optionQty" name="optionQty"
+                                        [(ngModel)]="item.optionQty" />
+                                    <label class="form-check-label" for="optionQty"
+                                        translate="objects.productItem.optionQty"></label>
+                                </div>
+
+
+
+                            </div>
+                            <div class="col-4">
+
+                                <ng-container *ngIf="item.optionQty">
+
+                                    <ng-select id="qtyFromOption" name="qtyFromOption" [items]="product.options"
+                                        bindLabel="name" bindValue="id" [clearable]="false" [multiple]="false"
+                                        [(ngModel)]="item.optionId">
+
+                                    </ng-select>
+
+                                </ng-container>
+
+                            </div>
+                        </div>
+
+
+                        <div class="row">
 
                             <div class="col-4 d-flex align-items-start pt-2">
 
-                                <!-- <input type="number" id="qty" name="qty"
-                                    required class="form-control" style="width: 60px;"
-                                    [(ngModel)]="item.qty" />
-                                     -->
                                 <div class="d-flex align-items-center">
 
+                                    <ng-container *ngIf="!item.optionQty">
+                                        <ng-select id="qty" name="qty" style="width: 60px;" [items]="qtyArray"
+                                            [clearable]="false" [multiple]="false" [(ngModel)]="item.qty">
+                                        </ng-select>
 
-                                    <ng-select id="qty" name="qty" style="width: 60px;" [items]="qtyArray"
-                                        [clearable]="false" [multiple]="false" [(ngModel)]="item.qty">
-                                    </ng-select>
 
-                                    &nbsp;&nbsp;x&nbsp;<div>{{item.name}}</div>
+                                    </ng-container>
+
+
+
+                                    &nbsp;&nbsp;x&nbsp;
+
+                                    <div>{{item.name}}</div>
                                 </div>
                             </div>
                             <div class="col">
-                                <!-- 
-                                class="list-group list-group-flush"
-                                class="list-group-item"
-                            <li class="list-group-item"
-
-                            bindValue="id"
-                         -->
 
                                 <ul *ngIf="dependingProduct">
                                     <li class="mt-2" *ngFor="let option of dependingProduct.options; let idx2 = index">
@@ -95,47 +128,39 @@
                                         <div class="row">
                                             <div class="col">{{option.name}}:</div>
                                             <div class="col-6">
-                                                <ng-select id="optionValues" name="optionValues" [items]="itemOptionValues.get(option.id)"
-                                                    bindLabel="name" [clearable]="true" [multiple]="false"
+                                                <ng-select id="optionValues" name="optionValues"
+                                                    [items]="itemOptionValues.get(option.id)" bindLabel="name"
+                                                    [clearable]="true" [multiple]="false"
                                                     [(ngModel)]="item.getOption(option).values[0]">
                                                 </ng-select>
                                             </div>
                                         </div>
-
-
-
-
-
-
-
-                                        <!--
-                                            option.values[0]
-
-
-
-                                            class="d-flex align-items-center"
-
-                                             [(ngModel)]="object.gender"
-                                            <ng-container *ngIf="option.value">
-                                            <ng-container *ngIf="Array.isArray(option.value)">
-                                                <span
-                                                    *ngFor="let val of option.value; let idx3 = index">{{val.value}}</span>
-                                            </ng-container>
-
-                                            <ng-container *ngIf="!Array.isArray(option.value)">
-                                                {{option.value.value}}
-                                            </ng-container>
-                                        </ng-container> -->
-
 
                                     </li>
                                 </ul>
 
 
                             </div>
-                        </ng-template>
+
+                            <ng-container *ngTemplateOutlet="editControls">
+                            </ng-container>
+                        </div>
+                    </ng-template>
 
 
+
+                    <!-- 
+                    <div class="col-1" *ngIf="sectionInEdit(ListSectionMode.readOnly)">
+
+                        <ng-container>
+                            <i class="fas fa-trash float-end" (click)="deleteItem(item)"></i>
+                            <i class="fas fa-pen float-end me-3" (click)="toggleEditItem($event, item, idx)"></i>
+                        </ng-container>
+
+                    </div> -->
+
+
+                    <ng-template #editControls>
                         <div class="col-1" *ngIf="sectionInEdit(ListSectionMode.readOnly)">
 
                             <ng-container>
@@ -144,8 +169,9 @@
                             </ng-container>
 
                         </div>
+                    </ng-template>
 
-                    </div>
+
 
                 </li>
             </ng-container>

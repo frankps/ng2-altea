@@ -35,7 +35,7 @@ export class ProductPriceComponent implements OnInit {
 
   async ngOnInit() {
 
-    const daysOfWeekShort = await this.translationSVc.translateEnum(DaysOfWeekShort, 'enums.days-of-week-short.', this.daysOfWeekShort)
+    const daysOfWeekShort = await this.translationSVc.translateEnum(DaysOfWeekShort, 'enums.days-of-week-short.', this.daysOfWeekShort, true)
 
     // make sure monday=1, ... saturday=6, sunday=0
     let value = 1

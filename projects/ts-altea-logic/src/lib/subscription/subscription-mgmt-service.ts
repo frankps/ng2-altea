@@ -1,7 +1,7 @@
 
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbObjectCreate, DbObjectMulti, DbObjectMultiCreate, DbQuery, DbQueryTyped, ObjectHelper, QueryOperator } from 'ts-common'
-import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, OrderLine, Subscription } from 'ts-altea-model'
+import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, OrderLine, Subscription, Product } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { AlteaDb } from '../general/altea-db'
 import { IDb } from '../interfaces/i-db'
@@ -40,10 +40,29 @@ export class SubscriptionMgmtService {
         let prod = orderLine.product
 
         if (ArrayHelper.IsEmpty(prod.items))
-            prod = await this.alteaDb.getProduct(orderLine.productId, )
+            prod = await this.alteaDb.getProduct(orderLine.productId, ...Product.defaultInclude)
 
 
         for (let prodItem of prod.items) {
+
+            let qty = prodItem.qty
+
+            if (prodItem.optionQty) {
+                let option = orderLine.getOptionById(prodItem.optionId)
+
+                if (!option) {
+                    let msg = `Option defining subscription quantity not found: ${prodItem.optionId}`
+                    console.error(msg)
+                }
+
+                if (!option.hasValues()) {
+                    let msg = `Option defining subscription quantity has no selected values: ${option.name}`
+                    console.error(msg)
+                }
+
+                let value = option.values[0]
+                qty = _.round(value.val, 0)
+            } 
 
             for (let i = 0; i < orderLine.qty; i++) {
 
@@ -56,7 +75,11 @@ export class SubscriptionMgmtService {
 
                 sub.subscriptionProductId = prod.id
                 sub.unitProductId = prodItem.productId
-                sub.totalQty = prodItem.qty
+                
+
+                sub.totalQty = qty
+
+
                 sub.usedQty = 0
 
                 subscriptions.push(sub)

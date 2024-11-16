@@ -443,6 +443,8 @@ export class OrderMgmtService {
         order.start = reservationOption.dateNum
         order.m.setDirty('start')
 
+
+
         const response = new ConfirmOrderResponse()
 
         if (solution)

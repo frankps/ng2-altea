@@ -11,7 +11,7 @@ import * as Handlebars from "handlebars"
 import * as sc from 'stringcase'
 import { OrderPersonMgr } from "../order-person-mgr";
 import { CancelOrderMessage } from "ts-altea-logic";
-import { Branch, Contact, DepositMode, FormulaTerm, Invoice, Order, OrderType, Organisation, Payment, PaymentType, PlanningMode, Product, ProductOption, ProductOptionValue, ProductType, Resource, ResourcePlanning, Subscription } from "ts-altea-model";
+import { Branch, Contact, DepositMode, FormulaTerm, Invoice, Order, OrderType, Organisation, Payment, PaymentType, PlanningMode, PriceMode, Product, ProductOption, ProductOptionValue, ProductType, Resource, ResourcePlanning, Subscription } from "ts-altea-model";
 
 export class OrderLineOptionSummary {
   /** option name */
@@ -29,7 +29,7 @@ export class OrderLineOptionSummary {
     if (!this.v)
       return ''
 
-    let value = this.v.replace(',','.')
+    let value = this.v.replace(',', '.')
 
     let num = +value
 
@@ -44,7 +44,7 @@ export class OrderLineOptionSummary {
     if (!this.v)
       return true
 
-    let value = this.v.replace(',','.')
+    let value = this.v.replace(',', '.')
 
     let num = +value
 
@@ -116,7 +116,7 @@ export class OrderLineOption extends ObjectWithId {
 
 
     this.setFormula(productOption)
-    
+
     if (Array.isArray(productOptionValues) && productOptionValues.length > 0) {
       let lineOptionVals = productOptionValues.map(prodVal => new OrderLineOptionValue(prodVal))
       this.values.push(...lineOptionVals)
@@ -189,7 +189,7 @@ export class OrderLineOption extends ObjectWithId {
     return this.values.find(o => o.id == valueId)
   }
 
-  getValueIds() : string[] {
+  getValueIds(): string[] {
 
     if (!this.hasValues())
       return []
@@ -598,6 +598,8 @@ export class OrderLine extends ObjectWithIdPlus {
     const previousExcl = this.excl
     const previousVat = this.vat
 
+    this.setUnitPrice()
+
     this.incl = this.unit * this.qty
 
     if (this.vatPct) {
@@ -621,9 +623,7 @@ export class OrderLine extends ObjectWithIdPlus {
 
     let previousUnit = this.unit
 
-
     let unitPrice = this.base
-    //let totalDuration = 0
 
     if (ArrayHelper.IsEmpty(this.options)) {
       this.unit = unitPrice
@@ -631,17 +631,9 @@ export class OrderLine extends ObjectWithIdPlus {
       return
     }
 
-
     for (const option of this.options) {
       if (!option.values)
         continue
-
-      // let factorOption = null
-
-      // if (option.factorOptionId) {
-      //   factorOption = this.options.find(o => o.id == option.factorOptionId)
-      // }
-
 
       for (const orderLineOptionValue of option.values) {
         unitPrice += orderLineOptionValue.getPrice(option.formula, this.options)
@@ -649,11 +641,35 @@ export class OrderLine extends ObjectWithIdPlus {
       }
     }
 
-
-
-    this.unit = unitPrice
+    this.unit = this.applySpecialPricing(unitPrice)
     if (previousUnit != this.unit) this.markAsUpdated('unit')
-    //this.incl = unitPrice * this.qty
+
+  }
+
+  applySpecialPricing(unit: number): number {
+
+    if (ArrayHelper.IsEmpty(this.product.prices))
+      return unit
+
+    for (let price of this.product.prices) {
+
+      if (price.isDay) {
+        let startDay = this.order?.startDate
+
+        let day = dateFns.getDay(startDay)
+
+        if (!price.days[day])
+          continue
+      }
+
+      switch (price.mode) {
+        case PriceMode.add:
+          unit += price.value
+          break
+      }
+    }
+
+    return unit
 
 
   }
@@ -665,6 +681,10 @@ export class OrderLine extends ObjectWithIdPlus {
   }
 
   getOptionById(optionId: string): OrderLineOption {
+
+    if (!optionId)
+      return null
+
     let olOption = this.options.find(o => o.id == optionId)
     return olOption
   }

@@ -32,7 +32,7 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
   defaultServiceOrder = ['start', 'compose', 'plan', 'contact', 'pay']
   defaultProductOrder = ['start', 'compose', 'contact', 'pay']
 
-  debug = false
+  debug = true
 
   @ViewChild('editContact') public editContact: ContactSelect2Component;
 

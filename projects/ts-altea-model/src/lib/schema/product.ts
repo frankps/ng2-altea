@@ -12,6 +12,7 @@ import * as sc from 'stringcase'
 import { OrderPersonMgr } from "../order-person-mgr";
 import { CancelOrderMessage } from "ts-altea-logic";
 
+
 export enum ProductType {
   prod = 'prod',
   svc = 'svc',
@@ -583,7 +584,7 @@ export class Product extends ObjectWithIdPlus {
 
   getOption(optionId: string): ProductOption {
 
-    if (!this.hasOptions())
+    if (!this.hasOptions() || !optionId)
       return null
 
     const option = this.options.find(o => o.id == optionId)
@@ -715,6 +716,12 @@ export class ProductItem extends ObjectWithIdPlus {
   name?: string;
   qty?: number = 1
 
+  /** instead of specifying an explicit qty, it can come from a product option (value): specified by optionId */
+  optionQty: boolean = false
+
+  /** optional: if optionQty=true, then the selected value of this option will be used for quantity */
+  optionId?: string;
+
   @Type(() => ProductItemOption)
   options?: ProductItemOption[] = []
 
@@ -817,7 +824,8 @@ export class OptionPrice {
 export enum PriceMode {
   same = 'same', // same base price
   abs = 'abs',  // absolute price change
-  pct = 'pct'   // percentage price change
+  pct = 'pct',   // percentage price change
+  add = 'add'   // addition: amount added to the price
 }
 
 
@@ -931,6 +939,14 @@ export class Price extends ObjectWithIdPlus {
 
   get isPercentage() {
     return this.mode == PriceMode.pct
+  }
+
+  set isAddition(value: boolean) {
+    this.mode = value ? PriceMode.add : PriceMode.same
+  }
+
+  get isAddition() {
+    return this.mode == PriceMode.add
   }
 
 
