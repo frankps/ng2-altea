@@ -18,6 +18,7 @@
     "create": "Maak",
     "create-account": "Account maken",
     "communication": "Communicatie",
+    "created": "Aangemaakt op",
     "currency": "Munteenheid",
     "delete": "Verwijder",
     "descr": "Omschrijving",
@@ -50,6 +51,7 @@
     "select": "Selecteer",
     "timeUnit": "Tijdseenheid",
     "to": "Aan",
+    "updated": "Veranderd op",
     "save": "Opslaan",
     "search": "Zoeken",
     "send": "Versturen",
@@ -172,6 +174,13 @@
       "amount": "Bedrag",
       "specific": "Specifiek"
     },
+    "gift-method": {
+      "emailFrom": "Email schenker",
+      "emailTo": "Email ontvanger",
+      "postal": "Per post",
+      "pos": "Afhalen winkel",
+      "app": "Mobiele app"
+    },
     "pay-type": {
       "all": "Totaal",
       "cash": "Cash",
@@ -273,7 +282,14 @@
       "4": "Do",
       "5": "Vr",
       "6": "Za",
-      "7": "Zo"
+      "7": "Zo",
+      "mo": "Ma",
+      "tu": "Di",
+      "we": "Wo",
+      "th": "Do",
+      "fr": "Vr",
+      "sa": "Za",
+      "su": "Zo"
     },
     "days-of-week": {
       "1": "Maandag",
@@ -459,11 +475,17 @@
           "subscriptions": {
             "title": "Abonnementen"
           },
-          "giftsIn": {
-            "title": "Ontvangen cadeaubonnen"
+          "gifts": {
+            "title": "Cadeaubonnen"
           },
           "loyalty": {
             "title": "Klantenkaarten"
+          },
+          "order": {
+            "title": "Orders"
+          },
+          "comm": {
+            "title": "Communicatie"
           }
         }
       }
@@ -988,6 +1010,9 @@
       "salesPrice": "Verkoopprijs",
       "personSelect": "Selecteer personen",
       "staffSelect": "Selecteer specialistes",
+      "priceFrom": "Prijs vanaf",
+      "priceFrom-app": "vanaf",
+      "priceInfo": "Extra info bij prijs",
       "planMode": "Planning mode",
       "type": "Type",
       "sub": "Sub type",
@@ -1016,6 +1041,9 @@
     },
     "formulaTerm": {
       "value": "Waarde"
+    },
+    "productItem": {
+      "optionQty": "Aantal via product optie"
     },
     "productOption": {
       "public": "Klant kan optie zien & selecteren",
@@ -1048,6 +1076,8 @@
       "groupAlloc": "Reserveren op groep",
       "prep": "Is voorbereidings- of opkuistijd",
       "prepOverlap": "Voorbereiding & opkuis overlappen elkaar",
+      "flex": "Flexibele start (bij duo's)",
+      "flexAfter": "Start na vorige inplanning",
       "help": {
         "offset": "Je kan ervoor kiezen om de bezetting van deze resource niet exact te laten aanvangen vanaf het begin of einde (bovenstaande keuze), maar wel met een correctie (in minuten)",
         "duration": "Gedurende deze tijd (minuten) wordt de resource bezet gehouden",
@@ -1061,6 +1091,7 @@
       "end": "Tot",
       "qty": "Vanaf aantal",
       "sameBasePrice": "Zelfde basisprijs",
+      "addition": "Toeslag",
       "isPromo": "Is promotie",
       "title": "Promotie titel",
       "title-tpl": "* promotie",
@@ -1210,7 +1241,8 @@
       "label": "Platform",
       "sub": {
         "users": "Gebruikers",
-        "orderDebug": "Order Details"
+        "orderDebug": "Order Details",
+        "stripeEvents": "Stripe Events"
       }
     }
   },

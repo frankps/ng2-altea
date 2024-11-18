@@ -350,7 +350,7 @@ export class SlotFinder {
                 }
 
                 // tempory disabled
-                // availableResources = this.subtractGroupLevelReservations(possibleResources, availableResources, ctx, availability, solution)
+                availableResources = this.subtractGroupLevelReservations(possibleResources, availableResources, ctx, availability, solution)
 
                 /* Create a new solution for each possible availability
                 */
@@ -540,7 +540,7 @@ export class SlotFinder {
 
         /** can contain breaks for multiple days! */
         const breaksByResourceId = ctx.getStaffBreakRanges(availability2)
-        
+
         const staffBreak = TimeSpan.minutes(breakTimeInMinutes)
 
         // we will invalidate some solutions and replace with new solutions to allow breaks for staff

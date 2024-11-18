@@ -450,8 +450,12 @@ export class Product extends ObjectWithIdPlus {
   @Type(() => Number)
   salesPrice = 0
 
-  advPricing = false
+  /** then price 'As from' will be shown, price can be higher (certain days/moments) using pricing  */
+  priceFrom = false
 
+  priceInfo?: string
+
+  advPricing = false
 
   salesPricing(onDate: Date = new Date()): number {
 

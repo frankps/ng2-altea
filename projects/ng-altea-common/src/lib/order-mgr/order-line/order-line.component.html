@@ -13,22 +13,21 @@
 
                     &nbsp;&nbsp;x&nbsp;
 
-<!--                     {{product?.name}}
-
-                    <span *ngIf="!product"></span> -->
                     {{orderLine.descr}}
-                    
+
                 </div>
                 <div class="col-3">
-                    <span class="float-end"> {{orderLine.incl}} €</span>
+                    <span class="float-end"> <span *ngIf="product.priceFrom"
+                            translate>objects.product.priceFrom-app</span> {{orderLine.incl}} €  <sup *ngIf="product.priceInfo">*</sup></span>
                 </div>
             </div>
-            <!-- 
-            <div class="row">
-                <div class="col"></div>
-            </div>   <i class="fa-solid fa-backward-step"></i>
- -->
-            <!-- <div class="col-6 d-flex justify-content-end"></div> -->
+
+            <div class="row mt-2" *ngIf="product.priceFrom">
+                <div class="col">
+                    <span class="float-end" style="font-size: smaller; text-align: right;"><sup>*</sup> <span translate>objects.product.priceFrom-info</span></span>
+                </div>
+            </div>
+
 
         </div>
         <div class="card-body">
@@ -100,16 +99,16 @@
                             class="fa-solid fa-backward-step"></i> &nbsp; {{ 'dic.back' | translate }} </button>
                 </div>
                 <div class="col-7 d-grid">
-                    <button type="button" class="btn btn-outline-primary"
-                    (click)="addOrderLine(orderLine)"><i class="fa-solid fa-circle-plus fa-lg"></i> &nbsp; {{ 'dic.add'
-                    | translate }} </button>
+                    <button type="button" class="btn btn-outline-primary" (click)="addOrderLine(orderLine)"><i
+                            class="fa-solid fa-circle-plus fa-lg"></i> &nbsp; {{ 'dic.add'
+                        | translate }} </button>
                 </div>
             </div>
 
 
 
 
-<!--             <div class="d-grid mt-3">
+            <!--             <div class="d-grid mt-3">
 
                 <button *ngIf="orderMgrSvc.orderLineIsNew" type="button" class="btn btn-outline-secondary float-end"
                     (click)="addOrderLine(orderLine)"><i class="fa-solid fa-circle-plus fa-lg"></i> &nbsp; {{ 'dic.add'

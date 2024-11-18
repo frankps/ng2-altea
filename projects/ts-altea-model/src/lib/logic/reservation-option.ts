@@ -1,11 +1,15 @@
 import { ArrayHelper, DateHelper } from "ts-common"
-import { SolutionSet } from "./solution"
+import { Solution, SolutionSet } from "./solution"
 import * as dateFns from 'date-fns'
 
 export class ReservationOption {
 
     /** a reservation option is originating from 1 or more solutions */
     solutionIds : string[] = []
+
+    solutions: Solution[] = []
+
+    price: number
 
     /**
      * 
@@ -26,13 +30,15 @@ export class ReservationOption {
         return ArrayHelper.NotEmpty(this.solutionIds)
     }
 
-    static fromDate(start: Date, solutionId?: string): ReservationOption {
+    static fromDate(start: Date, solution?: Solution): ReservationOption {
 
         const dateNum = DateHelper.yyyyMMddhhmmss(start)
         const option = new ReservationOption(dateNum)
 
-        if (solutionId)
-            option.solutionIds.push(solutionId)
+        if (solution) {
+            option.solutionIds.push(solution.id)
+            option.solutions.push(solution)
+        }
 
         return option
     }
@@ -50,12 +56,12 @@ export class ReservationOptionSet {
         return new ReservationOptionSet()
     }
 
-    static fromDates(dates: Date[], solutionId?: string): ReservationOptionSet {
+    static fromDates(dates: Date[], solution?: Solution): ReservationOptionSet {
 
         if (!Array.isArray(dates) || dates.length == 0)
             return ReservationOptionSet.empty
 
-        const options = dates.map(d => ReservationOption.fromDate(d, solutionId))
+        const options = dates.map(d => ReservationOption.fromDate(d, solution))
 
         return new ReservationOptionSet(options)
     }

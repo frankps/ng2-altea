@@ -547,7 +547,7 @@ export class OrderLine extends ObjectWithIdPlus {
   }
 
   calculateAll() {
-    this.setUnitPrice()
+    //  this.setUnitPrice()
     this.calculateInclThenExcl()
   }
 
@@ -623,12 +623,18 @@ export class OrderLine extends ObjectWithIdPlus {
 
     let previousUnit = this.unit
 
+    this.unit = this.calculateUnitPrice()
+
+    if (previousUnit != this.unit) this.markAsUpdated('unit')
+
+  }
+
+  calculateUnitPrice(startDate?: Date): number {
+
     let unitPrice = this.base
 
     if (ArrayHelper.IsEmpty(this.options)) {
-      this.unit = unitPrice
-      if (previousUnit != this.unit) this.markAsUpdated('unit')
-      return
+      return unitPrice
     }
 
     for (const option of this.options) {
@@ -641,35 +647,69 @@ export class OrderLine extends ObjectWithIdPlus {
       }
     }
 
-    this.unit = this.applySpecialPricing(unitPrice)
-    if (previousUnit != this.unit) this.markAsUpdated('unit')
+    let specialPricing = this.calculateSpecialPricing(unitPrice, startDate)
 
+    if (specialPricing)
+      unitPrice += specialPricing
+
+    return unitPrice
   }
 
-  applySpecialPricing(unit: number): number {
+
+  hasSpecialPrices(): boolean {
+    return ArrayHelper.NotEmpty(this.product.prices)
+  }
+
+  calculateSpecialPricing(basePrice: number, startDate?: Date): number {
 
     if (ArrayHelper.IsEmpty(this.product.prices))
-      return unit
+      return 0
+
+    let specialPricing = 0
+
+    if (!startDate)
+      startDate = this.order?.startDate
+
+    let day = -1
+    let skipDateChecks = false
+
+    if (startDate)
+      day = dateFns.getDay(startDate)
+    else
+      skipDateChecks = true
+
+
+    if (ArrayHelper.IsEmpty(this.product.prices))
+      return 0
 
     for (let price of this.product.prices) {
 
       if (price.isDay) {
-        let startDay = this.order?.startDate
+        if (skipDateChecks || !price.days[day])
+          continue
+      }
 
-        let day = dateFns.getDay(startDay)
+      if (price.isTime) {
 
-        if (!price.days[day])
+        if (skipDateChecks)
+          continue
+
+        let from = DateHelper.getDateAtTime(price.from, startDate)
+        let to = DateHelper.getDateAtTime(price.to, startDate)
+
+        // if startdate outside interval
+        if (startDate < from || startDate >= to)
           continue
       }
 
       switch (price.mode) {
         case PriceMode.add:
-          unit += price.value
+          specialPricing += price.value
           break
       }
     }
 
-    return unit
+    return specialPricing
 
 
   }

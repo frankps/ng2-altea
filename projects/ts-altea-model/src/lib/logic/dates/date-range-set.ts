@@ -894,7 +894,7 @@ export class DateRangeSet {
             if (resource)
                 solutionItem.resources.push(resource)
 
-            const solution = new Solution(solutionItem)
+            const solution = new Solution(request, solutionItem)
             solution.offsetRefDate = range.from
 
             return solution

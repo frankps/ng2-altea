@@ -61,7 +61,7 @@ export class DetermineReservationOptions {
 
         //possibleStartDates = _.sortedUniq(possibleStartDates)   //_.orderBy(possibleStartDates)
 
-        return ReservationOptionSet.fromDates(possibleStartDates, solution.id)
+        return ReservationOptionSet.fromDates(possibleStartDates, solution)
     }
 
     removeDuplicates(optionSet: ReservationOptionSet): ReservationOptionSet {

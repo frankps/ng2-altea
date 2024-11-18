@@ -12,7 +12,9 @@
                     <ng-container *ngFor="let option of orderMgrSvc.options">
 
                         <span class="badge bg-success mt-4" (click)="selectTimeSlot(option)">{{option.date |
-                            date:"HH:mm"}}</span>
+                            date:"HH:mm"}}
+                            <div *ngIf="option.price" class="mt-2" style="font-size: small; font-style: italic;">€{{option.price}}</div>
+                        </span>
                         &nbsp;
 
                     </ng-container>

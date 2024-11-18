@@ -158,7 +158,7 @@ export class OrderCancel {
 
 export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  // 
 
-  static defaultInclude = ['lines:orderBy=idx.product.items', 'contact', 'payments:orderBy=idx', 'planning']
+  static defaultInclude = ['lines:orderBy=idx', 'contact', 'payments:orderBy=idx', 'planning']   // .product.items
   static jsonProps = ['vatLines', 'persons', 'info', 'sum', 'extIds']
 
   organisation?: Organisation;
@@ -682,6 +682,17 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
   }
 
 
+  getOrderLinesWithSpecialPricing(): OrderLine[] {
+
+    if (!this.hasLines())
+      return []
+
+    let specialPriceLines = this.lines.filter(l => l.hasSpecialPrices())
+
+    return specialPriceLines
+
+  }
+
   /**
    * The default cancel time is defined on branch (branch.cancel in hours = number of hours before start of booking where free cancellation is not allowed anymore)
    * Products can optionally specify another minimum interval
@@ -1067,6 +1078,16 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     return productIds
   }
 
+  getNotLoadedProductIds(): string[] {
+
+    if (!this.hasLines())
+      return []
+
+    const productIds = this.lines!.filter(l => !l.product && l.productId).map(l => l.productId!)
+
+    return productIds
+  }
+  
   getProducts(): Product[] {
 
     if (!this.hasLines())

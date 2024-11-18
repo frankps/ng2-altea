@@ -121,7 +121,7 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
     let value = 1
     daysOfWeekShort.forEach(day => day.value = value++ % 7)
 
-    this.sectionProps.set('general', ['name', 'descr', 'inform', 'salesPrice', 'vatPct', 'color', 'personSelect', 'staffSelect', 'type', 'sub'])
+    this.sectionProps.set('general', ['name', 'descr', 'inform', 'salesPrice', 'vatPct', 'color', 'personSelect', 'staffSelect', 'priceFrom', 'priceInfo', 'type', 'sub'])
     this.sectionProps.set('planning', ['duration', 'hasPre', 'preTime', 'hasPost', 'postTime', 'planMode', 'plan'])
     this.sectionProps.set('serviceDetails', ['customers', 'gender', 'online', 'showPrice', 'duration', 'spacingAfter'])
     // pricing

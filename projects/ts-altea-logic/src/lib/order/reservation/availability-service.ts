@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { ApiListResult, ApiResult, DateHelper, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
-import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, Organisation, ResourceAvailability2, ResourcePlanning } from 'ts-altea-model'
+import { ApiListResult, ApiResult, ArrayHelper, DateHelper, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
+import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, Organisation, ResourceAvailability2, ResourcePlanning, ReservationOptionSet } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { AlteaDb } from '../../general/altea-db'
 import { IDb } from '../../interfaces/i-db'
@@ -130,13 +130,58 @@ export class AvailabilityService {
 
         console.error(response.optionSet)
 
+        this.doPricing(availabilityRequest, response.optionSet)
+
         return response
     }
+  
+
+    /**
+     * 
+     * @param availabilityRequest 
+     * @param optionSet 
+     * @returns 
+     */
+    doPricing(availabilityRequest: AvailabilityRequest, optionSet: ReservationOptionSet) {
 
 
+        // availabilityRequest.order.getLine
+
+        let order = availabilityRequest.order
+
+        let specialPriceLines = order.getOrderLinesWithSpecialPricing()
+
+        if (ArrayHelper.IsEmpty(specialPriceLines))
+            return
+
+        for (let option of optionSet.options) {
+
+            if (ArrayHelper.IsEmpty(option.solutions))
+                continue
+
+            let solution = option.solutions[0]
+
+            let date = option.date
+
+            let orderSpecialPrice = 0
+
+            for (let line of order.lines) {
+
+                let unitPrice = line.unit
+
+                if (line.hasSpecialPrices())
+                    unitPrice = line.calculateUnitPrice(date)
+
+                let lineSpecialPrice = line.qty * unitPrice
+
+                orderSpecialPrice += lineSpecialPrice
+            }
+
+            option.price = orderSpecialPrice
+        }
 
 
-
+    }
 
 
 

@@ -26,6 +26,30 @@ export class DateHelper {
         return utcDate
     }
 
+
+    /**
+     * 
+     * @param time time in format HH:mm
+     * @param date 
+     */
+    static getDateAtTime(time: string, date = new Date()) : Date {
+
+        if (!time || time.indexOf(':') == -1)
+            return null
+
+        let startOfDay = dateFns.startOfDay(date)
+
+        let items = time.split(':')
+
+        let hour = +items[0]
+        let minutes = +items[1]
+
+        let result = dateFns.addHours(startOfDay, hour)
+        result = dateFns.addMinutes(result, minutes)
+
+        return result
+    }
+
     static getYearMonths(from: Date, to: Date): number[] {
 
         const yearMonths = []

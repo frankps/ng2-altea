@@ -329,7 +329,7 @@ export class OrderMgrUiService {   // implements OnInit
       return
     }
 
-    let product = await me.productSvc.get$(productId, 'options:orderBy=idx.values:orderBy=idx,resources.resource')
+    let product = await me.productSvc.get$(productId, 'options:orderBy=idx.values:orderBy=idx,resources.resource,prices')
 
     me.prepareProduct(product)
 
@@ -350,7 +350,7 @@ export class OrderMgrUiService {   // implements OnInit
     const query = new DbQuery()
     query.and('id', QueryOperator.in, productIds)
 
-    query.include('options:orderBy=idx.values:orderBy=idx', 'resources.resource', 'items')
+    query.include('options:orderBy=idx.values:orderBy=idx', 'resources.resource', 'items', 'prices')
 
     let products = await me.productSvc.query$(query)
 
@@ -429,6 +429,31 @@ export class OrderMgrUiService {   // implements OnInit
 
 
 
+  async linkProductsToOrder(order: Order) {
+
+    if (!order)
+      return
+
+    let missingProductLines = order.lines.filter(l => !l.product && l.productId)
+    let productIds = missingProductLines.map(l => l.productId)
+
+    if (ArrayHelper.IsEmpty(productIds))
+      return
+
+    let products = await this.loadProducts$(...productIds)
+
+    if (ArrayHelper.IsEmpty(products))
+      return
+
+    for (let line of missingProductLines) {
+      let product = products.find(prod => prod.id == line.productId)
+
+      if (product)
+        line.product = product
+
+    }
+
+  }
 
 
 
@@ -439,7 +464,12 @@ export class OrderMgrUiService {   // implements OnInit
     this.clearData()
 
     // .resources.resource
-    const order = await this.orderSvc.get$(orderId, "planning.resource,lines:orderBy=idx.product,contact.cards,payments:orderBy=idx")
+    const order = await this.orderSvc.get$(orderId, "planning.resource,lines:orderBy=idx,contact.cards,payments:orderBy=idx")
+
+    if (!order)
+      return null
+
+    await this.linkProductsToOrder(order)
 
     if (order.gift) {
       this.gift = await this.giftSvc.getByOrderId$(orderId)
@@ -637,7 +667,7 @@ export class OrderMgrUiService {   // implements OnInit
       this.order.start = option.dateNum
       await this.calculateAll()
 
-      
+
       confirmOrderResponse = await me.alteaSvc.orderMgmtService.confirmOrder(me.order, option, solutionForOption, this.availabilityResponse)
 
       console.warn(confirmOrderResponse)
@@ -645,7 +675,7 @@ export class OrderMgrUiService {   // implements OnInit
 
       if (order) {
 
-        me.refreshOrder(order)
+        await me.refreshOrder(order)
 
         me.startTimer()
 
@@ -710,15 +740,18 @@ export class OrderMgrUiService {   // implements OnInit
 
 
   /** when an order is saved, we need to refresh all associated objects */
-  refreshOrder(bdOrder: Order) {
+  async refreshOrder(bdOrder: Order) {
 
     // attach branch again to order (needed for deposit calculations)
     if (!bdOrder.branch) {
       bdOrder.branch = this.sessionSvc.branch
     }
 
+    await this.linkProductsToOrder(bdOrder)
+
     this.order = bdOrder
 
+    // refresh the current orderline with the saved line
     if (this.orderLine?.id)
       this.orderLine = this.order.getLine(this.orderLine?.id)
   }
@@ -782,7 +815,6 @@ export class OrderMgrUiService {   // implements OnInit
 
     console.warn(this.order)
 
-
     //const newOrder = this.order.isNew()
 
     // let autoChangeState = (this.sessionSvc.appMode == AppMode.pos)
@@ -797,7 +829,7 @@ export class OrderMgrUiService {   // implements OnInit
 
       let order = res.object
 
-      this.refreshOrder(order)
+      await this.refreshOrder(order)
       me.orderDirty = false
 
       if (me.order.gift && me.gift) {
@@ -1030,7 +1062,7 @@ export class OrderMgrUiService {   // implements OnInit
    */
 
 
-        const product = await this.productSvc.get$(item.productId, 'options:orderBy=idx.values:orderBy=idx')
+        const product = await this.productSvc.get$(item.productId, ['options:orderBy=idx.values:orderBy=idx', 'resources:orderBy=idx', 'prices'])
 
         if (!product) {
           console.warn(`Product not found!`)

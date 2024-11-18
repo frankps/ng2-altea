@@ -584,7 +584,7 @@ export class OrderMgmtService {
 
         Here we have a start date, and we force a solution
         */
-        let solution = new Solution()
+        let solution = new Solution(resourceRequest)
 
         for (let requestItem of resourceRequest.items) {
 

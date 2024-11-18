@@ -276,7 +276,7 @@ export class Solution extends SolutionItems {
 
     num: number = -1
 
-    constructor(...items: SolutionItem[]) {
+    constructor(public request: ResourceRequest, ...items: SolutionItem[]) {
         super(items)
 
         if (ArrayHelper.NotEmpty(items)) {

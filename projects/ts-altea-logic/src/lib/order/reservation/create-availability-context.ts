@@ -23,6 +23,7 @@ export class CreateAvailabilityContext {
     }
 
 
+
     async create(availabilityRequest: AvailabilityRequest): Promise<AvailabilityContext> {
 
 
@@ -60,6 +61,7 @@ export class CreateAvailabilityContext {
 
         ctx.allResourceIds = this.getResourceIds(ctx.configResources, true, ctx.resourceGroups)
 
+        this.attachProductResources(ctx.order!, ctx.allResources)
 
         // Every branch has also a corresponding resource (to manage holidays, opening hours, etc of the branch)       
 
@@ -302,29 +304,51 @@ export class CreateAvailabilityContext {
      */
     async attachProductsToOrderLines(order: Order) {
 
-        const productIds = order.getProductIds()
+        const productIds = order.getNotLoadedProductIds()
 
         if (productIds.length == 0)
             return []
 
-        const products = await this.alteaDb.getProducts(productIds, 'resources.resource')
-
-
+        const products = await this.alteaDb.getProducts(productIds, 'resources.resource', 'prices')
 
         if (Array.isArray(products) && products.length > 0) {
 
-            for (const line of order.lines!) {
+            let linesProductsNotLoaded = order.lines.filter(l => !l.product)
+
+            for (const line of linesProductsNotLoaded!) {
 
                 const product = products.find(p => p.id == line.productId)
 
                 line.product = product
-
             }
         }
 
         return products
+    }
 
 
+    /**
+     * order.lines*.product.resources*.resource was sometimes missing (resource not previously loaded from product)
+     * => attach the missing ones
+     * 
+     * @param order 
+     * @param resources 
+     * @returns 
+     */
+    attachProductResources(order: Order, resources: Resource[]) {
+
+        if (!order || !order.hasLines() || ArrayHelper.IsEmpty(resources))
+            return
+
+        let productResources = order.lines.flatMap(l => l.product.resources)
+        productResources = productResources.filter(pr => !pr.resource && pr.resourceId)
+
+        for (let productResource of productResources) {
+            let resource = resources.find(r => r.id == productResource.resourceId)
+
+            if (resource)
+                productResource.resource = resource
+        }
     }
 
     /**

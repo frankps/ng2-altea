@@ -127,7 +127,7 @@ export class SlotFinderBlocks {
 
                 
 
-            currentSolution = new Solution()
+            currentSolution = new Solution(resourceRequest)
             currentSolution.offsetRefDate = offsetRefDate
 
             solutions.push(currentSolution)

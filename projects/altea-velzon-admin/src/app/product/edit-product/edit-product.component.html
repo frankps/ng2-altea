@@ -64,6 +64,12 @@
       </ngx-altea-label-control>
 
       <br />
+      <ngx-altea-label-control label="objects.product.priceInfo" for="priceInfo">
+        <textarea rows="4" class="form-control" id="priceInfo" name="priceInfo" style="height: 120px"
+          [(ngModel)]="object.priceInfo"></textarea>
+      </ngx-altea-label-control>
+
+      <br />
       <ngx-altea-label-control label="objects.product.inform" for="inform">
         <textarea rows="4" class="form-control" id="inform" name="inform" style="height: 80px"
           [(ngModel)]="object.inform"></textarea>
@@ -114,6 +120,11 @@
           <div class="form-check">
             <input class="form-check-input" type="checkbox" id="staffSelect" [(ngModel)]="object.staffSelect" />
             <label class="form-check-label" for="staffSelect" translate="objects.product.staffSelect"></label>
+          </div>
+
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="priceFrom" [(ngModel)]="object.priceFrom" />
+            <label class="form-check-label" for="priceFrom" translate="objects.product.priceFrom"></label>
           </div>
 
         </div>
