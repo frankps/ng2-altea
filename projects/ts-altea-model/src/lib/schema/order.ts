@@ -341,6 +341,17 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
   }
 
+  hasPriceFrom(): boolean {
+
+    if (!this.hasLines())
+      return false
+    
+    let idx = this.lines.findIndex(l => l.product.priceFrom)
+
+    return (idx >= 0)
+
+  }
+
   allPaid(): boolean {
     return this.paid >= this.incl
   }
@@ -777,6 +788,8 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
     if (!this.lines)
       this.lines = []
+
+    orderLine.order = this
 
     if (setUnitPrice)
       orderLine.setUnitPrice()

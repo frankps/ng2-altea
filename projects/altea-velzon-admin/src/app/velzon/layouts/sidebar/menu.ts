@@ -5,56 +5,56 @@ export const MENU: MenuItem[] = [
     id: 1,
     label: 'MENUITEMS.MENU.TEXT',
     isTitle: true,
-    roles: ['staff', 'admin']
+    roles: []
   },
   {
     id: 10,
     label: 'menu.order.label',
     icon: 'plus-circle',
     link: '/aqua/orders/manage',
-    roles: ['staff', 'admin']
+    roles: []
   },
   {
     id: 7,
     label: 'menu.calendar.label',
     icon: 'calendar',
     link: '/aqua/calendar/syncfusion',
-    roles: ['staff', 'admin']
+    roles: []
   },
   {
     id: 6,
     label: 'menu.orders.label',
     icon: 'archive',
     link: '/aqua/orders',
-    roles: ['staff', 'admin']
+    roles: []
   },
   {
     id: 16,
     label: 'menu.messaging.label',
     icon: 'message-square',
     link: '/aqua/messaging',
-    roles: ['staff', 'admin']
+    roles: []
   },
   {
     id: 5,
     label: 'menu.contacts.label',
     icon: 'users',
     link: '/aqua/contacts',
-    roles: ['staff', 'admin']
+    roles: []
   },  
   {
     id: 8,
     label: 'menu.gifts.label',
     icon: 'gift',
     link: '/aqua/gifts',
-    roles: ['staff', 'admin']
+    roles: ['staff', 'admin', 'posAdmin']
   },
   {
     id: 9,
     label: 'menu.subscriptions.label',
     icon: 'refresh-cw',
     link: '/aqua/subscriptions',
-    roles: ['staff', 'admin']
+    roles: ['staff', 'admin', 'posAdmin']
   },
   {
     id: 2,
@@ -175,18 +175,20 @@ export const MENU: MenuItem[] = [
     label: 'menu.accounting.label',
     icon: 'book',
     link: '/aqua/accounting',
-    roles: ['admin'],
+    roles: ['admin', 'posAdmin'],
     subItems: [
       {
         id: 171,
         label: 'menu.accounting.sub.transactions',
         link: '/aqua/accounting/transactions',
+        roles: ['admin'],
         parentId: 17
       },
       {
         id: 172,
         label: 'menu.accounting.sub.payments',
         link: '/aqua/orders/payments',
+        roles: ['admin', 'posAdmin'],
         parentId: 17
       }
     ]

@@ -134,8 +134,18 @@
             <form #generalForm="ngForm">
 
 
+                <div class="row mt-2">
+                    <div class="col-6">
+                        <ngx-altea-label-control label="objects.gift.code" for="code">
+                            <input type="text" id="code" name="code" class="form-control"
+                                [(ngModel)]="object.code" />
+                        </ngx-altea-label-control>
+                    </div>
+                </div>
 
-                <div class="row">
+
+
+                <div class="row  mt-2">
                     <div class="col-4">
                         <ngx-altea-label-control label="objects.gift.value" for="value">
                             <input type="number" id="value" name="value" required class="form-control"

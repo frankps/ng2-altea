@@ -12,13 +12,19 @@
                     </ng-select>
 
                     &nbsp;&nbsp;x&nbsp;
-
+  
                     {{orderLine.descr}}
 
                 </div>
                 <div class="col-3">
                     <span class="float-end"> <span *ngIf="product.priceFrom"
                             translate>objects.product.priceFrom-app</span> {{orderLine.incl}} €  <sup *ngIf="product.priceInfo">*</sup></span>
+                </div>
+            </div>
+
+            <div class="row mt-2" *ngIf="product.minQty > 1">
+                <div class="col">
+                    <span style="font-size: smaller; text-align: left;" translate [translateParams]="{min: product.minQty}">objects.product.minQty-app</span>
                 </div>
             </div>
 

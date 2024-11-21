@@ -95,12 +95,15 @@
             <div class="col-6">{{order.incl| currency:branch.cur}}</div>
         </div>
 
-        <div class="row" *ngIf="order.depo">
+<!--        
+ -->
+
+        <div class="row" *ngIf="order.depo  && order.deposit && order.paid < order.deposit && order.deposit < order.incl">
             <div class="col-6 d-flex justify-content-end">Voorschot:</div>
             <div class="col-6">{{order.deposit| currency:branch.cur}}</div>
         </div>
 
-        <div class="row mb-2">
+        <div class="row mb-2" *ngIf="order.paid > 0">
             <div class="col-6 d-flex justify-content-end">Betaald:</div>
             <div class="col-6">{{order.paid| currency:branch.cur}}</div>
         </div>

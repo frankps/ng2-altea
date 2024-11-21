@@ -22,7 +22,7 @@ export class SessionService implements OnInit {
     red: 'red'
   }
 
-  public _role: 'staff' | 'admin' = 'staff'
+  public _role: 'staff' | 'admin' | 'posAdmin' = 'staff'
 
   public currency = 'EUR'
   public currencySymbol = ' €'
@@ -68,7 +68,7 @@ export class SessionService implements OnInit {
 
     let role = localStorage.getItem('role')
 
-    if (role && (role == 'staff' || role == 'admin')) {
+    if (role && (role == 'staff' || role == 'admin' || role == 'posAdmin') ) {  // 
       this._role = role
     }
 
@@ -108,15 +108,19 @@ export class SessionService implements OnInit {
   }
 
 
-  toggleRole() {
+  toggleRolePosAdmin() {
+    this.role = this._role == 'staff' ? 'posAdmin' : 'staff'
+  }
+
+  toggleRoleAdmin() {
     this.role = this._role == 'staff' ? 'admin' : 'staff'
   }
 
-  get role(): 'staff' | 'admin' {
+  get role(): 'staff' | 'admin' | 'posAdmin' {
     return this._role
   }
 
-  set role(value: 'staff' | 'admin') {
+  set role(value: 'staff' | 'admin' | 'posAdmin') {
     this._role = value
     localStorage.setItem('role', value)
     console.error(`New role: ${value}`)

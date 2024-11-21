@@ -457,6 +457,10 @@ export class Product extends ObjectWithIdPlus {
 
   advPricing = false
 
+  /** Minimum quantity to order / reserv */
+  @Type(() => Number)
+  minQty = 1;
+
   salesPricing(onDate: Date = new Date()): number {
 
     if (ArrayHelper.IsEmpty(this.prices))
@@ -833,6 +837,20 @@ export enum PriceMode {
 }
 
 
+export enum PriceDateType {
+  day = 'day',
+  dayFrom = 'dayFrom'
+}
+
+/**
+ * if price is valid at certain
+ *  day: tp='day' and start has format yyyyMMdd
+ *  from certain hour at certain day: tp='dayFrom' and start has format yyyyMMddHHmm
+ */
+export class PriceDate {
+  tp: PriceDateType = PriceDateType.day
+  start: number
+}
 
 export class Price extends ObjectWithIdPlus {
 
@@ -864,9 +882,20 @@ export class Price extends ObjectWithIdPlus {
   isDay = false
   days: boolean[] = []
 
+  /** price only valid in [from, to] interval */
   isTime = false
+
+  /** if price is only valid from certain hour during the day, format HH:mm */
   from?: string
+
+  /** if price is only valid to certain hour during the day, format HH:mm */
   to?: string
+
+  /** if price is only valid at certain dates (defined in dates) */
+  hasDates = false
+
+  /** if price is only valid at certain dates */
+  dates?: PriceDate[]
 
   isExtraQty = false
   extraQty: number = 0
@@ -875,6 +904,8 @@ export class Price extends ObjectWithIdPlus {
   hasOptions = false  // true if this price also has option specific price changes
   options: OptionPrice[] = []
 
+  /** an extra optional price when buying a gift for this product (example wellness is more expensive during peak moments) */
+  giftOpt = false
 
   idx = 0
 
@@ -917,8 +948,8 @@ export class Price extends ObjectWithIdPlus {
       return this._startDate
 
     this._startDate = DateHelper.parse(this.start)
-    return this._startDate
 
+    return this._startDate
   }
 
   set sameBasePrice(value: boolean) {

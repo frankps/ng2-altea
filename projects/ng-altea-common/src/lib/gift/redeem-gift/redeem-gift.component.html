@@ -51,15 +51,21 @@
                     <div class="col-6">{{gift.value | currency:branch.cur}}</div>
                 </div>
 
-                <div class="row">
-                    <div class="col-6 d-flex justify-content-end">Reeds gebruikt:</div>
-                    <div class="col-6">{{gift.used | currency:branch.cur}}</div>
-                </div>
+                <ng-container *ngIf="gift.used > 0">
 
-                <div class="row">
-                    <div class="col-6 d-flex justify-content-end">Nog beschikbaar:</div>
-                    <div class="col-6">{{gift.value - gift.used | currency:branch.cur}}</div>
-                </div>
+                    <div class="row">
+                        <div class="col-6 d-flex justify-content-end">Reeds gebruikt:</div>
+                        <div class="col-6">{{gift.used | currency:branch.cur}}</div>
+                    </div>
+    
+                    <div class="row">
+                        <div class="col-6 d-flex justify-content-end">Nog beschikbaar:</div>
+                        <div class="col-6">{{gift.value - gift.used | currency:branch.cur}}</div>
+                    </div>
+
+
+                </ng-container>
+
 
 
                 <ng-container *ngIf="gift.hasLines()">

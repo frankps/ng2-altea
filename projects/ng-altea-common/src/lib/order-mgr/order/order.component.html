@@ -112,7 +112,12 @@
                 <div class="col" translate>ui.order-mgr.order.empty</div>
             </div>
 
+
         </ng-container>
+
+
+
+
 
 
 
@@ -128,7 +133,15 @@
 
                         </small>
                     </div>
-                    <div class="col-4 d-flex justify-content-end">€ {{line.incl}}</div>
+                    <div class="col-4 d-flex justify-content-end align-items-end">
+
+                        <!-- If no date is specified (order.start not set), and product has flexible price (priceFrom) -->
+                        <span *ngIf="!order.start && !order.gift && line?.product?.priceFrom " style="font-size: smaller; text-align: right;"><sup>*</sup> <span translate>objects.product.priceFrom-app</span> &nbsp; </span>
+        <!--                 
+                         <ng-container *ngIf="!order.start && line?.product?.priceFrom">
+                            <span translate>objects.product.priceFrom-app</span><sup>*</sup>&nbsp;
+                         </ng-container> -->
+                        € {{line.incl}}</div>
                 </div>
 
                 <ng-container *ngIf="line.hasPersons()">
@@ -174,7 +187,7 @@
 
 
 
-            <div class="row mt-2 mb-3" *ngIf="order.nrOfPersons > 1">
+            <div class="row mt-2 mb-3" *ngIf="order.nrOfPersons > 1 && appMode == AppMode.pos">
                 <div class="col">
                     <div class="btn-group btn-group-sm float-end" role="group" aria-label="Basic example">
 
@@ -192,10 +205,18 @@
 
         </ng-container>
 
+        <div class="row mt-2" *ngIf="!order.start && !order.gift && order?.hasPriceFrom()">
+            <div class="col">
+                <span class="float-end" style="font-size: smaller; text-align: right;"><sup>*</sup> <span translate>objects.product.priceFrom-info</span></span>
+            </div>
+        </div>
+
         <div class="d-grid mt-4">
             <button type="button" class="btn btn-outline-primary float-end btn-sm" (click)="emitAddProduct()"
                 translate>ui.order-mgr.order.add-product</button>
         </div>
+
+
 
 
         <div class="row mt-4" style="font-weight: bolder;">

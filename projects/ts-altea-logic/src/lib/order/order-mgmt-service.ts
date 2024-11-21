@@ -138,8 +138,8 @@ export class OrderMgmtService {
 
         if (res.notOk) {
             orderDeleteResult.error(`Problem deleting order: ${res.message}`)
-        }
-
+        } 
+        
         return orderDeleteResult
 
     }

@@ -187,6 +187,10 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
     var res = await orderMgmtSvc.deleteOrder(order.id)
 
     if (res.ok) {
+
+      var firebaseRes = this.orderSvc.deleteOrderInFirebase(order.branchId, order.id)
+      console.error(firebaseRes)
+
       this.dashboardSvc.showToastType(ToastType.saveSuccess)
 
       _.remove(this.uiOrders, order)

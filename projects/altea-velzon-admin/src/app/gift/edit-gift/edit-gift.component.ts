@@ -59,7 +59,7 @@ export class EditGiftComponent extends NgEditBaseComponent<Gift> {
       , giftSvc
       , router, route, spinner, dashboardSvc)
 
-    this.sectionProps.set('general', ['value', 'used', 'isConsumed', 'fromName', 'fromEmail', 'toName', 'toEmail', 'toAddress', 'toMessage', 'toSendEmail', 'fromId'])
+    this.sectionProps.set('general', ['code', 'value', 'used', 'isConsumed', 'fromName', 'fromEmail', 'toName', 'toEmail', 'toAddress', 'toMessage', 'toSendEmail', 'fromId'])
     // this.translationSvc.translateEnum(Gender, 'enums.gender.', this.gender)
     // this.translationSvc.translateEnum(Language, 'enums.language.', this.language)
 

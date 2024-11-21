@@ -1017,6 +1017,8 @@
       "planMode": "Planning mode",
       "type": "Type",
       "sub": "Sub type",
+      "minQty": "Minimum te bestellen",
+      "minQty-app": "Minimaal {{min}} te bestellen",
       "types": {
         "product": {
           "bundle": "Bevat andere producten"
@@ -1094,7 +1096,7 @@
       "sameBasePrice": "Zelfde basisprijs",
       "addition": "Toeslag",
       "isPromo": "Is promotie",
-      "title": "Promotie titel",
+      "title": "Titel",
       "title-tpl": "* promotie",
       "isAbsolute": "Andere basisprijs",
       "absValue": "Nieuwe prijs",
@@ -1109,6 +1111,7 @@
       "extraQty": "Extra beurten",
       "from": "Vanaf (hh:mm)",
       "to": "Tot (hh:mm)",
+      "giftOpt": "Cadeaubon optie",
       "help": {
         "price": "Prijs per behandeling"
       }

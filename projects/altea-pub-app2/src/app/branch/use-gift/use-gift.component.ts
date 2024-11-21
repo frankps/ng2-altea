@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Gift, RedeemGift } from 'ts-altea-model';
+import { Gift, GiftType, RedeemGift } from 'ts-altea-model';
 import { OrderMgrUiService } from 'ng-altea-common';
 import { SessionService } from 'ng-altea-common';
 
@@ -26,9 +26,12 @@ export class UseGiftComponent {
     await this.orderMgrSvc.redeemGift(redeemGift)
 
     console.log(me.orderMgrSvc.order)
-
-    this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'orderMode', 'browse-catalog'])
-
+    
+    if (redeemGift.mode == GiftType.specific) {
+      this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'orderMode', 'order'])
+    } else {
+      this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'orderMode', 'browse-catalog'])
+    }
     
   }
 }

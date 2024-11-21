@@ -161,7 +161,7 @@ export class AvailabilityService {
 
             let solution = option.solutions[0]
 
-            let date = option.date
+            let startDate = option.date
 
             let orderSpecialPrice = 0
 
@@ -170,7 +170,7 @@ export class AvailabilityService {
                 let unitPrice = line.unit
 
                 if (line.hasSpecialPrices())
-                    unitPrice = line.calculateUnitPrice(date)
+                    unitPrice = line.calculateUnitPrice(startDate, order.cre)
 
                 let lineSpecialPrice = line.qty * unitPrice
 

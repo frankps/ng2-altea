@@ -450,7 +450,7 @@ export class OrderLine extends ObjectWithIdPlus {
     line.unit = unit
     line.vatPct = vatPct
 
-    line.calculateInclThenExcl()
+    line.calculateInclThenExcl(false)
 
     return line
 
@@ -589,7 +589,7 @@ export class OrderLine extends ObjectWithIdPlus {
    * 
    * @returns this.incl
    */
-  calculateInclThenExcl(): number {
+  calculateInclThenExcl(recalculateUnitPrice: boolean = true): number {
 
 
     // this.product.prices
@@ -598,7 +598,9 @@ export class OrderLine extends ObjectWithIdPlus {
     const previousExcl = this.excl
     const previousVat = this.vat
 
-    this.setUnitPrice()
+    /** a gift orderline can have for instance no product attached */
+    if (recalculateUnitPrice && this.product)
+      this.setUnitPrice()
 
     this.incl = this.unit * this.qty
 
@@ -629,7 +631,7 @@ export class OrderLine extends ObjectWithIdPlus {
 
   }
 
-  calculateUnitPrice(startDate?: Date): number {
+  calculateUnitPrice(startDate?: Date, creationDate?: Date): number {
 
     let unitPrice = this.base
 
@@ -647,7 +649,7 @@ export class OrderLine extends ObjectWithIdPlus {
       }
     }
 
-    let specialPricing = this.calculateSpecialPricing(unitPrice, startDate)
+    let specialPricing = this.calculateSpecialPricing(unitPrice, startDate, creationDate)
 
     if (specialPricing)
       unitPrice += specialPricing
@@ -660,7 +662,12 @@ export class OrderLine extends ObjectWithIdPlus {
     return ArrayHelper.NotEmpty(this.product.prices)
   }
 
-  calculateSpecialPricing(basePrice: number, startDate?: Date): number {
+  calculateSpecialPricing(basePrice: number, startDate?: Date, creationDate?: Date): number {
+
+    /*
+    if (!this.order)
+      throw new Error('Link OrderLine -> Order not existing')
+*/
 
     if (ArrayHelper.IsEmpty(this.product.prices))
       return 0
@@ -670,19 +677,30 @@ export class OrderLine extends ObjectWithIdPlus {
     if (!startDate)
       startDate = this.order?.startDate
 
+    if (!creationDate)
+      creationDate = this.order?.cre
+
+    if (!creationDate)
+      creationDate = new Date()
+
     let day = -1
     let skipDateChecks = false
 
     if (startDate)
       day = dateFns.getDay(startDate)
     else
-      skipDateChecks = true
+      skipDateChecks = true  // because there is no date available
 
 
     if (ArrayHelper.IsEmpty(this.product.prices))
       return 0
 
     for (let price of this.product.prices) {
+
+      if (price.start) {
+        if (creationDate < price.startDate)
+          continue
+      }
 
       if (price.isDay) {
         if (skipDateChecks || !price.days[day])

@@ -539,6 +539,7 @@ export class OrderMgrUiService {   // implements OnInit
         return */
 
 
+    this.payGifts
 
     console.warn(this.order)
 
@@ -1116,17 +1117,12 @@ export class OrderMgrUiService {   // implements OnInit
     } else {
       console.warn(me.order)
 
-
-
-
-
       me.order.addLine(orderLine, setUnitPrice)
 
       if (product?.type == ProductType.svc) {
         /** introduced for wellness, has options adults & kids => this influences nrOfPersons */
         me.updateNrOfPersons(orderLine)
       }
-
 
       me.orderDirty = true
       me.orderLineIsNew = false
@@ -1147,8 +1143,11 @@ export class OrderMgrUiService {   // implements OnInit
 
     this.orderLineIsNew = true
     this.prepareProduct(product)
-    this.orderLine = new OrderLine(product, qty, initOptionValues)
 
+    if (qty < product.minQty)
+      qty = product.minQty
+
+    this.orderLine = new OrderLine(product, qty, initOptionValues)
 
     return this.orderLine
   }

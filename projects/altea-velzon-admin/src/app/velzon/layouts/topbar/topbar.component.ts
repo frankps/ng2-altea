@@ -327,10 +327,17 @@ export class TopbarComponent implements OnInit {
 
   searchNow(input: any) {
 
-    // console.error()
+     console.error(input)
 
-    if (this.searchString == 'wxc')
-      this.sessionSvc.toggleRole()
+    if (this.searchString == 'wxc') {
+     // console.error('toggleRolePosAdmin')
+      this.sessionSvc.toggleRolePosAdmin()
+    }
+      
+    if (this.searchString == 'wxcv') {
+      // console.error('toggleRolePosAdmin')
+       this.sessionSvc.toggleRoleAdmin()
+     }
 
     this.dashboardSvc.searchFor(this.searchString)
 

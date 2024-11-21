@@ -14,8 +14,6 @@ export class OrderService extends BackendHttpServiceBase<Order> {
     super(Order, 'Order', sessionSvc.backend, sessionSvc.branchUnique + '/orders', http)
   }
 
-
-
   async pushOrderToFirebase(orderId: string) : Promise<any> {
 
     var res = await this.httpGet$(`pushOrderToFirebase?id=${orderId}`)
@@ -23,7 +21,15 @@ export class OrderService extends BackendHttpServiceBase<Order> {
     return res
   }
 
+  async deleteOrderInFirebase(branchId: string, orderId: string) : Promise<any> {
 
+    var res = await this.httpGet$(`deleteOrderInFirebase?branchId=${branchId}&orderId=${orderId}`)
+  
+    return res
+  }
+
+
+  
 
 
 }

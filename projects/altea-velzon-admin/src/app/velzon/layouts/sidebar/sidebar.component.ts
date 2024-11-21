@@ -5,6 +5,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { MENU } from './menu';
 import { MenuItem } from './menu.model';
 import { SessionService } from 'ng-altea-common';
+import { ArrayHelper } from 'ts-common';
 
 @Component({
   selector: 'app-sidebar',
@@ -26,11 +27,8 @@ export class SidebarComponent implements OnInit {
   ngOnInit(): void {
     // Menu Items
 
+    this.loadMenu()
     
-    this.menuItems = MENU.filter(item => item.roles?.indexOf(this.sessionSvc.role) >= 0);
-
-
-
     this.router.events.subscribe((event) => {
       if (document.documentElement.getAttribute('data-layout') != "twocolumn") {
         if (event instanceof NavigationEnd) {
@@ -38,6 +36,21 @@ export class SidebarComponent implements OnInit {
         }
       }
     });
+  }
+
+  loadMenu() {
+
+    let role = this.sessionSvc.role
+
+    let menuItems = MENU.filter(item => ArrayHelper.IsEmpty(item.roles) || item.roles?.indexOf(role) >= 0);
+
+    for (let item of menuItems) {
+
+      if (ArrayHelper.NotEmpty(item.subItems))
+        item.subItems = item.subItems.filter(item => ArrayHelper.IsEmpty(item.roles) || item.roles?.indexOf(this.sessionSvc.role) >= 0);
+    }
+
+    this.menuItems = menuItems
   }
 
   /***

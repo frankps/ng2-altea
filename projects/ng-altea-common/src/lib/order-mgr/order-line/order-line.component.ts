@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { OrderMgrUiService } from '../order-mgr-ui.service';
 import { ProductService, SessionService } from 'ng-altea-common'
 import { OrderLine, OrderLineOption, OrderLineOptionValue, Product, ProductType } from 'ts-altea-model';
@@ -10,7 +10,7 @@ import { OrderLine, OrderLineOption, OrderLineOptionValue, Product, ProductType 
   templateUrl: './order-line.component.html',
   styleUrls: ['./order-line.component.scss'],
 })
-export class OrderLineComponent {
+export class OrderLineComponent implements OnInit {
 
   @Input() showConfirm = true
 
@@ -22,9 +22,39 @@ export class OrderLineComponent {
   @Output() back: EventEmitter<void> = new EventEmitter<void>();
 
   // create array from 1 to 20 , to select quantity
-  qtyArray = [...Array(20).keys()].map(i => i + 1)
+  qtyArray = [] // [...Array(20).keys()].map(i => i + 1)
 
   constructor(protected orderMgrSvc: OrderMgrUiService, private productSvc: ProductService, protected sessionSvc: SessionService) {
+  }
+
+  ngOnInit(): void {
+
+    /*
+    if (this.orderMgrSvc.product) {
+
+      let minQty = 1
+
+      if (this.orderMgrSvc.product.minQty)
+        minQty = this.orderMgrSvc.product.minQty
+
+
+      this.qtyArray = [...Array(20).keys()].map(i => i + minQty)
+    }
+      */
+    
+  }
+
+  setQtyArray(product: Product) {
+    let minQty = 1
+
+    if (product)
+      minQty = product.minQty
+
+    this.qtyArray = [...Array(21 - minQty).keys()].map(i => i + minQty)
+  }
+
+  @Input() set product(product: Product) {
+    this.setQtyArray(product)
   }
 
   get product() {
@@ -53,8 +83,6 @@ export class OrderLineComponent {
   // orderMgrSvc.addOrderLine(orderLine)
 
   addOrderLine(orderLine: OrderLine) {
-
-
 
     this.orderMgrSvc.addOrderLine(orderLine)
     this.new.emit(orderLine)

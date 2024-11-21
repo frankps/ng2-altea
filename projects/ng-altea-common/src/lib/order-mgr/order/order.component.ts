@@ -33,6 +33,7 @@ export class OrderComponent implements OnInit {
   humanResources: Resource[]
 
   appMode: AppMode
+  AppMode = AppMode
 
   /** show the confirmation button to finalise order (introduced for POS) */
   @Input() showConfirm = false

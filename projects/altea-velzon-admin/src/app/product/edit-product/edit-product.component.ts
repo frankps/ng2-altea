@@ -121,7 +121,7 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
     let value = 1
     daysOfWeekShort.forEach(day => day.value = value++ % 7)
 
-    this.sectionProps.set('general', ['name', 'descr', 'inform', 'salesPrice', 'vatPct', 'color', 'personSelect', 'staffSelect', 'priceFrom', 'priceInfo', 'type', 'sub'])
+    this.sectionProps.set('general', ['name', 'descr', 'inform', 'salesPrice', 'vatPct', 'color', 'personSelect', 'staffSelect', 'priceFrom', 'priceInfo', 'type', 'sub', 'minQty'])
     this.sectionProps.set('planning', ['duration', 'hasPre', 'preTime', 'hasPost', 'postTime', 'planMode', 'plan'])
     this.sectionProps.set('serviceDetails', ['customers', 'gender', 'online', 'showPrice', 'duration', 'spacingAfter'])
     // pricing
@@ -567,14 +567,14 @@ if (this.editSection == 'pricing') {
     if (!this.object?.id)
       return
 
-    let title: string = await this.translationSvc.getTrans("objects.price.title-tpl")
-
+/*     let title: string = await this.translationSvc.getTrans("objects.price.title-tpl")
 
     title = title.replace('*', this.object.name)
 
     console.warn(title)
+ */
 
-    const price = new Price(this.object?.id, title)
+    const price = new Price(this.object?.id, '')
 
     const priceMaxIdx = _.maxBy(this.object.prices, 'idx')
 
