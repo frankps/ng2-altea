@@ -113,6 +113,8 @@ ng generate module staff --project altea-pub-app --routing
 ng generate component staff/dashboard --project altea-pub-app
 ng generate component staff/task --project altea-pub-app
 
+ng generate component product/price-condition --project altea-velzon-admin
+
 ng generate component order/payments --project altea-velzon-admin
 ng generate component order-mgr/posPayment --project altea-velzon-admin
 ng generate component pos/posPayment --project ng-altea-common

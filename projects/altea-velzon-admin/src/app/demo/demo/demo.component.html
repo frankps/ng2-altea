@@ -4,6 +4,8 @@
 <order-mgr-contact-select2></order-mgr-contact-select2>
  -->
 
+<!--  <price-condition></price-condition> -->
+
 <ng-container *ngIf="stripeEvents">
 
     <ul class="list-group" *ngFor="let event of stripeEvents">
@@ -19,9 +21,10 @@
 
             <div class="row">
                 <div class="col-6"></div>
-                <div class="col-6"><button type="button" class="btn btn-primary btn-sm mx-3" (click)="postToStripeWebhook(event.event)">Post to webhook</button></div>      
-              </div>
-          
+                <div class="col-6"><button type="button" class="btn btn-primary btn-sm mx-3"
+                        (click)="postToStripeWebhook(event.event)">Post to webhook</button></div>
+            </div>
+
 
 
 
@@ -33,11 +36,53 @@
 </ng-container>
 
 
+<ng-container *ngIf="initialized">
+
+
+    <div class="row">
+
+
+        <div class="col-3">
+            <ng-select id="priceConditionType" name="priceConditionType" [items]="priceConditionTypes" bindLabel="trans"
+                bindValue="key" [clearable]="false" [multiple]="false" [(ngModel)]="cond.tp"></ng-select>
+
+        </div>
+        <div class="col-1">
+
+            <ng-select id="valueComparator" name="valueComparator" [items]="valueComparators" bindLabel="trans"
+                bindValue="key" [clearable]="false" [multiple]="false" [(ngModel)]="cond.comp"></ng-select>
+
+        </div>
+        <div class="col-1">
+
+            <input type="number" id="conditionValue" name="conditionValue" class="form-control" placeholder="Waarde"
+                [(ngModel)]="cond.val" />
+
+        </div>
+    </div>
+
+
+    <ng-select id="subscriptionUnitProducts" name="subscriptionUnitProducts" [items]="subscriptionUnitProducts"
+        bindLabel="name" bindValue="id" [clearable]="false" [multiple]="true" [(ngModel)]="cond.ids">
+    </ng-select>
+
+
+
+
+
+
+
+</ng-container>
+
+
+
 <div class="row">
 
 
     <div class="col-4">
 
+
+        <!-- 
         <button type="button" class="btn btn-primary btn-sm mx-3 my-3" (click)="deleteOrder()">Delete order</button>
 
         <button type="button" class="btn btn-primary btn-sm mx-3 my-3" (click)="saveMessage()">Save message</button>
@@ -57,7 +102,7 @@
 
         <button type="button" class="btn btn-primary btn-sm mx-3 my-3" (click)="loadStripeEvents()">Load stripe
             events</button>
-
+ -->
 
 
         <!--         <button type="button" class="btn btn-primary btn-sm mx-3" (click)="orderPay()">Order pay</button>

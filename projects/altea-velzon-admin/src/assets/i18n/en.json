@@ -62,6 +62,16 @@
     "validate": "Valideren"
   },
   "enums": {
+    "price-condition-type": {
+      "subUnitProdQty": "Beurten reeds gekocht"
+    },
+    "value-comparator": {
+      "=": "=",
+      "<": "<",
+      ">": ">",
+      "<=": "<=",
+      ">=": ">="
+    },
     "fb-auth": {
       "auth/weak-password": "Paswoord moet minstens 6 karakters hebben",
       "auth/missing-password": "Ontbrekend paswoord",
@@ -967,7 +977,7 @@
       "short": "SMS"
     },
     "planning": {
-      "prep":"Is voorbereidings- of opkuistijd"
+      "prep": "Is voorbereidings- of opkuistijd"
     },
     "resource": {
       "article": "de",
@@ -1105,10 +1115,13 @@
       "isQty": "Kwantumkorting",
       "isDay": "Prijs geldig op specifieke weekdagen",
       "isTime": "Prijs geldig gedurende een tijdsinterval",
-      "isExtraQty": "Klant ontvangt extra beurten",
+      "extraQty": {
+        "val": "Extra beurten",
+        "on": "Klant ontvangt extra beurten",
+        "pct": "Is percentage"
+      },
       "hasOptions": "Specifieke prijzen voor opties",
       "options": "Kies optie",
-      "extraQty": "Extra beurten",
       "from": "Vanaf (hh:mm)",
       "to": "Tot (hh:mm)",
       "giftOpt": "Cadeaubon optie",

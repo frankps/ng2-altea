@@ -487,6 +487,10 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
     return DateHelper.parse(this.start)
   }
+
+  set startDate(value: Date) {
+    this.start = DateHelper.yyyyMMddhhmmss(value)
+  }
   // <i class="fa-regular fa-list"></i>
   stateIcon() {
     switch (this?.state) {

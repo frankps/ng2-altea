@@ -177,23 +177,33 @@
     <div class="col-12">
 
       <div class="form-check form-switch">
-        <input class="form-check-input" type="checkbox" id="isExtraQty" [(ngModel)]="object.isExtraQty" />
-        <label class="form-check-label" for="isExtraQty" translate="objects.price.isExtraQty"></label>
+        <input class="form-check-input" type="checkbox" id="isExtraQty" [(ngModel)]="object.extraQtyOn" />
+        <label class="form-check-label" for="isExtraQty" translate="objects.price.extraQty.on"></label>
       </div>
 
     </div>
   </div>
 
-  <div class="row mt-2" *ngIf="object.isExtraQty">
+  <div class="row mt-2" *ngIf="object.extraQtyOn">
     <div class="col-2"></div>
     <div class="col-3">
 
-      <ngx-altea-label-control label="objects.price.extraQty" for="extraQty">
+      <ngx-altea-label-control label="objects.price.extraQty.val" for="extraQty">
         <input type="number" id="extraQty" name="extraQty" required class="form-control"
-          [(ngModel)]="object.extraQty" />
+          [(ngModel)]="object.extraQty.val" />
       </ngx-altea-label-control>
 
     </div>
+
+    <div class="col-5">
+
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" id="isExtraQty" [(ngModel)]="object.extraQty.pct" />
+        <label class="form-check-label" for="isExtraQty" translate="objects.price.extraQty.pct"></label>
+      </div>
+
+    </div>
+
   </div>
 
 

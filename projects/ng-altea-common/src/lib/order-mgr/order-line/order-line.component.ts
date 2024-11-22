@@ -1,7 +1,8 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { OrderMgrUiService } from '../order-mgr-ui.service';
 import { ProductService, SessionService } from 'ng-altea-common'
-import { OrderLine, OrderLineOption, OrderLineOptionValue, Product, ProductType } from 'ts-altea-model';
+import { OrderLine, OrderLineOption, OrderLineOptionValue, Price, Product, ProductType } from 'ts-altea-model';
+import { ArrayHelper } from 'ts-common';
 
 
 
@@ -24,6 +25,8 @@ export class OrderLineComponent implements OnInit {
   // create array from 1 to 20 , to select quantity
   qtyArray = [] // [...Array(20).keys()].map(i => i + 1)
 
+  prices = {}
+
   constructor(protected orderMgrSvc: OrderMgrUiService, private productSvc: ProductService, protected sessionSvc: SessionService) {
   }
 
@@ -41,7 +44,7 @@ export class OrderLineComponent implements OnInit {
       this.qtyArray = [...Array(20).keys()].map(i => i + minQty)
     }
       */
-    
+
   }
 
   setQtyArray(product: Product) {
@@ -82,9 +85,42 @@ export class OrderLineComponent implements OnInit {
 
   // orderMgrSvc.addOrderLine(orderLine)
 
+
+  getSelectedPrices(): Price[] {
+
+    if (!this.prices)
+      return []
+
+    let product = this.product
+
+    if (ArrayHelper.IsEmpty(product?.prices))
+      return []
+
+    let prices : Price[] = []
+
+    Object.keys(this.prices).forEach(priceId => {
+
+      const selected = this.prices[priceId]
+
+      if (!selected)
+        return
+
+      let price = product.prices?.find(price => price.id == priceId)
+
+      if (price)
+        prices.push(price)
+      
+    })
+
+    return prices
+  }
+
+
   addOrderLine(orderLine: OrderLine) {
 
-    this.orderMgrSvc.addOrderLine(orderLine)
+    let prices = this.getSelectedPrices()
+
+    this.orderMgrSvc.addOrderLine(orderLine, 1, true, prices)
     this.new.emit(orderLine)
 
   }
@@ -172,7 +208,7 @@ export class OrderLineComponent implements OnInit {
 
         if (productOption.hasFormula && !lineOption.hasFormula()) {
           lineOption.setFormula(productOption)
-          lineOptionChanged = true          
+          lineOptionChanged = true
         }
 
       }
@@ -225,4 +261,8 @@ export class OrderLineComponent implements OnInit {
       this.confirm.emit(this.orderLine)
   }
 
+
+  toggleGiftOptionPrice(price, $event) {
+    console.error(price, $event)
+  }
 }

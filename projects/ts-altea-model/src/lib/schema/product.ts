@@ -461,6 +461,29 @@ export class Product extends ObjectWithIdPlus {
   @Type(() => Number)
   minQty = 1;
 
+
+
+  hasGiftOptionPrices(): boolean {
+
+    if (ArrayHelper.IsEmpty(this.prices))
+      return false
+
+    let idx = this.prices.findIndex(p => p.giftOpt == true)
+
+    return idx >= 0
+  }
+
+  getGiftOptionPrices(): Price[] {
+
+    if (ArrayHelper.IsEmpty(this.prices))
+      return []
+
+    let prices = this.prices.filter(p => p.giftOpt == true)
+
+    return prices
+  }
+
+
   salesPricing(onDate: Date = new Date()): number {
 
     if (ArrayHelper.IsEmpty(this.prices))
@@ -852,6 +875,42 @@ export class PriceDate {
   start: number
 }
 
+
+export enum PriceConditionType {
+
+  /** Quantity of subscription unit products previously purchased */
+  subUnitProdQty = 'subUnitProdQty'
+}
+
+export enum ValueComparator {
+  '=' = '=',
+  '<' = '<',
+  '>' = '>',
+  '<=' = '<=',
+  '>=' = '>='
+
+}
+
+//  '=' | '<' | '>' | '>=' | '<='
+
+export class PriceCondition {
+
+  tp: PriceConditionType
+
+  comp: ValueComparator = ValueComparator["="]
+
+  @Type(() => Number)
+  val: number
+
+  ids: string[] = []
+}
+
+export class PriceExtraQuantity {
+  on: boolean = false
+  val: number = 0
+  pct: boolean = false
+}
+
 export class Price extends ObjectWithIdPlus {
 
   productId?: string;
@@ -897,15 +956,25 @@ export class Price extends ObjectWithIdPlus {
   /** if price is only valid at certain dates */
   dates?: PriceDate[]
 
-  isExtraQty = false
-  extraQty: number = 0
+  @Type(() => PriceExtraQuantity)
+  extraQty?: PriceExtraQuantity
+
+
   productItemId?: string
 
   hasOptions = false  // true if this price also has option specific price changes
   options: OptionPrice[] = []
 
-  /** an extra optional price when buying a gift for this product (example wellness is more expensive during peak moments) */
+  /** an extra optional price when buying a gift for this product (example wellness is more expensive during peak moments),
+   * when buying gift of this product, then customer can select this extra price
+   */
   giftOpt = false
+
+  /** price conditions: there was a promotion only if customer previously purchased a certain amount of unit products via previous subscriptions (Bodysculptor) */
+  @Type(() => PriceCondition)
+  cond: PriceCondition[] = []
+
+
 
   idx = 0
 
@@ -1022,7 +1091,25 @@ export class Price extends ObjectWithIdPlus {
 
   }
 
+  get extraQtyOn(): boolean {
+    return this.extraQty?.on
+  }
 
+  set extraQtyOn(value: boolean) {
+
+    if (value) {
+      if (!this.extraQty)
+        this.extraQty = new PriceExtraQuantity()
+
+      this.extraQty.on = true
+    } else {
+
+      if (this.extraQty)
+        this.extraQty.on = false
+
+    }
+
+  }
 
 
 }

@@ -105,9 +105,11 @@ export class ResourceAvailability2 {
             let resourceStillAvailable = extendedSchedule.subtractMany(unavailable)
             resourceStillAvailable = resourceStillAvailable.subtractMany(resourceOccupation.overlapAllowed)
 
-            
+            resourceStillAvailable.resource = resource
+            resourceOccupation.overlapAllowed.resource = resource
+            workingHours.resource = resource
 
-            let availability = new ResourceAvailabilitySets(resourceStillAvailable, resourceOccupation.overlapAllowed, workingHours)
+            let availability = new ResourceAvailabilitySets(resource, resourceStillAvailable, resourceOccupation.overlapAllowed, workingHours)
 
             this.availability.set(resourceId, availability)
 
@@ -366,14 +368,10 @@ export class ResourceAvailability2 {
                     }
                 }
             }
-
-
-
         }
 
         result.result = availableResources
         return result
-
     }
 
 

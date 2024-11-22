@@ -170,8 +170,12 @@ export class OrderMgmtService {
         if (!result.isOk)
             console.error(result.message)
 
-        console.debug('Starting change state')
-        await this.changeState(order)
+        /** we had Stripe payments coming in on cancelled (=timed out) orders => fix somewhere else */
+        if (order.state != OrderState.cancelled) {
+            console.debug('Starting change state')
+            await this.changeState(order)
+        }
+
 
         return result
     }

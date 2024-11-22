@@ -217,6 +217,9 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
 
     let includeString = null
 
+    if (!id || id.length < 20)
+      return null
+
     if (includes) {
       if (Array.isArray(includes))
         includeString = includes.join(',')

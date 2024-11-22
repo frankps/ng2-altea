@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import { Injectable, OnInit } from '@angular/core';
-import { AppMode, AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Branch, ConfirmOrderResponse, Contact, CreateCheckoutSession, DateBorder, DepositMode, Gift, GiftLine, GiftType, Order, OrderLine, OrderLineOption, OrderSource, OrderState, Payment, PaymentType, Product, ProductSubType, ProductType, ProductTypeIcons, RedeemGift, ReservationOption, ReservationOptionSet, Resource, ResourcePlanning, ResourceType } from 'ts-altea-model'
+import { AppMode, AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Branch, ConfirmOrderResponse, Contact, CreateCheckoutSession, DateBorder, DepositMode, Gift, GiftLine, GiftType, Order, OrderLine, OrderLineOption, OrderSource, OrderState, Payment, PaymentType, Price, Product, ProductSubType, ProductType, ProductTypeIcons, RedeemGift, ReservationOption, ReservationOptionSet, Resource, ResourcePlanning, ResourceType } from 'ts-altea-model'
 import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbQuery, QueryOperator, Translation } from 'ts-common'
 import { AlteaService, GiftService, ObjectService, OrderMgrService, OrderService, ProductService, ResourceService, SessionService } from 'ng-altea-common'
 import * as _ from "lodash";
@@ -274,11 +274,9 @@ export class OrderMgrUiService {   // implements OnInit
       this.gift = gift
     }
 
-
     if (uiMode == OrderUiMode.newGift) {
       this.order.gift = true
     }
-
 
   }
 
@@ -411,8 +409,9 @@ export class OrderMgrUiService {   // implements OnInit
 
   async selectExistingOrderLine(line: OrderLine) {
 
-    this.spinner.show()
+    console.warn(line)
 
+    this.spinner.show()
 
     await this.loadProduct$(line.productId)
 
@@ -921,8 +920,10 @@ export class OrderMgrUiService {   // implements OnInit
       return this.rootCategories
     }
 
+    let isConsumerOnline = this.sessionSvc.appMode != AppMode.pos
+
     const me = this
-    const rootProducts = await me.productSvc.getProductsInCategory$()
+    const rootProducts = await me.productSvc.getProductsInCategory$(null, isConsumerOnline)
     me.products = rootProducts
     me.rootCategories = me.products
 
@@ -972,7 +973,9 @@ export class OrderMgrUiService {   // implements OnInit
 
     this.path.push(category)
 
-    this.productSvc.getProductsInCategory(category.id).pipe(take(1)).subscribe(res => {
+    let isConsumerOnline = this.sessionSvc.appMode != AppMode.pos
+
+    this.productSvc.getProductsInCategory(category.id, isConsumerOnline).pipe(take(1)).subscribe(res => {
       this.products = res
       console.error(res)
 
@@ -1098,7 +1101,7 @@ export class OrderMgrUiService {   // implements OnInit
    * @param qty 
    * @param setUnitPrice use false for custom products (gifts etc...)
    */
-  async addOrderLine(orderLine: OrderLine, qty = 1, setUnitPrice = true) {
+  async addOrderLine(orderLine: OrderLine, qty = 1, setUnitPrice = true, prices: Price[] = null) {
     // orderLine.orderId = this.order.id
 
     const me = this
@@ -1128,6 +1131,15 @@ export class OrderMgrUiService {   // implements OnInit
       me.orderLineIsNew = false
 
       await me.calculateLoyalty()
+    }
+
+    if (ArrayHelper.NotEmpty(prices)) {
+
+      for (let price of prices) {
+        const orderLine = OrderLine.custom(price.title, price.value, 0.06)   // gift.vatPct
+        me.addOrderLine(orderLine, 1, false)
+      }
+
     }
 
     //this.tmp = 'aaaa'

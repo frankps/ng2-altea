@@ -3,9 +3,10 @@ import { OnlineMode, Product, ProductSubType, ProductType } from 'ts-altea-model
 import { BackendHttpServiceBase } from 'ng-common';
 import { HttpClient } from '@angular/common/http';
 import { SessionService } from '../../session.service';
-import { DbQuery, QueryOperator } from 'ts-common';
+import { ArrayHelper, DbQuery, QueryOperator } from 'ts-common';
 import { Observable, map, Subject, take } from "rxjs";
 import { ProductResourceService } from 'ng-altea-common';
+import * as _ from "lodash";
 
 
 @Injectable({
@@ -23,7 +24,7 @@ export class ProductService extends BackendHttpServiceBase<Product> {
     super(Product, 'Product', sessionSvc.backend, sessionSvc.branchUnique + '/products', http)
 
     this.softDelete = true
-  }  
+  }
 
 
   /*
@@ -41,7 +42,7 @@ options:orderBy=idx.values:orderBy=idx
 
     let product = await super.get$(id, includes)
 
-    if (this.caching) {
+    if (product && this.caching) {
       // we only need to do this in case of caching, because resources are NOT cached inside products
       await me.prodResSvc.attachResourcesToProduct(product)
     }
@@ -70,6 +71,36 @@ options:orderBy=idx.values:orderBy=idx
   }
 
 
+  async subscriptionUnitProducts(branchId?: string): Promise<Product[]> {
+
+    if (!branchId)
+      branchId = this.sessionSvc.branchId
+
+    const query = new DbQuery()
+    query.and('branchId', QueryOperator.equals, branchId)
+    query.and('type', QueryOperator.equals, ProductType.svc)
+    query.and('sub', QueryOperator.equals, ProductSubType.subs)
+    query.and('act', QueryOperator.equals, true)
+    query.include('items.product')
+
+    const subscriptions = await this.query$(query)
+
+    console.error(subscriptions)
+
+    if (ArrayHelper.IsEmpty(subscriptions))
+      return []
+
+    var ids = subscriptions.flatMap(sub => sub.items).flatMap(prodItem => prodItem.productId)
+
+    ids = _.uniq(ids)
+
+    var unitProducts: Product[] = await this.getMany$(ids)
+
+    unitProducts = _.sortBy(unitProducts, 'name')
+
+    return unitProducts
+  }
+
   getCategoriesQuery(type?: ProductType, categoryId: 'any' | string | null = null): DbQuery {
 
     const query = new DbQuery()
@@ -91,12 +122,14 @@ options:orderBy=idx.values:orderBy=idx
   }
 
 
-  getProductsInCategoryQuery(categoryId: string | null = null): DbQuery {
+  getProductsInCategoryQuery(categoryId: string | null = null, online: boolean): DbQuery {
     const query = new DbQuery()
 
     query.and('del', QueryOperator.equals, false)
     query.and('catId', QueryOperator.equals, categoryId)
-    query.and('online', QueryOperator.not, OnlineMode.invisible)
+
+    if (online)
+      query.and('online', QueryOperator.not, OnlineMode.invisible)
 
     //productQry.include('options:orderBy=idx.values:orderBy=idx', 'resources:orderBy=idx.resource', 'items:orderBy=idx', 'prices')
 
@@ -105,18 +138,18 @@ options:orderBy=idx.values:orderBy=idx
     query.take = 200
 
     return query
-  }   
+  }
 
-  getProductsInCategory$(categoryId: string | null = null): Promise<Product[]> {
+  getProductsInCategory$(categoryId: string | null = null, online: boolean): Promise<Product[]> {
 
-    const query = this.getProductsInCategoryQuery(categoryId)
+    const query = this.getProductsInCategoryQuery(categoryId, online)
 
     return this.query$(query)
   }
 
-  getProductsInCategory(categoryId: string | null = null): Observable<Product[]> {
+  getProductsInCategory(categoryId: string | null = null, online: boolean): Observable<Product[]> {
 
-    const query = this.getProductsInCategoryQuery(categoryId)
+    const query = this.getProductsInCategoryQuery(categoryId, online)
 
     return this.query(query).pipe(map(obj => obj.data ? obj.data : []))
   }

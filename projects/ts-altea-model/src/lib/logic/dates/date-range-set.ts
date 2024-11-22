@@ -28,7 +28,7 @@ export class ResourceOccupationSets {
  *  This class focuses on what is available for a resource: available = schedule - occupation
  */
 export class ResourceAvailabilitySets {
-    constructor(public available: DateRangeSet = DateRangeSet.empty,
+    constructor(public resource: Resource, public available: DateRangeSet = DateRangeSet.empty,
         public overlapAllowed: DateRangeSet = DateRangeSet.empty,
         public workingTime: DateRangeSet = DateRangeSet.empty
     ) {

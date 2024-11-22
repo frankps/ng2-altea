@@ -26,9 +26,17 @@ export class AvailabilityRequest {
     constructor(order?: Order) {
         this.order = order
 
-        this.from = order!.start!
-        this.to = order!.start!
+        let fromDate = DateHelper.parse(order!.start!)
+        let from = dateFns.startOfDay(fromDate)
+        let to = dateFns.addDays(from, 1)
 
+        this.from = DateHelper.yyyyMMdd000000(from)    //order!.start!
+        this.to =  DateHelper.yyyyMMdd000000(to)   //order!.start!
+
+        /*
+        this.from = order!.start!
+        this.to = order!.start! */
+        
     }
 
     getDateRange() : DateRange {

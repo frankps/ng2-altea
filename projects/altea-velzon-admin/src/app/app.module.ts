@@ -33,6 +33,8 @@ import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { ScheduleModule } from '@syncfusion/ej2-angular-schedule';
 import {NgIdleModule} from '@ng-idle/core'
 import { NgxEditorModule } from 'ngx-editor'
+import { FormsModule } from '@angular/forms';
+import { ProductModule } from "./product/product.module";
 //import { RichTextEditorModule } from '@syncfusion/ej2-angular-richtexteditor';
 
 defineLocale('nl-be', nlBeLocale);
@@ -58,29 +60,26 @@ if (environment.defaultauth === 'firebase') {
     provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
     provideAuth(() => getAuth()),
     provideFirestore(() => getFirestore()),
-//    OrderMgrModule,
+    //    OrderMgrModule,
     NgxSpinnerModule,
     Bootstrap5Module,
     NgSelectModule,
+    FormsModule,
     FullCalendarModule,
     TranslateModule.forRoot({
-      defaultLanguage: 'en',  
-      loader: {
-        provide: TranslateLoader,
-        useFactory: createTranslateLoader,
-        deps: [HttpClient],
-      },
+        defaultLanguage: 'en',
+        loader: {
+            provide: TranslateLoader,
+            useFactory: createTranslateLoader,
+            deps: [HttpClient],
+        },
     }),
     ContactModule,
     NgAlteaCommonModule,
     InterfaceModule,
     ScheduleModule,
-    NgIdleModule.forRoot(),
-   // RichTextEditorModule
-  //  NgxEditorModule.forRoot()
-  
-    
-  ],
+    NgIdleModule.forRoot()
+],
   providers: [],
   bootstrap: [AppComponent],
 })

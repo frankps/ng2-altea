@@ -111,6 +111,14 @@ export class AvailabilityContext {
         return this.allResources.find(r => r.id == resourceId)
     }
 
+    getHumanResources() : Resource[] {
+        if (ArrayHelper.IsEmpty(this.allResources))
+            return []
+
+        return this.allResources.filter(r => r.type == ResourceType.human)
+        
+    }
+
     getResources(resourceIds: string[]): Resource[] {
 
         if (ArrayHelper.IsEmpty(resourceIds))

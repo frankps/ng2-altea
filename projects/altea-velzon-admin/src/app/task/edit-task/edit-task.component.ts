@@ -1,10 +1,10 @@
 
 import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core'
 import { NgForm } from '@angular/forms'
-import { Task, Resource, ResourceType, TaskPriority, TaskSchedule, TaskStatus } from 'ts-altea-model'
+import { Task, Resource, ResourceType, TaskPriority, TaskSchedule, TaskStatus, AvailabilityRequest, Order, OrderLine, ResourceAvailability2, ResourceAvailabilitySets } from 'ts-altea-model'
 import { DashboardService, NgEditBaseComponent, TranslationService } from 'ng-common'
-import { DbQuery, QueryOperator, Translation } from 'ts-common'
-import { AlteaService, ObjectService, ResourceService, SessionService, TaskService } from 'ng-altea-common'
+import { DbQuery, ObjectHelper, QueryOperator, Translation } from 'ts-common'
+import { AlteaService, ObjectService, ProductService, ResourceService, SessionService, TaskService } from 'ng-altea-common'
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxModalComponent, DeleteModalComponent } from 'ng-common';
 import * as _ from "lodash";
@@ -12,7 +12,9 @@ import { NgxSpinnerService } from "ngx-spinner"
 import { NgTemplateOutlet } from '@angular/common';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ReplaySubject, take } from 'rxjs';
-import { AlteaDb, TaskSchedulingService } from 'ts-altea-logic'
+import { AlteaDb, AvailabilityService, TaskSchedulingService } from 'ts-altea-logic'
+import * as dateFns from 'date-fns'
+import { CreateAvailabilityContext } from 'projects/ts-altea-logic/src/lib/order/reservation/create-availability-context'
 
 @Component({
   selector: 'app-edit-task',
@@ -48,12 +50,15 @@ export class EditTaskComponent extends NgEditBaseComponent<Task> {
     // get successUrl() { return '/aqua/resources' + }
   }
 
+
+  guid = ObjectHelper.newSmallGuid()
+
   /* 	constructor(protected translationSvc: TranslationService, protected resourceSvc: ResourceService) {
   
       
     } */
 
-  constructor(protected taskSvc: TaskService, protected resourceSvc: ResourceService, protected translationSvc: TranslationService, route: ActivatedRoute, router: Router,
+  constructor(protected taskSvc: TaskService, protected resourceSvc: ResourceService, protected productSvc: ProductService, protected translationSvc: TranslationService, route: ActivatedRoute, router: Router,
     spinner: NgxSpinnerService, private modalService: NgbModal, dashboardSvc: DashboardService, protected sessionSvc: SessionService, protected backEndSvc: ObjectService) {
     super('task', Task, ''
       , taskSvc
@@ -92,7 +97,57 @@ export class EditTaskComponent extends NgEditBaseComponent<Task> {
     console.log(TaskStatus)
     console.log(TaskPriority)
 
+    await this.getResourceAvailability()
   }
+
+
+  availSets: ResourceAvailabilitySets[] = null
+
+  async getResourceAvailability() {
+
+    let branch = await this.sessionSvc.branch$()
+
+    let order = new Order()
+    order.branch = branch
+    order.branchId = this.sessionSvc.branchId
+
+    let product = await this.productSvc.get$('51d89ac4-0ede-49ab-835f-2a3dda81bd70')
+
+    let orderLine = new OrderLine(product, 1)
+    order.addLine(orderLine)
+
+    console.log(order)
+
+    let startDate = dateFns.addDays(new Date(), 1)
+
+    order.startDate = startDate
+
+    let availabilityRequest = new AvailabilityRequest(order)
+
+    let alteaDb = new AlteaDb(this.backEndSvc)
+
+    const createAvailabilityContext = new CreateAvailabilityContext(alteaDb)
+    const availabilityCtx = await createAvailabilityContext.create(availabilityRequest)
+
+    const availability2 = new ResourceAvailability2(availabilityCtx)
+   
+
+    console.error(availability2)
+
+    let availSets = []
+
+    let staffMembers = availabilityCtx.getHumanResources()
+
+    for (let staff of staffMembers) {
+
+      let av = availability2.availability.get(staff.id)
+      availSets.push(av)
+
+    }
+
+
+  }
+
 
   initialized$(): Promise<boolean> {
 

@@ -11,33 +11,6 @@ import { ResourceRequestOptimizer } from './resource-request-optimizer'
 import { SolutionPicker } from './solution-picker'
 import { DetermineReservationOptions } from './determine-reservation-options'
 import * as dateFns from 'date-fns'
-// import { ResourceAvailabilityCache } from './resource-availability-cache'
-
-
-
-// export class OrderGetContext {
-
-//     alteaDb: AlteaDb
-
-//     constructor(protected db: IDb) {
-//         this.alteaDb = new AlteaDb(db)
-//     }
-
-//     async process(order: Order): Promise<OrderContext> {
-
-//         const ctx = new OrderContext(order)
-
-//         if (order.lines) {
-
-//             const productIds = order.lines.map(line => line.productId!).filter(id => typeof id !== "undefined" && id != null)
-//             ctx.products = await this.alteaDb.getProducts(productIds)
-//         }
-
-//         return ctx
-
-//     }
-// }
-
 
 export class AvailabilityService {
 

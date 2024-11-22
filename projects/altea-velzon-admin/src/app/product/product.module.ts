@@ -23,6 +23,7 @@ import { SearchProductComponent } from './search-product/search-product.componen
 import { ProductRuleComponent } from './product-rule/product-rule.component';
 import { ProductRulesComponent } from './product-rules/product-rules.component';
 import { ProductPlanningComponent } from './product-planning/product-planning.component';
+import { PriceConditionComponent } from './price-condition/price-condition.component';
 
 @NgModule({
   declarations: [
@@ -39,6 +40,7 @@ import { ProductPlanningComponent } from './product-planning/product-planning.co
     ProductRuleComponent,
     ProductRulesComponent,
     ProductPlanningComponent,
+    PriceConditionComponent,
   ],
   imports: [
     CommonModule,
@@ -54,7 +56,8 @@ import { ProductPlanningComponent } from './product-planning/product-planning.co
     NgCommonModule,
   ],
   exports: [
-    SearchProductComponent
+    SearchProductComponent,
+//    PriceConditionComponent
   ]
 })
 export class ProductModule {}

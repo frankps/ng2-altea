@@ -1,5 +1,5 @@
 import { Component, ViewChild, inject } from '@angular/core';
-import { Contact, DateRangeTests, Message, Order, PaymentType, SmsMessage, User } from 'ts-altea-model';
+import { Contact, DateRangeTests, Message, Order, PaymentType, PriceCondition, PriceConditionType, Product, SmsMessage, User, ValueComparator } from 'ts-altea-model';
 import { SearchContactComponent } from '../../contact/search-contact/search-contact.component';
 import { AlteaService, BranchService, ObjectService, OrderService, ProductService, ResourceService, ScheduleService, SessionService, TemplateService, UserService } from 'ng-altea-common';
 import { AlteaDb, CheckDeposists, OrderCronJobs, OrderMessaging, OrderMgmtService } from 'ts-altea-logic';
@@ -40,11 +40,40 @@ export class DemoComponent {
 
   giftCode: string
 
+  cond: PriceCondition = new PriceCondition()
+
+  priceConditionTypes: Translation[] = []
+  valueComparators: Translation[] = []
+  subscriptionUnitProducts: Product[] = []
+
+  initialized = false
+
   constructor(private http: HttpClient, public dbSvc: ObjectService, protected translationSvc: TranslationService, protected backEndSvc: ObjectService
     , protected userSvc: UserService, protected resourceSvc: ResourceService, protected anySvc: ScheduleService, protected productSvc: ProductService, protected orderSvc: OrderService,
     protected messagingSvc: MessagingService, protected stripeSvc: StripeService, protected sessionSvc: SessionService) {
 
   }
+
+
+  async ngOnInit() {
+
+    await this.translationSvc.translateEnum(PriceConditionType, 'enums.price-condition-type.', this.priceConditionTypes)
+    await this.translationSvc.translateEnum(ValueComparator, 'enums.value-comparator.', this.valueComparators)
+
+    this.subscriptionUnitProducts = await this.productSvc.subscriptionUnitProducts()
+
+    console.error(this.subscriptionUnitProducts)
+
+    this.initialized = true
+    //   this.read()
+    /* 
+        await this.translationSvc.translateEnum(Country, 'enums.country.', this.countries)
+        await this.translationSvc.translateEnum(Country, 'enums.country.', this.country)
+    
+        console.warn(this.country) */
+  }
+
+
 
   stripeEvents: any[]
 
@@ -270,15 +299,6 @@ Datum: 1 april 2024 om 19h00
   }
 
 
-  async ngOnInit() {
-
-    //   this.read()
-    /* 
-        await this.translationSvc.translateEnum(Country, 'enums.country.', this.countries)
-        await this.translationSvc.translateEnum(Country, 'enums.country.', this.country)
-    
-        console.warn(this.country) */
-  }
 
 
   async saveMessage() {

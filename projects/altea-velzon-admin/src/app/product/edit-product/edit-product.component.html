@@ -92,8 +92,7 @@
         <div class="col-3">
 
           <ngx-altea-label-control label="objects.product.minQty" for="minQty">
-            <input type="number" id="minQty" name="minQty" required class="form-control"
-              [(ngModel)]="object.minQty" />
+            <input type="number" id="minQty" name="minQty" required class="form-control" [(ngModel)]="object.minQty" />
           </ngx-altea-label-control>
 
         </div>
@@ -145,7 +144,8 @@
       <div class="row {{css_cls_row}}">
         <div class="col">
           <ngx-altea-label-control label="objects.product.type" for="type">
-            <ng-select id="type" name="type" *ngIf="initialized" [items]="productType" bindLabel="trans" bindValue="key" [clearable]="false" [multiple]="false" [(ngModel)]="object.type"></ng-select>
+            <ng-select id="type" name="type" *ngIf="initialized" [items]="productType" bindLabel="trans" bindValue="key"
+              [clearable]="false" [multiple]="false" [(ngModel)]="object.type"></ng-select>
           </ngx-altea-label-control>
         </div>
       </div>
@@ -155,12 +155,13 @@
       <div class="row {{css_cls_row}}">
         <div class="col">
           <ngx-altea-label-control label="objects.product.sub" for="sub">
-            <ng-select id="sub" name="sub" *ngIf="initialized" [items]="productSubType" bindLabel="trans" bindValue="key" [clearable]="false" [multiple]="false" [(ngModel)]="object.sub"></ng-select>
+            <ng-select id="sub" name="sub" *ngIf="initialized" [items]="productSubType" bindLabel="trans"
+              bindValue="key" [clearable]="false" [multiple]="false" [(ngModel)]="object.sub"></ng-select>
           </ngx-altea-label-control>
         </div>
       </div>
-      
-<!--       <div class="row {{css_cls_row}}">
+
+      <!--       <div class="row {{css_cls_row}}">
         <div class="col">
           <div class="form-check form-switch">
             <input type="checkbox" class="form-check-input" id="bundle" name="bundle" [(ngModel)]="object.bundle">
@@ -406,13 +407,13 @@
             </div>
           </div>
 
-          <div class="row" *ngIf="price.isExtraQty">
+          <div class="row" *ngIf="price.extraQtyOn">
             <div class="col-2">
 
             </div>
             <div class="col">
 
-              Extra beurten: {{price.extraQty}}
+              Extra beurten: {{price.extraQty.val}} <span *ngIf="price.extraQty.pct">%</span>
 
             </div>
           </div>
@@ -439,46 +440,46 @@
 
             <div class="row mt-1">
               <div class="col-1">
-        
+
               </div>
 
               <div class="col">
-        
+
                 <ng-container *ngFor="let optionPrice of price.options; let idx = index">
 
                   <div class="row mt-1">
-    
+
                     <div class="col">
                       {{optionPrice.name}}
                     </div>
                     <div class="col">
                       <span *ngIf="!optionPrice.isPct">€</span>{{ optionPrice.value }} <span
                         *ngIf="optionPrice.isPct">%</span>
-    
+
                     </div>
-    
+
                   </div>
-    
+
                   <div class="row">
-    
+
                     <div class="col">
-    
+
                       <ul>
                         <li *ngFor="let value of optionPrice.values">
                           {{value.name}}
                         </li>
                       </ul>
-    
+
                     </div>
-    
-    
-    
+
+
+
                   </div>
-    
-    
-    
-    
-    
+
+
+
+
+
                 </ng-container>
 
 
@@ -492,7 +493,7 @@
           </ng-container>
 
 
-  
+
         </li>
       </ul>
 
@@ -516,8 +517,8 @@
 
 
 
-<ngx-altea-delete-modal #deleteModal objectType="product" [object]="object"
-  [objectSvc]="productSvc" [config]="deleteConfig" (deleted)="deleted($event)"></ngx-altea-delete-modal>
+<ngx-altea-delete-modal #deleteModal objectType="product" [object]="object" [objectSvc]="productSvc"
+  [config]="deleteConfig" (deleted)="deleted($event)"></ngx-altea-delete-modal>
 
 
 <!-- <ng-template #deleteModal let-modal>

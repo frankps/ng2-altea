@@ -697,6 +697,9 @@ export class OrderLine extends ObjectWithIdPlus {
 
     for (let price of this.product.prices) {
 
+      if (price.giftOpt)
+        continue
+
       if (price.start) {
         if (creationDate < price.startDate)
           continue

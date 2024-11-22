@@ -12,28 +12,56 @@
                     </ng-select>
 
                     &nbsp;&nbsp;x&nbsp;
-  
+
                     {{orderLine.descr}}
 
                 </div>
                 <div class="col-3">
-                    <span class="float-end"> <span *ngIf="product.priceFrom"
-                            translate>objects.product.priceFrom-app</span> {{orderLine.incl}} €  <sup *ngIf="product.priceInfo">*</sup></span>
+                    <span class="float-end"> <span *ngIf="product?.priceFrom"
+                            translate>objects.product.priceFrom-app</span> € {{orderLine.incl}} <sup
+                            *ngIf="product?.priceInfo">*</sup></span>
                 </div>
             </div>
 
-            <div class="row mt-2" *ngIf="product.minQty > 1">
+            <div class="row mt-2" *ngIf="product?.minQty > 1">
                 <div class="col">
-                    <span style="font-size: smaller; text-align: left;" translate [translateParams]="{min: product.minQty}">objects.product.minQty-app</span>
+                    <span style="font-size: smaller; text-align: left;" translate
+                        [translateParams]="{min: product.minQty}">objects.product.minQty-app</span>
                 </div>
             </div>
 
-            <div class="row mt-2" *ngIf="product.priceFrom">
+            <div class="row mt-2" *ngIf="product?.priceFrom">
                 <div class="col">
-                    <span class="float-end" style="font-size: smaller; text-align: right;"><sup>*</sup> <span translate>objects.product.priceFrom-info</span></span>
+                    <span class="float-end" style="font-size: smaller; text-align: right;"><sup>*</sup> <span
+                            translate>objects.product.priceFrom-info</span></span>
                 </div>
             </div>
 
+            <ng-container *ngIf="orderMgrSvc.gift && product?.hasGiftOptionPrices()">
+
+                <div class="row mt-2" *ngFor="let price of product.getGiftOptionPrices()">
+                    <div class="col-10">
+
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="giftOption_{{price.id}}"
+                                (change)="toggleGiftOptionPrice(price, $event)" [(ngModel)]="prices[price.id]" />
+                            <label class="form-check-label" for="giftOption_{{price.id}}">{{price.title}}</label>
+                        </div>
+                        <!-- 
+                         -->
+
+
+
+                    </div>
+                    <div class="col-2">
+
+                        <span class="float-end">+ € {{price.value}}</span>
+
+                    </div>
+                </div>
+
+
+            </ng-container>
 
         </div>
         <div class="card-body">
