@@ -1,1 +1,32 @@
-<p>price-condition works!</p>
+<ng-container *ngIf="initialized && condition">
+
+
+    <div class="row">
+
+
+        <div class="col-6">
+            <ng-select id="priceConditionType" name="priceConditionType" [items]="priceConditionTypes" bindLabel="trans"
+                bindValue="key" [clearable]="false" [multiple]="false" [(ngModel)]="condition.tp"></ng-select>
+
+        </div>
+        <div class="col-3">
+
+            <ng-select id="valueComparator" name="valueComparator" [items]="valueComparators" bindLabel="trans"
+                bindValue="key" [clearable]="false" [multiple]="false" [(ngModel)]="condition.comp"></ng-select>
+
+        </div>
+        <div class="col-3">
+
+            <input type="number" id="conditionValue" name="conditionValue" class="form-control" placeholder="Waarde"
+                [(ngModel)]="condition.val" />
+
+        </div>
+    </div>
+
+
+    <ng-select id="subscriptionUnitProducts" name="subscriptionUnitProducts" [items]="subscriptionUnitProducts"
+        bindLabel="name" bindValue="id" [clearable]="false" [multiple]="true" [(ngModel)]="condition.ids">
+    </ng-select>
+
+
+</ng-container>

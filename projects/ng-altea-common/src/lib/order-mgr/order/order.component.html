@@ -144,6 +144,16 @@
                         € {{line.incl}}</div>
                 </div>
 
+                <ng-container *ngIf="isPOS() && line.hasPriceChanges()">
+
+                    <div class="row mt-1 me-1" style="font-size: 75%; font-style: italic;" *ngFor="let priceChange of line.pc">
+                        <div class="col-1"></div>
+                        <div class="col-9">{{priceChange.info}}</div>
+                        <div class="col-2 d-flex justify-content-end align-items-end"><span *ngIf="priceChange.isPrice() && !priceChange.pct">€</span> {{priceChange.val}}<span *ngIf="priceChange.pct">%</span></div>
+                    </div>
+
+                </ng-container>
+
                 <ng-container *ngIf="line.hasPersons()">
                     <div class="row mt-1" style="font-size: 75%;">
                         <div class="col-1"></div>
@@ -153,6 +163,8 @@
                         </div>
                     </div>
                 </ng-container>
+
+
 
                 <ng-container *ngIf="line.options">
                     <div class="row mt-1" style="font-size: 75%;" *ngFor="let option of line.visibleOptions()">

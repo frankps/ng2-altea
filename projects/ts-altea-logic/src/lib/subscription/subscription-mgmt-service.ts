@@ -1,7 +1,7 @@
 
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbObjectCreate, DbObjectMulti, DbObjectMultiCreate, DbQuery, DbQueryTyped, ObjectHelper, QueryOperator } from 'ts-common'
-import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, OrderLine, Subscription, Product } from 'ts-altea-model'
+import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, OrderLine, Subscription, Product, PriceChangeType } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { AlteaDb } from '../general/altea-db'
 import { IDb } from '../interfaces/i-db'
@@ -39,13 +39,36 @@ export class SubscriptionMgmtService {
 
         let prod = orderLine.product
 
+        console.log('Subscriptions')
+
         if (ArrayHelper.IsEmpty(prod.items))
             prod = await this.alteaDb.getProduct(orderLine.productId, ...Product.defaultInclude)
+
+        // check if there is a price change causing extra subscription qty
+        let extraQtyAbs = 0
+        let extraQtyPct = 1
+        
+        if (orderLine.hasPriceChanges()) {
+            let qtyChanges = orderLine.pc.filter(pc => pc.tp == PriceChangeType.subsQty)
+
+            if (ArrayHelper.NotEmpty(qtyChanges)) {
+
+                for (let qtyChange of qtyChanges) {
+
+                    if (qtyChange.pct) {
+                        extraQtyPct = _.round(extraQtyPct * (1 + qtyChange.val / 100), 2)
+                    } else {
+                        extraQtyAbs += qtyChange.val
+                    }
+                }
+                
+            }
+        }
 
 
         for (let prodItem of prod.items) {
 
-            let qty = prodItem.qty
+            let qty = prodItem.qty 
 
             if (prodItem.optionQty) {
                 let option = orderLine.getOptionById(prodItem.optionId)
@@ -63,6 +86,10 @@ export class SubscriptionMgmtService {
                 let value = option.values[0]
                 qty = _.round(value.val, 0)
             } 
+        
+            qty = (qty + extraQtyAbs) * extraQtyPct
+            qty = _.round(qty,0)
+            
 
             for (let i = 0; i < orderLine.qty; i++) {
 
@@ -85,8 +112,6 @@ export class SubscriptionMgmtService {
                 subscriptions.push(sub)
             }
         }
-
-
 
         if (saveToDb) {
             console.warn(subscriptions)

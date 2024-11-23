@@ -309,7 +309,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
   }
 
-  depositTime(): string {
+  depositTime(): string {  
 
     if (Number.isNaN(this.depoMins))
       return ''
@@ -346,7 +346,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     if (!this.hasLines())
       return false
     
-    let idx = this.lines.findIndex(l => l.product.priceFrom)
+    let idx = this.lines.findIndex(l => l.product?.priceFrom)
 
     return (idx >= 0)
 
@@ -864,6 +864,15 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
         line.order = undefined
       })
     }
+
+  }
+
+  clearAllPriceChanges() {
+
+    if (!this.hasLines())
+      return
+
+    this.lines.forEach(line => line.pc = [])
 
   }
 

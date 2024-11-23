@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { DaysOfWeekShort, OptionPrice, Price, PriceMode, Product, ProductOption } from 'ts-altea-model'
+import { DaysOfWeekShort, OptionPrice, Price, PriceCondition, PriceMode, Product, ProductOption } from 'ts-altea-model'
 import { TranslationService } from 'ng-common'
 import { Translation } from 'ts-common'
 import { th } from 'date-fns/locale';
@@ -25,6 +25,8 @@ export class ProductPriceComponent implements OnInit {
 
   showAddOptionPanel = false
 
+  conditionInEdit: PriceCondition = null
+  newCondition = new PriceCondition()
 
   constructor(private translationSVc: TranslationService) {
 
@@ -42,6 +44,28 @@ export class ProductPriceComponent implements OnInit {
     daysOfWeekShort.forEach(day => day.value = value++ % 7)
 
     // console.error(this.object)
+
+  }
+
+  editCondition(condition: PriceCondition) {
+
+    if (condition != this.conditionInEdit)
+      this.conditionInEdit = condition
+    else
+      this.conditionInEdit = null
+  }
+
+  addCondition(newCondition: PriceCondition) {
+
+    if (!this.object)
+      return
+
+    if (!this.object.cond)
+      this.object.cond = []
+
+    this.object.cond.push(newCondition)
+
+    this.newCondition = new PriceCondition()
 
   }
 

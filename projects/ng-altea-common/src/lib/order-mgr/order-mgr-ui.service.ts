@@ -7,7 +7,7 @@ import * as _ from "lodash";
 import { NgxSpinnerService } from "ngx-spinner"
 import { DashboardService, ToastType } from 'ng-common';
 import { BehaviorSubject, Observable, take, takeUntil } from 'rxjs';
-import { AlteaDb, CancelOrder, LoyaltyUi, LoyaltyUiCard, PaymentProcessing } from 'ts-altea-logic';
+import { AlteaDb, CancelOrder, LoyaltyUi, LoyaltyUiCard, OrderMgmtService, PaymentProcessing } from 'ts-altea-logic';
 import * as dateFns from 'date-fns'
 import { StripeService } from '../stripe.service';
 import { er } from '@fullcalendar/core/internal-common';
@@ -98,6 +98,8 @@ export class OrderMgrUiService {   // implements OnInit
   modeChanges: BehaviorSubject<string> = new BehaviorSubject<string>(null)
 
 
+  isPos: boolean = false
+
 
   constructor(private productSvc: ProductService, private orderSvc: OrderService, private orderMgrSvc: OrderMgrService
     , protected spinner: NgxSpinnerService, public dbSvc: ObjectService, public alteaSvc: AlteaService, protected sessionSvc: SessionService,
@@ -112,6 +114,8 @@ export class OrderMgrUiService {   // implements OnInit
 
       console.error('--- BRANCH ---', branch)
     })
+
+    this.isPos = this.sessionSvc.isPos()
 
     this.autoCreateOrder()
 
@@ -455,6 +459,24 @@ export class OrderMgrUiService {   // implements OnInit
   }
 
 
+  async upgradeOrder(order: Order) {
+
+    if (!order)
+      return
+
+    const from241120 = new Date(2024, 10, 20)
+    const to241123 = new Date(2024, 10, 24)
+
+    if (order.cre >= from241120 && order.cre <= to241123) {
+      let orderMgmtSvc = new OrderMgmtService(this.dbSvc)
+
+      orderMgmtSvc.doOrderPriceChanges(order)
+      order.calculateAll()
+    }
+
+
+  }
+
 
   async loadOrder$(orderId: string): Promise<Order> {
 
@@ -476,6 +498,8 @@ export class OrderMgrUiService {   // implements OnInit
       if (!this.gift)
         this.dashboardSvc.showErrorToast('Could not find gift for this order!')
     }
+
+    this.upgradeOrder(order)
 
     this.order = order
 
@@ -665,6 +689,9 @@ export class OrderMgrUiService {   // implements OnInit
 
       // we might have special pricing for specific dates/times
       this.order.start = option.dateNum
+
+      me.alteaSvc.orderMgmtService.doOrderPriceChanges(me.order)
+
       await this.calculateAll()
 
 
@@ -900,9 +927,13 @@ export class OrderMgrUiService {   // implements OnInit
 
     this.orderLineOptions = []
 
-    if (product.options?.length > 0) {
-      this.orderLineOptions = product.options.map(prodOption => OrderLineOption.fromProductOption(prodOption))
+    if (product.hasOptions()) {
+
+      let showPrivate = this.isPos
+
+      this.orderLineOptions = product.options.filter(o => showPrivate || !o.pvt).map(prodOption => OrderLineOption.fromProductOption(prodOption, showPrivate))
     }
+
 
   }
 

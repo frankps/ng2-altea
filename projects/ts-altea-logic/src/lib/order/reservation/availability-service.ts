@@ -11,6 +11,7 @@ import { ResourceRequestOptimizer } from './resource-request-optimizer'
 import { SolutionPicker } from './solution-picker'
 import { DetermineReservationOptions } from './determine-reservation-options'
 import * as dateFns from 'date-fns'
+import { OrderMgmtService } from 'ts-altea-logic'
 
 export class AvailabilityService {
 
@@ -107,7 +108,7 @@ export class AvailabilityService {
 
         return response
     }
-  
+
 
     /**
      * 
@@ -117,6 +118,8 @@ export class AvailabilityService {
      */
     doPricing(availabilityRequest: AvailabilityRequest, optionSet: ReservationOptionSet) {
 
+
+        let orderMgmtSvc = new OrderMgmtService(this.alteaDb)
 
         // availabilityRequest.order.getLine
 
@@ -134,23 +137,30 @@ export class AvailabilityService {
 
             let solution = option.solutions[0]
 
-            let startDate = option.date
+            //let startDate = option.date
+            //let orderSpecialPrice = 0
 
-            let orderSpecialPrice = 0
+            order.clearAllPriceChanges()
+            order.startDate = option.date
+            orderMgmtSvc.doOrderPriceChanges(order)
+            order.calculateAll()
 
-            for (let line of order.lines) {
+            /*
+                        for (let line of order.lines) {
+            
+                            let unitPrice = line.unit
+            
+                            if (line.hasSpecialPrices()) {
+                                
+                            }
+                                unitPrice = line.calculateUnitPrice(startDate, order.cre)
+            
+                            let lineSpecialPrice = line.qty * unitPrice
+            
+                            orderSpecialPrice += lineSpecialPrice
+                        }*/
 
-                let unitPrice = line.unit
-
-                if (line.hasSpecialPrices())
-                    unitPrice = line.calculateUnitPrice(startDate, order.cre)
-
-                let lineSpecialPrice = line.qty * unitPrice
-
-                orderSpecialPrice += lineSpecialPrice
-            }
-
-            option.price = orderSpecialPrice
+            option.price = order.incl
         }
 
 

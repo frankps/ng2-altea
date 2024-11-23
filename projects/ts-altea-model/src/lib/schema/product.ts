@@ -462,6 +462,26 @@ export class Product extends ObjectWithIdPlus {
   minQty = 1;
 
 
+  hasSpecialPrices() {
+
+    if (ArrayHelper.IsEmpty(this.prices))
+      return false
+
+    let idx = this.prices.findIndex(p => p.isPromo && !p.giftOpt)
+
+    return idx >= 0
+  }
+
+  getSpecialPrices(): Price[] {
+
+    if (ArrayHelper.IsEmpty(this.prices))
+      return []
+
+    let prices = this.prices.filter(p => p.isPromo && !p.giftOpt)
+
+    return prices
+  }
+
 
   hasGiftOptionPrices(): boolean {
 
@@ -1089,6 +1109,11 @@ export class Price extends ObjectWithIdPlus {
     else
       this.end = null
 
+  }
+
+  hasConditions() {
+
+    return ArrayHelper.NotEmpty(this.cond)
   }
 
   get extraQtyOn(): boolean {

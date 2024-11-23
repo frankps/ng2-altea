@@ -37,6 +37,23 @@
                 </div>
             </div>
 
+            <!-- Typically for promotions -->
+            <ng-container *ngIf="orderMgrSvc.isPos && product.hasSpecialPrices()">
+
+                <div class="row mt-2" style="font-size: small;" *ngFor="let price of product.getSpecialPrices()">
+                    <div class="col">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="price_{{price.id}}"
+                                (change)="toggleSpecialPrice(price, $event)" [(ngModel)]="prices[price.id]" />
+                            <label class="form-check-label" for="price_{{price.id}}">{{price.title}}</label>
+                        </div>
+                    </div>
+                </div>
+
+            </ng-container>
+
+            <!-- If this is gift purchase, then there can be optional extra's 
+            -->
             <ng-container *ngIf="orderMgrSvc.gift && product?.hasGiftOptionPrices()">
 
                 <div class="row mt-2" *ngFor="let price of product.getGiftOptionPrices()">

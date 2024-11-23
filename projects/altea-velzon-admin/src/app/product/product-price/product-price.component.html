@@ -32,7 +32,7 @@
   </div>
 
   <div class="row mt-2">
-    <div class="col">  
+    <div class="col">
 
       <ngx-altea-label-control label="objects.price.title" for="title">
         <input type="text" id="title" name="title" class="form-control" [(ngModel)]="object.title" />
@@ -400,8 +400,8 @@
 
             <div class="row mt-2">
               <div class="col">
-                <button type="button" class="btn btn-primary btn-sm float-end" (click)="addOptionPrice()" [disabled]="!newOptionIsValid()"
-                  translate>dic.add</button>
+                <button type="button" class="btn btn-primary btn-sm float-end" (click)="addOptionPrice()"
+                  [disabled]="!newOptionIsValid()" translate>dic.add</button>
               </div>
             </div>
           </ng-container>
@@ -494,6 +494,52 @@
 
   </ng-container>
 
+  <div class="row mt-4">
+
+  </div>
+
+  <ng-container *ngIf="object.hasConditions()">
+    <ng-container *ngFor="let condition of object.cond">
+
+      <div class="row mt-2">
+        <div class="col-4">
+          {{condition.tp}}
+        </div>
+        <div class="col-3">
+          {{condition.comp}}
+        </div>
+        <div class="col-3">
+          {{condition.val}}
+        </div>
+        <div class="col-2">
+          <i class="fa-solid fa-pen-circle" (click)="editCondition(condition)"></i>
+        </div>
+      </div>
+
+      <div class="row mt-2">
+        <div class="col-10">
+          <price-condition *ngIf="condition == this.conditionInEdit" [condition]="condition"></price-condition>
+        </div>
+      </div>
+
+    </ng-container>
+
+  </ng-container>
+
+
+
+
+  <div class="row mt-2" *ngIf="!this.conditionInEdit">
+    <div class="col-10">
+      <price-condition [condition]="newCondition"></price-condition>
+    </div>
+    <div class="col-2">
+
+      <i class="fa-solid fa-circle-plus" (click)="addCondition(newCondition)"></i>
+
+
+    </div>
+  </div>
 
 
 

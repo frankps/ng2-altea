@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbQuery, DbQueryBaseTyped, DbQueryTyped, DeleteManyResult, QueryOperator } from 'ts-common'
-import { Order, Gift, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, ConfirmOrderResponse, OrderSource, TemplateCode, OrderCancel, OrderCancelBy, CustomerCancelReasons, PaymentType, Payment, ResourceRequestItem, Resource, DateRange, OrderLine, SolutionItem } from 'ts-altea-model'
+import { Order, Gift, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, ResourceAvailability, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, ConfirmOrderResponse, OrderSource, TemplateCode, OrderCancel, OrderCancelBy, CustomerCancelReasons, PaymentType, Payment, ResourceRequestItem, Resource, DateRange, OrderLine, SolutionItem, PriceMode, PriceChange, PriceChangeType } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { AlteaDb } from '../general/altea-db'
 import { IDb } from '../interfaces/i-db'
@@ -139,7 +139,7 @@ export class OrderMgmtService {
         if (res.notOk) {
             orderDeleteResult.error(`Problem deleting order: ${res.message}`)
         } 
-        
+
         return orderDeleteResult
 
     }
@@ -775,6 +775,97 @@ export class OrderMgmtService {
 
 
     }
+
+
+    doOrderPriceChanges(order: Order) {
+
+        for (let line of order.lines)
+            this.doOrderLinePriceChanges(order, line)
+
+    }
+
+    doOrderLinePriceChanges(order: Order, orderLine: OrderLine) {
+
+        let product = orderLine.product
+
+        if (ArrayHelper.IsEmpty(product.prices))
+            return 0
+
+        if (!orderLine.pc)
+            orderLine.pc = []
+        
+        let specialPricing = 0
+     
+        let startDate = order?.startDate
+    
+        let creationDate = order?.cre
+    
+        if (!creationDate)
+          creationDate = new Date()
+    
+        let day = -1
+        let skipDateChecks = false
+    
+        if (startDate)
+          day = dateFns.getDay(startDate)
+        else
+          skipDateChecks = true  // because there is no date available
+    
+        if (ArrayHelper.IsEmpty(product.prices))
+          return 0
+    
+        for (let price of product.prices) {
+
+            if (orderLine.hasPriceChange(price.id))
+                continue // price already applied
+    
+          if (price.giftOpt)
+            continue
+    
+          if (price.start) {
+            if (creationDate < price.startDate)
+              continue
+          }
+    
+          if (price.isDay) {
+            if (skipDateChecks || !price.days[day])
+              continue
+          }
+    
+          if (price.isTime) {
+    
+            if (skipDateChecks)
+              continue
+    
+            let from = DateHelper.getDateAtTime(price.from, startDate)
+            let to = DateHelper.getDateAtTime(price.to, startDate)
+    
+            // if startdate outside interval
+            if (startDate < from || startDate >= to)
+              continue
+          }
+    
+          switch (price.mode) {
+            case PriceMode.add:
+    
+              let priceChange = new PriceChange()
+              priceChange.tp = PriceChangeType.price
+              priceChange.val = price.value
+              priceChange.info = price.title
+              priceChange.id = price.id
+              priceChange.pct = false
+
+              orderLine.pc.push(priceChange)
+    
+              break
+          }
+        }
+    
+        return specialPricing
+    
+    
+      }
+    
 
 
 

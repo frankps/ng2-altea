@@ -124,6 +124,20 @@ export class OrderLineOption extends ObjectWithId {
 
   }
 
+  optionValues(isPos: boolean): OrderLineOptionValue[] {
+
+    if (!this.hasValues())
+      return []
+
+    if (isPos) {
+      return this.values
+    } else {
+      return this.values.filter(v => v.isVisible())
+    }
+
+  }
+
+
   /** Copy over formula from product option
    * To do: 
    */
@@ -133,13 +147,13 @@ export class OrderLineOption extends ObjectWithId {
   }
 
 
-  static fromProductOption(prodOption: ProductOption): OrderLineOption {
+  static fromProductOption(prodOption: ProductOption, showPrivate: boolean): OrderLineOption {
     const olOption = new OrderLineOption()
     olOption.id = prodOption.id
     olOption.name = prodOption.name
 
-    if (prodOption.values && prodOption.values.length > 0) {
-      olOption.values = prodOption.values.map(value => OrderLineOptionValue.fromProductOptionValue(value))
+    if (prodOption.hasValues()) {
+      olOption.values = prodOption.values.filter(v => showPrivate || !v.pvt).map(value => OrderLineOptionValue.fromProductOptionValue(value))
     }
 
     return olOption
@@ -317,6 +331,41 @@ export class OrderLineOptionValue extends ObjectWithId {
   }
 }
 
+export enum PriceChangeType {
+
+  /** Change in price of orderline */
+  price = 'price',
+
+  /** Change in subscription quantity */
+  subsQty = 'subsQty'
+}
+
+/**
+ *  prices coming from product.prices that are applied to an orderLine
+ */
+export class PriceChange {
+
+  tp: PriceChangeType = PriceChangeType.price
+
+  /** matching product.price.id */
+  id: string
+
+  /** The monetary price change: negative for promotion, positive for extra price (wellness during peak). 
+   * Pricechange can also be some other benefit: extra subscription units */
+  @Type(() => Number)
+  val: number = 0
+
+  /** extra info about this price */
+  info: string
+
+  /** if true, then val is a percentage change */
+  pct: boolean = false
+
+  isPrice() {
+    return this.tp == PriceChangeType.price
+  }
+}
+
 
 export class OrderLine extends ObjectWithIdPlus {
 
@@ -376,7 +425,9 @@ export class OrderLine extends ObjectWithIdPlus {
   persons?: string[] = []
   tag?: string;
 
-
+  /** price changes (promotions, flex pricing) coming from product.prices */
+  @Type(() => PriceChange)
+  pc?: PriceChange[]
 
   constructor(product?: Product, qty = 1, initOptionValues?: Map<String, String[]>) {
     super()
@@ -539,10 +590,52 @@ export class OrderLine extends ObjectWithIdPlus {
         if (Number.isFinite(value.dur))
           duration += value.dur
       }
-
     }
 
     return duration
+  }
+
+
+
+  /**
+   * Product.Prices can contain promotions or prive increases/decreases during certain days, periods.
+   * These prices are reflected on the orderLine via priceChanges (orderline.pc[])
+   * 
+   */
+
+
+
+  hasPriceChange(priceId: string): boolean {
+
+    if (ArrayHelper.IsEmpty(this.pc))
+      return false
+
+    let idx = this.pc.findIndex(pc => pc.id == priceId)
+
+    return (idx >= 0)
+
+  }
+
+  removePriceChanges(priceId: string) {
+
+    let res = _.remove(this.pc, pc => pc.id == priceId)
+
+/*     if (ArrayHelper.NotEmpty(res))
+      this.calculateAll() */
+
+  }
+
+  addPriceChange(priceChange: PriceChange) {
+
+    if (!priceChange)
+      return
+
+    if (!this.pc)
+      this.pc = []
+
+    this.pc.push(priceChange)
+
+    //this.calculateAll()
 
   }
 
@@ -649,91 +742,58 @@ export class OrderLine extends ObjectWithIdPlus {
       }
     }
 
+
+    let delta = this.calculatePriceChanges(unitPrice)
+
+    if (delta)
+      unitPrice += delta
+
+    /*
     let specialPricing = this.calculateSpecialPricing(unitPrice, startDate, creationDate)
 
     if (specialPricing)
       unitPrice += specialPricing
-
+    */
     return unitPrice
   }
 
+
+  hasPriceChanges(): boolean {
+    return ArrayHelper.NotEmpty(this.pc)
+  }
 
   hasSpecialPrices(): boolean {
     return ArrayHelper.NotEmpty(this.product.prices)
   }
 
-  calculateSpecialPricing(basePrice: number, startDate?: Date, creationDate?: Date): number {
 
-    /*
-    if (!this.order)
-      throw new Error('Link OrderLine -> Order not existing')
-*/
+  calculatePriceChanges(unitPrice: number): number {
 
-    if (ArrayHelper.IsEmpty(this.product.prices))
+    if (ArrayHelper.IsEmpty(this.pc))
       return 0
 
-    let specialPricing = 0
+    let delta = 0
 
-    if (!startDate)
-      startDate = this.order?.startDate
+    let priceChanges = this.pc.filter(pc => pc.tp == PriceChangeType.price)
 
-    if (!creationDate)
-      creationDate = this.order?.cre
+    for (const priceChange of priceChanges) {
 
-    if (!creationDate)
-      creationDate = new Date()
-
-    let day = -1
-    let skipDateChecks = false
-
-    if (startDate)
-      day = dateFns.getDay(startDate)
-    else
-      skipDateChecks = true  // because there is no date available
-
-
-    if (ArrayHelper.IsEmpty(this.product.prices))
-      return 0
-
-    for (let price of this.product.prices) {
-
-      if (price.giftOpt)
+      if (!priceChange.val)
         continue
 
-      if (price.start) {
-        if (creationDate < price.startDate)
-          continue
-      }
-
-      if (price.isDay) {
-        if (skipDateChecks || !price.days[day])
-          continue
-      }
-
-      if (price.isTime) {
-
-        if (skipDateChecks)
-          continue
-
-        let from = DateHelper.getDateAtTime(price.from, startDate)
-        let to = DateHelper.getDateAtTime(price.to, startDate)
-
-        // if startdate outside interval
-        if (startDate < from || startDate >= to)
-          continue
-      }
-
-      switch (price.mode) {
-        case PriceMode.add:
-          specialPricing += price.value
-          break
+      if (priceChange.pct) {
+        let pct = priceChange.val / 100
+        delta += _.round(unitPrice * pct, 2)
+      } else {
+        delta += _.round(priceChange.val, 2)
       }
     }
 
-    return specialPricing
-
-
+    return _.round(delta, 2)
   }
+
+
+
 
   visibleOptions(): OrderLineOption[] {
 

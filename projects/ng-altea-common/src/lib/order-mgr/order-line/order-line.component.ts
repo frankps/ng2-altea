@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { OrderMgrUiService } from '../order-mgr-ui.service';
 import { ProductService, SessionService } from 'ng-altea-common'
-import { OrderLine, OrderLineOption, OrderLineOptionValue, Price, Product, ProductType } from 'ts-altea-model';
+import { OrderLine, OrderLineOption, OrderLineOptionValue, Price, PriceChange, PriceChangeType, Product, ProductType } from 'ts-altea-model';
 import { ArrayHelper } from 'ts-common';
 
 
@@ -60,6 +60,20 @@ export class OrderLineComponent implements OnInit {
     this.setQtyArray(product)
   }
 
+  @Input() set orderLine(line: OrderLine) {
+
+    this.prices = {}
+
+    if (!line)
+      return
+
+    if (!line.hasPriceChanges())
+      return
+
+    line.pc.forEach(priceChange => { this.prices[priceChange.id] = true })
+
+  }
+
   get product() {
     return this.orderMgrSvc.product
   }
@@ -96,7 +110,7 @@ export class OrderLineComponent implements OnInit {
     if (ArrayHelper.IsEmpty(product?.prices))
       return []
 
-    let prices : Price[] = []
+    let prices: Price[] = []
 
     Object.keys(this.prices).forEach(priceId => {
 
@@ -109,7 +123,7 @@ export class OrderLineComponent implements OnInit {
 
       if (price)
         prices.push(price)
-      
+
     })
 
     return prices
@@ -124,6 +138,7 @@ export class OrderLineComponent implements OnInit {
     this.new.emit(orderLine)
 
   }
+
 
   goBack() {
     this.back.emit()
@@ -261,6 +276,69 @@ export class OrderLineComponent implements OnInit {
       this.confirm.emit(this.orderLine)
   }
 
+  toggleSpecialPrice(price: Price, $event) {
+
+    if (!price)
+      return
+
+    let priceId = price.id
+
+    let priceSelected: boolean = this.prices[priceId]
+    let hasPriceChangeAlreadyApplied = this.orderLine.hasPriceChange(priceId)
+
+    if (priceSelected) {
+
+      if (hasPriceChangeAlreadyApplied) {
+        console.log(`Price ${priceId} already applied`)
+      } else {
+
+        let priceChange = new PriceChange()
+
+        if (price.extraQty?.on) {
+          priceChange.tp = PriceChangeType.subsQty
+          priceChange.val = price.extraQty.val
+          priceChange.pct = price.extraQty.pct
+        }
+        else {
+          priceChange.tp = PriceChangeType.price
+          priceChange.val = price.value
+          priceChange.pct = price.isPercentage
+        }
+
+        priceChange.id = priceId
+
+        priceChange.info = price.title
+
+        this.orderLine.addPriceChange(priceChange)
+
+        this.orderMgrSvc.calculateAll()
+
+        this.orderMgrSvc.orderDirty = true
+        this.orderMgrSvc.orderLine.markAsUpdated('pc')
+
+
+      }
+
+    } else {
+
+      if (hasPriceChangeAlreadyApplied) {
+
+        this.orderLine.removePriceChanges(priceId)
+
+        this.orderMgrSvc.calculateAll()
+
+        this.orderMgrSvc.orderDirty = true
+        this.orderMgrSvc.orderLine.markAsUpdated('pc')
+      }
+
+    }
+
+
+
+
+    //console.log(this.prices)
+
+  }
 
   toggleGiftOptionPrice(price, $event) {
     console.error(price, $event)

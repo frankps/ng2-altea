@@ -1,6 +1,6 @@
 import { Component, ViewChild, OnInit } from '@angular/core';
 import { ProductService, PriceService, ProductResourceService, SessionService, ResourceService } from 'ng-altea-common'
-import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ProductSubType } from 'ts-altea-model'
+import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ProductSubType, PriceCondition } from 'ts-altea-model'
 import { DashboardService, FormCardSectionEventData, NgEditBaseComponent, ToastType, TranslationService } from 'ng-common'
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxModalComponent, DeleteModalComponent } from 'ng-common';
@@ -107,9 +107,12 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
 
   // sectionProps = new Map<string, string[]>()
 
+  //condition: PriceCondition
 
   override async ngOnInit() {
     super.ngOnInit()
+
+   // this.condition = new PriceCondition()
     // delete
     //  this.objectName = 'Product'
 
