@@ -61,7 +61,7 @@
 
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" id="giftOption_{{price.id}}"
-                                (change)="toggleGiftOptionPrice(price, $event)" [(ngModel)]="prices[price.id]" />
+                                (change)="toggleSpecialPrice(price, $event)" [(ngModel)]="prices[price.id]" />
                             <label class="form-check-label" for="giftOption_{{price.id}}">{{price.title}}</label>
                         </div>
                         <!-- 

@@ -260,7 +260,7 @@
 
         <ng-container always>
 
-            <ng-container *ngIf="object.subscriptions">
+            <ng-container *ngIf="subscriptions">
 
                 <div class="row">
                     <div class="col-6 d-flex justify-content-center">Abonnement</div>
@@ -270,7 +270,7 @@
                 </div>
 
 
-                <div class="row" *ngFor="let sub of object.subscriptions">
+                <div class="row" *ngFor="let sub of subscriptions">
                     <div class="col-6">
                         <a [routerLink]="['/', sessionSvc.branch.unique,'subscriptions',sub.id]">{{sub.name}} </a>
                     </div>
@@ -281,6 +281,22 @@
                     </div>
 
                 </div>
+
+                <div class="row mt-2">
+                    <div class="col me-3">
+
+
+                        <h5 *ngIf="moreSubscriptions"><span class="badge rounded-pill text-bg-primary float-end" (click)="toggleSubscriptions()">
+                                <ng-container *ngIf="showFilteredSubscriptions">
+                                    <span translate>dic.showMore</span> ({{moreSubscriptions}})
+                                </ng-container>
+
+                                <span *ngIf="!showFilteredSubscriptions" translate>dic.showLess</span>
+                            </span></h5>
+                    </div>
+                </div>
+
+
 
 
             </ng-container>
@@ -492,15 +508,17 @@
 
                 <!-- $ | async-->
                 <li class="list-group-item" *ngFor="let message of messages">
-            
+
                     <div class="row">
                         <div class="col-6">
-            
+
                             <h5>
-            
-                                <i [class]="MsgDirIcon[message.dir]" [style.color]="MsgDirColor[message.dir]"></i> &nbsp;
-                                <i [class]="MsgTypeIcon[message.type]" [style.color]="MsgDirColor[message.dir]"></i> &nbsp;
-            
+
+                                <i [class]="MsgDirIcon[message.dir]" [style.color]="MsgDirColor[message.dir]"></i>
+                                &nbsp;
+                                <i [class]="MsgTypeIcon[message.type]" [style.color]="MsgDirColor[message.dir]"></i>
+                                &nbsp;
+
                                 <ng-container [ngSwitch]="message.dir">
                                     <ng-container *ngSwitchCase="'in'">
                                         <ng-container *ngIf="message.from">
@@ -512,56 +530,56 @@
                                         <ng-container *ngFor="let to of message?.to">
                                             {{to.name}} <i style="font-size: small;">[{{to.addr}}]</i>
                                         </ng-container>
-            
-            
-            
-            
+
+
+
+
                                     </ng-container>
                                 </ng-container>
-            
-            
-            
+
+
+
                             </h5>
-            
-            
+
+
                             <ng-container *ngIf="message.type == 'email'">
                                 <b>Onderwerp</b>: {{message.subj}}
                             </ng-container>
-            
-            
-            
-            
+
+
+
+
                         </div>
                         <div class="col-2">
                             <small class="float-end">{{message.sent | intdate}}</small>
                         </div>
                         <div class="col-4">
-            
-            
-            
+
+
+
                             <h5 class="float-end">
-            
-            
+
+
                                 <i *ngIf="message.auto" class="fa-duotone fa-car"
                                     [ngbTooltip]="'objects.message.auto' | translate"></i> &nbsp;
-            
+
                                 <i *ngIf="MsgStateIcon[message.state]" [class]="MsgStateIcon[message.state]"
                                     [style.color]="message.stateColor()"></i> &nbsp;
                                 &nbsp;
 
 
                             </h5>
-            
-            
-            
+
+
+
                         </div>
                     </div>
-            
-            
-                    <div class="mt-2" [innerHTML]="message.body"></div>
-            
 
-            
+
+                    <div class="mt-2" [innerHTML]="message.body"></div>
+
+
+
                 </li>
             </ul>
 

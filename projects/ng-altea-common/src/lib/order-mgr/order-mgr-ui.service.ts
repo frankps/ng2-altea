@@ -490,6 +490,8 @@ export class OrderMgrUiService {   // implements OnInit
     if (!order)
       return null
 
+    order.branch = await this.sessionSvc.branch$()
+    
     await this.linkProductsToOrder(order)
 
     if (order.gift) {
@@ -1126,7 +1128,7 @@ export class OrderMgrUiService {   // implements OnInit
 
 
   /** method used in UI
-   *  to do: if bundle (add individual products)
+   *  
    * 
    * @param orderLine 
    * @param qty 
@@ -1164,6 +1166,7 @@ export class OrderMgrUiService {   // implements OnInit
       await me.calculateLoyalty()
     }
 
+    /*
     if (ArrayHelper.NotEmpty(prices)) {
 
       for (let price of prices) {
@@ -1172,6 +1175,7 @@ export class OrderMgrUiService {   // implements OnInit
       }
 
     }
+      */
 
     //this.tmp = 'aaaa'
 

@@ -48,7 +48,7 @@ export class ResourcePlannings {
     if (ArrayHelper.IsEmpty(this.plannings))
       return TimeSpan.zero
 
-    let durSeconds : number[] = this.plannings.map(plan => {
+    let durSeconds: number[] = this.plannings.map(plan => {
 
       if (!plan.start || !plan.end)
         return null
@@ -94,6 +94,96 @@ export class ResourcePlannings {
     return new ResourcePlannings(planningsForResource)
   }
 
+
+  groupByOrderId(plannings: ResourcePlanning[]): Map<string, ResourcePlanning[]> {
+
+    let map = new Map<string, ResourcePlanning[]>()
+
+    if (ArrayHelper.IsEmpty(plannings))
+      return map
+
+    for (let planning of plannings) {
+      let orderId = planning.orderId
+
+      if (!orderId)
+        orderId = ""
+
+      if (map.has(orderId))
+        map.get(orderId).push(planning)
+      else
+        map.set(orderId, [planning])
+    }
+
+    return map
+  }
+
+  merge(plannings1: ResourcePlannings, plannings2: ResourcePlannings): ResourcePlannings {
+
+    if (plannings1.isEmpty()) return plannings2
+    if (plannings2.isEmpty()) return plannings1
+
+    let ranges1 = plannings1.toDateRangeSet()
+    let ranges2 = plannings2.toDateRangeSet()
+    let plannings2Array: ResourcePlanning[] = [...plannings2.plannings]
+
+    let result: ResourcePlanning[] = []
+
+    for (let idx = 0; idx < ranges1.count; idx++) {
+      let range1: DateRange = ranges1.ranges[idx]
+      let planning1: ResourcePlanning = plannings1.plannings[idx]
+
+      let range2Idx = ranges2.indexOfRangeBiggestOverlap(range1)
+
+      if (range2Idx == -1)
+        result.push(planning1)
+
+      let range2: DateRange = ranges2.ranges[range2Idx]
+      let union: DateRange = range1.unionOfOverlapping(range2)
+      let newPlanning = planning1.clone()
+      newPlanning.setDates(union)
+
+      result.push(newPlanning)
+
+      // ranges2 & plannings2Array should be in sync
+      ranges2.ranges.splice(range2Idx, 1)
+      plannings2Array.splice(range2Idx, 1)
+    }
+
+    if (ArrayHelper.NotEmpty(plannings2Array)) {
+      result.push(...plannings2Array)
+    }
+
+    return new ResourcePlannings(result)
+  }
+  
+  /**
+   * If we have 2 group resource plannings with same times & overlap allowed and different order, then this can be grouped (=> can be executed by same person)
+   * If they are from the same order, then it means that 2 seperated resources are needed (otherwise there should have been 1 resource planning)
+   */
+  groupByOverlapAllowed(): ResourcePlannings {
+
+    // group per order
+    let planningsByOrderId: Map<string, ResourcePlanning[]> = this.groupByOrderId(this.plannings)
+
+    let orderIds = Array.from(planningsByOrderId.keys())
+
+    const nrOfOrderIds = orderIds.length
+
+    if (nrOfOrderIds <= 1)
+      return this
+
+    let orderId = orderIds[0]
+    let newPlannings: ResourcePlannings = new ResourcePlannings(planningsByOrderId.get(orderId))
+
+    for (let i = 1; i < nrOfOrderIds; i++) {
+      let nextOrderId = orderIds[i]
+      let nextPlannings = new ResourcePlannings(planningsByOrderId.get(nextOrderId))
+
+      newPlannings = this.merge(newPlannings, nextPlannings)
+    }
+
+    return newPlannings
+  }
 
   filterByResourceOverlapAllowed(resourceId: string, overlap: boolean = false): ResourcePlannings {
 
@@ -441,6 +531,14 @@ export class ResourcePlanning extends ObjectWithIdPlus implements IAsDbObject<Re
     let hour = dateFns.format(this.startDate, 'HH:mm')    //DateHelper.parse(this.start)
 
     return hour
+  }
+
+  setDates(range: DateRange) {
+    if (!range)
+      return
+
+    this.startDate = range.from
+    this.endDate = range.to
   }
 
   /**

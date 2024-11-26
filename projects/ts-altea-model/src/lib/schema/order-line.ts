@@ -743,10 +743,10 @@ export class OrderLine extends ObjectWithIdPlus {
     }
 
 
-    let delta = this.calculatePriceChanges(unitPrice)
+    let priceChange = this.calculatePriceChanges(unitPrice)
 
-    if (delta)
-      unitPrice += delta
+    if (priceChange)
+      unitPrice += priceChange
 
     /*
     let specialPricing = this.calculateSpecialPricing(unitPrice, startDate, creationDate)

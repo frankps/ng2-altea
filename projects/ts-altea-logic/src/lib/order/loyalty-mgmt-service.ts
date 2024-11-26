@@ -288,10 +288,11 @@ export class LoyaltyMgmtService {
 
         const result = new LoyaltyByProgram()
 
+        /*
         if (!order.allPaid()) {
             result.msg = `Order not fully paid!`
             return result
-        }
+        }*/
 
         if (order.loyal) {
             result.msg = `Loyalty already applied!`
@@ -334,7 +335,7 @@ export class LoyaltyMgmtService {
 
                     switch (loyaltyProgram.track) {
                         case LoyaltyUnit.qty:
-                            if (line.incl >= validTotal) {
+                            if (validTotal >= line.incl) {
                                 validTotal -= line.incl
                                 result.addLoyalty(loyaltyProgram.id, line.qty)
                             }

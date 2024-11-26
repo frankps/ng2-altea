@@ -60,18 +60,24 @@ export class OrderLineComponent implements OnInit {
     this.setQtyArray(product)
   }
 
+  _orderLine: OrderLine
+
   @Input() set orderLine(line: OrderLine) {
+
+    this._orderLine = line
 
     this.prices = {}
 
     if (!line)
       return
 
-    if (!line.hasPriceChanges())
-      return
+    if (line.hasPriceChanges()) {
+      line.pc.forEach(priceChange => { this.prices[priceChange.id] = true })
+    }
+  }
 
-    line.pc.forEach(priceChange => { this.prices[priceChange.id] = true })
-
+  get orderLine() {
+    return this._orderLine //this.orderMgrSvc.orderLine
   }
 
   get product() {
@@ -82,9 +88,7 @@ export class OrderLineComponent implements OnInit {
     return this.orderMgrSvc.orderLineOptions
   }
 
-  get orderLine() {
-    return this.orderMgrSvc.orderLine
-  }
+
 
   qtyChanged() {
     console.error(this.orderMgrSvc.orderLine)
@@ -132,9 +136,9 @@ export class OrderLineComponent implements OnInit {
 
   addOrderLine(orderLine: OrderLine) {
 
-    let prices = this.getSelectedPrices()
+    // let prices = this.getSelectedPrices()
 
-    this.orderMgrSvc.addOrderLine(orderLine, 1, true, prices)
+    this.orderMgrSvc.addOrderLine(orderLine, 1, true)  // , prices
     this.new.emit(orderLine)
 
   }
@@ -294,7 +298,7 @@ export class OrderLineComponent implements OnInit {
 
         let priceChange = new PriceChange()
 
-        if (price.extraQty?.on) {
+        if (price.extraQty?.on) {  // if this is not a 'real' price change, but instead customer receives extra quantity
           priceChange.tp = PriceChangeType.subsQty
           priceChange.val = price.extraQty.val
           priceChange.pct = price.extraQty.pct

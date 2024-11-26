@@ -408,13 +408,13 @@ export class OrderMgmtService {
                 order.lock = ''
                 order.m.setDirty('lock')
 
-                if (!order.gift)
-                    var res = await msgSvc.confirmationMessaging(order)
-                else {
+                if (order.gift) {
                     const giftMsg = new GiftMessaging(this.alteaDb) // GiftMes(this.alteaDb)
                     await giftMsg.fulfillGiftOrder(order)
+                } else if (order.hasServices()) {
+                    var res = await msgSvc.confirmationMessaging(order)
                 }
-
+                
                 console.warn(res)
 
                 break

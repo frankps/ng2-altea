@@ -144,6 +144,8 @@ export class AvailabilityService {
             order.startDate = option.date
             orderMgmtSvc.doOrderPriceChanges(order)
             order.calculateAll()
+            option.price = order.incl
+            order.clearAllPriceChanges()
 
             /*
                         for (let line of order.lines) {
@@ -160,7 +162,7 @@ export class AvailabilityService {
                             orderSpecialPrice += lineSpecialPrice
                         }*/
 
-            option.price = order.incl
+            
         }
 
 

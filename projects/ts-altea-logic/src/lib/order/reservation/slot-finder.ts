@@ -432,6 +432,9 @@ export class SlotFinder {
 
         let groupLevelPlannings = ctx.resourcePlannings.filterByDateRangeResourceGroupsOnly(groupResourceIds, outerRange.from, outerRange.to)
 
+        groupLevelPlannings = groupLevelPlannings.groupByOverlapAllowed()
+
+        
         if (!groupLevelPlannings || groupLevelPlannings.isEmpty())
             return availabilityForResources
 
@@ -453,6 +456,7 @@ export class SlotFinder {
         let groupPlanningMinTime = groupLevelPlannings.minTime()
 
         let otherAvailableResources = availability.getAvailabilityOfResourcesInRange(otherPossibleResources,  outerRange, groupPlanningMinTime, solution, false, false)
+
 
         for (let planning of groupLevelPlannings.plannings) {
             let dateRange = planning.toDateRange()

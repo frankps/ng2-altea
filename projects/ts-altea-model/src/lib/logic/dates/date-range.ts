@@ -52,6 +52,7 @@ export class DateRange<T = any> {
         return range
     }
 
+    
 
     isValid(): boolean {
         return (this.from < this.to)
@@ -364,6 +365,27 @@ export class DateRange<T = any> {
         const newTo = dateFns.subSeconds(this.to, span.seconds)
         return new DateRange(this.from, newTo)
 
+    }
+
+    /**
+     * It is assumed that the "other" DateRange is overlapping this range
+     * @param other 
+     * @returns 
+     */
+    unionOfOverlapping(other: DateRange) : DateRange {
+
+        if (!other)
+            return this
+
+        let result = this.clone()
+
+        if (other.from < this.from)
+            result.from = other.from
+
+        if (other.to > this.to)
+            result.to = other.to
+
+        return result
     }
 
     section(other: DateRange): DateRange {

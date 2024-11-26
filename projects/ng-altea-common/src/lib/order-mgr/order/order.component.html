@@ -403,9 +403,11 @@
 
 
         <!-- && order?.allPaid()
+
+        *ngIf="show.loyalty && order.contact"
          -->
 
-        <order-mgr-loyalty *ngIf="show.loyalty && order.contact" [order]="order"
+        <order-mgr-loyalty *ngIf="isPOS()" [order]="order"
             [loyalty]="orderMgrSvc.loyalty"></order-mgr-loyalty>
 
 

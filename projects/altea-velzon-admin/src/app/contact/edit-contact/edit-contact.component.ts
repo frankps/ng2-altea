@@ -1,8 +1,11 @@
 
 import { Component, ViewChild, OnInit, inject } from '@angular/core';
 import { ProductService, PriceService, ProductResourceService, ResourceService, ScheduleService, ContactService, SessionService, OrderService, MessagingService } from 'ng-altea-common'
-import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ResourceType, ResourceTypeIcons, Resource, Schedule, Contact, 
-  Language, DepositMode, LoyaltyCard, Order, Message, MsgType, MsgDirIcon, MsgDirColor, MsgTypeIcon, MsgStateIcon  } from 'ts-altea-model'
+import {
+  Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ResourceType, ResourceTypeIcons, Resource, Schedule, Contact,
+  Language, DepositMode, LoyaltyCard, Order, Message, MsgType, MsgDirIcon, MsgDirColor, MsgTypeIcon, MsgStateIcon,
+  Subscription
+} from 'ts-altea-model'
 import { BackendHttpServiceBase, DashboardService, FormCardSectionEventData, NgEditBaseComponent, ToastType, TranslationService } from 'ng-common'
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxModalComponent, DeleteModalComponent } from 'ng-common';
@@ -75,6 +78,17 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
 
   test = "31478336034"
 
+  /** initially we only show subscriptions with open quantities */
+  showFilteredSubscriptions = true
+
+  moreSubscriptions = 0
+
+  /** visible subscriptions (active ones with available quantities) */
+  subscriptions: Subscription[]
+
+
+
+
   public saveScheduling$: Rx.Subject<any> = new Rx.Subject<any>()
 
   constructor(protected contactSvc: ContactService, protected translationSvc: TranslationService, route: ActivatedRoute, router: Router,
@@ -116,14 +130,53 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
     console.error(contact)
 
     this.messages = []
+    this.subscriptions = null
 
     await this.getMessages(contact)
+
+    this.showFilteredSubscriptions = true
+    this.showSubscriptions(this.showFilteredSubscriptions)
+
+    this.moreSubscriptions = (contact.subscriptions ? contact.subscriptions.length : 0) - (this.subscriptions ? this.subscriptions.length : 0)
+
+    /*     if (ArrayHelper.NotEmpty(contact.subscriptions)) {
+    
+          let subs = contact.subscriptions.filter(sub => sub.usedQty != sub.totalQty)
+    
+          if (ArrayHelper.NotEmpty(subs)) {
+            subs = _.orderBy(subs, ['cre'], ['desc'])
+            this.subscriptions = subs
+          }
+        } */
 
     this.orders = []
     this.ordersCreateBefore = new Date(2050, 0, 1)
     await this.getOrders()
 
   }
+
+  toggleSubscriptions() {
+    this.showFilteredSubscriptions = !this.showFilteredSubscriptions
+    this.showSubscriptions(this.showFilteredSubscriptions)
+  }
+
+
+  showSubscriptions(showOpenOnly: boolean = false) {
+
+    let contact = this.object
+
+    if (ArrayHelper.NotEmpty(contact?.subscriptions)) {
+      let subs = contact.subscriptions
+
+      if (showOpenOnly)
+        subs = subs.filter(sub => sub.usedQty != sub.totalQty)
+
+      subs = _.orderBy(subs, ['cre'], ['desc'])
+      this.subscriptions = subs
+    }
+
+  }
+
 
   messages: Message[]
 
@@ -142,7 +195,7 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
 
     //    const qry = query(msgCol, or(where("from", "==", contact.mobile), where("to", "array-contains", contact.mobile)), orderBy('cre', 'desc'), limit(10))
 
-    const qry = query(msgCol, where("conIds", "array-contains", contact.id), orderBy('cre', 'desc'), limit(20))    
+    const qry = query(msgCol, where("conIds", "array-contains", contact.id), orderBy('cre', 'desc'), limit(20))
 
     const querySnapshot = await getDocs(qry);
 
