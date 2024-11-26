@@ -956,7 +956,7 @@ export class Price extends ObjectWithIdPlus {
   end?: number | null;
 
   qty?: number = 1
-
+   
   isQty = false
   isDay = false
   days: boolean[] = []
@@ -979,7 +979,7 @@ export class Price extends ObjectWithIdPlus {
   @Type(() => PriceExtraQuantity)
   extraQty?: PriceExtraQuantity
 
-
+   
   productItemId?: string
 
   hasOptions = false  // true if this price also has option specific price changes
@@ -994,9 +994,19 @@ export class Price extends ObjectWithIdPlus {
   @Type(() => PriceCondition)
   cond: PriceCondition[] = []
 
-
+  hasPeriods = false
+  periods: any
 
   idx = 0
+
+  /** Skip all next rules */
+  skip = false
+
+  /** Skip this rule last 'skipLast' hours, continue with other rules */
+  skipLast?: number
+
+  /** Rule is active */
+  on = true
 
   constructor(productId?: string, title?: string) {
     super()

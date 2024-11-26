@@ -1023,6 +1023,8 @@ export class OrderMgrUiService {   // implements OnInit
 
     query.and('name', QueryOperator.contains, searchFor)
     query.and('del', QueryOperator.equals, false)
+    query.and('showPos', QueryOperator.equals, true)
+
     query.include('options:orderBy=idx.values:orderBy=idx')
     query.take = 20
 

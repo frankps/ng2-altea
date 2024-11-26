@@ -375,8 +375,14 @@
         <li class="list-group-item" (click)="addPrice()" *ngIf="editSectionId === 'pricing'">
           Voeg prijs toe
         </li>
-        <li class="list-group-item" *ngFor="let price of priceChanges.orderedCol()">
+        <li class="list-group-item" *ngFor="let price of priceChanges.orderedCol(); let idx = index">
 
+
+          <div class="row mt-2">
+            <div class="col">
+              {{price.title}}
+            </div>
+          </div>
           <div class="row">
             <div class="col-2">
               <span *ngIf="price.isAbsolute">€</span>{{ price.value }} <span *ngIf="price.isPercentage">%</span>
@@ -395,6 +401,7 @@
             <div class="col" *ngIf="editSectionId === 'pricing'">
               <i class="fas fa-trash float-end" (click)="deletePrice(price)"></i>
               <i class="fas fa-pen float-end me-3" (click)="editPrice(price)"></i>
+              <i *ngIf="idx > 0" class="fa-solid fa-up float-end me-3" (click)="movePriceUp(price, idx)"></i>
             </div>
           </div>
 

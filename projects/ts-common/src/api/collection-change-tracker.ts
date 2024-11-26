@@ -1,5 +1,5 @@
 import { th } from "date-fns/locale";
-import { ObjectHelper } from "../lib";
+import { ArrayHelper, ObjectHelper } from "../lib";
 import { ObjectWithId } from "../lib/object-with-id"
 import { ApiBatchProcess } from "./api-batch"
 import * as _ from "lodash";
@@ -60,6 +60,16 @@ export class CollectionChangeTracker<T extends ObjectWithId> {
 
     return this.col
 
+  }
+
+  getById(id: string) {
+
+    if (ArrayHelper.IsEmpty(this.col))
+      return null
+
+    var item = this.col.find(i => i.id == id)
+
+    return item
   }
 
   cancel() {

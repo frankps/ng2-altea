@@ -93,7 +93,7 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
     spinner: NgxSpinnerService, private modalService: NgbModal,
     dashboardSvc: DashboardService) {
 
-    super('product', Product, 'prices,options:orderBy=idx.values:orderBy=idx,items:orderBy=idx,resources:orderBy=idx.resource'
+    super('product', Product, 'prices:orderBy=idx,options:orderBy=idx.values:orderBy=idx,items:orderBy=idx,resources:orderBy=idx.resource'
       , productSvc
       , router, route, spinner, dashboardSvc)
 
@@ -112,7 +112,7 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
   override async ngOnInit() {
     super.ngOnInit()
 
-   // this.condition = new PriceCondition()
+    // this.condition = new PriceCondition()
     // delete
     //  this.objectName = 'Product'
 
@@ -129,7 +129,7 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
     this.sectionProps.set('serviceDetails', ['customers', 'gender', 'online', 'showPrice', 'duration', 'spacingAfter'])
     // pricing
     this.sectionProps.set('pricing', ['prices'])  //'prices'
-    this.sectionProps.set('visibility', ['online', 'showPrice', 'showDuration'])  // , 'showPos'
+    this.sectionProps.set('visibility', ['online', 'showPrice', 'showDuration', 'showPos'])  // , 'showPos'
 
     this.sectionProps.set('options', ['options'])
     this.sectionProps.set('rules', ['rules'])
@@ -152,7 +152,7 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
   override async objectRetrieved(object: Product): Promise<void> {
 
 
-    object.prices = _.orderBy(object?.prices, ['idx'], ['desc'])
+    object.prices = _.orderBy(object?.prices, ['idx'], ['asc'])
 
     if (object.options)
       object.options = _.orderBy(object.options, 'idx')
@@ -352,8 +352,8 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
     } else {
       this.dashboardSvc.showToastType(ToastType.saveError)
     }
-      
-    
+
+
 
 
     console.error(batch)
@@ -564,18 +564,29 @@ if (this.editSection == 'pricing') {
     this.priceChanges?.delete(price)
   }
 
+  movePriceUp(price: Price, arrayIdx: number) {
+
+    var prices = this.priceChanges.orderedCol()
+
+    let prevPrice = prices[arrayIdx - 1]
+
+    let currentPriceIdx = price.idx
+    price.idx = prevPrice.idx
+    prevPrice.idx = currentPriceIdx
+  }
+
 
   async addPrice() {
 
     if (!this.object?.id)
       return
 
-/*     let title: string = await this.translationSvc.getTrans("objects.price.title-tpl")
-
-    title = title.replace('*', this.object.name)
-
-    console.warn(title)
- */
+    /*     let title: string = await this.translationSvc.getTrans("objects.price.title-tpl")
+    
+        title = title.replace('*', this.object.name)
+    
+        console.warn(title)
+     */
 
     const price = new Price(this.object?.id, '')
 

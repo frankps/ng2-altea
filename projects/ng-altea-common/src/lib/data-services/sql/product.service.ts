@@ -130,6 +130,9 @@ options:orderBy=idx.values:orderBy=idx
 
     if (online)
       query.and('online', QueryOperator.not, OnlineMode.invisible)
+    else
+      query.and('showPos', QueryOperator.equals, true)
+
 
     //productQry.include('options:orderBy=idx.values:orderBy=idx', 'resources:orderBy=idx.resource', 'items:orderBy=idx', 'prices')
 

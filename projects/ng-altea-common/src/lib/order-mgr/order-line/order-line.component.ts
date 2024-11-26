@@ -285,6 +285,8 @@ export class OrderLineComponent implements OnInit {
     if (!price)
       return
 
+    console.log(price)
+
     let priceId = price.id
 
     let priceSelected: boolean = this.prices[priceId]
@@ -315,9 +317,17 @@ export class OrderLineComponent implements OnInit {
 
         this.orderLine.addPriceChange(priceChange)
 
-        this.orderMgrSvc.calculateAll()
 
-        this.orderMgrSvc.orderDirty = true
+
+
+
+        if (this.orderMgrSvc.orderLineIsNew) {
+          this.orderLine.calculateAll()
+        }
+        else {
+          this.orderMgrSvc.calculateAll()
+          this.orderMgrSvc.orderDirty = true
+        }
         this.orderMgrSvc.orderLine.markAsUpdated('pc')
 
 
@@ -329,7 +339,13 @@ export class OrderLineComponent implements OnInit {
 
         this.orderLine.removePriceChanges(priceId)
 
-        this.orderMgrSvc.calculateAll()
+        if (this.orderMgrSvc.orderLineIsNew) {
+          this.orderLine.calculateAll()
+        }
+        else {
+          this.orderMgrSvc.calculateAll()
+        }
+
 
         this.orderMgrSvc.orderDirty = true
         this.orderMgrSvc.orderLine.markAsUpdated('pc')

@@ -1102,6 +1102,9 @@
       }
     },
     "price": {
+      "on": "Actief",
+      "skip": "Voer volgende prijsregels NIET meer uit",
+      "skipLast": "Skip regel laatste uren",
       "start": "Vanaf",
       "end": "Tot",
       "qty": "Vanaf aantal",
@@ -1127,6 +1130,7 @@
       "from": "Vanaf (hh:mm)",
       "to": "Tot (hh:mm)",
       "giftOpt": "Cadeaubon optie",
+      "hasPeriods": "Prijs geldig gedurende specifieke periodes",
       "help": {
         "price": "Prijs per behandeling"
       }

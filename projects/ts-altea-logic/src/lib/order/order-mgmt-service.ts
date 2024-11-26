@@ -17,6 +17,7 @@ import { OrderMessaging } from './messaging/order-messaging'
 import { GiftMessaging } from './messaging/gift-messaging'
 
 
+
 export class AddPaymentToOrderParams {
     orderId: string
     type: PaymentType
@@ -138,7 +139,7 @@ export class OrderMgmtService {
 
         if (res.notOk) {
             orderDeleteResult.error(`Problem deleting order: ${res.message}`)
-        } 
+        }
 
         return orderDeleteResult
 
@@ -149,7 +150,7 @@ export class OrderMgmtService {
 
 
         // 'lines:orderBy=idx.product', 'contact'
-        const order = await this.alteaDb.getOrder(orderId, ...Order.defaultInclude)  // , 'lines:orderBy=idx.product', 'contact', 'payments:orderBy=idx'
+        let order = await this.alteaDb.getOrder(orderId, ...Order.defaultInclude)  // , 'lines:orderBy=idx.product', 'contact', 'payments:orderBy=idx'
 
         if (!order) {
             const msg = `Order not found: ${orderId}: can't add payment!`
@@ -165,7 +166,9 @@ export class OrderMgmtService {
 
         order.addPayment(payment)
 
-        const result = await this.alteaDb.saveOrder(order)
+        let result = await this.alteaDb.saveOrder(order)
+
+        order = result.object
 
         if (!result.isOk)
             console.error(result.message)
@@ -173,9 +176,8 @@ export class OrderMgmtService {
         /** we had Stripe payments coming in on cancelled (=timed out) orders => fix somewhere else */
         if (order.state != OrderState.cancelled) {
             console.debug('Starting change state')
-            await this.changeState(order)
+            result = await this.changeState(order)
         }
-
 
         return result
     }
@@ -414,7 +416,7 @@ export class OrderMgmtService {
                 } else if (order.hasServices()) {
                     var res = await msgSvc.confirmationMessaging(order)
                 }
-                
+
                 console.warn(res)
 
                 break
@@ -784,88 +786,143 @@ export class OrderMgmtService {
 
     }
 
+    inHighPeriod(date: Date) {
+
+        if (!date)
+            return false
+
+        let specialDates = []   // 20241224, 20241225, 20241231, 20250101
+
+        let dateNum = DateHelper.yyyyMMdd(date)
+
+        if (specialDates.indexOf(dateNum) >= 0)
+            return true
+
+        let specialRanges = [[20241224, 20250101], [20250212, 20250214]]
+
+        for (let range of specialRanges) {
+              if (dateNum >= range[0] && dateNum <= range[1])
+                return true
+        }
+
+        return false
+    }
+
     doOrderLinePriceChanges(order: Order, orderLine: OrderLine) {
 
+        let now = new Date()
         let product = orderLine.product
 
         if (ArrayHelper.IsEmpty(product.prices))
             return 0
 
+        let prices = _.sortBy(product.prices, ['idx'], ['asc'])
+
         if (!orderLine.pc)
             orderLine.pc = []
-        
+
         let specialPricing = 0
-     
+
         let startDate = order?.startDate
-    
+
         let creationDate = order?.cre
-    
+
         if (!creationDate)
-          creationDate = new Date()
-    
+            creationDate = new Date()
+
         let day = -1
         let skipDateChecks = false
-    
+
         if (startDate)
-          day = dateFns.getDay(startDate)
+            day = dateFns.getDay(startDate)
         else
-          skipDateChecks = true  // because there is no date available
-    
+            skipDateChecks = true  // because there is no date available
+
         if (ArrayHelper.IsEmpty(product.prices))
-          return 0
-    
+            return 0
+
         for (let price of product.prices) {
+
+            
+            if (!price.on)
+                continue
 
             if (orderLine.hasPriceChange(price.id))
                 continue // price already applied
-    
-          if (price.giftOpt)
-            continue
-    
-          if (price.start) {
-            if (creationDate < price.startDate)
-              continue
-          }
-    
-          if (price.isDay) {
-            if (skipDateChecks || !price.days[day])
-              continue
-          }
-    
-          if (price.isTime) {
-    
-            if (skipDateChecks)
-              continue
-    
-            let from = DateHelper.getDateAtTime(price.from, startDate)
-            let to = DateHelper.getDateAtTime(price.to, startDate)
-    
-            // if startdate outside interval
-            if (startDate < from || startDate >= to)
-              continue
-          }
-    
-          switch (price.mode) {
-            case PriceMode.add:
-    
-              let priceChange = new PriceChange()
-              priceChange.tp = PriceChangeType.price
-              priceChange.val = price.value
-              priceChange.info = price.title
-              priceChange.id = price.id
-              priceChange.pct = false
 
-              orderLine.pc.push(priceChange)
-    
-              break
-          }
+            if (price.giftOpt)
+                continue
+
+            if (price.start) {
+                if (creationDate < price.startDate)
+                    continue
+            }
+
+            if (price.isDay) {
+                if (skipDateChecks || !price.days[day])
+                    continue
+            }
+
+            if (price.isTime) {
+
+                if (skipDateChecks)
+                    continue
+
+                let from = DateHelper.getDateAtTime(price.from, startDate)
+                let to = DateHelper.getDateAtTime(price.to, startDate)
+
+                // if startdate outside interval
+                if (startDate < from || startDate >= to)
+                    continue
+            }
+
+            if (price.hasPeriods) {
+
+                if (skipDateChecks)
+                    continue
+
+                if (!this.inHighPeriod(startDate))
+                    continue
+
+            }
+
+            if (price?.skipLast > 0) {
+
+                if (skipDateChecks)
+                    continue
+
+                const skipAfter = dateFns.subHours(startDate, price.skipLast)
+
+                if (skipAfter <= now )  // && now < startDate
+                    continue
+
+
+            }
+
+            switch (price.mode) {
+                case PriceMode.add:
+
+                    let priceChange = new PriceChange()
+                    priceChange.tp = PriceChangeType.price
+                    priceChange.val = price.value
+                    priceChange.info = price.title
+                    priceChange.id = price.id
+                    priceChange.pct = false
+
+                    orderLine.pc.push(priceChange)
+
+                    break
+            }
+
+            if (price.skip)
+                break
         }
-    
+
         return specialPricing
-    
-    
-      }
-    
+
+
+    }
+
 
 
 
