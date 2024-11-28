@@ -20,7 +20,7 @@
                 <!-- <i class="fa-solid fa-circle float-end" [style.color]="contact.color"></i> -->
 
                 <div class="row">
-                    <div class="col-12">{{contact.name}} <span *ngIf="contact?.mobile" class="float-end"><i
+                    <div class="col-12"><span [style]="contact.act?'':'text-decoration: line-through;'">{{contact.name}}</span> <span *ngIf="contact?.mobile" class="float-end"><i
                                 class="fa-light fa-mobile"></i> &nbsp;{{contact?.mobile}}</span></div>
 
                 </div>

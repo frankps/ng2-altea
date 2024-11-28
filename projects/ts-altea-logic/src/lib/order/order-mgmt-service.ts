@@ -410,10 +410,12 @@ export class OrderMgmtService {
                 order.lock = ''
                 order.m.setDirty('lock')
 
+                let hasServices = ArrayHelper.NotEmpty(order.planning) // order.hasServices()
+
                 if (order.gift) {
                     const giftMsg = new GiftMessaging(this.alteaDb) // GiftMes(this.alteaDb)
                     await giftMsg.fulfillGiftOrder(order)
-                } else if (order.hasServices()) {
+                } else if (hasServices) {
                     var res = await msgSvc.confirmationMessaging(order)
                 }
 

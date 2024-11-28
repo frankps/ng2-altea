@@ -37,6 +37,8 @@
 
 
 
+
+
             <div class="row">
                 <div class="col-6"> <ngx-altea-label-value label="objects.contact.first"
                         [value]="object.first"></ngx-altea-label-value> </div>
@@ -107,6 +109,18 @@
 
                 <!-- help="objects.resource.help.{{object.type}}-name" -->
 
+                <div class="row">
+                    <div class="col d-flex justify-content-end">
+
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="act" name="act"
+                                [(ngModel)]="object.act" />
+                            <label class="form-check-label" for="act" translate="objects.act"></label>
+                        </div>
+
+
+                    </div>
+                </div>
 
                 <div class="row">
                     <div class="col-6">
@@ -244,6 +258,15 @@
                 </div>
 
 
+                <altea-search-contact #searchContactModal [modal]="true"
+                    (contactSelected)="exportToContactSelected($event)"></altea-search-contact>
+
+                <div class="row mt-3">
+                    <div class="col"><button type="button" class="btn btn-primary btn-sm float-end"
+                            (click)="searchContact()">Exporteer gegevens naar andere klant</button></div>
+
+                </div>
+
 
             </form>
 
@@ -286,7 +309,8 @@
                     <div class="col me-3">
 
 
-                        <h5 *ngIf="moreSubscriptions"><span class="badge rounded-pill text-bg-primary float-end" (click)="toggleSubscriptions()">
+                        <h5 *ngIf="moreSubscriptions"><span class="badge rounded-pill text-bg-primary float-end"
+                                (click)="toggleSubscriptions()">
                                 <ng-container *ngIf="showFilteredSubscriptions">
                                     <span translate>dic.showMore</span> ({{moreSubscriptions}})
                                 </ng-container>

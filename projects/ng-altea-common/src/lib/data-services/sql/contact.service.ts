@@ -29,6 +29,7 @@ export class ContactService extends BackendHttpServiceBase<Contact> {
 
 
     query.and('name', QueryOperator.contains, searchFor)
+    query.and('act', QueryOperator.equals, true)
 
     /*   if (contact.last)
         query.and('last', QueryOperator.contains, contact.last)

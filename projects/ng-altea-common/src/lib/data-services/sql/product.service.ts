@@ -137,6 +137,7 @@ options:orderBy=idx.values:orderBy=idx
     //productQry.include('options:orderBy=idx.values:orderBy=idx', 'resources:orderBy=idx.resource', 'items:orderBy=idx', 'prices')
 
     query.include('options:orderBy=idx.values:orderBy=idx', 'items:orderBy=idx', 'prices', 'resources:orderBy=idx')
+    query.orderBy('name')
     // query.include('options:orderBy=idx.values:orderBy=idx', 'resources:orderBy=idx.resource', 'items:orderBy=idx', 'prices')
     query.take = 200
 

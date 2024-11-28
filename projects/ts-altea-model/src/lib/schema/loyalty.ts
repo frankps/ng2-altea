@@ -328,11 +328,12 @@ export class LoyaltyLine {
 export class LoyaltyCardChange extends ObjectWithId {
  // public id?: string;
 
-  public static newValue(orderId: string, cardId: string, value: number) {
+  public static newValue(orderId: string, cardId: string, value: number, info?: string) {
     const change = new LoyaltyCardChange()
     change.orderId = orderId
     change.cardId = cardId
     change.value = value
+    change.info = info
 
     return change
   }
@@ -367,6 +368,18 @@ export class LoyaltyCardChange extends ObjectWithId {
 
 export class LoyaltyCard extends ObjectWithIdPlus {
 
+
+  public static new(contactId?: string, programId?: string, name?: string, value: number = 0) : LoyaltyCard {
+
+    const card = new LoyaltyCard()
+    card.contactId = contactId
+    card.programId = programId
+    card.name = name
+    card.value = value
+
+    return card
+
+  }
   
 
   contact?: Contact

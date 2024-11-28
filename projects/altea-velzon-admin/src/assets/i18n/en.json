@@ -479,6 +479,9 @@
       }
     },
     "contact": {
+      "search": {
+          "title": "Contact zoeken"
+      },
       "edit": {
         "sections": {
           "general": {
@@ -766,6 +769,7 @@
     }
   },
   "objects": {
+    "act": "Is actief",
     "message": {
       "auto": "Automatisch bericht"
     },

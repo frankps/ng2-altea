@@ -1,6 +1,6 @@
 
 import { Component, ViewChild, OnInit, inject } from '@angular/core';
-import { ProductService, PriceService, ProductResourceService, ResourceService, ScheduleService, ContactService, SessionService, OrderService, MessagingService } from 'ng-altea-common'
+import { ProductService, PriceService, ProductResourceService, ResourceService, ScheduleService, ContactService, SessionService, OrderService, MessagingService, ObjectService } from 'ng-altea-common'
 import {
   Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ResourceType, ResourceTypeIcons, Resource, Schedule, Contact,
   Language, DepositMode, LoyaltyCard, Order, Message, MsgType, MsgDirIcon, MsgDirColor, MsgTypeIcon, MsgStateIcon,
@@ -25,6 +25,8 @@ import * as countryLib from 'country-list-js';
 import { LoyaltyCardChangeService } from 'ng-altea-common';
 import { UIOrder } from '../../order/order-grid/order-grid.component';
 import { plainToInstance } from 'class-transformer';
+import { SearchContactComponent } from '../search-contact/search-contact.component';
+import { MoveContactData } from 'ts-altea-logic';
 
 
 @Component({
@@ -38,6 +40,8 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
   @ViewChild('deleteModal') public deleteModal: DeleteModalComponent;
 
   @ViewChild('generalForm') generalForm: NgForm;
+
+  @ViewChild('searchContactModal') public searchContactModal: SearchContactComponent;
 
   deleteConfig = {
     successUrl: '',
@@ -93,12 +97,13 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
 
   constructor(protected contactSvc: ContactService, protected translationSvc: TranslationService, route: ActivatedRoute, router: Router,
     spinner: NgxSpinnerService, private modalService: NgbModal, dashboardSvc: DashboardService,
-    protected scheduleSvc: ScheduleService, protected sessionSvc: SessionService, protected loyaltyCardChangeSvc: LoyaltyCardChangeService, protected orderSvc: OrderService) {
+    protected scheduleSvc: ScheduleService, protected sessionSvc: SessionService, protected loyaltyCardChangeSvc: LoyaltyCardChangeService, 
+    protected orderSvc: OrderService, protected backendSvc: ObjectService) {
     super('contact', Contact, 'subscriptions,giftsIn,giftsOut,cards'
       , contactSvc
       , router, route, spinner, dashboardSvc)
 
-    this.sectionProps.set('general', ['first', 'last', 'gender', 'birth', 'email', 'emailRemind', 'mobile', 'smsRemind', 'language', 'deposit', 'depositPct'])
+    this.sectionProps.set('general', ['first', 'last', 'gender', 'birth', 'email', 'emailRemind', 'mobile', 'smsRemind', 'language', 'deposit', 'depositPct', 'act'])
     this.translationSvc.translateEnum(Gender, 'enums.gender.', this.gender)
     this.translationSvc.translateEnum(Language, 'enums.language.', this.language)
     this.translationSvc.translateEnum(DepositMode, 'enums.deposit-mode.', this.depositMode)
@@ -122,6 +127,25 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
 
     console.error(country.all)
 */
+  }
+
+
+  searchContact() {
+    this.searchContactModal.show()
+  }
+
+
+  async exportToContactSelected(toContact: Contact) {
+
+    console.error(toContact)
+
+    if (!toContact)
+      return
+
+    let moveContact = new MoveContactData(this.backendSvc)
+
+    await moveContact.move(this.object.id, toContact.id)
+
   }
 
   override async objectRetrieved(contact: Contact) {
@@ -339,6 +363,19 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
 
 
     console.log(this.orders)
+
+  }
+
+  migrate(from: Contact, toId: string) {
+
+    if (!from || !toId)
+      return
+
+
+    
+
+
+
 
   }
 

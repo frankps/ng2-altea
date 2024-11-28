@@ -264,7 +264,7 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
   }
 
   search(searchFor: string): Observable<ApiListResult<T>> {
-    return this.http.get<ApiListResult<T>>(`${this.host}/${this.urlDifferentiator}?query=name~${searchFor}`)
+    return this.http.get<ApiListResult<T>>(`${this.host}/${this.urlDifferentiator}?query=name~${searchFor}ANDact:true`)
   }
 
   search$(searchFor: string): Promise<T[]> {
@@ -274,6 +274,7 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
     return new Promise<any>(function (resolve, reject) {
 
       me.search(searchFor).pipe(take(1)).subscribe(res => {
+
 
         resolve(res.data)
 
