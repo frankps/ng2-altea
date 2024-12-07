@@ -37,6 +37,7 @@ import { FormsModule } from '@angular/forms';
 import { ProductModule } from "./product/product.module";
 //import { RichTextEditorModule } from '@syncfusion/ej2-angular-richtexteditor';
 
+
 defineLocale('nl-be', nlBeLocale);
 
 export function createTranslateLoader(http: HttpClient): any {

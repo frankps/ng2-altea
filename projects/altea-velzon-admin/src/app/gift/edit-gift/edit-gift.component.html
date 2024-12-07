@@ -26,7 +26,7 @@
     </div>
 
 
-<!-- export class GiftMethods {
+    <!-- export class GiftMethods {
     emailFrom = false
     emailTo = false
     postal = false
@@ -70,7 +70,7 @@
                 <div class="col-3"> <ngx-altea-label-value label="enums.gift-method.pos" valueFormat="yesNo"
                         [value]="object.methods.pos"></ngx-altea-label-value> </div>
 
- <!--                <div class="col-2"> <ngx-altea-label-value label="enums.gift-method.app" valueFormat="yesNo"
+                <!--                <div class="col-2"> <ngx-altea-label-value label="enums.gift-method.app" valueFormat="yesNo"
                         [value]="object.methods.app"></ngx-altea-label-value> </div> -->
             </div>
 
@@ -137,8 +137,7 @@
                 <div class="row mt-2">
                     <div class="col-6">
                         <ngx-altea-label-control label="objects.gift.code" for="code">
-                            <input type="text" id="code" name="code" class="form-control"
-                                [(ngModel)]="object.code" />
+                            <input type="text" id="code" name="code" class="form-control" [(ngModel)]="object.code" />
                         </ngx-altea-label-control>
                     </div>
                 </div>
@@ -146,19 +145,25 @@
 
 
                 <div class="row  mt-2">
-                    <div class="col-4">
+                    <div class="col-3">
                         <ngx-altea-label-control label="objects.gift.value" for="value">
                             <input type="number" id="value" name="value" required class="form-control"
                                 [(ngModel)]="object.value" />
                         </ngx-altea-label-control>
                     </div>
-                    <div class="col-4">
+                    <div class="col-3">
                         <ngx-altea-label-control label="objects.gift.used" for="used">
                             <input type="number" id="used" name="used" required class="form-control"
                                 [(ngModel)]="object.used" />
                         </ngx-altea-label-control>
+                    </div>  
+                    <div class="col-3">
+                        <ngx-altea-label-control label="objects.gift.vatPct" for="vatPct">
+                            <input type="number" id="vatPct" name="vatPct" required class="form-control"
+                                [(ngModel)]="object.vatPct" />
+                        </ngx-altea-label-control>
                     </div>
-                    <div class="col-4"> <ngx-altea-label-value label="objects.gift.isConsumed" valueFormat="yesNo"
+                    <div class="col-3"> <ngx-altea-label-value label="objects.gift.isConsumed" valueFormat="yesNo"
                             [value]="object.isConsumed"></ngx-altea-label-value> </div>
                 </div>
 
@@ -177,7 +182,7 @@
                     </div>
                 </div>
 
-   
+
 
 
                 <altea-search-contact #searchContactModal [modal]="true"

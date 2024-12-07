@@ -14,10 +14,12 @@ import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { TimepickerModule } from 'ngx-bootstrap/timepicker';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerModule } from 'ngx-spinner';
+import { EditInvoiceComponent } from './edit-invoice/edit-invoice.component';
 
 @NgModule({
   declarations: [
-    BankTransactionsComponent
+    BankTransactionsComponent,
+    EditInvoiceComponent
   ],
   imports: [
     CommonModule,
@@ -31,6 +33,9 @@ import { NgxSpinnerModule } from 'ngx-spinner';
     BsDatepickerModule,
     TimepickerModule,
     NgxSpinnerModule
+  ],
+  exports: [
+  //  EditInvoiceComponent
   ]
 })
 export class AccountingModule { }

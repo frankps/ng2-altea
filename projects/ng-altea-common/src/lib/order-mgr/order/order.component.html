@@ -8,8 +8,9 @@
                 <span *ngIf="order.contact"> &nbsp;{{order.contact.name}}</span>
 
             </div>
-            <div class="col-6 px-3 d-flex justify-content-end align-items-center"> {{order.start | intdate}}
+            <div class="col-6 px-3 d-flex justify-content-end align-items-center"> 
                 <span *ngIf="order.giftCode">{{order.giftCode}} &nbsp;<i class="fa-duotone fa-solid fa-gift"></i></span>
+                <span class="ms-2">{{order.start | intdate}}</span>
             </div>
 
 
@@ -36,7 +37,7 @@
     <div class="card-body">
 
         <div class="row">
-            <div class="col-6">
+            <div class="col-8">
 
                 <ng-container *ngIf="show.contact && order.contact">
 
@@ -51,11 +52,12 @@
 
 
             </div>
-            <div class="col-6">
+            <div class="col-4">
 
                 <div class="row">
                     <div class="col d-flex justify-content-end align-items-center">
-                        {{'enums.order-state.' + order.state | translate}} &nbsp;
+                        <span style="font-size: smaller;">{{'enums.order-state.' + order.state | translate}}</span>
+                        &nbsp;
                         <i *ngIf="order.stateIcon()" [style.color]="order.stateColor()" [class]="order.stateIcon()"></i>
                     </div>
 
@@ -136,20 +138,26 @@
                     <div class="col-4 d-flex justify-content-end align-items-end">
 
                         <!-- If no date is specified (order.start not set), and product has flexible price (priceFrom) -->
-                        <span *ngIf="!order.start && !order.gift && line?.product?.priceFrom " style="font-size: smaller; text-align: right;"><sup>*</sup> <span translate>objects.product.priceFrom-app</span> &nbsp; </span>
-        <!--                 
+                        <span *ngIf="!order.start && !order.gift && line?.product?.priceFrom "
+                            style="font-size: smaller; text-align: right;"><sup>*</sup> <span
+                                translate>objects.product.priceFrom-app</span> &nbsp; </span>
+                        <!--                 
                          <ng-container *ngIf="!order.start && line?.product?.priceFrom">
                             <span translate>objects.product.priceFrom-app</span><sup>*</sup>&nbsp;
                          </ng-container> -->
-                        € {{line.incl}}</div>
+                        € {{line.incl}}
+                    </div>
                 </div>
 
                 <ng-container *ngIf="isPOS() && line.hasPriceChanges()">
 
-                    <div class="row mt-1 me-1" style="font-size: 75%; font-style: italic;" *ngFor="let priceChange of line.pc">
+                    <div class="row mt-1 me-1" style="font-size: 75%; font-style: italic;"
+                        *ngFor="let priceChange of line.pc">
                         <div class="col-1"></div>
                         <div class="col-9">{{priceChange.info}}</div>
-                        <div class="col-2 d-flex justify-content-end align-items-end"><span *ngIf="priceChange.isPrice() && !priceChange.pct">€</span> {{priceChange.val}}<span *ngIf="priceChange.pct">%</span></div>
+                        <div class="col-2 d-flex justify-content-end align-items-end"><span
+                                *ngIf="priceChange.isPrice() && !priceChange.pct">€</span> {{priceChange.val}}<span
+                                *ngIf="priceChange.pct">%</span></div>
                     </div>
 
                 </ng-container>
@@ -219,7 +227,8 @@
 
         <div class="row mt-2" *ngIf="!order.start && !order.gift && order?.hasPriceFrom()">
             <div class="col">
-                <span class="float-end" style="font-size: smaller; text-align: right;"><sup>*</sup> <span translate>objects.product.priceFrom-info</span></span>
+                <span class="float-end" style="font-size: smaller; text-align: right;"><sup>*</sup> <span
+                        translate>objects.product.priceFrom-info</span></span>
             </div>
         </div>
 
@@ -274,15 +283,23 @@
         </ng-container>
 
 
-        <ng-container *ngIf="order.hasPayments() && !appInProgress()">
+        <ng-container *ngIf="(order.hasPayments() && !appInProgress()) || sessionSvc.clipboard.hasPayments()">
 
-            Betalingen
+            Betalingen <i *ngIf="sessionSvc.clipboard.hasPayments()" class="fa-duotone fa-solid fa-paste"
+                (click)="orderMgrSvc.pastePaymentsFromClipboard()"></i>
 
             <div class="row ms-2" *ngFor="let pay of order.payments">
                 <div class="col-4">{{'enums.pay-type.' + pay.type | translate}}</div>
-                <div class="col-7">{{pay.info}} <span class="float-end">€{{pay.amount}}</span></div>
-                <div class="col-1" *ngIf="show.extra">
-                    <i class="fas fa-trash float-end" (click)="orderMgrSvc.deletePayment(pay)"></i>
+                <div class="col-3" style="font-size: smaller;">
+                    <span *ngIf="isPOS()">{{pay.date | intdate}}</span>
+                </div>
+                <div class="col-3">{{pay.info}} <span class="float-end">€{{pay.amount}}</span></div>
+                <div class="col-2 d-flex justify-content-end" *ngIf="show.extra">
+
+                    <i class="fas fa-copy me-3" (click)="orderMgrSvc.copyPaymentToClipboard(pay)"></i>
+
+                    <i class="fas fa-trash" (click)="orderMgrSvc.deletePayment(pay)"></i>
+
                 </div>
             </div>
 
@@ -375,6 +392,11 @@
                         <button type="button" class="btn btn-primary btn-sm ms-2" (click)="copyOrder()"><i
                                 class="fa-solid fa-copy"></i></button>
 
+
+                        <button type="button" class="btn btn-primary btn-sm ms-2" *ngIf="order.toInvoice" (click)="manageInvoice()">
+                            <i class="fa-solid fa-file-invoice"></i></button>
+
+
                     </ng-container>
 
 
@@ -407,9 +429,13 @@
         *ngIf="show.loyalty && order.contact"
          -->
 
-        <order-mgr-loyalty *ngIf="isPOS()" [order]="order"
-            [loyalty]="orderMgrSvc.loyalty"></order-mgr-loyalty>
+        <order-mgr-loyalty *ngIf="isPOS()" [order]="order" [loyalty]="orderMgrSvc.loyalty"></order-mgr-loyalty>
 
+
+
+
+        <!-- 
+        *ngIf="show.invoice" [invoice]="orderMgrSvc.invoice" -->
 
 
         <ng-container *ngIf="show.extra">
@@ -417,6 +443,11 @@
 
             <div class="row mt-2">
                 <div class="col-6">
+                    <!-- 
+                    (click)="copyOrder()" -->
+
+
+
 
                     <div class="form-check form-switch float-end">
                         <input class="form-check-input" type="checkbox" id="toInvoice" name="toInvoice"

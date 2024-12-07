@@ -40,8 +40,84 @@
                 </div>
 
 
+
                 <int-phone-edit [(phone)]="contact.mobile" [required]="inputsRequired"
                     (phoneChange)="phoneChanged()"></int-phone-edit>
+
+                <div *ngIf="isPos && !showMore" class="row {{css_cls_row}}">
+                    <div class="col">
+
+                        <pre *ngIf="contact.remark">{{contact.remark}}</pre>
+
+                    </div>
+                </div>
+
+
+
+                <ng-container *ngIf="isPos && showMore">
+
+
+                    <div class="row {{css_cls_row}}">
+                        <div class="col-12">
+                            <ngx-altea-label-control label="objects.contact.remark" for="remark">
+                                <textarea rows="3" class="form-control" id="remark" name="remark" style="height: 90px"
+                                    [(ngModel)]="contact.remark" (change)="propertyChanged('remark')"></textarea>
+
+                            </ngx-altea-label-control>
+                        </div>
+                    </div>
+
+
+                    <div class="row {{css_cls_row}}">
+                        <div class="col-9">
+                            <ngx-altea-label-control label="objects.contact.str" for="str">
+                                <input type="text" id="str" name="str" class="form-control" [(ngModel)]="contact.str"
+                                    (change)="propertyChanged('str')">
+                            </ngx-altea-label-control>
+                        </div>
+
+                        <div class="col-3">
+                            <ngx-altea-label-control label="objects.contact.strNr" for="strNr">
+                                <input type="text" id="strNr" name="strNr" class="form-control"
+                                    [(ngModel)]="contact.strNr" (change)="propertyChanged('strNr')">
+                            </ngx-altea-label-control>
+                        </div>
+                    </div>
+
+                    <div class="row {{css_cls_row}}">
+                        <div class="col-4">
+                            <ngx-altea-label-control label="objects.contact.postal" for="postal">
+                                <input type="text" id="postal" name="postal" class="form-control"
+                                    [(ngModel)]="contact.postal" (change)="propertyChanged('postal')">
+                            </ngx-altea-label-control>
+                        </div>
+
+                        <div class="col-8">
+                            <ngx-altea-label-control label="objects.contact.city" for="city">
+                                <input type="text" id="city" name="city" class="form-control" [(ngModel)]="contact.city"
+                                    (change)="propertyChanged('city')">
+                            </ngx-altea-label-control>
+                        </div>
+                    </div>
+
+                    <div class="row {{css_cls_row}}">
+                        <div class="col-6">
+                            <ngx-altea-label-control label="objects.contact.company" for="company">
+                                <input type="text" id="company" name="company" class="form-control"
+                                    [(ngModel)]="contact.company" (change)="propertyChanged('company')">
+                            </ngx-altea-label-control>
+                        </div>
+
+                        <div class="col-6">
+                            <ngx-altea-label-control label="objects.contact.vatNum" for="vatNum">
+                                <input type="text" id="vatNum" name="vatNum" class="form-control"
+                                    [(ngModel)]="contact.vatNum" (change)="propertyChanged('vatNum')">
+                            </ngx-altea-label-control>
+                        </div>
+                    </div>
+
+
+                </ng-container>
 
 
                 <!-- Allowed message types  -->
@@ -49,6 +125,10 @@
                     <div class="col">
 
                         <span>Communicatie:</span>
+
+
+                        <i class="fa-light fa-circle-ellipsis fa-xl float-end" *ngIf="isPos"
+                            (click)="showMore = !showMore"></i>
 
                         <div class="form-check form-switch ms-3 mt-1" *ngFor="let msgType of msgTypes">
                             <input type="checkbox" class="form-check-input" [id]="msgType.key" [name]="msgType.key"

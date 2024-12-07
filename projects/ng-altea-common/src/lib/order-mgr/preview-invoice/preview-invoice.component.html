@@ -1,0 +1,154 @@
+<!-- 
+
+https://www.npmjs.com/package/ngx-printer#rendering-time
+
+ -->
+
+
+
+<ng-container *ngIf="invoice && branch">
+
+
+    <div class="row my-2">
+        <div class="col">
+            <img width='100%' src='https://marketing-image-production.s3.amazonaws.com/uploads/17ae7951ff4ef38519fa1a715981599a402f7e4d4b05f8508a5bdf2ff5f738656a4b382fde86d71f28e68b0f9b2124d322ce2b1afdd6028244e8ce986823557f.jpg'>
+        </div>
+    </div>
+
+    <div class="row my-3">
+        <div class="col">
+            <h5>Factuur</h5>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-6">
+            <b>Da Vinci IT bv</b><br>
+            Divisie Wellness - Aquasense
+        </div>
+        <div class="col-6">
+            <b>{{invoice.company}}</b>
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col-6">
+            Groenstraat 17a<br>
+            9041 Oostakker
+        </div>
+        <div class="col-6" *ngIf="invoice.address">
+            <div [innerHTML]="invoice.addressHtml()"></div>
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col-6">
+            {{branch.vatNr}}
+        </div>
+        <div class="col-6">
+            {{invoice.vatNum}}
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-6"><b>Factuurnummer</b></div>
+        <div class="col-6"><b>Datum</b></div>
+    </div>
+
+    <div class="row mt-1">
+        <div class="col-6">{{invoice.num}}</div>
+        <div class="col-6">{{invoice.typedDate | date:'dd-MM-yyyy'}}</div>
+    </div>
+
+
+    <ng-container *ngIf="invoice.hasOrders()">
+
+        <div class="row mt-4">
+            <div class="col-4"><b>Omschrijving</b></div>
+            <div class="col-1 d-flex justify-content-end"><b>#</b></div>
+            <div class="col-2 d-flex justify-content-end"><b>Prijs</b></div>
+            <div class="col-2 d-flex justify-content-end"><b>Totaal</b></div>
+            <div class="col-3 d-flex justify-content-end"><b>BTW</b></div>
+          </div>
+      
+
+
+        <ng-container *ngFor="let order of invoice.orders">
+
+
+            <ng-container *ngIf="order.hasLines()">
+
+                <div class="row" *ngFor="let line of order.lines">
+                    <div class="col-4">{{line.descr}}</div>
+                    <div class="col-1 d-flex justify-content-end">{{line.qty}}</div>
+                    <div class="col-2 d-flex justify-content-end">{{line.unit}}</div>
+                  <!--   <div class="col-3">{{line.vat | currency:branch.cur}}</div> -->
+                    <div class="col-2 d-flex justify-content-end">{{line.incl}}</div>
+                    <div class="col-3">{{line.product.vatPct}}% <span class="float-end">{{line.vat}}</span></div>
+                </div>
+
+
+
+            </ng-container>
+
+
+        </ng-container>
+
+    </ng-container>
+
+
+    <div class="row mt-4">
+        <div class="col-4"></div>
+        <div class="col-8">
+
+            <ng-container *ngIf="invoice.hasVatLines()">
+                <div class="row">
+                    <div class="col-3 d-flex justify-content-end"><b>BTW%</b></div>
+                    <div class="col-3 d-flex justify-content-end"><b>Excl</b></div>
+                    <div class="col-3 d-flex justify-content-end"><b>BTW</b></div>
+                    <div class="col-3 d-flex justify-content-end"><b>Incl</b></div>
+                </div>
+
+                <div class="row" *ngFor="let vatLine of invoice.vatLines">
+                    <div class="col-3 d-flex justify-content-end">{{vatLine.pct}}</div>
+                    <div class="col-3 d-flex justify-content-end">{{vatLine.excl}}</div>
+                    <div class="col-3 d-flex justify-content-end">{{vatLine.vat}}</div>
+                    <div class="col-3 d-flex justify-content-end">{{vatLine.incl}}</div>
+                </div>
+            </ng-container>
+
+        </div>
+    </div>
+
+
+
+    <div class="row mt-4">
+        <div class="col-4"></div>
+        <div class="col-8">
+
+            <ng-container *ngIf="invoice.totals">
+                <div class="row">
+                    <div class="col-4 d-flex justify-content-end"><b>Belastbaar</b></div>
+                    <div class="col-4 d-flex justify-content-end"><b>BTW</b></div>
+                    <div class="col-4 d-flex justify-content-end"><b>Totaal</b></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-4 d-flex justify-content-end">{{invoice.totals.excl | currency:branch.cur}}</div>
+                    <div class="col-4 d-flex justify-content-end">{{invoice.totals.vat | currency:branch.cur}}</div>
+                    <div class="col-4 d-flex justify-content-end">{{invoice.totals.incl | currency:branch.cur}}</div>
+                </div>
+            </ng-container>
+
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+</ng-container>

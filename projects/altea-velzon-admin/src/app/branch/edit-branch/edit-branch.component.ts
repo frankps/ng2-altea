@@ -1,7 +1,7 @@
 
 import { Component, ViewChild, OnInit } from '@angular/core';
 import { ProductService, PriceService, ProductResourceService, ResourceService, ScheduleService, ContactService, SessionService, BranchService } from 'ng-altea-common'
-import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ResourceType, ResourceTypeIcons, Resource, Schedule, Contact, Language, Branch, DepositTerm, TimeUnit, MsgType, ReminderConfig, Country, GiftConfig, GiftVatPct, Currency, ProdSalesConfig, CommunicationConfig } from 'ts-altea-model'
+import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ResourceType, ResourceTypeIcons, Resource, Schedule, Contact, Language, Branch, DepositTerm, TimeUnit, MsgType, ReminderConfig, Country, GiftConfig, GiftVatPct, Currency, ProdSalesConfig, CommunicationConfig, InvoiceConfig } from 'ts-altea-model'
 import { BackendHttpServiceBase, DashboardService, FormCardSectionEventData, NgEditBaseComponent, ToastType, TranslationService } from 'ng-common'
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxModalComponent, DeleteModalComponent } from 'ng-common';
@@ -37,6 +37,7 @@ export class EditBranchComponent extends NgEditBaseComponent<Branch> implements 
   @ViewChild('remindersForm') remindersForm: NgForm;
   @ViewChild('giftForm') giftForm: NgForm;
   @ViewChild('prodSalesForm') prodSalesForm: NgForm;
+  @ViewChild('invoiceForm') invoiceForm: NgForm;
 
   timeUnitsPlural: Translation[] = []
   timeUnitsSingular: Translation[] = []
@@ -71,7 +72,7 @@ export class EditBranchComponent extends NgEditBaseComponent<Branch> implements 
     this.sectionProps.set('deposit', ['depositPct', 'depositTerms', 'reminders'])
     this.sectionProps.set('gift', ['giftOn', 'gift'])
     this.sectionProps.set('prodSales', ['prodSales'])
-    
+    this.sectionProps.set('invoice', ['inv'])
     // 
 
     const branchId = this.sessionSvc.branchId
@@ -102,6 +103,9 @@ export class EditBranchComponent extends NgEditBaseComponent<Branch> implements 
 
     if (!branch.comm)
       branch.comm = new CommunicationConfig()
+
+    if (!branch.inv)
+      branch.inv = new InvoiceConfig()
 
     if (!branch.prodSales) {
       branch.prodSales = new ProdSalesConfig()

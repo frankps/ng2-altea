@@ -17,7 +17,8 @@ export enum PosOrderMode {
   plan = 'plan',
   contact = 'contact',
   pay = 'pay',
-  cancel = 'cancel'
+  cancel = 'cancel',
+  invoice = 'invoice'
 }
 
 
@@ -109,7 +110,7 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
 
     this.mode = 'compose'
 
-   // this.orderMgrSvc.order.hasPlanningLines()
+    // this.orderMgrSvc.order.hasPlanningLines()
 
   }
 
@@ -201,6 +202,42 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
     this.changeMode(PosOrderMode.cancel)
 
   }
+
+
+  printInvoice(): void {
+    const printContent = document.getElementById('invoice');
+    if (printContent) {
+      const printWindow = window.open('', '_blank', 'width=800,height=600');
+      if (printWindow) {
+        const bootstrapStylesheet = document.querySelector('link[href*="bootstrap"]')?.outerHTML || '';
+
+        printWindow.document.open();
+        printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Factuur</title>
+                    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+                    <style>
+                        /* Add custom styles for the printed version here */
+                        body { font-family: Arial, sans-serif; }
+                        #invoice { margin: 20px; }
+                    </style>
+                </head>
+                <body onload="window.print();window.close();">
+                
+                    ${printContent.innerHTML}
+
+                      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+                </body>
+                </html>
+            `);
+        printWindow.document.close();
+      }
+    }
+  }
+
+
+
 
   newGift(gift: Gift) {
 

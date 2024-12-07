@@ -39,6 +39,9 @@ import { DebugMessagingComponent } from './debug-messaging/debug-messaging.compo
 import { OrderSummaryComponent } from './order-summary/order-summary.component';
 import { OrderDebugComponent } from './order-debug/order-debug.component';
 import { OrderDebugInfoComponent } from './order-debug-info/order-debug-info.component'
+import { EditInvoiceComponent } from './edit-invoice/edit-invoice.component';
+import { PreviewInvoiceComponent } from './preview-invoice/preview-invoice.component';
+
 
 @NgModule({
   declarations: [
@@ -66,6 +69,8 @@ import { OrderDebugInfoComponent } from './order-debug-info/order-debug-info.com
     OrderSummaryComponent,
     OrderDebugComponent,
     OrderDebugInfoComponent,
+    EditInvoiceComponent,
+    PreviewInvoiceComponent
   ],
   imports: [
     CommonModule,
@@ -80,7 +85,10 @@ import { OrderDebugInfoComponent } from './order-debug-info/order-debug-info.com
     BsDatepickerModule,
     TimepickerModule,
     NgxSpinnerModule,
-    ClipboardModule
+    ClipboardModule,
+
+
+
     
   ],
   exports: [
@@ -106,7 +114,9 @@ import { OrderDebugInfoComponent } from './order-debug-info/order-debug-info.com
     DebugMessagingComponent,
     OrderSummaryComponent,
     OrderDebugComponent,
-    OrderDebugInfoComponent
+    OrderDebugInfoComponent,
+    EditInvoiceComponent,
+    PreviewInvoiceComponent
   ]
 })
 export class OrderMgrModule {}

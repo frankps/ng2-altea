@@ -12,6 +12,7 @@ import { RequestInvoiceComponent } from './invoice/request-invoice/request-invoi
 import { NgSelectModule } from '@ng-select/ng-select';
 import { UserSelectComponent } from './pos/user-select/user-select.component';
 
+
 @NgModule({
   imports: [CommonModule,
   HttpClientModule,
@@ -33,7 +34,7 @@ import { UserSelectComponent } from './pos/user-select/user-select.component';
     RequestInvoiceComponent,
     MainMenuComponent,
     OrderMgrModule,
-    UserSelectComponent,
+    UserSelectComponent
 
   ]
 })

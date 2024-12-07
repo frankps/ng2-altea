@@ -477,6 +477,18 @@ export class CreateAvailabilityContext {
         const resourcePlannings = await this.alteaDb.resourcePlannings(availabilityRequest.from, availabilityRequest.to, resourceIds, includeGroupPlannings, excludeOrderId, clientId)
 
 
+        /*
+        let debug = resourcePlannings.filter(rp => rp.resourceId == 'b39b2d8a-9a06-46b8-8334-4fc400cfc2c5' && rp.start == 20241206143000)
+
+        debug = _.sortBy(debug, 'start')
+
+        console.error(debug)
+        */
+       
+
+
+
+
         /*         const debug = resourcePlannings.filter(rp => rp.resourceId == "3d841573-7667-46f0-a4b2-b496ed027740")
                 console.error(debug) */
 

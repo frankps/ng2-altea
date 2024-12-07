@@ -249,6 +249,11 @@ export class Contact extends UserBase {
     super()
   }
 
+  getAddress(sep: string = '\n') : string {
+    return `${this.str} ${this.strNr}${sep}${this.postal} ${this.city}`
+  }
+
+
   hasGiftsIn(): boolean {
     return ArrayHelper.NotEmpty(this.giftsIn)
   }

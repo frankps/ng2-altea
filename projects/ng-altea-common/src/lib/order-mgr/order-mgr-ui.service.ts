@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import { Injectable, OnInit } from '@angular/core';
-import { AppMode, AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Branch, ConfirmOrderResponse, Contact, CreateCheckoutSession, DateBorder, DepositMode, Gift, GiftLine, GiftType, Order, OrderLine, OrderLineOption, OrderSource, OrderState, Payment, PaymentType, Price, Product, ProductSubType, ProductType, ProductTypeIcons, RedeemGift, ReservationOption, ReservationOptionSet, Resource, ResourcePlanning, ResourceType } from 'ts-altea-model'
+import { AppMode, AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Branch, ConfirmOrderResponse, Contact, CreateCheckoutSession, DateBorder, DepositMode, Gift, GiftLine, GiftType, Invoice, Order, OrderLine, OrderLineOption, OrderSource, OrderState, Payment, PaymentType, Price, Product, ProductSubType, ProductType, ProductTypeIcons, RedeemGift, ReservationOption, ReservationOptionSet, Resource, ResourcePlanning, ResourceType } from 'ts-altea-model'
 import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbQuery, QueryOperator, Translation } from 'ts-common'
-import { AlteaService, GiftService, ObjectService, OrderMgrService, OrderService, ProductService, ResourceService, SessionService } from 'ng-altea-common'
+import { AlteaService, GiftService, InvoiceService, ObjectService, OrderMgrService, OrderService, ProductService, ResourceService, SessionService } from 'ng-altea-common'
 import * as _ from "lodash";
 import { NgxSpinnerService } from "ngx-spinner"
 import { DashboardService, ToastType } from 'ng-common';
@@ -67,6 +67,11 @@ export class OrderMgrUiService {   // implements OnInit
   /** when user is paying with gifts */
   payGifts: Gift[] = []
 
+  /** when user is managing an invoice */
+  invoice: Invoice
+  invoiceIsNew = false
+  previewInvoice: boolean = false
+  invoiceOk = false
 
   resources: Resource[]
 
@@ -103,7 +108,9 @@ export class OrderMgrUiService {   // implements OnInit
 
   constructor(private productSvc: ProductService, private orderSvc: OrderService, private orderMgrSvc: OrderMgrService
     , protected spinner: NgxSpinnerService, public dbSvc: ObjectService, public alteaSvc: AlteaService, protected sessionSvc: SessionService,
-    public dashboardSvc: DashboardService, protected stripeSvc: StripeService, protected resourceSvc: ResourceService, protected giftSvc: GiftService) {
+    public dashboardSvc: DashboardService, protected stripeSvc: StripeService, protected resourceSvc: ResourceService, protected giftSvc: GiftService,
+    protected invoiceSvc: InvoiceService
+  ) {
 
     // this.alteaDb = new AlteaDb(dbSvc)
     // this.getAllCategories()
@@ -131,6 +138,78 @@ export class OrderMgrUiService {   // implements OnInit
 
   }
 
+
+  async manageInvoice() {
+
+    if (!this.order)
+      return
+
+    if (this.order.invoice)
+      this.invoice = this.order.invoice
+    else if (this.order.invoiceId)
+      this.invoice = await this.invoiceSvc.get$(this.order.invoiceId)
+    else {
+      this.invoice = this.order.createInvoice()
+      this.invoiceIsNew = true
+    }
+
+
+
+    this.order.calculateAll()
+
+    //this.invoice.vatLines = this.order.vatLines
+
+    // the preview will show orders
+    this.invoice.orders = [this.order]
+
+    this.invoice.updateFromOrders()
+
+    this.invoiceOk = this.invoice.isConsistent()
+
+
+  }
+
+
+  async saveInvoice() {
+
+    let invoice = this.invoice
+
+    console.warn(invoice)
+
+
+    let orders = invoice.orders
+
+    delete invoice.orders
+
+    let res
+
+    if (this.invoiceIsNew)
+      res = await this.invoiceSvc.create$(invoice)
+    else
+      res = await this.invoiceSvc.update$(invoice)
+
+    invoice.orders = orders
+
+    if (res.isOk && this.invoiceIsNew) {
+
+      this.order.invoiceId = res.object.id
+      this.order.invoiceNum = invoice.num
+      this.order.markAsUpdated('invoiceId', 'invoiceNum')
+      this.orderDirty = true
+
+      await this.saveOrder()
+    }
+
+    console.warn(res)
+
+  }
+
+
+  async showInvoice() {
+
+    this.previewInvoice = true
+
+  }
 
   hasOptions(): boolean {
 
@@ -246,7 +325,9 @@ export class OrderMgrUiService {   // implements OnInit
     this.loyalty = null
     this.showTimer = false
     this.loyalty = null
-
+    this.invoice = null
+    this.invoiceIsNew = false
+    this.previewInvoice = false
     this.gift = null
     this.payGifts = []
   }
@@ -491,7 +572,7 @@ export class OrderMgrUiService {   // implements OnInit
       return null
 
     order.branch = await this.sessionSvc.branch$()
-    
+
     await this.linkProductsToOrder(order)
 
     if (order.gift) {
@@ -566,9 +647,16 @@ export class OrderMgrUiService {   // implements OnInit
 
     this.payGifts
 
-    console.warn(this.order)
+    let order = this.order
 
-    const request = new AvailabilityRequest(this.order)
+
+    if (order.start)  // if order was already planned, then we will work on a copy 
+      order = order.clone()
+
+
+    console.warn(order)
+
+    const request = new AvailabilityRequest(order)
     this.availabilityRequest = request
     request.debug = true
     request.from = this.from
@@ -1307,6 +1395,20 @@ export class OrderMgrUiService {   // implements OnInit
       this.orderDirty = true
   }
 
+  copyPaymentToClipboard(payment: Payment) {
+    this.sessionSvc.clipboard.payments.push(payment)
+  }
+
+  pastePaymentsFromClipboard() {
+    if (!this.sessionSvc.clipboard.hasPayments())
+      return
+
+    for (let payment of this.sessionSvc.clipboard.payments) {
+      this.order.addPayment(payment, false)
+    }
+
+    this.sessionSvc.clipboard.payments = []
+  }
 
 
   async addPayment(amount: number, type: PaymentType, location: string): Promise<Payment> {
@@ -1392,6 +1494,7 @@ export class OrderMgrUiService {   // implements OnInit
 
     console.error(subscriptions)
   }
+
 
 
   /*

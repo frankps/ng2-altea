@@ -45,10 +45,13 @@
     "preview": "Preview",
     "phone": "Tel",
     "price": "Prijs",
+    "print": "Print",
     "qty": "Aantal",
     "reply": "Antwoorden",
     "reset-password": "Wachtwoord opnieuw instellen",
     "select": "Selecteer",
+    "showMore": "Toon meer",
+    "showLess": "Toon minder",
     "timeUnit": "Tijdseenheid",
     "to": "Aan",
     "updated": "Veranderd op",
@@ -62,6 +65,16 @@
     "validate": "Valideren"
   },
   "enums": {
+    "price-condition-type": {
+      "subUnitProdQty": "Beurten reeds gekocht"
+    },
+    "value-comparator": {
+      "=": "=",
+      "<": "<",
+      ">": ">",
+      "<=": "<=",
+      ">=": ">="
+    },
     "fb-auth": {
       "auth/weak-password": "Paswoord moet minstens 6 karakters hebben",
       "auth/missing-password": "Ontbrekend paswoord",
@@ -453,6 +466,9 @@
           "reminders": {
             "title": "Herinneringen",
             "help": "Hier kan u instellen hoe (email,sms) en hoeveel tijd voorafgaand de reservatie herinneringen verstuurd worden."
+          },
+          "invoice": {
+            "title": "Facturatie"
           }
         }
       }
@@ -467,6 +483,9 @@
       }
     },
     "contact": {
+      "search": {
+          "title": "Contact zoeken"
+      },
       "edit": {
         "sections": {
           "general": {
@@ -754,15 +773,20 @@
     }
   },
   "objects": {
+    "act": "Is actief",
     "message": {
       "auto": "Automatisch bericht"
     },
     "invoice": {
+      "num": "Factuurnummer",
       "company": "Bedrijf",
       "vat": "BTW",
       "address": "Adres",
       "email": "Email",
       "country": "Land",
+      "alter": "Omschrijving",
+      "useAlter": "Gebruik alternatieve omschrijving",
+      "date": "Factuurdatum",
       "needed": "Wenst u een factuur?"
     },
     "loyalty": {
@@ -813,6 +837,7 @@
       "_single": "Cadeaubon",
       "code": "Code",
       "value": "Waarde",
+      "vatPct": "BTW percentage",
       "used": "Gebruikt",
       "isConsumed": "Is gebruikt",
       "from": "Van",
@@ -845,6 +870,11 @@
       "vatNr": "BTW nummer",
       "smsOn": "Verstuur SMS berichten naar klanten",
       "cancel": "Minimum tijd voor kosteloze annulatie",
+      "inv": {
+        "on": "Facturatie",
+        "year": "Boekjaar",
+        "next": "Volgend factuurnummer"
+      },
       "gift": {
         "on": "Gebruik cadeaubonnen",
         "methods": {
@@ -927,6 +957,9 @@
       "privNote": "Interne notitie",
       "msg": "Communicatie"
     },
+    "orderLine": {
+      "cust": "Handmatige prijs"
+    },
     "user": {
       "article": "de",
       "uid": "Firebase id"
@@ -949,6 +982,11 @@
       "vatNum": "BTW nummer",
       "deposit": "Voorschot",
       "depositPct": "Voorschot percentage",
+      "str": "Straat",
+      "strNr": "Nr",
+      "postal": "Postcode",
+      "city": "Stad",
+      "remark": "Opmerking",
       "news": "Ik ontvang graag de {{company}} nieuwsbrief"
     },
     "template": {
@@ -967,7 +1005,7 @@
       "short": "SMS"
     },
     "planning": {
-      "prep":"Is voorbereidings- of opkuistijd"
+      "prep": "Is voorbereidings- of opkuistijd"
     },
     "resource": {
       "article": "de",
@@ -1090,13 +1128,16 @@
       }
     },
     "price": {
+      "on": "Actief",
+      "skip": "Voer volgende prijsregels NIET meer uit",
+      "skipLast": "Skip regel laatste uren",
       "start": "Vanaf",
       "end": "Tot",
       "qty": "Vanaf aantal",
       "sameBasePrice": "Zelfde basisprijs",
       "addition": "Toeslag",
       "isPromo": "Is promotie",
-      "title": "Promotie titel",
+      "title": "Titel",
       "title-tpl": "* promotie",
       "isAbsolute": "Andere basisprijs",
       "absValue": "Nieuwe prijs",
@@ -1105,12 +1146,17 @@
       "isQty": "Kwantumkorting",
       "isDay": "Prijs geldig op specifieke weekdagen",
       "isTime": "Prijs geldig gedurende een tijdsinterval",
-      "isExtraQty": "Klant ontvangt extra beurten",
+      "extraQty": {
+        "val": "Extra beurten",
+        "on": "Klant ontvangt extra beurten",
+        "pct": "Is percentage"
+      },
       "hasOptions": "Specifieke prijzen voor opties",
       "options": "Kies optie",
-      "extraQty": "Extra beurten",
       "from": "Vanaf (hh:mm)",
       "to": "Tot (hh:mm)",
+      "giftOpt": "Cadeaubon optie",
+      "hasPeriods": "Prijs geldig gedurende specifieke periodes",
       "help": {
         "price": "Prijs per behandeling"
       }

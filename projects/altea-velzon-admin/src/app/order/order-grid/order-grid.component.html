@@ -75,13 +75,16 @@
 
         <!-- showDetails openOrder -->
         <div class="row mb-1">
-            <div class="col-2" (click)="openOrder(uiOrder)">
+            <div class="col-3" (click)="openOrder(uiOrder)">
                 <!-- <i class="fa-solid fa-magnifying-glass" (click)="openOrder(uiOrder)"></i> &nbsp;  -->
                 <i *ngIf="uiOrder.stateIcon()" placement="top" [ngbTooltip]="uiOrder.state"
                     [style.color]="uiOrder.stateColor()" [class]="uiOrder.stateIcon()"></i>
                 &nbsp;
 
                 {{uiOrder.start| intdate}}
+
+                <span *ngIf="uiOrder.invoiceNum" class="badge text-bg-info mx-3">{{uiOrder.invoiceNum}}</span>
+
 
                 <span *ngIf="uiOrder.gift">{{uiOrder.giftCode}}</span>
 

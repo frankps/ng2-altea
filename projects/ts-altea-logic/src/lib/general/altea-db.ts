@@ -398,6 +398,7 @@ export class AlteaDb {
         /** consumers are sometimes creating new orders from same device (without finishing previous order) 
          *  => exclude plannings coming from same device
          */
+        
         if (excludeClientId) {
 
             let lockCheck = qry.and()
@@ -411,7 +412,7 @@ export class AlteaDb {
             qry.or('orderId', QueryOperator.equals, null)
         }
 
-
+        qry.take = 1000
 
         const resourcePlannings = await this.db.query$<ResourcePlanning>(qry)
 

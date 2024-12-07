@@ -3,19 +3,24 @@
 
         <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
 
-            <input type="radio" class="btn-check" name="menu" id="start" value="start" autocomplete="off" [(ngModel)]="mode">
+            <input type="radio" class="btn-check" name="menu" id="start" value="start" autocomplete="off"
+                [(ngModel)]="mode">
             <label class="btn btn-outline-primary" for="start" translate>ui.order-mgr.pos.menu.start</label>
 
-            <input type="radio" class="btn-check" name="menu" id="compose" value="compose" autocomplete="off" [(ngModel)]="mode">
+            <input type="radio" class="btn-check" name="menu" id="compose" value="compose" autocomplete="off"
+                [(ngModel)]="mode">
             <label class="btn btn-outline-primary" for="compose" translate>ui.order-mgr.pos.menu.compose</label>
 
-            <input type="radio" class="btn-check" name="menu" id="plan" value="plan" autocomplete="off" [(ngModel)]="mode">
+            <input type="radio" class="btn-check" name="menu" id="plan" value="plan" autocomplete="off"
+                [(ngModel)]="mode">
             <label class="btn btn-outline-primary" for="plan" translate>ui.order-mgr.pos.menu.plan</label>
 
-            <input type="radio" class="btn-check" name="menu" id="contact" value="contact" autocomplete="off" [(ngModel)]="mode">
+            <input type="radio" class="btn-check" name="menu" id="contact" value="contact" autocomplete="off"
+                [(ngModel)]="mode">
             <label class="btn btn-outline-primary" for="contact" translate>ui.order-mgr.pos.menu.contact</label>
 
-            <input type="radio" class="btn-check" name="menu" id="pay" value="pay" autocomplete="off" [(ngModel)]="mode">
+            <input type="radio" class="btn-check" name="menu" id="pay" value="pay" autocomplete="off"
+                [(ngModel)]="mode">
             <label class="btn btn-outline-primary" for="pay" translate>ui.order-mgr.pos.menu.pay</label>
 
         </div>
@@ -24,7 +29,7 @@
 
 
 <div class="row">
-    
+
 
     <div class="col-8">
 
@@ -34,7 +39,7 @@
 
                 <div class="col-6">
                     <altea-lib-main-menu [menu]="menu" (select)="menuClicked($event)"></altea-lib-main-menu>
-              
+
                 </div>
                 <div class="col-6">
 
@@ -42,7 +47,7 @@
                 </div>
             </div>
 
-        </ng-container> 
+        </ng-container>
 
         <ng-container *ngIf="mode == 'buyGift'">
 
@@ -50,17 +55,17 @@
 
                 <div class="col-6">
                     <altea-lib-request-gift (request)="newGift($event)"></altea-lib-request-gift>
-              
+
                 </div>
                 <div class="col-6">
 
                     <order-mgr-contact-select (select)="contactSelected($event)"></order-mgr-contact-select>
                     <order-mgr-contact-select2 #editContact></order-mgr-contact-select2>
-            
+
                 </div>
             </div>
 
-        </ng-container> 
+        </ng-container>
 
 
         <ng-container *ngIf="mode == 'compose'">
@@ -70,62 +75,65 @@
                 <div class="col-6">
 
                     <ngx-altea-browse-catalog></ngx-altea-browse-catalog>
-            
+
                     <order-mgr-product-list></order-mgr-product-list>
-              
+
                 </div>
                 <div class="col-6">
 
-                    
-            
-                    <order-mgr-order-line [showConfirm]="false" [product]="orderMgrSvc.product" [orderLine]="orderMgrSvc.orderLine"></order-mgr-order-line>
-            
+
+
+                    <order-mgr-order-line [showConfirm]="false" [product]="orderMgrSvc.product"
+                        [orderLine]="orderMgrSvc.orderLine"></order-mgr-order-line>
+
                 </div>
             </div>
 
         </ng-container>
 
         <ng-container *ngIf="mode == 'plan' && orderMgrSvc.order">
-        
+
             <div class="row" *ngIf="orderMgrSvc.order?.hasPlanningLines()">
 
                 <div class="col-6">
                     <order-mgr-select-date></order-mgr-select-date>
-              
+
                 </div>
                 <div class="col-6">
 
-                    <order-mgr-select-time-slot [otherDateButton]="false" (selected)="timeSlotSelected($event)"></order-mgr-select-time-slot>
+                    <order-mgr-select-time-slot [otherDateButton]="false"
+                        (selected)="timeSlotSelected($event)"></order-mgr-select-time-slot>
 
                 </div>
             </div>
-        
+
         </ng-container>
 
         <ng-container *ngIf="mode == 'contact'">
-        
+
             <div class="row">
 
                 <div class="col-6">
                     <order-mgr-contact-select (select)="contactSelected($event)"></order-mgr-contact-select>
-              
+
                 </div>
                 <div class="col-6">
 
-                    <order-mgr-contact-select2 #editContact [contact]="orderMgrSvc.order.contact"></order-mgr-contact-select2>
+                    <order-mgr-contact-select2 #editContact
+                        [contact]="orderMgrSvc.order.contact"></order-mgr-contact-select2>
 
                 </div>
             </div>
-        
+
         </ng-container>
 
         <ng-container *ngIf="mode == 'pay'">
-        
+
             <div class="row">
 
                 <div class="col-6">
-                   
-              
+
+
                 </div>
                 <div class="col-6">
 
@@ -133,35 +141,77 @@
 
                 </div>
             </div>
-        
+
         </ng-container>
 
         <ng-container *ngIf="mode == 'cancel'">
-        
+
             <div class="row">
 
                 <div class="col-6">
-                   
-              
+
+
                 </div>
                 <div class="col-6">
                     <order-mgr-cancel-order [order]="orderMgrSvc.order"></order-mgr-cancel-order>
                 </div>
             </div>
-        
+
         </ng-container>
 
 
+        <ng-container *ngIf="mode == 'invoice' && orderMgrSvc.invoice">
+
+            <div class="row">
+
+                <div class="col-4">
+
+                    <order-mgr-edit-invoice [invoice]="orderMgrSvc.invoice" [branch]="orderMgrSvc.branch"></order-mgr-edit-invoice>
+
+
+                    <button type="button" class="btn btn-primary btn-sm" (click)="orderMgrSvc.saveInvoice()"
+                        translate>dic.save</button>
+
+
+                    <button type="button" class="btn btn-primary btn-sm" (click)="orderMgrSvc.showInvoice()"
+                        translate>dic.preview</button>
+
+                    {{orderMgrSvc.invoiceOk}}
+                </div>
+
+
+                <div class="col-8">
+
+                    <!-- *ngIf="orderMgrSvc.previewInvoice" -->
+                    <div id="invoice px-5">
+                        <order-mgr-preview-invoice id="invoice" [invoice]="orderMgrSvc.invoice"
+                            [branch]="orderMgrSvc.branch"></order-mgr-preview-invoice>
+                    </div>
+
+
+                    <button type="button" class="btn btn-primary btn-sm" (click)="printInvoice()"
+                        translate>dic.print</button>
+
+                </div>
+
+            </div>
+
+        </ng-container>
+
+
+
     </div>
-    
+
 
 
 
     <div class="col-4">
 
-        <order-mgr-order [showConfirm]="showConfirm" (addProduct)="addProduct()" (orderLineSelected)="orderLineSelected($event)" (cancel)="cancelOrder($event)" (continue)="orderContinue()"></order-mgr-order>
+        <order-mgr-order [showConfirm]="showConfirm" (addProduct)="addProduct()"
+            (orderLineSelected)="orderLineSelected($event)" (cancel)="cancelOrder($event)"
+            (changeMode)="changeMode($event)" (continue)="orderContinue()"></order-mgr-order>
 
-<!-- 
+        <!-- 
         <order-mgr-person-select></order-mgr-person-select> -->
     </div>
 </div>
@@ -176,7 +226,7 @@
 
     <div class="row">
         <div class="col-8">
-    
+
 
             <order-mgr-order-debug-info [order]="orderMgrSvc.order"></order-mgr-order-debug-info>
 
@@ -186,21 +236,21 @@
             <order-mgr-debug-messaging></order-mgr-debug-messaging>
             -->
 
-        
+
         </div>
         <div class="col-4">
-    
+
             <order-mgr-demo-orders></order-mgr-demo-orders>
         </div>
     </div>
-    
-    
-    <order-mgr-debug-plannings *ngIf="orderMgrSvc.plannings" [plannings]="orderMgrSvc.plannings" ></order-mgr-debug-plannings>
-    
+
+
+    <order-mgr-debug-plannings *ngIf="orderMgrSvc.plannings"
+        [plannings]="orderMgrSvc.plannings"></order-mgr-debug-plannings>
+
     <order-mgr-debug-availability [response]="orderMgrSvc.availabilityResponse"></order-mgr-debug-availability>
-    
-    
-    
+
+
+
 
 </ng-container>
-

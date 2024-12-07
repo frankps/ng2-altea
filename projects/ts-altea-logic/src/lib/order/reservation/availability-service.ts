@@ -37,7 +37,7 @@ export class AvailabilityService {
         console.error('OrderGetPossibleDates.process()', availabilityRequest)
 
 
-        const order = availabilityRequest.order!
+        const order = availabilityRequest.order! //.clone()
 
         const response = new AvailabilityResponse()
 

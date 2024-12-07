@@ -23,6 +23,8 @@ export class OrderComponent implements OnInit {
   /** used to cancel an existing order */
   @Output() cancel: EventEmitter<Order> = new EventEmitter<Order>();
 
+  /** used to change the mode introduced for invoicing (show invoice)*/
+  @Output() changeMode: EventEmitter<string> = new EventEmitter<string>();
   //  @Input() showVat = false
 
   ResourceTypeIcons = ResourceType
@@ -195,6 +197,10 @@ export class OrderComponent implements OnInit {
 
   }
 
+  async manageInvoice() {
+    await this.orderMgrSvc.manageInvoice()
+    this.changeMode.emit('invoice')
+  }
 
   async confirm() {
 

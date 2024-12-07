@@ -27,6 +27,9 @@ export class OrderLineComponent implements OnInit {
 
   prices = {}
 
+  showMoreInternal = false
+
+  
   constructor(protected orderMgrSvc: OrderMgrUiService, private productSvc: ProductService, protected sessionSvc: SessionService) {
   }
 
@@ -46,6 +49,12 @@ export class OrderLineComponent implements OnInit {
       */
 
   }
+
+
+  toggleShowMoreInternal() {
+    this.showMoreInternal = !this.showMoreInternal
+  }
+
 
   setQtyArray(product: Product) {
     let minQty = 1
@@ -88,16 +97,24 @@ export class OrderLineComponent implements OnInit {
     return this.orderMgrSvc.orderLineOptions
   }
 
+  fieldChanged(field: string) {
+    console.warn(`Field changed ${field}`)
+    this.orderLine.markAsUpdated(field)
+    this.orderMgrSvc.orderDirty = true
+  }
 
+  unitPriceChanged() {
+
+    this.fieldChanged('unit')
+
+    this.orderMgrSvc.calculateAll()
+  }
 
   qtyChanged() {
     console.error(this.orderMgrSvc.orderLine)
-
-    this.orderMgrSvc.orderDirty = true
-    this.orderMgrSvc.orderLine.markAsUpdated('qty')
+    this.fieldChanged('qty')
 
     this.orderMgrSvc.updateNrOfPersons()
-
     this.orderMgrSvc.calculateAll()
   }
 

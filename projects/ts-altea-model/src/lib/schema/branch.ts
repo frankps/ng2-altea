@@ -95,6 +95,19 @@ export class ProdSalesConfig {
 
 }
 
+export class InvoiceConfig {
+
+    /** if invoice is enabled for this branch */
+    on: boolean = true
+
+    /** current year for invoicing */
+    year: number = -1
+
+    /** next invoice number */
+    next: number = 1
+
+    mode: string = 'branch'
+}
 
 export class Branch extends ObjectWithIdPlus {
 
@@ -169,6 +182,9 @@ export class Branch extends ObjectWithIdPlus {
 
 
     comm?: CommunicationConfig
+
+    /** Invoice settings */
+    inv?: InvoiceConfig
 
     get sameDayTerm(): number { return this.getDepositTerm(0) }
     set sameDayTerm(value: number) { this.setDepositTerm(0, value) }

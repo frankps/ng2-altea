@@ -232,13 +232,16 @@ export class DateRangeSet {
 
     /**
      * If there are ranges with qty > 1, then individual ranges will be returned (qty times) with each qty=1
+     * order by from & duration.seconds
      * @returns 
      */
     deduplicate(): DateRangeSet {
 
-        const deduplicated: DateRange[] = []
+        let deduplicated: DateRange[] = []
 
         for (let range of this.ranges) {
+
+
 
             if (!range || range.qty == 0)
                 continue
@@ -255,6 +258,9 @@ export class DateRangeSet {
 
             }
         }
+
+        deduplicated = _.orderBy(deduplicated, ['from', 'duration.seconds'], ['asc', 'desc'])
+
 
         return new DateRangeSet(deduplicated)
     }

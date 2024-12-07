@@ -122,6 +122,10 @@ ng generate component order-mgr/debug-plannings --project ng-altea-common
 ng generate component order-mgr/cancel-order --project ng-altea-common
 ng generate component order-mgr/debug-messaging --project ng-altea-common
 
+
+
+ng generate component invoice/edit-invoice --project ng-altea-common
+
 ng generate component order-mgr/order-debug-info --project ng-altea-common
 
 ng generate service data-services/sql/payment --project ng-altea-common
@@ -168,6 +172,9 @@ ng generate component order-mgr/staff-select --project ng-altea-common
 ng generate component order-mgr/send-offer --project ng-altea-common
 ng generate component invoice/request-invoice --project ng-altea-common
 
+ng generate component order-mgr/preview-invoice --project ng-altea-common
+
+
 ng generate component bootstrap5/yesNoModal --project ng-common
 ng generate component bootstrap5/intPhoneEdit --project ng-common
 
@@ -205,3 +212,9 @@ ng generate service local --project=ng-altea-common
 
 
 2911ef86-e3db-4033-9817-c898065673a9
+
+
+
+ng generate service data-services/sql/invoice --project=ng-altea-common
+
+

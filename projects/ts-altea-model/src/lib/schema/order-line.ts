@@ -401,6 +401,9 @@ export class OrderLine extends ObjectWithIdPlus {
   @Type(() => Number)
   unit = 0;
 
+  /** custom price: unit price entered manually */
+  cust: boolean = false
+
   @Type(() => Number)
   excl = 0;
 
@@ -692,7 +695,7 @@ export class OrderLine extends ObjectWithIdPlus {
     const previousVat = this.vat
 
     /** a gift orderline can have for instance no product attached */
-    if (recalculateUnitPrice && this.product)
+    if (recalculateUnitPrice && this.product && !this.cust)
       this.setUnitPrice()
 
     this.incl = this.unit * this.qty

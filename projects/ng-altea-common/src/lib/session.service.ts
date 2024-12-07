@@ -1,10 +1,18 @@
 import { Injectable, OnInit } from '@angular/core';
 import { ScheduleService } from './data-services/sql/schedule.service';
-import { DbQuery, ObjectHelper, QueryOperator } from 'ts-common';
-import { AppMode, Branch, Contact, Resource } from 'ts-altea-model';
+import { ArrayHelper, DbQuery, ObjectHelper, QueryOperator } from 'ts-common';
+import { AppMode, Branch, Contact, Payment, Resource } from 'ts-altea-model';
 import * as Rx from "rxjs";
 // import { LocalService } from 'ng-altea-common';
 
+
+export class Clipboard {
+  payments: Payment[] = []
+
+  hasPayments() : boolean {
+    return ArrayHelper.NotEmpty(this.payments)
+  }
+}
 
 @Injectable({
   providedIn: 'root'
@@ -21,6 +29,9 @@ export class SessionService implements OnInit {
     green: 'green',
     red: 'red'
   }
+
+  /** used for cut/paste operations */
+  clipboard = new Clipboard()
 
   public _role: 'staff' | 'admin' | 'posAdmin' = 'staff'
 
@@ -60,6 +71,11 @@ export class SessionService implements OnInit {
   public stripEnvironment: 'test' | 'live' = 'live'
 
 
+  public uiState = {
+    orderGrid: null
+  }
+
+
   constructor() {
     let stripeEnv = localStorage.getItem('stripEnvironment')
 
@@ -88,9 +104,12 @@ export class SessionService implements OnInit {
     return (this.appMode == AppMode.pos)
   }
 
-
   isAdmin(): boolean {
     return (this.role == 'admin')
+  }
+
+  isPosAdmin(): boolean {
+    return (this.appMode == AppMode.pos && this.role == 'admin')
   }
 
   init(environment: any) {

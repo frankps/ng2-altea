@@ -13,24 +13,49 @@
 
                     &nbsp;&nbsp;x&nbsp;
 
-                    {{orderLine.descr}}
+                    <span class="ms-2" *ngIf="!showMoreInternal; else editDescr">{{orderLine.descr}}</span>
+ 
+                    <ng-template #editDescr>
+                        <input type="text" id="descr" name="descr"class="form-control" (change)="fieldChanged('descr')"
+                         [(ngModel)]="orderLine.descr" />
+                    </ng-template>
+                
 
                 </div>
-                <div class="col-3">
-                    <span class="float-end"> <span *ngIf="product?.priceFrom"
-                            translate>objects.product.priceFrom-app</span> € {{orderLine.incl}} <sup
-                            *ngIf="product?.priceInfo">*</sup></span>
+                <div class="col-3 d-flex justify-content-end align-items-center">
+
+
+                    <input type="number" *ngIf="orderLine.cust && showMoreInternal; else showPrice" id="unit"
+                        name="unit" required class="form-control" [(ngModel)]="orderLine.unit"
+                        (change)="unitPriceChanged()" />
+
+                    <ng-template #showPrice>
+                        <span *ngIf="product?.priceFrom">{{'objects.product.priceFrom-app' |
+                            translate}}&nbsp;&nbsp;</span>
+                        € {{orderLine.incl}}
+                        <sup *ngIf="product?.priceInfo">&nbsp;*</sup>
+                    </ng-template>
+
+                    <i class="fas fa-pen ms-2" *ngIf="sessionSvc.isPosAdmin()" (click)="toggleShowMoreInternal()"></i>
+
+
+
+
+
                 </div>
             </div>
 
-            <div class="row mt-2" *ngIf="product?.minQty > 1">
-                <div class="col">
+            <div class="row">
+                <div class="col mt-2" *ngIf="product?.minQty > 1">
                     <span style="font-size: smaller; text-align: left;" translate
                         [translateParams]="{min: product.minQty}">objects.product.minQty-app</span>
                 </div>
+<!--                 <div class="col d-flex justify-content-end mt-2" *ngIf="orderLine.cust && orderMgrSvc.isPos">
+                    Eenheidsprijs
+                </div> -->
             </div>
 
-            <div class="row mt-2" *ngIf="product?.priceFrom">
+            <div class="row mt-2" *ngIf="product?.priceFrom && !orderLine.cust">
                 <div class="col">
                     <span class="float-end" style="font-size: smaller; text-align: right;"><sup>*</sup> <span
                             translate>objects.product.priceFrom-info</span></span>
@@ -80,6 +105,35 @@
 
             </ng-container>
 
+
+            <div class="row mt-2" *ngIf="orderMgrSvc.isPos && showMoreInternal">
+                <div class="col">
+
+                    <div class="row">
+                        <div class="col-6 d-flex align-items-center">{{ 'dic.vatPct' | translate }}</div>
+                        <div class="col-6 d-flex align-items-center">
+                            <ng-select id="vatPct" name="vatPct" [items]="sessionSvc.branch.vatPcts" bindLabel="label"
+                                bindValue="pct" [clearable]="false" [multiple]="false" [(ngModel)]="orderLine.vatPct"
+                                (change)="fieldChanged('vatPct')">
+                            </ng-select>
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="col d-flex justify-content-end  align-items-center">
+
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="cust" name="cust"
+                            [(ngModel)]="orderLine.cust" (change)="fieldChanged('cust')" />
+                        <label class="form-check-label" for="cust" translate="objects.orderLine.cust"></label>
+                    </div>
+
+                    
+
+                </div>
+            </div>
+
         </div>
         <div class="card-body">
 
@@ -98,7 +152,7 @@
                             <div class="row mt-1" *ngFor="let value of option.values">
                                 <div class="col-1"></div>
                                 <div class="col">
-                                    <div class="form-check">
+                                    <div class="form-check form-check-small">
                                         <input class="form-check-input" type="checkbox" id="value_{{value.id}}"
                                             [checked]="orderLine.optionValueSelected(option, value.id)"
                                             (change)="multiOptionValueChanged(option, value, $event.target['checked'])" />
@@ -159,6 +213,7 @@
 
 
 
+
             <!--             <div class="d-grid mt-3">
 
                 <button *ngIf="orderMgrSvc.orderLineIsNew" type="button" class="btn btn-outline-secondary float-end"
@@ -172,8 +227,10 @@
                             class="fa-solid fa-trash-can"></i> &nbsp; {{ 'dic.delete' | translate }} </button>
                 </div>
                 <div class="col-7 d-grid" *ngIf="showConfirm">
+
                     <button type="button" class="btn btn-outline-primary float-end" (click)="triggerConfirm()"><i
-                            class="fa-solid fa-circle-check"></i> &nbsp; {{ 'dic.confirm' | translate }} </button>
+                            class="fa-solid fa-circle-check"></i> &nbsp; {{ 'dic.confirm' |
+                        translate }} </button>
                 </div>
             </div>
 

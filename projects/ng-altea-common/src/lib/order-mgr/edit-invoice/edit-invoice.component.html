@@ -1,0 +1,76 @@
+
+<div class="row">
+
+    <div class="col-6">
+        <ngx-altea-label-control label="objects.invoice.num" for="num">
+            <input type="text" id="num" name="num" class="form-control" [(ngModel)]="existingInvoiceNum" />
+        </ngx-altea-label-control>
+    </div>
+
+    <div class="col-6">
+        <button type="button" class="btn btn-primary btn-sm" (click)="addToExistingInvoiceNum(existingInvoiceNum)">Toevoegen</button>
+
+    </div>
+</div>
+
+
+<div class="row" *ngIf="branch">
+
+    <div class="col-12">
+        <button type="button" class="btn btn-primary btn-sm" (click)="assignInvoiceNum()">Gebruik {{branch.inv.year}}.{{branch.inv.next}}</button>
+
+    </div>
+</div>
+
+
+<div class="row mt-2">
+    <div class="col-6">
+        <ngx-altea-label-control label="objects.invoice.num" for="num">
+            <input type="text" id="num" name="num" class="form-control" [(ngModel)]="invoice.num" />
+        </ngx-altea-label-control>
+    </div>
+    <div class="col-6">
+        <ngx-altea-label-control label="objects.invoice.date" for="date">
+            <input type="text" placeholder="Datepicker" class="form-control" bsDatepicker
+                [(ngModel)]="invoice.typedDate">
+        </ngx-altea-label-control>
+
+    </div>
+</div>
+
+<div class="row mt-2">
+    <div class="col-6">
+        <ngx-altea-label-control label="objects.invoice.company" for="company">
+            <input type="text" id="company" name="company" class="form-control" [(ngModel)]="invoice.company" />
+        </ngx-altea-label-control>
+    </div>
+    <div class="col-6">
+        <ngx-altea-label-control label="objects.invoice.vat" for="vat">
+            <input type="text" id="vat" name="vat" class="form-control" [(ngModel)]="invoice.vatNum" />
+        </ngx-altea-label-control>
+    </div>
+</div>
+
+<div class="row mt-2">
+    <div class="col">
+        <ngx-altea-label-control label="objects.invoice.address" for="address">
+            <textarea rows="3" class="form-control" id="address" name="address" style="height: 90px"
+                [(ngModel)]="invoice.address"></textarea>
+        </ngx-altea-label-control>
+    </div>
+</div>
+
+<div class="form-check form-switch">
+    <input class="form-check-input" type="checkbox" id="useAlter" name="useAlter" [(ngModel)]="invoice.useAlter" />
+    <label class="form-check-label" for="useAlter" translate="objects.invoice.useAlter"></label>
+</div>
+
+
+<div class="row mt-2" *ngIf="invoice.useAlter">
+    <div class="col">
+        <ngx-altea-label-control label="objects.invoice.alter" for="alter">
+            <textarea rows="3" class="form-control" id="alter" name="alter" style="height: 90px"
+                [(ngModel)]="invoice.alter"></textarea>
+        </ngx-altea-label-control>
+    </div>
+</div>

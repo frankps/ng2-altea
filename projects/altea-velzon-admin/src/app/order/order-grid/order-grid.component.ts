@@ -148,11 +148,19 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
 
     super._ngOnInit()
 
+    let date = new Date()
 
 
+    if (this.sessionSvc.uiState.orderGrid) {
+      this.orderSearch = this.sessionSvc.uiState.orderGrid
 
 
-    this.setDate()
+      date = this.orderSearch.start ? DateHelper.parse(this.orderSearch.start) : undefined
+    }
+
+
+    if (date)
+      this.setDate(date)
 
     await this.startSearch()
 
@@ -259,9 +267,9 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
   }
 
 
-  async startSearch() {
+  async startSearch(getStartEndFromUi: boolean = true) {
 
-    if (this.dateRange?.length == 2) {
+    if (getStartEndFromUi && this.dateRange?.length == 2) {
       var startDate = this.dateRange[0]
 
       this.orderSearch.start = startDate ? DateHelper.yyyyMMdd000000(startDate) : undefined
@@ -270,6 +278,8 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
       endDate = dateFns.addDays(endDate, 1)
       this.orderSearch.end = endDate ? DateHelper.yyyyMMdd000000(endDate) : undefined
     }
+
+    this.sessionSvc.uiState.orderGrid = this.orderSearch
 
     await this.advancedSearch(this.orderSearch)
   }

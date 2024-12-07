@@ -374,6 +374,9 @@ export class SlotFinder {
 
                         availableRange.to = dateFns.subSeconds(availableRange.to, requestItem.duration.seconds)
 
+                        if (availableRange.to < availableRange.from)
+                            continue
+
                         const solutionItem = new SolutionItem(requestItem, availableRange, false, ...resources)
                         newSolution.add(solutionItem)
                         solutionItem.addNote(`Limiting available range: ${availableRange.toString()}`)

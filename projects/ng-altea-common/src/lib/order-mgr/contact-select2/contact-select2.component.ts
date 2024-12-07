@@ -64,6 +64,9 @@ export class ContactSelect2Component implements OnInit {
   appMode: AppMode
 
   AppMode = AppMode
+  isPos = false
+
+  showMore = false
 
   constructor(protected translationSvc: TranslationService, private contactSvc: ContactService
     , protected orderMgrSvc: OrderMgrUiService, private sessionSvc: SessionService, private dashboardSvc: DashboardService,
@@ -95,7 +98,11 @@ export class ContactSelect2Component implements OnInit {
   async ngOnInit() {
 
     this.appMode = this.sessionSvc.appMode
-  console.log('APPPPPP MOOODE',this.appMode)
+
+    if (this.appMode == AppMode.pos)
+      this.isPos = true
+
+    console.log('APPPPPP MOOODE', this.appMode)
 
     await this.translationSvc.translateEnum(Country, 'enums.country.', this.country)
     await this.translationSvc.translateEnum(MsgType, 'enums.msg-type.', this.msgTypes)

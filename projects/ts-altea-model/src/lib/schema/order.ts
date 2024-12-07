@@ -10,7 +10,7 @@ import * as Handlebars from "handlebars"
 import * as sc from 'stringcase'
 import { OrderPersonMgr } from "../order-person-mgr";
 import { CancelOrderMessage } from "ts-altea-logic";
-import { Branch, Contact, Currency, DepositMode, Invoice, OrderLine, OrderLineSummary, OrderType, Organisation, Payment, PaymentType, PlanningMode, Product, ProductSubType, ProductType, Resource, ResourcePlanning, Subscription } from "ts-altea-model";
+import { Branch, Contact, Currency, DepositMode, Invoice, InvoiceTotals, OrderLine, OrderLineSummary, OrderType, Organisation, Payment, PaymentType, PlanningMode, Product, ProductSubType, ProductType, Resource, ResourcePlanning, Subscription } from "ts-altea-model";
 
 //import { numberAttribute } from "@angular/core";
 
@@ -72,6 +72,10 @@ export class VatLine {
 
   constructor(public pct: number, public vat: number, public excl: number, public incl: number) {
 
+  }
+
+  clone(): VatLine {
+    return new VatLine(this.pct, this.vat, this.excl, this.incl)
   }
 
 }
@@ -298,6 +302,33 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
   }
 
+  createInvoice(): Invoice {
+    let invoice = new Invoice()
+    invoice.branchId = this.branchId
+    invoice.orgId = this.orgId
+   
+    let totals = new InvoiceTotals()
+    totals.excl = this.excl
+    totals.incl = this.incl
+    totals.vat = this.vat
+
+    invoice.totals = totals 
+    invoice.orderCount = 1
+    
+    if (this.contact) {
+      const contact = this.contact
+
+      invoice.toId = contact.id
+      invoice.address = contact.getAddress()
+
+      invoice.company = contact.company
+      invoice.vatNum = contact.vatNum
+    }
+      
+
+    return invoice
+  }
+
   /**
    * The field product.inform contains extra info that needs to be sent to the customer after a booking
    */
@@ -309,7 +340,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
   }
 
-  depositTime(): string {  
+  depositTime(): string {
 
     if (Number.isNaN(this.depoMins))
       return ''
@@ -345,7 +376,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
     if (!this.hasLines())
       return false
-    
+
     let idx = this.lines.findIndex(l => l.product?.priceFrom)
 
     return (idx >= 0)
@@ -731,7 +762,12 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     return cancelHours
   }
 
-  addPayment(payment: Payment) {
+  /**
+   * 
+   * @param payment 
+   * @param newPayment false introduced for cut/paste payments from other orders
+   */
+  addPayment(payment: Payment, newPayment: boolean = true) {
 
     if (!payment)
       return
@@ -739,9 +775,23 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     if (!this.payments)
       this.payments = []
 
-    payment.idx = this.nextPaymentIdx()
     this.payments.push(payment)
-    payment.markAsNew()
+
+    if (newPayment) {
+      payment.idx = this.nextPaymentIdx()
+      payment.markAsNew()
+
+    } else {
+      payment.markAsUpdated('orderId')
+      payment.orderId = this.id
+
+      if (payment.order)
+        payment.order = this
+    }
+
+   
+
+    
 
     this.makePayTotals()
   }
@@ -965,10 +1015,15 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
   calculateVat() {
 
+    console.warn('calculateVat')
+
     if (!this.hasLines())
       this.vatLines = []
 
     const vatMap = new Map<number, VatLine>()
+
+
+    let totalVat = 0, totalExcl = 0, totalIncl = 0
 
     for (let orderLine of this.lines) {
 
@@ -987,6 +1042,10 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
       vatLine.vat += orderLine.vat
       vatLine.excl += orderLine.excl
       vatLine.incl += orderLine.incl
+
+      totalVat += orderLine.vat
+      totalExcl += orderLine.excl
+      totalIncl += orderLine.incl
     }
 
     let calculatedVatLines = Array.from(vatMap.values())
@@ -996,6 +1055,14 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
       this.vatLines = calculatedVatLines
       this.markAsUpdated('vatLines')
     }
+
+    this.vat = totalVat
+    this.excl = totalExcl
+    this.incl = totalIncl
+
+    this.markAsUpdated('vat')
+    this.markAsUpdated('excl')
+    this.markAsUpdated('incl')
   }
 
 
@@ -1113,7 +1180,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
     return productIds
   }
-  
+
   getProducts(): Product[] {
 
     if (!this.hasLines())

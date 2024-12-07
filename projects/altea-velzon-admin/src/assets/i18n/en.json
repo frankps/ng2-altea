@@ -45,6 +45,7 @@
     "preview": "Preview",
     "phone": "Tel",
     "price": "Prijs",
+    "print": "Print",
     "qty": "Aantal",
     "reply": "Antwoorden",
     "reset-password": "Wachtwoord opnieuw instellen",
@@ -54,6 +55,7 @@
     "timeUnit": "Tijdseenheid",
     "to": "Aan",
     "updated": "Veranderd op",
+    "vatPct": "BTW %",
     "save": "Opslaan",
     "search": "Zoeken",
     "send": "Versturen",
@@ -465,6 +467,9 @@
           "reminders": {
             "title": "Herinneringen",
             "help": "Hier kan u instellen hoe (email,sms) en hoeveel tijd voorafgaand de reservatie herinneringen verstuurd worden."
+          },
+          "invoice": {
+            "title": "Facturatie"
           }
         }
       }
@@ -774,11 +779,15 @@
       "auto": "Automatisch bericht"
     },
     "invoice": {
+      "num": "Factuurnummer",
       "company": "Bedrijf",
       "vat": "BTW",
       "address": "Adres",
       "email": "Email",
       "country": "Land",
+      "alter": "Omschrijving",
+      "useAlter": "Gebruik alternatieve omschrijving",
+      "date": "Factuurdatum",
       "needed": "Wenst u een factuur?"
     },
     "loyalty": {
@@ -829,6 +838,7 @@
       "_single": "Cadeaubon",
       "code": "Code",
       "value": "Waarde",
+      "vatPct": "BTW percentage",
       "used": "Gebruikt",
       "isConsumed": "Is gebruikt",
       "from": "Van",
@@ -861,6 +871,11 @@
       "vatNr": "BTW nummer",
       "smsOn": "Verstuur SMS berichten naar klanten",
       "cancel": "Minimum tijd voor kosteloze annulatie",
+      "inv": {
+        "on": "Facturatie",
+        "year": "Boekjaar",
+        "next": "Volgend factuurnummer"
+      },
       "gift": {
         "on": "Gebruik cadeaubonnen",
         "methods": {
@@ -943,6 +958,9 @@
       "privNote": "Interne notitie",
       "msg": "Communicatie"
     },
+    "orderLine": {
+      "cust": "Handmatige prijs"
+    },
     "user": {
       "article": "de",
       "uid": "Firebase id"
@@ -965,6 +983,11 @@
       "vatNum": "BTW nummer",
       "deposit": "Voorschot",
       "depositPct": "Voorschot percentage",
+      "str": "Straat",
+      "strNr": "Nr",
+      "postal": "Postcode",
+      "city": "Stad",
+      "remark": "Opmerking",
       "news": "Ik ontvang graag de {{company}} nieuwsbrief"
     },
     "template": {

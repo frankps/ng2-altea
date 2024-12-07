@@ -187,6 +187,16 @@ export class ResourcePlannings {
 
   filterByResourceOverlapAllowed(resourceId: string, overlap: boolean = false): ResourcePlannings {
 
+    // Debugging
+
+    /*
+    let debug = this.plannings.filter(rp => rp.resourceId == resourceId)
+
+    debug = _.sortBy(debug, 'start')
+
+    console.error(debug)
+    */
+
     const planningsForResource = this.plannings.filter(rp => rp.resourceId == resourceId && rp.overlap == overlap && !rp.scheduleId)
 
     if (!Array.isArray(planningsForResource))
