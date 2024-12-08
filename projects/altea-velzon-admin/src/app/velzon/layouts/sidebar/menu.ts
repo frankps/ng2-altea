@@ -11,49 +11,49 @@ export const MENU: MenuItem[] = [
     id: 10,
     label: 'menu.order.label',
     icon: 'plus-circle',
-    link: '/aqua/orders/manage',
+    link: '/%branch%/orders/manage',
     roles: []
   },
   {
     id: 7,
     label: 'menu.calendar.label',
     icon: 'calendar',
-    link: '/aqua/calendar/syncfusion',
+    link: '/%branch%/calendar/syncfusion',
     roles: []
   },
   {
     id: 6,
     label: 'menu.orders.label',
     icon: 'archive',
-    link: '/aqua/orders',
+    link: '/%branch%/orders',
     roles: []
   },
   {
     id: 16,
     label: 'menu.messaging.label',
     icon: 'message-square',
-    link: '/aqua/messaging',
+    link: '/%branch%/messaging',
     roles: []
   },
   {
     id: 5,
     label: 'menu.contacts.label',
     icon: 'users',
-    link: '/aqua/contacts',
+    link: '/%branch%/contacts',
     roles: []
   },  
   {
     id: 8,
     label: 'menu.gifts.label',
     icon: 'gift',
-    link: '/aqua/gifts',
+    link: '/%branch%/gifts',
     roles: ['staff', 'admin', 'posAdmin']
   },
   {
     id: 9,
     label: 'menu.subscriptions.label',
     icon: 'refresh-cw',
-    link: '/aqua/subscriptions',
+    link: '/%branch%/subscriptions',
     roles: ['staff', 'admin', 'posAdmin']
   },
   {
@@ -65,27 +65,27 @@ export const MENU: MenuItem[] = [
       {
         id: 21,
         label: 'menu.resources.sub.human',
-        link: '/aqua/resources/human',
-        mobileLink: '/aqua/resources/mobile/human',
+        link: '/%branch%/resources/human',
+        mobileLink: '/%branch%/resources/mobile/human',
         parentId: 2
       },
       {
         id: 22,
         label: 'menu.resources.sub.device',
-        link: '/aqua/resources/device',
-        mobileLink: '/aqua/resources/mobile/device',
+        link: '/%branch%/resources/device',
+        mobileLink: '/%branch%/resources/mobile/device',
         parentId: 2
       },
       {
         id: 23,
         label: 'menu.resources.sub.location',
-        link: '/aqua/resources/location',
+        link: '/%branch%/resources/location',
         parentId: 2
       },
       {
         id: 25,
         label: 'menu.resources.sub.branch',
-        link: '/aqua/resources/branch',
+        link: '/%branch%/resources/branch',
         parentId: 2
       }  
     ]
@@ -99,13 +99,13 @@ export const MENU: MenuItem[] = [
       {
         id: 32,
         label: 'menu.catalog.sub.svc',
-        link: '/aqua/catalog/service',
+        link: '/%branch%/catalog/service',
         parentId: 3
       },
       {
         id: 31,
         label: 'menu.catalog.sub.prod',
-        link: '/aqua/catalog/product',
+        link: '/%branch%/catalog/product',
         parentId: 3
       }
 
@@ -115,7 +115,7 @@ export const MENU: MenuItem[] = [
     id: 4,
     label: 'menu.templates.label',
     icon: 'file-text',
-    link: '/aqua/templates',
+    link: '/%branch%/templates',
     roles: ['admin']
   },
   /*
@@ -123,19 +123,19 @@ export const MENU: MenuItem[] = [
     id: 7,
     label: 'menu.calendar.label',
     icon: 'calendar',
-    link: '/aqua/calendar/syncfusion',
+    link: '/%branch%/calendar/syncfusion',
     roles: ['admin'],
     subItems: [
       {
         id: 71,
         label: 'menu.calendar.sub.fullcalendar',
-        link: '/aqua/calendar/fullcalendar',
+        link: '/%branch%/calendar/fullcalendar',
         parentId: 7
       },
       {
         id: 72,
         label: 'menu.calendar.sub.syncfusion',
-        link: '/aqua/calendar/syncfusion',
+        link: '/%branch%/calendar/syncfusion',
         parentId: 7
       }
     ]
@@ -146,26 +146,26 @@ export const MENU: MenuItem[] = [
     id: 11,
     label: 'menu.branch.label',
     icon: 'settings',
-    link: '/aqua/branch',
+    link: '/%branch%/branch',
     roles: ['admin']
   },
   {
     id: 12,
     label: 'menu.tasks.label',
     icon: 'briefcase',
-    link: '/aqua/tasks',
+    link: '/%branch%/tasks',
     roles: ['admin'],
     subItems: [
       {
         id: 121,
         label: 'menu.tasks.sub.manage',
-        link: '/aqua/tasks/manage',
+        link: '/%branch%/tasks/manage',
         parentId: 12
       },
       {
         id: 122,
         label: 'menu.tasks.sub.dashboard',
-        link: '/aqua/tasks/dashboard',
+        link: '/%branch%/tasks/dashboard',
         parentId: 12
       }
     ]
@@ -174,20 +174,20 @@ export const MENU: MenuItem[] = [
     id: 17,
     label: 'menu.accounting.label',
     icon: 'book',
-    link: '/aqua/accounting',
+    link: '/%branch%/accounting',
     roles: ['admin', 'posAdmin'],
     subItems: [
       {
         id: 171,
         label: 'menu.accounting.sub.transactions',
-        link: '/aqua/accounting/transactions',
+        link: '/%branch%/accounting/transactions',
         roles: ['admin'],
         parentId: 17
       },
       {
         id: 172,
         label: 'menu.accounting.sub.payments',
-        link: '/aqua/orders/payments',
+        link: '/%branch%/orders/payments',
         roles: ['admin', 'posAdmin'],
         parentId: 17
       }
@@ -197,7 +197,7 @@ export const MENU: MenuItem[] = [
     id: 13,
     label: 'menu.loyalty.label',
     icon: 'user-plus',
-    link: '/aqua/loyalty',
+    link: '/%branch%/loyalty',
     roles: ['admin']
   },
   {
@@ -209,25 +209,25 @@ export const MENU: MenuItem[] = [
       {
         id: 151,
         label: 'menu.local.sub.domo',
-        link: '/aqua/local/domo',
+        link: '/%branch%/local/domo',
         parentId: 15
       },
       {
         id: 152,
         label: 'menu.local.sub.jobs',
-        link: '/aqua/local/jobs',
+        link: '/%branch%/local/jobs',
         parentId: 15
       },
       {
         id: 153,
         label: 'menu.local.sub.dialogflow',
-        link: '/aqua/local/dialogflow',
+        link: '/%branch%/local/dialogflow',
         parentId: 15
       },
       {
         id: 154,
         label: 'menu.local.sub.doorAccess',
-        link: '/aqua/local/door-access',
+        link: '/%branch%/local/door-access',
         parentId: 15
       }
 
@@ -261,7 +261,7 @@ export const MENU: MenuItem[] = [
       {
         id: 304,
         label: 'menu.demo.label',
-        link: '/aqua/demo',
+        link: '/%branch%/demo',
         parentId: 30
       }
     ]
@@ -271,6 +271,6 @@ export const MENU: MenuItem[] = [
     id: 14,
     label: 'menu.demo.label',
     icon: 'home',
-    link: '/aqua/demo',
+    link: '/%branch%/demo',
   }*/
 ];

@@ -122,11 +122,12 @@ options:orderBy=idx.values:orderBy=idx
   }
 
 
-  getProductsInCategoryQuery(categoryId: string | null = null, online: boolean): DbQuery {
+  getProductsInCategoryQuery(branchId: string, categoryId: string | null = null, online: boolean): DbQuery {
     const query = new DbQuery()
 
     query.and('del', QueryOperator.equals, false)
     query.and('catId', QueryOperator.equals, categoryId)
+    query.and('branchId', QueryOperator.equals, branchId)
 
     if (online)
       query.and('online', QueryOperator.not, OnlineMode.invisible)
@@ -144,16 +145,16 @@ options:orderBy=idx.values:orderBy=idx
     return query
   }
 
-  getProductsInCategory$(categoryId: string | null = null, online: boolean): Promise<Product[]> {
+  getProductsInCategory$(branchId: string, categoryId: string | null = null, online: boolean): Promise<Product[]> {
 
-    const query = this.getProductsInCategoryQuery(categoryId, online)
+    const query = this.getProductsInCategoryQuery(branchId, categoryId, online)
 
     return this.query$(query)
   }
 
-  getProductsInCategory(categoryId: string | null = null, online: boolean): Observable<Product[]> {
+  getProductsInCategory(branchId: string, categoryId: string | null = null, online: boolean): Observable<Product[]> {
 
-    const query = this.getProductsInCategoryQuery(categoryId, online)
+    const query = this.getProductsInCategoryQuery(branchId, categoryId, online)
 
     return this.query(query).pipe(map(obj => obj.data ? obj.data : []))
   }

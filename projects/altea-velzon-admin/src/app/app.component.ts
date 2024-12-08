@@ -7,6 +7,7 @@ import { Idle, DEFAULT_INTERRUPTSOURCES } from '@ng-idle/core';
 import { UserSelectComponent } from 'projects/ng-altea-common/src/lib/pos/user-select/user-select.component';
 import { DashboardService } from 'ng-common';
 import { environment } from '../environments/environment';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -26,7 +27,7 @@ export class AppComponent implements OnInit {
 
   constructor(private idle: Idle, private localeService: BsLocaleService, private branchSvc: BranchService, private sessionSvc: SessionService, private dashboardSvc: DashboardService
     , private productSvc: ProductService, private resourceSvc: ResourceService, private typeInfoSvc: TypeInfoService,
-    private scheduleSvc: ScheduleService, private loyaltyProgramSvc: LoyaltyProgramService, private templateSvc: TemplateService, private objectSvc: ObjectService) {
+    private scheduleSvc: ScheduleService, private loyaltyProgramSvc: LoyaltyProgramService, private templateSvc: TemplateService, private objectSvc: ObjectService, protected router: Router) {
     this.localeService.use('nl-be');
 
     this.configUserSelectOnIdle(idle)
@@ -89,37 +90,53 @@ export class AppComponent implements OnInit {
 
     this.sessionSvc.appMode = AppMode.pos
 
-    await this.configureCaches()
+    // await this.configureCaches()
 
+  
     const branch = await this.branchSvc.get$(this.sessionSvc.branchId)
-
     this.sessionSvc.branch = branch
     console.error(branch)
+    
 
     this.appReady = true
+
+    this.sessionSvc.branchSub.subscribe(async branch => {
+      console.warn('branch', branch)
+
+      if (branch?.id) {
+
+        await this.configureCaches(branch.id)
+
+        this.router.navigate([branch.unique, 'branch'])
+
+      }
+        
+    
+    })
+
 
   }
 
 
-  async configureCaches() {
+  async configureCaches(branchId: string) {
 
     console.warn('configureCaches')
 
     const typeInfoQry = new DbQuery()
-    typeInfoQry.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
+    typeInfoQry.and('branchId', QueryOperator.equals, branchId)
 
     const typeInfos = await this.typeInfoSvc.query$(typeInfoQry)
     console.warn(typeInfos)
 
     const branchQry = new DbQuery()
-    branchQry.and('id', QueryOperator.equals, this.sessionSvc.branchId)
+    branchQry.and('id', QueryOperator.equals, branchId)
     branchQry.take = 1000
     this.branchSvc.cacheQuery = branchQry
     await this.branchSvc.initCache(typeInfos)
     this.objectSvc.typeCaches.set(Branch, this.branchSvc)
 
     const productQry = new DbQuery()
-    productQry.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
+    productQry.and('branchId', QueryOperator.equals, branchId)
     productQry.include('options:orderBy=idx.values:orderBy=idx', 'resources:orderBy=idx', 'items:orderBy=idx', 'prices')   // we previously also fteched the resource: 'resources:orderBy=idx.resource'
     productQry.take = 1000
     this.productSvc.cacheQuery = productQry
@@ -128,7 +145,7 @@ export class AppComponent implements OnInit {
     this.objectSvc.typeCaches.set(Product, this.productSvc)
 
     const resourceQry = new DbQuery()
-    resourceQry.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
+    resourceQry.and('branchId', QueryOperator.equals, branchId)
     resourceQry.include('groups.group', 'schedules:orderBy=idx.planning', 'children.child', 'user')
     resourceQry.take = 1000
     this.resourceSvc.cacheQuery = resourceQry
@@ -136,7 +153,7 @@ export class AppComponent implements OnInit {
     this.objectSvc.typeCaches.set(Resource, this.resourceSvc)
 
     const loyaltyProgramQry = new DbQuery()
-    loyaltyProgramQry.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
+    loyaltyProgramQry.and('branchId', QueryOperator.equals, branchId)
     //loyaltyProgramQry.include('groups.group', 'schedules:orderBy=idx.planning', 'children.child', 'user')
     loyaltyProgramQry.take = 1000
     this.loyaltyProgramSvc.cacheQuery = loyaltyProgramQry
@@ -144,7 +161,7 @@ export class AppComponent implements OnInit {
     this.objectSvc.typeCaches.set(LoyaltyProgram, this.loyaltyProgramSvc)
 
     const templateQry = new DbQuery()
-    templateQry.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
+    templateQry.and('branchId', QueryOperator.equals, branchId)
     templateQry.take = 1000
     this.templateSvc.cacheQuery = templateQry
     await this.templateSvc.initCache(typeInfos)

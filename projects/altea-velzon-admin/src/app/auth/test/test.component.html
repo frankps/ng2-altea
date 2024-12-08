@@ -1,0 +1,10 @@
+
+
+<!-- 
+<button type="button" class="btn btn-primary btn-sm" (click)="getBranches()">Get Branches</button>
+ -->
+
+<div *ngFor="let branch of branches">
+  
+  <button type="button" class="btn btn-primary btn-sm" (click)="openBranch(branch)">{{branch.name}}</button>
+</div>

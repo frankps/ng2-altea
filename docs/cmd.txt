@@ -70,6 +70,14 @@ New firestore service:
     ng generate service data-services/firestore/orderFirestore --project=ng-altea-common
 
 
+
+
+http://localhost:4200/auth2/test
+
+
+
+
+
 New component:
 
 ng generate module platform --project=altea-velzon-admin --routing
@@ -80,6 +88,9 @@ ng generate component platform/user-list --project=altea-velzon-admin
 ng generate component platform/order-debug --project=altea-velzon-admin
 
 ng generate component platform/stripe-events --project=altea-velzon-admin
+
+ng generate module auth --project=altea-velzon-admin --routing
+ng generate component auth/test --project=altea-velzon-admin
 
 
 ng generate module bank --project=altea-velzon-admin --routing
@@ -113,6 +124,13 @@ ng generate module staff --project altea-pub-app --routing
 ng generate component staff/dashboard --project altea-pub-app
 ng generate component staff/task --project altea-pub-app
 
+
+
+ng generate module newBranch --project ng-altea-common --routing
+ng generate component new-branch/create-branch --project ng-altea-common
+ng generate service new-branch/new-branch --project ng-altea-common
+
+
 ng generate component product/price-condition --project altea-velzon-admin
 
 ng generate component order/payments --project altea-velzon-admin
@@ -126,7 +144,12 @@ ng generate component order-mgr/debug-messaging --project ng-altea-common
 
 ng generate component invoice/edit-invoice --project ng-altea-common
 
+
+ng generate component invoice/edit-invoice --project ng-altea-common
+
 ng generate component order-mgr/order-debug-info --project ng-altea-common
+
+ng generate service data-services/sql/organisation --project ng-altea-common
 
 ng generate service data-services/sql/payment --project ng-altea-common
 

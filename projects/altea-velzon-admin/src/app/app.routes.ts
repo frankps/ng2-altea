@@ -4,13 +4,15 @@ import { AppComponent } from './app.component';
 import { DemoComponent } from './demo/demo/demo.component';
 
 export const appRoutes: Route[] = [
-  { path: 'auth', loadChildren: () => import('./velzon/account/account.module').then(m => m.AccountModule) },
+  // { path: 'auth', loadChildren: () => import('./velzon/account/account.module').then(m => m.AccountModule) },
+  { path: "auth2", loadChildren: () => import(`./auth/auth.module`).then(m => m.AuthModule) },
   {
     path: 'platform', component: LayoutComponent,
     children: [
       { path: "", loadChildren: () => import(`./platform/platform.module`).then(m => m.PlatformModule) },
     ]
   },
+  { path: "onboarding", loadChildren: () => import(`./onboarding/onboarding.module`).then(m => m.OnboardingModule) },
   {
     path: ':branch', component: LayoutComponent,
     //loadChildren: () => import('./resource/resource.module').then(m => m.ResourceModule) 

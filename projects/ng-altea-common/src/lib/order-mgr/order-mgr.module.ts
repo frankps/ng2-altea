@@ -1,12 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { OrderMgrRoutingModule } from './order-mgr-routing.module';
-import { BrowseCatalogComponent } from './browse-catalog/browse-catalog.component';
-//import { ManageOrderComponent } from '../../../../altea-velzon-admin/src/app/order/manage-order/manage-order.component';
-import { ProductListComponent } from './product-list/product-list.component';
-import { OrderLineComponent } from './order-line/order-line.component';
-
 // Generic imports
 import { NgCommonModule } from 'ng-common';
 import { Bootstrap5Module } from 'ng-common';
@@ -18,6 +12,17 @@ import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { TimepickerModule } from 'ngx-bootstrap/timepicker';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerModule } from 'ngx-spinner';
+import { ClipboardModule } from '@angular/cdk/clipboard';
+
+
+import { OrderMgrRoutingModule } from './order-mgr-routing.module';
+import { BrowseCatalogComponent } from './browse-catalog/browse-catalog.component';
+//import { ManageOrderComponent } from '../../../../altea-velzon-admin/src/app/order/manage-order/manage-order.component';
+import { ProductListComponent } from './product-list/product-list.component';
+import { OrderLineComponent } from './order-line/order-line.component';
+
+
+
 import { OrderComponent } from './order/order.component';
 import { SelectDateComponent } from './select-date/select-date.component';
 import { PersonSelectComponent } from './person-select/person-select.component';
@@ -34,7 +39,7 @@ import { ContactSelect2Component } from './contact-select2/contact-select2.compo
 import { DebugPlanningsComponent } from './debug-plannings/debug-plannings.component';
 import { CancelOrderComponent } from './cancel-order/cancel-order.component';
 import { LoyaltyComponent } from './loyalty/loyalty.component';
-import { ClipboardModule } from '@angular/cdk/clipboard';
+
 import { DebugMessagingComponent } from './debug-messaging/debug-messaging.component';
 import { OrderSummaryComponent } from './order-summary/order-summary.component';
 import { OrderDebugComponent } from './order-debug/order-debug.component';

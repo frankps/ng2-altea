@@ -317,8 +317,11 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
 
     this.spinner.show()
 
+    let branchId = this.sessionSvc.branchId
+
     const query = new DbQuery()
     query.and('attn', QueryOperator.equals, true)
+    query.and('branchId', QueryOperator.equals, branchId)
 
     query.take = 50
     query.include('lines.planning.resource', 'contact')
@@ -339,14 +342,18 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
 
     console.error(this.dateRange)
 
+    let branchId = this.sessionSvc.branchId
 
     this.spinner.show()
 
     this.objects$ = null
     const query = new DbQuery()
 
+    query.and('branchId', QueryOperator.equals, branchId)
 
     if (orderSearch.searchFor) {
+
+
 
       if (orderSearch.searchFor.length == 36)
         query.and('id', QueryOperator.equals, orderSearch.searchFor)

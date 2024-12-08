@@ -5,7 +5,9 @@ import { TranslateService } from '@ngx-translate/core';
 import { MENU } from './menu';
 import { MenuItem } from './menu.model';
 import { SessionService } from 'ng-altea-common';
-import { ArrayHelper } from 'ts-common';
+import { ArrayHelper, ObjectHelper } from 'ts-common';
+import * as _ from "lodash";
+
 
 @Component({
   selector: 'app-sidebar',
@@ -28,7 +30,11 @@ export class SidebarComponent implements OnInit {
     // Menu Items
 
     this.loadMenu()
-    
+
+    this.sessionSvc.branchSub.subscribe(branch => {
+      this.loadMenu()
+    })
+
     this.router.events.subscribe((event) => {
       if (document.documentElement.getAttribute('data-layout') != "twocolumn") {
         if (event instanceof NavigationEnd) {
@@ -41,13 +47,34 @@ export class SidebarComponent implements OnInit {
   loadMenu() {
 
     let role = this.sessionSvc.role
+    let branchUnique = this.sessionSvc.branchUnique
 
-    let menuItems = MENU.filter(item => ArrayHelper.IsEmpty(item.roles) || item.roles?.indexOf(role) >= 0);
+    let menuItems = MENU.filter(item => ArrayHelper.IsEmpty(item.roles) || item.roles?.indexOf(role) >= 0)
+
+    menuItems = menuItems.map(item => {
+      if (!item.link)
+        return item
+
+      let clone = _.cloneDeep(item)
+      clone.link = clone.link.replace('%branch%', branchUnique)
+      return clone
+    })
 
     for (let item of menuItems) {
 
-      if (ArrayHelper.NotEmpty(item.subItems))
+      if (ArrayHelper.NotEmpty(item.subItems)) {
         item.subItems = item.subItems.filter(item => ArrayHelper.IsEmpty(item.roles) || item.roles?.indexOf(this.sessionSvc.role) >= 0);
+
+        item.subItems = item.subItems.map(item => {
+          if (!item.link)
+            return item
+
+          let clone = _.cloneDeep(item)
+          clone.link = clone.link.replace('%branch%', branchUnique)
+          return clone
+        })
+      }
+
     }
 
     this.menuItems = menuItems

@@ -1042,9 +1042,10 @@ export class OrderMgrUiService {   // implements OnInit
     }
 
     let isConsumerOnline = this.sessionSvc.appMode != AppMode.pos
+    let branchId = this.sessionSvc.branchId
 
     const me = this
-    const rootProducts = await me.productSvc.getProductsInCategory$(null, isConsumerOnline)
+    const rootProducts = await me.productSvc.getProductsInCategory$(branchId, null, isConsumerOnline)
     me.products = rootProducts
     me.rootCategories = me.products
 
@@ -1095,8 +1096,9 @@ export class OrderMgrUiService {   // implements OnInit
     this.path.push(category)
 
     let isConsumerOnline = this.sessionSvc.appMode != AppMode.pos
+    let branchId = this.sessionSvc.branchId
 
-    this.productSvc.getProductsInCategory(category.id, isConsumerOnline).pipe(take(1)).subscribe(res => {
+    this.productSvc.getProductsInCategory(branchId, category.id, isConsumerOnline).pipe(take(1)).subscribe(res => {
       this.products = res
       console.error(res)
 

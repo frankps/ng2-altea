@@ -22,7 +22,7 @@
                 
 
                 </div>
-                <div class="col-3 d-flex justify-content-end align-items-center">
+                <div class="col-4 d-flex justify-content-end align-items-center">
 
 
                     <input type="number" *ngIf="orderLine.cust && showMoreInternal; else showPrice" id="unit"
@@ -30,7 +30,7 @@
                         (change)="unitPriceChanged()" />
 
                     <ng-template #showPrice>
-                        <span *ngIf="product?.priceFrom">{{'objects.product.priceFrom-app' |
+                        <span *ngIf="product?.priceFrom" style="font-size: small;">{{'objects.product.priceFrom-app' |
                             translate}}&nbsp;&nbsp;</span>
                         € {{orderLine.incl}}
                         <sup *ngIf="product?.priceInfo">&nbsp;*</sup>

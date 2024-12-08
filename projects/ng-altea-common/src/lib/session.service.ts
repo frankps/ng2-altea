@@ -9,7 +9,7 @@ import * as Rx from "rxjs";
 export class Clipboard {
   payments: Payment[] = []
 
-  hasPayments() : boolean {
+  hasPayments(): boolean {
     return ArrayHelper.NotEmpty(this.payments)
   }
 }
@@ -59,8 +59,8 @@ export class SessionService implements OnInit {
   public backend // = "https://dvit-477c9.uc.r.appspot.com"
   //public backend = "http://localhost:8080"
 
-   public localServer = "http://altea.dvit.local:3000"
-//  public localServer = "http://localhost:3000"
+  public localServer = "http://altea.dvit.local:3000"
+  //  public localServer = "http://localhost:3000"
 
   /** for internal use (POS): the current user working with the app */
   public humanResource: Resource
@@ -84,7 +84,7 @@ export class SessionService implements OnInit {
 
     let role = localStorage.getItem('role')
 
-    if (role && (role == 'staff' || role == 'admin' || role == 'posAdmin') ) {  // 
+    if (role && (role == 'staff' || role == 'admin' || role == 'posAdmin')) {  // 
       this._role = role
     }
 
@@ -148,7 +148,7 @@ export class SessionService implements OnInit {
 
   private uniqueClientId: string
 
-  clientId() : string {
+  clientId(): string {
 
     if (this.uniqueClientId)
       return this.uniqueClientId
@@ -170,10 +170,19 @@ export class SessionService implements OnInit {
     return this._branch
   }
 
-  set branch(value: Branch) {
-    this._branch = value
+  set branch(branch: Branch) {
+    this._branch = branch
 
-    this.branchSub.next(value)
+    if (branch) {
+      this.branchId = branch.id
+      this.branchUnique = branch.unique
+      this.orgId = branch.orgId
+    } else {
+      this.branchId = null
+      this.orgId = null
+    }
+
+    this.branchSub.next(branch)
   }
 
   delay(ms: number) {

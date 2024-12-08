@@ -18,5 +18,6 @@ export * from './lib/local'
 export * from './lib/bot'
 export * from './lib/schema'
 export * from './lib/ui/menu-item'
+export * from './lib/new-branch'
 
 

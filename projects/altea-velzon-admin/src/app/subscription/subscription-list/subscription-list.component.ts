@@ -47,6 +47,7 @@ export class SubscriptionListComponent extends NgBaseListComponent<Subscription>
 
     const query = new DbQuery()
     query.and('del', QueryOperator.equals, false)
+    query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
     query.include('contact')
 
     query.take = 20
@@ -71,6 +72,7 @@ export class SubscriptionListComponent extends NgBaseListComponent<Subscription>
     query.or('name', QueryOperator.contains, searchFor)
     query.or('contact.name', QueryOperator.contains, searchFor)
     query.and('del', QueryOperator.equals, false)
+    query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
 
     query.include('contact')
     return query
