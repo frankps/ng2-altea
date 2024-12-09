@@ -345,7 +345,7 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
     let branchId = this.sessionSvc.branchId
 
     this.spinner.show()
-
+  
     this.objects$ = null
     const query = new DbQuery()
 
@@ -364,6 +364,21 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
         filter.or('contact.email', QueryOperator.contains, orderSearch.searchFor)
       }
     }
+
+    if (ArrayHelper.IsEmpty(orderSearch.states)) {
+      let cancelFilter = query.and()
+
+      cancelFilter.or('state', QueryOperator.not, OrderState.cancelled)
+      cancelFilter.or('paid', QueryOperator.not, 0)
+
+/*       let cancelWithPayment = cancelFilter.or()
+      cancelWithPayment.and('state', QueryOperator.equals, OrderState.cancelled)
+      cancelWithPayment.and('paid', QueryOperator.greaterThan, 0) */
+    }
+
+
+
+
 
 
 

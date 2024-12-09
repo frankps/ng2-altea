@@ -35,7 +35,7 @@ export class SelectTimeSlotComponent {
 
     console.error('From date: ', from)
 
-    this.isPosAdmin = this.sessionSvc.isPos() && this.sessionSvc.isAdmin()
+    this.isPosAdmin = this.sessionSvc.isPosAdmin()
 
   }
 

@@ -10,7 +10,7 @@
 import { Type } from "class-transformer"
 import { ArrayHelper, DateHelper, ObjectWithId } from "ts-common"
 import * as _ from "lodash";
-import { OrderLineOptionValue, PlanningType, Resource, ResourcePlanning, ResourceType, OrderLineOption, OrderLine, OrderState, Contact, Order } from "ts-altea-model";
+import { OrderLineOptionValue, PlanningType, Resource, ResourcePlanning, ResourceType, OrderLineOption, OrderLine, OrderState, Contact, Order, Task } from "ts-altea-model";
 
 export class ObjectUi {
     id: string
@@ -221,6 +221,9 @@ export class OrderUi extends ObjectUi {
     incl = 0
     state?: OrderState
 
+    /** if not specified, it is an order. Otherwise it is a task */
+    type?: '' | 'order'| 'task' = ''
+
     get startDate() {
         return DateHelper.parse(this.start)
     }
@@ -229,11 +232,14 @@ export class OrderUi extends ObjectUi {
         return DateHelper.parse(this.end)
     }
 
+
+
     shortInfo(contact = true, pay = true, options = false, separator: string = ' '): string {
 
-        let info = ''
+        let info = '#'
+        let isOrder = (this.type == '' || this.type == 'order')
 
-        if (contact && this.contact)
+        if (isOrder && contact && this.contact)
             info += this.contact.name
 
         if (ArrayHelper.NotEmpty(this.lines)) {
@@ -244,7 +250,7 @@ export class OrderUi extends ObjectUi {
             info += ` ${lineInfo}`
         }
 
-        if (pay)
+        if (isOrder && pay)
             info += ` €${this.paid}/${this.incl}`
 
         return info
@@ -276,5 +282,34 @@ export class OrderUi extends ObjectUi {
 
         return orderUi
     }
+
+    static fromTask(task: Task): OrderUi {
+
+        if (!task)
+            return null
+
+        const orderUi = new OrderUi()
+        orderUi.id = task.id
+        orderUi.type = 'task'
+
+        let startDate = task.startDate()
+        let endDate = task.endDate()
+
+        orderUi.start = DateHelper.yyyyMMddhhmmss(startDate)
+        orderUi.end = DateHelper.yyyyMMddhhmmss(endDate)
+
+        const lineUi = new OrderLineUi()
+        lineUi.id = task.id
+        lineUi.qty = 1
+        lineUi.descr = task.name
+
+        orderUi.lines = [lineUi]
+
+        if (ArrayHelper.NotEmpty(task.planning))
+            orderUi.planning = task.planning.map(plan => ResourcePlanningUi.fromResourcePlanning(plan))
+
+        return orderUi
+    }
+
 
 }

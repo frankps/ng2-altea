@@ -1,4 +1,4 @@
-import { Branch, Contact, DepositMode, Gift, Invoice, Order, OrderLine, OrderType, Organisation, PlanningMode, Product, ProductResource, ProductType, Resource, ResourceType, Schedule, User } from "ts-altea-model";
+import { Branch, Contact, DepositMode, Gift, Invoice, Order, OrderLine, OrderType, Organisation, PlanningMode, Product, ProductResource, ProductType, Resource, ResourceType, Schedule, Task, User } from "ts-altea-model";
 import { Exclude, Type, Transform } from "class-transformer";
 import 'reflect-metadata';
 import { ArrayHelper, ConnectTo, DateHelper, DbObjectCreate, IAsDbObject, ManagedObject, ObjectHelper, ObjectMgmt, ObjectReference, ObjectWithId, ObjectWithIdPlus, QueryOperator, StringHelper, TimeHelper } from 'ts-common'
@@ -21,7 +21,10 @@ export enum PlanningType {
   edu = 'edu',
   avl = 'avl',    // available
   sch = 'sch',    // planning schedule
-  brk = 'brk'     // break (such as lunch break): at work, but not working
+  brk = 'brk',    // break (such as lunch break): at work, but not working
+  tsk = 'tsk'     // task
+
+
 }
 
 
@@ -473,6 +476,9 @@ export class ResourcePlanning extends ObjectWithIdPlus implements IAsDbObject<Re
 
   autoResourceId?: string;
 
+  taskId?: string;
+  @Type(() => Task)
+  task?: Task;
 
   @Type(() => Schedule)
   schedule?: Schedule | ConnectTo
@@ -493,7 +499,10 @@ export class ResourcePlanning extends ObjectWithIdPlus implements IAsDbObject<Re
   /** is preperation time (before or after actual treatment) */
   prep: boolean = false
 
-  /** overlap allowed (used if prep=true). Example: when cleaning of wellness can overlap the preparation of the next session */
+  /** overlap allowed, used if: 
+   *     (1) prep=true Example: when cleaning of wellness can overlap the preparation of the next session 
+   *     (2) taskId is set: if true, then new bookings can overlap with this task
+   * */
   overlap: boolean = false
 
   // service?: string;

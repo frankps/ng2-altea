@@ -5,7 +5,7 @@ import { ConnectableObservable } from 'rxjs';
 import { CancelOrderChecks } from 'ts-altea-logic';
 import { Contact, Order, OrderCancel, OrderCancelBy, PaymentType, Subscription } from 'ts-altea-model';
 import { ArrayHelper, DateHelper, DbQuery, QueryOperator, SortOrder } from 'ts-common';
-
+import * as dateFns from 'date-fns'
 
 
 @Component({
@@ -87,11 +87,15 @@ export class MyOrdersComponent implements OnInit {
 
   async loadOrders(contactId: string) {
 
+    let now = new Date()
+    let filterFrom = DateHelper.yyyyMMddhhmmss(now)
+    
     const query = new DbQuery()
 
     query.include("lines")
     query.and("contactId", QueryOperator.equals, contactId)
     query.and("act", QueryOperator.equals, true)
+    query.and("start", QueryOperator.greaterThanOrEqual, filterFrom)
 
     query.orderBy('start', SortOrder.desc)
 

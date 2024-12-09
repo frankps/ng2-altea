@@ -73,7 +73,7 @@ export class ResourceAvailability2 {
 
             const extendedSchedule = normalScheduleRanges.union(resourceOccupation.available)
 
-         //   let notWorking = 
+
             let workingHours = extendedSchedule.subtract(resourceOccupation.absent)
 
             if (workingHours.notEmpty()) {
@@ -81,26 +81,10 @@ export class ResourceAvailability2 {
                 workingHours.ranges[0].addFromLabel('START')
                 workingHours.ranges[workingHours.ranges.length - 1].addToLabel('END')
             }
-            //workingHours
-
-
 
             let unavailable = resourceOccupation.unAvailable
 
-/*
-            if (resource.qty > 1) {
-
-                console.warn('SUM UP Resource usage')
-
-                unavailable = resourceOccupation.unAvailable.sumUp()
-
-                // removeRangesWithQtyLowerThen => for these ranges there is at least 1 resource over
-                // unavailable = unavailable.removeRangesWithQtyLowerThen(resource.qty)
-                //console.error(unavailable)
-
-            }
-*/
-
+            
             /** switch to new subtract */
             let resourceStillAvailable = extendedSchedule.subtractMany(unavailable)
             resourceStillAvailable = resourceStillAvailable.subtractMany(resourceOccupation.overlapAllowed)

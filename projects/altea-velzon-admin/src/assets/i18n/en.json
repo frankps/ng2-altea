@@ -116,10 +116,12 @@
       "created": "Aangemaakt",
       "waitDeposit": "Afwachting voorschot",
       "confirmed": "Geconfirmeerd",
+      "arrived": "Aangekomen",
       "cancelled": "Geannuleerd",
       "noShow": "Niet opgedaagd",
       "timedOut": "Timed out",
-      "finished": "Afgerond"
+      "finished": "Afgerond",
+      "inProgress": "In uitvoering"
     },
     "cancel-order-message": {
       "possible": "Kosteloos annuleren is mogelijk",
@@ -336,7 +338,8 @@
       "ill": "Ziekte",
       "abs": "Afwezig",
       "edu": "Opleiding",
-      "avl": "Beschikbaar"
+      "avl": "Beschikbaar",
+      "tsk": "Taak"
     },
     "product-rule-type": {
       "startAt": "Starttijden dienst",
@@ -1191,10 +1194,12 @@
       "article": "de",
       "name": "Taaknaam",
       "loc": "Locatie",
+      "dur": "Duur (min)",
       "info": "Extra info",
       "hrIds": "Uitvoerders",
       "schedule": "Frequentie",
       "prio": "Prioriteit",
+      "date": "Datum",
       "time": "Start op/vanaf",
       "status": "Status"
     }

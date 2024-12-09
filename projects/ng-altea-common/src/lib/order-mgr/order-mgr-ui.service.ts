@@ -605,6 +605,7 @@ export class OrderMgrUiService {   // implements OnInit
 
     await this.calculateLoyalty()
 
+   // this.changeMode('')
 
     this.spinner.hide()
 

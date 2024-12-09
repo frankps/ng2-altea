@@ -10,7 +10,8 @@ import {Mutex, MutexInterface, Semaphore, SemaphoreInterface, withTimeout} from 
 export enum BaseEventType {
     ResourceSchedule,
     Order,
-    OrderPlanning
+    OrderPlanning,
+    Task
 }
 
 /**

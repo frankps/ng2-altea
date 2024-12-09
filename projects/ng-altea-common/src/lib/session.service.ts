@@ -109,7 +109,7 @@ export class SessionService implements OnInit {
   }
 
   isPosAdmin(): boolean {
-    return (this.appMode == AppMode.pos && this.role == 'admin')
+    return (this.appMode == AppMode.pos && (this.role == 'posAdmin' || this.role == 'admin'))
   }
 
   init(environment: any) {

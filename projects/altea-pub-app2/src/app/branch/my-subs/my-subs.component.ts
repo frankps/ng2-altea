@@ -40,7 +40,8 @@ export class MySubsComponent implements OnInit {
     query.and("contactId", QueryOperator.equals, contactId)
     query.and("act", QueryOperator.equals, true)
 
-    this.subs = await this.subsSvc.query$(query)
+    let subs = await this.subsSvc.query$(query)
+    this.subs = subs.filter(sub => sub.usedQty < sub.totalQty)
 
   }
 

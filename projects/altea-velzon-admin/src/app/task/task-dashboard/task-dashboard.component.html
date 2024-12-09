@@ -135,12 +135,19 @@
                     </div>
 
                     <div class="row {{css_cls_row}}">
-                        <div class="col">
+                        <div class="col-8">
 
                             <ngx-altea-label-control label="objects.task.loc" for="loc">
                                 <input type="text" id="loc" name="loc" class="form-control" [(ngModel)]="task.loc">
                             </ngx-altea-label-control>
 
+                        </div>
+                        <div class="col-4">
+
+                            <ngx-altea-label-control label="objects.task.dur" for="dur">
+                                <input type="number" id="dur" name="dur" class="form-control" [(ngModel)]="task.dur">
+                            </ngx-altea-label-control>
+  
                         </div>
                     </div>
 
@@ -175,10 +182,39 @@
                     </div>
 
                     <div class="row {{css_cls_row}}">
-                        <div class="col">
+                        <div class="col-6">
+                            <ngx-altea-label-control label="objects.task.date" for="date">
+                                <input type="text" placeholder="Datepicker" class="form-control" bsDatepicker
+                                    [(ngModel)]="task.typedDate">
+                            </ngx-altea-label-control>
+                    
+                        </div>
+                        <div class="col-6">
                             <ngx-altea-label-control label="objects.task.time" for="time">
                                 <input type="time" id="time" name="time" class="form-control" [(ngModel)]="task.time" />
                             </ngx-altea-label-control>
+                        </div>
+                    </div>
+  
+                    <div class="row {{css_cls_row}}">
+                        <div class="col-6">
+
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="plan" name="plan"
+                                    [(ngModel)]="task.plan" />
+                                <label class="form-check-label" for="plan">In kalender</label>
+
+                            </div>
+
+                        </div>
+                        <div class="col-6">
+
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="block" name="block"
+                                    [(ngModel)]="task.block" />
+                                <label class="form-check-label" for="block">Blokkeer</label>
+                            </div>
+
                         </div>
                     </div>
 

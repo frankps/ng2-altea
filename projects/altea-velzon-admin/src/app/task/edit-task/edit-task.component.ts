@@ -64,7 +64,7 @@ export class EditTaskComponent extends NgEditBaseComponent<Task> {
       , taskSvc
       , router, route, spinner, dashboardSvc)
 
-    this.sectionProps.set('general', ['name', 'loc', 'info', 'prio', 'date', 'time', 'hrIds', 'schedule', 'cmt', 'status'])
+    this.sectionProps.set('general', ['name', 'loc', 'info', 'prio', 'date', 'time', 'hrIds', 'schedule', 'cmt', 'status', 'dur'])
 
 
   }

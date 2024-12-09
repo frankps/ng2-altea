@@ -293,6 +293,21 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
   /** external ids for this order (for instance: used for Stripe payment intends) */
   //extIds?: string[] = []
 
+  constructor(codePrefix?: string, markAsNew = false, createContact: boolean = false) {
+    super()
+
+    this.code = this.generateCode(this.cre)
+
+    if (createContact) {
+      this.contact = new Contact()
+      this.contactId = this.contact.id
+    }
+
+    if (markAsNew)
+      this.m.n = true
+  }
+
+
   msgOnDate(): Date | null {
 
     if (this.msgOn && Number.isInteger(this.msgOn))
@@ -449,28 +464,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
   @Type(() => ResourcePreferences)
   resPrefs?: ResourcePreferences
 
-  constructor(codePrefix?: string, markAsNew = false) {
-    super()
 
-    /*
-    let date = dateFns.format(new Date(), 'yyMMdd')
- 
-    if (codePrefix?.length >= 2) {
-      codePrefix = codePrefix.substring(0, 2).toUpperCase()
-    } else
-      codePrefix = ''
- 
- 
-    let subId = this.id.substring(this.id.length - 5).toUpperCase()
-    this.code = `${codePrefix}-${date}-${subId}`
-    */
-
-    this.code = this.generateCode(this.cre)
-
-    if (markAsNew)
-      this.m.n = true
-    //delete this.id //= undefined
-  }
 
   /** generate a unique numerical code (can be entered on keypad, phone) */
   generateCode(date: Date = new Date()): string {

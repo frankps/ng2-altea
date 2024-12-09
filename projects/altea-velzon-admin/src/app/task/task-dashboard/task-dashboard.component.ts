@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import { CustomJsonService, ResourceService, SessionService, TaskService } from 'ng-altea-common';
-import { Resource, Task, TaskPriority, TaskSchedule, TaskStatus, WebPushToUsers } from 'ts-altea-model';
-import { DbQuery, QueryOperator, Translation } from 'ts-common';
+import { CustomJsonService, OrderService, ResourcePlanningService, ResourceService, SessionService, TaskService } from 'ng-altea-common';
+import { PlanningType, Resource, ResourcePlanning, Task, TaskPriority, TaskSchedule, TaskStatus, TimeOfDay, WebPushToUsers } from 'ts-altea-model';
+import { ApiBatchProcess, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbQuery, QueryOperator, Translation } from 'ts-common';
 import * as dateFns from 'date-fns'
 import { th, tr } from 'date-fns/locale';
 import { TranslationService } from 'ng-common';
@@ -44,8 +44,8 @@ export class TaskDashboardComponent {
 
 
   constructor(protected taskSvc: TaskService, protected resourceSvc: ResourceService, protected translationSvc: TranslationService
-    , protected spinner: NgxSpinnerService, public dashboardSvc: DashboardService, protected sessionSvc: SessionService,
-    public customJsonSvc: CustomJsonService, protected messagingSvc: MessagingService) {
+    , protected spinner: NgxSpinnerService, public dashboardSvc: DashboardService, protected sessionSvc: SessionService, protected planningSvc: ResourcePlanningService,
+    public customJsonSvc: CustomJsonService, protected messagingSvc: MessagingService, protected orderSvc: OrderService) {
 
   }
 
@@ -140,20 +140,86 @@ export class TaskDashboardComponent {
 
   }
 
+  taskToPlannings(task: Task): ResourcePlanning[] {
+
+    if (!task || ArrayHelper.IsEmpty(task.hrIds))
+      return []
+
+
+    let plannings = []
+
+    for (let hrId of task.hrIds) {
+
+      let resource = this.humanResourcesById.get(hrId)
+
+      if (!resource)
+        continue
+
+
+      let planning = new ResourcePlanning()
+      plannings.push(planning)
+
+      planning.branchId = task.branchId
+
+      if (resource.isGroup) {
+        planning.resourceGroupId = resource.id
+      } else {
+        planning.resourceId = resource.id
+      }
+
+      planning.taskId = task.id
+
+      let startDate = task.typedDate
+
+
+      if (task.time) {
+        let timeOfDay = TimeOfDay.parse(task.time)
+
+        if (timeOfDay) {
+          startDate = dateFns.set(startDate, { hours: timeOfDay.hours, minutes: timeOfDay.minutes })
+        }
+      }
+
+      planning.start = DateHelper.yyyyMMddhhmmss(startDate)
+
+      //DateHelper.addT addMinutes(startDate, task.dur)
+
+
+      let duration = task.dur ? task.dur : 0
+
+      let endDate = dateFns.addMinutes(startDate, duration)
+      planning.end = DateHelper.yyyyMMddhhmmss(endDate)
+
+      /** if blocking task => must be executed by resource => no overlap allowed with other (new) plannings */
+      planning.overlap = !task.block
+
+      planning.type = PlanningType.tsk
+
+
+    }
+
+    return plannings
+
+  }
+
+
   async saveTask() {
 
-    if (!this.task)
+    let me = this
+
+    if (!me.task)
       return
 
+    let task = this.task
 
     let error = false
 
     this.spinner.show()
 
     try {
-      console.error(this.task)
+      console.error(task)
 
-      let result
+      let result: ApiResult<Task>
 
       switch (this.taskMode) {
 
@@ -161,15 +227,40 @@ export class TaskDashboardComponent {
 
 
           // let newTask = this.manualTask.toInstance()
-          result = await this.taskSvc.create$(this.task, this.dashboardSvc.resourceId)
+          result = await this.taskSvc.create$(task, this.dashboardSvc.resourceId)
           console.warn('New task:', result)
           this.manualTask = undefined
 
           if (result.isOk) {
 
+            task = result.object
+
+            if (task.plan) {
+
+              let plannings = this.taskToPlannings(task)
+
+              if (!ArrayHelper.IsEmpty(plannings)) {
+                let batch = new ApiBatchProcess<ResourcePlanning>()
+                batch.create = plannings
+                let resultPlannings = await this.planningSvc.batchProcess$(batch, this.dashboardSvc.resourceId)
+                console.warn('ResourcePlanning', resultPlannings)
+
+
+                if (resultPlannings.status == ApiStatus.ok) {
+                  task.planning = plannings
+
+                  // we still need to push to Firebase
+                  var res = await me.orderSvc.pushTaskToFirebase(task.id)
+                  console.warn('push task to firebase', res)
+
+                }
+              }
+            }
+
             if (this.task.template) {
               this.manual.push(this.task)
             }
+
 
             if (!this.task.template && this.sendPush) {
 
@@ -188,9 +279,9 @@ export class TaskDashboardComponent {
               console.warn('web push msg', msg)
 
 
-/*               const pushRes = await this.messagingSvc.webPushToUsers$(msg)
-              console.warn('push res:', pushRes)
- */
+              /*               const pushRes = await this.messagingSvc.webPushToUsers$(msg)
+                            console.warn('push res:', pushRes)
+               */
 
             }
 

@@ -8,6 +8,28 @@ import { TimeUnit } from '../../altea-schema'
     seconds
 } */
 
+export class TimeOfDay {
+
+    hours = 0
+    minutes = 0
+
+    constructor(hours = 0, minutes = 0) {
+        this.hours = hours
+        this.minutes = minutes
+    }
+
+    /** time in format hh:mm */
+    static parse(time: string) : TimeOfDay | undefined {
+
+        if (!time)
+            return undefined
+
+        let [hours, minutes] = time.split(':').map(Number)
+
+        return new TimeOfDay(hours, minutes)
+    }
+}
+
 /** A TimeSpan is internally represented in seconds */
 export class TimeSpan {
 
@@ -20,6 +42,8 @@ export class TimeSpan {
     clone() {
         return new TimeSpan(this.seconds)
     }
+
+
 
     static hours(hours: number, minutes = 0, seconds = 0): TimeSpan {
         return new TimeSpan(hours * 3600 + minutes * 60 + seconds)

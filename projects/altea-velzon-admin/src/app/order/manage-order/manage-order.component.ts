@@ -67,6 +67,7 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
 
           if (order) {
             this.showConfirm = true
+            this.changeMode('pay')
           }
 
           var isNew = this.orderMgrSvc.order.isNew()

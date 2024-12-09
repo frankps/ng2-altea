@@ -19,8 +19,6 @@ export interface IDb {
 
     deleteMany$<T extends ObjectWithId>(query: DbQueryBaseTyped<T>): Promise<any> 
 
-    
-
 
     //  async deleteMany$<T extends ObjectWithId>(query: DbQueryBaseTyped<T>): Promise<any> 
 

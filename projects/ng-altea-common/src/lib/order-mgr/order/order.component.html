@@ -8,7 +8,7 @@
                 <span *ngIf="order.contact"> &nbsp;{{order.contact.name}}</span>
 
             </div>
-            <div class="col-6 px-3 d-flex justify-content-end align-items-center"> 
+            <div class="col-6 px-3 d-flex justify-content-end align-items-center">
                 <span *ngIf="order.giftCode">{{order.giftCode}} &nbsp;<i class="fa-duotone fa-solid fa-gift"></i></span>
                 <span class="ms-2">{{order.start | intdate}}</span>
             </div>
@@ -75,34 +75,6 @@
         </div>
 
 
-
-
-        <!--         <div class="row">
-            <div class="col d-flex justify-content-end align-items-center">{{'objects.order.state' | translate}}:
-                {{'enums.order-state.' + order.state | translate}} &nbsp;
-                <i *ngIf="order.stateIcon()" [style.color]="order.stateColor()" [class]="order.stateIcon()"></i>
-            </div>
-
-        </div> -->
-
-
-
-
-        <!--   
-        <ng-container *ngIf="show.contact && order.contact">
-
-            <div class="row">
-                <div class="col-6">{{order.contact.name}}</div>
-                <div class="col-6" *ngIf="order.contact.mobile"><i
-                        class="fa-duotone fa-mobile"></i>&nbsp;{{order.contact.mobile}}</div>
-            </div>
-            <div class="row">
-                <div class="col-12" *ngIf="order.contact.email"><small><i
-                            class="fa-sharp fa-solid fa-at"></i>&nbsp;{{order.contact.email}}</small></div>
-            </div>
-
-        </ng-container>
- -->
         <div class="row mt-2">
             <div class="col">&nbsp;</div>
         </div>
@@ -393,7 +365,8 @@
                                 class="fa-solid fa-copy"></i></button>
 
 
-                        <button type="button" class="btn btn-primary btn-sm ms-2" *ngIf="order.toInvoice" (click)="manageInvoice()">
+                        <button type="button" class="btn btn-primary btn-sm ms-2" *ngIf="order.toInvoice"
+                            (click)="manageInvoice()">
                             <i class="fa-solid fa-file-invoice"></i></button>
 
 

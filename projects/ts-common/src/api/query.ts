@@ -45,8 +45,13 @@ export class QueryCondition {
     return condition
   }
 
-  or(field: string, operator: QueryOperator, value?: any): QueryCondition {
-    const condition = QueryCondition.filter(field, operator, value)
+  or(field?: string, operator: QueryOperator = QueryOperator.equals, value?: any): QueryCondition {
+    let condition
+
+    if (field)
+      condition = QueryCondition.filter(field, operator, value)
+    else
+      condition = new QueryCondition()
 
     if (!this.where)
       this.where = new QueryWhere()
@@ -55,9 +60,24 @@ export class QueryCondition {
     return this
   }
 
+  and(field?: string, operator: QueryOperator = QueryOperator.equals, value?: any): QueryCondition {
+    let condition
+
+    if (field)
+      condition = QueryCondition.filter(field, operator, value)
+    else
+      condition = new QueryCondition()
+
+    if (!this.where)
+      this.where = new QueryWhere()
+
+    this.where.and.push(condition)
+    return this
+  }
+
 }
 
-export class OrQuery { 
+export class OrQuery {
   conditions: QueryCondition[] = []
 }
 
