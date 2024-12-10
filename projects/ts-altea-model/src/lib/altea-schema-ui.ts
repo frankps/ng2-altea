@@ -66,6 +66,7 @@ export class ResourcePlanningUi extends ObjectUi {
     start?: number
     end?: number
     prep: boolean = false
+    overlap: boolean = false
     type: PlanningType
 
     @Type(() => ResourceUi)
@@ -91,6 +92,7 @@ export class ResourcePlanningUi extends ObjectUi {
         planningUi.start = planning.start
         planningUi.end = planning.end
         planningUi.prep = planning.prep
+        planningUi.overlap = planning.overlap
         planningUi.type = planning.type
 
         if (planning.resource)
@@ -236,8 +238,24 @@ export class OrderUi extends ObjectUi {
 
     shortInfo(contact = true, pay = true, options = false, separator: string = ' '): string {
 
-        let info = '#'
+        let info = ''
+
         let isOrder = (this.type == '' || this.type == 'order')
+        let isTask = (this.type == 'task')
+
+        if (isTask) {
+            if (ArrayHelper.NotEmpty(this.planning)) {
+                let planning = this.planning[0]
+                
+                if (planning.overlap)
+                    info += '#'  // overlap allowed (new booking can overlap with this task)
+                else
+                    info += '##' // overlap not allowed (new booking cannot overlap with this task)
+            } else {
+                info += '#'
+            }
+        }
+
 
         if (isOrder && contact && this.contact)
             info += this.contact.name

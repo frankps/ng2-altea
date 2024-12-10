@@ -36,6 +36,8 @@ export class TaskDashboardComponent {
   humanResources: Resource[]
   humanResourcesById: Map<string, Resource> = new Map<string, Resource>()
 
+  quickResources: Resource[]  // frequently used resources
+
   initialized = false
   taskPriority: Translation[] = []
 
@@ -70,6 +72,11 @@ export class TaskDashboardComponent {
 
     this.humanResources = await this.resourceSvc.getHumanResourcesInclGroups(['children'])
     this.indexHumanResources(this.humanResources)
+
+    let shortNames = ['Lusien', 'Iris', 'Hèra']
+
+    this.quickResources = this.humanResources.filter(hr => shortNames.indexOf(hr.short) >= 0)
+
 
     this.getTasks()
 
@@ -110,6 +117,19 @@ export class TaskDashboardComponent {
       return undefined
 
     return this.humanResourcesById.get(resourceId).shortOrName()
+
+  }
+
+  addResource(resource: Resource) {
+
+    if (ArrayHelper.NotEmpty(this.task.hrIds)) {
+      if (this.task.hrIds.indexOf(resource.id) >= 0)
+        return
+
+      this.task.hrIds = [...this.task.hrIds, resource.id]
+    }
+    else
+      this.task.hrIds = [resource.id]
 
   }
 
@@ -159,6 +179,7 @@ export class TaskDashboardComponent {
       let planning = new ResourcePlanning()
       plannings.push(planning)
 
+      planning.taskId = task.id
       planning.branchId = task.branchId
 
       if (resource.isGroup) {
@@ -203,6 +224,31 @@ export class TaskDashboardComponent {
   }
 
 
+  async createPlannings(task: Task) {
+
+    let me = this
+
+    let plannings = this.taskToPlannings(task)
+
+    if (!ArrayHelper.IsEmpty(plannings)) {
+      let batch = new ApiBatchProcess<ResourcePlanning>()
+      batch.create = plannings
+      let resultPlannings = await this.planningSvc.batchProcess$(batch, this.dashboardSvc.resourceId)
+      console.warn('ResourcePlanning', resultPlannings)
+
+
+      if (resultPlannings.status == ApiStatus.ok) {
+        task.planning = plannings
+
+        // we still need to push to Firebase
+        var res = await me.orderSvc.pushTaskToFirebase(task.id)
+        console.warn('push task to firebase', res)
+
+      }
+    }
+  }
+
+
   async saveTask() {
 
     let me = this
@@ -235,27 +281,9 @@ export class TaskDashboardComponent {
 
             task = result.object
 
-            if (task.plan) {
-
-              let plannings = this.taskToPlannings(task)
-
-              if (!ArrayHelper.IsEmpty(plannings)) {
-                let batch = new ApiBatchProcess<ResourcePlanning>()
-                batch.create = plannings
-                let resultPlannings = await this.planningSvc.batchProcess$(batch, this.dashboardSvc.resourceId)
-                console.warn('ResourcePlanning', resultPlannings)
-
-
-                if (resultPlannings.status == ApiStatus.ok) {
-                  task.planning = plannings
-
-                  // we still need to push to Firebase
-                  var res = await me.orderSvc.pushTaskToFirebase(task.id)
-                  console.warn('push task to firebase', res)
-
-                }
-              }
-            }
+            /** check if we need to show taks in calendar */
+            if (!task.template && task.plan)
+              await this.createPlannings(task)
 
             if (this.task.template) {
               this.manual.push(this.task)
@@ -292,10 +320,19 @@ export class TaskDashboardComponent {
 
         case ManageTaskMode.edit:
 
+          // if task is planned => ResourcePlanning must be deleted & order (representing task) in Firebase must be deleted
+          if (!task.template && task.plan)
+            await this.deletePlannings(task)
 
 
           result = await this.taskSvc.update$(this.task, this.dashboardSvc.resourceId)
           console.warn('Task updated:', result)
+
+          /** check if we need to show taks in calendar */
+          if (!task.template && task.plan)
+            await this.createPlannings(task)
+
+
           break
 
         default:
@@ -363,18 +400,38 @@ export class TaskDashboardComponent {
     return userIds
   }
 
+  async deletePlannings(task: Task) {
+
+    let me = this
+
+    let query = new DbQuery()
+    query.and('taskId', QueryOperator.equals, task.id)
+    query.and('branchId', QueryOperator.equals, task.branchId)
+
+    let delPlannings = await this.planningSvc.deleteMany$(query)
+    console.warn('ResourcePlanning deleted:', delPlannings)
+
+    // for calendar purpose: we export a task as order in Firebase (just for UI)
+    var delFirebase = await me.orderSvc.deleteOrderInFirebase(task.branchId, task.id)
+    console.warn('delete order in firebase', delFirebase)
+
+  }
 
   async deleteTask() {
 
-    if (!this.task)
+    let me = this
+
+    if (!this.task || !this.task.id)
       return
+
+    let task = this.task
 
     let error = false
 
     this.spinner.show()
 
     try {
-      console.error(this.task)
+      console.error(task)
 
       let result
 
@@ -382,9 +439,16 @@ export class TaskDashboardComponent {
 
         case ManageTaskMode.edit:
 
-          result = await this.taskSvc.delete$(this.task.id, this.dashboardSvc.resourceId)
+          // if task is planned => ResourcePlanning must be deleted & order (representing task) in Firebase must be deleted
+          if (!task.template && task.plan)
+            await this.deletePlannings(task)
+
+          result = await this.taskSvc.delete$(task.id, this.dashboardSvc.resourceId)
           console.warn('Task deleted:', result)
+
+
           break
+
         default:
           return
       }

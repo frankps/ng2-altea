@@ -501,7 +501,7 @@ export class ResourcePlanning extends ObjectWithIdPlus implements IAsDbObject<Re
 
   /** overlap allowed, used if: 
    *     (1) prep=true Example: when cleaning of wellness can overlap the preparation of the next session 
-   *     (2) taskId is set: if true, then new bookings can overlap with this task
+   *     (2) if task (taskId is set): if true, then new bookings can overlap with this task
    * */
   overlap: boolean = false
 

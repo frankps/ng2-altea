@@ -412,6 +412,12 @@ export class AlteaDb {
             qry.or('orderId', QueryOperator.equals, null)
         }
 
+        /** exclude non-blocking tasks: tasks that can be overruled by new bookings */
+
+        let excludeNonBlockingTasks = qry.and()
+        excludeNonBlockingTasks.or('type', QueryOperator.not, PlanningType.tsk)
+        excludeNonBlockingTasks.or('overlap', QueryOperator.equals, false)
+
         qry.take = 1000
 
         const resourcePlannings = await this.db.query$<ResourcePlanning>(qry)

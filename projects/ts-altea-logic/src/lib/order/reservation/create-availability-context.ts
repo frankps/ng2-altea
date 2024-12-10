@@ -74,6 +74,9 @@ export class CreateAvailabilityContext {
         let includeGroupPlannings = true
         ctx.resourcePlannings = await this.loadResourcePlannings(ctx.allResourceIds, availabilityRequest, includeGroupPlannings, excludeOrderId, clientId)
 
+        
+
+
         /* get resource groups not previously loaded 
         */
 

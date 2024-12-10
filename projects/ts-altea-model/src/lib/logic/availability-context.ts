@@ -665,7 +665,7 @@ export class AvailabilityContext {
                     // 2. Subtract the ResourcePlanning for the child resource
                     // 3. Get DateBorderSet.getBorderOverview()
            
-    
+        
             let result = new DateRangeSet()
     
     

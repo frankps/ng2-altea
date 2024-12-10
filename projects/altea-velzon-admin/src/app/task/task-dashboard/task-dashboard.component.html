@@ -75,7 +75,9 @@
 <!--                         <span style="font-size: x-small;">{{'enums.task-schedule.' +
                             task.schedule | translate}}&nbsp;<i class="fa-solid fa-rotate-right"></i></span> -->
 
-                        <span class="badge rounded-pill text-bg-secondary float-end ms-2" *ngIf="task.origSched"
+                            <span *ngIf="task.plan">{{task.date}}  {{task.time}}</span>
+
+                                <span class="badge rounded-pill text-bg-secondary float-end ms-2" *ngIf="task.origSched"
                            ><i class="fa-solid fa-rotate-right"></i> &nbsp; {{'enums.task-schedule.' + task.origSched | translate}}</span>
 
 
@@ -160,6 +162,14 @@
                         </div>
                     </div>
 
+                    <div class="row {{css_cls_row}}">
+                        <div class="col">
+
+                            <button type="button" *ngFor="let res of quickResources" class="btn btn-primary btn-sm me-2" (click)="addResource(res)">{{res.short}}</button>
+
+
+                        </div>
+                    </div>
 
                     <div class="row {{css_cls_row}}">
                         <div class="col">

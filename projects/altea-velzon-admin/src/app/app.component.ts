@@ -107,7 +107,7 @@ export class AppComponent implements OnInit {
 
         await this.configureCaches(branch.id)
 
-        this.router.navigate([branch.unique, 'branch'])
+        // this.router.navigate([branch.unique, 'branch'])
 
       }
         

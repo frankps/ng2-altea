@@ -50,7 +50,7 @@ export class Task extends ObjectWithIdPlus {
 
   prio = TaskPriority.normal
 
-  date?: number // format: yyyymmdd
+  date?: number // format: yyyymmdd  
   time: string // format: hh:mm
 
   // the parent recurring task
@@ -159,10 +159,11 @@ export class Task extends ObjectWithIdPlus {
     clone.rTaskId = this.id
 
 
+    /*
     clone.hrIds = ['e738d496-a66d-414e-a098-d5ca84403e9d']
     clone.date = DateHelper.yyyyMMdd()
     clone.time = '09:00'
-
+    */
 
     // clone.id = null  // because it is a new task
 
