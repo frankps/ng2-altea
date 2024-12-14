@@ -122,8 +122,30 @@ export class MessagesComponent implements OnInit, OnDestroy {
 
 
     })
+  }
+
+  debug(msg: Message) {
+
+    let providerId = msg.prov.id
+
+    console.log(providerId)
+
+    const msgCol = collection(this.firestore, "operations", "msg", "in")
+
+    const filter = where('msg.entry[0].id', '==', providerId)
+
+    const qry = query(msgCol, filter)
+
+    let sub = collectionData(qry).subscribe(dataSet => {
+
+      console.log(dataSet)
+
+      sub.unsubscribe()
+    })
+
 
   }
+
 
   toggle(msg: Message) {
 

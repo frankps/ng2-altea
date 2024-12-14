@@ -59,7 +59,7 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
 
     let returnUrl = `http://localhost:4300/branch/${branch.unique}/pay-finished?orderId=123&sessionId={CHECKOUT_SESSION_ID}`
 
-    const createCheckout = CreateCheckoutSession.embedded(amount * 100, branch.cur, userInfo, returnUrl)
+    const createCheckout = CreateCheckoutSession.embedded(amount * 100, branch.cur, userInfo, returnUrl, this.sessionSvc.stripEnvironment)
     const apiResult = await this.stripeSvc.createCheckoutSession$(createCheckout)
     
     console.error(apiResult)

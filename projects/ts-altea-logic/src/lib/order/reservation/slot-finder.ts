@@ -561,6 +561,7 @@ export class SlotFinder {
 
         let solutionCount = 0
 
+        
 
         while (solution = solutionsToCheck.pop()) {
 
@@ -575,8 +576,18 @@ export class SlotFinder {
 
             for (var human of humanResources) {
 
+                let solutionStart = solution.offsetRefDate
+
                 if (solution.breaksChecked.indexOf(human.id) >= 0)
                     continue
+
+                // if solution for today, then the staff member might be currently in break (resourcePlanning of type 'brk' existing)
+                // => we don't need to forsee a 'virtual' break window (it is existing!)
+
+                if (dateFns.isToday(solutionStart) && availability2.hasBreakOnDay(human.id, solutionStart)) {
+                    continue
+                }
+
 
                 // the outer official break windows wherin we need to forsee a break
                 let breaksForStaffMember = breaksByResourceId.get(human.id)

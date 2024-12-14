@@ -567,7 +567,7 @@ export class AvailabilityContext {
         const availablePlannings = exclusivePlannings.filterByAvailable()
         const unavailable = exclusivePlannings.filterByAvailable(false)
 
-        const result = new ResourceOccupationSets(availablePlannings.toDateRangeSet(), unavailable.toDateRangeSet())
+        const result = new ResourceOccupationSets(exclusivePlannings, availablePlannings.toDateRangeSet(), unavailable.toDateRangeSet())
 
         return result
 
@@ -575,14 +575,16 @@ export class AvailabilityContext {
 
     getResourceOccupation2(resourceId: string): ResourceOccupationSets {
 
-        const exclusivePlannings = this.resourcePlannings.filterByResourceOverlapAllowed(resourceId, false)
+        let planningsForResource = this.resourcePlannings.filterByResource(resourceId)
+
+        const exclusivePlannings = planningsForResource.filterByOverlapAllowed(false)
 
 
-        const debug = this.resourcePlannings.filterByResource(resourceId)
+        // const debug = this.resourcePlannings.filterByResource(resourceId)
 
 
         // some plannings can overlap: preparations of next block might overlap with cleanup of previous block
-        const overlapAllowedPlannings = this.resourcePlannings.filterByResourceOverlapAllowed(resourceId, true)
+        const overlapAllowedPlannings = planningsForResource.filterByOverlapAllowed(true)
 
         if (exclusivePlannings.isEmpty() && overlapAllowedPlannings.isEmpty())
             return new ResourceOccupationSets()
@@ -590,11 +592,13 @@ export class AvailabilityContext {
         const availablePlannings = exclusivePlannings.filterByAvailable()
         const unavailable = exclusivePlannings.filterByAvailable(false)
 
+
         const absent = exclusivePlannings.filterByType(...AlteaPlanningQueries.absenceTypes())
 
         
 
         const result = new ResourceOccupationSets(
+            planningsForResource,
             availablePlannings.toDateRangeSet(),
             unavailable.toDateRangeSet(),
             overlapAllowedPlannings.toDateRangeSet(),
@@ -665,7 +669,7 @@ export class AvailabilityContext {
                     // 2. Subtract the ResourcePlanning for the child resource
                     // 3. Get DateBorderSet.getBorderOverview()
            
-        
+
             let result = new DateRangeSet()
     
     

@@ -166,6 +166,21 @@ export class DateHelper {
 
     }
 
+    static yyyyMMddxxxxxx(date: Date | null = new Date(), xxxxxx: string = '235959'): number {
+        if (!date)
+            throw `Input is null or undefined`
+
+        const year = dateFns.getYear(date)
+        const month = ("0" + (dateFns.getMonth(date) + 1)).slice(-2)
+        const day = ("0" + (dateFns.getDate(date))).slice(-2)
+
+        //  const milli = ("00" + (dateFns.getMilliseconds(date))).slice(-3)
+
+        const res = `${year}${month}${day}${xxxxxx}`
+        return Number(res)
+    }
+
+
     static yyyyMMddhhmm(date: Date = new Date()): number {
         if (!date)
             throw `Input is null or undefined`

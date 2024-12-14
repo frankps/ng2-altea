@@ -5,7 +5,7 @@ import * as _ from "lodash"
 import * as dateFns from 'date-fns'
 import { ResourceRequest, ResourceRequestItem } from "../resource-request"
 import { Solution, SolutionItem, SolutionNotes, SolutionSet } from "../solution"
-import { Resource, ResourcePlanning } from "ts-altea-model"
+import { Resource, ResourcePlanning, ResourcePlannings } from "ts-altea-model"
 import { TimeSpan } from "./time-span"
 import { ArrayHelper, DateHelper } from "ts-common"
 
@@ -16,7 +16,7 @@ import { ArrayHelper, DateHelper } from "ts-common"
  * overlapAllowed = existing preparation blocks from ResourcePlanning, where overlap is allowed
  */
 export class ResourceOccupationSets {
-    constructor(public available: DateRangeSet = DateRangeSet.empty,
+    constructor(public all: ResourcePlannings = new ResourcePlannings(), public available: DateRangeSet = DateRangeSet.empty,     
         public unAvailable: DateRangeSet = DateRangeSet.empty,
         public overlapAllowed: DateRangeSet = DateRangeSet.empty,
         public absent: DateRangeSet = DateRangeSet.empty
@@ -28,7 +28,11 @@ export class ResourceOccupationSets {
  *  This class focuses on what is available for a resource: available = schedule - occupation
  */
 export class ResourceAvailabilitySets {
-    constructor(public resource: Resource, public available: DateRangeSet = DateRangeSet.empty,
+
+    /** staff members need to press button when break starts => a break resourcePlanning is created  */
+    public hasBreakBlock: boolean = false
+
+    constructor(public resource: Resource, public all: ResourcePlannings, public available: DateRangeSet = DateRangeSet.empty,
         public overlapAllowed: DateRangeSet = DateRangeSet.empty,
         public workingTime: DateRangeSet = DateRangeSet.empty
     ) {

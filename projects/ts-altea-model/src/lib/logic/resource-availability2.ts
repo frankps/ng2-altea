@@ -1,6 +1,6 @@
 
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { Order, OrderLine, Product, ProductResource, Resource, ResourcePlanning, ResourcePlannings, ResourceType, Schedule } from"ts-altea-model"
+import { Order, OrderLine, PlanningType, Product, ProductResource, Resource, ResourcePlanning, ResourcePlannings, ResourceType, Schedule } from "ts-altea-model"
 import * as _ from "lodash";
 import { TimeSpan } from "./dates/time-span";
 import { AvailabilityRequest } from "./availability-request";
@@ -30,11 +30,11 @@ export class ResourceAvailability2 {
             throw new Error('Missing branch resource')
         if (idx > 0) {
             let branchResource = resources.splice(idx, 1)
-            resources = [ ...branchResource, ...resources ]
+            resources = [...branchResource, ...resources]
         }
 
 
-        let branchAvailability : DateRangeSet // = new DateRangeSet()
+        let branchAvailability: DateRangeSet // = new DateRangeSet()
 
 
         for (const resource of resources) {
@@ -82,9 +82,11 @@ export class ResourceAvailability2 {
                 workingHours.ranges[workingHours.ranges.length - 1].addToLabel('END')
             }
 
+
+            //resourceOccupation.unAvailable
             let unavailable = resourceOccupation.unAvailable
 
-            
+
             /** switch to new subtract */
             let resourceStillAvailable = extendedSchedule.subtractMany(unavailable)
             resourceStillAvailable = resourceStillAvailable.subtractMany(resourceOccupation.overlapAllowed)
@@ -93,7 +95,12 @@ export class ResourceAvailability2 {
             resourceOccupation.overlapAllowed.resource = resource
             workingHours.resource = resource
 
-            let availability = new ResourceAvailabilitySets(resource, resourceStillAvailable, resourceOccupation.overlapAllowed, workingHours)
+            let availability = new ResourceAvailabilitySets(resource, resourceOccupation.all, resourceStillAvailable, resourceOccupation.overlapAllowed, workingHours)
+
+
+
+
+            availability.hasBreakBlock = true
 
             this.availability.set(resourceId, availability)
 
@@ -121,6 +128,22 @@ export class ResourceAvailability2 {
         let result = sets.overlapAllowed.getRangeWhereFromEquals(date)
 
         return result
+    }
+
+    hasBreakOnDay(resourceId: string, onDay: Date): boolean {
+        let availability = this.availability.get(resourceId)
+
+        if (!availability)
+            return false
+
+        let breaks = availability.all.filterByType(PlanningType.brk)
+
+        if (breaks.count() == 0)
+            return false
+
+        // check if it is on same day
+
+        return true
     }
 
     /** All availabilities of 1 resource are grouped within a DateRangeSet.
@@ -206,7 +229,7 @@ export class ResourceAvailability2 {
 
     getWorkingTime(resourceId: string): DateRangeSet {
 
-        if (!resourceId || !this.availability) 
+        if (!resourceId || !this.availability)
             return DateRangeSet.empty
 
         if (!this.availability.has(resourceId))
@@ -221,12 +244,13 @@ export class ResourceAvailability2 {
     }
 
 
+
     getAvailabilitiesForResource(resource: Resource, minTime?: TimeSpan): DateRangeSet {
 
         // console.warn(`getAvailabilitiesForResource(${resource})`)
 
 
-        if (!resource?.id || !this.availability) 
+        if (!resource?.id || !this.availability)
             return DateRangeSet.empty
 
 

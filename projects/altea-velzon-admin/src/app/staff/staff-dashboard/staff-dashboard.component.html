@@ -1,0 +1,71 @@
+<!-- 
+<div class="row">
+    <div class="col-4">
+        
+    </div>
+    <div class="col-4"></div>
+    <div class="col-4"></div>
+</div>
+ -->
+
+
+
+<!-- 
+<button type="button" class="ms-2 btn btn-primary btn-sm" (click)="changeUser()">{{userName()}}</button> -->
+
+<ng-container *ngIf="init && sessionSvc.humanResource">
+
+    <h2>{{sessionSvc.humanResource.shortOrName()}}</h2>
+
+    <!--     [style.color]="presence?'green':'blue'" -->
+
+    <button type="button" class="ms-2 btn {{presence?'btn-success':'btn-primary'}}" [disabled]="presence"
+        (click)="startOfDay()" translate>ui.staff.start-day</button>
+
+    <button type="button" *ngIf="presence" class="ms-2 btn {{break?'btn-success':'btn-primary'}}" [disabled]="break"
+        (click)="startBreak()" translate>ui.staff.start-break</button>
+
+    <button type="button" *ngIf="presence" class="ms-2 btn {{presence?.end?'btn-success':'btn-primary'}}"
+        [disabled]="presence?.end" (click)="endOfDay()" translate>ui.staff.end-day</button>
+
+    <span class="ms-2" *ngIf="breakStarted">Smakelijk!</span>
+
+    <button type="button" class="ms-5 btn btn-info" (click)="toggleHolidays()" translate>ui.staff.my-holidays</button>
+</ng-container>
+
+
+
+<ng-container *ngIf="showHolidays">
+
+    <h4 class="mt-5">Verlof aanvragen</h4>
+
+    <div class="row" *ngFor="let req of holidayRequests">
+        <div class="col-3">{{req.startDate | date:'dd/MM/yy'}}</div>
+        <div class="col-3">{{req.endDate | date:'dd/MM/yy'}}</div>
+        <div class="col-3"></div>
+        <div class="col-3"></div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col-4">
+            <input class="form-control" #drp="bsDaterangepicker" bsDaterangepicker [(ngModel)]="holidayDateRange"
+                [bsConfig]="{useUtc: true}" onkeydown="return false" (bsValueChange)="rangePickerChanged($event)">
+        </div>
+        <div class="col-6">
+            <button type="button" *ngIf="holidayDateRange?.length == 2" class="ms-2 btn btn-primary"
+                (click)="requestHoliday()" translate>ui.staff.request-holiday</button>
+        </div>
+    </div>
+
+
+    <h4 class="mt-5">Mijn verlof</h4>
+
+    <div class="row" *ngFor="let hol of holidays">
+        <div class="col-3">{{hol.startDate | date:'dd/MM/yy'}}</div>
+        <div class="col-3">{{hol.endDate | date:'dd/MM/yy'}}</div>
+        <div class="col-3"></div>
+        <div class="col-3"></div>
+    </div>
+
+
+</ng-container>

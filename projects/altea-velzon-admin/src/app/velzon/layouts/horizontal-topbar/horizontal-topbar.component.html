@@ -47,6 +47,7 @@
                             <span class="badge {{item.badge.variant}} float-end" *ngIf="item.badge">{{item.badge.text |
                                 translate}}</span>
                         </a>
+                        <a>Appel</a>
                         <div class="collapse menu-dropdown" [ngClass]="{'mega-dropdown-menu':item.label === 'MENUITEMS.BASEUI.TEXT'}" id="sidebarDashboards" *ngIf="hasItems(item)">
                             <div [ngClass]="{'row':item.label == 'MENUITEMS.BASEUI.TEXT'}">
                                 <div *ngFor="let subitem of item.subItems" [ngClass]="{'col-lg-4': item.label == 'MENUITEMS.BASEUI.TEXT'}">

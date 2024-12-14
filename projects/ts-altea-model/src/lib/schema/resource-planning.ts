@@ -14,14 +14,28 @@ import { CancelOrderMessage } from "ts-altea-logic";
 export enum PlanningType {
   /** occupied */
   occ = 'occ',   // occupied, typically used for order planning
-  hol = 'hol',   // holidays 
-  bnk = 'bnk',   // bank holiday
+
+  /** holiday */
+  hol = 'hol',
+
+  /** holiday request */
+  holReq = 'holReq',
+
+  /** bank holiday */
+  bnk = 'bnk',
   ill = 'ill',
   abs = 'abs',   // absence, not paid by employer
   edu = 'edu',
   avl = 'avl',    // available
   sch = 'sch',    // planning schedule
-  brk = 'brk',    // break (such as lunch break): at work, but not working
+
+  /** presence */
+  pres = 'pres',
+
+  /**  break (such as lunch break): at work, but not working */
+  brk = 'brk',
+
+  /* task (such as a treatment) */
   tsk = 'tsk'     // task
 
 
@@ -35,6 +49,12 @@ export class ResourcePlannings {
 
   }
 
+  count() {
+    if (ArrayHelper.IsEmpty(this.plannings))
+      return 0
+
+    return this.plannings.length
+  }
 
   add(extraPlannings: ResourcePlannings) {
 
@@ -88,14 +108,7 @@ export class ResourcePlannings {
 
 
 
-  filterByResource(resourceId: string): ResourcePlannings {
-    const planningsForResource = this.plannings.filter(rp => rp.resourceId == resourceId && !rp.scheduleId)
 
-    if (!Array.isArray(planningsForResource))
-      return new ResourcePlannings()
-
-    return new ResourcePlannings(planningsForResource)
-  }
 
 
   groupByOrderId(plannings: ResourcePlanning[]): Map<string, ResourcePlanning[]> {
@@ -158,7 +171,7 @@ export class ResourcePlannings {
 
     return new ResourcePlannings(result)
   }
-  
+
   /**
    * If we have 2 group resource plannings with same times & overlap allowed and different order, then this can be grouped (=> can be executed by same person)
    * If they are from the same order, then it means that 2 seperated resources are needed (otherwise there should have been 1 resource planning)
@@ -187,6 +200,37 @@ export class ResourcePlannings {
 
     return newPlannings
   }
+
+  filterByResource(resourceId: string): ResourcePlannings {
+
+    const planningsForResource = this.plannings.filter(rp => rp.resourceId == resourceId)
+
+    if (!Array.isArray(planningsForResource))
+      return new ResourcePlannings()
+
+    return new ResourcePlannings(planningsForResource)
+  }
+
+  filterByOverlapAllowed(overlap: boolean = false): ResourcePlannings {
+
+    // Debugging
+
+    /*
+    let debug = this.plannings.filter(rp => rp.resourceId == resourceId)
+
+    debug = _.sortBy(debug, 'start')
+
+    console.error(debug)
+    */
+
+    const planningsForResource = this.plannings.filter(rp => rp.overlap == overlap && !rp.scheduleId)
+
+    if (!Array.isArray(planningsForResource))
+      return new ResourcePlannings()
+
+    return new ResourcePlannings(planningsForResource)
+  }
+
 
   filterByResourceOverlapAllowed(resourceId: string, overlap: boolean = false): ResourcePlannings {
 
@@ -496,6 +540,11 @@ export class ResourcePlanning extends ObjectWithIdPlus implements IAsDbObject<Re
   start?: number = DateHelper.yyyyMMddhhmmss(new Date())
   end?: number = DateHelper.yyyyMMddhhmmss(new Date())
 
+  /** date format: default (if not specified or fmt='s' -seconds-) is yyyyMMddhhmmss
+  *  fmt='d' -days- is yyyyMMdd
+  */
+  fmt?: undefined | null | 's' | 'd'
+
   /** is preperation time (before or after actual treatment) */
   prep: boolean = false
 
@@ -509,6 +558,7 @@ export class ResourcePlanning extends ObjectWithIdPlus implements IAsDbObject<Re
   // customer?: string;
   pre = 0
   post = 0
+
 
 
 

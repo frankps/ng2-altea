@@ -32,6 +32,7 @@ export const appRoutes: Route[] = [
       { path: "messaging", loadChildren: () => import(`./messaging/messaging.module`).then(m => m.MessagingModule) },
 
       { path: "local", loadChildren: () => import(`./local/local.module`).then(m => m.LocalModule) },
+      { path: "staff", loadChildren: () => import(`./staff/staff.module`).then(m => m.StaffModule) },
       
       // { path: "order", loadChildren: () => import(`./order-mgr/order-mgr.module`).then(m => m.OrderMgrModule) },
       { path: "demo", component: DemoComponent },

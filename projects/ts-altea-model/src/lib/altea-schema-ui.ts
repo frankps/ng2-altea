@@ -97,8 +97,15 @@ export class ResourcePlanningUi extends ObjectUi {
 
         if (planning.resource)
             planningUi.resource = ResourceUi.fromResource(planning.resource)
-        else
-            planningUi.resource = new ObjectUi(planning.resourceId)
+        else {
+
+            if (planning.resourceId)
+                planningUi.resource = new ObjectUi(planning.resourceId)
+            else
+                planningUi.resource = new ObjectUi(planning.resourceGroupId)
+
+        }
+
 
         return planningUi
 
@@ -204,6 +211,10 @@ export class OrderLineUi extends ObjectUi {
     }
 }
 
+/**
+ * OrderUi was initially created to show Orders in the calendar,
+ * but later on it is "abused" to show also tasks & breaks, ...
+ */
 export class OrderUi extends ObjectUi {
 
     @Type(() => ContactUi)
@@ -215,16 +226,19 @@ export class OrderUi extends ObjectUi {
     @Type(() => ResourcePlanningUi)
     planning: ResourcePlanningUi[] = []
 
-    start?: number; // format: yyyyMMddHHmmss
-    end?: number; // format: yyyyMMddHHmmss
+    /** format: yyyyMMddHHmmss */
+    start?: number;
+
+    /** format: yyyyMMddHHmmss */
+    end?: number;
 
     paid = 0
     deposit = 0
     incl = 0
     state?: OrderState
 
-    /** if not specified, it is an order. Otherwise it is a task */
-    type?: '' | 'order'| 'task' = ''
+    /** if not specified, it is an order. Otherwise it is a task or (resource)planning  */
+    type?: '' | 'order' | 'task' | 'planning' = ''
 
     get startDate() {
         return DateHelper.parse(this.start)
@@ -234,33 +248,59 @@ export class OrderUi extends ObjectUi {
         return DateHelper.parse(this.end)
     }
 
+    isOrder() {
+        return (this.type == '' || this.type == 'order')
+    }
 
+    isTask() {
+        return (this.type == 'task')
+    }
+
+    isPlanning() {
+        return (this.type == 'planning')
+    }
 
     shortInfo(contact = true, pay = true, options = false, separator: string = ' '): string {
 
         let info = ''
 
-        let isOrder = (this.type == '' || this.type == 'order')
-        let isTask = (this.type == 'task')
+        //   let isOrder = (this.type == '' || this.type == 'order')
+        //   let isTask = (this.type == 'task')
 
-        if (isTask) {
-            if (ArrayHelper.NotEmpty(this.planning)) {
-                let planning = this.planning[0]
-                
-                if (planning.overlap)
-                    info += '#'  // overlap allowed (new booking can overlap with this task)
-                else
-                    info += '##' // overlap not allowed (new booking cannot overlap with this task)
-            } else {
-                info += '#'
-            }
+        //    let isPlanning = (this.type == 'planning')   // introduced to show breaks in calendar
+
+
+        switch (this.type) {
+            case 'task':
+                if (ArrayHelper.NotEmpty(this.planning)) {
+                    let planning = this.planning[0]
+
+                    if (planning.overlap)
+                        info += '#'  // overlap allowed (new booking can overlap with this task)
+                    else
+                        info += '##' // overlap not allowed (new booking cannot overlap with this task)
+                } else {
+                    info += '#'
+                }
+
+                break
+
+            case 'planning':  // introduced to show breaks in calendar
+                info += "---"
+                break
+
+            case '':
+            case 'order':
+                if (contact && this.contact)
+                    info += this.contact.name
+                break
+
         }
 
 
-        if (isOrder && contact && this.contact)
-            info += this.contact.name
 
-        if (ArrayHelper.NotEmpty(this.lines)) {
+
+        if (!this.isPlanning() && ArrayHelper.NotEmpty(this.lines)) {
 
             let lineInfos = this.lines.map(line => line.shortInfo(options, separator))
             lineInfos = _.uniq(lineInfos)
@@ -268,7 +308,7 @@ export class OrderUi extends ObjectUi {
             info += ` ${lineInfo}`
         }
 
-        if (isOrder && pay)
+        if (this.isOrder() && pay)
             info += ` €${this.paid}/${this.incl}`
 
         return info
@@ -325,6 +365,30 @@ export class OrderUi extends ObjectUi {
 
         if (ArrayHelper.NotEmpty(task.planning))
             orderUi.planning = task.planning.map(plan => ResourcePlanningUi.fromResourcePlanning(plan))
+
+        return orderUi
+    }
+
+    static fromPlanning(planning: ResourcePlanning): OrderUi {
+
+        if (!planning)
+            return null
+
+        const orderUi = new OrderUi()
+        orderUi.id = planning.id
+        orderUi.type = 'planning'
+
+        orderUi.start = planning.start
+        orderUi.end = planning.end
+
+        const lineUi = new OrderLineUi()
+        lineUi.id = planning.id
+        lineUi.qty = 1
+        lineUi.descr = planning.type
+
+        orderUi.lines = [lineUi]
+
+        orderUi.planning = [ResourcePlanningUi.fromResourcePlanning(planning)]
 
         return orderUi
     }

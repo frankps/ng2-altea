@@ -386,6 +386,7 @@ export class AlteaDb {
         qry.and('end', QueryOperator.greaterThanOrEqual, from)
         qry.and('start', QueryOperator.lessThanOrEqual, to)
         qry.and('act', QueryOperator.equals, true)
+        qry.and('type', QueryOperator.notIn, ['pres'])
 
         if (includeGroupPlannings) {
             let resourceFilter = qry.and()

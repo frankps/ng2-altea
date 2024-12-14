@@ -36,6 +36,13 @@ export class OrderService extends BackendHttpServiceBase<Order> {
     return res
   }
 
+  async pushPlanningToFirebase(planningId: string) : Promise<any> {
+
+    var res = await this.httpGet$(`pushPlanningToFirebase?id=${planningId}`)
+  
+    return res
+  }
+
 
   
 

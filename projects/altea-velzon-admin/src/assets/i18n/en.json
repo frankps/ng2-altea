@@ -339,7 +339,9 @@
       "abs": "Afwezig",
       "edu": "Opleiding",
       "avl": "Beschikbaar",
-      "tsk": "Taak"
+      "tsk": "Taak",
+      "brk": "Pauze",
+      "pres": "Aanwezigheid"
     },
     "product-rule-type": {
       "startAt": "Starttijden dienst",
@@ -398,6 +400,14 @@
     }
   },
   "ui": {
+    "staff": {
+      "start-break": "Start pauze",
+      "start-day": "Start dag",
+      "end-day": "Einde dag",
+      "my-holidays": "Mijn verlof",
+      "request-holiday": "Aanvragen",
+      "change-staff": "Wissel personeel"
+    },
     "select-user-modal": {
       "title": "Kies profiel"
     },
@@ -1210,6 +1220,12 @@
     }
   },
   "menu": {
+    "staff": {
+      "label": "Personeel",
+      "sub": {
+        "dashboard": "Overzicht"
+      }
+    },
     "local": {
       "label": "Lokaal",
       "sub": {

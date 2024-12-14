@@ -16,7 +16,8 @@ export enum QueryOperator {
   lessThan = 'lt',
   in = 'in',
   hasSome = 'hasSome',
-  has = 'has'
+  has = 'has',
+  notIn = 'notIn'
 }
 
 export class QueryCondition {
@@ -134,10 +135,16 @@ export class DbQueryBase {
     return condition
   }
 
-  or(field: string, operator: QueryOperator, value?: any): DbQueryBase {
-    const condition = QueryCondition.filter(field, operator, value)
+  or(field?: string, operator: QueryOperator = QueryOperator.equals, value?: any): DbQueryBase {
+    let condition: QueryCondition
+
+    if (field)
+      condition = QueryCondition.filter(field, operator, value)
+    else
+      condition = new QueryCondition()
+
     this.where.or.push(condition)
-    return this
+    return condition
   }
 }
 

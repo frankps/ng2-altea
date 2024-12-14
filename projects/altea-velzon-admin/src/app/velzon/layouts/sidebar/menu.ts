@@ -265,6 +265,13 @@ export const MENU: MenuItem[] = [
         parentId: 30
       }
     ]
+  },
+  {
+    id: 31,
+    label: 'menu.staff.label',
+    icon: 'user',
+    link: '/%branch%/staff',
+    roles: ['admin']
   }
   /*,
   {

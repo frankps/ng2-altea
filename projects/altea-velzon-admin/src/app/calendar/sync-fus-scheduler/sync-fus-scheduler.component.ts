@@ -4,7 +4,7 @@ import { DataManager, ODataV4Adaptor, Query } from '@syncfusion/ej2-data';
 import * as dateFns from 'date-fns'
 import { Unsubscribe } from 'firebase/firestore';
 import { ObjectService, OrderFirestoreService, OrderService, ResourcePlanningService, ResourceService, SessionService } from 'ng-altea-common';
-import { OrderUi, Resource, ResourcePlanningUi } from 'ts-altea-model';
+import { Order, OrderUi, Resource, ResourcePlanningUi } from 'ts-altea-model';
 import { ApiListResult, DbQuery, QueryOperator, Translation, ApiResult, ApiStatus, DateHelper, ArrayHelper } from 'ts-common'
 import { CalendarBase, BaseEvent } from '../calendar-base';
 import { AlteaDb } from 'ts-altea-logic';
@@ -56,7 +56,7 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
 
   }
 
-  constructor(sessionSvc: SessionService, private planningSvc: ResourcePlanningService, orderFirestore: OrderFirestoreService, resourceSvc: ResourceService, protected objSvc: ObjectService) {
+  constructor(sessionSvc: SessionService, private planningSvc: ResourcePlanningService, orderFirestore: OrderFirestoreService, resourceSvc: ResourceService, protected objSvc: ObjectService, protected orderSvc: OrderService) {
     super(sessionSvc, orderFirestore, resourceSvc, new AlteaDb(objSvc))
 
     //this.implementation = this
@@ -81,7 +81,7 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
   }
 
   filterChanged(filterName: string) {
-      this.refreshEvents()
+    this.refreshEvents()
 
   }
 
@@ -142,7 +142,7 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
   baseEventToEvent(eventBase: BaseEvent) {
 
 
-    
+
     return {
       Id: eventBase.id,
 
@@ -157,12 +157,70 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
       CategoryColor: eventBase.color,
       OrderId: eventBase.order?.id,
       Options: eventBase.order?.shortInfo(false, false, true, '<br>'),
-      
-      
-    //  Type: eventBase.type,
 
-      
+
+      //  Type: eventBase.type,
+
+
     }
+  }
+
+  async onActionBegin($event: any) {
+
+    console.warn('onActionBegin', $event)
+
+    if (!$event)
+      return
+
+
+    switch ($event.requestType) {
+      case 'eventRemove':
+
+        if (!this.sessionSvc.isPosAdmin()) {
+
+          console.log('Only for POS admin')
+          $event.cancel = true
+
+          return
+        }
+
+
+        for (let item of $event.data) {
+
+          console.warn('Start removing item', item)
+
+          let orderUi = item.order
+
+          if (orderUi)
+            await this.deleteOrderUi(orderUi)
+
+
+        }
+
+    }
+  }
+
+  async deleteOrderUi(orderUi: OrderUi) {
+
+    console.warn('OrderUi', orderUi)
+
+    let branch = await this.sessionSvc.branch$()
+
+    if (!branch)
+      return
+
+    switch (orderUi.type) {
+
+      case 'planning':
+        var delPlanning = await this.planningSvc.delete$(orderUi.id)
+        console.log(delPlanning)
+
+        var delFirebase = await this.orderSvc.deleteOrderInFirebase(branch.id, orderUi.id)
+        console.log(delPlanning)
+
+    }
+
+
   }
 
 

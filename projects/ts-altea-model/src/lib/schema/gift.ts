@@ -525,10 +525,12 @@ export class Gift extends ObjectWithIdPlus {
 
   availableAmount(maxAmount?: number) {
 
-    if (this.used && this.used > 0)  // we had a bug that used was negative
-      return this.value - this.used
+    let value = this.value
 
-    return maxAmount ? Math.min(maxAmount, this.value) : this.value
+    if (this.used && this.used > 0)  // we had a bug that used was negative
+      value -= this.used
+
+    return maxAmount ? Math.min(maxAmount, value) : value
 
   }
 

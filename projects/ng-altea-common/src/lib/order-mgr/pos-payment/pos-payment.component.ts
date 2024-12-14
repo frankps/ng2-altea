@@ -161,7 +161,9 @@ export class PosPaymentComponent implements OnInit {
 
     //let amount = gift.availableAmount()
 
-    let amount = gift.availableAmount(this.mgrUiSvc.order.toPay())
+    let toPay = this.mgrUiSvc.order.toPay()
+
+    let amount = gift.availableAmount(toPay)
 
     let canUse = gift.canUse(amount)
 

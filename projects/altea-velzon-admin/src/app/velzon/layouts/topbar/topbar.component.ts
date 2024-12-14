@@ -19,6 +19,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { DashboardService } from 'ng-common';
 import { SessionService } from 'ng-altea-common';
+import { AppComponent } from '../../../app.component';
 
 @Component({
   selector: 'app-topbar',
@@ -51,7 +52,7 @@ export class TopbarComponent implements OnInit {
 
   constructor(@Inject(DOCUMENT) private document: any, private eventService: EventService, public languageService: LanguageService, private modalService: NgbModal,
     public _cookiesService: CookieService, public translate: TranslateService, private authService: AuthenticationService,
-    private router: Router, private TokenStorageService: TokenStorageService, public dashboardSvc: DashboardService, public sessionSvc: SessionService) { }
+    private router: Router, private TokenStorageService: TokenStorageService, public dashboardSvc: DashboardService, public sessionSvc: SessionService, protected appComponent: AppComponent) { }
 
   ngOnInit(): void {
     this.userData = this.TokenStorageService.getUser();
@@ -78,6 +79,11 @@ export class TopbarComponent implements OnInit {
       this.total += item_price
     });
   }
+
+  changeUser() {
+    this.appComponent.userSelect.show()
+  }
+
 
   /**
    * Toggle the menu bar when having mobile screen
