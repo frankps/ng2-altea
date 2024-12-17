@@ -27,8 +27,7 @@ export class AlteaPlanningQueries {
         qry.and('act', QueryOperator.equals, true)
         qry.and('resourceId', QueryOperator.in, resourceIds)
         qry.and('type', QueryOperator.in, types)
-        qry.and('act', QueryOperator.equals, true)
-
+       
         return qry
     }
 

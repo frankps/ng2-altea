@@ -33,7 +33,9 @@ export class SessionService implements OnInit {
   /** used for cut/paste operations */
   clipboard = new Clipboard()
 
-  public _role: 'staff' | 'admin' | 'posAdmin' = 'staff'
+  // public _role: 'staff' | 'admin' | 'posAdmin' = 'staff'
+
+  public roles: string[] = ['staff']
 
   public currency = 'EUR'
   public currencySymbol = ' €'
@@ -82,11 +84,23 @@ export class SessionService implements OnInit {
     if (stripeEnv && (stripeEnv == 'test' || stripeEnv == 'live'))
       this.stripEnvironment = stripeEnv
 
+    /*
     let role = localStorage.getItem('role')
 
     if (role && (role == 'staff' || role == 'admin' || role == 'posAdmin')) {  // 
       this._role = role
     }
+      */
+
+
+    // new version, to support more roles
+    let roles = localStorage.getItem('roles')
+
+    if (roles)
+      this.roles = roles.split('|')
+    else
+      this.roles = []
+
 
   }
 
@@ -105,11 +119,11 @@ export class SessionService implements OnInit {
   }
 
   isAdmin(): boolean {
-    return (this.role == 'admin')
+    return this.hasRole('admin')
   }
 
   isPosAdmin(): boolean {
-    return (this.appMode == AppMode.pos && (this.role == 'posAdmin' || this.role == 'admin'))
+    return (this.appMode == AppMode.pos && this.hasRole('admin', 'posAdmin'))
   }
 
   init(environment: any) {
@@ -127,6 +141,7 @@ export class SessionService implements OnInit {
   }
 
 
+  /*
   toggleRolePosAdmin() {
     this.role = this._role == 'staff' ? 'posAdmin' : 'staff'
   }
@@ -143,6 +158,38 @@ export class SessionService implements OnInit {
     this._role = value
     localStorage.setItem('role', value)
     console.error(`New role: ${value}`)
+  }
+*/
+
+  // new multi role mechanism
+
+  toggleRole(role: string) {
+
+    let idx = this.roles.indexOf(role)
+
+    if (idx >= 0)
+      this.roles.splice(idx, 1)
+    else
+      this.roles.push(role)
+
+    let str = this.roles.join('|')
+    localStorage.setItem('roles', str)
+  }
+
+  hasRole(...roles: string[]) {
+
+    // console.log(roles)
+
+    if (ArrayHelper.IsEmpty(roles))
+      return false
+
+    for (let role of roles) {
+      let idx = this.roles.indexOf(role)
+      if (idx >= 0)
+        return true
+    }
+
+    return false
   }
 
 

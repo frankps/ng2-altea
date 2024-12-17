@@ -1221,7 +1221,7 @@
   },
   "menu": {
     "staff": {
-      "label": "Personeel",
+      "label": "Team",
       "sub": {
         "dashboard": "Overzicht"
       }
@@ -1305,7 +1305,8 @@
       "label": "Boekhouding",
       "sub": {
         "transactions": "Transacties",
-        "payments": "Betalingen"
+        "payments": "Betalingen",
+        "hr-dashboard": "Personeel"
       }
     },
     "platform": {

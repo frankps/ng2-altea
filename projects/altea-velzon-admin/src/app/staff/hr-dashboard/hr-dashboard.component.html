@@ -1,0 +1,37 @@
+
+
+
+<ng-container *ngIf="init">
+
+    <h4 class="mt-5">Verlof aanvragen</h4>
+
+    <div class="row" *ngFor="let req of holidayRequests">
+        <div class="col-2">{{req.startDate | date:'dd/MM/yy'}}</div>
+        <div class="col-2">{{req.endDate | date:'dd/MM/yy'}}</div>
+        <div class="col-2">{{req.resource?.shortOrName()}}</div>
+
+        <div class="col-3">
+            <i class="fa-duotone fa-solid fa-thumbs-up" (click)="approveHolidayRequest(req)"></i>
+            <i class="ms-3 fas fa-trash" (click)="deletePlanning(req, holidayRequests)"></i>
+        </div>
+
+
+    </div>
+
+
+    <h4 class="mt-5">Mijn verlof</h4>
+<!-- 
+
+<i class="fa-duotone fa-solid fa-thumbs-up"></i>
+    <span *ngIf="!hasHolidays()">Geen verlof gepland</span> -->
+
+    <div class="row" *ngFor="let hol of holidays">
+        <div class="col-2">{{hol.startDate | date:'dd/MM/yy'}}</div>
+        <div class="col-2">{{hol.endDate | date:'dd/MM/yy'}}</div>
+        <div class="col-2">{{hol.resource?.shortOrName()}}</div>
+        <div class="col-3">
+            <i class="ms-3 fas fa-trash" (click)="deletePlanning(hol, holidays)"></i>
+        </div>
+    </div>
+
+</ng-container>

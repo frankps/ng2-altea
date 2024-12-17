@@ -47,14 +47,14 @@ export const MENU: MenuItem[] = [
     label: 'menu.gifts.label',
     icon: 'gift',
     link: '/%branch%/gifts',
-    roles: ['staff', 'admin', 'posAdmin']
+    roles: ['admin', 'posAdmin']
   },
   {
     id: 9,
     label: 'menu.subscriptions.label',
     icon: 'refresh-cw',
     link: '/%branch%/subscriptions',
-    roles: ['staff', 'admin', 'posAdmin']
+    roles: ['admin', 'posAdmin']
   },
   {
     id: 2,
@@ -190,6 +190,13 @@ export const MENU: MenuItem[] = [
         link: '/%branch%/orders/payments',
         roles: ['admin', 'posAdmin'],
         parentId: 17
+      },
+      {
+        id: 173,
+        label: 'menu.accounting.sub.hr-dashboard',
+        link: '/%branch%/staff/hr-dashboard',
+        roles: ['admin', 'posAdmin'],
+        parentId: 17
       }
     ]
   },
@@ -271,7 +278,7 @@ export const MENU: MenuItem[] = [
     label: 'menu.staff.label',
     icon: 'user',
     link: '/%branch%/staff',
-    roles: ['admin']
+    roles: ['admin', 'staff']
   }
   /*,
   {

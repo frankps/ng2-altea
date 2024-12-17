@@ -14,11 +14,13 @@ import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { TimepickerModule } from 'ngx-bootstrap/timepicker';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerModule } from 'ngx-spinner';
-import { NgxEditorModule } from 'ngx-editor'
+import { NgxEditorModule } from 'ngx-editor';
+import { HrDashboardComponent } from './hr-dashboard/hr-dashboard.component'
 
 @NgModule({
   declarations: [
-    StaffDashboardComponent
+    StaffDashboardComponent,
+    HrDashboardComponent
   ],
   imports: [
     CommonModule,

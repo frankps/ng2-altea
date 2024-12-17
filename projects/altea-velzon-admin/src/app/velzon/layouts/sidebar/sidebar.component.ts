@@ -46,10 +46,10 @@ export class SidebarComponent implements OnInit {
 
   loadMenu() {
 
-    let role = this.sessionSvc.role
+    //let role = this.sessionSvc.role
     let branchUnique = this.sessionSvc.branchUnique
 
-    let menuItems = MENU.filter(item => ArrayHelper.IsEmpty(item.roles) || item.roles?.indexOf(role) >= 0)
+    let menuItems = MENU.filter(item => ArrayHelper.IsEmpty(item.roles) || this.sessionSvc.hasRole(...item.roles))
 
     menuItems = menuItems.map(item => {
       if (!item.link)
@@ -63,7 +63,8 @@ export class SidebarComponent implements OnInit {
     for (let item of menuItems) {
 
       if (ArrayHelper.NotEmpty(item.subItems)) {
-        item.subItems = item.subItems.filter(item => ArrayHelper.IsEmpty(item.roles) || item.roles?.indexOf(this.sessionSvc.role) >= 0);
+        item.subItems = item.subItems.filter(item => ArrayHelper.IsEmpty(item.roles) || this.sessionSvc.hasRole(...item.roles));
+        // ArrayHelper.IsEmpty(item.roles) || item.roles?.indexOf(this.sessionSvc.role) >= 0
 
         item.subItems = item.subItems.map(item => {
           if (!item.link)
