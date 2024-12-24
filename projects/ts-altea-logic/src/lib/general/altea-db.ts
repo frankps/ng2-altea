@@ -1,4 +1,4 @@
-import { ApiListResult, ApiResult, ApiStatus, DateHelper, DbObject, DbObjectCreate, DbObjectMulti, DbObjectMultiCreate, DbQuery, DbQueryBaseTyped, DbQueryTyped, DbUpdateManyWhere, ObjectHelper, ObjectWithId, QueryOperator } from 'ts-common'
+import { ApiListResult, ApiResult, ApiStatus, DateHelper, DbObject, DbObjectCreate, DbObjectMulti, DbObjectMultiCreate, DbQuery, DbQueryBaseTyped, DbQueryTyped, DbUpdateManyWhere, ObjectHelper, ObjectWithId, QueryOperator, SortOrder } from 'ts-common'
 import { Branch, Gift, Subscription, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template, OrderLine, BankTransaction, Message, LoyaltyProgram, LoyaltyCard, PlanningType, ResourcePlannings, TemplateCode, MsgType, LoyaltyCardChange } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { IDb } from '../interfaces/i-db'
@@ -328,6 +328,10 @@ export class AlteaDb {
 
         qry.and('id', QueryOperator.in, resourceIds)
 
+/*         let endFilter = qry.and()
+        endFilter.or('children.child.end', QueryOperator.equals, null)
+        endFilter.or('children.child.end', QueryOperator.greaterThan, 20231231000000) */
+
         if (Array.isArray(includes) && includes.length > 0)
             qry.include(...includes)
 
@@ -401,7 +405,7 @@ export class AlteaDb {
         /** consumers are sometimes creating new orders from same device (without finishing previous order) 
          *  => exclude plannings coming from same device
          */
-        
+
         if (excludeClientId) {
 
             let lockCheck = qry.and()
@@ -698,6 +702,19 @@ export class AlteaDb {
         let updateResult = await this.updateObjects('bankTransaction', BankTransaction, bankTransactions, propertiesToUpdate)
         return updateResult
     }
+
+    async getLatestBankTransaction(): Promise<BankTransaction> {
+
+        const qry = new DbQueryTyped<BankTransaction>('bankTransaction', BankTransaction)
+
+        qry.orderBy('execDate', SortOrder.desc)
+        qry.orderBy('numInt', SortOrder.desc)
+
+        const tx = await this.db.queryFirst$<BankTransaction>(qry)
+
+        return tx
+    }
+
 
     /** ResourcePlanning */
 

@@ -47,14 +47,14 @@ export const MENU: MenuItem[] = [
     label: 'menu.gifts.label',
     icon: 'gift',
     link: '/%branch%/gifts',
-    roles: ['admin', 'posAdmin']
+    roles: []
   },
   {
     id: 9,
     label: 'menu.subscriptions.label',
     icon: 'refresh-cw',
     link: '/%branch%/subscriptions',
-    roles: ['admin', 'posAdmin']
+    roles: []
   },
   {
     id: 2,

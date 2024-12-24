@@ -404,7 +404,7 @@ export class OrderLine extends ObjectWithIdPlus {
   /** custom price: unit price entered manually */
   cust: boolean = false
 
-  @Type(() => Number)
+  @Type(() => Number)  
   excl = 0;
 
   @Type(() => Number)
@@ -424,6 +424,10 @@ export class OrderLine extends ObjectWithIdPlus {
 
   /** custom info: json.subs: contains array of subscriptionIds */
   json: any
+
+  /** Number of customers for this orderline   */
+  @Type(() => Number)
+  nrPers?: number
 
   persons?: string[] = []
   tag?: string;

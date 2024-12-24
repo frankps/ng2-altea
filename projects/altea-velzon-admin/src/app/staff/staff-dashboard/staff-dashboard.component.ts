@@ -220,7 +220,7 @@ export class StaffDashboardComponent implements OnInit {
     if (this.debugAddDays)
       start = dateFns.addDays(start, this.debugAddDays)
 
-    let end = dateFns.addMinutes(start, 30)
+    let end = dateFns.addMinutes(start, 32)
 
     breakPlanning.start = DateHelper.yyyyMMddhhmmss(start)
     breakPlanning.end = DateHelper.yyyyMMddhhmmss(end)
@@ -375,7 +375,7 @@ export class StaffDashboardComponent implements OnInit {
     qry.and('start', QueryOperator.lessThanOrEqual, holidayRequest.end)
     qry.and('type', QueryOperator.equals, PlanningType.hol)
     qry.and("act", QueryOperator.equals, true)
-    
+
     let plannings = await this.planningSvc.query$(qry)
 
     return ArrayHelper.IsEmpty(plannings) ? 0 : plannings.length

@@ -12,8 +12,10 @@ import { ResourceAvailability2 } from "./resource-availability2";
 
 export class AvailabilityRequest {
 
-    /** search for possibilities in the interval [from, to] */
+    /** search for possibilities in the interval [from, to], format: yyyyMMddHHmmss */
     from = 0   // format: yyyyMMddHHmmss
+
+    /** search for possibilities in the interval [from, to], format: yyyyMMddHHmmss */
     to = 0     // format: yyyyMMddHHmmss
 
     order?: Order

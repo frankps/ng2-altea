@@ -2,9 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { BankTransactionService, ObjectService, PaymentService } from 'ng-altea-common';
 import { ArrayHelper, DateHelper, DbQuery, QueryOperator } from 'ts-common';
 import * as dateFns from 'date-fns'
-import { BankTransaction, BankTxType, Payment, PaymentType } from 'ts-altea-model';
+import { BankTransaction, BankTxType, Payment, PaymentType, StripeGetPayouts, StripePayout } from 'ts-altea-model';
 import { FortisBankImport } from 'ts-altea-logic';
 import * as _ from "lodash";
+import { StripeService } from 'projects/ng-altea-common/src/lib/stripe.service';
 
 @Component({
   selector: 'app-bank-transactions',
@@ -38,7 +39,16 @@ export class BankTransactionsComponent implements OnInit {
     linked: 0
   }
 
-  constructor(protected txSvc: BankTransactionService, protected paySvc: PaymentService, protected objSvc: ObjectService) {
+
+  stripe = {
+    payouts: null
+  }
+
+  payouts: null
+
+  constructor(protected txSvc: BankTransactionService, protected paySvc: PaymentService, protected objSvc: ObjectService,
+    protected stripeSvc: StripeService
+  ) {
 
   }
 
@@ -51,15 +61,27 @@ export class BankTransactionsComponent implements OnInit {
 
   initFilters() {
 
-    this.bank.from = dateFns.addMonths(this.bank.to, -2)
+    this.bank.from = new Date(2024, 9, 1)
+    this.bank.to = new Date(2024, 10, 1)
+
+    //this.bank.from = dateFns.addMonths(this.bank.to, -2)
 
   }
 
   toggleTx(tx: BankTransaction) {
 
+    console.log(tx)
     tx['open'] = !tx['open']
 
   }
+
+  /*
+  "OVERSCHRIJVING IN EURO VAN REKENING NL41CITI2032304805 BIC CITINL2X STRIPE CO A L GOODBODY IFSC NORTH WALL QUA REFERTE OPDRACHTGEVER 
+  : STRIPE-RQWZXXC1XUK33U12XCL2OQL5KLUW MEDEDELING : STRIPE BANKREFERENTIE : 2410141145430438 VALUTADATUM : 14/10/2024"
+
+  OVERSCHRIJVING IN EURO VAN REKENING NL41CITI2032304805 BIC CITINL2X STRIPE CO A L GOODBODY IFSC NORTH WALL QUA REFERTE OPDRACHTGEVER : 
+  STRIPE-T2HDWXVJQFOPOAFXQLBUPVMW9XNL MEDEDELING : STRIPE BANKREFERENTIE : 2410151017415860 VALUTADATUM : 15/10/2024
+  */
 
   async getTransactions() {
 
@@ -90,7 +112,7 @@ export class BankTransactionsComponent implements OnInit {
 
     console.log(`findPaymentsForTx`, tx)
 
-    this.txId = tx.id 
+    this.txId = tx.id
     this.pays = []
 
     const fortis = new FortisBankImport(this.objSvc)
@@ -122,7 +144,7 @@ export class BankTransactionsComponent implements OnInit {
 
     /*
     switch (tx.type) {
-      case BankTxType.onlineBC:
+      case BankTxType.onlineBC: 
       case BankTxType.onlineCredit:
       case BankTxType.onlineBC:
 
@@ -141,7 +163,7 @@ export class BankTransactionsComponent implements OnInit {
     this.payments.total = 0
     this.payments.linked = 0
 
-    if (ArrayHelper.IsEmpty(pays)) 
+    if (ArrayHelper.IsEmpty(pays))
       return
 
     this.payments.total = _.sumBy(pays, 'amount')
@@ -149,11 +171,79 @@ export class BankTransactionsComponent implements OnInit {
     if (tx?.id) {
       let paysForTx = pays.filter(p => p.bankTxId == tx.id)
       this.payments.linked = _.sumBy(paysForTx, 'amount')
+    }
+  }
+
+
+  async assignStripePayoutsToTransactions(payouts: StripePayout[], txs: BankTransaction[]) {
+
+    if (ArrayHelper.IsEmpty(payouts) || ArrayHelper.IsEmpty(txs))
+      return
+
+    let payoutsOldToNew = _.reverse(payouts)
+
+    for (let payout of payoutsOldToNew) {
+
+      let foundIdx = txs.findIndex(tx => tx.providerRef == payout.id)
+
+      if (foundIdx >= 0) {
+        let tx = txs[foundIdx]
+        console.log(`Payout already linked ${payout.id} <-> ${tx.num}`)
+        continue
+      }
+
+      let payoutDateNum = payout.dateNum
+
+      let matchIdx = txs.findIndex(tx => tx.amount == payout.amountValue && tx.valDate == payoutDateNum)
+
+      if (matchIdx >= 0) {
+        let tx = txs[matchIdx]
+        tx.providerRef = payout.id
+//        tx.markAsUpdated('providerRef')
+        console.log(`Match found ${payout.id} <-> ${tx.num}`)
+        console.log(tx)
+
+        let update = {
+          id: tx.id,
+          providerRef: payout.id
+        }
+
+        let res = await this.txSvc.update$(update)
+        console.log(res)
+        continue
+
+      }
+
 
     }
 
-
   }
+
+
+  async getStripePayouts(endingBeforePayoutId: string, assignStripePayoutsToTransactions = true) {
+
+    let filter = new StripeGetPayouts()
+    filter.endingBefore = endingBeforePayoutId
+
+    this.stripe.payouts = await this.stripeSvc.getPayouts$(filter)
+
+    if (assignStripePayoutsToTransactions)
+      this.assignStripePayoutsToTransactions(this.stripe.payouts, this.txs)
+
+    console.error(this.stripe.payouts)
+  }
+
+
+  async getStripePayout(id: string) {
+
+    let me = this
+
+    let payout = await me.stripeSvc.getPayout$(id)
+
+    console.error(payout)
+  }
+
+
 
 
 

@@ -30,6 +30,8 @@ export class HrDashboardComponent implements OnInit {
 
   }
 
+
+
   async getHolidays() {
 
     this.holidays = []
@@ -101,15 +103,7 @@ export class HrDashboardComponent implements OnInit {
   }
 
   async deletePlanning(planning: ResourcePlanning, source: ResourcePlanning[]) {
-
-    /*
-        let deleteResult = await this.planningSvc.delete$(planning.id)
-    
-        if (deleteResult.isOk) {
-          _.remove(source, plan => plan.id == planning.id)
-        }
-    */
-
+ 
     let update = {
       id: planning.id,
       act: false

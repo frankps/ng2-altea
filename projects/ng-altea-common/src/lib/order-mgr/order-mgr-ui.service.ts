@@ -605,7 +605,7 @@ export class OrderMgrUiService {   // implements OnInit
 
     await this.calculateLoyalty()
 
-   // this.changeMode('')
+    // this.changeMode('')
 
     this.spinner.hide()
 
@@ -1310,6 +1310,12 @@ export class OrderMgrUiService {   // implements OnInit
         } */
 
 
+    // In order to support product 'Duo massage' that has setting customers=2
+    if (orderLine.product?.customers > 1) {
+      nrOfPersons *= orderLine.product?.customers
+    }
+
+
     /** check if same service is added multiple times and/or orderline.qty > 1 => probably different persons */
     let productId = orderLine?.productId
 
@@ -1325,8 +1331,12 @@ export class OrderMgrUiService {   // implements OnInit
     }
 
 
-
-
+    if (nrOfPersons != orderLine.nrPers) {
+      orderLine.nrPers = nrOfPersons
+      orderLine.markAsUpdated('nrPers')
+      this.orderDirty = true
+    }
+    
     if (nrOfPersons > 0) {
 
       if (this.order.nrOfPersons < nrOfPersons) {

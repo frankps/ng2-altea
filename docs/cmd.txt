@@ -80,6 +80,8 @@ http://localhost:4200/auth2/test
 
 New component:
 
+ng generate component accounting/orderCheck --project=altea-velzon-admin
+
 ng generate module staff --project=altea-velzon-admin --routing
 ng generate component staff/staff-dashboard --project=altea-velzon-admin
 ng generate component staff/hr-dashboard --project=altea-velzon-admin

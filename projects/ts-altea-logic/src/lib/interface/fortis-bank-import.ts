@@ -1,9 +1,10 @@
 import { BankTransaction, BankTxInfo, BankTxType } from "ts-altea-model"
 import { CsvImport, ImportColumn, ImportDefinition } from "./csv-import"
 import * as dateFns from 'date-fns'
-import { DateHelper, DbObjectMulti } from "ts-common"
+import { DateHelper, DbObjectMulti, ObjectHelper } from "ts-common"
 import { AlteaDb } from "../general/altea-db"
 import { IDb } from "../interfaces/i-db"
+import { instanceToPlain, plainToInstance } from "class-transformer"
 
 
 /*
@@ -51,28 +52,67 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
         ])
     }
 
-    async import(rowsOfCols: string[][]) {
+    /**
+     * 
+     * @param rowsOfCols 
+     */
+    async import(rowsOfCols: string[][])  {
 
+        let me = this
 
         // remove the header row
         rowsOfCols.splice(0, 1)
 
-        this.importRows(rowsOfCols)
+        me.importRows(rowsOfCols)
 
-        this.lines = this.lines.map(line => this.customProcessing(line))
+        // the last (empty) line was causing errors
+        me.lines = me.lines.filter(l => l.amount)
 
-        let uploadResult = await this.alteaDb.createBankTransactions(this.lines)
+        me.lines = me.lines.map(line => me.customProcessing(line))
 
-/*         const dbUpload = new DbObjectMulti<BankTransaction>('bankTransaction', BankTransaction, this.lines)
-        let uploadResult = await this.alteaDb.db.createMany$<BankTransaction>(dbUpload) */
+        let lines =  me.lines.map(line => line.clone())
+       // let typed = lines.map(line =>  plainToInstance(BankTransaction, line)) // plainToClass(type, unTypedClone)
+
+        // get rid of _... properties
+       // me.lines = me.lines.map(tx => ObjectHelper.clone(tx, BankTransaction))
+
+
+       // we only want new transactions
+       let lastDbTransaction = await me.alteaDb.getLatestBankTransaction()
+       lines = lines.filter(l => l.numInt > lastDbTransaction.numInt)
+
+/*        console.error(lines)
+       return */
+
+        let uploadResult = await me.alteaDb.createBankTransactions(lines)
+
+        /*         const dbUpload = new DbObjectMulti<BankTransaction>('bankTransaction', BankTransaction, this.lines)
+                let uploadResult = await this.alteaDb.db.createMany$<BankTransaction>(dbUpload) */
 
         console.error(uploadResult)
 
-        console.error(this.lines)
+        console.error(me.lines)
+
+        return uploadResult
 
     }
 
+
+    removeCharacter(str: string, idx: number): string {
+        // If the string is shorter than 6 characters, just return the original
+        if (str.length <= idx) {
+          return str;
+        }
+        // Slice the string up to (but not including) index 5,
+        // then slice from index 6 onward
+        return str.slice(0, idx) + str.slice(idx + 1);
+      }
+
     customProcessing(tx: BankTransaction): BankTransaction {
+
+        // transaction num is 2024-01089 
+/*         if (tx?.num.length > 5 && tx.num[5] == '0') 
+            tx.num = this.removeCharacter(tx.num, 5) */
 
         tx.numInt = this.convertransactionNum(tx.num)
 
@@ -105,9 +145,14 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
         if (!tx)
             return undefined
 
-        if (tx.details.toLowerCase().indexOf("stripe") >= 0)
-            return new BankTxInfo(BankTxType.stripe)
+        try {
+            if (tx.details.toLowerCase().indexOf("stripe") >= 0)
+                return new BankTxInfo(BankTxType.stripe)
+        } catch (err) {
 
+            console.log(tx)
+            throw err
+        }
         let txType = BankTxType.unknown
 
         if (tx.details.indexOf('TERMINAL') >= 0) {
@@ -190,6 +235,17 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
 
 
 }
+
+/*
+
+1079
+OVERSCHRIJVING IN EURO VAN REKENING NL41CITI2032304805 BIC CITINL2X STRIPE CO A L GOODBODY IFSC NORTH WALL QUA REFERTE OPDRACHTGEVER : STRIPE-XRURWAHGWECPNZ3CVFYOVRQ59FWJ MEDEDELING : STRIPE BANKREFERENTIE : 2410101017333580 VALUTADATUM : 10/10/2024
+
+
+OVERSCHRIJVING IN EURO VAN REKENING NL41CITI2032304805 BIC CITINL2X STRIPE CO A L GOODBODY IFSC NORTH WALL QUA REFERTE OPDRACHTGEVER : STRIPE-FJD8HIMJXNDL6MVQGXAEEY5MEKPK MEDEDELING : STRIPE BANKREFERENTIE : 2410111017358558 VALUTADATUM : 11/10/2024
+
+
+*/
 
 
 

@@ -9,7 +9,9 @@
 
             </div>
             <div class="col-6 px-3 d-flex justify-content-end align-items-center">
-                <span *ngIf="order.giftCode">{{order.giftCode}} &nbsp;<i class="fa-duotone fa-solid fa-gift"></i></span>
+                <span *ngIf="order.giftCode"><span *ngIf="order.isNew(); else showGiftCode">.....</span>
+                    <ng-template #showGiftCode>{{order.giftCode}}</ng-template>
+                    &nbsp;<i class="fa-duotone fa-solid fa-gift"></i></span>
                 <span class="ms-2">{{order.start | intdate}}</span>
             </div>
 
@@ -79,21 +81,13 @@
             <div class="col">&nbsp;</div>
         </div>
 
-
         <ng-container *ngIf="order.isEmpty()">
 
             <div class="row mt-2">
                 <div class="col" translate>ui.order-mgr.order.empty</div>
             </div>
 
-
         </ng-container>
-
-
-
-
-
-
 
         <ng-container *ngFor="let line of order.lines">
             <div (click)="selectOrderLine(line)">

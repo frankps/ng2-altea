@@ -286,7 +286,7 @@ export class OrderUi extends ObjectUi {
                 break
 
             case 'planning':  // introduced to show breaks in calendar
-                info += "---"
+                info += "PAUZE"
                 break
 
             case '':

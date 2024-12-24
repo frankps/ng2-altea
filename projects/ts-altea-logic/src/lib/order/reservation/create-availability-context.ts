@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { ApiListResult, ArrayHelper, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
+import { ApiListResult, ArrayHelper, DbQuery, DbQueryTyped, ObjectHelper, QueryOperator } from 'ts-common'
 import { AvailabilityRequest, Order, AvailabilityContext, Resource, ResourcePlanning, ResourceType, Schedule, SchedulingType, DateRangeSet, ResourcePlannings, BranchModeRange, DateRange } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { AlteaDb } from '../../general/altea-db'
@@ -11,7 +11,7 @@ export class CreateAvailabilityContext {
     alteaDb: AlteaDb
 
 
-    //  Next to do: load all active schedules in period (via scheduling)
+    //  Next to do: load all active schedules in period (via scheduling)   3d841573-7667-46f0-a4b2-b496ed027740
 
 
     constructor(protected db: IDb | AlteaDb) {
@@ -50,7 +50,7 @@ export class CreateAvailabilityContext {
         ctx.configResources = await this.alteaDb.getResources(resourceIds)
 
 
-        ctx.resourceGroups = await this.loadResourceGroupsWithChildren(ctx.configResources)
+        ctx.resourceGroups = await this.loadResourceGroupsWithChildren(ctx.configResources, availabilityRequest.from, availabilityRequest.to)
 
         /**
          * To do: only load groups where childeren are part of
@@ -74,7 +74,7 @@ export class CreateAvailabilityContext {
         let includeGroupPlannings = true
         ctx.resourcePlannings = await this.loadResourcePlannings(ctx.allResourceIds, availabilityRequest, includeGroupPlannings, excludeOrderId, clientId)
 
-        
+
 
 
         /* get resource groups not previously loaded 
@@ -355,24 +355,57 @@ export class CreateAvailabilityContext {
     }
 
     /**
-     * Fetch resource groups and all their containing resources
+     * Fetch resource groups and all their containing resources and only return active resource during period [from, to]
      * 
      * @param resources only type='group' will be refetched from backend (with containing child resources)
      * @param loadExtraResourceIds used to fetch extra resources from backend in same API call (can be other resource type then 'group')
      * @returns 
      */
-    async loadResourceGroupsWithChildren(resources: Resource[], ...loadExtraResourceIds: string[]): Promise<Resource[]> {
+    async loadResourceGroupsWithChildren(resources: Resource[], from?: number, to?: number, ...loadExtraResourceIds: string[]): Promise<Resource[]> {
 
         const resourceGroups = resources.filter(r => r.isGroup)
 
         const resourceGroupIds = resourceGroups.map(res => res.id!)
         resourceGroupIds.push(...loadExtraResourceIds)
 
-        const resourceGroupsExtra = await this.alteaDb.getResources(resourceGroupIds, 'children.child')
+        let resourceGroupsExtra = await this.alteaDb.getResources(resourceGroupIds, 'children.child')
+
+        resourceGroupsExtra = this.filterNonActiveChildResources(resourceGroupsExtra, from, to)
 
         return resourceGroupsExtra
 
     }
+
+
+    filterNonActiveChildResources(resources: Resource[], from?: number, to?: number) : Resource[] {
+
+        if (ArrayHelper.IsEmpty(resources))
+            return resources
+
+        let result = []
+
+        for (let resource of resources) {
+
+            /** clone, otherwise we are changing the master cache (the filters below were changing cache) */
+            let clone = ObjectHelper.clone(resource, Resource)
+
+            if (ArrayHelper.IsEmpty(clone.children))
+                continue
+
+            if (to)
+                clone.children = clone.children.filter(lnk => !lnk.child.end || from <= lnk.child.end)
+
+            if (from)
+                clone.children = clone.children.filter(lnk => !lnk.child.start || to >= lnk.child.start)
+
+            result.push(clone)
+
+        }
+
+        return result
+    }
+
+
 
     async loadResourceGroupsForBranchWithChildren(branchId: string) {
 

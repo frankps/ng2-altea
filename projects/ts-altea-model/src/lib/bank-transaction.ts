@@ -1,5 +1,6 @@
-import { DateHelper, ObjectWithId, ObjectWithIdPlus } from "ts-common";
+import { DateHelper, ObjectHelper, ObjectWithId, ObjectWithIdPlus } from "ts-common";
 import * as dateFns from 'date-fns'
+import { Exclude } from "class-transformer";
 
 export enum BankTxType {
     unknown = 'unknown',
@@ -78,6 +79,15 @@ export class BankTransaction extends ObjectWithId {
 
     providerRef?: string
 
+
+    clone() : BankTransaction {
+        let clone = ObjectHelper.clone(this, BankTransaction)
+        delete clone._info1
+
+        return clone
+    }
+
+    @Exclude()
     _execDate?: Date
     execDateObject(): Date {
 
@@ -91,7 +101,7 @@ export class BankTransaction extends ObjectWithId {
     }
 
 
-
+    @Exclude()
     _refDate?: Date
     refDateObject(): Date {
 
@@ -104,6 +114,7 @@ export class BankTransaction extends ObjectWithId {
         return this._refDate
     }
 
+    @Exclude()
     _info1: string = null
 
     info1(): string {

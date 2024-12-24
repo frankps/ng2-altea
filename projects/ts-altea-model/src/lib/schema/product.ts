@@ -122,11 +122,17 @@ export class ProductOption extends ObjectWithIdPlus {
     return (Array.isArray(this.values) && this.values.length > 0)
   }
 
-  getDefaultValues(): ProductOptionValue[] | undefined {
+  getDefaultValues(returnFirstIfNoDefault: boolean = true): ProductOptionValue[] | undefined {
     if (!this.values || this.values.length == 0)
       return undefined
 
-    return this.values.filter(v => v.default)
+    let values : ProductOptionValue[] = this.values.filter(v => v.default)
+
+    if (returnFirstIfNoDefault && ArrayHelper.IsEmpty(values)) {
+      return [ this.values[0] ]
+    }
+
+    return values
   }
 
   getValue(id: string): ProductOptionValue {

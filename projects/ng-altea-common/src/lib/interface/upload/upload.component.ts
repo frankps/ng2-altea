@@ -35,6 +35,9 @@ export class UploadComponent {
 
   uploadListener($event: any): void {
 
+/*     console.error('Start UPLOAD !!')
+    return */
+
     let text = [];
     let files = $event.srcElement.files;
 

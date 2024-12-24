@@ -260,7 +260,7 @@ export class ResourcePlannings {
     const debug = this.plannings.filter(rp => rp.resourceGroupId && !rp.resourceId &&
       rp.end > fromNum && rp.start < toNum)
 
-    console.error(debug)
+   // console.error(debug)
 
     const planningsForResource = this.plannings.filter(rp => rp.resourceGroupId && !rp.resourceId &&
       groupResourceIds.indexOf(rp.resourceGroupId) >= 0 && rp.end > fromNum && rp.start < toNum)

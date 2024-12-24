@@ -1,4 +1,11 @@
 
+<!-- 
+<ng-select id="humanResources" name="humanResources" [items]="humanResources"
+placeholder="Personeel" bindLabel="name" bindValue="id" [clearable]="true" [multiple]="true"
+[(ngModel)]="order.resPrefs.humIds" (change)="humanResourcesChanged()">
+</ng-select>
+ -->
+
 
 
 <ng-container *ngIf="init">
@@ -15,15 +22,9 @@
             <i class="ms-3 fas fa-trash" (click)="deletePlanning(req, holidayRequests)"></i>
         </div>
 
-
     </div>
 
-
-    <h4 class="mt-5">Mijn verlof</h4>
-<!-- 
-
-<i class="fa-duotone fa-solid fa-thumbs-up"></i>
-    <span *ngIf="!hasHolidays()">Geen verlof gepland</span> -->
+    <h4 class="mt-5">Gepland verlof</h4>
 
     <div class="row" *ngFor="let hol of holidays">
         <div class="col-2">{{hol.startDate | date:'dd/MM/yy'}}</div>

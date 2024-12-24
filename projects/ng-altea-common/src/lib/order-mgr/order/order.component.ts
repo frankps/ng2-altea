@@ -260,7 +260,11 @@ export class OrderComponent implements OnInit {
 
       console.error(line.persons)
 
-      if (line.persons.length > line.qty)
+
+      if (!line.nrPers)   // initially we didn't have nrPers and nrPers was defined by qty
+        line.nrPers = line.qty
+
+      if (line.persons.length > line.nrPers)
         line.persons.splice(0, 1)
 
       console.error(line.persons)

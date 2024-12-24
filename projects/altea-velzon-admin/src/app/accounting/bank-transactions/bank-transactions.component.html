@@ -1,3 +1,5 @@
+<altea-lib-upload></altea-lib-upload>
+
 <div class="row my-3">
     <div class="col">
         <input type="text" placeholder="Datepicker" class="form-control" bsDatepicker [(ngModel)]="bank.from">
@@ -11,11 +13,35 @@
     <div class="col">
         <button type="button" class="btn btn-primary" (click)="getTransactions()" translate>dic.search</button>
     </div>
+    <!-- 
+    <div class="col">
+        <button type="button" class="btn btn-primary" (click)="getStripePayouts()">Stripe Payouts</button>
+    </div> -->
 </div>
 
 
+
+<ng-container *ngIf="stripe.payouts">
+
+    <h3>Stripe Payouts</h3>
+    <ul class="list-group">
+        <li class="list-group-item" *ngFor="let payout of stripe.payouts">
+
+            <div class="row">
+                <div class="col-3">{{payout.date | date:"dd/MM HH:mm"}}</div>
+                <div class="col-3">{{payout.amountValue}}</div>
+                <div class="col-3">{{payout.amount}}</div>
+                <div class="col-3"></div>
+            </div>
+
+        </li>
+    </ul>
+</ng-container>
+
+
+
 <ul class="list-group">
-    <li class="list-group-item" *ngFor="let tx of txs" >
+    <li class="list-group-item" *ngFor="let tx of txs">
 
         <div class="row" [style.color]="tx.ok?'green':'red'" (click)="toggleTx(tx)">
             <div class="col">{{tx.execDateObject() | date : "dd/MM"}}</div>
@@ -26,13 +52,56 @@
             <div class="col">{{tx.info1()}}</div>
         </div>
 
+        <ng-container [ngSwitch]="tx.type">
+            <ng-container *ngSwitchCase="'stripe'">
+
+
+                <div class="row">
+                    <div class="col-1"></div>
+                    <div class="col-3">Payout: {{tx.providerRef}}</div>
+                    <div class="col-3"></div>
+                    <div class="col-3"></div>
+                    <div class="col-3"></div>
+                </div>
+
+
+
+                
+            </ng-container>
+            <ng-container *ngSwitchDefault>
+            </ng-container>
+        </ng-container>
+
         <ng-container *ngIf="tx['open']">
+
+
+
+
+
             <div class="row my-3">
                 <div class="col-1"></div>
                 <div class="col">{{tx.details}}</div>
                 <div class="col-2">
                     <button type="button" class="btn btn-primary btn-sm" (click)="findPaymentsForTx(tx)">Linken</button>
+
+                    <button type="button" class="btn btn-primary btn-sm" *ngIf="tx.providerRef"
+                        (click)="getStripePayout(tx.providerRef)">Payouts</button>
                 </div>
+            </div>
+
+            <div class="row my-3">
+
+                <div class="col">
+
+                    <ng-container *ngIf="tx.providerRef">
+                        <button type="button" class="btn btn-sm btn-primary"
+                            (click)="getStripePayouts(tx.providerRef)">Stripe Payouts ^</button>
+                    </ng-container>
+
+
+                </div>
+
+
             </div>
 
 
@@ -42,38 +111,39 @@
 
                     <ul class="list-group">
 
-                        <li class="list-group-item" *ngFor="let pay of pays" >
+                        <li class="list-group-item" *ngFor="let pay of pays">
 
                             <div class="row">
                                 <div class="col-1">
-                                    <i *ngIf="pay.bankTxId == tx.id" [style.color]="'green'" class="fa-duotone fa-solid fa-link"></i>
+                                    <i *ngIf="pay.bankTxId == tx.id" [style.color]="'green'"
+                                        class="fa-duotone fa-solid fa-link"></i>
                                 </div>
                                 <div class="col-2"> € {{pay.amount}}</div>
                                 <div class="col-2"> {{pay.type}}</div>
                                 <div class="col-2"> {{pay.order.for}}</div>
-                                <div class="col" *ngIf="pay.order.sum"> 
+                                <div class="col" *ngIf="pay.order.sum">
                                     <ng-container *ngFor="let line of pay.order.sum">
                                         <span class="badge text-bg-info">{{line.d}}</span>&nbsp;
                                     </ng-container>
-                                    
+
                                 </div>
                             </div>
 
-                           
 
 
-                            
+
+
 
                         </li>
 
                         <li class="list-group-item">
 
                             <div class="row">
-                                <div class="col-2">  <b>Totaal: {{payments.total}}</b> </div>
+                                <div class="col-2"> <b>Totaal: {{payments.total}}</b> </div>
                                 <div class="col-2"> Gelinkt: {{payments.linked}} </div>
                             </div>
 
-                           
+
                         </li>
                     </ul>
 

@@ -108,7 +108,7 @@ export class OrderFirestoreService {
     return filtered
   }
 
-  filterPlannings(planningUis: ResourcePlanningUi[], types: ResourceType[], orResourceIds: string[], filters?: OrderFireFilters): ResourcePlanningUi[] {
+  filterPlannings(planningUis: ResourcePlanningUi[], types: ResourceType[], orResourceIds: string[], excludeResourceIds: string[], filters?: OrderFireFilters): ResourcePlanningUi[] {
 
     if (ArrayHelper.IsEmpty(planningUis))
       return []
@@ -118,6 +118,8 @@ export class OrderFirestoreService {
       if (!filters.prep) // != null && filters.prep != undefined
         planningUis = planningUis.filter(planUi => planUi.prep == false)
     }
+
+    planningUis = planningUis.filter(p => !p.resource || excludeResourceIds.indexOf(p.resource.id) == -1)
    
     let filteredByType: ResourcePlanningUi[] = [], filteredByResourceId: ResourcePlanningUi[] = []
 
@@ -127,13 +129,7 @@ export class OrderFirestoreService {
     if (ArrayHelper.NotEmpty(orResourceIds))
       filteredByResourceId = planningUis.filter(planUi => orResourceIds.indexOf(planUi.resource?.id) >= 0)
 
-
-
-
     let result: ResourcePlanningUi[] = _.union(filteredByType, filteredByResourceId)
-
-
-
 
     return result
   }
@@ -278,7 +274,10 @@ export class OrderFirestoreService {
       let ucwId = 'e238c289-3e84-463a-84ca-1108d98ebaf4'
       let bodysculptorId = '9bc1e435-84de-4a02-b970-6e3d325e9715'
 
-      planningUis = this.filterPlannings(planningUis, [ResourceType.human], [wellnessId, bodyslimmingId, ucwId, bodysculptorId], filters)
+      // we don't want to see wellnessSupervisor blocks (= cleaning blocks) => too much blocks in agenda
+      let wellnessSupervisorId = '3b38b2ba-8375-4bdf-b292-2667e6933700'
+
+      planningUis = this.filterPlannings(planningUis, [ResourceType.human], [wellnessId, bodyslimmingId, ucwId, bodysculptorId], [wellnessSupervisorId], filters)
 
       console.warn(planningUis)
       planningUis = this.groupPlannings(planningUis)

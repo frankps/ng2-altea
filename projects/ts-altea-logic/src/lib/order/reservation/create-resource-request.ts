@@ -77,15 +77,15 @@ export class CreateResourceRequest {
             else
                 persons.push(...personsFromLines)
 
-                order.persons = personsFromLines
-                order.markAsUpdated('persons')
+            order.persons = personsFromLines
+            order.markAsUpdated('persons')
         }
 
 
         /**
          *  get the schudules used in orderLine.product.resources.scheduleIds
          */
-        const scheduleIds = this.getScheduleIds(orderlinesWithPlanning,availabilityCtx )
+        const scheduleIds = this.getScheduleIds(orderlinesWithPlanning, availabilityCtx)
 
 
 
@@ -151,7 +151,9 @@ export class CreateResourceRequest {
             let personOffsetToAdd = TimeSpan.zero
 
 
-            // most of the time there will be only 1 personId
+            /* most of the time there will be only 1 personId
+            Important: we will break this loop if personIdx >= orderLine.qty (see last line)
+            */
             for (const personId of orderLinePersonIds) {
 
                 // const personOffset = offsetPerPerson.get(personId)!
@@ -221,7 +223,7 @@ export class CreateResourceRequest {
                     resReqItem.offset = offset.add(offsetDuration.offset)
 
                     if (productResource.flex) {
-                        
+
                         // check if we already have items
                         let items = resourceRequest.getItemsForResource(resource.id)
 
@@ -288,10 +290,59 @@ export class CreateResourceRequest {
             console.error(orderLine)
         }
 
-        return resourceRequest
+        if (resourceRequest.hasItemsWithMinQty(2))
+            this.deduplicateItems(resourceRequest)
 
+
+        return resourceRequest
     }
 
+    /** Converts resourceRequest.items with qty > 1 to individual items with qty=1 
+     * 
+     * Was introduced for product 'Duo massage' which has customers=2
+     *  this caused a ResourceRequestItem with qty=2   (2 x 'Massage Staff')
+     *  So this method will covert it into 2 separate ResourceRequestItem
+     *    1 x 'Massage Staff' for person1 (= customer 1)
+     *    1 x 'Massage Staff' for person2 (= customer 2)
+    */
+    deduplicateItems(resourceRequest: ResourceRequest) {
+
+        if (!resourceRequest || resourceRequest.isEmpty())
+            return resourceRequest
+
+        let newItems: ResourceRequestItem[] = []
+
+        
+
+        for (let item of resourceRequest.items) {
+
+            let origQty = item.qty
+
+            if (origQty <= 0)
+                continue
+
+            item.qty = 1
+            newItems.push(item)
+
+            if (origQty >= 2) {
+                for (let i = 2; i <= origQty; i++) {
+
+                    let clonedItem = item.clone()
+
+                    if (item.orderLine?.persons?.length >= i) {
+                        clonedItem.personId = item.orderLine.persons[i -1]
+                    }
+
+                    newItems.push(clonedItem)
+                }
+            }
+
+        }
+
+        resourceRequest.items = newItems
+
+        return resourceRequest
+    }
 
     /**
      * get the schudules used in orderLine.product.resources.scheduleIds
@@ -330,7 +381,7 @@ export class CreateResourceRequest {
         // filter the active schedules
         const requestRange = ctx.request.getDateRange()
         const activeScheduleIds = ctx.getActiveSchedulesDuring(requestRange, scheduleIds)
-   
+
         return activeScheduleIds
     }
 

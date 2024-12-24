@@ -310,8 +310,6 @@ export class SlotFinder {
                     possibleResources = affinitySolutionItem.resources
                 }
 
-
-
                 if (hasAffinity)
                     solution.addNote(`Affinity for: ${resourceNames}`)
 

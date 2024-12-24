@@ -71,6 +71,11 @@ export class ResourceRequestItem extends ObjectWithId {
 
         clone.productResource = this.productResource
 
+        // added isProcessed & affinity        
+        clone.isProcessed = this.isProcessed
+        clone.affinity = this.affinity
+
+
         clone.orderLine = this.orderLine
         clone.product = this.product
         clone.resourceType = this.resourceType
@@ -170,6 +175,16 @@ export class ResourceRequest {
 
     isEmpty(): boolean {
         return (!Array.isArray(this.items) || this.items.length === 0)
+    }
+
+    hasItemsWithMinQty(minQty: number): boolean {
+
+        if (this.isEmpty())
+            return false
+
+        let idx = this.items.findIndex(i => i.qty >= minQty)
+
+        return (idx >= 0)
     }
 
     hasItemsToProcess(): boolean {

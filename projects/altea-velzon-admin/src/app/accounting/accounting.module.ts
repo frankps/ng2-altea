@@ -15,11 +15,14 @@ import { TimepickerModule } from 'ngx-bootstrap/timepicker';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { EditInvoiceComponent } from './edit-invoice/edit-invoice.component';
+import { OrderCheckComponent } from './order-check/order-check.component';
+import { InterfaceModule } from 'ng-altea-common';
 
 @NgModule({
   declarations: [
     BankTransactionsComponent,
-    EditInvoiceComponent
+    EditInvoiceComponent,
+    OrderCheckComponent
   ],
   imports: [
     CommonModule,
@@ -32,7 +35,8 @@ import { EditInvoiceComponent } from './edit-invoice/edit-invoice.component';
     ModalModule,
     BsDatepickerModule,
     TimepickerModule,
-    NgxSpinnerModule
+    NgxSpinnerModule,
+    InterfaceModule
   ],
   exports: [
   //  EditInvoiceComponent
