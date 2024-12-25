@@ -1,7 +1,7 @@
 /*
  * Public API Surface of ts-altea-logic
  */
-
+export * from './lib/accounting'
 export * from './lib/contact'
 export * from './lib/ts-altea-logic'
 export * from './lib/general/altea-db'

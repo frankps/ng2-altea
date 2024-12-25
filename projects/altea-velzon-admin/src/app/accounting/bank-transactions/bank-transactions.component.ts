@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { BankTransactionService, ObjectService, PaymentService } from 'ng-altea-common';
-import { ArrayHelper, DateHelper, DbQuery, QueryOperator } from 'ts-common';
+import { ArrayHelper, DateHelper, DbQuery, ObjectHelper, QueryOperator } from 'ts-common';
 import * as dateFns from 'date-fns'
 import { BankTransaction, BankTxType, Payment, PaymentType, StripeGetPayouts, StripePayout } from 'ts-altea-model';
-import { FortisBankImport } from 'ts-altea-logic';
+import { AlteaDb, BankTransactionLinking, FortisBankImport } from 'ts-altea-logic';
 import * as _ from "lodash";
 import { StripeService } from 'projects/ng-altea-common/src/lib/stripe.service';
 
@@ -39,6 +39,9 @@ export class BankTransactionsComponent implements OnInit {
     linked: 0
   }
 
+  alteaDb: AlteaDb
+
+  bankTransactionLinking: BankTransactionLinking
 
   stripe = {
     payouts: null
@@ -47,12 +50,15 @@ export class BankTransactionsComponent implements OnInit {
   payouts: null
 
   constructor(protected txSvc: BankTransactionService, protected paySvc: PaymentService, protected objSvc: ObjectService,
-    protected stripeSvc: StripeService
+    protected stripeSvc: StripeService, protected objectSvc: ObjectService
   ) {
 
   }
 
   async ngOnInit() {
+
+    this.alteaDb = new AlteaDb(this.objectSvc)
+    this.bankTransactionLinking = new BankTransactionLinking(this.alteaDb)
 
     this.initFilters()
     await this.getTransactions()
@@ -61,7 +67,7 @@ export class BankTransactionsComponent implements OnInit {
 
   initFilters() {
 
-    this.bank.from = new Date(2024, 9, 1)
+    this.bank.from = new Date(2024, 9, 20)
     this.bank.to = new Date(2024, 10, 1)
 
     //this.bank.from = dateFns.addMonths(this.bank.to, -2)
@@ -92,11 +98,15 @@ export class BankTransactionsComponent implements OnInit {
 
     qry.and('execDate', QueryOperator.greaterThanOrEqual, fromNum)
     qry.and('execDate', QueryOperator.lessThanOrEqual, toNum)
+    qry.and('amount', QueryOperator.greaterThanOrEqual, 0)
+    qry.and('ok', QueryOperator.equals, false)
 
     if (this.bank.search)
       qry.and('details', QueryOperator.contains, this.bank.search)
 
     qry.orderByDesc('num')
+
+    qry.take = 300
 
     console.warn(qry)
 
@@ -175,49 +185,84 @@ export class BankTransactionsComponent implements OnInit {
   }
 
 
-  async assignStripePayoutsToTransactions(payouts: StripePayout[], txs: BankTransaction[]) {
+  async autoStripe(): Promise<any> {
 
-    if (ArrayHelper.IsEmpty(payouts) || ArrayHelper.IsEmpty(txs))
-      return
+    let me = this
+    // get latest payout id
 
-    let payoutsOldToNew = _.reverse(payouts)
+    let lastKnownPayout = await me.alteaDb.getLatestBankTransaction(true)
 
-    for (let payout of payoutsOldToNew) {
+    console.error(lastKnownPayout)
+    let filter = new StripeGetPayouts()
+    filter.endingBefore = lastKnownPayout.providerRef
 
-      let foundIdx = txs.findIndex(tx => tx.providerRef == payout.id)
+    let payouts: StripePayout[] = await me.stripeSvc.getPayouts$(filter)
 
-      if (foundIdx >= 0) {
-        let tx = txs[foundIdx]
-        console.log(`Payout already linked ${payout.id} <-> ${tx.num}`)
+    me.stripe.payouts = payouts
+
+    if (ArrayHelper.IsEmpty(payouts)) {
+      let msg = `No new payouts`
+      console.log(msg)
+      return msg
+    }
+
+
+    let dates = payouts.map(po => po.date)
+
+    let minDate = dateFns.subDays(_.min(dates), 2)
+    let maxDate = dateFns.addDays(_.max(dates), 2)
+
+    me.txs = await me.alteaDb.getBankTransactionsBetween(minDate, maxDate, [BankTxType.stripe], { ok: false })
+
+    if (ArrayHelper.IsEmpty(me.txs)) {
+      let msg = `No new transactions`
+      console.log(msg)
+      return msg
+    }
+
+
+    console.error(me.txs)
+    //return
+
+    let newlyLinkedTransactions = await me.bankTransactionLinking.assignStripePayoutsToTransactions(me.stripe.payouts, me.txs)
+
+    if (ArrayHelper.IsEmpty(newlyLinkedTransactions)) {
+      let msg = `No new Stripe transactions to process`
+      console.log(msg)
+      return msg
+    }
+
+
+
+    /*       let payments = await this.alteaDb.getPaymentsBetween(minDate, maxDate, [PaymentType.stripe])
+          console.log(payments) */
+
+
+    for (let tx of newlyLinkedTransactions) {
+
+      await me.getStripePayout(tx)
+
+      if (!tx.prov)
         continue
-      }
 
-      let payoutDateNum = payout.dateNum
-
-      let matchIdx = txs.findIndex(tx => tx.amount == payout.amountValue && tx.valDate == payoutDateNum)
-
-      if (matchIdx >= 0) {
-        let tx = txs[matchIdx]
-        tx.providerRef = payout.id
-//        tx.markAsUpdated('providerRef')
-        console.log(`Match found ${payout.id} <-> ${tx.num}`)
-        console.log(tx)
-
-        let update = {
-          id: tx.id,
-          providerRef: payout.id
-        }
-
-        let res = await this.txSvc.update$(update)
-        console.log(res)
-        continue
-
-      }
+      await me.bankTransactionLinking.linkStripe(tx)
 
 
     }
 
+
+
+
+
+
+
+
+    console.error(`${minDate} - ${maxDate}`)
+
+    console.error(this.stripe.payouts)
+
   }
+
 
 
   async getStripePayouts(endingBeforePayoutId: string, assignStripePayoutsToTransactions = true) {
@@ -228,20 +273,44 @@ export class BankTransactionsComponent implements OnInit {
     this.stripe.payouts = await this.stripeSvc.getPayouts$(filter)
 
     if (assignStripePayoutsToTransactions)
-      this.assignStripePayoutsToTransactions(this.stripe.payouts, this.txs)
+      this.bankTransactionLinking.assignStripePayoutsToTransactions(this.stripe.payouts, this.txs)
 
     console.error(this.stripe.payouts)
   }
 
 
-  async getStripePayout(id: string) {
+  async getStripePayout(tx: BankTransaction) {
 
     let me = this
 
-    let payout = await me.stripeSvc.getPayout$(id)
+    let payout = await me.stripeSvc.getPayout$(tx.providerRef)
+
+    tx.prov = payout
+
+    let update = {
+      id: tx.id,
+      prov: payout
+    }
 
     console.error(payout)
+
+    let res = await this.txSvc.update$(update)
+
+    console.error(res)
+
   }
+
+
+  async linkStripe(tx: BankTransaction) {
+
+    //let stripeTransactions = tx?.prov?.transactions
+
+
+
+    await this.bankTransactionLinking.linkStripe(tx)
+
+  }
+
 
 
 

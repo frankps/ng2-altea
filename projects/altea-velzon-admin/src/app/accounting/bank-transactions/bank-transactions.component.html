@@ -12,6 +12,8 @@
     </div>
     <div class="col">
         <button type="button" class="btn btn-primary" (click)="getTransactions()" translate>dic.search</button>
+
+        <button type="button" class="btn btn-primary ms-2" (click)="autoStripe()">Stripe</button>
     </div>
     <!-- 
     <div class="col">
@@ -66,13 +68,45 @@
 
 
 
-                
+
             </ng-container>
             <ng-container *ngSwitchDefault>
             </ng-container>
         </ng-container>
 
         <ng-container *ngIf="tx['open']">
+
+            <ng-container [ngSwitch]="tx.type">
+                <ng-container *ngSwitchCase="'stripe'">
+
+
+                    <ng-container *ngIf="tx.prov">
+
+                        <ul class="list-group">
+                            <li class="list-group-item" *ngFor="let stripeTx of tx.prov.transactions">
+
+                                <div class="row">
+                                    <div class="col-2">{{stripeTx.amount/100}}</div>
+                                    <div class="col-2">{{stripeTx.fee/100}}</div>
+                                    <div class="col">{{stripeTx?.source?.payment_intent}}</div>
+                                    <!--  <div class="col-3"></div>
+                                    <div class="col-3"></div> -->
+                                </div>
+
+                            </li>
+                        </ul>
+
+
+
+                    </ng-container>
+
+
+
+                </ng-container>
+                <ng-container *ngSwitchDefault>
+                </ng-container>
+            </ng-container>
+
 
 
 
@@ -84,8 +118,7 @@
                 <div class="col-2">
                     <button type="button" class="btn btn-primary btn-sm" (click)="findPaymentsForTx(tx)">Linken</button>
 
-                    <button type="button" class="btn btn-primary btn-sm" *ngIf="tx.providerRef"
-                        (click)="getStripePayout(tx.providerRef)">Payouts</button>
+
                 </div>
             </div>
 
@@ -96,7 +129,14 @@
                     <ng-container *ngIf="tx.providerRef">
                         <button type="button" class="btn btn-sm btn-primary"
                             (click)="getStripePayouts(tx.providerRef)">Stripe Payouts ^</button>
+
+                        <button type="button" class="btn btn-primary btn-sm ms-2"
+                            (click)="getStripePayout(tx)">Payout</button>
+
+                        <button type="button" class="btn btn-primary btn-sm ms-2"
+                            (click)="linkStripe(tx)">Link</button>
                     </ng-container>
+
 
 
                 </div>

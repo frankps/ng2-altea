@@ -1,7 +1,7 @@
 import { BankTransaction, BankTxInfo, BankTxType } from "ts-altea-model"
 import { CsvImport, ImportColumn, ImportDefinition } from "./csv-import"
 import * as dateFns from 'date-fns'
-import { DateHelper, DbObjectMulti, ObjectHelper } from "ts-common"
+import { ApiListResult, ArrayHelper, DateHelper, DbObjectMulti, ObjectHelper } from "ts-common"
 import { AlteaDb } from "../general/altea-db"
 import { IDb } from "../interfaces/i-db"
 import { instanceToPlain, plainToInstance } from "class-transformer"
@@ -56,7 +56,7 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
      * 
      * @param rowsOfCols 
      */
-    async import(rowsOfCols: string[][])  {
+    async import(rowsOfCols: string[][]) : Promise<ApiListResult<BankTransaction>>  {
 
         let me = this
 
@@ -84,6 +84,10 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
 /*        console.error(lines)
        return */
 
+       if (ArrayHelper.IsEmpty(lines))
+        return ApiListResult.warning('No new lines to upload')
+
+
         let uploadResult = await me.alteaDb.createBankTransactions(lines)
 
         /*         const dbUpload = new DbObjectMulti<BankTransaction>('bankTransaction', BankTransaction, this.lines)
@@ -93,6 +97,7 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
 
         console.error(me.lines)
 
+        uploadResult.data = lines
         return uploadResult
 
     }

@@ -1,5 +1,5 @@
-import { ApiListResult, ApiResult, ApiStatus, DateHelper, DbObject, DbObjectCreate, DbObjectMulti, DbObjectMultiCreate, DbQuery, DbQueryBaseTyped, DbQueryTyped, DbUpdateManyWhere, ObjectHelper, ObjectWithId, QueryOperator, SortOrder } from 'ts-common'
-import { Branch, Gift, Subscription, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template, OrderLine, BankTransaction, Message, LoyaltyProgram, LoyaltyCard, PlanningType, ResourcePlannings, TemplateCode, MsgType, LoyaltyCardChange } from 'ts-altea-model'
+import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbObject, DbObjectCreate, DbObjectMulti, DbObjectMultiCreate, DbQuery, DbQueryBaseTyped, DbQueryTyped, DbUpdateManyWhere, ObjectHelper, ObjectWithId, QueryOperator, SortOrder, TypeHelper } from 'ts-common'
+import { Branch, Gift, Subscription, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template, OrderLine, BankTransaction, Message, LoyaltyProgram, LoyaltyCard, PlanningType, ResourcePlannings, TemplateCode, MsgType, LoyaltyCardChange, Payment, PaymentType, BankTxType } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { IDb } from '../interfaces/i-db'
 import { AlteaPlanningQueries } from './altea-queries'
@@ -328,9 +328,9 @@ export class AlteaDb {
 
         qry.and('id', QueryOperator.in, resourceIds)
 
-/*         let endFilter = qry.and()
-        endFilter.or('children.child.end', QueryOperator.equals, null)
-        endFilter.or('children.child.end', QueryOperator.greaterThan, 20231231000000) */
+        /*         let endFilter = qry.and()
+                endFilter.or('children.child.end', QueryOperator.equals, null)
+                endFilter.or('children.child.end', QueryOperator.greaterThan, 20231231000000) */
 
         if (Array.isArray(includes) && includes.length > 0)
             qry.include(...includes)
@@ -703,9 +703,15 @@ export class AlteaDb {
         return updateResult
     }
 
-    async getLatestBankTransaction(): Promise<BankTransaction> {
+    async getLatestBankTransaction(providerRefNotNull: boolean = false): Promise<BankTransaction> {
 
         const qry = new DbQueryTyped<BankTransaction>('bankTransaction', BankTransaction)
+
+
+        if (providerRefNotNull) {
+            qry.and('providerRef', QueryOperator.not, null)
+        }
+
 
         qry.orderBy('execDate', SortOrder.desc)
         qry.orderBy('numInt', SortOrder.desc)
@@ -715,6 +721,43 @@ export class AlteaDb {
         return tx
     }
 
+    async getBankTransactionsBetween(start: number | Date, end: number | Date, types: BankTxType[], extra?: any): Promise<BankTransaction[]> {
+
+        let startNum: number
+        let endNum: number
+
+        if (TypeHelper.isDate(start))
+            startNum = DateHelper.yyyyMMdd(start as Date)
+        else
+            startNum = start as number
+
+        if (TypeHelper.isDate(end))
+            endNum = DateHelper.yyyyMMdd(end as Date)
+        else
+            endNum = end as number
+
+
+        const qry = new DbQueryTyped<BankTransaction>('bankTransaction', BankTransaction)
+
+        qry.and('execDate', QueryOperator.greaterThanOrEqual, startNum)
+        qry.and('execDate', QueryOperator.lessThanOrEqual, endNum)
+
+        if (ArrayHelper.NotEmpty(types))
+            qry.and('type', QueryOperator.in, types)
+
+        if (extra) {
+
+            if ('ok' in extra)
+                qry.and('ok', QueryOperator.equals, extra.ok)
+
+        }
+
+
+        const payments = await this.db.query$<BankTransaction>(qry)
+
+        return payments
+
+    }
 
     /** ResourcePlanning */
 
@@ -902,6 +945,56 @@ export class AlteaDb {
         return updateResult
     }
 
+    async getPaymentsByProvIds(provIds: string[]): Promise<Payment[]> {
+
+        if (ArrayHelper.IsEmpty(provIds))
+            return []
+
+        const qry = new DbQueryTyped<Payment>('payment', Payment)
+
+        qry.and('provId', QueryOperator.in, provIds)
+
+        const payments = await this.db.query$<Payment>(qry)
+
+        return payments
+
+    }
+
+    async getPaymentsBetween(start: number | Date, end: number | Date, types: PaymentType[]): Promise<Payment[]> {
+
+        let startNum: number
+        let endNum: number
+
+        if (TypeHelper.isDate(start))
+            startNum = DateHelper.yyyyMMddhhmmss(start as Date)
+        else
+            startNum = start as number
+
+        if (TypeHelper.isDate(end))
+            endNum = DateHelper.yyyyMMddhhmmss(end as Date)
+        else
+            endNum = end as number
+
+
+        const qry = new DbQueryTyped<Payment>('payment', Payment)
+
+        qry.and('date', QueryOperator.greaterThanOrEqual, startNum)
+        qry.and('date', QueryOperator.lessThanOrEqual, endNum)
+
+        if (ArrayHelper.NotEmpty(types))
+            qry.and('type', QueryOperator.in, types)
+
+
+        const payments = await this.db.query$<Payment>(qry)
+
+        return payments
+
+    }
+
+    async updatePayments(payments: Payment[], propertiesToUpdate: string[]): Promise<ApiListResult<Payment>> {
+        let updateResult = await this.updateObjects('payment', Payment, payments, propertiesToUpdate)
+        return updateResult
+    }
 
 
 

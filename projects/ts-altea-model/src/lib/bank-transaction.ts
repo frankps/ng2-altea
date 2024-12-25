@@ -79,6 +79,8 @@ export class BankTransaction extends ObjectWithId {
 
     providerRef?: string
 
+    /** data retrieved from provider (ex Stripe) related to this payment */
+    prov?: any
 
     clone() : BankTransaction {
         let clone = ObjectHelper.clone(this, BankTransaction)

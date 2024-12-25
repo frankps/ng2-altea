@@ -20,6 +20,18 @@ export class StringHelper {
 
 }
 
+export class TypeHelper {
+
+    static isNumber(value: any): boolean {
+        return typeof value === "number";
+    }
+
+    static isDate(value: any): boolean {
+        return value instanceof Date;
+    }
+
+
+}
 
 export class ObjectHelper {
 

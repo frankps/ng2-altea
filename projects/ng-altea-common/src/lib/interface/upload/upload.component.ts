@@ -1,6 +1,8 @@
 import { Component, ViewChild } from '@angular/core';
 import { FortisBankImport } from 'ts-altea-logic';
 import { ObjectService } from '../../object.service';
+import { DashboardService, ToastType } from 'ng-common'
+import { ApiStatus } from 'ts-common';
 
 
 export class CSVRecord {
@@ -27,7 +29,7 @@ export class CSVRecord {
 export class UploadComponent {
 
 
-  constructor(protected backEndSvc: ObjectService) { }
+  constructor(protected backEndSvc: ObjectService, public dashboardSvc: DashboardService) { }
 
 
   public records: any[] = [];
@@ -35,8 +37,10 @@ export class UploadComponent {
 
   uploadListener($event: any): void {
 
-/*     console.error('Start UPLOAD !!')
-    return */
+    let me = this
+
+    /*     console.error('Start UPLOAD !!')
+        return */
 
     let text = [];
     let files = $event.srcElement.files;
@@ -47,14 +51,30 @@ export class UploadComponent {
       let reader = new FileReader();
       reader.readAsText(input.files[0]);
 
-      reader.onload = () => {
+      reader.onload = async () => {
         let csvData = reader.result;
         let csvRecordsArray = (<string>csvData).split(/\r\n|\n/);
 
         const rowsOfCols = csvRecordsArray.map(row => row.split(';'))
 
         let fortisImport = new FortisBankImport(this.backEndSvc)
-        fortisImport.import(rowsOfCols)
+
+        let importResult = await fortisImport.import(rowsOfCols)
+
+        switch (importResult.status) {
+          case ApiStatus.ok:
+            me.dashboardSvc.showToastType(ToastType.saveSuccess)
+            break
+          case ApiStatus.warning:
+            me.dashboardSvc.showToastType(ToastType.saveNoChanges)
+            break
+
+          default:
+            me.dashboardSvc.showToastType(ToastType.saveError)
+
+
+        }
+
 
 
         /*
