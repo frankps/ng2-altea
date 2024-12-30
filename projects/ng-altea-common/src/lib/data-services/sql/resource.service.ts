@@ -1,15 +1,18 @@
 import { Injectable } from '@angular/core';
-import { Product, Resource, ResourceType } from 'ts-altea-model'
+import { Product, Resource, ResourcePlannings, ResourceType } from 'ts-altea-model'
 import { BackendHttpServiceBase } from 'ng-common';
 import { HttpClient } from '@angular/common/http';
 import { SessionService } from '../../session.service';
-import { DbQuery, QueryOperator } from 'ts-common';
+import { DateHelper, DbQuery, QueryOperator } from 'ts-common';
 import * as _ from "lodash";
+import * as dateFns from 'date-fns'
 
 @Injectable({
   providedIn: 'root'
 })
 export class ResourceService extends BackendHttpServiceBase<Resource> {
+
+
 
   constructor(http: HttpClient, protected sessionSvc: SessionService) {
     super(Resource, 'Resource', sessionSvc.backend, sessionSvc.branchUnique + '/resources', http)
@@ -18,7 +21,7 @@ export class ResourceService extends BackendHttpServiceBase<Resource> {
 
 
 
-  override async  getAllForBranch$(): Promise<Resource[]> {
+  override async getAllForBranch$(): Promise<Resource[]> {
 
     const query = new DbQuery()
     query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)

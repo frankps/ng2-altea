@@ -1,7 +1,7 @@
 import { Injectable, OnInit } from '@angular/core';
 import { ScheduleService } from './data-services/sql/schedule.service';
 import { ArrayHelper, DbQuery, ObjectHelper, QueryOperator } from 'ts-common';
-import { AppMode, Branch, Contact, Payment, Resource } from 'ts-altea-model';
+import { AppMode, Branch, Contact, Payment, Resource, ResourcePlannings } from 'ts-altea-model';
 import * as Rx from "rxjs";
 // import { LocalService } from 'ng-altea-common';
 
@@ -73,25 +73,16 @@ export class SessionService implements OnInit {
   public stripEnvironment: 'test' | 'live' = 'live'
 
 
+
   public uiState = {
     orderGrid: null
   }
-
 
   constructor() {
     let stripeEnv = localStorage.getItem('stripEnvironment')
 
     if (stripeEnv && (stripeEnv == 'test' || stripeEnv == 'live'))
       this.stripEnvironment = stripeEnv
-
-    /*
-    let role = localStorage.getItem('role')
-
-    if (role && (role == 'staff' || role == 'admin' || role == 'posAdmin')) {  // 
-      this._role = role
-    }
-      */
-
 
     // new version, to support more roles
     let roles = localStorage.getItem('roles')

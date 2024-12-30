@@ -270,10 +270,10 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
 
   async payOnline() {
 
-    const toPay = this.calculateToPay()
+    // const toPay = this.calculateToPay()
 
 
-    await this.startPayment(toPay)
+    await this.startPayment(this.toPay)
   }
 
   async ngOnDestroy() {

@@ -34,6 +34,14 @@ export class AvailabilityService {
 
     async process(availabilityRequest: AvailabilityRequest): Promise<AvailabilityResponse> {
 
+//        availabilityRequest.to
+
+       
+/*         let nowNum = DateHelper.yyyyMMddhhmmss()
+
+        if (availabilityRequest.from < nowNum)
+            availabilityRequest.from = nowNum */
+
         console.error('OrderGetPossibleDates.process()', availabilityRequest)
 
 

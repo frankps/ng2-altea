@@ -25,6 +25,10 @@ export class AvailabilityRequest {
     /** if preferred staff members: supply id's */
     staffIds: string[] = []
 
+    fromDate() {
+        return DateHelper.parse(this.from)
+    }
+
     constructor(order?: Order) {
         this.order = order
 

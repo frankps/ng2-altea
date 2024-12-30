@@ -128,4 +128,51 @@ export class Payment extends ObjectWithIdPlus {
 
   }
 
+  amountRounded() {
+    return _.round(this.amount, 2)
+  }
+
+  @Exclude()
+  _dateTyped: Date
+
+  @Exclude()
+  get dateTyped(): Date | null {
+
+    if (!this.date)
+      return null
+
+    if (this._dateTyped && DateHelper.yyyyMMddhhmmss(this._dateTyped) === this.date)
+      return this._dateTyped
+
+    this._dateTyped = DateHelper.parse(this.date)
+    return this._dateTyped
+
+
+  }
+
+
+  set dateTyped(value: Date | null) {
+
+    if (value) {
+      this.date = DateHelper.yyyyMMdd000000(value) + 120000  // 120000= noon
+      this._dateTyped = null
+    }
+    else
+      this.date = null
+
+  }
+
+
+
+  /*
+    @Exclude()
+    get dateTyped() {
+      return DateHelper.parse(this.date)
+    }
+  
+    changeDate(date: Date) {
+      console.log(date)
+  
+    }
+  */
 }

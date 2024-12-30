@@ -22,7 +22,7 @@
     <button type="button" class="ms-2 btn {{presence?'btn-success':'btn-primary'}}" [disabled]="presence"
         (click)="startOfDay()" translate>ui.staff.start-day</button>
 
-    <button type="button" *ngIf="presence" class="ms-2 btn {{break?'btn-success':'btn-primary'}}" [disabled]="break"
+    <button type="button" class="ms-2 btn {{break?'btn-success':'btn-primary'}}" [disabled]="break"
         (click)="startBreak()" translate>ui.staff.start-break</button>
 
     <button type="button" *ngIf="presence" class="ms-2 btn {{presence?.end?'btn-success':'btn-primary'}}"

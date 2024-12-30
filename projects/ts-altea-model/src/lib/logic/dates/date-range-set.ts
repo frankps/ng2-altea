@@ -16,7 +16,7 @@ import { ArrayHelper, DateHelper } from "ts-common"
  * overlapAllowed = existing preparation blocks from ResourcePlanning, where overlap is allowed
  */
 export class ResourceOccupationSets {
-    constructor(public all: ResourcePlannings = new ResourcePlannings(), public available: DateRangeSet = DateRangeSet.empty,     
+    constructor(public all: ResourcePlannings = new ResourcePlannings(), public available: DateRangeSet = DateRangeSet.empty,
         public unAvailable: DateRangeSet = DateRangeSet.empty,
         public overlapAllowed: DateRangeSet = DateRangeSet.empty,
         public absent: DateRangeSet = DateRangeSet.empty
@@ -62,7 +62,7 @@ export class DateRangeSets extends SolutionNotes {
 
     }
 
-    merge() : DateRangeSet {
+    merge(): DateRangeSet {
 
         let mergedSet = new DateRangeSet()
 
@@ -75,12 +75,12 @@ export class DateRangeSets extends SolutionNotes {
 
     }
 
-    outerRange() : DateRange {
+    outerRange(): DateRange {
         let merged = this.merge()
         return merged.outerRange()
     }
 
-    resources() : Resource[] {
+    resources(): Resource[] {
 
         if (ArrayHelper.IsEmpty(this.sets))
             return []
@@ -90,7 +90,7 @@ export class DateRangeSets extends SolutionNotes {
     }
 
 
-    reduce(possibleResourceIds: string[], range: DateRange, qty: number = 1, resources?: Resource[]) : DateRangeSets {
+    reduce(possibleResourceIds: string[], range: DateRange, qty: number = 1, resources?: Resource[]): DateRangeSets {
 
         if (ArrayHelper.IsEmpty(this.sets))
             return this
@@ -142,38 +142,38 @@ export class DateRangeSets extends SolutionNotes {
             resultSets.addNote(`Group level planning => removed ${range.toString()} for resource ${resourceInfo}`)
 
             resultSets.reduced++
-           
+
 
             if (resultSets.reduced == qty) {
                 workFinished = true
             }
-                
+
         }
 
         return resultSets
 
 
-/*
-        let setsForResourceRanges = this.sets.filter(set => possibleResourceIds.indexOf(set.resource?.id))
-
-        setsForResourceRanges = setsForResourceRanges.filter(set => set.contains(range))
-
-        if (!setsForResourceRanges || setsForResourceRanges.length == 0)
-            return false
-
-        let minPossible = Math.min(qty, setsForResourceRanges.length)
-
-        for (let i = 0; i < minPossible; i++) {
-
-            let set = setsForResourceRanges[i]
-            let newRange = set.subtractRange(range)
-
-
-        }
-
-
-        return true
-*/
+        /*
+                let setsForResourceRanges = this.sets.filter(set => possibleResourceIds.indexOf(set.resource?.id))
+        
+                setsForResourceRanges = setsForResourceRanges.filter(set => set.contains(range))
+        
+                if (!setsForResourceRanges || setsForResourceRanges.length == 0)
+                    return false
+        
+                let minPossible = Math.min(qty, setsForResourceRanges.length)
+        
+                for (let i = 0; i < minPossible; i++) {
+        
+                    let set = setsForResourceRanges[i]
+                    let newRange = set.subtractRange(range)
+        
+        
+                }
+        
+        
+                return true
+        */
 
 
     }
@@ -520,7 +520,7 @@ export class DateRangeSet {
     }
 
 
-    max() : DateRangeSet {
+    max(): DateRangeSet {
 
         if (ArrayHelper.IsEmpty(this.ranges))
             return new DateRangeSet()
@@ -722,14 +722,14 @@ export class DateRangeSet {
         let overlapsInSeconds = this.ranges.map(range => range.section(other)?.duration.seconds)
 
         // replace undefined by 0
-        overlapsInSeconds = overlapsInSeconds.map(sec => sec?sec:0)
+        overlapsInSeconds = overlapsInSeconds.map(sec => sec ? sec : 0)
 
         const maxValue = Math.max(...overlapsInSeconds);
 
         if (!maxValue || maxValue <= 0)
             return -1
 
-        const idxMaxValue = overlapsInSeconds.indexOf(maxValue); 
+        const idxMaxValue = overlapsInSeconds.indexOf(maxValue);
 
         return idxMaxValue
     }
@@ -752,7 +752,7 @@ export class DateRangeSet {
             return null
     }
 
-    subtractMany(setToSubtract: DateRangeSet, mode: subtractManyMode = subtractManyMode.biggestOverlap) : DateRangeSet {
+    subtractMany(setToSubtract: DateRangeSet, mode: subtractManyMode = subtractManyMode.biggestOverlap): DateRangeSet {
 
         let subtractFrom = this.clone()
 
@@ -793,6 +793,14 @@ export class DateRangeSet {
 
     }
 
+
+    removeBefore(date: Date = new Date()) {
+
+        for (let range of this.ranges)
+            range.removeBefore(date)
+
+        this.ranges = this.ranges.filter(r => r.isValid())
+    }
 
 
     /**

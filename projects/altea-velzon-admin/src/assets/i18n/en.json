@@ -122,6 +122,16 @@
       "timedOut": "Timed out",
       "finished": "Afgerond",
       "inProgress": "In uitvoering"
+    },  
+    "bank-tx-type": {
+      "unknown": "unknown",
+      "stripe": "Stripe",
+      "depositTransfer": "Overschrijving",
+      "terminalBC": "Bancontact",
+      "terminalCredit": "VISA",
+      "onlineBC": "onlineBC",
+      "onlineCredit": "onlineCredit",
+      "unidentifiedCredit": "unidentifiedCredit"
     },
     "cancel-order-message": {
       "possible": "Kosteloos annuleren is mogelijk",

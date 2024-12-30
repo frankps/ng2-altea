@@ -5,7 +5,7 @@ import { AccountingRoutingModule } from './accounting-routing.module';
 import { BankTransactionsComponent } from './bank-transactions/bank-transactions.component';
 
 // Generic imports
-import { Bootstrap5Module } from 'ng-common';
+import { Bootstrap5Module, NgCommonModule } from 'ng-common';
 import { FormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { TranslateModule } from '@ngx-translate/core';
@@ -36,7 +36,8 @@ import { InterfaceModule } from 'ng-altea-common';
     BsDatepickerModule,
     TimepickerModule,
     NgxSpinnerModule,
-    InterfaceModule
+    InterfaceModule,
+    NgCommonModule
   ],
   exports: [
   //  EditInvoiceComponent

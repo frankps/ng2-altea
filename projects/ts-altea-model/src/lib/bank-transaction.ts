@@ -1,6 +1,7 @@
 import { DateHelper, ObjectHelper, ObjectWithId, ObjectWithIdPlus } from "ts-common";
 import * as dateFns from 'date-fns'
 import { Exclude } from "class-transformer";
+import * as _ from "lodash";
 
 export enum BankTxType {
     unknown = 'unknown',
@@ -88,6 +89,21 @@ export class BankTransaction extends ObjectWithId {
 
         return clone
     }
+
+    amountRounded() : number {
+        return _.round(this.amount, 2)
+    }
+
+    amountToLink() : number {
+
+        let amount = this.amount
+
+        if (this.type == BankTxType.terminalCredit || this.type == BankTxType.stripe)
+            amount = this.orig
+
+        return _.round(amount, 2)
+    }
+
 
     @Exclude()
     _execDate?: Date

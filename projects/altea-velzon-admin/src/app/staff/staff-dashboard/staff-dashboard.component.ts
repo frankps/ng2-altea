@@ -49,6 +49,8 @@ export class StaffDashboardComponent implements OnInit {
   // we try to auto approve any new incoming request
   autoApprove: HolidayApproval
 
+  
+
   constructor(protected sessionSvc: SessionService, protected appComponent: AppComponent, protected translationSvc: TranslationService, protected planningSvc: ResourcePlanningService, protected orderSvc: OrderService) {
 
   }
@@ -58,13 +60,18 @@ export class StaffDashboardComponent implements OnInit {
 
     let resource = this.sessionSvc.humanResource
 
-    if (resource)
+    if (resource) {
+      console.log('11111')
       await this.showPlannings(resource)
+    }
+      
 
     this.appComponent.userSelect.select.subscribe(async staffMember => {
 
       if (!staffMember)
         return
+
+      console.log('22222')
 
       await this.showPlannings(staffMember)
 
@@ -96,54 +103,40 @@ export class StaffDashboardComponent implements OnInit {
     this.autoApprove = null
   }
 
-
   async showPlannings(resource: Resource) {
+
+    if (resource && resource.id == this.staffMember?.id)
+      return
+
+    console.log('showPlannings')
 
     this.clearData()
 
     this.staffMember = resource
 
-    let resourceId = resource.id
+    if (!resource?.id)
+      return
 
-    var qry = new DbQuery()
+    let staffPlannings = await this.planningSvc.getStaffPlannings(resource.id)
 
-    qry.and("branchId", QueryOperator.equals, this.sessionSvc.branchId)
-    qry.and("resourceId", QueryOperator.equals, resourceId)
-    qry.and("type", QueryOperator.in, ['brk', 'pres'])
-    qry.and("act", QueryOperator.equals, true)
+    if (staffPlannings.notEmpty()) {
 
-    let startOfDay = dateFns.startOfDay(new Date())
-    let startOfDayNum = DateHelper.yyyyMMddhhmmss(startOfDay)
+      this.plannings = staffPlannings.plannings
 
-    let endOfDay = dateFns.endOfDay(new Date())
-    let endOfDayNum = DateHelper.yyyyMMddhhmmss(endOfDay)
+      this.presence = staffPlannings.firstOfType(PlanningType.pres)
+      this.break = staffPlannings.firstOfType(PlanningType.brk)
 
-    qry.and("start", QueryOperator.greaterThanOrEqual, startOfDayNum)
-    qry.and("start", QueryOperator.lessThanOrEqual, endOfDayNum)
-
-
-    /*
-        var breakOrPresence = qry.or()
-        breakOrPresence.and("type", QueryOperator.in, ['brk', 'pres'])
-    */
-
-    this.plannings = await this.planningSvc.query$(qry)
-
-    if (ArrayHelper.NotEmpty(this.plannings)) {
-
-      this.presence = this.plannings.find(p => p.type == PlanningType.pres)
-      this.break = this.plannings.find(p => p.type == PlanningType.brk)
 
     }
 
-    console.log('showPlannings', this.plannings, this.presence, this.break)
+
 
     this.init = true
 
   }
 
-  /** Create a staff service containing all resource plannings for today */
 
+  /** Create a staff service containing all resource plannings for today */
   userName(): string {
 
     if (this.sessionSvc.humanResource)
@@ -176,9 +169,11 @@ export class StaffDashboardComponent implements OnInit {
     var planningCreated = await this.planningSvc.create$(dayPresence)
     console.warn(planningCreated)
 
+    // also add to local cache
+    this.planningSvc.staffToday.plannings.push(dayPresence)
+
     if (planningCreated.isOk) {
       this.presence = dayPresence
-
     }
 
   }
@@ -227,6 +222,9 @@ export class StaffDashboardComponent implements OnInit {
 
     var planningCreated = await this.planningSvc.create$(breakPlanning)
     console.warn(planningCreated)
+
+    // also add to local cache
+    this.planningSvc.staffToday.plannings.push(breakPlanning)
 
     if (planningCreated.isOk) {
 
@@ -277,6 +275,8 @@ export class StaffDashboardComponent implements OnInit {
     }
 
     var planningCreated = await me.planningSvc.create$(holidayRequest)
+
+
 
     console.log(planningCreated)
 
@@ -415,7 +415,7 @@ export class StaffDashboardComponent implements OnInit {
 
     let start = holidayRequest.startDate
     let end = holidayRequest.endDate
-    let nrOfDays = dateFns.differenceInDays(holidayRequest.endDate, holidayRequest.startDate) + 1 
+    let nrOfDays = dateFns.differenceInDays(holidayRequest.endDate, holidayRequest.startDate) + 1
 
     if (holidayRequest.resourceId != 'cc241d0c-b650-429c-86d6-f3cbd5c32e88' && nrOfDays < 3) {
       if (this.intervalHasSaturday(start, end)) {

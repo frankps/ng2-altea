@@ -1,17 +1,14 @@
 <div class="row my-2">
     <div class="col-3">
-<!--         <input class="form-control" #drp="bsDaterangepicker" bsDaterangepicker [(ngModel)]="dateRange" [bsConfig]="{useUtc: true}" onkeydown="return false">
+        <!--         <input class="form-control" #drp="bsDaterangepicker" bsDaterangepicker [(ngModel)]="dateRange" [bsConfig]="{useUtc: true}" onkeydown="return false">
  -->
 
-        <input class="form-control"
-           placeholder="Datepicker"
-           bsDatepicker
-           (bsValueChange)="dateChange($event)">
+        <input class="form-control" placeholder="Datepicker" bsDatepicker (bsValueChange)="dateChange($event)">
     </div>
     <div class="col">
         <button type="button" class="btn btn-primary btn-sm me-3" (click)="showGroup(group)"
-        *ngFor="let group of paymentsByType">
-        {{'enums.pay-type.' + group.name | translate}}: €{{group.total}}</button>
+            *ngFor="let group of paymentsByType">
+            {{'enums.pay-type.' + group.name | translate}}: €{{group.total}}</button>
 
     </div>
 
@@ -19,26 +16,26 @@
 
 
 <div class="row my-2">
+    <div class="col-2">Bedrag</div>
+    <div class="col-2">Type</div>
     <div class="col-1">Betaling</div>
     <div class="col-1">Afspraak</div>
-    <div class="col-2">Type</div>
-    <div class="col-2">Bedrag</div>
     <div class="col-2">Klant</div>
     <div class="col-4">Details</div>
 </div>
-   
+
 <ng-container *ngFor="let pay of payments">
 
-    <div class="row mb-1" (click)="togglePayment(pay)">
+    <div class="row mb-1">
+        <div class="col-2"><button type="button" class="btn btn-primary btn-sm me-3" (click)="togglePayment(pay)"><i class="fa-solid fa-pen"></i></button> <span class="float-end">€{{pay.amountRounded()}}</span></div>
+        <div class="col-2">{{'enums.pay-type.' + pay.type | translate}}</div>
         <div class="col-1">{{pay.date | intdate}}</div>
         <div class="col-1">{{pay?.order?.start | intdate}}</div>
-        <div class="col-2">{{'enums.pay-type.' + pay.type | translate}}</div>
-        <div class="col-2">€{{pay.amount}}</div>
-
+        
         <ng-container *ngIf="pay.order">
             <div class="col-2">{{pay.order.for}}
 
-                <i *ngIf="pay.id == payId" class="fas fa-trash float-end" (click)="deletePayment(pay)"></i>
+                
 
             </div>
 
@@ -48,10 +45,10 @@
                 <span *ngIf="pay.id != payId">{{pay.order.sum?.[0].q}} x {{pay.order.sum?.[0].d}}</span>
 
                 <ng-container *ngIf="pay.id == payId">
-                    
+
                     <span *ngFor="let sum of pay.order.sum">{{sum.q}} x {{sum.d}}<br></span>
                 </ng-container>
-                
+
 
 
             </div>
@@ -67,7 +64,29 @@
     </div>
 
     <div class="row my-2" *ngIf="pay.id == payId">
-        <div class="col"></div>
+        <div class="col-1"></div>
+        <div class="col-1">
+            <input type="number" id="payAmount" name="payAmount" required class="form-control"
+                        [(ngModel)]="pay.amount"/>
+        </div>
+        <div class="col-2">
+
+            <ng-select id="payType" name="payType" [items]="paymentTypes" bindLabel="trans" bindValue="key" [clearable]="false"
+                [multiple]="false" [(ngModel)]="pay.type">
+            </ng-select>
+
+
+        </div>
+        <div class="col-1">
+
+            <input type="text" placeholder="Datepicker" class="form-control" bsDatepicker [(ngModel)]="pay.dateTyped">
+
+        </div>
+        <div class="col-1"></div>
+        <div class="col-2"></div>
+        <div class="col-4">
+            <button type="button" class="btn btn-primary btn-sm me-3" (click)="savePayment(pay)"><i class="fa-solid fa-check"></i></button>
+            <i class="ms-3 fas fa-trash" (click)="deletePayment(pay)"></i></div>
     </div>
 
 </ng-container>

@@ -537,6 +537,19 @@ export class AlteaDb {
         return updateResult
     }
 
+    async updatePartialObjects<T>(typeName: string, type: { new(): T; }, objects: any[]): Promise<ApiListResult<T>> {
+
+        if (!Array.isArray(objects) || objects.length == 0)
+            return new ApiListResult([], ApiStatus.ok)
+
+        let dbObjectMany = new DbObjectMulti(typeName, type, objects)
+
+        let updateResult = await this.db.updateMany$<ObjectWithId, T>(dbObjectMany)
+
+        return updateResult
+    }
+
+
     async updateObjects<T>(typeName: string, type: { new(): T; }, objects: T[], propertiesToUpdate: string[]): Promise<ApiListResult<T>> {
 
         if (!Array.isArray(objects) || objects.length == 0)
@@ -544,9 +557,13 @@ export class AlteaDb {
 
         let objectsToUpdate = ObjectHelper.extractArrayProperties(objects, ['id', ...propertiesToUpdate])
 
+        /*
         let dbObjectMany = new DbObjectMulti(typeName, type, objectsToUpdate)
 
         let updateResult = await this.db.updateMany$<ObjectWithId, T>(dbObjectMany)
+*/
+
+        let updateResult = await this.updatePartialObjects(typeName, type, objectsToUpdate)
 
         return updateResult
     }

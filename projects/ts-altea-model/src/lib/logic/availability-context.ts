@@ -577,6 +577,7 @@ export class AvailabilityContext {
 
         let planningsForResource = this.resourcePlannings.filterByResource(resourceId)
 
+        // exclusive:  meaning no overlap allowed (can be both available or unavailable)
         const exclusivePlannings = planningsForResource.filterByOverlapAllowed(false)
 
 
@@ -590,6 +591,9 @@ export class AvailabilityContext {
             return new ResourceOccupationSets()
 
         const availablePlannings = exclusivePlannings.filterByAvailable()
+        
+
+
         const unavailable = exclusivePlannings.filterByAvailable(false)
 
 

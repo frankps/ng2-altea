@@ -74,6 +74,10 @@ export class ResourceAvailability2 {
             const extendedSchedule = normalScheduleRanges.union(resourceOccupation.available)
 
 
+            extendedSchedule.removeBefore()
+
+
+
             let workingHours = extendedSchedule.subtract(resourceOccupation.absent)
 
             if (workingHours.notEmpty()) {

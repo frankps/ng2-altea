@@ -1021,16 +1021,21 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
     for (let orderLine of this.lines) {
 
-      if (!orderLine || !orderLine.vatPct || orderLine.vatPct === 0)
+      if (!orderLine) // || !orderLine.vatPct || orderLine.vatPct === 0
         continue
+
+      let vatPct = orderLine.vatPct
+
+      if (!orderLine.vatPct)  // in case of null or undefined
+        vatPct = 0
 
       let vatLine: VatLine
 
-      if (vatMap.has(orderLine.vatPct))
-        vatLine = vatMap.get(orderLine.vatPct)
+      if (vatMap.has(vatPct))
+        vatLine = vatMap.get(vatPct)
       else {
-        vatLine = new VatLine(orderLine.vatPct, 0, 0, 0)
-        vatMap.set(orderLine.vatPct, vatLine)
+        vatLine = new VatLine(vatPct, 0, 0, 0)
+        vatMap.set(vatPct, vatLine)
       }
 
       vatLine.vat += orderLine.vat

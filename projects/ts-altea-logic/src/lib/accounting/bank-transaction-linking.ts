@@ -108,6 +108,7 @@ export class BankTransactionLinking {
             totalAmount += amount
 
             payment.bankTxId = tx.id
+            payment.bankTxNum = tx.num
             payment.fee = _.round(stripeTx.fee / 100, 2)
             totalFee += payment.fee
 

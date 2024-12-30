@@ -1,7 +1,7 @@
 import { Component, Output, EventEmitter, Input, OnInit } from '@angular/core';
 import { OrderMgrUiService } from '../order-mgr-ui.service';
 import { ObjectService, ResourceService, SessionService } from 'ng-altea-common';
-import { AppMode, CreateCheckoutSession, Order, OrderLine, OrderPerson, OrderState, Resource, ResourcePreferences, ResourceType } from 'ts-altea-model';
+import { AppMode, CreateCheckoutSession, Order, OrderLine, OrderPerson, OrderState, Payment, Resource, ResourcePreferences, ResourceType } from 'ts-altea-model';
 import { TranslationService } from 'ng-common'
 import { ArrayHelper, Translation } from 'ts-common'
 
@@ -54,6 +54,9 @@ export class OrderComponent implements OnInit {
 
   orderStates: Translation[] = []
 
+  // payment currently in edit
+  editPay: Payment
+
   constructor(protected orderMgrSvc: OrderMgrUiService, protected sessionSvc: SessionService, protected stripeSvc: ObjectService,
     protected resourceSvc: ResourceService, protected translationSvc: TranslationService) {
 
@@ -82,6 +85,17 @@ export class OrderComponent implements OnInit {
     }
 
     await this.translationSvc.translateEnum(OrderState, 'enums.order-state.', this.orderStates)
+
+  }
+
+  toggleEditPayment(pay: Payment) {
+
+    if (pay?.id != this.editPay?.id) {
+      console.log(pay)
+      this.editPay = pay
+    } else {
+      this.editPay = null
+    }
 
   }
 
@@ -115,6 +129,19 @@ export class OrderComponent implements OnInit {
 
     this.fieldChanged('state')
 
+  }
+
+  payDateChanged(pay: Payment, idx: number, date: Date) {
+
+    pay.markAsUpdated('date')
+    this.orderMgrSvc.orderDirty = true
+
+  }
+
+  payAmountChanged(pay: Payment, idx: number) {
+
+    pay.markAsUpdated('amount')
+    this.orderMgrSvc.orderDirty = true
   }
 
   /**

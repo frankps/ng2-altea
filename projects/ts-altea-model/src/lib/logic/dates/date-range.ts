@@ -109,6 +109,13 @@ export class DateRange<T = any> {
 
     }
 
+    removeBefore(date: Date = new Date()) {
+
+        if (this.from < date)
+            this.from = date
+
+    }
+
     seconds(): number {
         return this.duration.seconds
     }

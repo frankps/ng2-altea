@@ -1,19 +1,46 @@
-<altea-lib-upload></altea-lib-upload>
+<altea-lib-upload *ngIf="showUpload"></altea-lib-upload>
 
 <div class="row my-3">
-    <div class="col">
+    <div class="col-2">
         <input type="text" placeholder="Datepicker" class="form-control" bsDatepicker [(ngModel)]="bank.from">
     </div>
-    <div class="col">
+    <div class="col-2">
         <input type="text" placeholder="Datepicker" class="form-control" bsDatepicker [(ngModel)]="bank.to">
     </div>
-    <div class="col">
+    <div class="col-2">
         <input type="text" id="txSearch" name="txSearch" class="form-control" [(ngModel)]="bank.search" />
     </div>
-    <div class="col">
-        <button type="button" class="btn btn-primary" (click)="getTransactions()" translate>dic.search</button>
+    <div class="col-2">
+        <ng-select *ngIf="init" id="gender" name="gender" [items]="bankTxTypes" bindLabel="trans" bindValue="key"
+            [clearable]="false" [multiple]="true" [(ngModel)]="bank.types">
+        </ng-select>
 
-        <button type="button" class="btn btn-primary ms-2" (click)="autoStripe()">Stripe</button>
+    </div>
+
+    <div class="col d-flex align-items-center">
+
+        <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
+            <input type="checkbox" class="btn-check" id="btncheck1" autocomplete="off" [(ngModel)]="bank.notLinked">
+            <label class="btn btn-outline-primary my-0" for="btncheck1"> <i class="fa-solid fa-link-slash"></i></label>
+
+            <input type="checkbox" class="btn-check" id="btncheck2" autocomplete="off" [(ngModel)]="bank.linked">
+            <label class="btn btn-outline-primary my-0" for="btncheck2"><i class="fa-solid fa-link"></i></label>
+
+            <input type="checkbox" class="btn-check" id="btnPlus" autocomplete="off" [(ngModel)]="bank.positive">
+            <label class="btn btn-outline-primary my-0" for="btnPlus"><i class="fa-solid fa-plus"></i></label>
+
+            <input type="checkbox" class="btn-check" id="btnMin" autocomplete="off" [(ngModel)]="bank.negative">
+            <label class="btn btn-outline-primary my-0" for="btnMin"><i class="fa-solid fa-minus"></i></label>
+
+            <input type="checkbox" class="btn-check" id="btnUpload" autocomplete="off" [(ngModel)]="showUpload">
+            <label class="btn btn-outline-primary my-0" for="btnUpload"><i class="fa-solid fa-upload"></i></label>
+        </div>
+
+        <button type="button" class="btn btn-primary ms-2" (click)="getTransactions()"><i
+                class="fa-solid fa-magnifying-glass"></i></button>
+
+        <button type="button" class="btn btn-primary ms-2" (click)="autoStripe()"><i
+                class="fa-brands fa-stripe-s"></i></button>
     </div>
     <!-- 
     <div class="col">
@@ -48,13 +75,13 @@
         <div class="row" [style.color]="tx.ok?'green':'red'" (click)="toggleTx(tx)">
             <div class="col">{{tx.execDateObject() | date : "dd/MM"}}</div>
             <div class="col">{{tx.num}}</div>
-            <div class="col">{{tx.amount}}</div>
+            <div class="col">{{tx.amountRounded()}}</div>
             <div class="col">{{tx.remoteName}}</div>
             <div class="col">{{tx.type}}</div>
             <div class="col">{{tx.info1()}}</div>
         </div>
 
-        <ng-container [ngSwitch]="tx.type">
+        <!--         <ng-container [ngSwitch]="tx.type">
             <ng-container *ngSwitchCase="'stripe'">
 
 
@@ -66,17 +93,14 @@
                     <div class="col-3"></div>
                 </div>
 
-
-
-
             </ng-container>
             <ng-container *ngSwitchDefault>
             </ng-container>
-        </ng-container>
+        </ng-container> -->
 
         <ng-container *ngIf="tx['open']">
 
-            <ng-container [ngSwitch]="tx.type">
+            <!--             <ng-container [ngSwitch]="tx.type">
                 <ng-container *ngSwitchCase="'stripe'">
 
 
@@ -89,8 +113,8 @@
                                     <div class="col-2">{{stripeTx.amount/100}}</div>
                                     <div class="col-2">{{stripeTx.fee/100}}</div>
                                     <div class="col">{{stripeTx?.source?.payment_intent}}</div>
-                                    <!--  <div class="col-3"></div>
-                                    <div class="col-3"></div> -->
+                                 <div class="col-3"></div>
+                                    <div class="col-3"></div>
                                 </div>
 
                             </li>
@@ -107,7 +131,7 @@
                 </ng-container>
             </ng-container>
 
-
+ -->
 
 
 
@@ -133,8 +157,7 @@
                         <button type="button" class="btn btn-primary btn-sm ms-2"
                             (click)="getStripePayout(tx)">Payout</button>
 
-                        <button type="button" class="btn btn-primary btn-sm ms-2"
-                            (click)="linkStripe(tx)">Link</button>
+                        <button type="button" class="btn btn-primary btn-sm ms-2" (click)="linkStripe(tx)">Link</button>
                     </ng-container>
 
 
@@ -151,35 +174,95 @@
 
                     <ul class="list-group">
 
-                        <li class="list-group-item" *ngFor="let pay of pays">
+                        <li class="list-group-item" *ngFor="let pay of pays; let payIdx = index">
 
                             <div class="row">
-                                <div class="col-1">
-                                    <i *ngIf="pay.bankTxId == tx.id" [style.color]="'green'"
-                                        class="fa-duotone fa-solid fa-link"></i>
-                                </div>
-                                <div class="col-2"> € {{pay.amount}}</div>
-                                <div class="col-2"> {{pay.type}}</div>
-                                <div class="col-2"> {{pay.order.for}}</div>
-                                <div class="col" *ngIf="pay.order.sum">
-                                    <ng-container *ngFor="let line of pay.order.sum">
-                                        <span class="badge text-bg-info">{{line.d}}</span>&nbsp;
+                                <div class="col-2">
+                                    <input class="form-check-input me-1" type="checkbox" id="showPrice"
+                                        (change)="togglePayment(pay)" [(ngModel)]="selectedPays[pay.id]" />
+
+                                    <ng-container *ngIf="pay.bankTxId == tx.id">
+                                        <i [style.color]="'green'" class="fa-duotone fa-solid fa-link"></i>
+                                        {{pay.bankTxNum}}
                                     </ng-container>
+
+
+                                    <ng-container *ngIf="pay.bankTxId && pay.bankTxId != tx.id">
+                                        <i [style.color]="'orange'" class="fa-duotone fa-solid fa-link"></i>
+                                        {{pay.bankTxNum}}
+                                    </ng-container>
+
+                                    <ng-container *ngIf="pay['labels']">
+                                        <span class="badge bg-warning text-dark badge-sm"
+                                            *ngFor="let label of pay['labels']">{{label}}</span>&nbsp;
+                                    </ng-container>
+
+
+                                </div>
+                                <ng-container *ngIf="pay.id != payInEdit?.id; else editPayment">
+                                    <div class="col-1"> € {{pay.amountRounded()}}</div>
+                                    <div class="col-1"> {{pay.date | intdate}}</div>
+                                    <div class="col-1"> {{pay.type}}</div>
+                                </ng-container>
+
+                                <ng-template #editPayment>
+                                    <div class="col-1"> <input type="number" id="payAmount" name="payAmount" required
+                                            class="form-control" [(ngModel)]="pay.amount" /></div>
+                                    <div class="col-2">
+
+                                        <input type="text" placeholder="Datepicker" class="form-control" bsDatepicker
+                                            [(ngModel)]="pay.dateTyped">
+
+                                    </div>
+                                    <div class="col-2">
+                                        <ng-select id="payType" name="payType" [items]="paymentTypes" bindLabel="trans"
+                                            bindValue="key" [clearable]="false" [multiple]="false"
+                                            [(ngModel)]="pay.type">
+                                        </ng-select>
+                                    </div>
+                                </ng-template>
+
+
+                                <div class="col-2"> 
+                                    <i class="fa-solid fa-pen me-2" *ngIf="pay.id != payInEdit?.id; else editPaymentControls" (click)="toggleEditPayment(pay)"></i> {{pay.order.for}}</div>
+
+                                    <ng-template #editPaymentControls>
+                                        <i class="fa-solid fa-floppy-disk me-2" (click)="savePayment(pay)"></i>
+                                        <i class="fa-solid fa-xmark"  (click)="cancelPayment(payIdx)"></i>
+                                    </ng-template>
+                                   
+                                    
+                                <div class="col">
+
+                                    <!--  <button type="button" class="btn btn-primary btn-sm me-3" (click)="toggleEditPayment(pay)"><i class="fa-solid fa-pen"></i></button>
+ -->
+                                    <ng-container *ngIf="pay.id != payInEdit?.id && pay.order.sum">
+                                        <ng-container *ngFor="let line of pay.order.sum">
+                                            <span class="badge text-bg-info">{{line.d}}</span>&nbsp;
+                                        </ng-container>
+                                    </ng-container>
+
 
                                 </div>
                             </div>
-
-
-
-
-
 
                         </li>
 
                         <li class="list-group-item">
 
                             <div class="row">
-                                <div class="col-2"> <b>Totaal: {{payments.total}}</b> </div>
+                                <div class="col-2">
+
+                                    <i class="fa-solid fa-wand-magic-sparkles me-2" (click)="magicSelection()"></i>
+
+                                    <span
+                                        [style.color]="payments.selected==tx.amountToLink()?'green':'red'">{{payments.selected}}
+                                    </span> / {{tx.amountToLink()}}
+                                    <button type="button" class="ms-2 btn btn-primary btn-sm"
+                                        (click)="linkSelectedPayments(tx)">V</button>
+                                </div>
+                                <div class="col-2"> Totaal: {{payments.total}} </div>
+                                <div class="col-2"> Te kort: {{payments.missing}} </div>
                                 <div class="col-2"> Gelinkt: {{payments.linked}} </div>
                             </div>
 

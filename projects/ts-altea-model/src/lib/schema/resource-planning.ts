@@ -97,6 +97,10 @@ export class ResourcePlannings {
     return ArrayHelper.NotEmpty(this.plannings)
   }
 
+  firstOfType(type: PlanningType) : ResourcePlanning {
+    return this.plannings.find(p => p.type == type)
+  }
+
   filterByType(...types: PlanningType[]): ResourcePlannings {
     const plannings = this.plannings.filter(rp => types.indexOf(rp.type) >= 0)
 
@@ -204,6 +208,16 @@ export class ResourcePlannings {
   filterByResource(resourceId: string): ResourcePlannings {
 
     const planningsForResource = this.plannings.filter(rp => rp.resourceId == resourceId)
+
+    if (!Array.isArray(planningsForResource))
+      return new ResourcePlannings()
+
+    return new ResourcePlannings(planningsForResource)
+  }
+
+  filterByResourceType(resourceId: string, ... types: PlanningType[]): ResourcePlannings {
+
+    const planningsForResource = this.plannings.filter(rp => rp.resourceId == resourceId && types.indexOf(rp.type) >= 0)
 
     if (!Array.isArray(planningsForResource))
       return new ResourcePlannings()

@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { PaymentService } from 'ng-altea-common';
 import { Payment, PaymentType } from 'ts-altea-model';
-import { ArrayHelper, DateHelper, DbQuery, QueryOperator } from 'ts-common';
+import { ArrayHelper, DateHelper, DbQuery, QueryOperator, Translation } from 'ts-common';
 import * as _ from "lodash";
 import * as dateFns from 'date-fns'
+import { TranslationService } from 'ng-common'
+import { DashboardService, ToastType } from 'ng-common'
 
 export class PaymentGroup {
 
@@ -29,7 +31,7 @@ export class PaymentGroup {
     }
 
     let total = _.sumBy(this.payments, 'amount')
-    this.total = Math.round(total * 100) / 100 
+    this.total = Math.round(total * 100) / 100
   }
 
 }
@@ -56,17 +58,23 @@ export class PaymentsComponent implements OnInit {
 
   dateRange: Date[] = []
 
-  constructor(protected paySvc: PaymentService) {
+  paymentTypes: Translation[] = []
+
+  init = false
+
+  constructor(protected paySvc: PaymentService, private translationSvc: TranslationService, public dashboardSvc: DashboardService) {
 
   }
 
   async ngOnInit() {
 
+    await this.translationSvc.translateEnum(PaymentType, 'enums.pay-type.', this.paymentTypes)
 
 
 
     await this.refreshPayments()
 
+    this.init = true
   }
 
   async dateChange(value: Date) {
@@ -79,8 +87,34 @@ export class PaymentsComponent implements OnInit {
 
   }
 
+  async savePayment(payment: Payment) {
+
+    if (!payment)
+      return
+
+    let update = {
+      id: payment.id,
+      type: payment.type,
+      amount: payment.amount,
+      date: payment.date
+    }
+
+    let updateRes = await this.paySvc.update$(update)
+    console.log(updateRes)
+
+    if (updateRes.isOk) {
+      this.paymentsByType = this.makeGroups(this.payments)
+      this.payId = null
+      this.dashboardSvc.showToastType(ToastType.saveSuccess)
+    } else
+      this.dashboardSvc.showToastType(ToastType.saveError)
+
+
+  }
 
   deletePayment(payment: Payment) {
+
+
 
   }
 
@@ -123,7 +157,7 @@ export class PaymentsComponent implements OnInit {
 
   makeGroups(payments: Payment[]): PaymentGroup[] {
 
-    const groups: PaymentGroup[] = []
+    let groups: PaymentGroup[] = []
 
 
     if (ArrayHelper.IsEmpty(payments))
@@ -138,12 +172,13 @@ export class PaymentsComponent implements OnInit {
 
       const group = new PaymentGroup(key, groupBy[key])
 
-
-
       groups.push(group)
 
     })
 
+    groups = _.orderBy(groups, ['name', 'asc'])
+
+    console.error(groups)
 
     return groups
 

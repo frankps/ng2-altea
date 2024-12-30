@@ -254,18 +254,38 @@
             Betalingen <i *ngIf="sessionSvc.clipboard.hasPayments()" class="fa-duotone fa-solid fa-paste"
                 (click)="orderMgrSvc.pastePaymentsFromClipboard()"></i>
 
-            <div class="row ms-2" *ngFor="let pay of order.payments">
-                <div class="col-4">{{'enums.pay-type.' + pay.type | translate}}</div>
-                <div class="col-3" style="font-size: smaller;">
-                    <span *ngIf="isPOS()">{{pay.date | intdate}}</span>
-                </div>
-                <div class="col-3">{{pay.info}} <span class="float-end">€{{pay.amount}}</span></div>
-                <div class="col-2 d-flex justify-content-end" *ngIf="show.extra">
+            <div class="row ms-2" *ngFor="let pay of order.payments; let idx = index">
 
-                    <i class="fas fa-copy me-3" (click)="orderMgrSvc.copyPaymentToClipboard(pay)"></i>
+                <ng-container *ngIf="!show.extra || pay.id != editPay?.id; else editPaymentTpl">
+                    <div class="col-4">{{'enums.pay-type.' + pay.type | translate}}</div>
+                    <div class="col-3" style="font-size: smaller;">
+                        <span *ngIf="isPOS()">{{pay.date | intdate}}</span>
+                    </div>
+                    <div class="col-3">{{pay.info}} <span class="float-end">€{{pay.amount}}</span></div>
+    
+                </ng-container>
 
-                    <i class="fas fa-trash" (click)="orderMgrSvc.deletePayment(pay)"></i>
+                <!-- (bsValueChange)="pay.changeDate($event)"
+                 -->
+                <ng-template #editPaymentTpl>
+                    <div class="col-3">{{'enums.pay-type.' + pay.type | translate}}</div>
+                    <div class="col-4"><input type="text" placeholder="Datepicker" class="form-control form-control-sm" bsDatepicker [(ngModel)]="pay.dateTyped" (bsValueChange)="payDateChanged(pay, idx, $event)">
+                    </div>
+                    <div class="col-3"><input type="number" id="payAmount" name="payAmount" required class="form-control form-control-sm"
+                        [(ngModel)]="pay.amount" (change)="payAmountChanged(pay, idx)"/>
+                    </div>
+                </ng-template>
+            
 
+                <div class="col-2 d-flex justify-content-end align-items-center" *ngIf="show.extra">
+
+                    <i class="fas fa-pen fa-sm ms-1 me-2" (click)="toggleEditPayment(pay)"></i>
+
+                    <i class="fas fa-copy fa-sm me-2" (click)="orderMgrSvc.copyPaymentToClipboard(pay)"></i>
+
+                    <i class="fas fa-trash fa-sm" (click)="orderMgrSvc.deletePayment(pay)"></i>
+
+                    
                 </div>
             </div>
 
