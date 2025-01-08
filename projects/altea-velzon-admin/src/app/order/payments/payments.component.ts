@@ -58,6 +58,8 @@ export class PaymentsComponent implements OnInit {
 
   dateRange: Date[] = []
 
+  date: Date
+
   paymentTypes: Translation[] = []
 
   init = false
@@ -199,6 +201,46 @@ export class PaymentsComponent implements OnInit {
     const payments = await this.paySvc.query$(query)
 
     console.log(payments)
+
+    return payments
+
+  }
+
+  /**
+   * To identify payments that are not linked
+   */
+  async getUnlinkedBankPayments(date: Date) {
+
+    if (!date)
+      date = new Date()
+
+    console.log(date)
+
+    const fromDate = dateFns.startOfMonth(date)
+    const toDate = dateFns.endOfMonth(date)
+
+    const from = DateHelper.yyyyMMddhhmmss(fromDate) //20240901000000
+    const to = DateHelper.yyyyMMddhhmmss(toDate) //20240910000000
+
+
+    const query = new DbQuery()
+
+    query.and('date', QueryOperator.greaterThanOrEqual, from)
+    query.and('date', QueryOperator.lessThan, to)
+    query.and('type', QueryOperator.in, [PaymentType.credit, PaymentType.debit, PaymentType.stripe, PaymentType.transfer])
+    query.and('bankTxId', QueryOperator.equals, null)
+
+    query.include('order')
+
+    query.orderBy('date')
+
+    const payments = await this.paySvc.query$(query)
+
+    console.log(payments)
+
+    
+    this.payments = payments
+    this.paymentsByType = this.makeGroups(payments)
 
     return payments
 

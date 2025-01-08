@@ -22,7 +22,8 @@ export class ResultWithSolutionNotes<T> {
     }
 }
 
-export class ResourceAvailability {
+
+class ResourceAvailability_DoNotUse {
 
     availability = new Map<string, DateRangeSet>()
 
@@ -51,7 +52,7 @@ export class ResourceAvailability {
 
             const resourceOccupation = ctx.getResourceOccupation(resourceId)
 
-            const resourceActiveExtended = resourceActive.union(resourceOccupation.available)
+            const resourceActiveExtended = resourceActive.union(resourceOccupation.extraAvailable)
 
             const resourceStillAvailable = resourceActiveExtended.subtract(resourceOccupation.unAvailable)
 

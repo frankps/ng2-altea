@@ -431,9 +431,19 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
 
     console.log(query)
 
+    let orders = await this.orderSvc.query$(query)
 
-    this.objects = await this.orderSvc.query$(query)
+    /** Some orders have no start date (gifts, products) */
 
+    orders.forEach(order => {
+      if (!order.start)
+        order.startDate = order.cre  
+    })
+    
+    orders = _.orderBy(orders, ['start'], ['desc'])
+
+
+    this.objects = orders
     this.uiOrders = this.objects.map(order => UIOrder.fromOrder(order))
 
 

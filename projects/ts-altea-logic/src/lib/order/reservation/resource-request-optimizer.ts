@@ -1,6 +1,6 @@
 
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { PossibleSlots, Resource, ResourceAvailability, ResourceRequest, ResourceRequestItem, ResourceSet, ResourceType, SlotInfo, TimeSpan } from "ts-altea-model";
+import { PossibleSlots, Resource, ResourceRequest, ResourceRequestItem, ResourceSet, ResourceType, SlotInfo, TimeSpan } from "ts-altea-model";
 import * as _ from "lodash"
 
 

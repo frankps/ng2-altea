@@ -30,6 +30,8 @@ export class InvoiceTotals {
 
 export class Invoice extends ObjectWithIdPlus {
 
+
+  @Type(() => Order)
   orders?: Order[];
 
   orderCount: number = 0
@@ -79,6 +81,7 @@ export class Invoice extends ObjectWithIdPlus {
   /** last date used to check if we need to parse the date again */
   _lastDate?: number
 
+  @Exclude()
   get typedDate(): Date | undefined {
     if (!this.date)
       return undefined

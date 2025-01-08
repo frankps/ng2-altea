@@ -30,7 +30,7 @@ export class OrderLineComponent implements OnInit {
   showMoreInternal = false
 
   
-  constructor(protected orderMgrSvc: OrderMgrUiService, private productSvc: ProductService, protected sessionSvc: SessionService) {
+  constructor(protected orderMgrSvc: OrderMgrUiService, private productSvc: ProductService, public sessionSvc: SessionService) {
   }
 
   ngOnInit(): void {
@@ -69,9 +69,11 @@ export class OrderLineComponent implements OnInit {
     this.setQtyArray(product)
   }
 
-  _orderLine: OrderLine
+  _orderLine: OrderLine   
 
   @Input() set orderLine(line: OrderLine) {
+
+    console.log(line)
 
     this._orderLine = line
 
@@ -108,6 +110,12 @@ export class OrderLineComponent implements OnInit {
     this.fieldChanged('unit')
 
     this.orderMgrSvc.calculateAll()
+  }
+
+  vatChanged() {
+    this.fieldChanged('vatPct')
+    this.orderMgrSvc.calculateAll()
+
   }
 
   qtyChanged() {
@@ -278,10 +286,15 @@ export class OrderLineComponent implements OnInit {
 
       console.error(this.orderLine)
     } else { // de-selected
-
       olOption.removeValueById(value.id)
-
     }
+
+    let previousIncl = this.orderLine.incl
+    let newIncl = this.orderLine.calculateAll()
+
+    if (newIncl != previousIncl)
+      this.orderMgrSvc.calculateAll()
+      
 
     this.orderLine.markAsUpdated("options")
     this.orderMgrSvc.orderDirty = true

@@ -139,6 +139,9 @@ ng generate service new-branch/new-branch --project ng-altea-common
 
 ng generate component product/price-condition --project altea-velzon-admin
 
+
+ng generate component order-mgr/order-line/orderLineOption --project ng-altea-common
+
 ng generate component order/payments --project altea-velzon-admin
 ng generate component order-mgr/posPayment --project altea-velzon-admin
 ng generate component pos/posPayment --project ng-altea-common

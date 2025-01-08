@@ -2,7 +2,6 @@ import { DateHelper } from "ts-common";
 import { Order } from "ts-altea-model"
 import { AvailabilityContext } from "./availability-context";
 import { ResourceRequest } from "./resource-request";
-import { ResourceAvailability } from "./resource-availability";
 import * as _ from "lodash"
 import * as dateFns from 'date-fns'
 import { DateRange } from "./dates";

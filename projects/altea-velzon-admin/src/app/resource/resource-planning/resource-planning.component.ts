@@ -4,7 +4,7 @@ import { Gender, OnlineMode, Product, Price, DaysOfWeekShort, ProductTypeIcons, 
 import { DashboardService, FormCardSectionEventData, ToastType, TranslationService } from 'ng-common'
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxModalComponent } from 'ng-common';
-import { ListSectionMode, BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, Translation, ObjectHelper, DbQuery, QueryOperator, CollectionChangeTracker, ObjectWithId, ApiStatus } from 'ts-common'
+import { ListSectionMode, BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, Translation, ObjectHelper, DbQuery, QueryOperator, CollectionChangeTracker, ObjectWithId, ApiStatus, DateHelper } from 'ts-common'
 import * as _ from "lodash";
 import { NgxSpinnerService } from "ngx-spinner"
 import * as dateFns from 'date-fns'
@@ -83,11 +83,29 @@ export class ResourcePlanningComponent implements OnInit {
 
   async ngOnInit() {
 
-    await this.translationSvc.translateEnum(PlanningType, 'enums.planning-type.', this.planningTypes)
+    let planningTypes: Translation[] = []
+
+    await this.translationSvc.translateEnum(PlanningType, 'enums.planning-type.', planningTypes)
+
+    this.planningTypes = planningTypes.filter(pt => pt.key != 'pres')
+
 
     console.error(this.planningTypes)
   }
 
+  startChanged(start: Date) {
+
+
+    let start0am = dateFns.startOfDay(start)
+
+    
+    let end0am = dateFns.startOfDay(this.end as Date)
+    
+    if (start0am > end0am)
+      this.end = start
+    
+
+  }
 
   editModeChanged(cardSectionChanged: FormCardSectionEventData) {
 
@@ -150,16 +168,31 @@ export class ResourcePlanningComponent implements OnInit {
 
   async addPlanning() {
 
+    let planning = this.objNew
+
     console.error('Add planning ... ')
 
     this.objNew.branchId = this.sessionSvc.branchId
     this.objNew.resourceId = this._resource.id
 
-    if (this.start instanceof Date)
-      this.objNew.startDate = this.start
+    if (this.start instanceof Date) {
 
-    if (this.end instanceof Date)
-      this.objNew.endDate = this.end
+      if (planning.fullDays)
+        planning.start = DateHelper.yyyyMMdd000000(this.start)
+      else
+        this.objNew.startDate = this.start
+    }
+
+
+    if (this.end instanceof Date) {
+
+      if (planning.fullDays)
+        planning.end = DateHelper.yyyyMMddxxxxxx(this.end)
+      else
+        this.objNew.endDate = this.end
+
+    }
+
 
     this.planningChanges.add(this.objNew)
 

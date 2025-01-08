@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 // Generic imports
-import { Bootstrap5Module } from 'ng-common';
+import { Bootstrap5Module, NgCommonModule } from 'ng-common';
 import { FormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { TranslateModule } from '@ngx-translate/core';
@@ -40,6 +40,7 @@ import { ContactModule } from '../contact/contact.module';
     BsDatepickerModule,
     TimepickerModule,
     NgxSpinnerModule,
-  ContactModule],
+    ContactModule,
+    NgCommonModule],
 })
 export class GiftModule { }

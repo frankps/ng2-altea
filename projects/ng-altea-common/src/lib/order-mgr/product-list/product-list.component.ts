@@ -55,7 +55,7 @@ export class ProductListComponent extends NgBaseComponent implements OnInit {
   }
 
 
-  select(product: Product) {
+  async select(product: Product) {
 
     if (!product)
       return
@@ -64,7 +64,7 @@ export class ProductListComponent extends NgBaseComponent implements OnInit {
     if (product.isCategory())
       this.orderMgrSvc.showProductsInCategory(product)
     else {
-      this.orderMgrSvc.newOrderLine(product)
+      await this.orderMgrSvc.newOrderLine(product)
       this.productSelected.emit(product)
     }
 

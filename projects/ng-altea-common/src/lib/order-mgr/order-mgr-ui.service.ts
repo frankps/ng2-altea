@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import { Injectable, OnInit } from '@angular/core';
-import { AppMode, AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Branch, ConfirmOrderResponse, Contact, CreateCheckoutSession, DateBorder, DepositMode, Gift, GiftLine, GiftType, Invoice, Order, OrderLine, OrderLineOption, OrderSource, OrderState, Payment, PaymentType, Price, Product, ProductSubType, ProductType, ProductTypeIcons, RedeemGift, ReservationOption, ReservationOptionSet, Resource, ResourcePlanning, ResourceType } from 'ts-altea-model'
+import { AppMode, AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Branch, ConfirmOrderResponse, Contact, CreateCheckoutSession, DateBorder, DepositMode, Gift, GiftLine, GiftType, Invoice, Order, OrderLine, OrderLineOption, OrderSource, OrderState, Payment, PaymentType, Price, Product, ProductItem, ProductSubType, ProductType, ProductTypeIcons, RedeemGift, ReservationOption, ReservationOptionSet, Resource, ResourcePlanning, ResourceType } from 'ts-altea-model'
 import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbQuery, QueryOperator, Translation } from 'ts-common'
 import { AlteaService, GiftService, InvoiceService, ObjectService, OrderMgrService, OrderService, ProductService, ResourceService, SessionService } from 'ng-altea-common'
 import * as _ from "lodash";
@@ -11,6 +11,7 @@ import { AlteaDb, CancelOrder, LoyaltyUi, LoyaltyUiCard, OrderMgmtService, Payme
 import * as dateFns from 'date-fns'
 import { StripeService } from '../stripe.service';
 import { er } from '@fullcalendar/core/internal-common';
+import { OrderReminders } from 'projects/ts-altea-logic/src/lib/order/messaging/order-reminders';
 
 
 /** reflects the UI component that should be visible  */
@@ -52,7 +53,9 @@ export class OrderMgrUiService {   // implements OnInit
   from = 0
   to = 0
 
-  // derived from product.options
+
+  /** derived from product.options, these options containe all possible values (so UI can show them),
+   * orderLine.options only contains the selected ones */
   orderLineOptions: OrderLineOption[] = []
 
   orderLine: OrderLine
@@ -146,8 +149,25 @@ export class OrderMgrUiService {   // implements OnInit
 
     if (this.order.invoice)
       this.invoice = this.order.invoice
-    else if (this.order.invoiceId)
-      this.invoice = await this.invoiceSvc.get$(this.order.invoiceId)
+    else if (this.order.invoiceId) {
+      let invoice = await this.invoiceSvc.get$(this.order.invoiceId)
+
+      if (invoice) {
+
+        if (invoice.num != this.order.invoiceNum) {
+          this.order.invoiceNum = invoice.num
+          this.order.markAsUpdated('invoiceNum')
+          this.orderDirty = true
+
+        }
+
+
+
+      }
+
+      this.invoice = invoice
+
+    }
     else {
       this.invoice = this.order.createInvoice()
       this.invoiceIsNew = true
@@ -408,13 +428,13 @@ export class OrderMgrUiService {   // implements OnInit
     this.spinner.show()
 
     if (!productId) {
-      me.prepareProduct(undefined)
+      await me.prepareProduct(undefined)
       return
     }
 
     let product = await me.productSvc.get$(productId, 'options:orderBy=idx.values:orderBy=idx,resources.resource,prices')
 
-    me.prepareProduct(product)
+    await me.prepareProduct(product)
 
     me.spinner.hide()
 
@@ -537,7 +557,69 @@ export class OrderMgrUiService {   // implements OnInit
 
     }
 
+    await this.loadDependentProductsForOrder(order)
+
   }
+
+
+  async loadDependentProductsForOrder(order: Order) {
+
+    let subscriptionProductItems = order.lines.filter(l => l.product.isSubscription()).flatMap(l => l.product.items)
+
+    await this.loadDependentProductsForItems(subscriptionProductItems)
+  }
+
+
+
+  /**
+ * Some products are composed out of other products (arrangements, bundles: see product.items).
+ * This method will load these products in product.items.product 
+ * @param product 
+ * @returns 
+ */
+  async loadDependentProductsForProduct(product: Product) {
+
+    console.log('loadDependentProducts')
+
+    if (ArrayHelper.IsEmpty(product?.items))
+      return
+
+    await this.loadDependentProductsForItems(product?.items)
+
+  }
+
+  async loadDependentProductsForItems(productItems: ProductItem[]) {
+
+    console.log('loadDependentProducts')
+
+    if (ArrayHelper.IsEmpty(productItems))
+      return
+
+    let productItemsToLoad = productItems.filter(i => i.productId && !i.product)
+    let productIdsToLoad = productItemsToLoad.map(i => i.productId)
+
+    if (ArrayHelper.IsEmpty(productIdsToLoad))
+      return
+
+    let products = await this.loadProducts$(...productIdsToLoad)
+
+    if (ArrayHelper.IsEmpty(products))
+      return
+
+    //console.log('before loading items.product', product)
+
+    for (let productItem of productItemsToLoad) {
+      let product = products.find(p => p.id == productItem.productId)
+
+      if (product)
+        productItem.product = product
+
+    }
+
+    // console.log('after loading items.product', product)
+
+  }
+
 
 
   async upgradeOrder(order: Order) {
@@ -995,7 +1077,7 @@ export class OrderMgrUiService {   // implements OnInit
     this.orderMgrSvc.getPossibleDates(this.order)
   }
 
-  prepareProduct(product: Product) {
+  async prepareProduct(product: Product) {
 
     if (!product) {
       this.product = undefined
@@ -1006,23 +1088,42 @@ export class OrderMgrUiService {   // implements OnInit
 
     this.product = product
 
+    await this.loadDependentProductsForProduct(product)
+
     this.setOrderLineOptions(product)
 
+    let products = this.loadProducts$()
 
     this.orderLine = new OrderLine()
 
     console.error(this.orderLineOptions)
   }
 
+
   setOrderLineOptions(product: Product) {
+
+    let showPrivate = this.isPos
+
+    console.log('setOrderLineOptions', product)
 
     this.orderLineOptions = []
 
     if (product.hasOptions()) {
 
-      let showPrivate = this.isPos
+
 
       this.orderLineOptions = product.options.filter(o => showPrivate || !o.pvt).map(prodOption => OrderLineOption.fromProductOption(prodOption, showPrivate))
+    }
+
+
+    if (product.hasItems()) {
+
+      var itemOptions = product.items.flatMap(i => i.product.options)
+
+      let extraOrderLineOptions = itemOptions.filter(o => showPrivate || !o.pvt).map(prodOption => OrderLineOption.fromProductOption(prodOption, showPrivate))
+
+      this.orderLineOptions.push(...extraOrderLineOptions)
+
     }
 
 
@@ -1200,7 +1301,7 @@ export class OrderMgrUiService {   // implements OnInit
         }
 
         let optionValues = item.getOptionValuesAsMap()
-        let orderLine = this.newOrderLine(product, item.qty, optionValues)
+        let orderLine = await this.newOrderLine(product, item.qty, optionValues)
         await this.addOrderLine(orderLine)
         orderLines.push(orderLine)
 
@@ -1212,7 +1313,7 @@ export class OrderMgrUiService {   // implements OnInit
       return orderLines
 
     } else {
-      let orderLine = this.newOrderLine(product, qty, initOptionValues)
+      let orderLine = await this.newOrderLine(product, qty, initOptionValues)
       await this.addOrderLine(orderLine)
       return [orderLine]
     }
@@ -1277,12 +1378,12 @@ export class OrderMgrUiService {   // implements OnInit
 
 
 
-  newOrderLine(product: Product, qty = 1, initOptionValues?: Map<String, String[]>): OrderLine {
+  async newOrderLine(product: Product, qty = 1, initOptionValues?: Map<String, String[]>): Promise<OrderLine> {
 
     console.error(product)
 
     this.orderLineIsNew = true
-    this.prepareProduct(product)
+    await this.prepareProduct(product)
 
     if (qty < product.minQty)
       qty = product.minQty
@@ -1336,7 +1437,7 @@ export class OrderMgrUiService {   // implements OnInit
       orderLine.markAsUpdated('nrPers')
       this.orderDirty = true
     }
-    
+
     if (nrOfPersons > 0) {
 
       if (this.order.nrOfPersons < nrOfPersons) {
@@ -1505,6 +1606,7 @@ export class OrderMgrUiService {   // implements OnInit
 
     const subscriptions = await this.alteaSvc.subscriptionMgmtService.createSubscriptions(this.order, orderLine, true)
 
+    
     console.error(subscriptions)
   }
 

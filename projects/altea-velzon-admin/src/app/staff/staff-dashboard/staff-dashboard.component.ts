@@ -49,7 +49,7 @@ export class StaffDashboardComponent implements OnInit {
   // we try to auto approve any new incoming request
   autoApprove: HolidayApproval
 
-  
+
 
   constructor(protected sessionSvc: SessionService, protected appComponent: AppComponent, protected translationSvc: TranslationService, protected planningSvc: ResourcePlanningService, protected orderSvc: OrderService) {
 
@@ -64,7 +64,7 @@ export class StaffDashboardComponent implements OnInit {
       console.log('11111')
       await this.showPlannings(resource)
     }
-      
+
 
     this.appComponent.userSelect.select.subscribe(async staffMember => {
 
@@ -395,6 +395,14 @@ export class StaffDashboardComponent implements OnInit {
 
     let approval = new HolidayApproval(holidayRequest, true)
 
+    let maxDays = 7
+
+    let nrOfDays = holidayRequest.nrOfDays()
+    if (nrOfDays > 7) {
+      approval.approved = false
+      approval.issues.push(`Aanvraag is meer dan ${maxDays} dagen: we gaan dit samen met de collega's bekijken...`)
+    }
+
     // first check if no bookings for staff member
     let numOfExistingPlannings = await this.countExistingPlanningsForStaffMember(holidayRequest)
 
@@ -411,12 +419,12 @@ export class StaffDashboardComponent implements OnInit {
       approval.issues.push(`Er zijn reeds ${numOfHolidaysOthers} andere verlofperiodes van andere collega's.`)
     }
 
-    // check if saterday and less then 3 days (except Hèra)
+    // check if saturday and less then 3 days (except Hèra)
 
     let start = holidayRequest.startDate
     let end = holidayRequest.endDate
-    let nrOfDays = dateFns.differenceInDays(holidayRequest.endDate, holidayRequest.startDate) + 1
-
+    /*    let nrOfDays = dateFns.differenceInDays(holidayRequest.endDate, holidayRequest.startDate) + 1
+    */
     if (holidayRequest.resourceId != 'cc241d0c-b650-429c-86d6-f3cbd5c32e88' && nrOfDays < 3) {
       if (this.intervalHasSaturday(start, end)) {
 
@@ -431,6 +439,20 @@ export class StaffDashboardComponent implements OnInit {
 
 
     return approval
+  }
+
+  /** Staff can only delete holidays that are more then 2 months in the future */
+  canDelete(holiday: ResourcePlanning) {
+    let start = holiday?.startDate
+
+    if (!start)
+      return false
+
+    let now = new Date()
+
+    let daysInFuture = dateFns.differenceInDays(start, now)
+
+    return (daysInFuture >= 60)
   }
 
   async deletePlanning(planning: ResourcePlanning, source: ResourcePlanning[]) {

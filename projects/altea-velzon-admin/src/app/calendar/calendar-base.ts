@@ -5,7 +5,7 @@ import { OrderFireFilters, OrderFirestoreService, ResourcePlanningService, Resou
 import { ArrayHelper, DbQueryTyped, QueryOperator } from "ts-common";
 import { AlteaDb, AlteaPlanningQueries } from "ts-altea-logic";
 import * as _ from "lodash";
-import {Mutex, MutexInterface, Semaphore, SemaphoreInterface, withTimeout} from 'async-mutex';
+import { Mutex, MutexInterface, Semaphore, SemaphoreInterface, withTimeout } from 'async-mutex';
 
 export enum BaseEventType {
     ResourceSchedule,
@@ -185,7 +185,7 @@ export abstract class CalendarBase {
 
         var humanResourceIds = humanResources.map(hr => hr.id)
 
-        var getResourceIds = [ ...humanResourceIds, branchId]
+        var getResourceIds = [...humanResourceIds, branchId]
 
         var extraPlannings = await this.alteaDb.getPlanningsByTypes(getResourceIds, start, end, AlteaPlanningQueries.extraTypes(), branchId)
 
@@ -216,14 +216,40 @@ export abstract class CalendarBase {
             dateRangeSet.resource = humanResource
 
             var absencesForResource = absencePlannings.filterByResource(humanResource.id).toDateRangeSet()
-            var extraAvailableForResource = availablePlannings.filterByResource(humanResource.id).toDateRangeSet()
 
-             if (!extraAvailableForResource.isEmpty()) {
-                dateRangeSet = dateRangeSet.add(extraAvailableForResource) 
+            let availabilitiesForResource = availablePlannings.filterByResource(humanResource.id)
 
-                console.warn('EXTRA AVAILABLE')
-                console.error(dateRangeSet)
-             }
+            if (availabilitiesForResource.notEmpty()) {
+
+                /** these resourcePlannings (resourcePlanning.ors = true) overrule the default schedule for impacted days
+                 * => first remove the corresponding full days, then add these plannings
+                 */
+                let overrulingAvailabilitiesForResource = availabilitiesForResource.filterByOverruleScheduleDay(true)
+
+                if (overrulingAvailabilitiesForResource.notEmpty()) {
+
+                    var overrulingRanges = overrulingAvailabilitiesForResource.toDateRangeSet()
+                    var fullDayRanges = overrulingRanges.fullDayRanges()
+
+                    dateRangeSet = dateRangeSet.subtract(fullDayRanges)
+                    dateRangeSet = dateRangeSet.add(overrulingRanges)
+                }
+
+
+                let extraAvailabilitiesForResource = availabilitiesForResource.filterByOverruleScheduleDay(false)
+
+                if (extraAvailabilitiesForResource.notEmpty()) {
+
+                    var extraRanges = extraAvailabilitiesForResource.toDateRangeSet()
+
+                    dateRangeSet = dateRangeSet.add(extraRanges)
+
+                    console.warn('EXTRA AVAILABLE')
+                    console.error(dateRangeSet)
+                }
+
+
+            }
 
             if (!absencesForResource.isEmpty())
                 dateRangeSet = dateRangeSet.subtract(absencesForResource)
@@ -372,12 +398,12 @@ export abstract class CalendarBase {
             if (!this.events)
                 this.events = []
             else {
-    
-                
+
+
                 // remove events of type eventType
                 const toRemove = []
-                for (let i = this.events.length-1; i >= 0 ; i--) {
-                    if (this.events[i]['type'] === eventType) 
+                for (let i = this.events.length - 1; i >= 0; i--) {
+                    if (this.events[i]['type'] === eventType)
                         toRemove.push(i)
                 }
 
@@ -385,9 +411,9 @@ export abstract class CalendarBase {
                     this.events.splice(idx, 1)
 
             }
-    
+
             this.events.push(...events)
-            
+
         });
 
 
@@ -399,6 +425,8 @@ export abstract class CalendarBase {
     */
     async showPlanningUis(context: CalendarBase, planningUis: ResourcePlanningUi[]) {
         let events = []
+
+        //planningUis = planningUis.filter(p => p.order.id == "8b8535d3-1ee2-4678-bc3a-0e136e981d6d")
 
         if (ArrayHelper.AtLeastOneItem(planningUis)) {
             console.warn(planningUis)

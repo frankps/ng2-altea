@@ -3,7 +3,7 @@ import { IDb } from '../interfaces/i-db'
 import * as dateFns from 'date-fns'
 import * as Handlebars from "handlebars"
 import * as _ from "lodash"
-import { BankTransaction, BankTxType, PaymentInfo, StripePayout } from 'ts-altea-model'
+import { BankTransaction, BankTxType, Payment, PaymentInfo, StripePayout } from 'ts-altea-model'
 import { ApiStatus, ArrayHelper } from 'ts-common'
 
 
@@ -69,11 +69,11 @@ export class BankTransactionLinking {
     
       }
 
-    async linkStripe(tx: BankTransaction) {
+    async linkStripe(tx: BankTransaction) : Promise<Payment[]> {
 
         if (!tx.prov) {
           console.error('No Stripe provider provider info available for linking!')
-          return
+          return []
         }
 
         let stripeTransactions: any[] = tx.prov.transactions
@@ -81,7 +81,7 @@ export class BankTransactionLinking {
         if (ArrayHelper.IsEmpty(stripeTransactions)) {
           let err = 'No Stripe transactions available at BankTransaction.prov.transactions'
           console.error(err)
-          return
+          return []
         }
     
         let paymentIntentIds: string[] = stripeTransactions.map(tx => tx.source?.payment_intent).filter(id => id != null && id != undefined)
@@ -94,7 +94,7 @@ export class BankTransactionLinking {
         if (ArrayHelper.IsEmpty(payments)) {
             let err = 'No internal payments found'
             console.error(err)
-            return
+            return []
         }
 
         let errors: PaymentInfo[] = []
@@ -142,6 +142,9 @@ export class BankTransactionLinking {
         var updateResult = await this.alteaDb.updatePayments(payments, ['fee', 'bankTxId', 'lnk'])
 
         console.log(updateResult)
+        
+        return payments
+
       }
 
 

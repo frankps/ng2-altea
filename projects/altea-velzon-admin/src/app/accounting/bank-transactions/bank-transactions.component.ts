@@ -323,8 +323,8 @@ export class BankTransactionsComponent implements OnInit {
 
   initFilters() {
 
-    this.bank.from = new Date(2024, 11, 1)
-    this.bank.to = new Date(2024, 11, 20)
+    this.bank.from = new Date(2024, 9, 1)
+    this.bank.to = new Date(2024, 11, 31)
 
     //this.bank.from = dateFns.addMonths(this.bank.to, -2)
 
@@ -441,14 +441,19 @@ export class BankTransactionsComponent implements OnInit {
     qry.and('date', QueryOperator.greaterThanOrEqual, DateHelper.yyyyMMddhhmmss(fromDate))
     qry.and('date', QueryOperator.lessThanOrEqual, DateHelper.yyyyMMddhhmmss(toDate))
 
-    const payTypes = [PaymentType.credit, PaymentType.debit]
+    let payTypes = [PaymentType.credit, PaymentType.debit, PaymentType.transfer]
+
+    if (tx.type == BankTxType.stripe) {
+      payTypes = [PaymentType.stripe]
+    }
+    
     qry.and('type', QueryOperator.in, payTypes)
 
     /*     qry.and('type', QueryOperator.equals, PaymentType.debit) */
 
     /*
     switch (tx.type) {
-      case BankTxType.onlineBC: 
+      case BankTxType.onlineBC:   
       case BankTxType.onlineCredit:
       case BankTxType.onlineBC:
 

@@ -123,13 +123,13 @@ export class ProductOption extends ObjectWithIdPlus {
   }
 
   getDefaultValues(returnFirstIfNoDefault: boolean = true): ProductOptionValue[] | undefined {
-    if (!this.values || this.values.length == 0)
-      return undefined
+    if (!this.hasValues())
+      return []
 
-    let values : ProductOptionValue[] = this.values.filter(v => v.default)
+    let values: ProductOptionValue[] = this.values.filter(v => v.default)
 
     if (returnFirstIfNoDefault && ArrayHelper.IsEmpty(values)) {
-      return [ this.values[0] ]
+      return [this.values[0]]
     }
 
     return values
@@ -578,6 +578,17 @@ export class Product extends ObjectWithIdPlus {
     return (this.options && this.options.length > 0)
   }
 
+  getOptionsHavingPrices() : ProductOption[] {
+
+    if (!this.hasOptions())
+      return []
+
+
+    let options = this.options.filter(o => o.hasPrice)
+
+    return options
+  }
+
   hasItems() {
     return (this.items && this.items.length > 0)
   }
@@ -644,9 +655,37 @@ export class Product extends ObjectWithIdPlus {
     if (!this.hasOptions() || !optionId)
       return null
 
-    const option = this.options.find(o => o.id == optionId)
+    let option = this.options.find(o => o.id == optionId)
 
-    return option
+    if (option)
+      return option
+
+
+    if (this.hasItems()) {
+
+      let allItemOptions = this.items.flatMap(i => i?.product?.options).filter(o => ObjectHelper.notNullOrUndefined(o))
+
+      if (ArrayHelper.NotEmpty(allItemOptions)) {
+
+        let option = allItemOptions.find(o => o.id == optionId)
+
+        return option
+      }
+    }
+
+    return null
+
+  }
+
+
+  getOptionIds(): string[] {
+
+    if (!this.hasOptions())
+      return []
+
+    let optionIds = this.options.map(o => o.id)
+
+    return optionIds
   }
 
   getOptionValues(optionId: string): ProductOptionValue[] {
@@ -730,12 +769,22 @@ export class ProductItemOptionValue {
   }
 }
 
+export enum ProductItemOptionMode {
+  /** already pre-selected in ProductItemOption.values */
+  'pre' = 'pre',
+
+  /** the customer/user can select this option */
+  'cust' = 'cust'
+}
+
 export class ProductItemOption {
   id?: string;
   name?: string;
 
   @Type(() => ProductItemOptionValue)
   values?: ProductItemOptionValue[] = []
+
+  mode: ProductItemOptionMode
 
   constructor(productOption?: ProductOption) {
 
@@ -747,21 +796,42 @@ export class ProductItemOption {
 
   }
 
+  valueIds(): string[] {
+
+    if (!this.values)
+      return []
+
+    return this.values.filter(v => v != null).map(v => v.id)
+
+  }
+
+  valueNames(): string[] {
+
+    if (!this.values)
+      return []
+
+    return this.values.filter(v => v != null).map(v => v.name)
+
+  }
+
   hasValue(): boolean {
 
-    if (Array.isArray(this.values) && this.values.length > 0) {
-      return true
-    }
-    //else {
+    return ArrayHelper.NotEmpty(this.values)
 
-    //   if (this.values?.value && this.values?.value != 0)
-    //     return true
-
-
-    // }
-
-    return false
   }
+
+  /*
+  getValues(ids: String[]): ProductOptionValue[] {
+
+    if (!Array.isArray(this.values) || !Array.isArray(ids))
+      return []
+
+    const values = this.values.filter(v => ids.indexOf(v.id) >= 0)
+
+    return values
+  }
+    */
+
 }
 
 export class ProductItem extends ObjectWithIdPlus {
@@ -962,7 +1032,7 @@ export class Price extends ObjectWithIdPlus {
   end?: number | null;
 
   qty?: number = 1
-   
+
   isQty = false
   isDay = false
   days: boolean[] = []
@@ -985,7 +1055,7 @@ export class Price extends ObjectWithIdPlus {
   @Type(() => PriceExtraQuantity)
   extraQty?: PriceExtraQuantity
 
-   
+
   productItemId?: string
 
   hasOptions = false  // true if this price also has option specific price changes

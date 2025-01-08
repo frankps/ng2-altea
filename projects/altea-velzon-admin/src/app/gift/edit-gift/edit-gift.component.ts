@@ -1,11 +1,11 @@
 
 import { Component, ViewChild, OnInit } from '@angular/core';
-import { ProductService, PriceService, ProductResourceService, ResourceService, ScheduleService, ContactService, SessionService, GiftService, ObjectService } from 'ng-altea-common'
-import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ResourceType, ResourceTypeIcons, Resource, Schedule, Contact, Language, Gift, Message, TemplateCode, GiftTemplateCode } from 'ts-altea-model'
+import { ProductService, PriceService, ProductResourceService, ResourceService, ScheduleService, ContactService, SessionService, GiftService, ObjectService, PaymentService } from 'ng-altea-common'
+import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ResourceType, ResourceTypeIcons, Resource, Schedule, Contact, Language, Gift, Message, TemplateCode, GiftTemplateCode, Payment } from 'ts-altea-model'
 import { BackendHttpServiceBase, DashboardService, FormCardSectionEventData, NgEditBaseComponent, ToastType, TranslationService } from 'ng-common'
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxModalComponent, DeleteModalComponent } from 'ng-common';
-import { BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, Translation, ObjectHelper, ObjectWithId, CollectionChangeTracker, ApiStatus, DateHelper } from 'ts-common'
+import { BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, Translation, ObjectHelper, ObjectWithId, CollectionChangeTracker, ApiStatus, DateHelper, DbQuery, QueryOperator, ArrayHelper } from 'ts-common'
 import * as _ from "lodash";
 import { NgxSpinnerService } from "ngx-spinner"
 import { NgTemplateOutlet } from '@angular/common';
@@ -46,6 +46,8 @@ export class EditGiftComponent extends NgEditBaseComponent<Gift> {
 
   templateCode
 
+  totalPayments = 0
+
   // gender: Translation[] = []
   // language: Translation[] = []
 
@@ -54,8 +56,8 @@ export class EditGiftComponent extends NgEditBaseComponent<Gift> {
 
   constructor(protected giftSvc: GiftService, protected translationSvc: TranslationService, route: ActivatedRoute, router: Router,
     spinner: NgxSpinnerService, private modalService: NgbModal, dashboardSvc: DashboardService, protected backendSvc: ObjectService,
-    protected sessionSvc: SessionService) {
-    super('gift', Gift, 'from'
+    protected sessionSvc: SessionService, protected paySvc: PaymentService) {
+    super('gift', Gift, 'from,payments.order'
       , giftSvc
       , router, route, spinner, dashboardSvc)
 
@@ -87,6 +89,14 @@ export class EditGiftComponent extends NgEditBaseComponent<Gift> {
 
     console.error('objectRetrieved')
     console.error(object)
+
+    this.totalPayments = 0
+
+    if (ArrayHelper.NotEmpty(object.payments)) {
+
+      let totalPayments = _.sumBy(object.payments, 'amount')
+      this.totalPayments = _.round(totalPayments, 2)
+    }
 
     // this.editSectionId = 'general'
   }
@@ -179,6 +189,7 @@ export class EditGiftComponent extends NgEditBaseComponent<Gift> {
 
 
   }
+
 
 
 

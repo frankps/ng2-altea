@@ -100,7 +100,7 @@
 
         <ng-container *ngIf="tx['open']">
 
-            <!--             <ng-container [ngSwitch]="tx.type">
+            <ng-container [ngSwitch]="tx.type">
                 <ng-container *ngSwitchCase="'stripe'">
 
 
@@ -113,7 +113,7 @@
                                     <div class="col-2">{{stripeTx.amount/100}}</div>
                                     <div class="col-2">{{stripeTx.fee/100}}</div>
                                     <div class="col">{{stripeTx?.source?.payment_intent}}</div>
-                                 <div class="col-3"></div>
+                                    <div class="col-3"></div>
                                     <div class="col-3"></div>
                                 </div>
 
@@ -131,7 +131,6 @@
                 </ng-container>
             </ng-container>
 
- -->
 
 
 
@@ -223,15 +222,18 @@
                                 </ng-template>
 
 
-                                <div class="col-2"> 
-                                    <i class="fa-solid fa-pen me-2" *ngIf="pay.id != payInEdit?.id; else editPaymentControls" (click)="toggleEditPayment(pay)"></i> {{pay.order.for}}</div>
+                                <div class="col-2">
+                                    <i class="fa-solid fa-pen me-2"
+                                        *ngIf="pay.id != payInEdit?.id; else editPaymentControls"
+                                        (click)="toggleEditPayment(pay)"></i> {{pay.order.for}}
+                                </div>
 
-                                    <ng-template #editPaymentControls>
-                                        <i class="fa-solid fa-floppy-disk me-2" (click)="savePayment(pay)"></i>
-                                        <i class="fa-solid fa-xmark"  (click)="cancelPayment(payIdx)"></i>
-                                    </ng-template>
-                                   
-                                    
+                                <ng-template #editPaymentControls>
+                                    <i class="fa-solid fa-floppy-disk me-2" (click)="savePayment(pay)"></i>
+                                    <i class="fa-solid fa-xmark" (click)="cancelPayment(payIdx)"></i>
+                                </ng-template>
+
+
                                 <div class="col">
 
                                     <!--  <button type="button" class="btn btn-primary btn-sm me-3" (click)="toggleEditPayment(pay)"><i class="fa-solid fa-pen"></i></button>

@@ -16,7 +16,17 @@ import { ArrayHelper, DateHelper } from "ts-common"
  * overlapAllowed = existing preparation blocks from ResourcePlanning, where overlap is allowed
  */
 export class ResourceOccupationSets {
-    constructor(public all: ResourcePlannings = new ResourcePlannings(), public available: DateRangeSet = DateRangeSet.empty,
+
+    /**
+     * 
+     * @param all 
+     * @param extraAvailable on top of default schedule
+     * @param overruleDayAvailable  forget default schedule, take these ones for the corresponding days
+     * @param unAvailable 
+     * @param overlapAllowed 
+     * @param absent 
+     */
+    constructor(public all: ResourcePlannings = new ResourcePlannings(), public extraAvailable: DateRangeSet = DateRangeSet.empty, public overruleDayAvailable: DateRangeSet = DateRangeSet.empty,
         public unAvailable: DateRangeSet = DateRangeSet.empty,
         public overlapAllowed: DateRangeSet = DateRangeSet.empty,
         public absent: DateRangeSet = DateRangeSet.empty
@@ -330,8 +340,19 @@ export class DateRangeSet {
         this.addRanges(range)
 
         return range
-
     }
+
+    fullDayRanges(): DateRangeSet {
+        if (this.isEmpty())
+            return DateRangeSet.empty
+
+        let set = new DateRangeSet()
+
+        set.ranges = this.ranges.map(range => range.fullDay())
+
+        return set
+    }
+
 
 
     outerRange(): DateRange {

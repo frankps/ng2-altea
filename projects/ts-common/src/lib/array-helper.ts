@@ -9,7 +9,7 @@ export class ArrayHelper {
     }
 
     static IsEmpty(array: any): boolean {
-        return (!Array.isArray(array) || array.length == 0)
+        return (!Array.isArray(array) || array.length == 0)  // || array.filter(item => item != null).length == 0
     }
 
 

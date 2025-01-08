@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { AvailabilityContext, DateRange, DateRangeSet, DateRangeSets, PlanningBlockSeries, PlanningMode, PossibleSlots, Product, Resource, ResourceAvailability, ResourceAvailability2, ResourcePlanning, ResourceRequest, ResourceRequestItem, ResourceType, SlotInfo, Solution, SolutionItem, SolutionNoteLevel, TimeSpan } from "ts-altea-model";
+import { AvailabilityContext, DateRange, DateRangeSet, DateRangeSets, PlanningBlockSeries, PlanningMode, PossibleSlots, Product, Resource, ResourceAvailability2, ResourcePlanning, ResourceRequest, ResourceRequestItem, ResourceType, SlotInfo, Solution, SolutionItem, SolutionNoteLevel, TimeSpan } from "ts-altea-model";
 import * as _ from "lodash"
 import { ResourceRequestOptimizer } from "./resource-request-optimizer";
 import { scheduled } from "rxjs";
@@ -300,15 +300,25 @@ export class SlotFinder {
                 // const startRange = new DateRange(startFrom, startTo)
                 const checkInRange = new DateRange(startFrom, endsOn)
 
-
-
                 const hasAffinity = requestItem.hasAffinity()
 
                 /** check if this request item is related to previous items */
                 if (hasAffinity) {
                     let affinitySolutionItem = solution.getSolutionItemForRequestItem(requestItem.affinity.id)
-                    possibleResources = affinitySolutionItem.resources
+
+                    let newPossibleResources = []
+
+                    for (let affinityResource of affinitySolutionItem.resources) {
+                        if (possibleResources.findIndex(r => r.id == affinityResource.id) >= 0)
+                            newPossibleResources.push(affinityResource)
+                        else
+                            solution.addNote(`Affinity resource '${affinityResource.name}' can't fulfill '${requestItem?.product?.name}'`)
+                    }
+
+                    possibleResources = newPossibleResources
                 }
+
+
 
                 if (hasAffinity)
                     solution.addNote(`Affinity for: ${resourceNames}`)
@@ -412,7 +422,7 @@ export class SlotFinder {
      * @param availability 
      * @returns 
      */
-    subtractGroupLevelReservations(resourcesChecked: Resource[], availabilityForResources: DateRangeSets, ctx: AvailabilityContext, availability: ResourceAvailability2, solution: Solution) : DateRangeSets {
+    subtractGroupLevelReservations(resourcesChecked: Resource[], availabilityForResources: DateRangeSets, ctx: AvailabilityContext, availability: ResourceAvailability2, solution: Solution): DateRangeSets {
 
         let origResourceIds = resourcesChecked.map(res => res.id)
 
@@ -435,7 +445,7 @@ export class SlotFinder {
 
         groupLevelPlannings = groupLevelPlannings.groupByOverlapAllowed()
 
-        
+
         if (!groupLevelPlannings || groupLevelPlannings.isEmpty())
             return availabilityForResources
 
@@ -451,12 +461,12 @@ export class SlotFinder {
 
         let resourceGroupIds = groupLevelPlannings.getGroupOnlyPlanningIds()
         let allChildResourceIds = ctx.getChildResourceIds(...resourceGroupIds)
-        
+
         let otherPossibleResourceIds = ArrayHelper.removeItems(allChildResourceIds, origResourceIds)
         let otherPossibleResources = ctx.getResources(otherPossibleResourceIds)
         let groupPlanningMinTime = groupLevelPlannings.minTime()
 
-        let otherAvailableResources = availability.getAvailabilityOfResourcesInRange(otherPossibleResources,  outerRange, groupPlanningMinTime, solution, false, false)
+        let otherAvailableResources = availability.getAvailabilityOfResourcesInRange(otherPossibleResources, outerRange, groupPlanningMinTime, solution, false, false)
 
 
         for (let planning of groupLevelPlannings.plannings) {
@@ -476,7 +486,7 @@ export class SlotFinder {
             let childResourceIds = ctx.getChildResourceIds(groupId)
 
             let childResourceIdsNotYetChecked = childResourceIds.filter(id => resourcesChecked.findIndex(res => res.id == id) == -1)
-            
+
             availabilityForResources = availabilityForResources.reduce(childResourceIds, dateRange, 1, ctx.allResources)
 
             solution.addNotes(availabilityForResources.notes)
@@ -559,7 +569,7 @@ export class SlotFinder {
 
         let solutionCount = 0
 
-        
+
 
         while (solution = solutionsToCheck.pop()) {
 

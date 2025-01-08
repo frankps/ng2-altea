@@ -592,7 +592,10 @@ export class AvailabilityContext {
 
         const availablePlannings = exclusivePlannings.filterByAvailable()
         
+        let extraAvailabilitiesForResource = availablePlannings.filterByOverruleScheduleDay(false)
 
+        /** these resourcePlannings (resourcePlanning.ors = true) overrule the default schedule for impacted days */
+        let overrulingAvailabilitiesForResource = availablePlannings.filterByOverruleScheduleDay(true)
 
         const unavailable = exclusivePlannings.filterByAvailable(false)
 
@@ -603,7 +606,8 @@ export class AvailabilityContext {
 
         const result = new ResourceOccupationSets(
             planningsForResource,
-            availablePlannings.toDateRangeSet(),
+            extraAvailabilitiesForResource.toDateRangeSet(),
+            overrulingAvailabilitiesForResource.toDateRangeSet(),
             unavailable.toDateRangeSet(),
             overlapAllowedPlannings.toDateRangeSet(),
             absent.toDateRangeSet()

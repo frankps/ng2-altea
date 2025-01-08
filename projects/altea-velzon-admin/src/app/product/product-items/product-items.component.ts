@@ -1,6 +1,6 @@
 import { Component, ViewChild, OnInit, Input } from '@angular/core';
 import { ProductService, PriceService, ProductResourceService, ProductOptionService, SessionService, ProductOptionValueService, ProductItemService } from 'ng-altea-common'
-import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ProductOptionValue, ProductItem, ProductItemOptionValue, ProductSubType } from 'ts-altea-model'
+import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ProductOptionValue, ProductItem, ProductItemOptionValue, ProductSubType, ProductItemOptionMode } from 'ts-altea-model'
 import { DashboardService, FormCardSectionEventData, NgEditBaseComponent, ToastType, TranslationService } from 'ng-common'
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxModalComponent, DeleteModalComponent } from 'ng-common';
@@ -21,7 +21,7 @@ import { SearchProductComponent } from '../search-product/search-product.compone
   templateUrl: './product-items.component.html',
   styleUrls: ['./product-items.component.scss'],
 })
-export class ProductItemsComponent {
+export class ProductItemsComponent implements OnInit {
 
   @ViewChild('searchProductModal') public searchProductModal: SearchProductComponent;
 
@@ -55,6 +55,9 @@ export class ProductItemsComponent {
     return this._product
   }
 
+
+  data = {}
+
   ListSectionMode = ListSectionMode
   mode = ListSectionMode.readOnly // readOnly
 
@@ -75,8 +78,23 @@ export class ProductItemsComponent {
   // create array from 1 to 20 
   qtyArray = [...Array(20).keys()].map(i => i + 1)
 
-  constructor(protected productItemSvc: ProductItemService, protected productSvc: ProductService, protected spinner: NgxSpinnerService, protected dashboardSvc: DashboardService) {
 
+  optionModes: Translation[] = []
+
+  init = false
+
+  constructor(protected productItemSvc: ProductItemService, protected productSvc: ProductService, protected spinner: NgxSpinnerService, 
+    protected dashboardSvc: DashboardService, protected translationSvc: TranslationService) {
+
+
+  }
+
+  
+  async ngOnInit() {
+
+    await this.translationSvc.translateEnum(ProductItemOptionMode, 'enums.product-item-option-mode.', this.optionModes)
+
+    this.init = true
   }
 
 

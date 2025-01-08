@@ -48,6 +48,15 @@ export class ObjectHelper {
         return typedClone
     }
 
+
+    static isNullOrUndefined(obj) : boolean {
+        return obj === undefined || obj === null
+    }
+
+    static notNullOrUndefined(obj) : boolean {
+        return obj !== undefined && obj !== null
+    }
+
     /** before saving to the backend we want to remove linked objects (propsToRemove), we don't want to this on the original objects, but on a clone
      * => the original objects still have the linked objects
      */

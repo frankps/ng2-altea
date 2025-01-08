@@ -1,5 +1,5 @@
 
-import { Branch, Contact, DepositMode, Invoice, Order, OrderLine, OrderLineOption, OrderLineOptionValue, OrderType, Organisation, PlanningMode, Product, ProductResource, ProductType, ResourcePlanning, Schedule, TimeUnit, User } from "ts-altea-model";
+import { Branch, Contact, DepositMode, Invoice, Order, OrderLine, OrderLineOption, OrderLineOptionValue, OrderType, Organisation, Payment, PlanningMode, Product, ProductResource, ProductType, ResourcePlanning, Schedule, TimeUnit, User } from "ts-altea-model";
 import { Exclude, Type, Transform } from "class-transformer";
 import 'reflect-metadata';
 import { ArrayHelper, ConnectTo, DateHelper, DbObjectCreate, IAsDbObject, ManagedObject, ObjectHelper, ObjectMgmt, ObjectReference, ObjectWithId, ObjectWithIdPlus, QueryOperator, TimeHelper } from 'ts-common'
@@ -387,6 +387,10 @@ export class Gift extends ObjectWithIdPlus {
   @Type(() => GiftLine)
   lines?: GiftLine[] = []
 
+  @Type(() => Payment)
+  payments?: Payment[] = []
+
+
   invoice = false
 
   /** the vat% that will be used if gift is invoice and type=amount  */
@@ -535,7 +539,11 @@ export class Gift extends ObjectWithIdPlus {
   }
 
   hasLines() {
-    return Array.isArray(this.lines) && this.lines.length > 0
+    return ArrayHelper.NotEmpty(this.lines)  
+  }
+
+  hasPayments() {
+    return ArrayHelper.NotEmpty(this.payments)  
   }
 
   methodSelected() {

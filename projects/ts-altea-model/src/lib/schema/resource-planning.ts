@@ -97,7 +97,7 @@ export class ResourcePlannings {
     return ArrayHelper.NotEmpty(this.plannings)
   }
 
-  firstOfType(type: PlanningType) : ResourcePlanning {
+  firstOfType(type: PlanningType): ResourcePlanning {
     return this.plannings.find(p => p.type == type)
   }
 
@@ -215,7 +215,7 @@ export class ResourcePlannings {
     return new ResourcePlannings(planningsForResource)
   }
 
-  filterByResourceType(resourceId: string, ... types: PlanningType[]): ResourcePlannings {
+  filterByResourceType(resourceId: string, ...types: PlanningType[]): ResourcePlannings {
 
     const planningsForResource = this.plannings.filter(rp => rp.resourceId == resourceId && types.indexOf(rp.type) >= 0)
 
@@ -223,6 +223,16 @@ export class ResourcePlannings {
       return new ResourcePlannings()
 
     return new ResourcePlannings(planningsForResource)
+  }
+
+  filterByOverruleScheduleDay(overrule: boolean = true): ResourcePlannings {
+
+    const filtered = this.plannings.filter(rp => rp.ors == overrule)
+
+    if (!Array.isArray(filtered))
+      return new ResourcePlannings()
+
+    return new ResourcePlannings(filtered)
   }
 
   filterByOverlapAllowed(overlap: boolean = false): ResourcePlannings {
@@ -274,7 +284,7 @@ export class ResourcePlannings {
     const debug = this.plannings.filter(rp => rp.resourceGroupId && !rp.resourceId &&
       rp.end > fromNum && rp.start < toNum)
 
-   // console.error(debug)
+    // console.error(debug)
 
     const planningsForResource = this.plannings.filter(rp => rp.resourceGroupId && !rp.resourceId &&
       groupResourceIds.indexOf(rp.resourceGroupId) >= 0 && rp.end > fromNum && rp.start < toNum)
@@ -549,18 +559,27 @@ export class ResourcePlanning extends ObjectWithIdPlus implements IAsDbObject<Re
   @Type(() => PlanningInfo)
   info?: PlanningInfo
 
+  /** remark */
+  rem?: string
+
   type = PlanningType.occ
 
   start?: number = DateHelper.yyyyMMddhhmmss(new Date())
   end?: number = DateHelper.yyyyMMddhhmmss(new Date())
 
-  /** date format: default (if not specified or fmt='s' -seconds-) is yyyyMMddhhmmss
-  *  fmt='d' -days- is yyyyMMdd
+  /** date format: 
+   *  's': second format, start & end have format yyyyMMddhhmmss
+   *  'd': hour format, UI just works with dates (not hours), start has format yyyyMMdd000000, end has format yyyyMMdd235959
   */
   fmt?: undefined | null | 's' | 'd'
 
   /** is preperation time (before or after actual treatment) */
   prep: boolean = false
+
+  /** Overrule schedule: used to overrule a normal day schedule of (for instance) staff member. So schedule will not be used, instead we use
+   * this record (planning type: avl)
+   */
+  ors: boolean = false
 
   /** overlap allowed, used if: 
    *     (1) prep=true Example: when cleaning of wellness can overlap the preparation of the next session 
@@ -614,6 +633,27 @@ export class ResourcePlanning extends ObjectWithIdPlus implements IAsDbObject<Re
     let hour = dateFns.format(this.startDate, 'HH:mm')    //DateHelper.parse(this.start)
 
     return hour
+  }  
+
+  set endDate(value: Date) {
+    this.end = DateHelper.yyyyMMddhhmmss(value)
+  }
+
+  get endDate() {
+    return DateHelper.parse(this.end)
+  }
+
+  set fullDays(value: boolean) {
+    this.fmt = value ? 'd' : 's'
+  }
+
+  @Exclude()
+  get fullDays() {
+    return this.fmt == 'd'
+  }
+
+  dateFormat() {
+    return this.fmt == 'd' ? 'dd/MM/yyyy' : 'dd/MM/yyyy HH:mm'
   }
 
   setDates(range: DateRange) {
@@ -623,6 +663,19 @@ export class ResourcePlanning extends ObjectWithIdPlus implements IAsDbObject<Re
     this.startDate = range.from
     this.endDate = range.to
   }
+
+  nrOfDays() {
+
+    let start = this.startDate
+    let end = this.endDate
+
+    if (DateHelper.isDate(start) && DateHelper.isDate(end)) {
+      let days = dateFns.differenceInDays(end, start) + 1
+      return days
+    } else
+      return -1
+  }
+
 
   /**
    * 
@@ -658,13 +711,7 @@ export class ResourcePlanning extends ObjectWithIdPlus implements IAsDbObject<Re
     return newStart
   }
 
-  set endDate(value: Date) {
-    this.end = DateHelper.yyyyMMddhhmmss(value)
-  }
 
-  get endDate() {
-    return DateHelper.parse(this.end)
-  }
 
   toDateRange(): DateRange {
 

@@ -41,6 +41,7 @@
     "new": "Nieuw",
     "ok": "OK",
     "passwd": "Paswoord",
+    "payments": "Betalingen",
     "payOnline": "Online betalen",
     "preview": "Preview",
     "phone": "Tel",
@@ -326,6 +327,10 @@
       "6": "Zaterdag",
       "7": "Zondag"
     },
+    "product-item-option-mode": {
+      "pre": "Vaste selectie",
+      "cust": "Klant selecteerd"
+    },
     "product-type": {
       "prod": "Product",
       "svc": "Dienst",
@@ -344,10 +349,12 @@
     "planning-type": {
       "occ": "Bezet",
       "hol": "Vakantie",
+      "holReq": "Vakantie aanvraag",
       "bnk": "Feestdag",
       "ill": "Ziekte",
       "abs": "Afwezig",
       "edu": "Opleiding",
+      "sch": "Schedule",
       "avl": "Beschikbaar",
       "tsk": "Taak",
       "brk": "Pauze",
@@ -1108,7 +1115,10 @@
       "value": "Waarde"
     },
     "productItem": {
-      "optionQty": "Aantal via product optie"
+      "optionQty": "Aantal via product optie",
+      "option": {
+        "mode": "Selectie mode"
+      }
     },
     "productOption": {
       "public": "Klant kan optie zien & selecteren",
@@ -1184,6 +1194,10 @@
       "help": {
         "price": "Prijs per behandeling"
       }
+    },
+    "resourcePlanning": {
+      "fullDays": "Volledige dag(en)",
+      "ors": "Overrule dagplanning"
     },
     "optionPrice": {
       "allValues": "Geldig voor alle optie waarden",

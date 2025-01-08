@@ -19,7 +19,9 @@ export class UserSelectComponent implements OnInit {
   @Output() select: EventEmitter<Resource> = new EventEmitter<Resource>();
 
 
-  constructor(private modalService: NgbModal, protected resourceSvc: ResourceService, protected planningSvc: ResourcePlanningService, protected router: Router) {
+  constructor(private modalService: NgbModal, protected resourceSvc: ResourceService, protected planningSvc: ResourcePlanningService, protected router: Router,
+    protected sessionSvc: SessionService
+  ) {
 
   }
 
@@ -41,7 +43,7 @@ export class UserSelectComponent implements OnInit {
 
     
 
-    if (humanResource?.id) {
+    if (humanResource?.id && !this.sessionSvc.hasRole('admin')) {
       var staffCheckedIn = await this.planningSvc.staffCheckedIn(humanResource.id)
 
       if (!staffCheckedIn) {

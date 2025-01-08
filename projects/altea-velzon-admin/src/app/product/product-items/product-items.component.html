@@ -47,7 +47,7 @@
                                         <ng-container *ngIf="option.values">
                                             <ng-container *ngIf="Array.isArray(option.values)">
                                                 <span
-                                                    *ngFor="let val of option.values; let idx3 = index">{{val.name}}</span>
+                                                    *ngFor="let val of option.values; let idx3 = index">{{val?.name}}</span>
                                             </ng-container>
                                             <!-- 
                                             <ng-container *ngIf="!Array.isArray(option.values)">
@@ -114,27 +114,45 @@
                                     </ng-container>
 
 
-
+                                    <span *ngIf="item.optionQty">{{getQty(item)}}</span>
                                     &nbsp;&nbsp;x&nbsp;
 
                                     <div>{{item.name}}</div>
                                 </div>
                             </div>
+                        </div>
+                        <div class="row ms-3">
                             <div class="col">
 
                                 <ul *ngIf="dependingProduct">
                                     <li class="mt-2" *ngFor="let option of dependingProduct.options; let idx2 = index">
 
-                                        <div class="row">
-                                            <div class="col">{{option.name}}:</div>
-                                            <div class="col-6">
-                                                <ng-select id="optionValues" name="optionValues"
-                                                    [items]="itemOptionValues.get(option.id)" bindLabel="name"
-                                                    [clearable]="true" [multiple]="false"
-                                                    [(ngModel)]="item.getOption(option).values[0]">
-                                                </ng-select>
+                                            <div class="row">
+                                                <div class="col-4">{{option.name}}:</div>
+                                                <div class="col-4">
+    
+                                                    <ngx-altea-label-control label="objects.productItem.option.mode" [trans]="true"
+                                                        for="gender">
+                                                        <ng-select *ngIf="init" id="optionMode" name="optionMode" [items]="optionModes"
+                                                            bindLabel="trans" bindValue="key" [clearable]="false"
+                                                            [multiple]="false" [(ngModel)]="item.getOption(option).mode">
+                                                        </ng-select>
+                                                    </ngx-altea-label-control>
+    
+    
+    
+                                                </div>
+                                                <div class="col-4">
+                                                    <ng-select id="optionValues" name="optionValues" *ngIf="item.getOption(option).mode == 'pre'"
+                                                        [items]="itemOptionValues.get(option.id)" bindLabel="name"
+                                                        [clearable]="true" [multiple]="false"
+                                                        [(ngModel)]="item.getOption(option).values[0]">
+                                                    </ng-select>
+                                                </div>
                                             </div>
-                                        </div>
+    
+
+                           
 
                                     </li>
                                 </ul>

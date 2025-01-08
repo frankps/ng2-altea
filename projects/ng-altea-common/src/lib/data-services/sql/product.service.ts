@@ -65,8 +65,8 @@ options:orderBy=idx.values:orderBy=idx
    * @param categoryId if 'any', then we search categoryId independent
    * @returns 
    */
-  getCategories$(type?: ProductType, categoryId: 'any' | string | null = 'any'): Promise<Product[]> {
-    const query = this.getCategoriesQuery(type, categoryId)
+  getCategories$(type?: ProductType, categoryId: 'any' | string | null = 'any', checkOnlineVisible: boolean = true): Promise<Product[]> {
+    const query = this.getCategoriesQuery(type, categoryId, checkOnlineVisible)
     return this.query$(query)
   }
 
@@ -101,7 +101,7 @@ options:orderBy=idx.values:orderBy=idx
     return unitProducts
   }
 
-  getCategoriesQuery(type?: ProductType, categoryId: 'any' | string | null = null): DbQuery {
+  getCategoriesQuery(type?: ProductType, categoryId: 'any' | string | null = null, checkOnlineVisible: boolean = true): DbQuery {
 
     const query = new DbQuery()
 
@@ -114,7 +114,9 @@ options:orderBy=idx.values:orderBy=idx
     if (categoryId != 'any')
       query.and('catId', QueryOperator.equals, categoryId)
 
-    query.and('online', QueryOperator.not, OnlineMode.invisible)
+    if (checkOnlineVisible)
+      query.and('online', QueryOperator.not, OnlineMode.invisible)
+
     query.take = 200
     query.select('id', 'catId', 'name', 'type', 'sub')
 

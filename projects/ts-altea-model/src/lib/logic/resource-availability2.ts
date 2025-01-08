@@ -6,7 +6,7 @@ import { TimeSpan } from "./dates/time-span";
 import { AvailabilityRequest } from "./availability-request";
 import { ResourceOccupationSets, DateRange, DateRangeSet, DateRangeSets, ResourceAvailabilitySets } from "./dates";
 import { AvailabilityContext } from "./availability-context";
-import { ObjectWithId } from 'ts-common'
+import { ArrayHelper, ObjectWithId } from 'ts-common'
 import { Solution, SolutionNote, SolutionNoteLevel } from "./solution";
 import * as dateFns from 'date-fns'
 import { ResourceRequestItem } from "./resource-request";
@@ -71,12 +71,19 @@ export class ResourceAvailability2 {
             const resourceOccupation = ctx.getResourceOccupation2(resourceId)
             console.error(resourceOccupation)
 
-            const extendedSchedule = normalScheduleRanges.union(resourceOccupation.available)
+            let extendedSchedule = normalScheduleRanges
 
+            if (resourceOccupation.overruleDayAvailable.notEmpty()) {
+                var fullDayRanges = resourceOccupation.overruleDayAvailable.fullDayRanges()
+
+                extendedSchedule = extendedSchedule.subtract(fullDayRanges)
+                extendedSchedule = extendedSchedule.add(resourceOccupation.overruleDayAvailable)
+            }
+
+            if (resourceOccupation.extraAvailable.notEmpty())
+                extendedSchedule = extendedSchedule.union(resourceOccupation.extraAvailable)
 
             extendedSchedule.removeBefore()
-
-
 
             let workingHours = extendedSchedule.subtract(resourceOccupation.absent)
 
@@ -194,7 +201,7 @@ export class ResourceAvailability2 {
     /** check the availability of given resources inside range (insideRange), only return blocks > minTime */
     getAvailabilityOfResourcesInRange(resources: Resource[], insideRange: DateRange, minTime: TimeSpan, solution: Solution, excludeSolutionOccupation: boolean, durationAlreadyIncluded: boolean, personId?: string): DateRangeSets {
 
-        if (!Array.isArray(resources) || resources.length == 0)
+        if (ArrayHelper.IsEmpty(resources))
             return DateRangeSets.empty
 
         const allSets = new DateRangeSets()

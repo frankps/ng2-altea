@@ -11,7 +11,7 @@ import * as Handlebars from "handlebars"
 import * as sc from 'stringcase'
 import { OrderPersonMgr } from "../order-person-mgr";
 import { CancelOrderMessage } from "ts-altea-logic";
-import { Branch, Contact, DepositMode, FormulaTerm, Invoice, Order, OrderType, Organisation, Payment, PaymentType, PlanningMode, PriceMode, Product, ProductOption, ProductOptionValue, ProductType, Resource, ResourcePlanning, Subscription } from "ts-altea-model";
+import { Branch, Contact, DepositMode, FormulaTerm, Invoice, Order, OrderType, Organisation, Payment, PaymentType, PlanningMode, PriceMode, Product, ProductItemOption, ProductItemOptionMode, ProductOption, ProductOptionValue, ProductType, Resource, ResourcePlanning, Subscription } from "ts-altea-model";
 
 export class OrderLineOptionSummary {
   /** option name */
@@ -175,6 +175,16 @@ export class OrderLineOption extends ObjectWithId {
       return false
 
     var idx = this.values.findIndex(val => val?.d === false)
+
+    return idx >= 0
+  }
+
+  hasAtLeastOne(valueIds: string[]): boolean {
+
+    if (!this.values)
+      return false
+
+    var idx = this.values.findIndex(val => valueIds.indexOf(val.id) >= 0)
 
     return idx >= 0
   }
@@ -404,7 +414,7 @@ export class OrderLine extends ObjectWithIdPlus {
   /** custom price: unit price entered manually */
   cust: boolean = false
 
-  @Type(() => Number)  
+  @Type(() => Number)
   excl = 0;
 
   @Type(() => Number)
@@ -458,32 +468,83 @@ export class OrderLine extends ObjectWithIdPlus {
 
     for (const option of product.options) {
 
-      let optionValues: ProductOptionValue[]
+      let orderLineOption = this.createOrderLineOption(option, initOptionValues)
 
-      if (initOptionValues && initOptionValues.has(option.id)) {
-        let valueIds = initOptionValues.get(option.id)
+      if (orderLineOption)
+        this.options.push(orderLineOption)
 
-        if (Array.isArray(valueIds) && valueIds.length > 0) {
+    }
 
-          optionValues = option.getValues(valueIds)
 
+    /** In case of arrangements (bundles => product has product.items) 
+     * 
+     */
+
+    if (ArrayHelper.NotEmpty(product.items)) {
+
+      for (let item of product.items) {
+
+        let dependentProduct = item.product
+
+        if (!dependentProduct) {
+          console.error('dependent product not loaded!')
+          continue
+        }
+
+        for (let productItemOption of item.options) {
+
+          let dependentOption = dependentProduct.getOption(productItemOption.id)
+
+          if (!dependentOption) {
+            console.error('dependent option not found!')
+            continue
+          }
+
+          if (productItemOption.mode == ProductItemOptionMode.cust) {
+
+            let orderLineOption = this.createOrderLineOption(dependentOption, initOptionValues)
+
+            if (orderLineOption)
+              this.options.push(orderLineOption)
+
+          }
 
         }
       }
 
-      if (!Array.isArray(optionValues) || optionValues.length == 0)
-        optionValues = option.getDefaultValues()
-
-      if (optionValues) {
-        const orderLineOption = new OrderLineOption(option, ...optionValues)
-        this.options.push(orderLineOption)
-      }
 
     }
 
     this.calculateAll()
     console.error(this.incl)
   }
+
+  createOrderLineOption(productOption: ProductOption, initOptionValues?: Map<String, String[]>): OrderLineOption {
+
+    let optionValues: ProductOptionValue[]
+
+    if (initOptionValues && initOptionValues.has(productOption.id)) {
+      let valueIds = initOptionValues.get(productOption.id)
+
+      if (Array.isArray(valueIds) && valueIds.length > 0) {
+
+        optionValues = productOption.getValues(valueIds)
+
+
+      }
+    }
+
+    if (!Array.isArray(optionValues) || optionValues.length == 0)
+      optionValues = productOption.getDefaultValues(!productOption.multiSelect)
+
+    if (optionValues) {
+      const orderLineOption = new OrderLineOption(productOption, ...optionValues)
+      return orderLineOption
+    }
+
+    return null
+  }
+
 
   override toString() {
 
@@ -627,8 +688,8 @@ export class OrderLine extends ObjectWithIdPlus {
 
     let res = _.remove(this.pc, pc => pc.id == priceId)
 
-/*     if (ArrayHelper.NotEmpty(res))
-      this.calculateAll() */
+    /*     if (ArrayHelper.NotEmpty(res))
+          this.calculateAll() */
 
   }
 
@@ -646,9 +707,8 @@ export class OrderLine extends ObjectWithIdPlus {
 
   }
 
-  calculateAll() {
-    //  this.setUnitPrice()
-    this.calculateInclThenExcl()
+  calculateAll(): number {
+    return this.calculateInclThenExcl()
   }
 
   hasPersons(): boolean {
@@ -721,7 +781,11 @@ export class OrderLine extends ObjectWithIdPlus {
 
   setUnitPrice() {
 
-    console.warn('makeTotals')
+    if (this.cust)
+      return
+
+    console.warn('setUnitPrice')
+
 
     let previousUnit = this.unit
 
@@ -735,10 +799,71 @@ export class OrderLine extends ObjectWithIdPlus {
 
     let unitPrice = this.base
 
-    if (ArrayHelper.IsEmpty(this.options)) {
+    if (!this.hasOptions()) {
       return unitPrice
     }
 
+    /**
+     * Code introduced for when price of subscription is defined by (options of) containing products (product.items)
+     */
+    if (this.product.isSubscription() && this.product.hasItems()) {
+
+      for (let productItem of this.product.items) {
+
+        let qty = productItem.qty
+
+        if (productItem.optionQty && productItem.optionId) {
+          let qtyOrderLineOption = this.getOptionById(productItem.optionId)
+
+          if (qtyOrderLineOption.hasValues())
+            qty = qtyOrderLineOption.values[0].val
+        }
+
+        // unitPrice += qty
+
+        let optionPrices = 0
+
+        for (let productItemOption of productItem.options) {
+
+          let orderLineOption = this.getOptionById(productItemOption.id)
+
+          optionPrices = _.sumBy(orderLineOption.values, 'prc')
+
+          if (optionPrices)
+            unitPrice += qty * optionPrices
+
+        }
+
+      }
+    }
+
+    // Handle 
+
+
+    let optionsWithPrice = this.product.getOptionsHavingPrices()
+    for (let option of optionsWithPrice) {
+
+      let orderLineOption = this.getOptionById(option.id)
+
+      if (!orderLineOption)
+        continue
+
+      for (const orderLineOptionValue of orderLineOption.values) {
+
+        if (option.hasFormula)
+          unitPrice += orderLineOptionValue.getPrice(option.formula, this.options)
+        else if (option.hasPrice)
+          unitPrice += orderLineOptionValue.prc
+
+       // unitPrice += orderLineOptionValue.getPrice(formula, this.options)
+        // totalDuration += value.duration
+      }
+
+
+    }
+
+
+    /*
     for (const option of this.options) {
       if (!option.values)
         continue
@@ -748,19 +873,13 @@ export class OrderLine extends ObjectWithIdPlus {
         // totalDuration += value.duration
       }
     }
-
+      */
 
     let priceChange = this.calculatePriceChanges(unitPrice)
 
     if (priceChange)
       unitPrice += priceChange
 
-    /*
-    let specialPricing = this.calculateSpecialPricing(unitPrice, startDate, creationDate)
-
-    if (specialPricing)
-      unitPrice += specialPricing
-    */
     return unitPrice
   }
 
@@ -816,6 +935,17 @@ export class OrderLine extends ObjectWithIdPlus {
     let olOption = this.options.find(o => o.id == optionId)
     return olOption
   }
+
+  getOptions(...optionIds: string[]): OrderLineOption[] {
+
+    if (ArrayHelper.IsEmpty(optionIds))
+      return []
+
+    let olOptions = this.options.filter(o => optionIds.indexOf(o.id) >= 0)
+
+    return olOptions
+  }
+
 
   getOption(option: OrderLineOption): OrderLineOption {
 

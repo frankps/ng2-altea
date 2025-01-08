@@ -84,7 +84,7 @@ https://www.npmjs.com/package/ngx-printer#rendering-time
                     <div class="col-2 d-flex justify-content-end">{{line.unit}}</div>
                   <!--   <div class="col-3">{{line.vat | currency:branch.cur}}</div> -->
                     <div class="col-2 d-flex justify-content-end">{{line.incl}}</div>
-                    <div class="col-3">{{line.product.vatPct}}% <span class="float-end">{{line.vat}}</span></div>
+                    <div class="col-3">{{line?.vatPct}}% <span class="float-end">{{line.vat}}</span></div>
                 </div>
 
 

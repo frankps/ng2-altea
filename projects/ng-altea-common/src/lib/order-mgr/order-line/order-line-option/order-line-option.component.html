@@ -1,0 +1,40 @@
+
+
+<ng-container *ngIf="productOption?.multiSelect; else optionValueSingleSelect">
+
+    <div class="row mt-1">
+        <div class="col">{{orderLineOption.name}}</div>
+    </div>
+
+    <div class="row mt-1" *ngFor="let value of orderLineOption.values">
+        <div class="col-1"></div>
+        <div class="col">
+            <div class="form-check form-check-small">
+                <input class="form-check-input" type="checkbox" id="value_{{value.id}}"
+                    [checked]="orderLine.optionValueSelected(orderLineOption, value.id)"
+                    (change)="parent.multiOptionValueChanged(orderLineOption, value, $event.target['checked'])" />
+                <label class="form-check-label" for="value_{{value.id}}">{{value.name}}</label>
+
+                <span class="float-end">{{value.prc}} {{parent.sessionSvc.currencySymbol}}</span>
+            </div>
+
+
+        </div>
+    </div>
+
+</ng-container>
+
+<ng-template #optionValueSingleSelect>
+    <div class="row mt-1">
+        <div class="col-6">{{orderLineOption.name}}</div>
+        <div class="col-6">
+            <ng-select id="option_{{orderLineOption.id}}" name="option_{{orderLineOption.id}}"
+                [items]="orderLineOption.values" bindLabel="name" [clearable]="false" [multiple]="false"
+                [(ngModel)]="orderLine.getOption(orderLineOption).values[0]"
+                (change)="parent.optionChanged(orderLineOption, $event)">
+            </ng-select>
+        </div>
+    </div>
+</ng-template>
+
+

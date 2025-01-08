@@ -46,6 +46,7 @@ import { OrderDebugComponent } from './order-debug/order-debug.component';
 import { OrderDebugInfoComponent } from './order-debug-info/order-debug-info.component'
 import { EditInvoiceComponent } from './edit-invoice/edit-invoice.component';
 import { PreviewInvoiceComponent } from './preview-invoice/preview-invoice.component';
+import { OrderLineOptionComponent } from './order-line/order-line-option/order-line-option.component';
 
 
 @NgModule({
@@ -75,7 +76,8 @@ import { PreviewInvoiceComponent } from './preview-invoice/preview-invoice.compo
     OrderDebugComponent,
     OrderDebugInfoComponent,
     EditInvoiceComponent,
-    PreviewInvoiceComponent
+    PreviewInvoiceComponent,
+    OrderLineOptionComponent
   ],
   imports: [
     CommonModule,

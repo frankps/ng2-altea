@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { OrderMgrUiService } from '../order-mgr-ui.service';
-import { CompensationGiftReason, Gift, LoyaltyReward, Payment, PaymentType, Subscription, TemplateCode } from 'ts-altea-model';
+import { CompensationGiftReason, Gift, LoyaltyReward, OrderLine, Payment, PaymentType, Subscription, TemplateCode } from 'ts-altea-model';
 import { GiftService } from '../../data-services/sql/gift.service';
 import { SessionService } from '../../session.service';
 import { SubscriptionService } from '../../data-services/sql/subscription.service';
@@ -124,6 +124,9 @@ export class PosPaymentComponent implements OnInit {
     query.and('act', QueryOperator.equals, true)
     query.and('contactId', QueryOperator.equals, contactId)
 
+    // subscriptionProduct
+    query.include('subscriptionProduct.items')
+    //    query.include('unitProduct.items')
 
     this.subscriptions = await this.subSvc.query$(query)
 
@@ -184,6 +187,50 @@ export class PosPaymentComponent implements OnInit {
   }
 
 
+  canUseSubscription(orderLine: OrderLine, subs: Subscription): boolean {
+
+    let openQty = subs.openQty()
+
+    if (openQty <= 0)
+      return false
+
+    if (orderLine.productId != subs.unitProductId)
+      return false
+
+    for (let prodItem of subs.subscriptionProduct.items) {
+
+
+      for (let option of prodItem.optionsWithValues) {
+
+        let orderLineOption = orderLine.getOptionById(option.id)
+
+        if (!orderLineOption) {
+          let msg = `Orderline is missing option ${option.name}`
+          console.warn(msg)
+          return false
+        }
+
+        let valueIds = option.valueIds()
+
+        if (valueIds.length > 0 && !orderLineOption.hasAtLeastOne(valueIds)) {
+
+          let possibleValues = option.valueNames()
+          let msg = `Orderline option '${option.name}' is missing specific value: ${possibleValues.join(',')}`
+          console.warn(msg)
+          return false
+        }
+
+
+      }
+
+    }
+
+
+    return true
+
+  }
+
+
   async useSubscription(subs: Subscription) {
 
     // whatever the current price, we need to pay the product (identified by unitProductId)
@@ -193,13 +240,27 @@ export class PosPaymentComponent implements OnInit {
 
     */
 
+
+
+    console.warn('useSubscription', subs)
+
+
     let orderLine = this.mgrUiSvc.order.getLineByProduct(subs.unitProductId)
 
     if (orderLine) {
 
-      /** The back-end will update the subscription when saving the order */
-      const payment = await this.mgrUiSvc.addPayment(orderLine.product.salesPrice, PaymentType.subs, 'pos')
-      payment.subsId = subs.id
+      let canUseSubscription = this.canUseSubscription(orderLine, subs)
+
+      if (canUseSubscription) {
+
+        /** The back-end will update the subscription when saving the order */
+        const payment = await this.mgrUiSvc.addPayment(orderLine.unit, PaymentType.subs, 'pos')
+        
+        payment.subsId = subs.id
+        subs.usedQty++
+
+      }
+
 
     }
 

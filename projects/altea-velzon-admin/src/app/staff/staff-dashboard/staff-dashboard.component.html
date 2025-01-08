@@ -42,9 +42,9 @@
     <span *ngIf="!hasHolidayRequests()">Geen verlofaanvragen</span>
 
     <div class="row" *ngFor="let req of holidayRequests">
-        <div class="col-3">{{req.startDate | date:'dd/MM/yy'}}</div>
-        <div class="col-3">{{req.endDate | date:'dd/MM/yy'}}</div>
-        <div class="col-3"><i class="fas fa-trash" (click)="deletePlanning(req, holidayRequests)"></i>
+        <div class="col-2">{{req.startDate | date:'dd/MM/yy'}}</div>
+        <div class="col-2">{{req.endDate | date:'dd/MM/yy'}}</div>
+        <div class="col-2"><i class="fas fa-trash" (click)="deletePlanning(req, holidayRequests)"></i>
         </div>
     </div>
 
@@ -92,9 +92,9 @@
     <span *ngIf="!hasHolidays()">Geen verlof gepland</span>
 
     <div class="row" *ngFor="let hol of holidays">
-        <div class="col-3">{{hol.startDate | date:'dd/MM/yy'}}</div>
-        <div class="col-3">{{hol.endDate | date:'dd/MM/yy'}}</div>
-        <div class="col-3"></div>
+        <div class="col-2">{{hol.startDate | date:'dd/MM/yy'}}</div>
+        <div class="col-2">{{hol.endDate | date:'dd/MM/yy'}}</div>
+        <div class="col-2"><i class="fas fa-trash" *ngIf="canDelete(hol)" (click)="deletePlanning(hol, holidays)"></i></div>
         <div class="col-3"></div>
     </div>
 

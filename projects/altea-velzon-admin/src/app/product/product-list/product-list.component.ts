@@ -124,7 +124,8 @@ export class ProductListComponent extends NgBaseListComponent<Product> implement
 
   async startMoveSelected() {
 
-    this.categories = await this.productSvc.getCategories$(this.productType)
+    let checkOnlineVisible = false
+    this.categories = await this.productSvc.getCategories$(this.productType, 'any', checkOnlineVisible)
 
     console.warn(this.categories)
 

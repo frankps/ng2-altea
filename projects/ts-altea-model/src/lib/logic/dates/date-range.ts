@@ -158,6 +158,16 @@ export class DateRange<T = any> {
         return clone
     }
 
+    fullDay(): DateRange {
+
+        let from = dateFns.startOfDay(this.from)
+        let to = dateFns.endOfDay(this.to)
+
+        let fullDay = new DateRange(from, to)
+
+        return fullDay
+    }
+
     invert(): DateRangeSet {
 
         const inverted = new DateRangeSet()

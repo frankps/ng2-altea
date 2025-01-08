@@ -12,10 +12,15 @@
             </li>
             <li class="list-group-item" *ngFor="let planning of plannings; let idx = index">
                 <div class="row">
-                    <div class="col-3"><span translate>enums.planning-type.{{planning.type}}</span></div>
-                    <div class="col-3">{{planning.startDate | date:"dd/MM/yyyy HH:mm"}}</div>
-                    <div class="col-3">{{planning.endDate | date:"dd/MM/yyyy HH:mm"}}</div>
-                    <div class="col-3" *ngIf="parent.sectionInEditIs(thisSection)">
+                    <div class="col-2"><span translate>enums.planning-type.{{planning.type}}</span>
+                    
+                        <i class="fa-sharp-duotone fa-solid fa-calendar-day float-end" *ngIf="planning.ors"
+                        [ngbTooltip]="'objects.resourcePlanning.ors' | translate"></i>
+                    </div>
+                    <div class="col-2">{{planning.startDate | date:planning.dateFormat()}}</div>
+                    <div class="col-2">{{planning.endDate | date:planning.dateFormat()}}</div>
+                    <div class="col-4">{{planning?.rem}}</div>
+                    <div class="col-2" *ngIf="parent.sectionInEditIs(thisSection)">
                         <i class="fas fa-trash float-end" (click)="delete(planning)"></i>
                     </div>
                 </div>
@@ -25,7 +30,7 @@
 
             <!-- (click)="startAdd()" -->
             <li *ngIf="parent.editSectionId === thisSection && mode === ListSectionMode.readOnly"
-                class="list-group-item" style="text-align: center; cursor: pointer;" >
+                class="list-group-item" style="text-align: center; cursor: pointer;">
                 <i class="fa-duotone fa-circle-plus fa-xl"></i> &nbsp; {{ 'ui.resource.edit.sections.planning.add-btn' |
                 translate }}
             </li>
@@ -41,38 +46,20 @@
                         <ng-select id="type" name="type" [items]="planningTypes" bindLabel="trans" bindValue="key"
                             [clearable]="false" [multiple]="false" [(ngModel)]="objNew.type"></ng-select>
 
-                    </div>
-                    <div class="col-3">
 
-                        <div class="row">
-                            <div class="col"><input type="text" placeholder="Datepicker" class="form-control"
-                                    bsDatepicker [(ngModel)]="start"></div>
-                        </div>
-                        <div class="row mt-1">
-                            <div class="col"><time-picker class="mt-3" [(time)]="start"></time-picker></div>
-                        </div>
 
-                        <!-- 
-                            [bsValue]  (bsValueChange)="startChanged($event)"
 
-                        <input type="text" placeholder="Datepicker" class="form-control" bsDatepicker [bsValue]="start">
-
-                        <time-picker class="mt-3" [(time)]="startTime"></time-picker> -->
 
                     </div>
                     <div class="col-3">
+                        <input type="text" placeholder="Datepicker" class="form-control" bsDatepicker
+                            [(ngModel)]="start" (bsValueChange)="startChanged($event)">
 
-                        <div class="row">
-                            <div class="col">
-                                <input type="text" placeholder="Datepicker" class="form-control" bsDatepicker
-                                    [(ngModel)]="end" >  <!-- (bsValueChange)="endChanged($event)" -->
-                            </div>
-                        </div>
-                        <div class="row mt-1">
-                            <div class="col">
-                                <time-picker [(time)]="end"></time-picker>
-                            </div>
-                        </div>
+                    </div>
+                    <div class="col-3">
+                        <input type="text" placeholder="Datepicker" class="form-control" bsDatepicker [(ngModel)]="end">
+
+
 
 
 
@@ -86,6 +73,46 @@
                     </div>
                 </div>
 
+                <div class="row mt-2">
+                    <div class="col-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="fullDays" name="fullDays"
+                                [(ngModel)]="objNew.fullDays" />
+                            <label class="form-check-label" for="fullDays"
+                                translate="objects.resourcePlanning.fullDays"></label>
+                        </div>
+
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="ors" name="ors"
+                                [(ngModel)]="objNew.ors" />
+                            <label class="form-check-label" for="ors" translate="objects.resourcePlanning.ors"></label>
+                        </div>
+
+                    </div>
+                    <div class="col-3">
+                        <time-picker *ngIf="!objNew.fullDays" class="mt-3" [(time)]="start"></time-picker>
+                    </div>
+                    <div class="col-3">
+                        <time-picker *ngIf="!objNew.fullDays" [(time)]="end"></time-picker>
+                    </div>
+                </div>
+
+
+                <div class="row mt-2">
+                    <div class="col-3 d-flex justify-content-end">
+                        Opmerking
+                    </div>
+                    <div class="col-6">
+                        <input type="text" id="remark" name="remark" class="form-control" [(ngModel)]="objNew.rem" />
+                    </div>
+
+                </div>
+
+
+
+
+
+                
 
 
             </li>

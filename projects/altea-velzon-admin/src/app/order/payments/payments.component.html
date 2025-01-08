@@ -1,11 +1,19 @@
 <div class="row my-2">
-    <div class="col-3">
-        <!--         <input class="form-control" #drp="bsDaterangepicker" bsDaterangepicker [(ngModel)]="dateRange" [bsConfig]="{useUtc: true}" onkeydown="return false">
- -->
+    <div class="col-2">
 
-        <input class="form-control" placeholder="Datepicker" bsDatepicker (bsValueChange)="dateChange($event)">
+
+        <input class="form-control" placeholder="Datepicker" bsDatepicker [(bsValue)]="date">
     </div>
     <div class="col">
+
+        
+        <button type="button" class="btn btn-primary btn-sm me-3" (click)="refreshPayments(date)">
+            <i class="fa-solid fa-cash-register"></i>
+        </button>
+      
+        <button type="button" class="btn btn-primary btn-sm me-3" (click)="getUnlinkedBankPayments(date)">
+            <i class="fa-solid fa-link-slash"></i>
+        </button>
         <button type="button" class="btn btn-primary btn-sm me-3" (click)="showGroup(group)"
             *ngFor="let group of paymentsByType">
             {{'enums.pay-type.' + group.name | translate}}: €{{group.total}}</button>
@@ -27,16 +35,17 @@
 <ng-container *ngFor="let pay of payments">
 
     <div class="row mb-1">
-        <div class="col-2"><button type="button" class="btn btn-primary btn-sm me-3" (click)="togglePayment(pay)"><i class="fa-solid fa-pen"></i></button> <span class="float-end">€{{pay.amountRounded()}}</span></div>
+        <div class="col-2"><button type="button" class="btn btn-primary btn-sm me-3" (click)="togglePayment(pay)"><i
+                    class="fa-solid fa-pen"></i></button>
+
+            <span class="float-end">€{{pay.amountRounded()}}</span>
+        </div>
         <div class="col-2">{{'enums.pay-type.' + pay.type | translate}}</div>
         <div class="col-1">{{pay.date | intdate}}</div>
         <div class="col-1">{{pay?.order?.start | intdate}}</div>
-        
+
         <ng-container *ngIf="pay.order">
             <div class="col-2">{{pay.order.for}}
-
-                
-
             </div>
 
 
@@ -67,12 +76,12 @@
         <div class="col-1"></div>
         <div class="col-1">
             <input type="number" id="payAmount" name="payAmount" required class="form-control"
-                        [(ngModel)]="pay.amount"/>
+                [(ngModel)]="pay.amount" />
         </div>
         <div class="col-2">
 
-            <ng-select id="payType" name="payType" [items]="paymentTypes" bindLabel="trans" bindValue="key" [clearable]="false"
-                [multiple]="false" [(ngModel)]="pay.type">
+            <ng-select id="payType" name="payType" [items]="paymentTypes" bindLabel="trans" bindValue="key"
+                [clearable]="false" [multiple]="false" [(ngModel)]="pay.type">
             </ng-select>
 
 
@@ -85,8 +94,10 @@
         <div class="col-1"></div>
         <div class="col-2"></div>
         <div class="col-4">
-            <button type="button" class="btn btn-primary btn-sm me-3" (click)="savePayment(pay)"><i class="fa-solid fa-check"></i></button>
-            <i class="ms-3 fas fa-trash" (click)="deletePayment(pay)"></i></div>
+            <button type="button" class="btn btn-primary btn-sm me-3" (click)="savePayment(pay)"><i
+                    class="fa-solid fa-check"></i></button>
+            <i class="ms-3 fas fa-trash" (click)="deletePayment(pay)"></i>
+        </div>
     </div>
 
 </ng-container>

@@ -141,9 +141,7 @@
                         </ngx-altea-label-control>
                     </div>
                 </div>
-
-
-
+                
                 <div class="row  mt-2">
                     <div class="col-3">
                         <ngx-altea-label-control label="objects.gift.value" for="value">
@@ -156,7 +154,7 @@
                             <input type="number" id="used" name="used" required class="form-control"
                                 [(ngModel)]="object.used" />
                         </ngx-altea-label-control>
-                    </div>  
+                    </div>
                     <div class="col-3">
                         <ngx-altea-label-control label="objects.gift.vatPct" for="vatPct">
                             <input type="number" id="vatPct" name="vatPct" required class="form-control"
@@ -181,9 +179,6 @@
                         {{'objects.gift.from' | translate}}
                     </div>
                 </div>
-
-
-
 
                 <altea-search-contact #searchContactModal [modal]="true"
                     (contactSelected)="setContact($event)"></altea-search-contact>
@@ -268,6 +263,65 @@
     <!-- 
     (save)="save()" (cancel)="cancel()"  [enableSave]="!generalForm?.form.pristine && generalForm?.form.valid"
  -->
+
+
+
+    <ngx-altea-form-card-section sectionName="dic.payments" sectionId="payments" [editSectionId]="editSectionId"
+        (editModeChanged)="editModeChanged($event)">
+
+
+        <ng-container always *ngIf="initialized && object.hasPayments()">
+
+            <ng-container *ngFor="let pay of object.payments">
+
+                <div class="row mb-1">
+
+                    <div class="col-2">
+                        <a [routerLink]="['/', 'aqua','orders','manage',pay.orderId]">{{pay.date |
+                            intdate}}</a>
+                    </div>
+
+                    <div class="col-1">€{{pay.amountRounded()}}
+                        
+                    </div>
+
+
+                    <ng-container *ngIf="pay.order">
+                        <div class="col-3">{{pay.order.for}}
+                        </div>
+
+
+                        <div class="col">
+
+                            <span>{{pay.order.sum?.[0].q}} x {{pay.order.sum?.[0].d}}</span>
+
+                        </div>
+
+                    </ng-container>
+
+                </div>
+            </ng-container>
+
+            <div class="row mb-1">
+                <div class="col-2">
+                    Totaal:
+                </div>
+
+                <div class="col-1">
+                    €{{totalPayments}}
+                        
+                </div>
+            </div>
+
+
+        </ng-container>
+
+
+
+
+    </ngx-altea-form-card-section>
+
+
 
 
     <ngx-altea-form-card-section sectionName="dic.communication" sectionId="communication"
