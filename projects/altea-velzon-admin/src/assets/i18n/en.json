@@ -994,6 +994,8 @@
     },
     "user": {
       "article": "de",
+      "block": "Geblokkeerd",
+      "alert": "Boodschap voor gebruiker",
       "uid": "Firebase id"
     },
     "contact": {

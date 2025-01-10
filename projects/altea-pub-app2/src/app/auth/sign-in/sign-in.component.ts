@@ -160,6 +160,8 @@ export class SignInComponent implements OnInit {
       this.idToken = await this.user.getIdToken();
       //return of(this.user);
 
+      console.log(this.idToken)
+
       return userCredentials
     }).catch(error => {
       console.error('signInWithPopup error catched')

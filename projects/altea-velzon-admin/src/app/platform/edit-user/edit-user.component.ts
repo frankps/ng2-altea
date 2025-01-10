@@ -59,7 +59,7 @@ export class EditUserComponent extends NgEditBaseComponent<User> implements OnIn
       , userSvc
       , router, route, spinner, dashboardSvc)
 
-    this.sectionProps.set('general', ['first', 'last', 'email', 'mobile'])
+    this.sectionProps.set('general', ['first', 'last', 'email', 'mobile', 'block', 'alert'])
     this.translationSvc.translateEnum(Gender, 'enums.gender.', this.gender)
     this.translationSvc.translateEnum(Language, 'enums.language.', this.language)
 

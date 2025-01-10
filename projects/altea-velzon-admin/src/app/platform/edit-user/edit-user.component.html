@@ -21,7 +21,7 @@
                 </div>
             </div>
 
-  
+
         </div>
 
     </div>
@@ -55,6 +55,7 @@
             </div>
 
 
+
             <div class="mt-4" *ngIf="object.contacts">
                 <h6>Linked contacts</h6>
                 <ul class="list-group">
@@ -66,7 +67,7 @@
                     </li>
                 </ul>
             </div>
-  
+
 
             <div class="mt-4" *ngIf="object.resources">
                 <h6>Linked resources</h6>
@@ -96,8 +97,7 @@
                     </div>
                     <div class="col-6">
                         <ngx-altea-label-control label="objects.contact.last" for="last">
-                            <input type="text" id="last" name="last" class="form-control"
-                                [(ngModel)]="object.last" />
+                            <input type="text" id="last" name="last" class="form-control" [(ngModel)]="object.last" />
                         </ngx-altea-label-control>
                     </div>
                 </div>
@@ -119,6 +119,26 @@
                 <int-phone-edit [css]="mobilePhoneCss" [(phone)]="object.mobile"
                     (phoneChange)="formChanged('general')"></int-phone-edit>
 
+
+                <div class="row">
+                    <div class="col">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="block" name="block"
+                                [(ngModel)]="object.block" />
+                            <label class="form-check-label" for="block" translate="objects.user.block"></label>
+                        </div>
+
+                    </div>
+                    <div class="col">
+
+                        <ngx-altea-label-control label="objects.user.alert" for="alert">
+                            <textarea rows="4" class="form-control" id="alert" name="alert" style="height: 120px"
+                                [(ngModel)]="object.alert"></textarea>
+                        </ngx-altea-label-control>
+
+
+                    </div>
+                </div>
 
 
 
