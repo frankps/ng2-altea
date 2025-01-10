@@ -11,7 +11,7 @@ import * as Handlebars from "handlebars"
 import * as sc from 'stringcase'
 import { OrderPersonMgr } from "../order-person-mgr";
 import { CancelOrderMessage } from "ts-altea-logic";
-import { Branch, Contact, DepositMode, FormulaTerm, Invoice, Order, OrderType, Organisation, Payment, PaymentType, PlanningMode, PriceMode, Product, ProductItemOption, ProductItemOptionMode, ProductOption, ProductOptionValue, ProductType, Resource, ResourcePlanning, Subscription } from "ts-altea-model";
+import { Branch, Contact, DepositMode, FormulaTerm, Invoice, Order, OrderType, Organisation, Payment, PaymentType, PlanningMode, Price, PriceMode, Product, ProductItemOption, ProductItemOptionMode, ProductOption, ProductOptionValue, ProductType, Resource, ResourcePlanning, Subscription } from "ts-altea-model";
 
 export class OrderLineOptionSummary {
   /** option name */
@@ -579,6 +579,22 @@ export class OrderLine extends ObjectWithIdPlus {
     return (ArrayHelper.NotEmpty(this.options))
   }
 
+  getOptionValueIds(optionId: string): string[] {
+
+    if (!this.hasOptions())
+      return []
+
+    let option = this.options.find(o => o.id == optionId)
+
+    if (!option || !option.hasValues())
+      return []
+
+    let valueIds = option.values.filter(v => ObjectHelper.notNullOrUndefined(v)).map(v => v.id)
+
+    return valueIds 
+  }
+
+
   getOptionValueMap(): Map<string, string[]> {
 
     let map = new Map<string, string[]>()
@@ -692,6 +708,30 @@ export class OrderLine extends ObjectWithIdPlus {
           this.calculateAll() */
 
   }
+
+
+  applyPrice(price: Price) {
+    
+    let priceChange = new PriceChange()
+
+    if (price.extraQty?.on) {  // if this is not a 'real' price change, but instead customer receives extra quantity
+      priceChange.tp = PriceChangeType.subsQty
+      priceChange.val = price.extraQty.val
+      priceChange.pct = price.extraQty.pct
+    }
+    else {
+      priceChange.tp = PriceChangeType.price
+      priceChange.val = price.value
+      priceChange.pct = price.isPercentage
+    }
+
+    priceChange.id = price.id
+
+    priceChange.info = price.title
+
+    this.addPriceChange(priceChange)
+  }
+
 
   addPriceChange(priceChange: PriceChange) {
 
@@ -855,7 +895,7 @@ export class OrderLine extends ObjectWithIdPlus {
         else if (option.hasPrice)
           unitPrice += orderLineOptionValue.prc
 
-       // unitPrice += orderLineOptionValue.getPrice(formula, this.options)
+        // unitPrice += orderLineOptionValue.getPrice(formula, this.options)
         // totalDuration += value.duration
       }
 

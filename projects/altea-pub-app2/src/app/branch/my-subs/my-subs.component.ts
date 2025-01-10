@@ -49,7 +49,9 @@ export class MySubsComponent implements OnInit {
 
     await this.orderMgrSvc.newOrder()
 
-    const orderLines = await this.orderMgrSvc.addProductById(subscription.unitProductId)
+    
+
+    const orderLines = await this.orderMgrSvc.addProductById(subscription.unitProductId, 1, subscription.options)
 
     console.log(orderLines)
     console.log(this.orderMgrSvc.order)

@@ -473,7 +473,15 @@ export class Product extends ObjectWithIdPlus {
     if (ArrayHelper.IsEmpty(this.prices))
       return false
 
-    let idx = this.prices.findIndex(p => p.isPromo && !p.giftOpt)
+    let now = new Date()
+
+
+   // console.log(this.prices)
+
+    let idx = this.prices.findIndex(p => p.act && p.isPromo && !p.giftOpt && (!p.hasDates || (p.startDate <= now && now <= p.endDate)))
+
+
+   // console.log(idx)
 
     return idx >= 0
   }
@@ -483,7 +491,11 @@ export class Product extends ObjectWithIdPlus {
     if (ArrayHelper.IsEmpty(this.prices))
       return []
 
-    let prices = this.prices.filter(p => p.isPromo && !p.giftOpt)
+    let now = new Date()
+
+
+    let prices = this.prices.filter(p => p.act && p.isPromo && !p.giftOpt && (!p.hasDates || (p.startDate <= now && now <= p.endDate)))
+
 
     return prices
   }
@@ -578,7 +590,7 @@ export class Product extends ObjectWithIdPlus {
     return (this.options && this.options.length > 0)
   }
 
-  getOptionsHavingPrices() : ProductOption[] {
+  getOptionsHavingPrices(): ProductOption[] {
 
     if (!this.hasOptions())
       return []
@@ -852,6 +864,13 @@ export class ProductItem extends ObjectWithIdPlus {
   @Type(() => ProductItemOption)
   options?: ProductItemOption[] = []
 
+  hasOptions(): boolean {
+
+    return ArrayHelper.NotEmpty(this.options)
+
+  }
+
+
   get optionsWithValues() {
     if (!this.options)
       return []
@@ -1096,6 +1115,8 @@ export class Price extends ObjectWithIdPlus {
     // this.end = new Date()
   }
 
+
+
   initDays() {
 
     if (!this.days)
@@ -1113,19 +1134,95 @@ export class Price extends ObjectWithIdPlus {
   @Exclude()
   _endDate: Date | null = null
 
+  get startDate(): Date {
 
-  get startDate(): Date | null {
+    /** we keep track of a cached verion of the converted date (start to startDate).
+     * Reason: UI binding doesn't like to have all the time new Date objects => if start not changed, we return the cached conversion
+     */
 
-    if (!this.start)
-      return null
+    if (this._startDate) {
 
-    if (this._startDate && DateHelper.yyyyMMddhhmmss(this._startDate) === this.start)
-      return this._startDate
+      if (this.start) {
+        if (DateHelper.yyyyMMddhhmmss(this._startDate) === this.start)
+          return this._startDate
+      }
+      else
+        if (DateHelper.yyyyMMddhhmmss(DateHelper.minDate) === DateHelper.yyyyMMddhhmmss(this._startDate))
+          return this._startDate
+    }
 
-    this._startDate = DateHelper.parse(this.start)
+    if (this.start)
+      this._startDate = DateHelper.parse(this.start)
+    else
+      this._startDate = DateHelper.minDate
 
     return this._startDate
   }
+
+
+  set startDate(value: Date | null) {
+
+    if (value) {
+      this.start = DateHelper.yyyyMMdd(value) * 1000000  // * 1000000 because we don't care about hhmmss
+      this._startDate = null
+    }
+    else {
+      this.start = null
+      this._startDate = DateHelper.minDate
+    }
+
+  }
+
+
+  get endDate(): Date {
+
+    /** we keep track of a cached verion of the converted date (start to startDate).
+ * Reason: UI binding doesn't like to have all the time new Date objects => if start not changed, we return the cached conversion
+ */
+
+    if (this._endDate) {
+
+      if (this.end) {
+        if (DateHelper.yyyyMMddhhmmss(this._endDate) === this.end)
+          return this._endDate
+      }
+      else
+        if (DateHelper.yyyyMMddhhmmss(DateHelper.maxDate) === DateHelper.yyyyMMddhhmmss(this._endDate))
+          return this._endDate
+    }
+
+    if (this.end)
+      this._endDate = DateHelper.parse(this.end)
+    else
+      this._endDate = DateHelper.maxDate
+
+    return this._endDate
+    /*
+    if (!this.end)
+      return null
+
+    if (this._endDate && DateHelper.yyyyMMddhhmmss(this._endDate) === this.end)
+      return this._endDate
+
+    this._endDate = DateHelper.parse(this.end)
+    return this._endDate
+*/
+  }
+
+
+  set endDate(value: Date | null) {
+
+    if (value) {
+      this.end = DateHelper.yyyyMMdd(value) * 1000000
+      this._endDate = null
+    }
+    else
+      this.end = null
+
+
+  }
+
+
 
   set sameBasePrice(value: boolean) {
     this.mode = value ? PriceMode.same : PriceMode.pct
@@ -1160,42 +1257,6 @@ export class Price extends ObjectWithIdPlus {
   }
 
 
-  set startDate(value: Date | null) {
-
-    if (value) {
-      this.start = DateHelper.yyyyMMdd(value) * 1000000  // * 1000000 because we don't care about hhmmss
-      this._startDate = null
-    }
-    else
-      this.start = null
-
-  }
-
-
-  get endDate(): Date | null {
-
-    if (!this.end)
-      return null
-
-    if (this._endDate && DateHelper.yyyyMMddhhmmss(this._endDate) === this.end)
-      return this._endDate
-
-    this._endDate = DateHelper.parse(this.end)
-    return this._endDate
-
-  }
-
-
-  set endDate(value: Date | null) {
-
-    if (value) {
-      this.end = DateHelper.yyyyMMdd(value) * 1000000
-      this._endDate = null
-    }
-    else
-      this.end = null
-
-  }
 
   hasConditions() {
 

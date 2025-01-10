@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { OrderMgrUiService } from '../order-mgr-ui.service';
-import { CompensationGiftReason, Gift, LoyaltyReward, OrderLine, Payment, PaymentType, Subscription, TemplateCode } from 'ts-altea-model';
+import { CompensationGiftReason, Gift, LoyaltyReward, OrderLine, Payment, PaymentType, ProductItemOptionMode, Subscription, TemplateCode } from 'ts-altea-model';
 import { GiftService } from '../../data-services/sql/gift.service';
 import { SessionService } from '../../session.service';
 import { SubscriptionService } from '../../data-services/sql/subscription.service';
@@ -197,28 +197,65 @@ export class PosPaymentComponent implements OnInit {
     if (orderLine.productId != subs.unitProductId)
       return false
 
+    /* Most subscriptions just have 1 item */
     for (let prodItem of subs.subscriptionProduct.items) {
 
+      if (!prodItem.hasOptions())
+        continue
 
-      for (let option of prodItem.optionsWithValues) {
+      for (let option of prodItem.options) {
 
-        let orderLineOption = orderLine.getOptionById(option.id)
+        switch (option.mode) {
+          case ProductItemOptionMode.cust:
 
-        if (!orderLineOption) {
-          let msg = `Orderline is missing option ${option.name}`
-          console.warn(msg)
-          return false
+            /** Custom subscription. The customer can choose option values themselves: the selected option values are stored in Subscription.options
+               *  => the orderline needs to have at least these options selected. (if other options with price are selected in orderline)
+                */
+            let subscriptionValueIds = subs.getOptionValueIds(option.id)
+            let orderLineValueIds = orderLine.getOptionValueIds(option.id)
+
+            let commonValueIds = _.intersection(subscriptionValueIds, orderLineValueIds)
+
+            if (commonValueIds.length < subscriptionValueIds.length) {
+
+              let msg = `Not all values from subscription are selected in orderline!`
+              console.warn(msg)
+              return false
+
+            }
+
+            break
+
+
+          default:
+
+            /** the options are preconfigured in the subscription-product, orderLine needs to have them */
+
+
+
+            let orderLineOption = orderLine.getOptionById(option.id)
+
+            if (!orderLineOption) {
+              let msg = `Orderline is missing option ${option.name}`
+              console.warn(msg)
+              return false
+            }
+
+            let valueIds = option.valueIds()
+
+            if (valueIds.length > 0 && !orderLineOption.hasAtLeastOne(valueIds)) {
+
+              let possibleValues = option.valueNames()
+              let msg = `Orderline option '${option.name}' is missing specific value: ${possibleValues.join(',')}`
+              console.warn(msg)
+              return false
+            }
+
+
         }
 
-        let valueIds = option.valueIds()
 
-        if (valueIds.length > 0 && !orderLineOption.hasAtLeastOne(valueIds)) {
 
-          let possibleValues = option.valueNames()
-          let msg = `Orderline option '${option.name}' is missing specific value: ${possibleValues.join(',')}`
-          console.warn(msg)
-          return false
-        }
 
 
       }
@@ -255,7 +292,7 @@ export class PosPaymentComponent implements OnInit {
 
         /** The back-end will update the subscription when saving the order */
         const payment = await this.mgrUiSvc.addPayment(orderLine.unit, PaymentType.subs, 'pos')
-        
+
         payment.subsId = subs.id
         subs.usedQty++
 

@@ -35,8 +35,15 @@ export class AlteaDb {
             delete l['product']
             delete l['orderId']
 
-            //l.product = undefinedf
+            
         })
+
+        /*
+        orderClone.payments?.forEach(p => {
+
+            delete p['orderId']            
+        })
+            */
 
         /*         orderClone.info = undefined
                 orderClone.persons = undefined
@@ -139,6 +146,18 @@ export class AlteaDb {
 
         const orders = await this.db.query$<Order>(qry)
 
+        return orders
+
+    }
+
+    async getOrdersForContact(contactId: string) : Promise<Order[]> {
+
+        const qry = new DbQueryTyped<Order>('order', Order)
+
+        qry.and('contactId', QueryOperator.equals, contactId)
+        qry.take = 500
+
+        const orders = await this.db.query$<Order>(qry)
         return orders
 
     }

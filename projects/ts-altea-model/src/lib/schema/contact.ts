@@ -113,7 +113,11 @@ export class User extends UserBase {
   /** initial data received from provider (facebook, google) via Firebase */
   prvOrig?: any
 
+  /** user was using multiple accounts (Facebook/Google): use this to block accounts that should not be used  */
+  block: boolean = false
 
+  /** to be used when block=true, show this message */
+  alert?: string
 
   email?: string
   mobile?: string

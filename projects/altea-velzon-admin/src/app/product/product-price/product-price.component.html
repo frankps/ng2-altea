@@ -4,8 +4,8 @@
     <div class="col-12">
 
       <div class="form-check form-switch">
-        <input class="form-check-input" type="checkbox" id="on" [(ngModel)]="object.on" />
-        <label class="form-check-label" for="on" translate="objects.price.on"></label>
+        <input class="form-check-input" type="checkbox" id="act" [(ngModel)]="object.act" />
+        <label class="form-check-label" for="act" translate="dic.act"></label>
       </div>
 
     </div>
@@ -17,6 +17,17 @@
       <div class="form-check form-switch">
         <input class="form-check-input" type="checkbox" id="skip" [(ngModel)]="object.skip" />
         <label class="form-check-label" for="skip" translate="objects.price.skip"></label>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" id="hasDates" [(ngModel)]="object.hasDates" />
+        <label class="form-check-label" for="hasDates" translate="objects.price.hasDates"></label>
       </div>
 
     </div>
@@ -36,28 +47,31 @@
 
 
     </div>
-    <div class="col-4">
+    <ng-container *ngIf="object.hasDates">
+      <div class="col-4">
 
 
-      <ngx-altea-label-control label="{{ 'objects.price.start' | translate }}" for="start">
+        <ngx-altea-label-control label="{{ 'objects.price.start' | translate }}" for="start">
+  
+          <input type="text" id="start" placeholder="Datepicker" class="form-control" bsDatepicker
+            [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY' }" [(ngModel)]="object.startDate">
+  
+        </ngx-altea-label-control>
+  
+      </div>
+      <div class="col-4">
+  
+  
+        <ngx-altea-label-control label="{{ 'objects.price.end' | translate }}" for="end">
+  
+          <input type="text" id="dateSelect" placeholder="Datepicker" class="form-control" bsDatepicker
+            [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY' }" [(ngModel)]="object.endDate">
+  
+        </ngx-altea-label-control>
+  
+      </div>
+    </ng-container>
 
-        <input type="text" id="start" placeholder="Datepicker" class="form-control" bsDatepicker
-          [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY' }" [(ngModel)]="object.startDate">
-
-      </ngx-altea-label-control>
-
-    </div>
-    <div class="col-4">
-
-
-      <ngx-altea-label-control label="{{ 'objects.price.end' | translate }}" for="end">
-
-        <input type="text" id="dateSelect" placeholder="Datepicker" class="form-control" bsDatepicker
-          [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY' }" [(ngModel)]="object.endDate">
-
-      </ngx-altea-label-control>
-
-    </div>
 
   </div>
 

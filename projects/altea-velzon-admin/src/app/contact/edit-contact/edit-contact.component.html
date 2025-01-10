@@ -293,17 +293,39 @@
                 </div>
 
 
-                <div class="row" *ngFor="let sub of subscriptions">
-                    <div class="col-6">
-                        <a [routerLink]="['/', sessionSvc.branch.unique,'subscriptions',sub.id]">{{sub.name}} </a>
-                    </div>
-                    <div class="col-2 d-flex justify-content-center">{{sub.usedQty}}/{{sub.totalQty}}</div>
-                    <div class="col-2 d-flex justify-content-center">{{sub.cre | date: sessionSvc.formats.date}}
-                    </div>
-                    <div class="col-2 d-flex justify-content-center">{{sub.firstUsedOn | date: sessionSvc.formats.date}}
+                <ng-container *ngFor="let sub of subscriptions">
+                    <div class="row">
+                        <div class="col-6">
+                            <a [routerLink]="['/', sessionSvc.branch.unique,'subscriptions',sub.id]">{{sub.name}} </a>
+                        </div>
+                        <div class="col-2 d-flex justify-content-center">{{sub.usedQty}}/{{sub.totalQty}}</div>
+                        <div class="col-2 d-flex justify-content-center">{{sub.cre | date: sessionSvc.formats.date}}
+                        </div>
+                        <div class="col-2 d-flex justify-content-center">{{sub.firstUsedOn | date:
+                            sessionSvc.formats.date}}
+                        </div>
                     </div>
 
-                </div>
+
+                    <ng-container *ngIf="sub.hasOptions()">
+
+                        <ng-container *ngFor="let option of sub.options">
+                            <div class="row mb-2">
+                                <div class="col-4 d-flex justify-content-end">{{ option.name }}</div>
+                                <div class="col">
+                                    <span class="badge text-bg-secondary me-2" *ngFor="let value of option.values">{{value.name}}</span>
+
+
+                                </div>
+                            </div>
+
+                        </ng-container>
+
+                    </ng-container>
+
+                </ng-container>
+
+
 
                 <div class="row mt-2">
                     <div class="col me-3">

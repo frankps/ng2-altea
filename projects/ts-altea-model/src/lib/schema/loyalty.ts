@@ -183,7 +183,7 @@ export class LoyaltyProgram extends ObjectWithIdPlus {
 
   idx = 0
 
-  getRewardById(id: string) : LoyaltyReward {
+  getRewardById(id: string): LoyaltyReward {
 
     if (ArrayHelper.IsEmpty(this.rewards))
       return null
@@ -230,12 +230,26 @@ export class LoyaltyProgram extends ObjectWithIdPlus {
     return ArrayHelper.AtLeastOneItem(this.incl)
   }
 
-  includesProduct(productId: string) {
+  includesProduct(product: Product): boolean {
+
+    let productId = product.id
 
     if (!this.hasIncl())
       return false
 
-    const idx = this.incl.findIndex(p => p.id == productId)
+    let idx = this.incl.findIndex(p => p.id == productId)
+
+    if (idx >= 0)
+      return true
+
+    // also check folders (we only check products in category, not inside sub-categories)
+
+    let categoryId = product.catId
+
+    if (!categoryId)
+      return false
+
+    idx = this.incl.findIndex(p => p.id == categoryId)
 
     return (idx >= 0)
   }
@@ -277,7 +291,7 @@ export class LoyaltyProgram extends ObjectWithIdPlus {
         inProgram = true
     }
 
-    if (!inProgram && this.includesProduct(product.id)) {
+    if (!inProgram && this.includesProduct(product)) {
       inProgram = true
     }
 
@@ -292,7 +306,7 @@ export class LoyaltyProgram extends ObjectWithIdPlus {
 
 
 export class RegisterLoyalty {
-  
+
   /*
   orderId: string
   contactId: string
@@ -300,7 +314,7 @@ export class RegisterLoyalty {
   lines: LoyaltyLine[] = []
 
   constructor(public order: Order) {
-   
+
   }
 
 
@@ -326,7 +340,7 @@ export class LoyaltyLine {
 
 
 export class LoyaltyCardChange extends ObjectWithId {
- // public id?: string;
+  // public id?: string;
 
   public static newValue(orderId: string, cardId: string, value: number, info?: string) {
     const change = new LoyaltyCardChange()
@@ -369,7 +383,7 @@ export class LoyaltyCardChange extends ObjectWithId {
 export class LoyaltyCard extends ObjectWithIdPlus {
 
 
-  public static new(contactId?: string, programId?: string, name?: string, value: number = 0) : LoyaltyCard {
+  public static new(contactId?: string, programId?: string, name?: string, value: number = 0): LoyaltyCard {
 
     const card = new LoyaltyCard()
     card.contactId = contactId
@@ -380,7 +394,7 @@ export class LoyaltyCard extends ObjectWithIdPlus {
     return card
 
   }
-  
+
 
   contact?: Contact
   contactId?: string

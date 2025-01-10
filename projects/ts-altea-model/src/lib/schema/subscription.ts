@@ -46,13 +46,15 @@ export class Subscription extends ObjectWithIdPlus {
   @Type(() => Product)
   unitProduct?: Product;
 
+
+  unitProductId?: string;
+
   /** Customer can purchase a subscription for hair removal of specific zones (zones are selected as orderline options: example arms & legs)
    * These zones are copied over to the subscription (so that it can only be used for arms & legs)
    */
   @Type(() => OrderLineOption)
   options: OrderLineOption[] = []
 
-  unitProductId?: string;
   firstUsedOn?: Date;
   expiresOn?: Date;
   totalQty = 0;
@@ -71,6 +73,22 @@ export class Subscription extends ObjectWithIdPlus {
 
     return ArrayHelper.NotEmpty(this.options)
 
+  }
+
+  getOptionValueIds(optionId: string): string[] {
+
+    if (!this.hasOptions())
+      return []
+
+
+    let option = this.options.find(o => o.id == optionId)
+
+    if (!option || !option.hasValues())
+      return []
+
+    let valueIds = option.values.filter(v => ObjectHelper.notNullOrUndefined(v)).map(v => v.id)
+
+    return valueIds 
   }
 
   /** created at */

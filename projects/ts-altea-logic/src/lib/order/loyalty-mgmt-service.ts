@@ -230,25 +230,25 @@ export class LoyaltyMgmtService {
 
         console.error('-- getOverview --')
 
-        const result = await this.calculateLoyalty(order)
+        const newLoyaltyThisOrder = await this.calculateLoyalty(order)
 
-        if (!result)
+        if (!newLoyaltyThisOrder)
             return null
 
         const loyalty = new LoyaltyUi(order)
 
-        loyalty.programs = result.programs
+        loyalty.programs = newLoyaltyThisOrder.programs
         let cards: LoyaltyCard[] = []
 
         if (order?.contact?.cards)
             cards = order.contact.cards
 
-        if (!result || !result.hasValues())
+        if (!newLoyaltyThisOrder || !newLoyaltyThisOrder.hasValues())
             return loyalty
 
         //  const uiCards = []
 
-        for (let loyaltyProgram of result.programs) {
+        for (let loyaltyProgram of newLoyaltyThisOrder.programs) {
 
             const existingCard = cards.find(c => c.programId == loyaltyProgram.id)
 
@@ -256,7 +256,7 @@ export class LoyaltyMgmtService {
             loyalty.cards.push(uiCard)
 
             // the extra amount that can be added coming from this order
-            uiCard.extra = result.getValue(loyaltyProgram.id)
+            uiCard.extra = newLoyaltyThisOrder.getValue(loyaltyProgram.id)
 
             if (uiCard.extra > 0)
                 loyalty.newLoyalty = true

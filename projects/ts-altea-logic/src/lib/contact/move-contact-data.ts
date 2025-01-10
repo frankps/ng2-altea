@@ -1,5 +1,5 @@
 import { AlteaDb, IDb } from "ts-altea-logic"
-import { LoyaltyCard, LoyaltyCardChange } from "ts-altea-model"
+import { LoyaltyCard, LoyaltyCardChange, Order } from "ts-altea-model"
 import { ArrayHelper } from "ts-common"
 
 
@@ -19,6 +19,25 @@ export class MoveContactData {
         console.log(`Move ${fromContactId} to ${toContactId}`)
         await this.moveLoyalty(fromContactId, toContactId)
 
+        await this.moveOrders(fromContactId, toContactId)
+
+    }
+
+    async moveOrders(fromContactId: string, toContactId: string): Promise<number> {
+
+        var orders: Order[] = await this.alteaDb.getOrdersForContact(fromContactId)
+
+        if (ArrayHelper.IsEmpty(orders))
+            return 0
+
+        orders.forEach(o => o.contactId = toContactId)
+
+        var res = await this.alteaDb.updateOrders(orders, ['contactId'])
+
+        if (res.isOk)
+            return orders.length
+        else
+            return 0
     }
 
     async moveLoyalty(fromContactId: string, toContactId: string) {

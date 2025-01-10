@@ -9,6 +9,7 @@
   "dic": {
     "address": "Adres",
     "actions": "Acties",
+    "act": "Actief",
     "add": "Toevoegen",
     "back": "Terug",
     "cancel": "Annuleren",
@@ -1165,6 +1166,7 @@
       "on": "Actief",
       "skip": "Voer volgende prijsregels NIET meer uit",
       "skipLast": "Skip regel laatste uren",
+      "hasDates": "Enkel geldig gedurende periode",
       "start": "Vanaf",
       "end": "Tot",
       "qty": "Vanaf aantal",

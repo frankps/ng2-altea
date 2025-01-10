@@ -252,7 +252,7 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
 
     const now = new Date()
 
-    const firstActivePrice = this.object?.prices.find(price => (price.start && price.startDate > now) || !price.start || !price.end || (price.end && price.endDate > now))
+    const firstActivePrice = this.object?.prices.find(price => price.startDate <= now || now <= price.endDate)
 
     return firstActivePrice ? true : false
   }

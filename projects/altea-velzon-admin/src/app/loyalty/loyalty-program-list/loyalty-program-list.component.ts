@@ -83,8 +83,23 @@ export class LoyaltyProgramListComponent extends NgBaseListComponent<LoyaltyProg
 
   }
 
-  override addNew() {
+  override async addNew() {
     console.log('Add product')
+    let prog = new LoyaltyProgram()
+
+    let branchId = this.sessionSvc.branchId
+
+    prog.orgId = branchId
+    prog.branchId = branchId
+
+    prog.name = 'Nieuw'
+
+
+    var res = await this.objectSvc.create$(prog)
+
+    console.log(res)
+
+
   }
 
 }

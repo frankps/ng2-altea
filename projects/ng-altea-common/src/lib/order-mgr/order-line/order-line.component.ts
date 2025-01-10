@@ -328,28 +328,7 @@ export class OrderLineComponent implements OnInit {
         console.log(`Price ${priceId} already applied`)
       } else {
 
-        let priceChange = new PriceChange()
-
-        if (price.extraQty?.on) {  // if this is not a 'real' price change, but instead customer receives extra quantity
-          priceChange.tp = PriceChangeType.subsQty
-          priceChange.val = price.extraQty.val
-          priceChange.pct = price.extraQty.pct
-        }
-        else {
-          priceChange.tp = PriceChangeType.price
-          priceChange.val = price.value
-          priceChange.pct = price.isPercentage
-        }
-
-        priceChange.id = priceId
-
-        priceChange.info = price.title
-
-        this.orderLine.addPriceChange(priceChange)
-
-
-
-
+        this.orderLine.applyPrice(price)
 
         if (this.orderMgrSvc.orderLineIsNew) {
           this.orderLine.calculateAll()

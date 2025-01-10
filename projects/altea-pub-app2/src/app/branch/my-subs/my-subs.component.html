@@ -12,22 +12,47 @@
         <li class="list-group-item" *ngFor="let sub of subs">
 
             <div class="row">
-                <div class="col-4">{{sub.name}}</div>
-                <div class="col-4">
-                    <button type="button" class="btn btn-primary btn-sm"  [disabled]="sub.usedQty >= sub.totalQty"   (click)="bookSubscription(sub)">Reserveer</button>
-
-                </div>
-                <div class="col-4">
+                <div class="col">{{sub.name}}
 
                     <div class="float-end">{{sub.usedQty}} / {{sub.totalQty}}</div>
                 </div>
-              </div>
+            </div>
 
-              
 
-            
 
-           
+            <ng-container *ngIf="sub.hasOptions()">
+
+                <ng-container *ngFor="let option of sub.options">
+                    <div class="row ms-3">
+                        <div class="col"><span class="me-2">{{option.name}}:</span>
+                            <span class="badge text-bg-secondary me-2"
+                                *ngFor="let value of option.values">{{value.name}}</span>
+
+
+                        </div>
+                    </div>
+
+                </ng-container>
+
+            </ng-container>
+
+
+            <div class="row mt-2 mb-2">
+                <div class="col">
+
+                    <button type="button" class="btn btn-primary btn-sm float-end"
+                        [disabled]="sub.usedQty >= sub.totalQty" (click)="bookSubscription(sub)">Reserveer</button>
+
+                </div>
+
+
+            </div>
+
+
+
+
+
+
 
         </li>
     </ul>

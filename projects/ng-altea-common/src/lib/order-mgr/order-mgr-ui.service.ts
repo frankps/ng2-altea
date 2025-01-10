@@ -1038,6 +1038,9 @@ export class OrderMgrUiService {   // implements OnInit
 
           this.gift.orderId = this.order.id
           this.gift.syncFromOrder(this.order)
+
+          delete this.gift.payments  // this should be moved to giftSvc (or generic implementation)
+
           let giftRes = await this.giftSvc.create$(this.gift, this.dashboardSvc.resourceId)
 
           console.warn(giftRes)
@@ -1047,6 +1050,9 @@ export class OrderMgrUiService {   // implements OnInit
           }
 
         } else {
+
+          delete this.gift.payments  // this should be moved to giftSvc (or generic implementation)
+
           this.gift.syncFromOrder(this.order)
           let giftRes = await this.giftSvc.update$(this.gift, this.dashboardSvc.resourceId)
         }
@@ -1258,7 +1264,30 @@ export class OrderMgrUiService {   // implements OnInit
 
   }
 
-  async addProductById(productId: string, qty = 1): Promise<OrderLine[]> {
+  convertOrderLineOptionsToMap(options?: OrderLineOption[]) : Map<String, String[]> {
+
+    if (ArrayHelper.IsEmpty(options))
+      return null
+
+    let map = new Map<String, String[]>()
+
+    for (let option of options) {
+
+      if (!option || ArrayHelper.IsEmpty(option.values))
+        continue
+
+      let valueIds = option.values.map(v => v.id)
+
+      map.set(option.id, valueIds)
+    }
+
+
+    return map
+
+  }
+
+
+  async addProductById(productId: string, qty = 1, options?: OrderLineOption[]): Promise<OrderLine[]> {
 
     const product = await this.loadProduct$(productId)
 
@@ -1267,7 +1296,8 @@ export class OrderMgrUiService {   // implements OnInit
       return []
     }
 
-    const orderLines = await this.addProduct(product, qty)
+    const optionMap = this.convertOrderLineOptionsToMap(options)
+    const orderLines = await this.addProduct(product, qty, optionMap)
 
     return orderLines
     console.warn(this.order)
@@ -1359,24 +1389,7 @@ export class OrderMgrUiService {   // implements OnInit
 
       await me.calculateLoyalty()
     }
-
-    /*
-    if (ArrayHelper.NotEmpty(prices)) {
-
-      for (let price of prices) {
-        const orderLine = OrderLine.custom(price.title, price.value, 0.06)   // gift.vatPct
-        me.addOrderLine(orderLine, 1, false)
-      }
-
-    }
-      */
-
-    //this.tmp = 'aaaa'
-
-
   }
-
-
 
   async newOrderLine(product: Product, qty = 1, initOptionValues?: Map<String, String[]>): Promise<OrderLine> {
 
@@ -1390,9 +1403,37 @@ export class OrderMgrUiService {   // implements OnInit
 
     this.orderLine = new OrderLine(product, qty, initOptionValues)
 
+    this.preselectSpecialPrices(this.orderLine)
+
     return this.orderLine
   }
 
+
+  preselectSpecialPrices(orderLine: OrderLine) {
+
+    let product = orderLine.product
+
+    let hasSpecialPrices = product.hasSpecialPrices()
+
+    if (hasSpecialPrices) {
+
+      let prices = product.getSpecialPrices()
+
+      for (let price of prices) {
+
+        if (orderLine.hasPriceChange(price.id))
+          continue
+
+        orderLine.applyPrice(price)
+
+      }
+
+
+    }
+
+
+
+  }
 
 
 
@@ -1518,6 +1559,7 @@ export class OrderMgrUiService {   // implements OnInit
       return
 
     for (let payment of this.sessionSvc.clipboard.payments) {
+      payment.markAsUpdated('orderId')
       this.order.addPayment(payment, false)
     }
 
@@ -1606,7 +1648,7 @@ export class OrderMgrUiService {   // implements OnInit
 
     const subscriptions = await this.alteaSvc.subscriptionMgmtService.createSubscriptions(this.order, orderLine, true)
 
-    
+
     console.error(subscriptions)
   }
 

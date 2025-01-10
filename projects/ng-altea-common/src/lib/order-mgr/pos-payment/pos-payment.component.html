@@ -4,7 +4,7 @@
     </div> -->
     <div class="card-body">
 
-        <div *ngIf="message != PosPaymentMessage.none" class="alert alert-danger" role="alert" >
+        <div *ngIf="message != PosPaymentMessage.none" class="alert alert-danger" role="alert">
             {{'enums.pos-payment-message.' + message | translate}}
         </div>
 
@@ -45,8 +45,8 @@
                         (click)="addPayment(PaymentType.stripe)" translate>enums.pay-type.stripe</button>
                 </div>
                 <div class="col-4 d-grid mt-2">
-                    <button type="button" [disabled]="!canDoSubscription()" class="btn btn-primary" (click)="addPayment(PaymentType.subs)"
-                        translate>enums.pay-type.subs</button>
+                    <button type="button" [disabled]="!canDoSubscription()" class="btn btn-primary"
+                        (click)="addPayment(PaymentType.subs)" translate>enums.pay-type.subs</button>
                 </div>
             </div>
 
@@ -66,9 +66,9 @@
 
             <div class="row" *ngIf="compensation > 0">
                 <div class="col-4 d-grid mt-2">
-                    
-                    <input type="text" id="compensation" name="compensation" class="form-control" placeholder="Compenseren"
-                        [(ngModel)]="compensation" />
+
+                    <input type="text" id="compensation" name="compensation" class="form-control"
+                        placeholder="Compenseren" [(ngModel)]="compensation" />
 
                 </div>
 
@@ -100,26 +100,46 @@
         <ul class="list-group mt-3" *ngIf="showSubscriptions">
             <li class="list-group-item" *ngFor="let sub of subscriptions">
                 <div class="row">
-                    <div class="col-8"><small>{{sub.name}}</small></div>
-                    <div class="col-4">{{sub.usedQty}}/{{sub.totalQty}}
+                    <div class="col-9"><small>{{sub.name}}</small>
 
-                        <button type="button" class="btn btn-primary btn-sm float-end" (click)="useSubscription(sub)"><i
-                                class="fa-duotone fa-stamp"></i></button>
+
+                        <ng-container *ngIf="sub.hasOptions()">
+
+                            <ng-container *ngFor="let option of sub.options">
+                                <div class="row ms-3">
+                                    <div class="col"><span class="me-2"
+                                            style="font-size: x-small;">{{option.name}}:</span>
+                                        <span class="badge text-bg-secondary me-2"
+                                            *ngFor="let value of option.values"><small>{{value.name}}</small></span>
+
+
+                                    </div>
+                                </div>
+
+                            </ng-container>
+
+                        </ng-container>
 
                     </div>
+                    <div class="col-3">
+                        <div class="row">
+                            <div class="col d-flex justify-content-end">{{sub.usedQty}}/{{sub.totalQty}}</div>
+                        </div>
+                        <div class="row my-2">
+                            <div class="col d-flex justify-content-end">
+
+                                <button type="button" class="btn btn-primary btn-sm"
+                                    (click)="useSubscription(sub)"><i class="fa-duotone fa-stamp"></i></button>
+
+                            </div>
+                        </div>
 
 
 
 
-                    <!--                     <div class="col-4">
-                        <button type="button" [disabled]="gift.availableAmount() <= 0" class="btn btn-primary btn-sm"
-                            (click)="useGift(gift)">{{gift.availableAmount()}}</button>
-                    </div> -->
-
+                    </div>
                 </div>
-
             </li>
-
         </ul>
 
 
