@@ -1,5 +1,5 @@
 
-import { Branch, Contact, DepositMode, Gift, Invoice, Order, OrderLine, OrderLineOption, OrderType, Organisation, PlanningMode, Product, ProductResource, ProductType, ResourcePlanning, Schedule, User } from "ts-altea-model";
+import { Branch, Contact, DepositMode, Gift, Invoice, Order, OrderLine, OrderLineOption, OrderType, Organisation, Payment, PlanningMode, Product, ProductResource, ProductType, ResourcePlanning, Schedule, User } from "ts-altea-model";
 import { Exclude, Type, Transform } from "class-transformer";
 import 'reflect-metadata';
 import { ArrayHelper, ConnectTo, DateHelper, DbObjectCreate, IAsDbObject, ManagedObject, ObjectHelper, ObjectMgmt, ObjectReference, ObjectWithId, ObjectWithIdPlus, QueryOperator, TimeHelper } from 'ts-common'
@@ -36,6 +36,10 @@ export class Subscription extends ObjectWithIdPlus {
   /** the purchase order id */
   orderId?: string;
   name?: string;
+
+  @Type(() => Payment)
+  payments: Payment[]
+
   remark?: string;
 
   @Type(() => Product)
@@ -45,7 +49,6 @@ export class Subscription extends ObjectWithIdPlus {
 
   @Type(() => Product)
   unitProduct?: Product;
-
 
   unitProductId?: string;
 
@@ -73,6 +76,11 @@ export class Subscription extends ObjectWithIdPlus {
 
     return ArrayHelper.NotEmpty(this.options)
 
+  }
+
+  hasPayments(): boolean {
+
+    return ArrayHelper.NotEmpty(this.payments)
   }
 
   getOptionValueIds(optionId: string): string[] {

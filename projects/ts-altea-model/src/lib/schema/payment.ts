@@ -1,7 +1,7 @@
-import { Branch, Contact, DepositMode, Gift, Invoice, Order, OrderLine, OrderType, Organisation, PlanningMode, Product, ProductType, Resource, ResourcePlanning, Subscription } from "ts-altea-model";
+import { BankTransaction, Branch, Contact, DepositMode, Gift, Invoice, Order, OrderLine, OrderType, Organisation, PlanningMode, Product, ProductType, Resource, ResourcePlanning, Subscription } from "ts-altea-model";
 import { Exclude, Type, Transform } from "class-transformer";
 import 'reflect-metadata';
-import { ArrayHelper, ConnectTo, DateHelper, DbObjectCreate, IAsDbObject, ManagedObject, ObjectHelper, ObjectMgmt, ObjectReference, ObjectWithId, ObjectWithIdPlus, QueryOperator, TimeHelper } from 'ts-common'
+import { ArrayHelper, ConnectTo, DateHelper, DbObjectCreate, IAsDbObject, ManagedObject, ObjectHelper, ObjectMgmt, ObjectReference, ObjectWithId, ObjectWithIdPlus, QueryOperator, TimeHelper, YearMonth } from 'ts-common'
 import * as _ from "lodash";
 import { PersonLine } from "../person-line";
 import { DateRange, DateRangeSet, TimeBlock, TimeBlockSet, TimeSpan } from "../logic";
@@ -59,6 +59,87 @@ export class PaymentInfo {
   }
 }
 
+export class Payments {
+  list: Payment[] = []
+
+
+  constructor(list: Payment[] = []) {
+    this.list = list
+
+  }
+
+  add(...pays: Payment[]) {
+
+    if (ArrayHelper.IsEmpty(pays))
+      return this
+
+    for (let pay of pays) {
+      if (!this.list.find(p => p.id == pay.id))
+        this.list.push(pay)
+    }
+
+    return this
+
+  }
+
+  orderByDate(): Payment[] {
+
+    if (!this.list)
+      this.list = []
+
+    this.list = _.orderBy(this.list, ['date'], ['desc'])
+   
+    return this.list
+
+  }
+
+  getTotalsByDay(): Map<Date, number> {
+
+    let pays = this.list
+
+    let map = new Map<Date, number>()
+
+    if (ArrayHelper.IsEmpty(pays))
+      return map
+
+    let min = _.minBy(pays, 'dateTyped')
+    let max = _.maxBy(pays, 'dateTyped')
+
+    let start = dateFns.startOfDay(min.dateTyped)
+
+    while (start <= max.dateTyped) {
+      let end = dateFns.addDays(start, 1)
+
+      let paysOnDate = pays.filter(p => p.dateTyped >= start && p.dateTyped < end)
+
+      if (ArrayHelper.NotEmpty(paysOnDate)) {
+        let sum = _.sumBy(paysOnDate, 'amount')
+
+        if (sum != 0) {
+          map.set(start, sum)
+        }
+      }
+
+      start = end
+    }
+
+    return map
+  }
+
+
+  getPaysOnDay(startOfDay: Date): Payment[] {
+
+    let pays = this.list
+
+    let endOfDay = dateFns.addDays(startOfDay, 1)
+
+    let paysOnDate = pays.filter(p => p.dateTyped >= startOfDay && p.dateTyped < endOfDay)
+
+    return paysOnDate
+  }
+
+}
+
 export class Payment extends ObjectWithIdPlus {
 
   static cash(amount: number): Payment {
@@ -102,6 +183,8 @@ export class Payment extends ObjectWithIdPlus {
   @Type(() => LoyaltyPayInfo)
   loyal?: LoyaltyPayInfo
 
+  @Type(() => BankTransaction)
+  bankTx?: BankTransaction
   bankTxId?: string
   bankTxNum?: string
 
@@ -125,6 +208,16 @@ export class Payment extends ObjectWithIdPlus {
     super()
 
     this.date = DateHelper.yyyyMMddhhmmss()
+
+  }
+
+  declarationPeriod(): number {
+
+    let yearMonth = YearMonth.fromDateNumber(this.date)
+
+    let yearMonthNum = yearMonth.toNumber()
+
+    return yearMonthNum
 
   }
 

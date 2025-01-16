@@ -211,7 +211,8 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
             if (dateMatches && amountMatches) {
 
                 let now = new Date()
-                let dateString = dateMatches[1] + '/' + dateFns.getYear(now)
+                let year = tx.getYearFromNum()
+                let dateString = dateMatches[1] + '/' + year
                 let transactionDate = dateFns.parse(dateString, 'dd/MM/yyyy', new Date())
 
                 let origAmount = amountMatches[1]

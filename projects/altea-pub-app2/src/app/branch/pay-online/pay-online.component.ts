@@ -32,14 +32,14 @@ http://localhost:4350/branch/aqua/orderMode/pay-online
 export class PaymentOption {
   amount: number
 
-  type: 'deposit' | 'full' | 'confirm'
+  type: 'deposit' | 'full' | 'balance' | 'confirm'
 
   /** Call To Action */
   cta: string
 
   info: string
 
-  constructor(amount: number, type: 'deposit' | 'full' | 'confirm', cta?: string, info?: string) {
+  constructor(amount: number, type: 'deposit' | 'full' | 'balance' | 'confirm', cta?: string, info?: string) {
 
     this.amount = amount
     this.type = type
@@ -49,7 +49,7 @@ export class PaymentOption {
   }
 
 }
-
+  
 
 declare var Stripe;
 
@@ -181,7 +181,10 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
     var total = order.incl
     var alreadyPaid = order.paid
 
-    if (deposit && deposit > 0) { // && alreadyPaid < deposit
+    let now = new Date()
+    let startDate = order.startDate
+
+    if ((!startDate || now < startDate) && deposit && deposit > 0) { // && alreadyPaid < deposit
 
       const openDeposit = deposit - alreadyPaid
 
@@ -199,7 +202,7 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
 
     if (total && total > deposit && alreadyPaid < total) {
 
-      if (alreadyPaid == 0) {
+      if ((!startDate || now < startDate) && alreadyPaid == 0) {
 
         const fullPayOption = new PaymentOption(total, 'full', `Volledige bedrag betalen €${total}`)
         this.payOptions.push(fullPayOption)
@@ -207,7 +210,7 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
       } else {
         const saldo = total - alreadyPaid
 
-        const fullPayOption = new PaymentOption(saldo, 'full', `Saldo betalen van €${saldo}`)
+        const fullPayOption = new PaymentOption(saldo, 'balance', `Saldo betalen van €${saldo}`)
         this.payOptions.push(fullPayOption)
 
       }

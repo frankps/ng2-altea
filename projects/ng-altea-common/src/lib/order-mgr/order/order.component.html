@@ -131,6 +131,21 @@
 
                 </ng-container>
 
+
+                <ng-container *ngIf="!isPOS() && line.hasPromotions()">
+
+                    <div class="row mt-1 me-1" style="font-size: 75%; font-style: italic;"
+                        *ngFor="let priceChange of line.promotions()">
+                        <div class="col-1"></div>
+                        <div class="col-9">{{priceChange.info}}</div>
+                        <div class="col-2 d-flex justify-content-end align-items-end"><span
+                                *ngIf="priceChange.isPrice() && !priceChange.pct">€</span> {{priceChange.val}}<span
+                                *ngIf="priceChange.pct">%</span></div>
+                    </div>
+
+                </ng-container>
+
+
                 <ng-container *ngIf="line.hasPersons()">
                     <div class="row mt-1" style="font-size: 75%;">
                         <div class="col-1"></div>
@@ -483,37 +498,87 @@
 
         <ng-container *ngIf="show.extra">
 
-            <div class="row mt-2">
-                <div class="col-3  d-flex justify-content-center">
-                    BTW%
+            <ng-container *ngIf="order.hasVatLines()">
+                <div class="row mt-2">
+                    <div class="col-3  d-flex justify-content-center">
+                        BTW%
+                    </div>
+                    <div class="col-3  d-flex justify-content-center">
+                        Excl
+                    </div>
+                    <div class="col-3  d-flex justify-content-center">
+                        BTW
+                    </div>
+                    <div class="col-3  d-flex justify-content-center">
+                        Incl
+                    </div>
                 </div>
-                <div class="col-3  d-flex justify-content-center">
-                    Excl
+    
+                <div class="row" *ngFor="let vatLine of order.vatLines">
+    
+                    <div class="col-3 d-flex justify-content-end">
+                        {{vatLine.pct}}%
+                    </div>
+                    <div class="col-3 d-flex justify-content-end">
+                        {{vatLine.excl}}
+                    </div>
+                    <div class="col-3 d-flex justify-content-end">
+                        {{vatLine.vat}}
+                    </div>
+                    <div class="col-3 d-flex justify-content-end">
+                        {{vatLine.incl}}
+                    </div>
+    
                 </div>
-                <div class="col-3  d-flex justify-content-center">
-                    BTW
-                </div>
-                <div class="col-3  d-flex justify-content-center">
-                    Incl
-                </div>
-            </div>
 
-            <div class="row" *ngFor="let vatLine of order.vatLines">
+            </ng-container>
 
-                <div class="col-3 d-flex justify-content-end">
-                    {{vatLine.pct}}%
+            <button type="button" class="btn btn-primary btn-sm" (click)="orderMgrSvc.calculateTax()">dic.add</button>
+
+            <ng-container *ngIf="order.hasTaxLines()">
+                <div class="row mt-2">
+                    <div class="col-2  d-flex justify-content-center">
+                        Periode
+                    </div>
+                    <div class="col-2  d-flex justify-content-center">
+                        BTW%
+                    </div>
+                    <div class="col-3  d-flex justify-content-center">
+                        Excl
+                    </div>
+                    <div class="col-2  d-flex justify-content-center">
+                        BTW
+                    </div>
+                    <div class="col-3  d-flex justify-content-center">
+                        Incl
+                    </div>
                 </div>
-                <div class="col-3 d-flex justify-content-end">
-                    {{vatLine.excl}}
-                </div>
-                <div class="col-3 d-flex justify-content-end">
-                    {{vatLine.vat}}
-                </div>
-                <div class="col-3 d-flex justify-content-end">
-                    {{vatLine.incl}}
+    
+                <div class="row" *ngFor="let taxLine of order.tax.lines">
+    
+                    <div class="col-2 d-flex justify-content-end">
+                        {{taxLine.per}}
+                    </div>
+
+                    <div class="col-2 d-flex justify-content-end">
+                        {{taxLine.pct}}%
+                    </div>
+                    <div class="col-3 d-flex justify-content-end">
+                        {{taxLine.excl}}
+                    </div>
+
+                    <div class="col-2 d-flex justify-content-end">
+                        {{taxLine.tax}}
+                    </div>
+
+                    <div class="col-3 d-flex justify-content-end">
+                        {{taxLine.incl}}
+                    </div>
+    
                 </div>
 
-            </div>
+            </ng-container>
+
 
         </ng-container>
 

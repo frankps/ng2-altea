@@ -1,7 +1,8 @@
-import { DateHelper, ObjectHelper, ObjectWithId, ObjectWithIdPlus } from "ts-common";
+import { ArrayHelper, DateHelper, ObjectHelper, ObjectWithId, ObjectWithIdPlus } from "ts-common";
 import * as dateFns from 'date-fns'
-import { Exclude } from "class-transformer";
+import { Exclude, Type } from "class-transformer";
 import * as _ from "lodash";
+import { Payment } from "ts-altea-model";
 
 export enum BankTxType {
     unknown = 'unknown',
@@ -36,7 +37,7 @@ export class BankTransaction extends ObjectWithId {
 
     accountId?: string
 
-    /** TransactionNum */
+    /** TransactionNum, format yyyy-nnnnnnnn */
     num?: string
     numInt?: number
 
@@ -83,6 +84,9 @@ export class BankTransaction extends ObjectWithId {
     /** data retrieved from provider (ex Stripe) related to this payment */
     prov?: any
 
+    @Type(() => Payment)
+    payments?: Payment[] = []
+
     clone() : BankTransaction {
         let clone = ObjectHelper.clone(this, BankTransaction)
         delete clone._info1
@@ -104,6 +108,18 @@ export class BankTransaction extends ObjectWithId {
         return _.round(amount, 2)
     }
 
+    getYearFromNum() : number {
+
+        if (!this.num) 
+            return -1
+
+        let items = this.num.split('-')
+
+        if (ArrayHelper.IsEmpty(items))
+            return -1
+
+        return +items[0]
+    }
 
     @Exclude()
     _execDate?: Date
@@ -163,58 +179,4 @@ export class BankTransaction extends ObjectWithId {
 
         return info1
     }
-
-    /*
-    if (tx.Type != null && (tx.Type == "KredietKaart" || tx.Type.Contains("Credit") || tx.Type.Contains("Stripe")))
-        {
-            if (tx.RefDate.HasValue)
-                txText += string.Format(" ({0:d/M} = € {1:0.00} - {2:0.00})", tx.RefDate.Value, tx.AmountOriginal, tx.AmountCost);
-        }
-        else if (tx.Type != null && (tx.Type == "Terminal" || tx.Type.Contains("BC")))
-        {
-            if (tx.RefDate.HasValue)
-                txText += string.Format(" ({0:d/M})", tx.RefDate.Value);
-        }
-        else
-        {
-            if (tx.RefDate.HasValue)
-                txText += string.Format(" ({0:d/M H:m})", tx.RefDate.Value);
-        }
-*/
-
 }
-
-
-/*
-
-
-       
-        public string TransactionNum { get; set; }
-        public System.DateTime ExecutionDate { get; set; }
-        public System.DateTime ValueDate { get; set; }
-        public decimal Amount { get; set; }
-        public string Currency { get; set; }
-        public string Account { get; set; }
-        public string CounterpartAccount { get; set; }
-        public string Details { get; set; }
-        public decimal AmountCheck { get; set; }
-        public bool CheckOk { get; set; }
-        public System.DateTime CreatedOn { get; set; }
-        public string ShortInfo { get; set; }
-        public string Info { get; set; }
-        public string Type { get; set; }
-        public Nullable<System.DateTime> RefDate { get; set; }
-        public Nullable<decimal> AmountOriginal { get; set; }
-        public Nullable<decimal> AmountCost { get; set; }
-        
-        public Nullable<int> TransactionNumInt { get; set; }
-        public string ProviderRef { get; set; }
-        public string CounterpartName { get; set; }
-
-
-public System.Guid BankTransactionId { get; set; }
-         public Nullable<System.Guid> BankAccountId { get; set; }
-        public Nullable<System.Guid> DocId { get; set; }
-public string LinkedBy { get; set; }
-
-        */

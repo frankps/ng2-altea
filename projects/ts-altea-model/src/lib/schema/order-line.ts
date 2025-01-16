@@ -371,6 +371,9 @@ export class PriceChange {
   /** if true, then val is a percentage change */
   pct: boolean = false
 
+  /** is a promotion */
+  promo: boolean = false
+
   isPrice() {
     return this.tp == PriceChangeType.price
   }
@@ -446,6 +449,58 @@ export class OrderLine extends ObjectWithIdPlus {
   @Type(() => PriceChange)
   pc?: PriceChange[]
 
+
+  __old_constructor(product?: Product, qty = 1, initOptionValues?: Map<String, String[]>) {
+    //super()
+
+
+    this.qty = qty
+
+    if (!product)
+      return
+
+
+    this.descr = product.name
+    this.base = product.salesPricing()
+    //this.incl = product.salesPrice
+    this.vatPct = product.vatPct
+    this.productId = product.id
+    this.product = product
+
+    if (!product.options)
+      return
+
+    for (const option of product.options) {
+
+      let optionValues: ProductOptionValue[]
+
+      if (initOptionValues && initOptionValues.has(option.id)) {
+        let valueIds = initOptionValues.get(option.id)
+
+        if (Array.isArray(valueIds) && valueIds.length > 0) {
+
+          optionValues = option.getValues(valueIds)
+
+
+        }
+      }
+
+      if (!Array.isArray(optionValues) || optionValues.length == 0)
+        optionValues = option.getDefaultValues()
+
+      if (optionValues) {
+        const orderLineOption = new OrderLineOption(option, ...optionValues)
+        this.options.push(orderLineOption)
+      }
+
+    }
+
+    this.calculateAll()
+    console.error(this.incl)
+  }
+
+
+
   constructor(product?: Product, qty = 1, initOptionValues?: Map<String, String[]>) {
     super()
 
@@ -476,11 +531,13 @@ export class OrderLine extends ObjectWithIdPlus {
     }
 
 
-    /** In case of arrangements (bundles => product has product.items) 
+    /** In case of subscriptions (product has product.items) 
+     * 
+     *  Be carefull: product.items is used for both subscriptions & bundles
      * 
      */
 
-    if (ArrayHelper.NotEmpty(product.items)) {
+    if (product.isSubscription() && ArrayHelper.NotEmpty(product.items)) {
 
       for (let item of product.items) {
 
@@ -584,6 +641,7 @@ export class OrderLine extends ObjectWithIdPlus {
     if (!this.hasOptions())
       return []
 
+
     let option = this.options.find(o => o.id == optionId)
 
     if (!option || !option.hasValues())
@@ -591,7 +649,7 @@ export class OrderLine extends ObjectWithIdPlus {
 
     let valueIds = option.values.filter(v => ObjectHelper.notNullOrUndefined(v)).map(v => v.id)
 
-    return valueIds 
+    return valueIds
   }
 
 
@@ -711,8 +769,10 @@ export class OrderLine extends ObjectWithIdPlus {
 
 
   applyPrice(price: Price) {
-    
+
     let priceChange = new PriceChange()
+
+    price.isPromo
 
     if (price.extraQty?.on) {  // if this is not a 'real' price change, but instead customer receives extra quantity
       priceChange.tp = PriceChangeType.subsQty
@@ -725,6 +785,7 @@ export class OrderLine extends ObjectWithIdPlus {
       priceChange.pct = price.isPercentage
     }
 
+    priceChange.promo = price.isPromo
     priceChange.id = price.id
 
     priceChange.info = price.title
@@ -930,6 +991,23 @@ export class OrderLine extends ObjectWithIdPlus {
 
   hasSpecialPrices(): boolean {
     return ArrayHelper.NotEmpty(this.product.prices)
+  }
+
+  hasPromotions(): boolean {
+    if (!this.hasPriceChanges())
+      return false
+
+    let idx = this.pc.findIndex(pc => pc.promo === true)
+
+    return idx >= 0
+  }
+
+  promotions(): PriceChange[] {
+    
+    if (!this.hasPriceChanges())
+      return []
+
+    return this.pc.filter(pc => pc.promo == true)
   }
 
 

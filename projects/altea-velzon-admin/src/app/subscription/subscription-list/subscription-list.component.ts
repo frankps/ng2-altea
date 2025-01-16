@@ -75,6 +75,7 @@ export class SubscriptionListComponent extends NgBaseListComponent<Subscription>
     query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
 
     query.include('contact')
+    query.orderByDesc('cre')
     return query
 
   }

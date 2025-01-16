@@ -19,4 +19,5 @@ export * from './template-enums'
 export * from './text-parameter'
 //export * from './user'
 export * from './user-base'
+export * from './tax-line'
 //export * from './object-with-parameters'   ++ can not be exported !!!

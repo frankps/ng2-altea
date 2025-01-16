@@ -1,5 +1,8 @@
 import { Component } from '@angular/core';
-import { OrderService } from 'ng-altea-common';
+import { Year } from '@syncfusion/ej2-angular-schedule';
+import { ObjectService, OrderService } from 'ng-altea-common';
+import { ConsistencyReport, MonthConsistencyReportBuilder } from 'ts-altea-logic';
+import { YearMonth } from 'ts-common';
 
 @Component({
   selector: 'app-order-check',
@@ -8,12 +11,28 @@ import { OrderService } from 'ng-altea-common';
 })
 export class OrderCheckComponent {
 
-  constructor(protected orderSvc: OrderService) {
+
+  report: ConsistencyReport
+
+  constructor(protected orderSvc: OrderService, protected objSvc: ObjectService) {
 
 
   }
 
 
+  async doChecks(year, month) {
+
+    let report = new MonthConsistencyReportBuilder(this.objSvc)
+
+    let yearMonth = new YearMonth(year, month)
+    // let pays = await report.checkPayments(yearMonth)
+    // console.log(pays)
+
+    this.report = await report.checkAll(yearMonth)
+
+    console.log(this.report)
+
+  }
 
   ordersWithoutPlanning() {
 

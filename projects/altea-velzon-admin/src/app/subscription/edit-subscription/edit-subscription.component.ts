@@ -4,7 +4,7 @@ import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, Produ
 import { BackendHttpServiceBase, DashboardService, FormCardSectionEventData, NgEditBaseComponent, ToastType, TranslationService } from 'ng-common'
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxModalComponent, DeleteModalComponent } from 'ng-common';
-import { BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, Translation, ObjectHelper, ObjectWithId, CollectionChangeTracker, ApiStatus, DateHelper } from 'ts-common'
+import { BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, Translation, ObjectHelper, ObjectWithId, CollectionChangeTracker, ApiStatus, DateHelper, ArrayHelper } from 'ts-common'
 import * as _ from "lodash";
 import { NgxSpinnerService } from "ngx-spinner"
 import { NgTemplateOutlet } from '@angular/common';
@@ -42,7 +42,7 @@ export class EditSubscriptionComponent extends NgEditBaseComponent<Subscription>
   constructor(protected subscriptionSvc: SubscriptionService, protected translationSvc: TranslationService, route: ActivatedRoute, router: Router,
     spinner: NgxSpinnerService, private modalService: NgbModal, dashboardSvc: DashboardService,
     protected sessionSvc: SessionService) {
-    super('subscription', Subscription, 'contact,order'
+    super('subscription', Subscription, 'contact,order,payments.order'
       , subscriptionSvc
       , router, route, spinner, dashboardSvc)
 
@@ -65,6 +65,12 @@ export class EditSubscriptionComponent extends NgEditBaseComponent<Subscription>
 
     console.error('objectRetrieved')
     console.error(object)
+
+
+    if (ArrayHelper.NotEmpty(object?.payments)) {
+      object.payments = _.orderBy(object.payments, pay => pay.order?.start, ['desc'])
+    }
+
 
     // this.editSectionId = 'general'
   }

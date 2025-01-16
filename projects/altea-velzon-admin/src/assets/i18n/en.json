@@ -411,7 +411,8 @@
       "gift_online": "Online cadeaubon",
       "gift_online_from": "Cadeaubon schenker",
       "gift_online_to": "Cadeaubon ontvanger",
-      "order_compensate_gift": "Compensatie cadeaubon"
+      "order_compensate_gift": "Compensatie cadeaubon",
+      "order_outstanding_balance": "Openstaand saldo"
     },
     "compensation-gift-reason": {
       "overpaid": "Omzetting teveel betaald naar cadeaubon"
@@ -761,7 +762,8 @@
     },
     "payment": {
       "full": "Volledig bedrag",
-      "deposit": "Voorschot"
+      "deposit": "Voorschot",
+      "balance": "Saldo"
     },
     "gift": {
       "choice": "Wat wenst u te schenken: een bedrag of kiest u liever zelf een dienst uit het aanbod?",
@@ -1334,7 +1336,8 @@
       "sub": {
         "transactions": "Transacties",
         "payments": "Betalingen",
-        "hr-dashboard": "Personeel"
+        "hr-dashboard": "Personeel",
+        "checks": "Controles"
       }
     },
     "platform": {

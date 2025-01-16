@@ -30,8 +30,8 @@ export enum TemplateCode {
   resv_footer = 'resv_footer',
   gift_online = 'gift_online',
 
-  order_compensate_gift = 'order_compensate_gift'
-
+  order_compensate_gift = 'order_compensate_gift',
+  order_outstanding_balance = 'order_outstanding_balance'
 } 
 
 export enum GiftTemplateCode {

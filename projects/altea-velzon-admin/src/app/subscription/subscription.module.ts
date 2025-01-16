@@ -16,6 +16,9 @@ import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { TimepickerModule } from 'ngx-bootstrap/timepicker';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerModule } from 'ngx-spinner';
+import { NgAlteaCommonModule, OrderMgrModule } from 'ng-altea-common';
+import {  NgCommonModule } from 'ng-common';
+
 
 @NgModule({
   declarations: [
@@ -33,6 +36,9 @@ import { NgxSpinnerModule } from 'ngx-spinner';
     ModalModule,
     BsDatepickerModule,
     TimepickerModule,
-    NgxSpinnerModule],
+    NgxSpinnerModule,
+    NgCommonModule,
+    NgAlteaCommonModule
+  ],
 })
 export class SubscriptionModule { }

@@ -1,1 +1,32 @@
-<p>order-check works!</p>
+<button type="button" class="btn btn-primary btn-sm me-2" (click)="doChecks(2024,10)">Okt</button>
+<button type="button" class="btn btn-primary btn-sm me-2" (click)="doChecks(2024,11)">Nov</button>
+<button type="button" class="btn btn-primary btn-sm me-2" (click)="doChecks(2024,12)">Dec</button>
+
+
+<ng-container *ngIf="report">
+
+
+
+    <ng-container *ngIf="report.bank">
+
+
+
+        Checks ok: {{report.bank.count.ok}}<br>
+
+        Errors: {{report.bank.count.errors}}<br>
+
+        <div class="row" *ngFor="let error of report.bank.errors">
+            <div class="col-2">{{error.tx.num}}</div>
+            <div class="col-2">{{error.tx.type}}</div>
+            <div class="col-2">{{error.tx.execDateObject() | date:"dd/MM/yy HH:mm"}}</div>
+            <div class="col">{{error.msg}}</div>
+          </div>
+      
+
+
+
+    </ng-container>
+
+
+</ng-container>
+

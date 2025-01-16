@@ -2,6 +2,84 @@ import * as dateFns from 'date-fns'
 import { plainToInstance } from 'class-transformer';
 
 
+export class YearMonth {
+    /** year number in format yyyy */
+    y: number
+
+    /** month number from 1 to 12 */
+    m: number
+
+    constructor(year: number, month: number) {
+        this.y = year
+        this.m = month
+    }
+
+    static fromDateNumber(dateNum: number) : YearMonth {
+
+        if (!dateNum)
+            return null
+
+        let date = DateHelper.parse(dateNum)
+
+        let ym = new YearMonth(dateFns.getYear(date), dateFns.getMonth(date) + 1)
+
+
+        return ym
+    }
+
+    static fromDate(date: Date) : YearMonth {
+
+        if (!date)
+            return null
+
+        let ym = new YearMonth(dateFns.getYear(date), dateFns.getMonth(date) + 1)
+
+        return ym
+    }
+
+    next(): YearMonth {
+
+        let start = this.startDate()
+        let startNextMonth = dateFns.addMonths(start, 1)
+
+        return YearMonth.fromDate(startNextMonth)
+    }
+
+    startDate() : Date {
+        let date = new Date(this.y, this.m - 1, 1)
+        return date
+    }
+
+    endDate() : Date {
+        let date = this.startDate()
+        date = dateFns.addMonths(date, 1)
+        return date
+    }
+
+    /**
+     * returns yearmonth in format yymm as number
+     */
+    toNumber() : number {
+        let num = (this.y - 2000) * 100 + this.m
+        return num
+    }
+
+    /**
+     * 
+     * @returns first day of next month in numeric date format most used (yyyyMMddhhmmss)
+     */
+    firstDayNextMonth(): number {
+
+        let date = new Date(this.y, this.m - 1, 1)
+
+        let firstDayNextMonth = dateFns.addMonths(date, 1)
+
+        let toNum = DateHelper.yyyyMMdd000000(firstDayNextMonth)
+
+        return toNum
+    }
+}
+
 export class DateHelper {
 
     static dummy = 5

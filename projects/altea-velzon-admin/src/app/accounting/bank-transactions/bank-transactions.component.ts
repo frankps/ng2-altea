@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { BankTransactionService, ObjectService, PaymentService } from 'ng-altea-common';
 import { ApiListResult, ApiStatus, ArrayHelper, DateHelper, DbQuery, ObjectHelper, QueryOperator, Translation } from 'ts-common';
 import * as dateFns from 'date-fns'
-import { BankTransaction, BankTxType, Payment, PaymentType, StripeGetPayouts, StripePayout } from 'ts-altea-model';
+import { BankTransaction, BankTxType, Payment, Payments, PaymentType, StripeGetPayouts, StripePayout } from 'ts-altea-model';
 import { AlteaDb, BankTransactionLinking, FortisBankImport } from 'ts-altea-logic';
 import * as _ from "lodash";
 import { StripeService } from 'projects/ng-altea-common/src/lib/stripe.service';
@@ -266,7 +266,8 @@ export class BankTransactionsComponent implements OnInit {
         }
       } else {  // !selected
 
-        if (pay.bankTxId || pay.bankTxNum || pay.lnk) {
+        // we will only save if it was unselected and previously this transaction
+        if (pay.bankTxId == linkWith.id) {
 
           pay.bankTxId = null
           pay.bankTxNum = null
@@ -398,6 +399,7 @@ export class BankTransactionsComponent implements OnInit {
     qry.orderByDesc('num')
 
     qry.take = 300
+    qry.include('payments.order')
 
     console.warn(qry)
 
@@ -407,6 +409,33 @@ export class BankTransactionsComponent implements OnInit {
 
   }
 
+
+  async searchPayments(fromDate: Date, toDate: Date, txType: BankTxType): Promise<Payments> {
+    let me = this
+
+    const qry = new DbQuery()
+
+    qry.include('order')
+
+    let or1 = qry
+
+    or1.and('date', QueryOperator.greaterThanOrEqual, DateHelper.yyyyMMddhhmmss(fromDate))
+    or1.and('date', QueryOperator.lessThanOrEqual, DateHelper.yyyyMMddhhmmss(toDate))
+
+    let payTypes = [PaymentType.credit, PaymentType.debit, PaymentType.transfer]
+
+    if (txType == BankTxType.stripe) {
+      payTypes = [PaymentType.stripe]
+    }
+
+    or1.and('type', QueryOperator.in, payTypes)
+
+    qry.take = 50
+
+    let payments = await me.paySvc.query$(qry)
+
+    return new Payments(payments)
+  }
 
 
   async findPaymentsForTx(tx: BankTransaction, extraDays: number = 0) {
@@ -423,43 +452,28 @@ export class BankTransactionsComponent implements OnInit {
 
     const txInfo = fortis.getBankTransactionInfo(tx)
 
+    let searchPays = new Payments()
+
+
     const forDate = txInfo.forDateTime()
-
     let fromDate = dateFns.startOfDay(forDate)
-    let toDate = dateFns.endOfDay(forDate)
 
-    if (extraDays > 0) {
-      fromDate = dateFns.addDays(fromDate, - extraDays)
-      toDate = dateFns.addDays(toDate, extraDays)
+    if (forDate) {
+
+      let toDate = dateFns.endOfDay(forDate)
+
+      if (extraDays > 0) {
+        fromDate = dateFns.addDays(fromDate, - extraDays)
+        toDate = dateFns.addDays(toDate, extraDays)
+      }
+
+      console.warn(txInfo)
+
+      searchPays = await this.searchPayments(fromDate, toDate, tx.type)
     }
 
-    console.warn(txInfo)
 
-    const qry = new DbQuery()
-
-    qry.include('order')
-    qry.and('date', QueryOperator.greaterThanOrEqual, DateHelper.yyyyMMddhhmmss(fromDate))
-    qry.and('date', QueryOperator.lessThanOrEqual, DateHelper.yyyyMMddhhmmss(toDate))
-
-    let payTypes = [PaymentType.credit, PaymentType.debit, PaymentType.transfer]
-
-    if (tx.type == BankTxType.stripe) {
-      payTypes = [PaymentType.stripe]
-    }
-    
-    qry.and('type', QueryOperator.in, payTypes)
-
-    /*     qry.and('type', QueryOperator.equals, PaymentType.debit) */
-
-    /*
-    switch (tx.type) {
-      case BankTxType.onlineBC:   
-      case BankTxType.onlineCredit:
-      case BankTxType.onlineBC:
-
-    } */
-
-    me.pays = await me.paySvc.query$(qry)
+    me.pays = searchPays.add(...tx.payments).orderByDate()
 
     me.selectedPays = {}
 
@@ -484,7 +498,9 @@ export class BankTransactionsComponent implements OnInit {
 
       if (ArrayHelper.IsEmpty(matchingPayments)) { // if no exact set of payments found
         this.magicSelection()
-        await this.findMissingPaysInDb(tx, fromDate, [me.payments.missing, tx.amount])
+
+        if (fromDate)
+          await this.findMissingPaysInDb(tx, fromDate, [me.payments.missing, tx.amount])
       }
 
     }
@@ -853,6 +869,15 @@ export class BankTransactionsComponent implements OnInit {
 
   }
 
+  async fallBackStripeLinking(tx: BankTransaction) {
+
+    //let stripeTransactions = tx?.prov?.transactions
+
+
+
+    await this.bankTransactionLinking.fallBackStripeLinking(tx)
+
+  }
 
 
 

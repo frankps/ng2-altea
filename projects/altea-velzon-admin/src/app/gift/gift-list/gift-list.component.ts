@@ -68,6 +68,8 @@ export class GiftListComponent extends NgBaseListComponent<Gift> implements OnIn
     searchFor = searchFor.trim()
 
     const query = new DbQuery()
+
+    query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
     
     if (searchFor.length == 36) {
       query.or('id', QueryOperator.equals, searchFor)
@@ -76,6 +78,7 @@ export class GiftListComponent extends NgBaseListComponent<Gift> implements OnIn
     }
     
     query.or('fromName', QueryOperator.contains, searchFor)
+    query.or('fromEmail', QueryOperator.contains, searchFor)
 
     query.and('del', QueryOperator.equals, false)
 

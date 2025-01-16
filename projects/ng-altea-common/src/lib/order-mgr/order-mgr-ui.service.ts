@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import { Injectable, OnInit } from '@angular/core';
 import { AppMode, AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Branch, ConfirmOrderResponse, Contact, CreateCheckoutSession, DateBorder, DepositMode, Gift, GiftLine, GiftType, Invoice, Order, OrderLine, OrderLineOption, OrderSource, OrderState, Payment, PaymentType, Price, Product, ProductItem, ProductSubType, ProductType, ProductTypeIcons, RedeemGift, ReservationOption, ReservationOptionSet, Resource, ResourcePlanning, ResourceType } from 'ts-altea-model'
-import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbQuery, QueryOperator, Translation } from 'ts-common'
+import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbQuery, QueryOperator, Translation, YearMonth } from 'ts-common'
 import { AlteaService, GiftService, InvoiceService, ObjectService, OrderMgrService, OrderService, ProductService, ResourceService, SessionService } from 'ng-altea-common'
 import * as _ from "lodash";
 import { NgxSpinnerService } from "ngx-spinner"
@@ -432,7 +432,7 @@ export class OrderMgrUiService {   // implements OnInit
       return
     }
 
-    let product = await me.productSvc.get$(productId, 'options:orderBy=idx.values:orderBy=idx,resources.resource,prices')
+    let product = await me.productSvc.get$(productId, 'options:orderBy=idx.values:orderBy=idx,resources.resource,items,prices')
 
     await me.prepareProduct(product)
 
@@ -1098,7 +1098,7 @@ export class OrderMgrUiService {   // implements OnInit
 
     this.setOrderLineOptions(product)
 
-    let products = this.loadProducts$()
+    let products = await this.loadProducts$()
 
     this.orderLine = new OrderLine()
 
@@ -1122,7 +1122,7 @@ export class OrderMgrUiService {   // implements OnInit
     }
 
 
-    if (product.hasItems()) {
+    if (product.isSubscription() && product.hasItems()) {
 
       var itemOptions = product.items.flatMap(i => i.product.options)
 
@@ -1393,19 +1393,22 @@ export class OrderMgrUiService {   // implements OnInit
 
   async newOrderLine(product: Product, qty = 1, initOptionValues?: Map<String, String[]>): Promise<OrderLine> {
 
+    let me = this
+
+
     console.error(product)
 
-    this.orderLineIsNew = true
-    await this.prepareProduct(product)
+    me.orderLineIsNew = true
+    await me.prepareProduct(product)
 
     if (qty < product.minQty)
       qty = product.minQty
 
-    this.orderLine = new OrderLine(product, qty, initOptionValues)
+    me.orderLine = new OrderLine(product, qty, initOptionValues)
 
-    this.preselectSpecialPrices(this.orderLine)
+    me.preselectSpecialPrices(me.orderLine)
 
-    return this.orderLine
+    return me.orderLine
   }
 
 
@@ -1650,6 +1653,17 @@ export class OrderMgrUiService {   // implements OnInit
 
 
     console.error(subscriptions)
+  }
+
+
+
+  calculateTax() {
+
+    console.error('calculateTax')
+
+    let closedUntil = new YearMonth(2024, 9)
+    this.order.calculateTax(closedUntil)
+
   }
 
 

@@ -98,8 +98,10 @@ export class PaymentsComponent implements OnInit {
       id: payment.id,
       type: payment.type,
       amount: payment.amount,
+      provId: payment.provId,
       date: payment.date
     }
+
 
     let updateRes = await this.paySvc.update$(update)
     console.log(updateRes)

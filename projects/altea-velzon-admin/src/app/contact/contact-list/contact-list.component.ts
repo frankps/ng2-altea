@@ -65,13 +65,16 @@ export class ContactListComponent extends NgBaseListComponent<Contact> implement
   override getSearchDbQuery(searchFor: string): DbQuery | null {
     const query = new DbQuery()
 
+    query.and('del', QueryOperator.equals, false)
+    query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
+
     let filters = query.and()
 
     filters.or('name', QueryOperator.contains, searchFor)
     filters.or('mobile', QueryOperator.contains, searchFor)
+    filters.or('email', QueryOperator.contains, searchFor)
 
-    query.and('del', QueryOperator.equals, false)
-    query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
+
 
 
     return query
@@ -79,23 +82,9 @@ export class ContactListComponent extends NgBaseListComponent<Contact> implement
 
   override addNew() {
     console.log('Add product')
-    // this.newModal.show(this.resourceType)
   }
 
-  // select(object: Resource) {
 
-  //   const mobileMod = this.dashboardSvc.isMobile ? 'mobile/' : ''
-
-  //   if (object?.id)
-  //     this.router.navigate(['/aqua/contacts/' + mobileMod, object.id])
-  //   else
-  //     this.router.navigate(['/aqua/contacts/' + mobileMod])
-  // }
-  /*
-
-<i class="fa-brands fa-facebook"></i>
-<i class="fa-brands fa-google"></i>
-  */
 
 }
 

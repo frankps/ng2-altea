@@ -9,6 +9,7 @@
   "dic": {
     "address": "Adres",
     "actions": "Acties",
+    "act": "Actief",
     "add": "Toevoegen",
     "back": "Terug",
     "cancel": "Annuleren",
@@ -41,6 +42,7 @@
     "new": "Nieuw",
     "ok": "OK",
     "passwd": "Paswoord",
+    "payments": "Betalingen",
     "payOnline": "Online betalen",
     "preview": "Preview",
     "phone": "Tel",
@@ -55,6 +57,7 @@
     "timeUnit": "Tijdseenheid",
     "to": "Aan",
     "updated": "Veranderd op",
+    "vatPct": "BTW %",
     "save": "Opslaan",
     "search": "Zoeken",
     "send": "Versturen",
@@ -115,10 +118,22 @@
       "created": "Aangemaakt",
       "waitDeposit": "Afwachting voorschot",
       "confirmed": "Geconfirmeerd",
+      "arrived": "Aangekomen",
       "cancelled": "Geannuleerd",
       "noShow": "Niet opgedaagd",
       "timedOut": "Timed out",
-      "finished": "Afgerond"
+      "finished": "Afgerond",
+      "inProgress": "In uitvoering"
+    },  
+    "bank-tx-type": {
+      "unknown": "unknown",
+      "stripe": "Stripe",
+      "depositTransfer": "Overschrijving",
+      "terminalBC": "Bancontact",
+      "terminalCredit": "VISA",
+      "onlineBC": "onlineBC",
+      "onlineCredit": "onlineCredit",
+      "unidentifiedCredit": "unidentifiedCredit"
     },
     "cancel-order-message": {
       "possible": "Kosteloos annuleren is mogelijk",
@@ -313,6 +328,10 @@
       "6": "Zaterdag",
       "7": "Zondag"
     },
+    "product-item-option-mode": {
+      "pre": "Vaste selectie",
+      "cust": "Klant selecteerd"
+    },
     "product-type": {
       "prod": "Product",
       "svc": "Dienst",
@@ -331,11 +350,16 @@
     "planning-type": {
       "occ": "Bezet",
       "hol": "Vakantie",
+      "holReq": "Vakantie aanvraag",
       "bnk": "Feestdag",
       "ill": "Ziekte",
       "abs": "Afwezig",
       "edu": "Opleiding",
-      "avl": "Beschikbaar"
+      "sch": "Schedule",
+      "avl": "Beschikbaar",
+      "tsk": "Taak",
+      "brk": "Pauze",
+      "pres": "Aanwezigheid"
     },
     "product-rule-type": {
       "startAt": "Starttijden dienst",
@@ -387,13 +411,22 @@
       "gift_online": "Online cadeaubon",
       "gift_online_from": "Cadeaubon schenker",
       "gift_online_to": "Cadeaubon ontvanger",
-      "order_compensate_gift": "Compensatie cadeaubon"
+      "order_compensate_gift": "Compensatie cadeaubon",
+      "order_outstanding_balance": "Openstaand saldo"
     },
     "compensation-gift-reason": {
       "overpaid": "Omzetting teveel betaald naar cadeaubon"
     }
   },
   "ui": {
+    "staff": {
+      "start-break": "Start pauze",
+      "start-day": "Start dag",
+      "end-day": "Einde dag",
+      "my-holidays": "Mijn verlof",
+      "request-holiday": "Aanvragen",
+      "change-staff": "Wissel personeel"
+    },
     "select-user-modal": {
       "title": "Kies profiel"
     },
@@ -729,7 +762,8 @@
     },
     "payment": {
       "full": "Volledig bedrag",
-      "deposit": "Voorschot"
+      "deposit": "Voorschot",
+      "balance": "Saldo"
     },
     "gift": {
       "choice": "Wat wenst u te schenken: een bedrag of kiest u liever zelf een dienst uit het aanbod?",
@@ -962,6 +996,8 @@
     },
     "user": {
       "article": "de",
+      "block": "Geblokkeerd",
+      "alert": "Boodschap voor gebruiker",
       "uid": "Firebase id"
     },
     "contact": {
@@ -1084,7 +1120,10 @@
       "value": "Waarde"
     },
     "productItem": {
-      "optionQty": "Aantal via product optie"
+      "optionQty": "Aantal via product optie",
+      "option": {
+        "mode": "Selectie mode"
+      }
     },
     "productOption": {
       "public": "Klant kan optie zien & selecteren",
@@ -1131,6 +1170,7 @@
       "on": "Actief",
       "skip": "Voer volgende prijsregels NIET meer uit",
       "skipLast": "Skip regel laatste uren",
+      "hasDates": "Enkel geldig gedurende periode",
       "start": "Vanaf",
       "end": "Tot",
       "qty": "Vanaf aantal",
@@ -1161,6 +1201,10 @@
         "price": "Prijs per behandeling"
       }
     },
+    "resourcePlanning": {
+      "fullDays": "Volledige dag(en)",
+      "ors": "Overrule dagplanning"
+    },
     "optionPrice": {
       "allValues": "Geldig voor alle optie waarden",
       "value": "Aangepaste prijs",
@@ -1190,10 +1234,12 @@
       "article": "de",
       "name": "Taaknaam",
       "loc": "Locatie",
+      "dur": "Duur (min)",
       "info": "Extra info",
       "hrIds": "Uitvoerders",
       "schedule": "Frequentie",
       "prio": "Prioriteit",
+      "date": "Datum",
       "time": "Start op/vanaf",
       "status": "Status"
     }
@@ -1204,6 +1250,12 @@
     }
   },
   "menu": {
+    "staff": {
+      "label": "Team",
+      "sub": {
+        "dashboard": "Overzicht"
+      }
+    },
     "local": {
       "label": "Lokaal",
       "sub": {
@@ -1283,7 +1335,8 @@
       "label": "Boekhouding",
       "sub": {
         "transactions": "Transacties",
-        "payments": "Betalingen"
+        "payments": "Betalingen",
+        "hr-dashboard": "Personeel"
       }
     },
     "platform": {

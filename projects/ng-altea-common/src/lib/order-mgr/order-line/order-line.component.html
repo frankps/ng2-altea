@@ -62,8 +62,8 @@
                 </div>
             </div>
 
-            <!-- Typically for promotions -->
-            <ng-container *ngIf="orderMgrSvc.isPos && product.hasSpecialPrices()">
+            <!-- Typically for promotions     orderMgrSvc.isPos && -->
+            <ng-container *ngIf="product.hasSpecialPrices()">
 
                 <div class="row mt-2" style="font-size: small;" *ngFor="let price of product.getSpecialPrices()">
                     <div class="col">

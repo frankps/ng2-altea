@@ -197,6 +197,13 @@ export const MENU: MenuItem[] = [
         link: '/%branch%/staff/hr-dashboard',
         roles: ['admin', 'posAdmin'],
         parentId: 17
+      },
+      {
+        id: 173,
+        label: 'menu.accounting.sub.checks',
+        link: '/%branch%/accounting/checks',
+        roles: ['admin', 'posAdmin'],
+        parentId: 17
       }
     ]
   },

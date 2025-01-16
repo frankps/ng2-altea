@@ -37,7 +37,7 @@ export class LoyaltyComponent implements OnInit {
   ) {
 
   }
-  
+
 
   async ngOnInit() {
 
@@ -57,18 +57,12 @@ export class LoyaltyComponent implements OnInit {
     let loyaltyCard: LoyaltyCard = cardUi.card
     let loyaltyProgram: LoyaltyProgram = cardUi.program
 
-    // this recalculates the loyalty
-    let rewardOrderLines: OrderLine[] = []
 
-    if (this.orderMgrSvc.containsProduct(reward.product.id))
-      rewardOrderLines = this.orderMgrSvc.getOrderLines(reward.product.id)
-    else
-      rewardOrderLines = await this.orderMgrSvc.addProductById(reward.product.id)
 
     console.log(reward)
 
     let rewardAmound = 0
-    
+
 
     switch (reward.type) {
       case LoyaltyRewardType.productDiscount:
@@ -77,12 +71,21 @@ export class LoyaltyComponent implements OnInit {
         break
 
       case LoyaltyRewardType.freeProduct:
+
+        // this recalculates the loyalty
+        let rewardOrderLines: OrderLine[] = []
+
+        if (this.orderMgrSvc.containsProduct(reward.product.id))
+          rewardOrderLines = this.orderMgrSvc.getOrderLines(reward.product.id)
+        else
+          rewardOrderLines = await this.orderMgrSvc.addProductById(reward.product.id)
+
         rewardAmound = _.sumBy(rewardOrderLines, 'incl')
         break
 
-        case LoyaltyRewardType.discount:
-          rewardAmound = reward.discount
-          break
+      case LoyaltyRewardType.discount:
+        rewardAmound = reward.discount
+        break
     }
 
     let pay = await this.orderMgrSvc.addPayment(rewardAmound, PaymentType.loyal, this.sessionSvc.loc)
@@ -96,22 +99,8 @@ export class LoyaltyComponent implements OnInit {
 
     console.log(this.loyalty)
 
-    // pay.subsId = card.card.
-
-    // this.orderMgrSvc.orderLine
-
   }
 
-
-  /* 
-    async calculateLoyalty() {
-  
-      console.warn('-- calculateLoyalty --')
-  
-      this.loyalty = await this.alteaSvc.loyaltyMgmtService.getOverview(this.order)
-      console.error(this.loyalty)
-  
-    } */
 
   async addLoyalty() {
 

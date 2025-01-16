@@ -8,7 +8,7 @@ import { ContactListComponent } from './contact-list/contact-list.component';
 import { NewContactComponent } from './new-contact/new-contact.component';
 import { SearchContactComponent } from './search-contact/search-contact.component';
 
-import { Bootstrap5Module, NgCommonModule } from 'ng-common';
+
 import { FormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { TranslateModule } from '@ngx-translate/core';
@@ -19,7 +19,7 @@ import { TimepickerModule } from 'ngx-bootstrap/timepicker';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { NgAlteaCommonModule, OrderMgrModule } from 'ng-altea-common';
-
+import { Bootstrap5Module, NgCommonModule } from 'ng-common';
 
 
 @NgModule({

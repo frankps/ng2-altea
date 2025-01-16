@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { Exclude, Type, Transform } from "class-transformer";
 import 'reflect-metadata';
-import { ArrayHelper, ConnectTo, DateHelper, DbObjectCreate, IAsDbObject, ManagedObject, NumberHelper, ObjectHelper, ObjectMgmt, ObjectReference, ObjectWithId, ObjectWithIdPlus, QueryOperator, TimeHelper } from 'ts-common'
+import { ArrayHelper, ConnectTo, DateHelper, DbObjectCreate, IAsDbObject, ManagedObject, NumberHelper, ObjectHelper, ObjectMgmt, ObjectReference, ObjectWithId, ObjectWithIdPlus, QueryOperator, TimeHelper, YearMonth } from 'ts-common'
 import * as _ from "lodash";
 import { PersonLine } from "../person-line";
 import { DateRange, DateRangeSet, TimeBlock, TimeBlockSet, TimeSpan } from "../logic";
@@ -10,7 +10,8 @@ import * as Handlebars from "handlebars"
 import * as sc from 'stringcase'
 import { OrderPersonMgr } from "../order-person-mgr";
 import { CancelOrderMessage } from "ts-altea-logic";
-import { Branch, Contact, Currency, DepositMode, Invoice, InvoiceTotals, OrderLine, OrderLineSummary, OrderType, Organisation, Payment, PaymentType, PlanningMode, Product, ProductSubType, ProductType, Resource, ResourcePlanning, Subscription } from "ts-altea-model";
+import { TaxLines, TaxLine, VatLine, Branch, Contact, Currency, DepositMode, Invoice, InvoiceTotals, OrderLine, OrderLineSummary, OrderType, Organisation, Payment, PaymentType, PlanningMode, Product, ProductSubType, ProductType, Resource, ResourcePlanning, Subscription, OrderDeclare } from "ts-altea-model";
+
 
 //import { numberAttribute } from "@angular/core";
 
@@ -68,17 +69,7 @@ export enum OrderState {
   timedOut = 'timedOut'
 }
 
-export class VatLine {
 
-  constructor(public pct: number, public vat: number, public excl: number, public incl: number) {
-
-  }
-
-  clone(): VatLine {
-    return new VatLine(this.pct, this.vat, this.excl, this.incl)
-  }
-
-}
 
 /** Resource preferences */
 export class ResourcePreferences {
@@ -218,6 +209,9 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
   @Type(() => VatLine)
   vatLines?: VatLine[] = []
 
+  @Type(() => TaxLines)
+  tax?: TaxLines = new TaxLines()
+
   @Type(() => Number)
   incl = 0;
 
@@ -321,15 +315,15 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     let invoice = new Invoice()
     invoice.branchId = this.branchId
     invoice.orgId = this.orgId
-   
+
     let totals = new InvoiceTotals()
     totals.excl = this.excl
     totals.incl = this.incl
     totals.vat = this.vat
 
-    invoice.totals = totals 
+    invoice.totals = totals
     invoice.orderCount = 1
-    
+
     if (this.contact) {
       const contact = this.contact
 
@@ -339,7 +333,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
       invoice.company = contact.company
       invoice.vatNum = contact.vatNum
     }
-      
+
 
     return invoice
   }
@@ -676,6 +670,10 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     return this.lines.findIndex(l => l.product?.type == ProductType.svc) >= 0
   }
 
+  hasTaxLines(): boolean {
+    return ArrayHelper.NotEmpty(this.tax?.lines)
+  }
+
   nrOfLines(): number {
     if (!Array.isArray(this.lines))
       return 0
@@ -694,6 +692,15 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     return this.lines?.find(l => l.productId == productId)
   }
 
+  getPaymentsAfter(dateNum: number): Payment[] {
+
+    if (!this.hasPayments())
+      return []
+
+    let pays = this.payments.filter(p => p.date >= dateNum)
+
+    return pays
+  }
 
   getPaymentsByType(type: PaymentType): Payment[] {
 
@@ -783,9 +790,9 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
         payment.order = this
     }
 
-   
 
-    
+
+
 
     this.makePayTotals()
   }
@@ -1408,6 +1415,39 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     const orderlinesWithPlanning = this.lines?.filter(ol => ol.product.type == ProductType.svc
       && ol.product?.planMode != PlanningMode.none) // .hasResources()
     return orderlinesWithPlanning
+  }
+
+  /**
+   * 
+   * @param closedUntil last closed month (=> up to this point fixed)
+   */
+  calculateTax(closedUntil: YearMonth) {
+
+    let orderDeclare = OrderDeclare.init(this.vatLines)
+
+    //  let taxAlreadyDeclared = this.tax.getLinesGroupedByPct(closedUntil)
+
+    if (this.tax) {
+      let taxAlreadyDeclared = this.tax.getLinesUntil(closedUntil.toNumber())
+      orderDeclare.setAlreadyDeclared(taxAlreadyDeclared)
+    } else {
+      this.tax = new TaxLines()
+    }
+
+    let firstDayNextMonth = closedUntil.firstDayNextMonth()
+
+    let newPays = this.getPaymentsAfter(firstDayNextMonth)
+
+    let declareResult = orderDeclare.declare(newPays)
+
+    if (declareResult.isOk()) {
+
+      let updateFrom = closedUntil.next()
+      let yyMM = updateFrom.toNumber()
+      this.tax.updateLines(yyMM, orderDeclare)
+
+    }
+
   }
 
 

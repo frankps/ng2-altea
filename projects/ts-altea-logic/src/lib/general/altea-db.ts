@@ -1,5 +1,5 @@
 import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbObject, DbObjectCreate, DbObjectMulti, DbObjectMultiCreate, DbQuery, DbQueryBaseTyped, DbQueryTyped, DbUpdateManyWhere, ObjectHelper, ObjectWithId, QueryOperator, SortOrder, TypeHelper } from 'ts-common'
-import { Branch, Gift, Subscription, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template, OrderLine, BankTransaction, Message, LoyaltyProgram, LoyaltyCard, PlanningType, ResourcePlannings, TemplateCode, MsgType, LoyaltyCardChange, Payment, PaymentType, BankTxType } from 'ts-altea-model'
+import { Branch, Gift, Subscription, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template, OrderLine, BankTransaction, Message, LoyaltyProgram, LoyaltyCard, PlanningType, ResourcePlannings, TemplateCode, MsgType, LoyaltyCardChange, Payment, PaymentType, BankTxType, Payments } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { IDb } from '../interfaces/i-db'
 import { AlteaPlanningQueries } from './altea-queries'
@@ -35,7 +35,7 @@ export class AlteaDb {
             delete l['product']
             delete l['orderId']
 
-            
+
         })
 
         /*
@@ -150,7 +150,7 @@ export class AlteaDb {
 
     }
 
-    async getOrdersForContact(contactId: string) : Promise<Order[]> {
+    async getOrdersForContact(contactId: string): Promise<Order[]> {
 
         const qry = new DbQueryTyped<Order>('order', Order)
 
@@ -757,7 +757,7 @@ export class AlteaDb {
         return tx
     }
 
-    async getBankTransactionsBetween(start: number | Date, end: number | Date, types: BankTxType[], extra?: any): Promise<BankTransaction[]> {
+    async getBankTransactionsBetween(start: number | Date, end: number | Date, types?: BankTxType[], extra?: any): Promise<BankTransaction[]> {
 
         let startNum: number
         let endNum: number
@@ -786,8 +786,17 @@ export class AlteaDb {
             if ('ok' in extra)
                 qry.and('ok', QueryOperator.equals, extra.ok)
 
+            if ('positiveAmount')
+                qry.and('amount', QueryOperator.greaterThan, 0)
+
+            if ('payments' in extra)
+                qry.include('payments')
+
         }
 
+        qry.take = 1000
+
+        qry.orderBy('num')
 
         const payments = await this.db.query$<BankTransaction>(qry)
 
@@ -996,7 +1005,7 @@ export class AlteaDb {
 
     }
 
-    async getPaymentsBetween(start: number | Date, end: number | Date, types: PaymentType[]): Promise<Payment[]> {
+    async getPaymentsBetween(start: number | Date, end: number | Date, types: PaymentType[], notLinkedToBankTx = false): Promise<Payments> {
 
         let startNum: number
         let endNum: number
@@ -1021,9 +1030,16 @@ export class AlteaDb {
             qry.and('type', QueryOperator.in, types)
 
 
+        if (notLinkedToBankTx)
+            qry.and('bankTxId', QueryOperator.equals, null)
+
+        qry.take = 1000
+
+        qry.orderBy('date')
+
         const payments = await this.db.query$<Payment>(qry)
 
-        return payments
+        return new Payments(payments)
 
     }
 
