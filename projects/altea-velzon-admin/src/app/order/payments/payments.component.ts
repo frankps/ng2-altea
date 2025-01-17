@@ -116,9 +116,12 @@ export class PaymentsComponent implements OnInit {
 
   }
 
-  deletePayment(payment: Payment) {
+  async deletePayment(payment: Payment) {
 
 
+    var res = await this.paySvc.delete$(payment.id)
+
+    console.log(res)
 
   }
 

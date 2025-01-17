@@ -277,7 +277,13 @@
                 <ng-container *ngIf="!show.extra || pay.id != editPay?.id; else editPaymentTpl">
                     <div class="col-4">{{'enums.pay-type.' + pay.type | translate}}</div>
                     <div class="col-3" style="font-size: smaller;">
-                        <span *ngIf="isPOS()">{{pay.date | intdate}}</span>
+
+                        <ng-container *ngIf="isPOS()">
+                            <span>{{pay.date | intdate}}</span>
+                            <i class="fa-solid fa-link float-end" [ngbTooltip]="pay.bankTxNum"
+                            *ngIf="pay.bankTxId"></i>
+                        </ng-container>
+                      
                     </div>
                     <div class="col-3">{{pay.info}} <span class="float-end">€{{pay.amount}}</span></div>
 

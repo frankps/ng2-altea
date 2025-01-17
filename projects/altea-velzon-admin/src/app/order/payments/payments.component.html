@@ -6,11 +6,11 @@
     </div>
     <div class="col">
 
-        
+
         <button type="button" class="btn btn-primary btn-sm me-3" (click)="refreshPayments(date)">
             <i class="fa-solid fa-cash-register"></i>
         </button>
-      
+
         <button type="button" class="btn btn-primary btn-sm me-3" (click)="getUnlinkedBankPayments(date)">
             <i class="fa-solid fa-link-slash"></i>
         </button>
@@ -40,7 +40,9 @@
 
             <span class="float-end">€{{pay.amountRounded()}}</span>
         </div>
-        <div class="col-2">{{'enums.pay-type.' + pay.type | translate}}</div>
+        <div class="col-2">{{'enums.pay-type.' + pay.type | translate}}
+            <i class="fa-solid fa-link float-end" [ngbTooltip]="pay.bankTxNum" *ngIf="pay.bankTxId"></i>
+        </div>
         <div class="col-1">{{pay.date | intdate}}</div>
         <div class="col-1">{{pay?.order?.start | intdate}}</div>
 

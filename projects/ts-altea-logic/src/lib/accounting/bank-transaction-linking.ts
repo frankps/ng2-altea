@@ -86,6 +86,54 @@ export class BankTransactionLinking {
   }
 
 
+  async processPayments(tx: BankTransaction, stripeTotal: number, pays: Payment[], stripeTransactions: any[]) {
+
+
+    let totalAmount = 0, totalFee = 0
+    let refDate
+
+    for (let payment of pays) {
+
+      let stripeTx = stripeTransactions.find(stripeTx => _.round(stripeTx.amount / 100, 2) == payment.amount)
+
+      if (!stripeTx) {
+        console.log(`No Stripe transaction found for amount ${payment.amount}`)
+        continue
+      }
+
+      let amount = _.round(stripeTx.amount / 100, 2)
+      totalAmount += amount
+
+      payment.bankTxId = tx.id
+      payment.bankTxNum = tx.num
+      payment.fee = _.round(stripeTx.fee / 100, 2)
+      totalFee += payment.fee
+
+      if (!refDate && payment.dateTyped)
+        refDate = DateHelper.yyyyMMdd(payment.dateTyped)
+
+      payment.lnk = true
+
+    }
+
+    if (totalAmount == stripeTotal) {
+      tx.ok = true
+      tx.cost = _.round(totalFee, 2)
+      tx.orig = _.round(tx.cost + tx.amount, 2)
+
+      if (refDate && !tx.refDate) {
+        tx.refDate = refDate
+      }
+
+      var txUpdate = await this.alteaDb.updateBankTransaction(tx, ['ok', 'cost', 'orig', 'refDate'])
+
+      console.log(txUpdate)
+
+      var updateResult = await this.alteaDb.updatePayments(pays, ['fee', 'bankTxId', 'bankTxNum', 'lnk'])
+
+      console.log(updateResult)
+    }
+  }
 
 
 
@@ -107,73 +155,55 @@ export class BankTransactionLinking {
 
 
     let start = tx.execDateObject()
-
     let end = start
     start = dateFns.addDays(start, -8)
+
+    let singleDay = false
+
+    if (!singleDay) {
+      start = new Date(2024, 9, 5)
+      end = new Date(2024, 9, 8)
+    }
+
 
     let payments = await this.alteaDb.getPaymentsBetween(start, end, [PaymentType.stripe], false)
     let totalsByDay = payments.getTotalsByDay()
 
-
     let days = totalsByDay.keys()
 
-    for (let day of days) {
 
-      let totalOnDay = totalsByDay.get(day)
 
-      if (totalOnDay == stripeTotal) {
+    if (!singleDay) {
 
-        console.warn('FOUND!!!  do work ....')
+      let totalPays = _.sumBy(payments.list, 'amount')
 
-        let paysOnDay = payments.getPaysOnDay(day)
-        let totalAmount = 0, totalFee = 0
-        let refDate
+      if (totalPays == stripeTotal) {
+        await this.processPayments(tx, stripeTotal, payments.list, stripeTransactions)
+      }
 
-        for (let payment of paysOnDay) {
+      console.log()
 
-          let stripeTx = stripeTransactions.find(stripeTx => _.round(stripeTx.amount / 100, 2) == payment.amount)
+    }
 
-          if (!stripeTx) {
-            console.log(`No Stripe transaction found for amount ${payment.amount}`)
-            continue
-          }
 
-          let amount = _.round(stripeTx.amount / 100, 2)
-          totalAmount += amount
+    if (singleDay) {
+      for (let day of days) {
 
-          payment.bankTxId = tx.id
-          payment.bankTxNum = tx.num
-          payment.fee = _.round(stripeTx.fee / 100, 2)
-          totalFee += payment.fee
+        let totalOnDay = totalsByDay.get(day)
 
-          if (!refDate && payment.dateTyped)
-            refDate = DateHelper.yyyyMMdd(payment.dateTyped)
+        if (totalOnDay == stripeTotal) {
 
-          payment.lnk = true
+          console.warn('FOUND!!!  do work ....')
 
+          let paysOnDay = payments.getPaysOnDay(day)
+
+          await this.processPayments(tx, stripeTotal, paysOnDay, stripeTransactions)
+
+          return true
         }
-
-        if (totalAmount == stripeTotal) {
-          tx.ok = true
-          tx.cost = _.round(totalFee, 2)
-          tx.orig = _.round(tx.cost + tx.amount, 2)
-
-          if (refDate && !tx.refDate) {
-            tx.refDate = refDate
-          }
-
-          var txUpdate = await this.alteaDb.updateBankTransaction(tx, ['ok', 'cost', 'orig', 'refDate'])
-
-          console.log(txUpdate)
-
-          var updateResult = await this.alteaDb.updatePayments(paysOnDay, ['fee', 'bankTxId', 'bankTxNum', 'lnk'])
-
-          console.log(updateResult)
-        }
-
-        return true
       }
     }
+
 
 
 

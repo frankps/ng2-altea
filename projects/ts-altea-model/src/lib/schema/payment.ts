@@ -110,7 +110,11 @@ export class Payments {
     while (start <= max.dateTyped) {
       let end = dateFns.addDays(start, 1)
 
+/*       if (start.getDate() == 15)
+        console.warn('Day 15') */
+
       let paysOnDate = pays.filter(p => p.dateTyped >= start && p.dateTyped < end)
+
 
       if (ArrayHelper.NotEmpty(paysOnDate)) {
         let sum = _.sumBy(paysOnDate, 'amount')
