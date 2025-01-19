@@ -28,6 +28,9 @@ export interface IDb {
     sendMessage$(message: Message): Promise<ApiResult<Message>>
 
 
+    //getOrdersWithPaymentsBetween(start: number, end: number): Promise<ApiResult<Order[]>>
+
+
 
 
 }  

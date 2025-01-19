@@ -62,10 +62,13 @@ export class PaymentInfo {
 export class Payments {
   list: Payment[] = []
 
-
   constructor(list: Payment[] = []) {
     this.list = list
 
+  }
+
+  hasPayments() : boolean {
+    return ArrayHelper.NotEmpty(this.list)
   }
 
   add(...pays: Payment[]) {

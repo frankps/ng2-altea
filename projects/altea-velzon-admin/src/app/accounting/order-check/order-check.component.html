@@ -1,3 +1,4 @@
+<h4>Checks</h4>
 <button type="button" class="btn btn-primary btn-sm me-2" (click)="doChecks(2024,10)">Okt</button>
 <button type="button" class="btn btn-primary btn-sm me-2" (click)="doChecks(2024,11)">Nov</button>
 <button type="button" class="btn btn-primary btn-sm me-2" (click)="doChecks(2024,12)">Dec</button>
@@ -9,8 +10,6 @@
 
     <ng-container *ngIf="report.bank">
 
-
-
         Checks ok: {{report.bank.count.ok}}<br>
 
         Errors: {{report.bank.count.errors}}<br>
@@ -20,13 +19,58 @@
             <div class="col-2">{{error.tx.type}}</div>
             <div class="col-2">{{error.tx.execDateObject() | date:"dd/MM/yy HH:mm"}}</div>
             <div class="col">{{error.msg}}</div>
-          </div>
-      
+        </div>
+
+    </ng-container>
 
 
+    <ng-container *ngIf="report.paysNotLinkedToBank.hasPayments()">
+
+        Betalingen niet gelinkt met bank:
+
+        <div class="row" *ngFor="let pay of report.paysNotLinkedToBank.list">
+            <div class="col-2">
+                <a [routerLink]="['/aqua/orders/manage',pay.orderId]">{{pay.dateTyped | date: 'dd/MM HH:mm'}}</a>
+            </div>
+            <div class="col-2">{{pay.amount}}</div>
+            <div class="col-2">{{pay.type}}</div>
+        </div>
 
     </ng-container>
 
 
 </ng-container>
+
+
+<br><br><br><br>
+
+<h4>Berekeningen</h4>
+<button type="button" class="btn btn-primary btn-sm me-2" (click)="calcMonth(2024,10)">Okt</button>
+
+
+<ng-container *ngIf="closeResult">
+
+    <ng-container *ngFor="let orderCheck of closeResult.checks">
+
+        <div class="row" *ngFor="let item of orderCheck.items">
+            <div class="col-2"><a [routerLink]="['/aqua/orders/manage',orderCheck.order.id]">{{item.type}}</a></div>
+            <div class="col-2">{{orderCheck.order.for}}</div>
+            <div class="col">{{item.msg}}</div>
+
+        </div>
+
+    </ng-container>
+
+
+
+</ng-container>
+
+
+<br><br><br><br>
+
+<h4>Maand rapport</h4>
+<button type="button" class="btn btn-primary btn-sm me-2" (click)="showReportMonths()">Okt</button>
+
+<div *ngIf="htmlReport" [outerHTML]="htmlReport"></div>
+
 

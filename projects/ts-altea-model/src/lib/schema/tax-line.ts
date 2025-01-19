@@ -311,6 +311,9 @@ export class TaxLines {
 
         declareLines = declareLines.filter(l => l.hasNewDeclares())
 
+        // initially: we only keep already fixed lines
+        this.lines = this.lines.filter(l => l.per < asFromPeriod)
+
         if (ArrayHelper.IsEmpty(declareLines))
             return
 
@@ -327,8 +330,8 @@ export class TaxLines {
 
                 let valueToDeclareIncl = declareLine.newDeclares.get(period)
 
-                let tax = _.round(valueToDeclareIncl / (1 + pct/100))
-                let excl = valueToDeclareIncl - tax
+                let excl = _.round(valueToDeclareIncl / (1 + pct/100), 2)
+                let tax = _.round(valueToDeclareIncl - excl, 2)
 
                 let taxLine = new TaxLine(period, pct, tax, excl, valueToDeclareIncl)
                 newTaxLines.push(taxLine)
@@ -366,6 +369,17 @@ export class TaxLines {
 
     hasLines(): boolean {
         return ArrayHelper.NotEmpty(this.lines)
+    }
+
+    getLines(yearMonth: YearMonth) {
+        if (!this.hasLines())
+            return TaxLines.empty()
+
+        let yearMonthNum = yearMonth.toNumber()
+
+        let scope = this.lines.filter(t => t.per == yearMonthNum)
+
+        return new TaxLines(scope)
     }
 
     /**

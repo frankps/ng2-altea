@@ -846,6 +846,8 @@ export class OrderLine extends ObjectWithIdPlus {
     return nrOfPersons
   }
 
+
+  
   /**
    * 
    * @returns this.incl

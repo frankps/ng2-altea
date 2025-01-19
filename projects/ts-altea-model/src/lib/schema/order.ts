@@ -1057,18 +1057,46 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     let calculatedVatLines = Array.from(vatMap.values())
     calculatedVatLines = _.sortBy<VatLine>(calculatedVatLines, 'pct')
 
+    for (let vatLine of calculatedVatLines) {
+      vatLine.vat = _.round(vatLine.vat, 2)
+      vatLine.excl = _.round(vatLine.excl, 2)
+      vatLine.incl = _.round(vatLine.incl, 2)
+    }
+
     if (!this.vatLinesSame(this.vatLines, calculatedVatLines)) {
       this.vatLines = calculatedVatLines
       this.markAsUpdated('vatLines')
     }
 
-    this.vat = totalVat
-    this.excl = totalExcl
-    this.incl = totalIncl
 
-    this.markAsUpdated('vat')
-    this.markAsUpdated('excl')
-    this.markAsUpdated('incl')
+    let origVat = this.vat
+    let origExcl = this.excl
+    let origIncl = this.incl
+
+    totalVat = _.round(totalVat, 2)
+    totalExcl = _.round(totalExcl, 2)
+    totalIncl = _.round(totalIncl, 2)
+
+
+    if (this.vat != totalVat) {
+      this.vat = totalVat
+      this.markAsUpdated('vat')
+    }
+
+
+    if (this.excl != totalExcl) {
+      this.excl = totalExcl
+      this.markAsUpdated('excl')
+    }
+
+
+    if (this.incl != totalIncl) {
+      this.incl = totalIncl
+      this.markAsUpdated('incl')
+    }
+
+
+
   }
 
 
@@ -1445,6 +1473,8 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
       let updateFrom = closedUntil.next()
       let yyMM = updateFrom.toNumber()
       this.tax.updateLines(yyMM, orderDeclare)
+
+      this.markAsUpdated('tax')
 
     }
 

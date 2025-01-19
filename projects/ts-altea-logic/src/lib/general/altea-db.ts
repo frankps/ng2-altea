@@ -1,5 +1,5 @@
-import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbObject, DbObjectCreate, DbObjectMulti, DbObjectMultiCreate, DbQuery, DbQueryBaseTyped, DbQueryTyped, DbUpdateManyWhere, ObjectHelper, ObjectWithId, QueryOperator, SortOrder, TypeHelper } from 'ts-common'
-import { Branch, Gift, Subscription, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template, OrderLine, BankTransaction, Message, LoyaltyProgram, LoyaltyCard, PlanningType, ResourcePlannings, TemplateCode, MsgType, LoyaltyCardChange, Payment, PaymentType, BankTxType, Payments } from 'ts-altea-model'
+import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbObject, DbObjectCreate, DbObjectMulti, DbObjectMultiCreate, DbQuery, DbQueryBaseTyped, DbQueryTyped, DbUpdateManyWhere, ObjectHelper, ObjectWithId, QueryCondition, QueryOperator, SortOrder, TypeHelper } from 'ts-common'
+import { Branch, Gift, Subscription, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template, OrderLine, BankTransaction, Message, LoyaltyProgram, LoyaltyCard, PlanningType, ResourcePlannings, TemplateCode, MsgType, LoyaltyCardChange, Payment, PaymentType, BankTxType, Payments, ReportMonth, ReportMonths } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { IDb } from '../interfaces/i-db'
 import { AlteaPlanningQueries } from './altea-queries'
@@ -193,6 +193,32 @@ export class AlteaDb {
         return orders
     }
 
+    async getOrdersWithPaymentsBetween(start: Date, end: Date, lastId?: string, take: number = 25): Promise<Order[]> {
+
+        let startNum = DateHelper.yyyyMMddhhmmss(start)
+        let endNum = DateHelper.yyyyMMddhhmmss(end)
+
+        const qry = new DbQueryTyped<Order>('order', Order)
+        qry.include('lines.product')
+        qry.include('payments')
+
+        let subQry = new QueryCondition()
+        subQry.and('date', QueryOperator.greaterThanOrEqual, startNum)
+        subQry.and('date', QueryOperator.lessThan, endNum)
+
+        qry.and('payments', QueryOperator.some, subQry)
+
+        if (lastId) {
+            qry.and('id', QueryOperator.greaterThan, lastId)
+        }
+
+        qry.orderBy('id')
+        qry.take = take
+
+        const orders = await this.db.query$<Order>(qry)
+
+        return orders
+    }
 
     async getPosOrdersToCleanup(): Promise<Order[]> {
 
@@ -542,12 +568,17 @@ export class AlteaDb {
         return objects
     }
 
-    async updateObject<T>(typeName: string, type: { new(): T; }, object: T, propertiesToUpdate: string[]): Promise<ApiResult<T>> {
+    async updateObject<T>(typeName: string, type: { new(): T; }, object: T, propertiesToUpdate?: string[]): Promise<ApiResult<T>> {
 
         if (!object)
             return new ApiResult(null, ApiStatus.error, 'No object supplied to update!')
 
-        let objectToUpdate = ObjectHelper.extractObjectProperties(object, ['id', ...propertiesToUpdate])
+        let objectToUpdate
+
+        if (ArrayHelper.NotEmpty(propertiesToUpdate))
+            objectToUpdate = ObjectHelper.extractObjectProperties(object, ['id', ...propertiesToUpdate])
+        else
+            objectToUpdate = object
 
         let dbObject = new DbObject(typeName, type, objectToUpdate)
 
@@ -1048,6 +1079,62 @@ export class AlteaDb {
         return updateResult
     }
 
+
+    async getReportMonth(branchId: string, year: number, month: number): Promise<ReportMonth> {
+
+        const qry = new DbQueryTyped<ReportMonth>('reportMonth', ReportMonth)
+
+        qry.and('branchId', QueryOperator.equals, branchId)
+        qry.and('year', QueryOperator.equals, year)
+        qry.and('month', QueryOperator.equals, month)
+
+        const report = await this.db.queryFirst$<ReportMonth>(qry)
+
+        return report
+    }
+
+
+    async getReportMonths(branchId: string): Promise<ReportMonths> {
+        const qry = new DbQueryTyped<ReportMonth>('reportMonth', ReportMonth)
+
+        qry.and('branchId', QueryOperator.equals, branchId)
+       
+        qry.orderBy('year', SortOrder.desc).orderBy('month', SortOrder.desc)
+
+        const months = await this.db.query$<ReportMonth>(qry)
+
+        return new ReportMonths(months)
+    }
+
+    async getReportMonthById(id: string): Promise<ReportMonth> {
+        const object = await this.getObjectById$('reportMonth', ReportMonth, id)
+        return object
+    }
+    async getReportMonthsByIds(ids: string[]): Promise<ReportMonth[]> {
+        const objects = await this.getObjectsByIds('reportMonth', ReportMonth, ids)
+        return objects
+    }
+
+
+    async createReportMonth(reportMonth: ReportMonth): Promise<ApiResult<ReportMonth>> {
+        let createResult = await this.createObject('reportMonth', ReportMonth, reportMonth)
+        return createResult
+    }
+
+    async createReportMonths(reportMonths: ReportMonth[]): Promise<ApiListResult<ReportMonth>> {
+        let createResult = await this.createObjects('reportMonth', ReportMonth, reportMonths)
+        return createResult
+    }
+
+    async updateReportMonth(reportMonth: ReportMonth, propertiesToUpdate?: string[]): Promise<ApiResult<ReportMonth>> {
+        let updateResult = await this.updateObject('reportMonth', ReportMonth, reportMonth, propertiesToUpdate)
+        return updateResult
+    }
+
+    async updateReportMonths(reportMonths: ReportMonth[], propertiesToUpdate: string[]): Promise<ApiListResult<ReportMonth>> {
+        let updateResult = await this.updateObjects('reportMonth', ReportMonth, reportMonths, propertiesToUpdate)
+        return updateResult
+    }
 
 
 }

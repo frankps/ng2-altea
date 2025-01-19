@@ -17,7 +17,10 @@ export enum QueryOperator {
   in = 'in',
   hasSome = 'hasSome',
   has = 'has',
-  notIn = 'notIn'
+  notIn = 'notIn',
+
+  /** filter on relations */
+  some = 'some'
 }
 
 export class QueryCondition {

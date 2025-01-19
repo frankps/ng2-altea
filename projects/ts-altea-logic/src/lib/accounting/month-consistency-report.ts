@@ -3,7 +3,7 @@ import { IDb } from '../interfaces/i-db'
 import * as dateFns from 'date-fns'
 import * as Handlebars from "handlebars"
 import * as _ from "lodash"
-import { BankTransaction, BankTxType, Payment, PaymentInfo, PaymentType, StripePayout } from 'ts-altea-model'
+import { BankTransaction, BankTxType, Payment, PaymentInfo, Payments, PaymentType, StripePayout } from 'ts-altea-model'
 import { ApiStatus, ArrayHelper, YearMonth } from 'ts-common'
 
 
@@ -54,6 +54,9 @@ export class ConsistencyReportBank {
 export class ConsistencyReport {
 
   bank: ConsistencyReportBank
+
+
+  paysNotLinkedToBank: Payments
 }
 
 
@@ -76,18 +79,19 @@ export class MonthConsistencyReportBuilder {
 
     report.bank = await this.checkTransactions(yearMonth)
 
-    return report
+    report.paysNotLinkedToBank = await this.checkPayments(yearMonth)
 
+    return report
   }
 
 
-  async checkPayments(yearMonth: YearMonth): Promise<any> {
+  async checkPayments(yearMonth: YearMonth): Promise<Payments> {
 
     let start = yearMonth.startDate()
 
     let end = dateFns.addMonths(start, 1)  // yearMonth.endDate()
 
-    let pays = await this.alteaDb.getPaymentsBetween(start, end, [PaymentType.credit, PaymentType.debit, PaymentType.stripe])
+    let pays = await this.alteaDb.getPaymentsBetween(start, end, [PaymentType.credit, PaymentType.debit, PaymentType.stripe], true)
 
     return pays
 
