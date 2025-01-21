@@ -3,7 +3,7 @@ import { IDb } from '../interfaces/i-db'
 import * as dateFns from 'date-fns'
 import * as Handlebars from "handlebars"
 import * as _ from "lodash"
-import { BankTransaction, BankTxType, Payment, PaymentInfo, Payments, PaymentType, StripePayout } from 'ts-altea-model'
+import { BankTransaction, BankTxType, Invoice, Order, Payment, PaymentInfo, Payments, PaymentType, StripePayout } from 'ts-altea-model'
 import { ApiStatus, ArrayHelper, YearMonth } from 'ts-common'
 
 
@@ -38,6 +38,20 @@ export class BankTransactionCheckResult {
 }
 
 
+export class CheckResults {
+
+  msg: string[] = []
+
+  addMsg(msg: string): CheckResults {
+    this.msg.push(msg)
+
+    return this
+  }
+
+
+}
+
+
 
 export class ConsistencyReportBank {
 
@@ -53,8 +67,11 @@ export class ConsistencyReportBank {
 
 export class ConsistencyReport {
 
-  bank: ConsistencyReportBank
+  invoices: CheckResults
 
+  gifts: CheckResults
+
+  bank: ConsistencyReportBank
 
   paysNotLinkedToBank: Payments
 }
@@ -64,7 +81,7 @@ export class MonthConsistencyReportBuilder {
 
   alteaDb: AlteaDb
 
-  constructor(db: IDb | AlteaDb) {
+  constructor(public branchId, db: IDb | AlteaDb) {
 
     if (db instanceof AlteaDb)
       this.alteaDb = db
@@ -77,6 +94,10 @@ export class MonthConsistencyReportBuilder {
 
     let report = new ConsistencyReport()
 
+    report.invoices = await this.invoiceChecks(yearMonth)
+
+    report.gifts = await this.giftChecks(yearMonth)
+
     report.bank = await this.checkTransactions(yearMonth)
 
     report.paysNotLinkedToBank = await this.checkPayments(yearMonth)
@@ -84,11 +105,190 @@ export class MonthConsistencyReportBuilder {
     return report
   }
 
+  async invoiceChecks(yearMonth: YearMonth): Promise<CheckResults> {
+
+
+    let result = new CheckResults()
+
+
+    let yearMonthNum = yearMonth.toNumber()
+
+    let start = yearMonth.startDate()
+    let end = yearMonth.endDate()
+
+
+    /** all orders invoiced? */
+
+    let ordersInvoiceProblem = await this.alteaDb.getOrdersMissingInvoice(this.branchId)
+
+    if (ArrayHelper.NotEmpty(ordersInvoiceProblem)) {
+
+      result.addMsg(`${ordersInvoiceProblem.length} orders with invoice problem, trying to solve...`)
+
+      let ordersToUpdate: Order[] = []
+
+      for (let order of ordersInvoiceProblem) {
+
+        let orderInvoiceOk = false
+
+        console.log('invoiceId')
+
+        if (order.invoiceId && order.invoice) {
+
+          
+
+          if (order.incl == order.invoice.totals.incl) {
+            orderInvoiceOk = true
+          } else {
+            
+          }
+
+          if (orderInvoiceOk) {
+            order.invoiced = true
+            order.invoiceNum = order.invoice.num
+
+            ordersToUpdate.push(order)
+          }
+        }
+
+        if (!orderInvoiceOk) {
+
+          let createdAt = dateFns.format(order.cre, 'dd/MM/yy')
+          result.addMsg(`${order.for} created at ${createdAt}  has invoice problem... (${order.id})`)
+
+        }
+
+
+      }
+
+      if (ArrayHelper.NotEmpty(ordersToUpdate)) {
+        let updateRes = await this.alteaDb.updateOrders(ordersToUpdate, ['invoiced', 'invoiceNum'])
+
+        if (updateRes.isOk)
+          result.addMsg(`${ordersToUpdate.length} orders updated...`)
+      }
+
+    }
+
+
+
+
+    /** GIFTS needing invoice */
+
+    let gifts = await this.alteaDb.getGiftsToInvoice(start, end)
+
+    result.addMsg(`${gifts.length} gifts found needing invoice in ${yearMonthNum}`)
+
+    let orderIds = gifts.filter(g => g.orderId).map(g => g.orderId)
+
+    result.addMsg(`${orderIds.length} corresponding orders found`)
+
+    let orders = await this.alteaDb.getOrdersByIds(orderIds)
+
+    for (let gift of gifts) {
+      let order = orders.find(o => o.id == gift.orderId)
+
+      if (!order) {
+        result.addMsg(`no order found for gift ${gift.code}`)
+        continue
+      }
+
+      if (!order.toInvoice || !order.invoiced) {
+        result.addMsg(`corresponding order for '${gift.code}' invoiced? toInvoice=${order.toInvoice} invoiced=${order.invoiced} invoiceNum=${order.invoiceNum}`)
+      }
+
+    }
+
+    return result
+
+  }
+
+  /**
+   * We need to make sure that the decalred flag of a gift is set, when the original gift purchase order was invoiced!
+   * 
+   * @param yearMonth 
+   * @returns 
+   */
+  async giftChecks(yearMonth: YearMonth): Promise<CheckResults> {
+
+
+    let yearMonthNum = yearMonth.toNumber()
+
+    let result = new CheckResults()
+
+    let start = yearMonth.startDate()
+    let end = dateFns.addMonths(start, 1)
+
+    let giftPays = await this.alteaDb.getPaymentsBetween(start, end, [PaymentType.gift], true, ['gift'])
+
+    if (!giftPays || !giftPays.hasPayments())
+      return result.addMsg(`No gift payments in period ${yearMonthNum}`)
+
+    result.addMsg(`${giftPays.list.length} gift payments found in period ${yearMonthNum}`)
+
+    let orderIds = giftPays.getGiftOrderIds()
+
+    if (ArrayHelper.IsEmpty(orderIds))
+      return result.addMsg('No gift purchase order ids found!')
+
+    result.addMsg(`${orderIds.length} gift purchase order ids found`)
+
+    let orders = await this.alteaDb.getOrdersByIds(orderIds)
+
+    if (ArrayHelper.IsEmpty(orders))
+      return result.addMsg('No orders found!')
+
+    result.addMsg(`${orders.length} gift purchase orders found`)
+
+    let invoicedOrders = orders.filter(o => o.invoiced)
+
+    if (ArrayHelper.IsEmpty(invoicedOrders))
+      return result.addMsg('No invoiced orders found!')
+
+    result.addMsg(`${invoicedOrders.length} gift purchase orders found that are invoiced`)
+
+    let gifts = giftPays.getGifts()
+
+    let giftsToUpdate = []
+
+    for (let order of invoicedOrders) {
+
+      let gift = gifts.find(g => g.orderId == order.id)
+
+      if (!gift) {
+        result.addMsg(`Error: gift not found where gift.orderId='{order.id}'`)
+        continue
+      }
+
+      if (!gift.decl || !gift.invoice) {
+        gift.decl = true
+        gift.invoice = true
+
+        giftsToUpdate.push(gift)
+      }
+    }
+
+    if (ArrayHelper.IsEmpty(giftsToUpdate)) {
+
+      return result.addMsg('No gifts to update!')
+
+    } else {
+
+      result.addMsg(`${giftsToUpdate.length} gifts to update (properties: decl=true, invoice=true)`)
+      var updateResult = await this.alteaDb.updateGifts(giftsToUpdate, ['decl', 'invoice'])
+
+      result.addMsg(`Gift update: ${updateResult.status}`)
+
+    }
+
+    return result
+  }
+
+
 
   async checkPayments(yearMonth: YearMonth): Promise<Payments> {
 
     let start = yearMonth.startDate()
-
     let end = dateFns.addMonths(start, 1)  // yearMonth.endDate()
 
     let pays = await this.alteaDb.getPaymentsBetween(start, end, [PaymentType.credit, PaymentType.debit, PaymentType.stripe], true)
@@ -112,8 +312,8 @@ export class MonthConsistencyReportBuilder {
 
     let expectedTotal = tx.cost != 0 ? tx.orig : tx.amount
 
-    expectedTotal = _.round(expectedTotal,2)
-    totalPayments = _.round(totalPayments,2)
+    expectedTotal = _.round(expectedTotal, 2)
+    totalPayments = _.round(totalPayments, 2)
 
     if (expectedTotal == totalPayments) {
 

@@ -67,7 +67,7 @@ export class Payments {
 
   }
 
-  hasPayments() : boolean {
+  hasPayments(): boolean {
     return ArrayHelper.NotEmpty(this.list)
   }
 
@@ -91,7 +91,7 @@ export class Payments {
       this.list = []
 
     this.list = _.orderBy(this.list, ['date'], ['desc'])
-   
+
     return this.list
 
   }
@@ -113,8 +113,8 @@ export class Payments {
     while (start <= max.dateTyped) {
       let end = dateFns.addDays(start, 1)
 
-/*       if (start.getDate() == 15)
-        console.warn('Day 15') */
+      /*       if (start.getDate() == 15)
+              console.warn('Day 15') */
 
       let paysOnDate = pays.filter(p => p.dateTyped >= start && p.dateTyped < end)
 
@@ -133,6 +133,30 @@ export class Payments {
     return map
   }
 
+  getGiftOrderIds(): string[] {
+
+    if (!this.hasPayments())
+      return []
+
+    var giftPays = this.list.filter(p => p.type == PaymentType.gift && p.gift.orderId)
+
+    if (ArrayHelper.IsEmpty(giftPays))
+      return []
+
+    let orderIds = giftPays.map(p => p.gift.orderId)
+
+    return orderIds
+
+  }
+
+
+  getGifts(): Gift[] {
+
+    let gifts = this.list.filter(p => p.gift).map(p => p.gift)
+
+    return gifts
+
+  }
 
   getPaysOnDay(startOfDay: Date): Payment[] {
 
@@ -207,6 +231,9 @@ export class Payment extends ObjectWithIdPlus {
 
   /** amount is declared */
   decl: boolean = false
+
+  /** no declare: example: a gift payment from a gift that was previously invoiced */
+  noDecl: boolean = false
 
   /** provider id, if payment executed by external provider (example: Stripe payment intent id) */
   provId: string

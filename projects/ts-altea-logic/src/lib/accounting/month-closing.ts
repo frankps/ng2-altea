@@ -3,45 +3,12 @@ import { IDb } from '../interfaces/i-db'
 import * as dateFns from 'date-fns'
 import * as Handlebars from "handlebars"
 import * as _ from "lodash"
+import { OrderCheck, OrderCheckItem, OrderCheckItemType } from 'ts-altea-logic'
 import { BankTransaction, BankTxType, Order, OrderLine, Payment, PaymentInfo, PaymentType, ReportMonth, StripePayout } from 'ts-altea-model'
 import { ApiListResult, ApiStatus, ArrayHelper, DateHelper, YearMonth } from 'ts-common'
+import * as Rx from "rxjs";
 
-export enum OrderCheckItemType {
 
-    lineVatPctMismatch = 'lineVatPctMismatch',
-    lineVatError = 'lineVatError',
-    lineExclError = 'lineExclError',
-    orderInclMismatch = 'orderInclMismatch',
-    orderExclMismatch = 'orderExclMismatch',
-    orderVatMismatch = 'orderVatMismatch'
-
-}
-
-export class OrderCheckItem {
-
-    constructor(public type: OrderCheckItemType,
-        public msg: string) {
-
-    }
-
-}
-
-export class OrderCheck {
-
-    items: OrderCheckItem[] = []
-
-    constructor(public order: Order) {
-
-    }
-
-    add(type: OrderCheckItemType, msg: string) {
-
-        let item = new OrderCheckItem(type, msg)
-        this.items.push(item)
-
-    }
-
-}
 
 export class MonthClosingResult {
 
@@ -92,9 +59,25 @@ export class MonthClosingUpdates {
 }
 
 
+export class MonthClosingUpdate {
+
+    msg: string
+
+    static info(msg: string) : MonthClosingUpdate {
+
+        let upd = new MonthClosingUpdate()
+        upd.msg = msg
+
+        return upd
+
+    }
+}
+
 export class MonthClosing {
 
     alteaDb: AlteaDb
+
+    inProgress$: Rx.BehaviorSubject<MonthClosingUpdate> = new Rx.BehaviorSubject<MonthClosingUpdate>(null)
 
     constructor(db: IDb | AlteaDb) {
 
@@ -113,69 +96,104 @@ export class MonthClosing {
     }
 
 
-    checkOrder(order: Order, objectsToUpdate: MonthClosingUpdates, closedUntil: YearMonth, fix: boolean = false): OrderCheck {
+    checkOrder(order: Order, objectsToUpdate: MonthClosingUpdates, fix: boolean = false): OrderCheck {
 
         let orderCheck = new OrderCheck(order)
-
-        if (ArrayHelper.IsEmpty(order.lines)) {
-
-        }
 
 
         let orderIncl = 0, orderExcl = 0, orderVat = 0
 
-        for (let line of order.lines) {
-            let linePropsToUpdate = []
-            let lineChanged = false
+        if (order.hasLines()) {
 
-            if (line.product) {
-                let product = line.product
+            for (let line of order.lines) {
+                let linePropsToUpdate = []
+                let lineChanged = false
 
-                if (line.vatPct != product.vatPct) {
-                    orderCheck.add(OrderCheckItemType.lineVatPctMismatch, `line: ${line.vatPct} <> product ${product.vatPct}`)
+                if (line.product) {
+                    let product = line.product
 
-                    if (fix) {
-                        line.vatPct = product.vatPct
-                        linePropsToUpdate.push('vatPct')
-                        lineChanged = true
+                    if (line.vatPct != product.vatPct) {
+                        orderCheck.add(OrderCheckItemType.lineVatPctMismatch, `line: ${line.vatPct} <> product ${product.vatPct}`)
+
+                        if (fix) {
+                            line.vatPct = product.vatPct
+                            linePropsToUpdate.push('vatPct')
+                            lineChanged = true
+                        }
                     }
+
+                    let calculatedIncl = _.round(line.excl + line.vat, 2)
+                    let incl = _.round(line.incl, 2)
+                    if (calculatedIncl != incl) {
+                        orderCheck.add(OrderCheckItemType.lineVatError, `calculated: ${calculatedIncl} <> orderLine.incl ${incl}`)
+                    }
+
+                    let calculatedExcl = _.round(line.incl / (1 + line.vatPct / 100), 2)
+                    let excl = _.round(line.excl, 2)
+                    if (calculatedExcl != excl) {
+                        orderCheck.add(OrderCheckItemType.lineExclError, `calculated: ${calculatedExcl} <> orderLine.excl ${excl}`)
+                    }
+
+
                 }
 
-                let calculatedIncl = _.round(line.excl + line.vat, 2)
-                let incl = _.round(line.incl, 2)
-                if (calculatedIncl != incl) {
-                    orderCheck.add(OrderCheckItemType.lineVatError, `calculated: ${calculatedIncl} <> orderLine.incl ${incl}`)
+                orderIncl += line.incl
+                orderExcl += line.excl
+                orderVat += line.vat
+
+
+                line.calculateInclThenExcl(false)
+
+                if (ArrayHelper.NotEmpty(line.m.f)) { // check if there are updated fields 
+                    linePropsToUpdate.push(...line.m.f)
+                    lineChanged = true
                 }
 
-                let calculatedExcl = _.round(line.incl / (1 + line.vatPct / 100), 2)
-                let excl = _.round(line.excl, 2)
-                if (calculatedExcl != excl) {
-                    orderCheck.add(OrderCheckItemType.lineExclError, `calculated: ${calculatedExcl} <> orderLine.excl ${excl}`)
-                }
-
+                if (lineChanged)
+                    objectsToUpdate.addLine(line, ...linePropsToUpdate)
 
             }
 
-            orderIncl += line.incl
-            orderExcl += line.excl
-            orderVat += line.vat
+        }
 
+        /*
+        if (order.hasPayments()) {
 
-            line.calculateInclThenExcl(false)
+            for (let pay of order.payments) {
 
-            if (ArrayHelper.NotEmpty(line.m.f)) { // check if there are updated fields 
-                linePropsToUpdate.push(...line.m.f)
-                lineChanged = true
+                switch (pay.type) {
+
+                    case PaymentType.gift:
+                        break
+                }
             }
+        }
+            */
 
-            if (lineChanged)
-                objectsToUpdate.addLine(line, ...linePropsToUpdate)
+
+        if (order.toInvoice) {
+
+            if (!order.invoiced)
+                orderCheck.add(OrderCheckItemType.invoiceProblem, `toInvoice=${order.toInvoice} <> invoiced=${order.invoiced}`)
+
+            if (!order.invoiceId)
+                orderCheck.add(OrderCheckItemType.invoiceProblem, `missing invoice (invoiceId is empty)`)
+
+            if (!order.invoiceNum)
+                orderCheck.add(OrderCheckItemType.invoiceProblem, `missing invoice number (invoiceNum is empty)`)
 
         }
 
 
-        let orderChanged = false
-        let orderPropsToUpdate = []
+        if (order.gift && !order.giftCode) {
+            orderCheck.add(OrderCheckItemType.giftProblem, `missing giftCode on gift order`)
+        }
+
+        if (!order.gift && order.giftCode) {
+            orderCheck.add(OrderCheckItemType.giftProblem, `order has gift code ${order.giftCode}, but not marked as gift`)
+        }
+
+
 
         orderIncl = _.round(orderIncl, 2)
 
@@ -195,6 +213,17 @@ export class MonthClosing {
             orderCheck.add(OrderCheckItemType.orderVatMismatch, `calculated: ${orderVat} <> order.vat ${order.vat}`)
         }
 
+
+
+
+        return orderCheck
+
+    }
+
+    calculateOrderTaxes(order: Order, objectsToUpdate: MonthClosingUpdates, closedUntil: YearMonth) {
+        let orderChanged = false
+        let orderPropsToUpdate = []
+
         order.calculateVat()
 
         order.calculateTax(closedUntil)
@@ -204,13 +233,8 @@ export class MonthClosing {
             orderChanged = true
         }
 
-        if (fix && orderChanged)
+        if (orderChanged)
             objectsToUpdate.addOrder(order, ...orderPropsToUpdate)
-
-
-
-        return orderCheck
-
     }
 
     async updateDatabase(objectsToUpdate: MonthClosingUpdates) {
@@ -229,10 +253,23 @@ export class MonthClosing {
             objectsToUpdate.orders = []
 
         }
-
-
-
     }
+
+
+    shouldDeclareTax(order: Order): boolean {
+
+        if (!order || !order.tax || !order.tax.hasLines())
+            return false
+
+        if (order.invoiced)
+            return false
+
+        if (order.gift)
+            return false
+
+        return true
+    }
+
 
     async addOrderToMonthReport(order: Order, month: ReportMonth, yearMonth: YearMonth, from: number, to: number) {
 
@@ -248,7 +285,7 @@ export class MonthClosing {
             }
         }
 
-        if (order.tax?.hasLines()) {
+        if (this.shouldDeclareTax(order)) {
 
             let taxInPeriod = order.tax.getLines(yearMonth)
 
@@ -258,12 +295,15 @@ export class MonthClosing {
         }
     }
 
+    inProgress(msg: string) {
+        this.inProgress$.next(MonthClosingUpdate.info(msg))
+    }
+
+
     async calculateMonth(branchId: string, yearMonth: YearMonth, closedUntil: YearMonth): Promise<MonthClosingResult> {
 
-        
-
         let from = yearMonth.startDate()
-        let to = dateFns.addDays(from, 1)
+        let to = yearMonth.endDate() // dateFns.addDays(from, 1)
 
         let fromNum = DateHelper.yyyyMMddhhmmss(from)
         let toNum = DateHelper.yyyyMMddhhmmss(to)
@@ -274,17 +314,20 @@ export class MonthClosing {
             reportMonth = new ReportMonth(branchId, branchId, yearMonth.y, yearMonth.m)
 
             await this.alteaDb.createReportMonth(reportMonth)
-        } 
+        }
 
         reportMonth.reset()
 
 
         let lastId = null
-        let take = 30
+        let take = 50
         let ordersProcessed = 0
 
         let orders = await this.alteaDb.getOrdersWithPaymentsBetween(from, to, lastId, take)
         console.log(orders)
+
+        
+        
 
         let result = new MonthClosingResult()
         let objectsToUpdate = new MonthClosingUpdates()
@@ -293,16 +336,22 @@ export class MonthClosing {
         while (ArrayHelper.NotEmpty(orders)) {
             let ordersInBatch = orders.length
 
+            this.inProgress(`Start processing ${ordersInBatch} new orders. (${ordersProcessed} processed) `)
+
+
 
             for (let order of orders) {
 
                 //        console.log(`${order.id}: ${order.incl}`)
                 // this.calculateOrder(order)
 
-                let orderCheck = this.checkOrder(order, objectsToUpdate, closedUntil, fixIssues)
+                let orderCheck = this.checkOrder(order, objectsToUpdate, fixIssues)   // closedUntil
                 result.checks.push(orderCheck)
 
+                this.calculateOrderTaxes(order, objectsToUpdate, closedUntil)
+
                 this.addOrderToMonthReport(order, reportMonth, yearMonth, fromNum, toNum)
+
 
                 lastId = order.id
             }
@@ -315,14 +364,12 @@ export class MonthClosing {
                 orders = await this.alteaDb.getOrdersWithPaymentsBetween(from, to, lastId, take)
                 console.log(orders)
             } else {
-                console.log(`No more orders (last query retrieved less -${ordersInBatch}- then requested -${take}-)`)
+                let msg = `No more orders (last query retrieved less -${ordersInBatch}- then requested -${take}-)`
+                console.log(msg)
+                this.inProgress(`Start processing ${ordersInBatch} new orders. (${ordersProcessed} processed) `)
                 break
             }
-
-
         }
-
-
 
         await this.alteaDb.updateReportMonth(reportMonth)
 

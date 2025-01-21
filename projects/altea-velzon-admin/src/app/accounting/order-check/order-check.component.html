@@ -6,15 +6,34 @@
 
 <ng-container *ngIf="report">
 
+    <ng-container *ngIf="report.invoices">
+
+        <h5>Invoices & gifts to invoice</h5>
+
+        <div class="row ms-3" *ngFor="let msg of report.invoices.msg">
+            <div class="col">{{msg}}</div>
+        </div>
+    </ng-container>
+
+
+    <ng-container *ngIf="report.gifts">
+
+        <h5>Gifts (gift.decl=true for invoiced purcahe orders)</h5>
+
+        <div class="row ms-3" *ngFor="let msg of report.gifts.msg">
+            <div class="col">{{msg}}</div>
+        </div>
+    </ng-container>
 
 
     <ng-container *ngIf="report.bank">
 
+        <h5>Bank checks</h5>
         Checks ok: {{report.bank.count.ok}}<br>
 
         Errors: {{report.bank.count.errors}}<br>
 
-        <div class="row" *ngFor="let error of report.bank.errors">
+        <div class="row ms-3" *ngFor="let error of report.bank.errors">
             <div class="col-2">{{error.tx.num}}</div>
             <div class="col-2">{{error.tx.type}}</div>
             <div class="col-2">{{error.tx.execDateObject() | date:"dd/MM/yy HH:mm"}}</div>
@@ -24,11 +43,11 @@
     </ng-container>
 
 
-    <ng-container *ngIf="report.paysNotLinkedToBank.hasPayments()">
+    <ng-container *ngIf="report.paysNotLinkedToBank?.hasPayments()">
 
-        Betalingen niet gelinkt met bank:
+        <h5>Betalingen niet gelinkt met bank</h5>
 
-        <div class="row" *ngFor="let pay of report.paysNotLinkedToBank.list">
+        <div class="row ms-3" *ngFor="let pay of report.paysNotLinkedToBank.list">
             <div class="col-2">
                 <a [routerLink]="['/aqua/orders/manage',pay.orderId]">{{pay.dateTyped | date: 'dd/MM HH:mm'}}</a>
             </div>
@@ -64,6 +83,15 @@
 
 
 </ng-container>
+
+
+<ng-container *ngIf="calcMonthLog">
+    <div class="row ms-3" *ngFor="let item of calcMonthLog">
+        <div class="col">{{item.msg}}</div>
+    </div>
+</ng-container>
+
+
 
 
 <br><br><br><br>

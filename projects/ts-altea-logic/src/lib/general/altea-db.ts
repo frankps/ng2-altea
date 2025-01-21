@@ -162,6 +162,24 @@ export class AlteaDb {
 
     }
 
+    async getOrdersMissingInvoice(branchId: string): Promise<Order[]> {
+
+        const qry = new DbQueryTyped<Order>('order', Order)
+
+        qry.include('invoice.orders')
+
+        qry.and('branchId', QueryOperator.equals, branchId)
+        qry.and('toInvoice', QueryOperator.equals, true)
+        
+        qry.or('invoiced', QueryOperator.equals, false)
+        qry.or('invoiceId', QueryOperator.equals, null)
+        qry.or('invoiceNum', QueryOperator.equals, null)
+        qry.take = 500
+
+        const orders = await this.db.query$<Order>(qry)
+        return orders
+
+    }
 
     async getOrdersNeedingCommunication(date: Date = new Date()) {
 
@@ -193,24 +211,30 @@ export class AlteaDb {
         return orders
     }
 
-    async getOrdersWithPaymentsBetween(start: Date, end: Date, lastId?: string, take: number = 25): Promise<Order[]> {
+    async getOrdersWithPaymentsBetween(start: Date, end: Date, lastId?: string, take: number = 25): Promise<Order[]> {   // , types?: PaymentType[]
 
         let startNum = DateHelper.yyyyMMddhhmmss(start)
         let endNum = DateHelper.yyyyMMddhhmmss(end)
 
         const qry = new DbQueryTyped<Order>('order', Order)
         qry.include('lines.product')
-        qry.include('payments')
+        qry.include('payments.gift')
 
-        let subQry = new QueryCondition()
-        subQry.and('date', QueryOperator.greaterThanOrEqual, startNum)
-        subQry.and('date', QueryOperator.lessThan, endNum)
+        let paymentFilter = new QueryCondition()
+        paymentFilter.and('date', QueryOperator.greaterThanOrEqual, startNum)
+        paymentFilter.and('date', QueryOperator.lessThan, endNum)
 
-        qry.and('payments', QueryOperator.some, subQry)
+        /*         if (ArrayHelper.NotEmpty(types)) {
+                    paymentFilter.and('type', QueryOperator.in, types)
+                } */
+
+        qry.and('payments', QueryOperator.some, paymentFilter)
 
         if (lastId) {
             qry.and('id', QueryOperator.greaterThan, lastId)
         }
+
+
 
         qry.orderBy('id')
         qry.take = take
@@ -642,6 +666,21 @@ export class AlteaDb {
 
     /** Gifts */
 
+
+    async getGiftsToInvoice(from: Date, to: Date): Promise<Gift[]> {
+        //const object = await this.getObjectById$('gift', Gift, id)
+
+        const qry = new DbQueryTyped<Gift>('gift', Gift)
+        qry.and('invoice', QueryOperator.equals, true)
+        qry.and('cre', QueryOperator.greaterThanOrEqual, from)
+        qry.and('cre', QueryOperator.lessThan, to)
+
+        let gifts = await this.db.query$<Gift>(qry)
+
+        return gifts
+    }
+
+
     async getGiftByOrderId(orderId: string): Promise<Gift> {
         //const object = await this.getObjectById$('gift', Gift, id)
 
@@ -724,6 +763,13 @@ export class AlteaDb {
         let updateResult = await this.updateObjects('subscription', Subscription, subscriptions, propertiesToUpdate)
         return updateResult
 
+    }
+
+    /** Order */
+
+    async getOrdersByIds(ids: string[]): Promise<Order[]> {
+        const objects = await this.getObjectsByIds('order', Order, ids)
+        return objects
     }
 
     /** Orderline */
@@ -1036,7 +1082,7 @@ export class AlteaDb {
 
     }
 
-    async getPaymentsBetween(start: number | Date, end: number | Date, types: PaymentType[], notLinkedToBankTx = false): Promise<Payments> {
+    async getPaymentsBetween(start: number | Date, end: number | Date, types: PaymentType[], notLinkedToBankTx = false, includes?: string[]): Promise<Payments> {
 
         let startNum: number
         let endNum: number
@@ -1068,6 +1114,11 @@ export class AlteaDb {
 
         qry.orderBy('date')
 
+        if (ArrayHelper.NotEmpty(includes)) {
+            qry.include(...includes)
+        }
+        //qry.include()
+
         const payments = await this.db.query$<Payment>(qry)
 
         return new Payments(payments)
@@ -1098,7 +1149,7 @@ export class AlteaDb {
         const qry = new DbQueryTyped<ReportMonth>('reportMonth', ReportMonth)
 
         qry.and('branchId', QueryOperator.equals, branchId)
-       
+
         qry.orderBy('year', SortOrder.desc).orderBy('month', SortOrder.desc)
 
         const months = await this.db.query$<ReportMonth>(qry)

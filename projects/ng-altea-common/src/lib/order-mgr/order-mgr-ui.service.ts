@@ -150,7 +150,7 @@ export class OrderMgrUiService {   // implements OnInit
     if (this.order.invoice)
       this.invoice = this.order.invoice
     else if (this.order.invoiceId) {
-      let invoice = await this.invoiceSvc.get$(this.order.invoiceId)
+      let invoice = await this.invoiceSvc.get$(this.order.invoiceId, 'orders')
 
       if (invoice) {
 
@@ -180,7 +180,7 @@ export class OrderMgrUiService {   // implements OnInit
     //this.invoice.vatLines = this.order.vatLines
 
     // the preview will show orders
-    this.invoice.orders = [this.order]
+    //this.invoice.orders = [this.order]
 
     this.invoice.updateFromOrders()
 

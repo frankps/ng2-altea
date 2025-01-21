@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Year } from '@syncfusion/ej2-angular-schedule';
 import { ObjectService, OrderService, SessionService } from 'ng-altea-common';
-import { AlteaDb, ConsistencyReport, MonthClosing, MonthClosingResult, MonthConsistencyReportBuilder } from 'ts-altea-logic';
+import { AlteaDb, ConsistencyReport, MonthClosing, MonthClosingResult, MonthClosingUpdate, MonthConsistencyReportBuilder } from 'ts-altea-logic';
 import { YearMonth } from 'ts-common';
 import * as _ from "lodash";
 import { NgxSpinnerService } from "ngx-spinner"
@@ -37,7 +37,8 @@ export class OrderCheckComponent {
 
   async doChecks(year, month) {
 
-    let report = new MonthConsistencyReportBuilder(this.objSvc)
+    let branchId = this.sessionSvc.branchId
+    let report = new MonthConsistencyReportBuilder(branchId, this.objSvc)
 
     let yearMonth = new YearMonth(year, month)
     // let pays = await report.checkPayments(yearMonth)
@@ -49,6 +50,8 @@ export class OrderCheckComponent {
 
   }
 
+
+  calcMonthLog: MonthClosingUpdate[] = []
 
   async calcMonth(year, month) {
 
@@ -73,13 +76,14 @@ export class OrderCheckComponent {
 
       let yearMonth = new YearMonth(year, month)
 
-
       let closedUntil = new YearMonth(2024, 9)
-
 
       let branchId = this.sessionSvc.branchId
       this.closeResult = await monthClosing.calculateMonth(branchId, yearMonth, closedUntil)
 
+      monthClosing.inProgress$.subscribe(upd => {
+        this.calcMonthLog.unshift(upd)
+      })
 
 
     } catch (err) {

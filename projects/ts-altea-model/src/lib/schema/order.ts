@@ -692,12 +692,16 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     return this.lines?.find(l => l.productId == productId)
   }
 
-  getPaymentsAfter(dateNum: number): Payment[] {
+  getPaymentsAfter(dateNum: number, excludeTypes?: PaymentType[]): Payment[] {
 
     if (!this.hasPayments())
       return []
 
     let pays = this.payments.filter(p => p.date >= dateNum)
+
+    if (ArrayHelper.NotEmpty(excludeTypes)) {
+      pays = pays.filter(p => excludeTypes.indexOf(p.type) == -1)
+    }
 
     return pays
   }
@@ -1464,7 +1468,12 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
     let firstDayNextMonth = closedUntil.firstDayNextMonth()
 
-    let newPays = this.getPaymentsAfter(firstDayNextMonth)
+    let newPays = this.getPaymentsAfter(firstDayNextMonth, [PaymentType.subs, PaymentType.loyal])
+
+
+    /* Also filter out gift payments where the gift was already declared (because gift was invoiced or OLD gift)
+    */
+    newPays = newPays.filter(p => p.type != PaymentType.gift || (p.type == PaymentType.gift && !p.gift.decl))
 
     let declareResult = orderDeclare.declare(newPays)
 

@@ -390,7 +390,6 @@ export class Gift extends ObjectWithIdPlus {
   @Type(() => Payment)
   payments?: Payment[] = []
 
-
   invoice = false
 
   /** the vat% that will be used if gift is invoice and type=amount  */
@@ -423,6 +422,11 @@ export class Gift extends ObjectWithIdPlus {
 
   @Type(() => GiftMethods)
   methods: GiftMethods = new GiftMethods()
+
+  /** gift is already declared: normally a gift will be declared when used (only then we now the correct VAT).
+   * But if the gift was intially invoiced or created before 2015, then it is already declared
+   */
+  decl: boolean = false
 
 
   /** created at */
