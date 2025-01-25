@@ -150,7 +150,7 @@ export class OrderMgrUiService {   // implements OnInit
     if (this.order.invoice)
       this.invoice = this.order.invoice
     else if (this.order.invoiceId) {
-      let invoice = await this.invoiceSvc.get$(this.order.invoiceId, 'orders')
+      let invoice = await this.invoiceSvc.get$(this.order.invoiceId, 'orders.lines')
 
       if (invoice) {
 
@@ -564,7 +564,7 @@ export class OrderMgrUiService {   // implements OnInit
 
   async loadDependentProductsForOrder(order: Order) {
 
-    let subscriptionProductItems = order.lines.filter(l => l.product.isSubscription()).flatMap(l => l.product.items)
+    let subscriptionProductItems = order.lines.filter(l => l.product?.isSubscription()).flatMap(l => l.product.items)
 
     await this.loadDependentProductsForItems(subscriptionProductItems)
   }

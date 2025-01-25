@@ -228,12 +228,13 @@ export class Payment extends ObjectWithIdPlus {
 
   /** amount is fully linked to a banktransaction */
   lnk: boolean = false
-
+  
   /** amount is declared */
   decl: boolean = false
 
   /** no declare: example: a gift payment from a gift that was previously invoiced */
-  noDecl: boolean = false
+  @Type(() => Number)
+  noDecl = 0
 
   /** provider id, if payment executed by external provider (example: Stripe payment intent id) */
   provId: string

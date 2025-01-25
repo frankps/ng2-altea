@@ -80,8 +80,8 @@ export class EditGiftComponent extends NgEditBaseComponent<Gift> {
   delete() {
     console.error('new delete')
 
-    this.deleteConfig.successUrl = '/aqua/contacts/'
-    this.deleteConfig.successUrlMobile = '/aqua/contacts/mobile/'
+    this.deleteConfig.successUrl = '/aqua/gifts/'
+    this.deleteConfig.successUrlMobile = '/aqua/gifts/mobile/'
     this.deleteModal?.delete()
   }
 

@@ -403,7 +403,7 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
     switch (orderSearch.typeSelect) {
       case SearchTypeSelect.toInvoice:
         query.and('toInvoice', QueryOperator.equals, true)
-        query.and('invoiced', QueryOperator.equals, false)
+       // query.and('invoiced', QueryOperator.equals, false)
         break
 
       case SearchTypeSelect.invoiced:

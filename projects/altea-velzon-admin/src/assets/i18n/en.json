@@ -869,7 +869,9 @@
     },
     "gift": {
       "_single": "Cadeaubon",
+      "article": "de",
       "code": "Code",
+      "invoice": "Te facturen",
       "value": "Waarde",
       "vatPct": "BTW percentage",
       "used": "Gebruikt",
@@ -905,6 +907,15 @@
       "smsOn": "Verstuur SMS berichten naar klanten",
       "cancel": "Minimum tijd voor kosteloze annulatie",
       "inv": {
+        "on": "Facturatie",
+        "year": "Boekjaar",
+        "next": "Volgend factuurnummer"
+      },
+      "acc": {  
+        "closed": {
+          "year": "Afsluiting van jaar",
+          "month": "Laatst afgesloten maand"
+        },
         "on": "Facturatie",
         "year": "Boekjaar",
         "next": "Volgend factuurnummer"

@@ -63,7 +63,7 @@
             </div>
 
             <!-- Typically for promotions     orderMgrSvc.isPos && -->
-            <ng-container *ngIf="product.hasSpecialPrices()">
+            <ng-container *ngIf="product?.hasSpecialPrices()">
 
                 <div class="row mt-2" style="font-size: small;" *ngFor="let price of product.getSpecialPrices()">
                     <div class="col">
@@ -139,7 +139,7 @@
 
             {{product?.descr}}
 
-            <ng-container *ngIf="orderLineOptions">   <!-- orderLineOptions -->
+            <ng-container *ngIf="orderLineOptions && product">   <!-- orderLineOptions -->
                 <div class="mt-4">
                     <ng-container *ngFor="let option of orderLineOptions; let idx = index">
 

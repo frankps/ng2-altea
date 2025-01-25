@@ -1,6 +1,3 @@
-
-
-
 import { Contact, DepositMode, Gender, Gift, GiftConfig, Invoice, LoyaltyCard, MsgInfo, MsgType, Order, OrderLine, OrderType, Organisation, PlanningMode, Product, ProductResource, ProductType, ResourcePlanning, Schedule, Subscription, TimeUnit, TimeUnitHelper, User, UserBase } from "ts-altea-model";
 import { Exclude, Type, Transform } from "class-transformer";
 import 'reflect-metadata';
@@ -109,6 +106,17 @@ export class InvoiceConfig {
     mode: string = 'branch'
 }
 
+export class AccountingConfig {
+
+    /** the last closed month: all data up to that month is fixed and can't be changed */
+    closed = {
+        year: 2000,
+        month: 1
+    }
+
+}
+
+
 export class Branch extends ObjectWithIdPlus {
 
     orders?: Order[];  
@@ -185,6 +193,9 @@ export class Branch extends ObjectWithIdPlus {
 
     /** Invoice settings */
     inv?: InvoiceConfig
+
+    /** Accounting settings */
+    acc?: AccountingConfig
 
     get sameDayTerm(): number { return this.getDepositTerm(0) }
     set sameDayTerm(value: number) { this.setDepositTerm(0, value) }

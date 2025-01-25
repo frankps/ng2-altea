@@ -4,7 +4,7 @@ import * as dateFns from 'date-fns'
 import * as Handlebars from "handlebars"
 import * as _ from "lodash"
 import { OrderCheck, OrderCheckItem, OrderCheckItemType } from 'ts-altea-logic'
-import { BankTransaction, BankTxType, Order, OrderLine, Payment, PaymentInfo, PaymentType, ReportMonth, StripePayout } from 'ts-altea-model'
+import { BankTransaction, BankTxType, Order, OrderLine, OrderState, Payment, PaymentInfo, PaymentType, ReportMonth, StripePayout } from 'ts-altea-model'
 import { ApiListResult, ApiStatus, ArrayHelper, DateHelper, YearMonth } from 'ts-common'
 import * as Rx from "rxjs";
 
@@ -63,7 +63,7 @@ export class MonthClosingUpdate {
 
     msg: string
 
-    static info(msg: string) : MonthClosingUpdate {
+    static info(msg: string): MonthClosingUpdate {
 
         let upd = new MonthClosingUpdate()
         upd.msg = msg
@@ -98,16 +98,54 @@ export class MonthClosing {
 
     checkOrder(order: Order, objectsToUpdate: MonthClosingUpdates, fix: boolean = false): OrderCheck {
 
+        let me = this
+
         let orderCheck = new OrderCheck(order)
 
+        let shouldDeclareTax = me.shouldDeclareTax(order)
+
+
+        let origTotalPaid = order.paid
+        let orderPropsToUpdate = []
+
+        if (origTotalPaid != order.makePayTotals()) {
+            orderCheck.add(OrderCheckItemType.paidMismatch, `order.paid db: ${origTotalPaid} <> calculated: ${order.paid}`)
+
+            if (fix) {
+                orderPropsToUpdate.push('paid')
+            }
+        }
+
+        if (order.state != OrderState.cancelled && order.paid > order.incl) {
+            orderCheck.add(OrderCheckItemType.paidNotEqualTotal, `order.paid=${order.paid} > order.incl: ${order.incl}`)
+        }
+
+
+        // temp fix (for accident)
+        /*
+        if (order.giftCode)
+            order.gift = true
+        else
+            order.gift = false
+        
+        orderPropsToUpdate.push('gift')
+        */
 
         let orderIncl = 0, orderExcl = 0, orderVat = 0
+        let skipGiftCheck = false
 
         if (order.hasLines()) {
 
             for (let line of order.lines) {
                 let linePropsToUpdate = []
                 let lineChanged = false
+
+                /** this should be solved as from feb 2025 */
+                if (line.descr && line.descr == 'Gift for canceled order') {
+                    order.gift = true
+                    skipGiftCheck = true
+                    orderPropsToUpdate.push('gift')
+                }
 
                 if (line.product) {
                     let product = line.product
@@ -137,10 +175,13 @@ export class MonthClosing {
 
                 }
 
+                if (shouldDeclareTax && [6, 12, 21].indexOf(line.vatPct) == -1) {
+                    orderCheck.add(OrderCheckItemType.lineVatError, `correct vat%: ${line.vatPct} ?`)
+                }
+
                 orderIncl += line.incl
                 orderExcl += line.excl
                 orderVat += line.vat
-
 
                 line.calculateInclThenExcl(false)
 
@@ -185,13 +226,16 @@ export class MonthClosing {
         }
 
 
-        if (order.gift && !order.giftCode) {
-            orderCheck.add(OrderCheckItemType.giftProblem, `missing giftCode on gift order`)
+        if (!skipGiftCheck) {
+            if (order.gift && !order.giftCode) {
+                orderCheck.add(OrderCheckItemType.giftProblem, `missing giftCode on gift order`)
+            }
+
+            if (!order.gift && order.giftCode) {
+                orderCheck.add(OrderCheckItemType.giftProblem, `order has gift code ${order.giftCode}, but not marked as gift`)
+            }
         }
 
-        if (!order.gift && order.giftCode) {
-            orderCheck.add(OrderCheckItemType.giftProblem, `order has gift code ${order.giftCode}, but not marked as gift`)
-        }
 
 
 
@@ -214,19 +258,36 @@ export class MonthClosing {
         }
 
 
-
+        if (orderPropsToUpdate.length > 0) {
+            orderPropsToUpdate = _.uniq(orderPropsToUpdate)
+            objectsToUpdate.addOrder(order, ...orderPropsToUpdate)
+        }
 
         return orderCheck
 
     }
 
     calculateOrderTaxes(order: Order, objectsToUpdate: MonthClosingUpdates, closedUntil: YearMonth) {
+        let me = this
+        
         let orderChanged = false
         let orderPropsToUpdate = []
 
         order.calculateVat()
 
-        order.calculateTax(closedUntil)
+        if (me.shouldDeclareTax(order)) {
+            order.calculateTax(closedUntil)
+        } else {
+
+            // if it was 
+            if (order.tax?.hasLines()) {
+                let lastClosedPeriod = closedUntil.toNumber()
+                order.tax.lines = order.tax.lines.filter(l => l.per <= lastClosedPeriod)
+                order.markAsUpdated('tax')
+            }
+
+            
+        }
 
         if (ArrayHelper.NotEmpty(order.m.f)) { // check if there are updated fields 
             orderPropsToUpdate.push(...order.m.f)
@@ -248,14 +309,17 @@ export class MonthClosing {
 
 
         if (objectsToUpdate.hasOrderUpdates()) {
-
             objectsToUpdate.orderUpdateResult = await this.alteaDb.updateOrders(objectsToUpdate.orders, objectsToUpdate.orderProps)
             objectsToUpdate.orders = []
-
         }
     }
 
 
+    /**
+     * Invoiced orders or gift orders are NOT declared
+     * @param order 
+     * @returns 
+     */
     shouldDeclareTax(order: Order): boolean {
 
         if (!order || !order.tax || !order.tax.hasLines())
@@ -302,18 +366,20 @@ export class MonthClosing {
 
     async calculateMonth(branchId: string, yearMonth: YearMonth, closedUntil: YearMonth): Promise<MonthClosingResult> {
 
+        let me = this
+
         let from = yearMonth.startDate()
         let to = yearMonth.endDate() // dateFns.addDays(from, 1)
 
         let fromNum = DateHelper.yyyyMMddhhmmss(from)
         let toNum = DateHelper.yyyyMMddhhmmss(to)
 
-        let reportMonth = await this.alteaDb.getReportMonth(branchId, yearMonth.y, yearMonth.m)
+        let reportMonth = await me.alteaDb.getReportMonth(branchId, yearMonth.y, yearMonth.m)
 
         if (!reportMonth) {
             reportMonth = new ReportMonth(branchId, branchId, yearMonth.y, yearMonth.m)
 
-            await this.alteaDb.createReportMonth(reportMonth)
+            await me.alteaDb.createReportMonth(reportMonth)
         }
 
         reportMonth.reset()
@@ -323,11 +389,11 @@ export class MonthClosing {
         let take = 50
         let ordersProcessed = 0
 
-        let orders = await this.alteaDb.getOrdersWithPaymentsBetween(from, to, lastId, take)
+        let orders = await me.alteaDb.getOrdersWithPaymentsBetween(from, to, lastId, take)
         console.log(orders)
 
-        
-        
+
+
 
         let result = new MonthClosingResult()
         let objectsToUpdate = new MonthClosingUpdates()
@@ -336,42 +402,40 @@ export class MonthClosing {
         while (ArrayHelper.NotEmpty(orders)) {
             let ordersInBatch = orders.length
 
-            this.inProgress(`Start processing ${ordersInBatch} new orders. (${ordersProcessed} processed) `)
-
-
+            me.inProgress(`Start processing ${ordersInBatch} new orders. (${ordersProcessed} processed) `)
 
             for (let order of orders) {
 
+                order.sortPayments()
                 //        console.log(`${order.id}: ${order.incl}`)
-                // this.calculateOrder(order)
+                // me.calculateOrder(order)
 
-                let orderCheck = this.checkOrder(order, objectsToUpdate, fixIssues)   // closedUntil
+                let orderCheck = me.checkOrder(order, objectsToUpdate, fixIssues)   // closedUntil
                 result.checks.push(orderCheck)
 
-                this.calculateOrderTaxes(order, objectsToUpdate, closedUntil)
+                me.calculateOrderTaxes(order, objectsToUpdate, closedUntil)
 
-                this.addOrderToMonthReport(order, reportMonth, yearMonth, fromNum, toNum)
-
+                me.addOrderToMonthReport(order, reportMonth, yearMonth, fromNum, toNum)
 
                 lastId = order.id
             }
 
             ordersProcessed += ordersInBatch
 
-            await this.updateDatabase(objectsToUpdate)
+            await me.updateDatabase(objectsToUpdate)
 
             if (ordersInBatch == take) {
-                orders = await this.alteaDb.getOrdersWithPaymentsBetween(from, to, lastId, take)
+                orders = await me.alteaDb.getOrdersWithPaymentsBetween(from, to, lastId, take)
                 console.log(orders)
             } else {
                 let msg = `No more orders (last query retrieved less -${ordersInBatch}- then requested -${take}-)`
                 console.log(msg)
-                this.inProgress(`Start processing ${ordersInBatch} new orders. (${ordersProcessed} processed) `)
+                me.inProgress(`Start processing ${ordersInBatch} new orders. (${ordersProcessed} processed) `)
                 break
             }
         }
 
-        await this.alteaDb.updateReportMonth(reportMonth)
+        await me.alteaDb.updateReportMonth(reportMonth)
 
 
 

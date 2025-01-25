@@ -4,7 +4,7 @@ import * as dateFns from 'date-fns'
 import * as Handlebars from "handlebars"
 import * as _ from "lodash"
 import { BankTransaction, BankTxType, Invoice, Order, Payment, PaymentInfo, Payments, PaymentType, StripePayout } from 'ts-altea-model'
-import { ApiStatus, ArrayHelper, YearMonth } from 'ts-common'
+import { ApiStatus, ArrayHelper, DateHelper, YearMonth } from 'ts-common'
 
 
 export class BankTransactionCheckResult {
@@ -94,6 +94,12 @@ export class MonthConsistencyReportBuilder {
 
     let report = new ConsistencyReport()
 
+    console.warn('checkAll')
+
+    await this.cashPayments(yearMonth)
+
+//    return report
+
     report.invoices = await this.invoiceChecks(yearMonth)
 
     report.gifts = await this.giftChecks(yearMonth)
@@ -104,6 +110,43 @@ export class MonthConsistencyReportBuilder {
 
     return report
   }
+
+  orderHealthCheck(order: Order) {
+
+
+
+  }
+
+  async orderHealthChecks(yearMonth: YearMonth) {
+
+    let from = yearMonth.startDate()
+    let to = yearMonth.endDate() // dateFns.addDays(from, 1)
+
+    let lastId = null
+    let take = 50
+    let ordersProcessed = 0
+
+    let orders = await this.alteaDb.getOrdersWithPaymentsBetween(from, to, lastId, take)
+
+    while (ArrayHelper.NotEmpty(orders)) {
+      let ordersInBatch = orders.length
+
+
+
+
+      if (ordersInBatch == take) {
+        orders = await this.alteaDb.getOrdersWithPaymentsBetween(from, to, lastId, take)
+        console.log(orders)
+      } else {
+        let msg = `No more orders (last query retrieved less -${ordersInBatch}- then requested -${take}-)`
+        console.log(msg)
+        // this.inProgress(`Start processing ${ordersInBatch} new orders. (${ordersProcessed} processed) `)
+        break
+      }
+    }
+
+  }
+
 
   async invoiceChecks(yearMonth: YearMonth): Promise<CheckResults> {
 
@@ -135,12 +178,12 @@ export class MonthConsistencyReportBuilder {
 
         if (order.invoiceId && order.invoice) {
 
-          
+
 
           if (order.incl == order.invoice.totals.incl) {
             orderInvoiceOk = true
           } else {
-            
+
           }
 
           if (orderInvoiceOk) {
@@ -194,7 +237,7 @@ export class MonthConsistencyReportBuilder {
       }
 
       if (!order.toInvoice || !order.invoiced) {
-        result.addMsg(`corresponding order for '${gift.code}' invoiced? toInvoice=${order.toInvoice} invoiced=${order.invoiced} invoiceNum=${order.invoiceNum}`)
+        result.addMsg(`corresponding order for '${gift.code}' invoiced? toInvoice=${order.toInvoice} invoiced=${order.invoiced} invoiceNum=${order.invoiceNum} id=${order.id}`)
       }
 
     }
@@ -285,13 +328,67 @@ export class MonthConsistencyReportBuilder {
   }
 
 
+  async cashPayments(yearMonth: YearMonth): Promise<any> {
+
+    let start = yearMonth.startDate()
+
+    // let end = dateFns.addDays(start, 10)
+    let end = dateFns.addMonths(start, 1)  // yearMonth.endDate()
+
+    let startNum = DateHelper.yyyyMMddhhmmss(start)
+    let endNum = DateHelper.yyyyMMddhhmmss(end)
+
+    let orders = await this.alteaDb.getOrdersWithPaymentsBetween(start, end, null, 1000, [PaymentType.cash])
+
+    let totalNoDeclare = 0
+
+    let paysToUpdate = []
+
+    for (let order of orders) {
+
+      if (order.toInvoice || order.invoiced || order.gift)
+        continue
+
+      let cashPays = order.getPaymentsBetween(startNum, endNum, [PaymentType.cash])
+
+      if (ArrayHelper.IsEmpty(cashPays))
+        continue
+
+      cashPays = cashPays.filter(p => p.amount > 0)
+
+      if (ArrayHelper.IsEmpty(cashPays))
+        continue
+
+      let totalPays = order.nrOfPayments()
+      let numOfCashPays = cashPays.length
+      let totalCashPays = _.sumBy(cashPays, 'amount')
+
+      let startDateNum = order.start
+
+      /** Only cash used and order serviced with period  */
+      if (numOfCashPays == totalPays && startDateNum && startDateNum >= startNum && startDateNum < endNum) {
+        let paysToReduce = cashPays
+        for (let pay of paysToReduce) {
+          pay.noDecl = pay.amount
+          paysToUpdate.push(pay)
+          totalNoDeclare += pay.noDecl
+        }
+      }
+    }
+
+    var payUpdateRes = await this.alteaDb.updatePayments(paysToUpdate, ['noDecl'])
+
+    console.log(orders)
+    console.log(totalNoDeclare)
+  }
+
 
   async checkPayments(yearMonth: YearMonth): Promise<Payments> {
 
     let start = yearMonth.startDate()
     let end = dateFns.addMonths(start, 1)  // yearMonth.endDate()
 
-    let pays = await this.alteaDb.getPaymentsBetween(start, end, [PaymentType.credit, PaymentType.debit, PaymentType.stripe], true)
+    let pays = await this.alteaDb.getPaymentsBetween(start, end, [PaymentType.credit, PaymentType.debit, PaymentType.stripe, PaymentType.transfer], true, ['order'])
 
     return pays
 

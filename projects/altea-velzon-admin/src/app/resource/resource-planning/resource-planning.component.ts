@@ -125,13 +125,18 @@ export class ResourcePlanningComponent implements OnInit {
       this.plannings = []
     }
 
+    let startDate = new Date()
+    let startNum = DateHelper.yyyyMMdd000000(startDate)
 
 
     const query = new DbQuery()
     query.and('resourceId', QueryOperator.equals, resource.id)
-    query.and('type', QueryOperator.in, ['hol', 'bnk', 'ill', 'abs', 'edu', 'avl'])
+    query.and('type', QueryOperator.in, ['occ', 'hol', 'bnk', 'ill', 'abs', 'edu', 'avl'])
     // query.and('type', QueryOperator.in, this.types)
-    // query.and('act', QueryOperator.equals, true)
+
+    /** we're only interested in general plannings (=> not tied to specific orders) */
+    query.and('orderId', QueryOperator.equals, null)
+    query.and('start', QueryOperator.greaterThanOrEqual, startNum)
     query.take = 200
     query.orderByDesc('start')
     //query.select('id', 'catId', 'name', 'type')
@@ -156,7 +161,7 @@ export class ResourcePlanningComponent implements OnInit {
     this.start = new Date()
     this.start.setHours(8, 0, 0, 0)
     this.end = dateFns.addDays(new Date(), 3)
-    this.end.setHours(22, 0, 0, 0)
+    this.end.setHours(23, 0, 0, 0)
 
     this.mode = ListSectionMode.createNew
   }

@@ -62,7 +62,7 @@ export class Invoice extends ObjectWithIdPlus {
   @Type(() => VatLine)
   vatLines?: VatLine[] = []
 
-  /** use alter message instead of default */
+  /** use alternate message instead of default */
   useAlter: boolean = false
 
   /** alternative message for on invoice */

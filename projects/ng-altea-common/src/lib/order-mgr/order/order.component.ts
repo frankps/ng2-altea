@@ -141,7 +141,10 @@ export class OrderComponent implements OnInit {
   payAmountChanged(pay: Payment, idx: number) {
 
     pay.markAsUpdated('amount')
+    this.order.makePayTotals()
     this.orderMgrSvc.orderDirty = true
+
+    
   }
 
   /**

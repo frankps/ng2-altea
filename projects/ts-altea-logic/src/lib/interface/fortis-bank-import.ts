@@ -56,7 +56,7 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
      * 
      * @param rowsOfCols 
      */
-    async import(rowsOfCols: string[][]) : Promise<ApiListResult<BankTransaction>>  {
+    async import(rowsOfCols: string[][]): Promise<ApiListResult<BankTransaction>> {
 
         let me = this
 
@@ -70,22 +70,22 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
 
         me.lines = me.lines.map(line => me.customProcessing(line))
 
-        let lines =  me.lines.map(line => line.clone())
-       // let typed = lines.map(line =>  plainToInstance(BankTransaction, line)) // plainToClass(type, unTypedClone)
+        let lines = me.lines.map(line => line.clone())
+        // let typed = lines.map(line =>  plainToInstance(BankTransaction, line)) // plainToClass(type, unTypedClone)
 
         // get rid of _... properties
-       // me.lines = me.lines.map(tx => ObjectHelper.clone(tx, BankTransaction))
+        // me.lines = me.lines.map(tx => ObjectHelper.clone(tx, BankTransaction))
 
 
-       // we only want new transactions
-       let lastDbTransaction = await me.alteaDb.getLatestBankTransaction()
-       lines = lines.filter(l => l.numInt > lastDbTransaction.numInt)
+        // we only want new transactions
+        let lastDbTransaction = await me.alteaDb.getLatestBankTransaction()
+        lines = lines.filter(l => l.numInt > lastDbTransaction.numInt)
 
-/*        console.error(lines)
-       return */
+        /*        console.error(lines)
+               return */
 
-       if (ArrayHelper.IsEmpty(lines))
-        return ApiListResult.warning('No new lines to upload')
+        if (ArrayHelper.IsEmpty(lines))
+            return ApiListResult.warning('No new lines to upload')
 
 
         let uploadResult = await me.alteaDb.createBankTransactions(lines)
@@ -106,18 +106,18 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
     removeCharacter(str: string, idx: number): string {
         // If the string is shorter than 6 characters, just return the original
         if (str.length <= idx) {
-          return str;
+            return str;
         }
         // Slice the string up to (but not including) index 5,
         // then slice from index 6 onward
         return str.slice(0, idx) + str.slice(idx + 1);
-      }
+    }
 
     customProcessing(tx: BankTransaction): BankTransaction {
 
         // transaction num is 2024-01089 
-/*         if (tx?.num.length > 5 && tx.num[5] == '0') 
-            tx.num = this.removeCharacter(tx.num, 5) */
+        /*         if (tx?.num.length > 5 && tx.num[5] == '0') 
+                    tx.num = this.removeCharacter(tx.num, 5) */
 
         tx.numInt = this.convertransactionNum(tx.num)
 
@@ -169,6 +169,16 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
 
         }
 
+        if (tx.details.indexOf('INSTANTOVERSCHRIJVING') >= 0) {
+            txType = BankTxType.transfer;
+
+            let txInfo = new BankTxInfo(txType)
+
+            txInfo.forDate = tx.execDate
+
+            return txInfo
+        }
+
         if (txType == BankTxType.terminalBC || txType == BankTxType.onlineBC) {
 
             const regexDate = /DATUM : (\d+[-/]\d+[-/]\d+)/i
@@ -212,7 +222,23 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
 
                 let now = new Date()
                 let year = tx.getYearFromNum()
-                let dateString = dateMatches[1] + '/' + year
+                let dayMonth = dateMatches[1] // format: 'dd/MM'
+
+                {
+                    /* Handle case where tx number is already in next year, but transactions in previous year
+                      example: 2025-0003 is for payments in 30/12/2024   => we need to decrease the year from the transaction number
+                    */
+                    let sequenceNumber = tx.getSequenceNumberFromNum()
+    
+                    let dayMonthItems = dayMonth.split('/')
+                    let month = Number(dayMonthItems[1])
+                    let day = Number(dayMonthItems[0])
+
+                    if (month == 12 && day >= 29 && sequenceNumber < 50)
+                        year = year - 1
+                }
+
+                let dateString = dayMonth + '/' + year
                 let transactionDate = dateFns.parse(dateString, 'dd/MM/yyyy', new Date())
 
                 let origAmount = amountMatches[1]

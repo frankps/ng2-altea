@@ -429,6 +429,11 @@ export class Gift extends ObjectWithIdPlus {
   decl: boolean = false
 
 
+  @Exclude()
+  get name() {
+    return this.code
+  }
+
   /** created at */
   /*
   @Type(() => Date)

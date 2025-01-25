@@ -170,7 +170,7 @@ export class AlteaDb {
 
         qry.and('branchId', QueryOperator.equals, branchId)
         qry.and('toInvoice', QueryOperator.equals, true)
-        
+
         qry.or('invoiced', QueryOperator.equals, false)
         qry.or('invoiceId', QueryOperator.equals, null)
         qry.or('invoiceNum', QueryOperator.equals, null)
@@ -211,7 +211,7 @@ export class AlteaDb {
         return orders
     }
 
-    async getOrdersWithPaymentsBetween(start: Date, end: Date, lastId?: string, take: number = 25): Promise<Order[]> {   // , types?: PaymentType[]
+    async getOrdersWithPaymentsBetween(start: Date, end: Date, lastId?: string, take: number = 25, types?: PaymentType[]): Promise<Order[]> {   // , types?: PaymentType[]
 
         let startNum = DateHelper.yyyyMMddhhmmss(start)
         let endNum = DateHelper.yyyyMMddhhmmss(end)
@@ -220,19 +220,29 @@ export class AlteaDb {
         qry.include('lines.product')
         qry.include('payments.gift')
 
-        let paymentFilter = new QueryCondition()
-        paymentFilter.and('date', QueryOperator.greaterThanOrEqual, startNum)
-        paymentFilter.and('date', QueryOperator.lessThan, endNum)
 
-        /*         if (ArrayHelper.NotEmpty(types)) {
-                    paymentFilter.and('type', QueryOperator.in, types)
-                } */
+        let queryById = null  // 'a534da50-3507-45dc-b0e8-8274b97be4c3'   //  null  // for debugging
 
-        qry.and('payments', QueryOperator.some, paymentFilter)
+        if (queryById) {
+            qry.and('id', QueryOperator.equals, queryById)
+        } else {
 
-        if (lastId) {
-            qry.and('id', QueryOperator.greaterThan, lastId)
+            let paymentFilter = new QueryCondition()
+            paymentFilter.and('date', QueryOperator.greaterThanOrEqual, startNum)
+            paymentFilter.and('date', QueryOperator.lessThan, endNum)
+
+            if (ArrayHelper.NotEmpty(types)) {
+                paymentFilter.and('type', QueryOperator.in, types)
+            }
+
+            qry.and('payments', QueryOperator.some, paymentFilter)
+
+            if (lastId) {
+                qry.and('id', QueryOperator.greaterThan, lastId)
+            }
+
         }
+
 
 
 

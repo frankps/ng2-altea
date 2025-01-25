@@ -7,7 +7,7 @@ import { Payment } from "ts-altea-model";
 export enum BankTxType {
     unknown = 'unknown',
     stripe = 'stripe',
-    depositTransfer = 'depositTransfer',
+    transfer = 'transfer',
     terminalBC = 'terminalBC',
     terminalCredit = 'terminalCredit',
     onlineBC = 'onlineBC',
@@ -119,6 +119,19 @@ export class BankTransaction extends ObjectWithId {
             return -1
 
         return +items[0]
+    }
+
+    getSequenceNumberFromNum() : number {
+
+        if (!this.num) 
+            return -1
+
+        let items = this.num.split('-')
+
+        if (ArrayHelper.IsEmpty(items))
+            return -1
+
+        return +items[1]
     }
 
     @Exclude()

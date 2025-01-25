@@ -393,6 +393,10 @@ export class CancelOrder {
         order.branch = origOrder.branch
         order.contactId = origOrder.contactId
         order.state = OrderState.finished
+        order.gift = true
+
+        let gift = new Gift(true, true)
+        order.giftCode = gift.code
 
         if (origOrder.for)
             order.for = origOrder.for
@@ -416,7 +420,7 @@ export class CancelOrder {
         order.addPayment(pay)  //payments.push(pay)
 
 
-        let gift = new Gift(true, true)
+        
 
         order.gift = true
         order.giftCode = gift.code

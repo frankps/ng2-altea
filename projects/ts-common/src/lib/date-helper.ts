@@ -45,6 +45,14 @@ export class YearMonth {
         return YearMonth.fromDate(startNextMonth)
     }
 
+    previous(): YearMonth {
+
+        let start = this.startDate()
+        let startPreviousMonth = dateFns.subMonths(start, 1)
+
+        return YearMonth.fromDate(startPreviousMonth)
+    }
+
     startDate() : Date {
         let date = new Date(this.y, this.m - 1, 1)
         return date
@@ -54,6 +62,10 @@ export class YearMonth {
         let date = this.startDate()
         date = dateFns.addMonths(date, 1)
         return date
+    }
+
+    toString(): string {
+        return `${this.y}.${this.m}`
     }
 
     /**

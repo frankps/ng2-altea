@@ -11,7 +11,8 @@
             <div class="col-6 px-3 d-flex justify-content-end align-items-center">
                 <span *ngIf="order.giftCode"><span *ngIf="order.isNew(); else showGiftCode">.....</span>
                     <ng-template #showGiftCode>{{order.giftCode}}</ng-template>
-                    &nbsp;<i class="fa-duotone fa-solid fa-gift"></i></span>
+                </span>
+                &nbsp;<i *ngIf="order.gift" class="fa-duotone fa-solid fa-gift"></i>
                 <span class="ms-2">{{order.start | intdate}}</span>
             </div>
 
@@ -176,7 +177,7 @@
             </div>
             <ng-container *ngIf="line.product?.isSubscription()">
 
-                <div class="row">    <!-- && !line.subscriptionsCreated() -->
+                <div class="row"> <!-- && !line.subscriptionsCreated() -->
                     <div class="col">
                         <button type="button" *ngIf="sessionSvc.isPos() && !line.subscriptionsCreated()"
                             class="btn btn-secondary btn-sm float-end"
@@ -280,12 +281,13 @@
 
                         <ng-container *ngIf="isPOS()">
                             <span>{{pay.date | intdate}}</span>
-                            <i class="fa-solid fa-link float-end" [ngbTooltip]="pay.bankTxNum"
-                            *ngIf="pay.bankTxId"></i>
+                            <i class="fa-solid fa-link float-end" [ngbTooltip]="pay.bankTxNum" *ngIf="pay.bankTxId"></i>
                         </ng-container>
-                      
+
                     </div>
-                    <div class="col-3">{{pay.info}} <span class="float-end">€{{pay.amount}}</span></div>
+
+                    <div class="col"><span *ngIf="!show.extra">{{pay.info}}</span> <span
+                            class="float-end">€{{pay.amount}}</span></div>
 
                 </ng-container>
 
@@ -519,9 +521,9 @@
                         Incl
                     </div>
                 </div>
-    
+
                 <div class="row" *ngFor="let vatLine of order.vatLines">
-    
+
                     <div class="col-3 d-flex justify-content-end">
                         {{vatLine.pct}}%
                     </div>
@@ -534,7 +536,16 @@
                     <div class="col-3 d-flex justify-content-end">
                         {{vatLine.incl}}
                     </div>
-    
+
+                </div>
+
+                <div class="row mt-1" *ngIf="order.hasVatLines(2)">
+                    <div class="col-9  d-flex justify-content-center">
+                     
+                    </div>
+                    <div class="col-3  d-flex justify-content-end">
+                        <b>{{order.totalVatIncl()}}</b>
+                    </div>
                 </div>
 
             </ng-container>
@@ -559,9 +570,9 @@
                         Incl
                     </div>
                 </div>
-    
+
                 <div class="row" *ngFor="let taxLine of order.tax.lines">
-    
+
                     <div class="col-2 d-flex justify-content-end">
                         {{taxLine.per}}
                     </div>
@@ -580,7 +591,17 @@
                     <div class="col-3 d-flex justify-content-end">
                         {{taxLine.incl}}
                     </div>
-    
+
+                </div>
+
+
+                <div class="row mt-1" *ngIf="order.tax.hasLines(2)">
+                    <div class="col-9  d-flex justify-content-center">
+                     
+                    </div>
+                    <div class="col-3  d-flex justify-content-end">
+                        <b>{{order.tax.totalIncl()}}</b>
+                    </div>
                 </div>
 
             </ng-container>

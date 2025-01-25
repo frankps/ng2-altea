@@ -40,7 +40,7 @@ export class TimePickerComponent {
 
   @Output() timeChange = new EventEmitter<string | Date>();
 
-  hours = [...Array(23).keys()].map(i => ("0" + i).slice(-2))
+  hours = [...Array(24).keys()].map(i => ("0" + i).slice(-2))
   hour = "09"
 
   minutes = [...Array(13).keys()].map(i => ("0" + (i * 5)).slice(-2))

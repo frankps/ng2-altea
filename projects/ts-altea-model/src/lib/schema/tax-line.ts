@@ -25,247 +25,6 @@ export class VatLine {
 
 }
 
-
-export class DeclareLine {
-
-    /** each declare line is focused on a certain percentage */
-    pct: number
-
-    /** Total to declare for this order and for this percentage */
-    total: VatLine
-
-    /** Total already declared */
-    declared: TaxLine
-
-    /*
-        toDeclareExcl: number = 0
-    
-        toDeclareIncl: number = 0
-    */
-
-    /** indexed by period (number in format yymm) */
-    newDeclares: Map<number, number> = new Map<number, number>()
-
-    constructor(pct: number) {
-        this.pct = pct
-        this.total = new VatLine(pct)
-    }
-
-    static init(vatLine: VatLine): DeclareLine {
-
-        let declareLine = new DeclareLine(vatLine.pct)
-        declareLine.total = vatLine
-
-        return declareLine
-    }
-
-    hasNewDeclares(): boolean {
-
-        let hasNew = this.newDeclares && this.newDeclares.size > 0
-
-        return hasNew
-
-    }
-
-    sumNewDeclares(): number {
-
-        if (!this.newDeclares || this.newDeclares.size == 0)
-            return 0
-
-        let values = Array.from(this.newDeclares.values())
-
-        let total = _.sum(values)
-
-        return total
-    }
-
-    addNewDeclare(period: number, amount: number) {
-
-        let current = 0
-
-        if (this.newDeclares.has(period))
-            current = this.newDeclares.get(period)
-
-        let newAmount = _.round(current + amount, 2)
-
-        this.newDeclares.set(period, newAmount)
-
-    }
-
-
-    /*
-    openAmountExcl() {
-
-        let toDeclare = this.total ? this.total.excl : 0
-        let declared = this.declared ? this.declared.excl : 0
-
-        return _.round(toDeclare - declared - this.toDeclareExcl, 2)
-    }*/
-
-    openAmountIncl() {
-
-        let toDeclare = this.total ? this.total.incl : 0
-        let declared = this.declared ? this.declared.incl : 0
-        let newDeclares = this.sumNewDeclares()
-
-        return _.round(toDeclare - declared - newDeclares, 2)
-    }
-
-
-}
-
-export class OrderDeclareResult {
-
-    status: ApiStatus = ApiStatus.notProcessed
-
-    msg: string
-
-    constructor(status: ApiStatus = ApiStatus.notProcessed, msg?: string) {
-        this.status = status
-        this.msg = msg
-    }
-
-    static ok(msg?: string): OrderDeclareResult {
-
-        let res = new OrderDeclareResult(ApiStatus.ok, msg)
-        return res
-    }
-
-    static warning(msg?: string): OrderDeclareResult {
-
-        let res = new OrderDeclareResult(ApiStatus.warning, msg)
-        return res
-    }
-
-    static error(msg?: string): OrderDeclareResult {
-
-        let res = new OrderDeclareResult(ApiStatus.error, msg)
-        return res
-    }
-
-    isOk(): boolean {
-        return this.status == ApiStatus.ok
-    }
-
-}
-
-export class OrderDeclare {
-
-    vatMap = new Map<number, DeclareLine>()
-
-    static init(vatLines: VatLine[]): OrderDeclare {
-
-        let orderDeclare = new OrderDeclare()
-
-        if (ArrayHelper.IsEmpty(vatLines))
-            return orderDeclare
-
-        let declareLines = vatLines.map(vl => DeclareLine.init(vl))
-
-        orderDeclare.vatMap = new Map(declareLines.map(dl => [dl.pct, dl]))
-
-        return orderDeclare
-    }
-
-
-    setAlreadyDeclared(tax: TaxLines) {
-
-        if (!tax || !tax.hasLines())
-            return
-
-        if (!this.vatMap)
-            this.vatMap = new Map<number, DeclareLine>()
-
-        tax = tax.sumByPct()
-
-        for (let taxLine of tax.lines) {
-            let declareLine = this.vatMap.get(taxLine.pct)
-
-            if (!declareLine) {
-                declareLine = new DeclareLine(taxLine.pct)
-                this.vatMap.set(taxLine.pct, declareLine)
-            }
-
-            declareLine.declared = taxLine
-        }
-    }
-
-    /**
-     * 
-     * @returns percentages where declared < orderTax, ordered desc
-     */
-    getAvailablePercentages(): number[] {
-
-        if (!this.vatMap || this.vatMap.size == 0)
-            return []
-
-        let declareLines: DeclareLine[] = Array.from(this.vatMap.values())
-
-        declareLines = declareLines.filter(l => l.openAmountIncl() > 0)
-
-        let pcts = declareLines.map(l => l.pct)
-
-        pcts = _.orderBy(pcts, [], 'desc')
-
-        return pcts
-    }
-
-    declare(pays: Payment[]): OrderDeclareResult {
-
-        if (ArrayHelper.IsEmpty(pays))
-            return OrderDeclareResult.ok('No payments to process')
-
-        let pcts = this.getAvailablePercentages()
-
-        let pct = pcts.pop()
-        let declareLine = pct ? this.vatMap.get(pct) : null
-
-        for (let pay of pays) {
-
-            let toDeclare = _.round(pay.amount, 2)
-            let period = pay.declarationPeriod()
-
-            while (toDeclare > 0) {
-
-                if (!declareLine) {
-                    return OrderDeclareResult.error(`No declaration line available for payment ${pay.amount}`)
-                }
-
-                let openIncl = declareLine.openAmountIncl()
-
-                if (openIncl <= 0)
-                    return OrderDeclareResult.error(`${pct}% vat: open amount ${openIncl} is negative!`)
-
-                let newDeclare = 0
-
-                if (toDeclare <= openIncl)
-                    newDeclare = toDeclare
-                else // toDeclare > openIncl
-                    newDeclare = openIncl
-
-
-                declareLine.addNewDeclare(period, newDeclare)   //toDeclareIncl = _.round(declareLine.toDeclareIncl + newDeclare, 2)
-                toDeclare = _.round(toDeclare - newDeclare, 2)
-                openIncl = _.round(openIncl - newDeclare, 2)
-
-                if (openIncl == 0) {  // then we have consumed available amount for percentage => use next percentage
-                    pct = pcts.pop()
-                    declareLine = pct ? this.vatMap.get(pct) : null
-                }
-
-            }
-        }
-
-        return OrderDeclareResult.ok()
-    }
-
-
-
-}
-
-
-
-
 export class TaxLine {
 
     /**
@@ -294,6 +53,7 @@ export class TaxLine {
 
 export class TaxLines {
 
+    @Type(() => TaxLine)
     lines: TaxLine[] = []
 
     constructor(lines?: TaxLine[]) {
@@ -305,43 +65,6 @@ export class TaxLines {
         return new TaxLines()
     }
 
-    updateLines(asFromPeriod: number, orderDeclare: OrderDeclare) {
-
-        let declareLines: DeclareLine[] = Array.from(orderDeclare.vatMap.values())
-
-        declareLines = declareLines.filter(l => l.hasNewDeclares())
-
-        // initially: we only keep already fixed lines
-        this.lines = this.lines.filter(l => l.per < asFromPeriod)
-
-        if (ArrayHelper.IsEmpty(declareLines))
-            return
-
-        let newTaxLines = []
-
-        for (let declareLine of declareLines) {
-
-            let pct = declareLine.pct
-
-            let periods = Array.from(declareLine.newDeclares.keys())
-
-
-            for (let period of periods) {
-
-                let valueToDeclareIncl = declareLine.newDeclares.get(period)
-
-                let excl = _.round(valueToDeclareIncl / (1 + pct/100), 2)
-                let tax = _.round(valueToDeclareIncl - excl, 2)
-
-                let taxLine = new TaxLine(period, pct, tax, excl, valueToDeclareIncl)
-                newTaxLines.push(taxLine)
-
-            }
-        }
-
-        this.lines.push(...newTaxLines)
-
-    }
 
     sumByPct(): TaxLines {
 
@@ -365,11 +88,41 @@ export class TaxLines {
         return new TaxLines(lines)
     }
 
+/*
+  hasVatLines(atLeast: number = 1): boolean {
 
+    if (!Array.isArray(this.vatLines))
+      return false
 
-    hasLines(): boolean {
-        return ArrayHelper.NotEmpty(this.lines)
+    let length = this.vatLines.length
+
+    return length >= 1
+  }
+
+  totalVatIncl() {
+    if (!this.vatLines)
+      return 0
+    
+    return _.sumBy(this.vatLines, 'incl')
+  }
+    */
+
+    hasLines(atLeast: number = 1): boolean {
+        if (ArrayHelper.IsEmpty(this.lines))
+            return false
+
+        let length = this.lines.length
+
+        return length >= atLeast
+
     }
+
+    totalIncl() {
+        if (!this.lines)
+          return 0
+        
+        return _.sumBy(this.lines, 'incl')
+      }
 
     getLines(yearMonth: YearMonth) {
         if (!this.hasLines())

@@ -310,7 +310,7 @@ export class PosPaymentComponent implements OnInit {
     if (!this.mgrUiSvc.order)
       return 0
 
-    return this.mgrUiSvc.order.incl - this.mgrUiSvc.order.paid
+    return _.round(this.mgrUiSvc.order.incl - this.mgrUiSvc.order.paid, 2)
   }
 
   setAmountTotal() {

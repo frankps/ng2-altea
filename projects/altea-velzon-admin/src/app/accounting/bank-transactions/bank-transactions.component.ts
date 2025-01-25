@@ -504,7 +504,7 @@ export class BankTransactionsComponent implements OnInit {
       }
 
     }
-
+  
     console.warn(this.pays)
   }
 

@@ -8,6 +8,8 @@ export enum OrderCheckItemType {
     orderInclMismatch = 'orderInclMismatch',
     orderExclMismatch = 'orderExclMismatch',
     orderVatMismatch = 'orderVatMismatch',
+    paidMismatch = 'paidMismatch',
+    paidNotEqualTotal = 'paidNotEqualTotal',
     invoiceProblem = 'invoiceProblem',
     giftProblem = 'giftProblem'
 

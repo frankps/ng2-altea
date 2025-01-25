@@ -682,6 +682,14 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
   }
 
+  nrOfPayments(): number {
+    if (!Array.isArray(this.payments))
+      return 0
+
+    return this.payments.length
+
+  }
+
   getLine(orderLineId: string): OrderLine | undefined {
 
     return this.lines?.find(l => l.id == orderLineId)
@@ -714,6 +722,11 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
     return this.payments.filter(pay => pay.type == type)
 
+  }
+
+  getPaymentsBetween(start: number, end: number, types: PaymentType[]) {
+    let pays = this.payments.filter(p => p.date >= start && p.date < end && types.indexOf(p.type) >= 0)
+    return pays
   }
 
   getPaymentsByTypes(...types: PaymentType[]): Payment[] {
@@ -801,18 +814,24 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     this.makePayTotals()
   }
 
+  sortPayments() {
+
+    if (!this.hasPayments())
+      return
+
+    this.payments = _.orderBy(this.payments, ['date'])
+  }
+
   hasPayments(): boolean {
     return (Array.isArray(this.payments) && this.payments.length > 0)
   }
 
   toPay(): number {
-    return this.incl - this.paid
+    return _.round(this.incl - this.paid, 2)
   }
 
 
   makePayTotals() {
-
-
 
     let totalPaid = 0
 
@@ -821,12 +840,16 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     if (Array.isArray(this.payments))
       totalPaid = _.sumBy(this.payments, 'amount');
 
+    totalPaid = _.round(totalPaid, 2)
     console.error(totalPaid)
 
     if (totalPaid != this.paid) {
       this.paid = totalPaid
       this.markAsUpdated('paid')
     }
+
+    return totalPaid
+
 
   }
 
@@ -1014,8 +1037,64 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
   }
 
 
-  hasVatLines(): boolean {
-    return (Array.isArray(this.vatLines) && this.vatLines.length > 0)
+  hasVatLines(atLeast: number = 1): boolean {
+
+    if (!Array.isArray(this.vatLines))
+      return false
+
+    let length = this.vatLines.length
+
+    return length >= atLeast
+  }
+
+  totalVatIncl() {
+    if (!this.vatLines)
+      return 0
+
+    return _.sumBy(this.vatLines, 'incl')
+  }
+
+  /** In case there is a negative orderLine with VAT% of 0, we will reduce existing vat starting with highest values,
+   * returns the amount reduced
+   */
+  reduceVat(vatMap: Map<number, VatLine>, amountIncl: number): number {
+
+    if (!vatMap || !amountIncl)
+      return 0
+
+    let vatPctgs = Array.from(vatMap.keys())
+
+    if (ArrayHelper.IsEmpty(vatPctgs))
+      return 0
+
+    vatPctgs = _.sortBy(vatPctgs, [], 'desc')
+
+    let stillToReduce = amountIncl
+
+    for (let vatPctg of vatPctgs) {
+      let vatLine = vatMap.get(vatPctg)
+
+      let amountInclToReduceFromLine = stillToReduce
+
+      if (amountInclToReduceFromLine > vatLine.incl)
+        amountInclToReduceFromLine = vatLine.incl
+
+      let excl = _.round(amountInclToReduceFromLine / (1 + vatPctg / 100), 2)
+      let vat = amountInclToReduceFromLine - excl
+
+      vatLine.incl = _.round(vatLine.incl - amountInclToReduceFromLine, 2)
+      vatLine.vat = _.round(vatLine.vat - vat, 2)
+      vatLine.excl = _.round(vatLine.excl - excl, 2)
+
+      stillToReduce = _.round(stillToReduce - amountInclToReduceFromLine, 2)
+
+      if (stillToReduce == 0)
+        return amountIncl
+
+    }
+
+    let amountReduced = _.round(amountIncl - stillToReduce, 2)
+    return amountReduced
   }
 
   calculateVat() {
@@ -1030,7 +1109,10 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
     let totalVat = 0, totalExcl = 0, totalIncl = 0
 
-    for (let orderLine of this.lines) {
+    /** we want to treat the 0 pct lines at the end */
+    let orderLines = _.orderBy(this.lines, ['vatPct'], ['desc'])
+
+    for (let orderLine of orderLines) {
 
       if (!orderLine) // || !orderLine.vatPct || orderLine.vatPct === 0
         continue
@@ -1040,18 +1122,31 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
       if (!orderLine.vatPct)  // in case of null or undefined
         vatPct = 0
 
-      let vatLine: VatLine
+      let doVat = true
 
-      if (vatMap.has(vatPct))
-        vatLine = vatMap.get(vatPct)
-      else {
-        vatLine = new VatLine(vatPct, 0, 0, 0)
-        vatMap.set(vatPct, vatLine)
+      if (vatPct == 0 && orderLine.incl < 0) {
+        let toReduce = Math.abs(orderLine.incl)
+        this.reduceVat(vatMap, toReduce)
+        doVat = false
       }
 
-      vatLine.vat += orderLine.vat
-      vatLine.excl += orderLine.excl
-      vatLine.incl += orderLine.incl
+      if (doVat) {
+
+        let vatLine: VatLine
+
+        if (vatMap.has(vatPct))
+          vatLine = vatMap.get(vatPct)
+        else {
+          vatLine = new VatLine(vatPct, 0, 0, 0)
+          vatMap.set(vatPct, vatLine)
+        }
+  
+        vatLine.vat += orderLine.vat
+        vatLine.excl += orderLine.excl
+        vatLine.incl += orderLine.incl
+      }
+
+
 
       totalVat += orderLine.vat
       totalExcl += orderLine.excl
@@ -1449,19 +1544,34 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     return orderlinesWithPlanning
   }
 
+
+  /** returns vat% most used in this order (highest line values) */
+  dominantVatPct(fallbackPct: number): number {
+    if (!this.hasVatLines())
+      return fallbackPct
+
+    let ordered = _.orderBy(this.vatLines, ['incl'], ['desc'])
+
+    return ordered[0].pct
+  }
+
+
   /**
    * 
    * @param closedUntil last closed month (=> up to this point fixed)
    */
   calculateTax(closedUntil: YearMonth) {
 
-    let orderDeclare = OrderDeclare.init(this.vatLines)
+    let orderDeclare = OrderDeclare.init(this, this.vatLines)
 
     //  let taxAlreadyDeclared = this.tax.getLinesGroupedByPct(closedUntil)
 
     if (this.tax) {
       let taxAlreadyDeclared = this.tax.getLinesUntil(closedUntil.toNumber())
-      orderDeclare.setAlreadyDeclared(taxAlreadyDeclared)
+
+      if (taxAlreadyDeclared?.hasLines())
+        orderDeclare.setAlreadyDeclared(taxAlreadyDeclared)
+
     } else {
       this.tax = new TaxLines()
     }
@@ -1475,13 +1585,18 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     */
     newPays = newPays.filter(p => p.type != PaymentType.gift || (p.type == PaymentType.gift && !p.gift.decl))
 
-    let declareResult = orderDeclare.declare(newPays)
+    let positivePays = newPays.filter(p => p.amount > 0)
+    let negativePays = newPays.filter(p => p.amount < 0)
 
-    if (declareResult.isOk()) {
+    let declarePositiveResult = orderDeclare.declarePositive(positivePays)
+    let declareNegativeResult = orderDeclare.declareNegative(negativePays)
+
+    if (declarePositiveResult.isOk()) {
 
       let updateFrom = closedUntil.next()
       let yyMM = updateFrom.toNumber()
-      this.tax.updateLines(yyMM, orderDeclare)
+      orderDeclare.updateLines(this.tax, yyMM)
+      //.updateLines(yyMM, orderDeclare)
 
       this.markAsUpdated('tax')
 

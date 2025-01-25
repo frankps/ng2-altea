@@ -53,6 +53,11 @@
             </div>
             <div class="col-2">{{pay.amount}}</div>
             <div class="col-2">{{pay.type}}</div>
+            <ng-container *ngIf="pay.order">
+                <div class="col-2">{{pay.order.for}}</div>
+                <div class="col-2">{{pay.order.start | intdate}}</div>
+            </ng-container>
+
         </div>
 
     </ng-container>
@@ -64,17 +69,23 @@
 <br><br><br><br>
 
 <h4>Berekeningen</h4>
-<button type="button" class="btn btn-primary btn-sm me-2" (click)="calcMonth(2024,10)">Okt</button>
 
+<ng-container *ngIf="branch">Laatst afgesloten maand: {{branch.acc.closed.year}}.{{branch.acc.closed.month}}
+
+    <button type="button" class="btn btn-primary btn-sm mx-2" (click)="calcNextMonth()">Bereken {{getNextMonth()}}</button>
+
+    <button type="button" class="btn btn-primary btn-sm mx-2" (click)="closeNextMonth()">Sluit {{getNextMonth()}}</button>
+
+</ng-container>
 
 <ng-container *ngIf="closeResult">
 
     <ng-container *ngFor="let orderCheck of closeResult.checks">
 
         <div class="row" *ngFor="let item of orderCheck.items">
-            <div class="col-2"><a [routerLink]="['/aqua/orders/manage',orderCheck.order.id]">{{item.type}}</a></div>
-            <div class="col-2">{{orderCheck.order.for}}</div>
-            <div class="col">{{item.msg}}</div>
+            <div class="col-2"><a [routerLink]="['/aqua/orders/manage',orderCheck.order.id]">{{item?.type}}</a></div>
+            <div class="col-2">{{orderCheck?.order?.for}}</div>
+            <div class="col">{{item?.msg}}</div>
 
         </div>
 
@@ -87,7 +98,7 @@
 
 <ng-container *ngIf="calcMonthLog">
     <div class="row ms-3" *ngFor="let item of calcMonthLog">
-        <div class="col">{{item.msg}}</div>
+        <div class="col">{{item?.msg}}</div>
     </div>
 </ng-container>
 
@@ -100,5 +111,3 @@
 <button type="button" class="btn btn-primary btn-sm me-2" (click)="showReportMonths()">Okt</button>
 
 <div *ngIf="htmlReport" [outerHTML]="htmlReport"></div>
-
-

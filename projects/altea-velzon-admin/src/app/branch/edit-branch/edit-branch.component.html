@@ -1098,6 +1098,20 @@
                 </div>
             </div>
 
+            <div class="row">
+                <div class="col-4">
+            
+                </div>
+                <div class="col-4">
+                    <ngx-altea-label-value label="objects.branch.acc.closed.year"
+                        [value]="object.acc.closed.year"></ngx-altea-label-value>
+                </div>
+                <div class="col-4">
+                    <ngx-altea-label-value label="objects.branch.acc.closed.month"
+                        [value]="object.acc.closed.month"></ngx-altea-label-value>
+                </div>
+            </div>
+
             <div class="row mt-3">
                 <div class="col-6">
 
@@ -1143,6 +1157,38 @@
                     </ng-container>
 
                 </div>
+
+                <div class="row mt-3">
+                    <div class="col-4">
+
+                      
+
+                    </div>
+
+                    <!-- accounting related settings -->
+                    <ng-container *ngIf="object.acc">
+
+                        <div class="col-4">
+
+                            <ngx-altea-label-control label="objects.branch.acc.closed.year" for="closedYear">
+                                <input type="number" id="closedYear" name="closedYear" class="form-control"
+                                    [(ngModel)]="object.acc.closed.year" />
+                            </ngx-altea-label-control>
+
+                        </div>
+                        <div class="col-4">
+
+                            <ngx-altea-label-control label="objects.branch.acc.closed.month" for="closedMonth">
+                                <input type="number" id="closedMonth" name="closedMonth" class="form-control"
+                                    [(ngModel)]="object.acc.closed.month" />
+                            </ngx-altea-label-control>
+
+                        </div>
+                        
+                    </ng-container>
+  
+                </div>
+
 
                 <div class="row mt-3">
 
