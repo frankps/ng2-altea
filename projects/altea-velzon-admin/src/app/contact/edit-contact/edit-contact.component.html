@@ -449,10 +449,15 @@
 
                         <div class="row" *ngFor="let change of card.changes">
 
-                            <div class="col-2"></div>
+                            <div class="col-1"></div>
                             <div class="col-3 d-flex justify-content-center">{{change.value}}</div>
                             <div class="col-3 d-flex justify-content-center">{{change.info}}</div>
                             <div class="col-3 d-flex justify-content-center">{{change.date | date:"dd/MM/yy"}}</div>
+
+                            <div class="col">
+                                <i class="fa-solid fa-trash" (click)="deleteCardChange(change, card)"></i>
+                            </div>
+                            
 
                         </div>
 

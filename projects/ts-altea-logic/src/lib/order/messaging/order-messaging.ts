@@ -406,7 +406,7 @@ export class OrderMessaging extends OrderMessagingBase {
 
             cancelledTable.rows.push(cols)
 
-            reportBlocks.push(cancelledTable.toString())
+            reportBlocks.push(cancelledTable.toHtmlString())
         }
 
         if (ArrayHelper.NotEmpty(errors)) {
@@ -434,7 +434,7 @@ export class OrderMessaging extends OrderMessagingBase {
 
             errorTable.rows.push(cols)
 
-            reportBlocks.push(errorTable.toString())
+            reportBlocks.push(errorTable.toHtmlString())
         }
 
         const body = reportBlocks.join('\n')
@@ -560,7 +560,7 @@ export class OrderMessaging extends OrderMessagingBase {
 
                 }
 
-                htmlBody.push(reminderTable.toString())
+                htmlBody.push(reminderTable.toHtmlString())
 
             }
 

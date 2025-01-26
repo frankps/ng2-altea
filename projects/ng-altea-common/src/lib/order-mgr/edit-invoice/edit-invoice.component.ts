@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { BranchService, InvoiceService, OrderMgrUiService, SessionService } from 'ng-altea-common';
 import { Branch, Invoice } from 'ts-altea-model';
-import { ObjectHelper } from 'ts-common';
+import { ArrayHelper, DateHelper, ObjectHelper } from 'ts-common';
 
 @Component({
   selector: 'order-mgr-edit-invoice',
@@ -10,7 +10,20 @@ import { ObjectHelper } from 'ts-common';
 })
 export class EditInvoiceComponent {
 
-  @Input() invoice: Invoice = new Invoice()
+  _invoice: Invoice = new Invoice()
+
+  @Input() set invoice(invoice: Invoice) {
+    this._invoice = invoice
+
+
+  }
+
+  get invoice(): Invoice {
+    return this._invoice
+  }
+
+
+  //= new Invoice()
 
   @Input() branch: Branch
 
@@ -18,7 +31,26 @@ export class EditInvoiceComponent {
 
   constructor(private branchSvc: BranchService, private sessionSvc: SessionService, private invoiceSvc: InvoiceService, private orderMgrUiSvc: OrderMgrUiService) {
 
-  } 
+  }
+
+  checkDate() {
+
+    if (ArrayHelper.IsEmpty(this.invoice.orders)) {
+      console.log('Invoice has no associated orders...')
+      return
+    }
+
+
+    let order = this.invoice.orders[0]
+
+    if (order.gift) {
+      this.invoice.date = DateHelper.yyyyMMdd(order.cre)
+    } else if (order.start) {
+      let start = order.startDate
+      this.invoice.date = DateHelper.yyyyMMdd(start)
+    }
+
+  }
 
   async addToExistingInvoiceNum(existingInvoiceNum: string) {
 
@@ -67,7 +99,7 @@ export class EditInvoiceComponent {
 
   async assignInvoiceNum() {
 
-    let num =  '0000' + this.branch.inv.next
+    let num = '0000' + this.branch.inv.next
 
     num = num.slice(-3)
 

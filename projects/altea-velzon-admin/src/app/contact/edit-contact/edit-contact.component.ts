@@ -1,10 +1,11 @@
 
 import { Component, ViewChild, OnInit, inject } from '@angular/core';
-import { ProductService, PriceService, ProductResourceService, ResourceService, ScheduleService, ContactService, SessionService, OrderService, MessagingService, ObjectService } from 'ng-altea-common'
+import { ProductService, PriceService, ProductResourceService, ResourceService, ScheduleService, ContactService, SessionService, OrderService, MessagingService, ObjectService, LoyaltyCardService } from 'ng-altea-common'
 import {
   Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ResourceType, ResourceTypeIcons, Resource, Schedule, Contact,
   Language, DepositMode, LoyaltyCard, Order, Message, MsgType, MsgDirIcon, MsgDirColor, MsgTypeIcon, MsgStateIcon,
-  Subscription
+  Subscription,
+  LoyaltyCardChange
 } from 'ts-altea-model'
 import { BackendHttpServiceBase, DashboardService, FormCardSectionEventData, NgEditBaseComponent, ToastType, TranslationService } from 'ng-common'
 import { ActivatedRoute, Router } from '@angular/router';
@@ -27,6 +28,7 @@ import { UIOrder } from '../../order/order-grid/order-grid.component';
 import { plainToInstance } from 'class-transformer';
 import { SearchContactComponent } from '../search-contact/search-contact.component';
 import { MoveContactData } from 'ts-altea-logic';
+
 
 
 @Component({
@@ -97,7 +99,7 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
 
   constructor(protected contactSvc: ContactService, protected translationSvc: TranslationService, route: ActivatedRoute, router: Router,
     spinner: NgxSpinnerService, private modalService: NgbModal, dashboardSvc: DashboardService,
-    protected scheduleSvc: ScheduleService, protected sessionSvc: SessionService, protected loyaltyCardChangeSvc: LoyaltyCardChangeService, 
+    protected scheduleSvc: ScheduleService, protected sessionSvc: SessionService, protected loyaltyCardSvc: LoyaltyCardService, protected loyaltyCardChangeSvc: LoyaltyCardChangeService,
     protected orderSvc: OrderService, protected backendSvc: ObjectService) {
     super('contact', Contact, 'subscriptions,giftsIn,giftsOut,cards'
       , contactSvc
@@ -312,6 +314,30 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
 
   }
 
+  async deleteCardChange(change: LoyaltyCardChange, card: LoyaltyCard) {
+
+    card.value -= change.value
+
+    let update = {
+      id: card.id,
+      value: card.value
+    }
+
+    let updateRes = await this.loyaltyCardSvc.update$(update)
+
+    console.log(updateRes)
+
+    let deleteRes = await this.loyaltyCardChangeSvc.delete$(change.id)
+    console.log(deleteRes)
+
+    if (deleteRes.status == ApiStatus.ok) {
+
+      _.remove(card.changes, ch => ch.id == change.id)
+
+    }
+
+
+  }
 
 
   async showCardDetails(card: LoyaltyCard) {
@@ -372,7 +398,7 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
       return
 
 
-    
+
 
 
 

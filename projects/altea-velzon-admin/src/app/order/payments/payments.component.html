@@ -35,7 +35,7 @@
 <ng-container *ngFor="let pay of payments">
 
     <div class="row mb-1">
-        <div class="col-2"><button type="button" class="btn btn-primary btn-sm me-3" (click)="togglePayment(pay)"><i
+        <div class="col-2"><button type="button" class="btn btn-primary btn-sm me-3" *ngIf="canEditPayment(pay)" (click)="togglePayment(pay)"><i
                     class="fa-solid fa-pen"></i></button>
 
             <span class="float-end">€{{pay.amountRounded()}}</span>

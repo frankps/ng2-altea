@@ -11,10 +11,14 @@
             <li class="list-group-item" *ngFor="let loyaltyProgram of objects" (click)="select(loyaltyProgram)">
 
                 <div class="row">
-                    <div class="col-4"><b>{{ loyaltyProgram.name }}</b></div>
+                    <div class="col">
+
+                        <span [style]="loyaltyProgram.act?'':'text-decoration: line-through;'">
+                        <b>{{ loyaltyProgram.name }}</b></span>
+                    </div>
 
 
-<!--                     <div class="col-4">{{ loyaltyProgram.used }}/{{ loyaltyProgram.value }}</div>
+                    <!--                     <div class="col-4">{{ loyaltyProgram.used }}/{{ loyaltyProgram.value }}</div>
                     <div class="col-4"><span class="badge rounded-pill text-bg-primary float-end"
                             translate>enums.gift-type.{{loyaltyProgram.type}}</span></div> -->
 
@@ -25,7 +29,7 @@
 
                 <!-- <i class="{{ResourceTypeIcons[contact.type]}}"></i> &nbsp;  -->
 
-<!--     
+                <!--     
 
                 <div class="row mt-2" >
                     <div class="col-6"><span style="font-size: small">{{gift.fromName}}</span></div>

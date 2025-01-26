@@ -307,11 +307,16 @@
 
                 <div class="col-2 d-flex justify-content-end align-items-center" *ngIf="show.extra">
 
-                    <i class="fas fa-pen fa-sm ms-1 me-2" (click)="toggleEditPayment(pay)"></i>
+                    <ng-container *ngIf="canEditPayment(pay)">
+                        <i class="fas fa-pen fa-sm ms-1 me-2" (click)="toggleEditPayment(pay)"></i>
 
-                    <i class="fas fa-copy fa-sm me-2" (click)="orderMgrSvc.copyPaymentToClipboard(pay)"></i>
+                        <i class="fas fa-trash fa-sm me-2" (click)="orderMgrSvc.deletePayment(pay)"></i>
+                    </ng-container>
 
-                    <i class="fas fa-trash fa-sm" (click)="orderMgrSvc.deletePayment(pay)"></i>
+
+                    <i class="fas fa-copy fa-sm" (click)="orderMgrSvc.copyPaymentToClipboard(pay)"></i>
+
+
 
 
                 </div>

@@ -37,13 +37,20 @@ export class BankTransactionCheckResult {
 
 }
 
+export class CheckResult {
+  
+  constructor(public msg: string, public order?: Order) {
+
+  }
+
+}
 
 export class CheckResults {
 
-  msg: string[] = []
+  results: CheckResult[] = []
 
-  addMsg(msg: string): CheckResults {
-    this.msg.push(msg)
+  addMsg(msg: string, order?: Order): CheckResults {
+    this.results.push(new CheckResult(msg, order))
 
     return this
   }
@@ -66,6 +73,8 @@ export class ConsistencyReportBank {
 
 
 export class ConsistencyReport {
+
+  cash: CheckResults
 
   invoices: CheckResults
 
@@ -96,9 +105,7 @@ export class MonthConsistencyReportBuilder {
 
     console.warn('checkAll')
 
-    await this.cashPayments(yearMonth)
-
-//    return report
+    report.cash = await this.cashPayments(yearMonth)
 
     report.invoices = await this.invoiceChecks(yearMonth)
 
@@ -328,7 +335,9 @@ export class MonthConsistencyReportBuilder {
   }
 
 
-  async cashPayments(yearMonth: YearMonth): Promise<any> {
+  async cashPayments(yearMonth: YearMonth): Promise<CheckResults> {
+
+    let result = new CheckResults()
 
     let start = yearMonth.startDate()
 
@@ -370,6 +379,9 @@ export class MonthConsistencyReportBuilder {
         let paysToReduce = cashPays
         for (let pay of paysToReduce) {
           pay.noDecl = pay.amount
+
+          result.addMsg(`noDecl ${pay.noDecl} for ${order.for}`, order)
+
           paysToUpdate.push(pay)
           totalNoDeclare += pay.noDecl
         }
@@ -378,8 +390,11 @@ export class MonthConsistencyReportBuilder {
 
     var payUpdateRes = await this.alteaDb.updatePayments(paysToUpdate, ['noDecl'])
 
+    console.log(payUpdateRes)
     console.log(orders)
     console.log(totalNoDeclare)
+
+    return result
   }
 
 

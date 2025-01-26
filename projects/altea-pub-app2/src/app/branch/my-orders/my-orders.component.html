@@ -8,17 +8,21 @@
 
 
             <div class="row">
-                <div class="col-4">{{order.startDate | date:"dd/MM/yyyy HH:mm"}}
+                <div class="col-4">{{order.startDate | date:"dd/MM/yy HH:mm"}}<br>
+                    <i *ngIf="order.stateIcon()" [style.color]="order.stateColor()" [class]="order.stateIcon()"></i>
+                    &nbsp;
+                    <span style="font-size: smaller;">{{'enums.order-state.' + order.state | translate}}</span>
+                    
+                    
 
-
-
+                   <!--  {{order.state}} -->
                 </div>
                 <div class="col-8">
 
                     <ng-container *ngIf="order.lines">
                         <span *ngFor="let line of order.lines"><i>{{line.descr}}</i><br></span>
                     </ng-container>
-                   
+
 
                 </div>
 
@@ -29,33 +33,34 @@
                 <div class="row" *ngIf="order.start && order.start > nowNum">
 
                     <div class="col d-flex justify-content-end">
-    
+
                         <button type="button" class="btn btn-primary btn-sm me-3" (click)="checkCancel(order)"
                             translate>dic.cancel</button>
-    
+
                         <button type="button" class="btn btn-primary btn-sm" (click)="moveOrder(order)"
                             translate>dic.move</button>
-    
+
                     </div>
-    
+
                 </div>
-    
+
                 <div class="row my-3" *ngIf="order.id == curOrder?.id">
-    
+
                     <div class="col" *ngIf="mode == 'cancel'"></div>
-    
-    
+
+
                     <div class="col" *ngIf="mode == 'cancel' && cancelChecks">
-    
+
                         {{'enums.cancel-order-message.' + cancelChecks.message | translate }}
-    
+
                         <ng-container *ngIf="cancelChecks.message == 'possible'">
-    
-                            <button type="button" class="btn btn-danger" (click)="confirmCancel(order)">Confirmeer annulatie</button>
+
+                            <button type="button" class="btn btn-danger" (click)="confirmCancel(order)">Confirmeer
+                                annulatie</button>
                         </ng-container>
-    
-    
-    
+
+
+
                     </div>
                 </div>
 

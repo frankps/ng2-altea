@@ -414,7 +414,7 @@ export class OrderLine extends ObjectWithIdPlus {
   @Type(() => Number)
   unit = 0;
 
-  /** custom price: unit price entered manually */
+  /** custom price: unit price entered manually or vatPct changed */
   cust: boolean = false
 
   @Type(() => Number)
@@ -847,7 +847,7 @@ export class OrderLine extends ObjectWithIdPlus {
   }
 
 
-  
+
   /**
    * 
    * @returns this.incl

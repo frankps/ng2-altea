@@ -16,7 +16,7 @@ export class HtmlTable {
     }
 
 
-    toString(): string {
+    toHtmlString(): string {
 
 
 

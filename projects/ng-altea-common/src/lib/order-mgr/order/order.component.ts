@@ -57,6 +57,8 @@ export class OrderComponent implements OnInit {
   // payment currently in edit
   editPay: Payment
 
+  accountingFrozenUntil: Date
+
   constructor(protected orderMgrSvc: OrderMgrUiService, protected sessionSvc: SessionService, protected stripeSvc: ObjectService,
     protected resourceSvc: ResourceService, protected translationSvc: TranslationService) {
 
@@ -83,6 +85,10 @@ export class OrderComponent implements OnInit {
         break
 
     }
+
+    let branch = await this.sessionSvc.branch$()
+    this.accountingFrozenUntil = branch.accountingClosedUntil()
+    console.log(this.accountingFrozenUntil)
 
     await this.translationSvc.translateEnum(OrderState, 'enums.order-state.', this.orderStates)
 
@@ -315,6 +321,19 @@ export class OrderComponent implements OnInit {
       return 'btn-primary'
     else
       return 'btn-secondary'
+  }
+
+  canEditPayment(pay: Payment) {
+
+    if (pay.bankTxId)
+      return false
+
+
+    let payDate = pay.dateTyped
+    if (payDate && payDate < this.accountingFrozenUntil)
+      return false
+    
+    return true
   }
 
 

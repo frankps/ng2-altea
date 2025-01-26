@@ -10,8 +10,8 @@
 
         <h5>Invoices & gifts to invoice</h5>
 
-        <div class="row ms-3" *ngFor="let msg of report.invoices.msg">
-            <div class="col">{{msg}}</div>
+        <div class="row ms-3" *ngFor="let result of report.invoices.results">
+            <div class="col">{{result.msg}}</div>
         </div>
     </ng-container>
 
@@ -20,8 +20,17 @@
 
         <h5>Gifts (gift.decl=true for invoiced purcahe orders)</h5>
 
-        <div class="row ms-3" *ngFor="let msg of report.gifts.msg">
-            <div class="col">{{msg}}</div>
+        <div class="row ms-3" *ngFor="let result of report.gifts.results">
+            <div class="col">{{result.msg}}</div>
+        </div>
+    </ng-container>
+
+    <ng-container *ngIf="report.cash">
+
+        <h5>No declares</h5>
+
+        <div class="row ms-3" *ngFor="let result of report.cash.results">
+            <div class="col">{{result.msg}} <a [routerLink]="['/aqua/orders/manage',result.order.id]">Open {{result.order.for}}</a> </div>
         </div>
     </ng-container>
 
@@ -76,7 +85,10 @@
 
     <button type="button" class="btn btn-primary btn-sm mx-2" (click)="closeNextMonth()">Sluit {{getNextMonth()}}</button>
 
+    <button type="button" class="btn btn-primary btn-sm mx-2" (click)="calculateCustomMonth()">Bereken</button>
+
 </ng-container>
+
 
 <ng-container *ngIf="closeResult">
 
@@ -110,4 +122,13 @@
 <h4>Maand rapport</h4>
 <button type="button" class="btn btn-primary btn-sm me-2" (click)="showReportMonths()">Okt</button>
 
-<div *ngIf="htmlReport" [outerHTML]="htmlReport"></div>
+<div *ngIf="htmlReport" [innerHTML]="htmlReport"></div>
+
+
+<h4>Kwartaal rapport</h4>
+
+<button type="button" class="btn btn-primary btn-sm me-2" (click)="showTaxReport()">Aangifte</button>
+
+<button type="button" class="btn btn-primary btn-sm me-2" (click)="showIncomeReport()">Inkomsten</button>
+
+<div *ngIf="customReport" [innerHTML]="customReport"></div>

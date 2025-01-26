@@ -39,8 +39,18 @@ export class YearMonth {
 
     next(): YearMonth {
 
+        return this.add(1)
+        /*
         let start = this.startDate()
         let startNextMonth = dateFns.addMonths(start, 1)
+
+        return YearMonth.fromDate(startNextMonth) */
+    }
+
+    add(months: number): YearMonth {
+
+        let start = this.startDate()
+        let startNextMonth = dateFns.addMonths(start, months)
 
         return YearMonth.fromDate(startNextMonth)
     }

@@ -7,7 +7,7 @@ import * as _ from "lodash";
 import { NgxSpinnerService } from "ngx-spinner"
 import { DashboardService } from 'ng-common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { Branch } from 'ts-altea-model';
+import { Branch, ReportMonth, ReportMonths } from 'ts-altea-model';
 import { NgZone } from '@angular/core';
 
 @Component({
@@ -26,6 +26,7 @@ export class OrderCheckComponent implements OnInit {
 
 
   htmlReport: SafeHtml
+  customReport: SafeHtml
 
   branch: Branch
 
@@ -63,6 +64,13 @@ export class OrderCheckComponent implements OnInit {
 
   calcMonthLog: MonthClosingUpdate[] = []
 
+  private getClosedYearMonth(): YearMonth {
+    let closed = this.branch.acc.closed
+
+    let yearMonth = new YearMonth(closed.year, closed.month)
+
+    return yearMonth
+  }
 
   private getNextYearMonth(): YearMonth {
     let closed = this.branch.acc.closed
@@ -110,6 +118,27 @@ export class OrderCheckComponent implements OnInit {
     console.log(res)
 
   }
+
+
+  async calculateCustomMonth() {
+
+    console.log('calculateCustomMonth')
+
+    let yearMonth = new YearMonth(2024, 10)
+
+    this.spinner.show()
+
+
+    let closedYearMonth = this.getClosedYearMonth()
+
+    let monthClosing = new MonthClosing(this.objSvc)
+    let branchId = this.sessionSvc.branchId
+    this.closeResult = await monthClosing.calculateMonth(branchId, yearMonth, closedYearMonth)
+
+    this.spinner.hide()
+
+  }
+
 
   async calcMonth(year, month) {
 
@@ -198,6 +227,8 @@ export class OrderCheckComponent implements OnInit {
 
     let me = this
 
+    me.htmlReport = ''
+
     let alteaDb = new AlteaDb(this.objSvc)
 
     let branchId = me.sessionSvc.branchId
@@ -205,9 +236,57 @@ export class OrderCheckComponent implements OnInit {
 
     let htmlTable = months.toHtmlTable()
 
-    me.htmlReport = this.sanitizer.bypassSecurityTrustHtml(htmlTable.toString())
+    let htmlToShow = htmlTable.toHtmlString()
+
+    me.htmlReport = this.sanitizer.bypassSecurityTrustHtml(htmlToShow)
 
     console.log(months)
+
+  }
+
+  async getReportMonths() : Promise<ReportMonths> {
+
+    let me = this
+
+    let alteaDb = new AlteaDb(this.objSvc)
+
+    let branchId = me.sessionSvc.branchId
+
+    let from = new YearMonth(2024, 10)
+    let to = from.add(2)
+
+    let reportMonths = await alteaDb.getReportMonthsPeriod(branchId, from, to, true)
+
+    return reportMonths
+  }
+
+  async showTaxReport() {
+    
+    let me = this
+
+    me.customReport = ''
+
+    let reportMonths = await this.getReportMonths()
+
+    let htmlTable = reportMonths.taxReport()
+    let htmlString = htmlTable.toHtmlString()
+
+    me.customReport = this.sanitizer.bypassSecurityTrustHtml(htmlString)
+
+  }
+
+  async showIncomeReport() {
+    
+    let me = this
+
+    me.customReport = ''
+
+    let reportMonths = await this.getReportMonths()
+
+    let htmlTable = reportMonths.incomeReport()
+    let htmlString = htmlTable.toHtmlString()
+
+    me.customReport = this.sanitizer.bypassSecurityTrustHtml(htmlString)
 
   }
 

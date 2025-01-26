@@ -126,7 +126,7 @@ export class OrderCronJobs {
 
         } finally {
 
-            msg.body = html.toString()
+            msg.body = html.toHtmlString()
 
             if (orderCount > 0)
                 await me.sendMessage(msg)

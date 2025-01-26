@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { PaymentService } from 'ng-altea-common';
+import { PaymentService, SessionService } from 'ng-altea-common';
 import { Payment, PaymentType } from 'ts-altea-model';
 import { ArrayHelper, DateHelper, DbQuery, QueryOperator, Translation } from 'ts-common';
 import * as _ from "lodash";
@@ -64,11 +64,16 @@ export class PaymentsComponent implements OnInit {
 
   init = false
 
-  constructor(protected paySvc: PaymentService, private translationSvc: TranslationService, public dashboardSvc: DashboardService) {
+  accountingFrozenUntil: Date
+
+  constructor(protected paySvc: PaymentService, private translationSvc: TranslationService, public dashboardSvc: DashboardService, public sessionSvc: SessionService) {
 
   }
 
   async ngOnInit() {
+
+    let branch = await this.sessionSvc.branch$()
+    this.accountingFrozenUntil = branch.accountingClosedUntil()
 
     await this.translationSvc.translateEnum(PaymentType, 'enums.pay-type.', this.paymentTypes)
 
@@ -87,6 +92,20 @@ export class PaymentsComponent implements OnInit {
     await this.refreshPayments(value)
 
 
+  }
+
+
+  canEditPayment(pay: Payment) {
+
+    if (pay.bankTxId)
+      return false
+
+
+    let payDate = pay.dateTyped
+    if (payDate && payDate < this.accountingFrozenUntil)
+      return false
+    
+    return true
   }
 
   async savePayment(payment: Payment) {

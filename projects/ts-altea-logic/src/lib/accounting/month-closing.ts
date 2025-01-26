@@ -87,7 +87,101 @@ export class MonthClosing {
             this.alteaDb = new AlteaDb(db)
     }
 
+    async calculateMonth(branchId: string, yearMonth: YearMonth, closedUntil: YearMonth): Promise<MonthClosingResult> {
 
+        let me = this
+
+        let from = yearMonth.startDate()
+        let to = yearMonth.endDate() // dateFns.addDays(from, 1)
+
+        let fromNum = DateHelper.yyyyMMddhhmmss(from)
+        let toNum = DateHelper.yyyyMMddhhmmss(to)
+
+        let reportMonth = new ReportMonth(branchId, branchId, yearMonth.y, yearMonth.m)
+
+        let lastId = null
+        let take = 50
+        let ordersProcessed = 0
+
+        let orders = await me.alteaDb.getOrdersWithPaymentsBetween(from, to, lastId, take)
+        console.log(orders)
+
+
+        let result = new MonthClosingResult()
+        let objectsToUpdate = new MonthClosingUpdates()
+        let fixIssues = true
+
+        while (ArrayHelper.NotEmpty(orders)) {
+            let ordersInBatch = orders.length
+
+            me.inProgress(`Start processing ${ordersInBatch} new orders. (${ordersProcessed} processed) `)
+
+            for (let order of orders) {
+
+                order.sortPayments()
+            
+                let orderCheck = me.checkOrder(order, objectsToUpdate, fixIssues)   // closedUntil
+                result.checks.push(orderCheck)
+
+                me.calculateOrderTaxes(order, objectsToUpdate, closedUntil)
+
+                me.addOrderToMonthReport(order, reportMonth, yearMonth, fromNum, toNum)
+
+                lastId = order.id
+            }
+
+            ordersProcessed += ordersInBatch
+
+            await me.updateDatabase(objectsToUpdate)
+
+            if (ordersInBatch == take) {
+                orders = await me.alteaDb.getOrdersWithPaymentsBetween(from, to, lastId, take)
+                console.log(orders)
+            } else {
+                let msg = `No more orders (last query retrieved less -${ordersInBatch}- then requested -${take}-)`
+                console.log(msg)
+                me.inProgress(`Start processing ${ordersInBatch} new orders. (${ordersProcessed} processed) `)
+                break
+            }
+        }
+
+        await me.saveReportMonth(reportMonth)
+       // await me.alteaDb.updateReportMonth(reportMonth)
+
+        console.log(orders)
+
+        return result
+    }
+
+
+    async saveReportMonth(reportMonth: ReportMonth) {
+        let me = this
+
+        let latestTrue = false
+        let latestMonths = await this.alteaDb.getReportMonthsForMonth(reportMonth.branchId, reportMonth.year, reportMonth.month, latestTrue)
+
+        let newVersion = 1
+
+        if (ArrayHelper.NotEmpty(latestMonths)) {
+            newVersion = latestMonths[0].version + 1
+
+            for (let rep of latestMonths) {
+                rep.latest = false
+                rep.act = false
+            }
+
+            let res = await this.alteaDb.updateReportMonths(latestMonths, ['latest', 'act'])
+            console.log(res)
+        }
+
+        reportMonth.latest = true
+        reportMonth.version = newVersion
+
+        let createRes = await me.alteaDb.createReportMonth(reportMonth)
+        console.log(createRes)
+
+        return reportMonth
+    }
 
     calculateOrder(order: Order) {
 
@@ -150,7 +244,7 @@ export class MonthClosing {
                 if (line.product) {
                     let product = line.product
 
-                    if (line.vatPct != product.vatPct) {
+                    if (!line.cust && line.vatPct != product.vatPct) {
                         orderCheck.add(OrderCheckItemType.lineVatPctMismatch, `line: ${line.vatPct} <> product ${product.vatPct}`)
 
                         if (fix) {
@@ -269,7 +363,7 @@ export class MonthClosing {
 
     calculateOrderTaxes(order: Order, objectsToUpdate: MonthClosingUpdates, closedUntil: YearMonth) {
         let me = this
-        
+
         let orderChanged = false
         let orderPropsToUpdate = []
 
@@ -286,7 +380,7 @@ export class MonthClosing {
                 order.markAsUpdated('tax')
             }
 
-            
+
         }
 
         if (ArrayHelper.NotEmpty(order.m.f)) { // check if there are updated fields 
@@ -322,8 +416,9 @@ export class MonthClosing {
      */
     shouldDeclareTax(order: Order): boolean {
 
+        /*
         if (!order || !order.tax || !order.tax.hasLines())
-            return false
+            return false   */
 
         if (order.invoiced)
             return false
@@ -347,6 +442,12 @@ export class MonthClosing {
             for (let pay of paymentsInPeriod) {
                 month.increaseInc(pay.type, pay.amount)
             }
+
+            let orderNoDecl = _.sumBy(paymentsInPeriod, 'noDecl')
+
+            if (orderNoDecl)
+                month.noDecl = _.round(month.noDecl + orderNoDecl, 2)
+
         }
 
         if (this.shouldDeclareTax(order)) {
@@ -357,6 +458,8 @@ export class MonthClosing {
                 month.addTax(taxLine)
             }
         }
+
+
     }
 
     inProgress(msg: string) {
@@ -364,86 +467,6 @@ export class MonthClosing {
     }
 
 
-    async calculateMonth(branchId: string, yearMonth: YearMonth, closedUntil: YearMonth): Promise<MonthClosingResult> {
-
-        let me = this
-
-        let from = yearMonth.startDate()
-        let to = yearMonth.endDate() // dateFns.addDays(from, 1)
-
-        let fromNum = DateHelper.yyyyMMddhhmmss(from)
-        let toNum = DateHelper.yyyyMMddhhmmss(to)
-
-        let reportMonth = await me.alteaDb.getReportMonth(branchId, yearMonth.y, yearMonth.m)
-
-        if (!reportMonth) {
-            reportMonth = new ReportMonth(branchId, branchId, yearMonth.y, yearMonth.m)
-
-            await me.alteaDb.createReportMonth(reportMonth)
-        }
-
-        reportMonth.reset()
-
-
-        let lastId = null
-        let take = 50
-        let ordersProcessed = 0
-
-        let orders = await me.alteaDb.getOrdersWithPaymentsBetween(from, to, lastId, take)
-        console.log(orders)
-
-
-
-
-        let result = new MonthClosingResult()
-        let objectsToUpdate = new MonthClosingUpdates()
-        let fixIssues = true
-
-        while (ArrayHelper.NotEmpty(orders)) {
-            let ordersInBatch = orders.length
-
-            me.inProgress(`Start processing ${ordersInBatch} new orders. (${ordersProcessed} processed) `)
-
-            for (let order of orders) {
-
-                order.sortPayments()
-                //        console.log(`${order.id}: ${order.incl}`)
-                // me.calculateOrder(order)
-
-                let orderCheck = me.checkOrder(order, objectsToUpdate, fixIssues)   // closedUntil
-                result.checks.push(orderCheck)
-
-                me.calculateOrderTaxes(order, objectsToUpdate, closedUntil)
-
-                me.addOrderToMonthReport(order, reportMonth, yearMonth, fromNum, toNum)
-
-                lastId = order.id
-            }
-
-            ordersProcessed += ordersInBatch
-
-            await me.updateDatabase(objectsToUpdate)
-
-            if (ordersInBatch == take) {
-                orders = await me.alteaDb.getOrdersWithPaymentsBetween(from, to, lastId, take)
-                console.log(orders)
-            } else {
-                let msg = `No more orders (last query retrieved less -${ordersInBatch}- then requested -${take}-)`
-                console.log(msg)
-                me.inProgress(`Start processing ${ordersInBatch} new orders. (${ordersProcessed} processed) `)
-                break
-            }
-        }
-
-        await me.alteaDb.updateReportMonth(reportMonth)
-
-
-
-        console.log(orders)
-
-        return result
-
-    }
 
 
 

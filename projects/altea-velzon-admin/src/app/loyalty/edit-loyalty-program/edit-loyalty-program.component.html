@@ -39,6 +39,8 @@
         <ng-container readonly>
             <!-- <div>{{ object.descr }}</div> -->
 
+
+
             <div class="row">
                 <div class="col-6"> <ngx-altea-label-value label="objects.loyalty.program.name"
                         [value]="object.name"></ngx-altea-label-value> </div>
@@ -182,6 +184,18 @@
             <form #generalForm="ngForm">
 
 
+                <div class="row">
+                    <div class="col d-flex justify-content-end">
+    
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="act" name="act"
+                                [(ngModel)]="object.act" />
+                            <label class="form-check-label" for="act" translate="objects.act"></label>
+                        </div>
+    
+    
+                    </div>
+                </div>
 
                 <div class="row">
                     <div class="col-4">

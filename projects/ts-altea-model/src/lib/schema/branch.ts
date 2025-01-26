@@ -31,7 +31,7 @@ export class DepositTerm {
 
 export class CommunicationConfig {
 
-    
+
     footer?: string
 
 
@@ -84,7 +84,7 @@ export class ProdSalesShipping {
 }
 
 /** Configuration for product sales: shipping */
-export class ProdSalesConfig {  
+export class ProdSalesConfig {
 
     pickup: ProdSalesPickup = new ProdSalesPickup()
 
@@ -119,7 +119,7 @@ export class AccountingConfig {
 
 export class Branch extends ObjectWithIdPlus {
 
-    orders?: Order[];  
+    orders?: Order[];
 
     @Type(() => Number)
     idx = 0
@@ -212,8 +212,8 @@ export class Branch extends ObjectWithIdPlus {
 
     // 
     //nextDayTerm: number = 5
-    
-    getMaxDepositWaitTimeInHours(days: number) : number {
+
+    getMaxDepositWaitTimeInHours(days: number): number {
 
         // if nothing configured, then 2 hours
         if (ArrayHelper.IsEmpty(this?.depositTerms))
@@ -277,6 +277,19 @@ export class Branch extends ObjectWithIdPlus {
 
         console.error(term)
         console.warn(this?.depositTerms)
+    }
+
+
+
+    accountingClosedUntil() : Date {
+
+        if (!this.acc.closed)
+            return new Date(2000, 0, 1)
+
+        let startMonth = new Date(this.acc.closed.year, this.acc.closed.month - 1, 1)
+        let endMonth = dateFns.addMonths(startMonth, 1)
+
+        return endMonth
     }
 
 }

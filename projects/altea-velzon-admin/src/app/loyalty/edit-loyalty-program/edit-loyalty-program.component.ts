@@ -67,7 +67,7 @@ export class EditLoyaltyProgramComponent extends NgEditBaseComponent<LoyaltyProg
       , loyaltyProgramSvc
       , router, route, spinner, dashboardSvc)
 
-    this.sectionProps.set('general', ['name', 'track', 'incl', 'excl', 'prod', 'svc_basic', 'svc_bundle', 'svc_subs', 'promo', 'idx'])  // , 'prod', 'svc_basic', 'svc_bundle', 'svc_subs', 'promo'
+    this.sectionProps.set('general', ['act', 'name', 'track', 'incl', 'excl', 'prod', 'svc_basic', 'svc_bundle', 'svc_subs', 'promo', 'idx'])  // , 'prod', 'svc_basic', 'svc_bundle', 'svc_subs', 'promo'
     this.sectionProps.set('rewards', ['rewards'])  // , 'prod', 'svc_basic', 'svc_bundle', 'svc_subs', 'promo'
 
     // this.translationSvc.translateEnum(Gender, 'enums.gender.', this.gender)
