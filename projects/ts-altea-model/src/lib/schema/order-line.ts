@@ -485,7 +485,7 @@ export class OrderLine extends ObjectWithIdPlus {
         }
       }
 
-      if (!Array.isArray(optionValues) || optionValues.length == 0)
+      if (ArrayHelper.IsEmpty(optionValues))
         optionValues = option.getDefaultValues()
 
       if (optionValues) {
@@ -547,6 +547,9 @@ export class OrderLine extends ObjectWithIdPlus {
           console.error('dependent product not loaded!')
           continue
         }
+
+        if (ArrayHelper.IsEmpty(item.options))
+          continue
 
         for (let productItemOption of item.options) {
 
@@ -1005,7 +1008,7 @@ export class OrderLine extends ObjectWithIdPlus {
   }
 
   promotions(): PriceChange[] {
-    
+
     if (!this.hasPriceChanges())
       return []
 

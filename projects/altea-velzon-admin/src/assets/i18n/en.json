@@ -380,6 +380,10 @@
         "custom": "Definieer zelf een aangepaste bezetting"
       }
     },
+    "prod-opt-dur-mode": {
+      "add": "Toevoegen aan totale duurtijd",
+      "custom": "Definieer zelf een aangepaste bezetting (sectie Resources)"
+    },
     "duration-reference": {
       "start": "het begin van deze dienst",
       "end": "het einde van deze dienst",
@@ -1142,6 +1146,7 @@
       "multiSelect": "Er kan meer dan 1 waarde selecteerd worden",
       "persons": "Waarde van deze optie bepaalt aantal personen",
       "hasDuration": "Deze optie heeft een duurtijd",
+      "addDur": "Voeg duurtijd van optie automatisch toe aan totale duurtijd van dienst",
       "hasPrice": "Deze optie heeft een prijs",
       "hasValue": "Deze optie heeft een waarde",
       "hasFormula": "Deze optie heeft een formule",
@@ -1169,6 +1174,9 @@
       "prepOverlap": "Voorbereiding & opkuis overlappen elkaar",
       "flex": "Flexibele start (bij duo's)",
       "flexAfter": "Start na vorige inplanning",
+      "optionDur": "Voeg tijden van opties toe",
+      "optionIds": "Product opties",
+      "back": "Tel terug (vanaf referentiepunt)",
       "help": {
         "offset": "Je kan ervoor kiezen om de bezetting van deze resource niet exact te laten aanvangen vanaf het begin of einde (bovenstaande keuze), maar wel met een correctie (in minuten)",
         "duration": "Gedurende deze tijd (minuten) wordt de resource bezet gehouden",

@@ -152,6 +152,9 @@ export class AppComponent implements OnInit {
     await this.resourceSvc.initCache(typeInfos)
     this.objectSvc.typeCaches.set(Resource, this.resourceSvc)
 
+    
+
+
     const loyaltyProgramQry = new DbQuery()
     loyaltyProgramQry.and('branchId', QueryOperator.equals, branchId)
     //loyaltyProgramQry.include('groups.group', 'schedules:orderBy=idx.planning', 'children.child', 'user')

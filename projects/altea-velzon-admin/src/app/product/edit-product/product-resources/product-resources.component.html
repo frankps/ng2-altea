@@ -21,7 +21,7 @@
                         *ngIf="sectionInEdit() && mode === ListSectionMode.edit && idx === idxEdit; else readOnlyItem">
 
 
-                        <ngx-altea-edit-product-resource [object]="objEdit" [resources]="resources"
+                        <ngx-altea-edit-product-resource [object]="objEdit" [product]="product" [resources]="resources"
                             [durationMode]="durationMode" [durationReference]="durationReference"
                             [branchSchedules]="branchSchedules" (cancel)="cancelItemEdit()"
                             (save)="acceptItemEdit(objEdit, idx)"></ngx-altea-edit-product-resource>
@@ -90,7 +90,7 @@
 
             <li class="list-group-item" *ngIf="mode === ListSectionMode.createNew">
 
-                <ngx-altea-edit-product-resource [isNew]="true" [object]="objNew" [resources]="resources"
+                <ngx-altea-edit-product-resource [isNew]="true" [object]="objNew" [product]="product" [resources]="resources"
                     [durationMode]="durationMode" [durationReference]="durationReference"
                     [branchSchedules]="branchSchedules" (cancel)="cancelAdd()"
                     (save)="addToList()"></ngx-altea-edit-product-resource>

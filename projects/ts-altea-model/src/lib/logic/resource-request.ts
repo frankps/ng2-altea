@@ -29,7 +29,7 @@ export class ResourceRequestItem extends ObjectWithId {
     /** the number of resources that should be allocated from the resourceGroup (or from resources) */
     qty = 1
 
-    /** is preparation time => no actual treatment, but preparations or cleaning */
+    /** is preparation time => no actual treatment, but preparations or cleaning (coming from ProductResource.prep) */
     isPrepTime: boolean = false
     prepOverlap: boolean = false
 

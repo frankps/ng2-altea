@@ -12,6 +12,7 @@ export class EditProductResourceComponent {
 
   @Input() isNew = false
   @Input() object: ProductResource
+  @Input() product: Product
   @Input() resources: Resource[]
   @Input() branchSchedules: Schedule[]
 
@@ -32,6 +33,7 @@ export class EditProductResourceComponent {
   }
 
   _cancel() {
+    console.log(this.product)
     this.cancel.emit()
   }
 

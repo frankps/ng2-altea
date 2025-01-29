@@ -172,6 +172,9 @@ export class CreateResourceRequest {
 
                     const offsetDuration = this.getDuration(orderLine, product, productResource)
 
+                    if (offsetDuration.duration.seconds == 0)
+                        continue
+
                     const resReqItem = new ResourceRequestItem(orderLine, product, resource.type!)
 
                     if (!resource)  // not sure if this is needed
@@ -312,7 +315,7 @@ export class CreateResourceRequest {
 
         let newItems: ResourceRequestItem[] = []
 
-        
+
 
         for (let item of resourceRequest.items) {
 
@@ -330,7 +333,7 @@ export class CreateResourceRequest {
                     let clonedItem = item.clone()
 
                     if (item.orderLine?.persons?.length >= i) {
-                        clonedItem.personId = item.orderLine.persons[i -1]
+                        clonedItem.personId = item.orderLine.persons[i - 1]
                     }
 
                     newItems.push(clonedItem)
@@ -385,6 +388,16 @@ export class CreateResourceRequest {
         return activeScheduleIds
     }
 
+    getDurationOfOptionIds(optionIds: string[], line: OrderLine): number {
+
+        if (!line || ArrayHelper.IsEmpty(optionIds))
+            return 0
+
+        const optionValuesWithDurations = line.allOptionValues(optionIds)
+        const optionDuration = _.sumBy(optionValuesWithDurations, 'dur')
+      
+        return optionDuration
+    }
 
     getDuration(line: OrderLine, product: Product, productResource: ProductResource): OffsetDuration {
 
@@ -401,24 +414,50 @@ export class CreateResourceRequest {
         if (product.hasPost)
             productDuration.addMinutes(product.postTime)
 
+
+        /*
+        
+        // OLD LOGIC
+
         const optionValues = line.allOptionValues()
 
         const optionDuration = _.sumBy(optionValues, 'dur')
 
         productDuration.addMinutes(optionDuration)
+        */
+
+        /** Add duration of option values:
+         *  optionIdsAlwaysInclude = for options having duration and that we always need to include  (hasDuration && addDur)
+         *  specificOptionIds = for specific options (optionDur=true, then look at optionIds) */
 
 
+        //  NEW LOGIC
 
+
+        let optionIdsAlwaysInclude = product.getOptionIds(o => o.hasDuration && o.addDur)
+        
+        let optionAlwaysIncludeDuration = this.getDurationOfOptionIds(optionIdsAlwaysInclude, line)
+
+        productDuration.addMinutes(optionAlwaysIncludeDuration)
 
         let duration = TimeSpan.zero
 
         switch (productResource.durationMode) {
             case DurationMode.product:
 
+
                 duration = duration.add(productDuration)
                 break
             case DurationMode.custom:
                 duration.addMinutes(productResource.duration)
+
+                // If we need to add duration of certain options
+                if (productResource.optionDur && ArrayHelper.NotEmpty(productResource.optionIds)) {
+
+                    let optionDuration = this.getDurationOfOptionIds(productResource.optionIds, line)
+                    duration.addMinutes(optionDuration)
+
+                }
 
                 if (productResource.reference == DurationReference.end)
                     offsetDuration.offset = offsetDuration.offset.add(productDuration)
@@ -426,10 +465,16 @@ export class CreateResourceRequest {
                 if (productResource.offset)
                     offsetDuration.offset.addMinutes(productResource.offset)
 
+                if (productResource.back) {
+                    offsetDuration.offset = offsetDuration.offset.subtract(duration)
+                }
+
                 break
 
 
         }
+
+
 
         offsetDuration.duration = duration
 

@@ -15,7 +15,7 @@
                     (change)="parent.multiOptionValueChanged(orderLineOption, value, $event.target['checked'])" />
                 <label class="form-check-label" for="value_{{value.id}}">{{value.name}}</label>
 
-                <span class="float-end">{{value.prc}} {{parent.sessionSvc.currencySymbol}}</span>
+                <span class="float-end" *ngIf="productOption.hasPrice">{{value.prc}} {{parent.sessionSvc.currencySymbol}}</span>
             </div>
 
 

@@ -1,6 +1,6 @@
 import { Component, ViewChild, OnInit, Input } from '@angular/core';
 import { ProductService, PriceService, ProductResourceService, ProductOptionService, SessionService, ProductOptionValueService } from 'ng-altea-common'
-import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ProductOptionValue, FormulaTerm, ProductOptionPreview } from 'ts-altea-model'
+import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ProductOptionValue, FormulaTerm, ProductOptionPreview, ProductOptionDurationMode } from 'ts-altea-model'
 import { DashboardService, FormCardSectionEventData, NgEditBaseComponent, ToastType, TranslationService } from 'ng-common'
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxModalComponent, DeleteModalComponent } from 'ng-common';
@@ -40,7 +40,7 @@ export class ProductOptionsComponent implements OnInit {
       }
 
       this.optionChanges = new CollectionChangeTracker<ProductOption>(value.options, ProductOption, {
-        propsToUpdate: ['name', 'short', 'required', 'multiSelect', 'persons', 'hasDuration', 'hasValue', 'hasPrice', 'pvt', 'hasFormula', 'formula', 'prev'],
+        propsToUpdate: ['name', 'short', 'required', 'multiSelect', 'persons', 'hasDuration', 'addDur', 'hasValue', 'hasPrice', 'pvt', 'hasFormula', 'formula', 'prev'],
         propsToRemove: ['values']
       })
     }
@@ -70,12 +70,25 @@ export class ProductOptionsComponent implements OnInit {
 
   formulaTerm = new FormulaTerm()
 
+  durationMode: Translation[] = []  // ProductOptionDurationMode
+
+  init = false
 
   constructor(protected productOptionSvc: ProductOptionService
     , protected productOptionValueSvc: ProductOptionValueService
     , protected sessionSvc: SessionService, protected productSvc: ProductService,
-    public dashboardSvc: DashboardService) {
+    public dashboardSvc: DashboardService, private translationSvc: TranslationService) {
 
+  }
+
+
+  async ngOnInit() {
+    console.warn('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+    console.warn(this.product)
+
+    await this.translationSvc.translateEnum(ProductOptionDurationMode, 'enums.prod-opt-dur-mode.', this.durationMode, false, true)
+
+    this.init = true
   }
 
 
@@ -132,10 +145,7 @@ export class ProductOptionsComponent implements OnInit {
     }
   }
 
-  ngOnInit(): void {
-    console.warn('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-    console.warn(this.product)
-  }
+
 
   sectionInEdit(mode?: ListSectionMode) {
 

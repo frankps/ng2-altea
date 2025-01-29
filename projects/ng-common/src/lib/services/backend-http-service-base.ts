@@ -988,6 +988,13 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
 
     let cacheString = json  // await this.compressToString(json)
     localStorage.setItem(me.urlDifferentiator, cacheString)
+
+  }
+
+
+  clearCache() {
+    let me = this
+    localStorage.removeItem(me.urlDifferentiator)
   }
 
 

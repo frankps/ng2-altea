@@ -45,8 +45,15 @@ export class DetermineReservationOptions {
         const refItem = solution.items[0]
         let possibleStartDates: Date[] = []
 
-        if (refItem.exactStart)
-            possibleStartDates.push(solution.offsetRefDate)
+        if (refItem.exactStart) {
+
+           // Instead: take earliest date
+
+            //solution.
+            let startDate = solution.getMinimumFromDate()
+
+            possibleStartDates.push(startDate)
+        }
         else {
 
             if (refItem.dateRange.from.getTime() == refItem.dateRange.to.getTime()) {

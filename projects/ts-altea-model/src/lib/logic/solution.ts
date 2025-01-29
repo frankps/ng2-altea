@@ -287,6 +287,8 @@ export class Solution extends SolutionItems {
         }
     }
 
+
+
     getSolutionItemForRequestItem(requestId: string) {
 
         const solItem = this.items.find(item => item.request.id == requestId)
@@ -512,6 +514,28 @@ export class Solution extends SolutionItems {
 
         // so we have a floating start => we split the given interval
         return exactSolutions
+    }
+
+
+    getMinimumFromDate(excludePrepTimes: boolean = true) {
+
+        if (ArrayHelper.IsEmpty(this.items))
+            return this.offsetRefDate
+
+        let solutionItems = this.items
+
+        if (excludePrepTimes)
+            solutionItems = this.items.filter(i => !i.request.isPrepTime)
+
+        if (ArrayHelper.IsEmpty(solutionItems))
+            return this.offsetRefDate
+
+        let startDates = solutionItems.map(item => item.dateRange.from)
+
+        let minDate = _.min(startDates)
+
+        return minDate
+
     }
 
 

@@ -25,7 +25,7 @@
                     <label class="form-check-label" [for]="mode.key">{{mode.trans}}<br>
                         <small>{{mode.help}}</small>
                     </label>
-                </div>   
+                </div>
 
             </ngx-altea-label-control>
 
@@ -89,7 +89,7 @@
 
 
     <!-- *ngIf="object?.resource?.type == 'group'" -->
-    
+
     <div class="row mb-3" *ngIf="object?.resource?.isGroup">
 
         <div class="col-6">
@@ -108,13 +108,12 @@
             <div class="form-check form-switch">
                 <input type="checkbox" class="form-check-input" id="groupAlloc" name="groupAlloc"
                     [(ngModel)]="object.groupAlloc">
-                <label class="form-check-label" for="groupAlloc"
-                    translate="objects.prodRes.groupAlloc"></label>
+                <label class="form-check-label" for="groupAlloc" translate="objects.prodRes.groupAlloc"></label>
             </div>
         </div>
 
 
-<!--         <div class="col-6">
+        <!--         <div class="col-6">
 
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="groupAlloc" name="groupAlloc" [(ngModel)]="object.groupAlloc" />
@@ -123,13 +122,12 @@
 
         </div> -->
 
-    </div> 
+    </div>
 
     <div class="row {{css_cls_row}}">
         <div class="col-6">
             <div class="form-check form-switch">
-                <input type="checkbox" class="form-check-input" id="prep" name="prep"
-                    [(ngModel)]="object.prep">
+                <input type="checkbox" class="form-check-input" id="prep" name="prep" [(ngModel)]="object.prep">
                 <label class="form-check-label" for="prep" translate="objects.prodRes.prep"></label>
             </div>
         </div>
@@ -138,8 +136,7 @@
             <div class="form-check form-switch">
                 <input type="checkbox" class="form-check-input" id="prepOverlap" name="prepOverlap"
                     [(ngModel)]="object.prepOverlap">
-                <label class="form-check-label" for="prepOverlap"
-                    translate="objects.prodRes.prepOverlap"></label>
+                <label class="form-check-label" for="prepOverlap" translate="objects.prodRes.prepOverlap"></label>
             </div>
         </div>
     </div>
@@ -147,8 +144,7 @@
     <div class="row {{css_cls_row}}">
         <div class="col-6">
             <div class="form-check form-switch">
-                <input type="checkbox" class="form-check-input" id="flex" name="flex"
-                    [(ngModel)]="object.flex">
+                <input type="checkbox" class="form-check-input" id="flex" name="flex" [(ngModel)]="object.flex">
                 <label class="form-check-label" for="flex" translate="objects.prodRes.flex"></label>
             </div>
         </div>
@@ -157,12 +153,40 @@
             <div class="form-check form-switch" *ngIf="object.flex">
                 <input type="checkbox" class="form-check-input" id="flexAfter" name="flexAfter"
                     [(ngModel)]="object.flexAfter">
-                <label class="form-check-label" for="flexAfter"
-                    translate="objects.prodRes.flexAfter"></label>
+                <label class="form-check-label" for="flexAfter" translate="objects.prodRes.flexAfter"></label>
             </div>
         </div>
     </div>
 
+    <div class="row {{css_cls_row}}">
+        <div class="col-6">
+            <div class="form-check form-switch">
+                <input type="checkbox" class="form-check-input" id="optionDur" name="optionDur"
+                    [(ngModel)]="object.optionDur">
+                <label class="form-check-label" for="optionDur" translate="objects.prodRes.optionDur"></label>
+            </div>
+        </div>
+
+        <div class="col-6">
+           <!--  *ngIf="product" -->
+
+            <ng-select *ngIf="object.optionDur" id="optionIds" name="optionIds" [items]="product?.options" bindLabel="name" bindValue="id"
+                [clearable]="true" [multiple]="true" [(ngModel)]="object.optionIds">
+
+            </ng-select>
+        </div>
+    </div>
+
+    <div class="row {{css_cls_row}}">
+
+        <div class="col-6">
+            <div class="form-check form-switch">
+                <input type="checkbox" class="form-check-input" id="back" name="back" [(ngModel)]="object.back">
+                <label class="form-check-label" for="back" translate="objects.prodRes.back"></label>
+            </div>
+        </div>
+
+    </div>
 
     <div class="row my-3">
 

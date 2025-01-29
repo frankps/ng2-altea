@@ -78,6 +78,10 @@ export class ProductOptionPreview {
   suf: string = ""
 }
 
+export enum ProductOptionDurationMode {
+  add = 'add',        // add to the total duration of the service
+  custom = 'custom'   // define custom resourceOccupations for the product option
+}
 export class ProductOption extends ObjectWithIdPlus {
   productId?: string;
   product?: Product;
@@ -96,6 +100,18 @@ export class ProductOption extends ObjectWithIdPlus {
   persons = false
 
   hasDuration = false
+
+  /* only evaluated is hasDuration=true, then if addDur=true, the duration (of selected product option) is 
+  automatically added to the total service duration.
+  */
+  addDur: boolean = true
+
+  /** In case hasDuration=true, the duration (of selected product option) can be added to the total service duration.
+   *  Or custom resource plannings can be created (custom).
+  
+  durMode: ProductOptionDurationMode = ProductOptionDurationMode.add
+*/
+
   hasPrice = false
 
   hasValue = false
@@ -476,12 +492,12 @@ export class Product extends ObjectWithIdPlus {
     let now = new Date()
 
 
-   // console.log(this.prices)
+    // console.log(this.prices)
 
     let idx = this.prices.findIndex(p => p.act && p.isPromo && !p.giftOpt && (!p.hasDates || (p.startDate <= now && now <= p.endDate)))
 
 
-   // console.log(idx)
+    // console.log(idx)
 
     return idx >= 0
   }
@@ -690,15 +706,32 @@ export class Product extends ObjectWithIdPlus {
   }
 
 
-  getOptionIds(): string[] {
+  getOptionIds(filter?: (input: ProductOption) => boolean): string[] {
 
     if (!this.hasOptions())
       return []
 
-    let optionIds = this.options.map(o => o.id)
+    let options = this.options
+
+    if (filter) {
+      options = options.filter(filter)
+    }
+
+    let optionIds = options.map(o => o.id)
 
     return optionIds
   }
+
+
+/*   getOptionIdsHavingDurations(): string[] {
+
+    if (!this.hasOptions())
+      return []
+
+    let optionIds = this.options.filter(o => o.hasDuration && o.addDur).map(o => o.id)
+
+    return optionIds
+  } */
 
   getOptionValues(optionId: string): ProductOptionValue[] {
 
@@ -733,7 +766,7 @@ export class ProductResource extends ObjectWithIdPlus {
   @Type(() => Resource)
   resource?: Resource;
   idx?: number;
-  durationMode: DurationMode = DurationMode.custom
+  durationMode: DurationMode = DurationMode.product
   reference: DurationReference = DurationReference.start
   offset = 0
   duration = 0
@@ -761,6 +794,22 @@ export class ProductResource extends ObjectWithIdPlus {
 
   /** the second device reservation will be placed AFTER the first if true, otherwise (false) placed BEFORE */
   flexAfter: boolean = true
+
+  /** Durations of selected product options defined in this.optionIds will be added to the duration specified here.
+   * Example: there can be a product option 'coaching' with options 0 mins, 15 mins, 30 mins attached to the service 'BodySlimming session'
+   * The selected option should not make the service 'BodySlimming session' longer, instead it should result in an extra resource planning with a duration matching the
+   * selected product option.
+   */
+  optionDur: boolean = false
+
+  /** see info on optionDur */
+  optionIds?: string[] = []
+
+  /** if true, the duration will be calculated backwards as from this.reference (corrected by offset).
+   *  Imagine a service 'BodySlimming session' with a product-option for doing an intake of 20mins (configure by using this.optionDur), 
+   * then we want to this intake starting 20mins before the starting of this session.  
+   */
+  back: boolean = false
 
 }
 

@@ -18,7 +18,7 @@ import { cartData } from './data';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { DashboardService } from 'ng-common';
-import { SessionService } from 'ng-altea-common';
+import { ProductService, ResourceService, SessionService } from 'ng-altea-common';
 import { AppComponent } from '../../../app.component';
 
 @Component({
@@ -52,7 +52,8 @@ export class TopbarComponent implements OnInit {
 
   constructor(@Inject(DOCUMENT) private document: any, private eventService: EventService, public languageService: LanguageService, private modalService: NgbModal,
     public _cookiesService: CookieService, public translate: TranslateService, private authService: AuthenticationService,
-    private router: Router, private TokenStorageService: TokenStorageService, public dashboardSvc: DashboardService, public sessionSvc: SessionService, protected appComponent: AppComponent) { }
+    private router: Router, private TokenStorageService: TokenStorageService, public dashboardSvc: DashboardService,
+     public sessionSvc: SessionService, protected appComponent: AppComponent, public productSvc: ProductService, public resourceSvc: ResourceService) { }
 
   ngOnInit(): void {
     this.userData = this.TokenStorageService.getUser();
@@ -138,10 +139,20 @@ export class TopbarComponent implements OnInit {
     this.modalService.open(content, { centered: true });
   }
 
+
+  clearCache() {
+    this.productSvc.clearCache()
+    this.resourceSvc.clearCache()
+  }
+
   /**
   * Topbar Light-Dark Mode Change
   */
   changeMode(mode: string) {
+
+
+    this.clearCache()
+
     this.mode = mode;
     this.eventService.broadcast('changeMode', mode);
 
