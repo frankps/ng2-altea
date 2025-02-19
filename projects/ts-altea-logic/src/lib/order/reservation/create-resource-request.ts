@@ -170,7 +170,7 @@ export class CreateResourceRequest {
                     if (!resource)
                         continue
 
-                    const offsetDuration = this.getOffsetDuration(orderLine, product, productResource)
+                    const offsetDuration = this.getOffsetDurationParams(orderLine, product, productResource)
 
                     const defaultDuration = offsetDuration.defaultDuration()
                     if (defaultDuration.seconds == 0)
@@ -223,11 +223,13 @@ export class CreateResourceRequest {
 
                     resReqItem.offsetDuration = offsetDuration.clone()
 
-                    resReqItem.duration2 = offsetDuration.duration
+                 //   resReqItem.duration2 = offsetDuration.duration
 
-                    const offset = personInfo.offset.clone()
+                    const personOffset : TimeSpan = personInfo.offset.clone()
                     // const offset = personOffset.clone()
-                    resReqItem.offset = offset.add(offsetDuration.offset)
+                   
+                   // resReqItem.offset = personOffset.add(offsetDuration.offset)
+                   resReqItem.offsetDuration.addToOffset(personOffset)
 
                     if (productResource.flex) {
 
@@ -238,10 +240,14 @@ export class CreateResourceRequest {
 
                             if (productResource.flexAfter) {
                                 let item = items[0]
-                                resReqItem.offset = item.offset.add(item.duration2)
+                                // resReqItem.offset = item.offset.add(item.duration2)
+                                resReqItem.offsetDuration.offset = item.offsetDuration.offset.add(item.duration())
+
+
                             } else {
                                 let item = items[items.length - 1]
-                                resReqItem.offset = item.offset.subtract(resReqItem.duration2)
+                                //resReqItem.offset = item.offset.subtract(resReqItem.duration2)
+                                resReqItem.offsetDuration.offset = item.offsetDuration.offset.subtract(item.duration())
                             }
                         }
                     }
@@ -403,10 +409,14 @@ export class CreateResourceRequest {
         return optionDuration
     }
 
-    getOffsetDuration(line: OrderLine, product: Product, productResource: ProductResource): OffsetDurationParams {
+    getOffsetDurationParams(line: OrderLine, product: Product, productResource: ProductResource): OffsetDurationParams {
 
-        let useParameters = true
+        let wellnessId = '31eaebbc-af39-4411-a997-f2f286c58a9d'
+
+        let useParameters = (product?.id == wellnessId)  // this should come from a DB setting in future
+
         let productDurationParamId = product.id + '_duration'
+        let productDurationParamUsed = false
 
         const offsetDuration = new OffsetDurationParams()
 
@@ -446,11 +456,6 @@ export class CreateResourceRequest {
         productDuration.addMinutes(optionAlwaysIncludeDuration)
 
 
-
-        if (useParameters) {
-            offsetDuration.defaults.set(productDurationParamId, productDuration.seconds)
-        }
-
         let duration = TimeSpan.zero
 
         switch (productResource.durationMode) {
@@ -458,6 +463,7 @@ export class CreateResourceRequest {
 
                 if (useParameters) {
                     offsetDuration.durationParams.push(productDurationParamId)
+                    productDurationParamUsed = true
                 } else {
                     duration = duration.add(productDuration)
                 }
@@ -477,6 +483,7 @@ export class CreateResourceRequest {
                 if (productResource.reference == DurationReference.end) {
                     if (useParameters) {
                         offsetDuration.offsetParams.push(productDurationParamId)
+                        productDurationParamUsed = true
                     } else {
                         
                         offsetDuration.offset = offsetDuration.offset.add(productDuration)
@@ -497,6 +504,9 @@ export class CreateResourceRequest {
 
         }
 
+        if (productDurationParamUsed) {
+            offsetDuration.defaults.set(productDurationParamId, productDuration)
+        }
 
 
         offsetDuration.duration = duration

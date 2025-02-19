@@ -358,6 +358,10 @@ export class Solution extends SolutionItems {
         }
     }
 
+    hasParamOverrides(): boolean {
+
+        return this.overrides?this.overrides.size > 0:false
+    }
 
 
     getSolutionItemForRequestItem(requestId: string) {

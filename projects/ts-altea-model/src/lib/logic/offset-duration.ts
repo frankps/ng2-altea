@@ -1,12 +1,23 @@
 import { ArrayHelper, ObjectHelper } from "ts-common"
 import { TimeSpan } from "./dates/time-span"
 import { Solution } from "./solution"
-
+import { Type } from "class-transformer";
 
 export class OffsetDuration {
 
+    @Type(() => TimeSpan)
     offset = TimeSpan.zero
+
+    @Type(() => TimeSpan)
     duration = TimeSpan.zero
+
+    addToOffset(timespan: TimeSpan) {
+        this.offset = this.offset.add(timespan)
+    }
+
+    addToDuration(timespan: TimeSpan) {
+        this.duration = this.duration.add(timespan)
+    }
 }
 
 /**
@@ -21,6 +32,7 @@ export class OffsetDurationParams extends OffsetDuration {
     offsetParams: string[] = []
     durationParams: string[] = []
 
+    @Type(() => Map<string, TimeSpan>)
     defaults: Map<string, TimeSpan> = new Map<string, TimeSpan>()
 
     defaultDuration(): TimeSpan {
@@ -40,6 +52,11 @@ export class OffsetDurationParams extends OffsetDuration {
     clone(): OffsetDurationParams {
         let clone = ObjectHelper.clone(this, OffsetDurationParams)
         return clone
+    }
+    
+    hasParams(): boolean {
+
+        return this.defaults?this.defaults.size > 0:false
     }
 
 

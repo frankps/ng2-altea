@@ -31,9 +31,24 @@
                 </ng-container>
             </div>
             <div class="col-2">{{item.personId}}</div>
-            <div class="col-2">{{item.offset.toString()}}</div>
-            <div class="col-2">{{item.duration2.toString()}}</div>
+            <div class="col-2">{{item.offset().toString()}}</div>
+            <div class="col-2">{{item.duration().toString()}}</div>
         </div>
+
+        <ng-container *ngIf="item.offsetDuration.hasParams()">
+            <div class="row">
+                <div class="col-2"><span class="float-end">Params:</span></div>
+                <div class="col-10">
+                    <div class="row" *ngFor="let key of item.offsetDuration.defaults.keys()">
+                        <div class="col-4"><span class="float-end">{{key}}:</span></div>
+                        <div class="col-2">{{item.offsetDuration.defaults.get(key)?.seconds}} sec</div>
+                    </div>
+
+                </div>
+            </div>
+
+        </ng-container>
+
     </ng-container>
 
 </ng-container>

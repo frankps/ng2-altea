@@ -186,7 +186,8 @@
 
             <div class="row">
                 <div class="col-1"></div>
-                <div class="col"><span style="color: red;">{{availability.getSetForResource(resource.id)?.info}}</span></div>
+                <div class="col"><span style="color: red;">{{availability.getSetForResource(resource.id)?.info}}</span>
+                </div>
             </div>
 
             <div class="row" *ngFor="let day of availability.getAvailabilitiesForResource(resource).fromDays()">
@@ -210,14 +211,14 @@
                 <div class="col-1">Plannings:</div>
                 <div class="col">
 
-                    <span class="badge bg-warning text-dark me-2" *ngFor="let planning of planningsForResource(resource.id)"
-                    [cdkCopyToClipboard]="planning.id">
+                    <span class="badge bg-warning text-dark me-2"
+                        *ngFor="let planning of planningsForResource(resource.id)" [cdkCopyToClipboard]="planning.id">
                         {{'enums.planning-type.' + planning.type | translate}}: {{planning.startDate | date:"dd/MM
-                            HH:mm" }} - {{planning.endDate |
-                            date:"dd/MM HH:mm" }}
+                        HH:mm" }} - {{planning.endDate |
+                        date:"dd/MM HH:mm" }}
                     </span>
 
- <!--                    
+                    <!--                    
                
 
                     <div class="row">
@@ -329,13 +330,13 @@
                     <div class="row">
                         <!-- <div class="col-1"></div> -->
                         <div class="col-2">
-                            {{solutionItem.num}}: 
+                            {{solutionItem.num}}:
                             <span class="badge bg-secondary">{{solutionItem.dateRange.from | date:"dd/MM HH:mm"}}</span>
                             - <span class="badge bg-secondary">{{solutionItem.dateRange.to | date:"HH:mm"}}</span>
 
                         </div>
                         <div class="col-2">
-                            {{solutionItem.request.qty}}x  dur={{solutionItem.request.duration2.toString()}}
+                            {{solutionItem.request.qty}}x dur={{solutionItem.request.duration(solution).toString()}}
                         </div>
                         <div class="col-3">
 
@@ -360,6 +361,24 @@
 
             </div>
         </div>
+
+        <div class="row">
+            <ng-container *ngIf="solution.hasParamOverrides()">
+                <div class="row">
+                    <div class="col-2"><span class="float-end">Params:</span></div>
+                    <div class="col-10">
+                        <div class="row" *ngFor="let key of solution.overrides.keys()">
+                            <div class="col-4"><span class="float-end">{{key}}:</span></div>
+                            <div class="col-2">{{solution.overrides.get(key)?.seconds}} sec</div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </ng-container>
+        </div>  
+
+
         <div class="row" *ngFor="let note of solution.notes">
             <div class="col-2">
             </div>

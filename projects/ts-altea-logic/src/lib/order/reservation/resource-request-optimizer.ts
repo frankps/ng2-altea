@@ -284,7 +284,7 @@ export class ResourceRequestOptimizer {
         item.offset = items[0].offset
 
         const seconds = _.sumBy(items, 'duration2.seconds')
-        item.duration2 = new TimeSpan(seconds)
+        item.offsetDuration.duration = new TimeSpan(seconds)
 
         return item
     }

@@ -508,7 +508,7 @@ export class OrderMgmtService {
 
             continue
 
-            const startDate = dateFns.addSeconds(refDate, requestItem.offset.seconds)
+            const startDate = dateFns.addSeconds(refDate, requestItem.offsetInSeconds(solution))
             const endDate = dateFns.addSeconds(startDate, requestItem.durationInSeconds(solution))
 
             const productInfo = new PlanningProductInfo(requestItem.product.name)
@@ -596,7 +596,7 @@ export class OrderMgmtService {
 
         for (let requestItem of resourceRequest.items) {
 
-            const startDate = dateFns.addSeconds(refDate, requestItem.offset.seconds)
+            const startDate = dateFns.addSeconds(refDate, requestItem.offsetInSeconds(solution))
             const endDate = dateFns.addSeconds(startDate, requestItem.durationInSeconds(solution))
             let range = new DateRange(startDate, endDate)
 
@@ -638,7 +638,7 @@ export class OrderMgmtService {
     private requestItemToPlannings(requestItem: ResourceRequestItem, refDate: Date, order: Order, resources: Resource[], solution: Solution): ResourcePlanning[] {
         const plannings: ResourcePlanning[] = []
 
-        const startDate = dateFns.addSeconds(refDate, requestItem.offset.seconds)
+        const startDate = dateFns.addSeconds(refDate, requestItem.offsetInSeconds(solution))
         const endDate = dateFns.addSeconds(startDate, requestItem.durationInSeconds(solution))
 
         const productInfo = new PlanningProductInfo(requestItem.product.name)
