@@ -2,7 +2,7 @@ import { EventType, OrderUi, PlanningType, Resource, ResourcePlanning, ResourceP
 import * as dateFns from 'date-fns'
 import { Unsubscribe } from 'firebase/firestore';
 import { OrderFireFilters, OrderFirestoreService, ResourcePlanningService, ResourceService, SessionService } from "ng-altea-common";
-import { ArrayHelper, DbQueryTyped, QueryOperator } from "ts-common";
+import { ArrayHelper, DateHelper, DbQueryTyped, QueryOperator } from "ts-common";
 import { AlteaDb, AlteaPlanningQueries } from "ts-altea-logic";
 import * as _ from "lodash";
 import { Mutex, MutexInterface, Semaphore, SemaphoreInterface, withTimeout } from 'async-mutex';
@@ -181,7 +181,7 @@ export abstract class CalendarBase {
         let branchId = this.sessionSvc.branchId
 
         var humanResources = await this.resourceSvc.getHumanResourcesInclGroups()
-        humanResources = humanResources.filter(hr => !hr.isGroup && hr.online)
+        humanResources = humanResources.filter(hr => !hr.isGroup && hr.online && (!hr.hasEnd || hr.endDate > start) && (!hr.hasStart || hr.startDate < end))
 
         var humanResourceIds = humanResources.map(hr => hr.id)
 
@@ -216,6 +216,14 @@ export abstract class CalendarBase {
             dateRangeSet.resource = humanResource
 
             var absencesForResource = absencePlannings.filterByResource(humanResource.id).toDateRangeSet()
+
+            /** take into account a possibe start/end date for the resource */
+            if (humanResource.hasEnd && humanResource.end)
+                absencesForResource.addRangeByDates(humanResource.endDate, DateHelper.maxDate)
+
+            if (humanResource.hasStart && humanResource.start)
+                absencesForResource.addRangeByDates(DateHelper.minDate, humanResource.startDate)
+
 
             let availabilitiesForResource = availablePlannings.filterByResource(humanResource.id)
 

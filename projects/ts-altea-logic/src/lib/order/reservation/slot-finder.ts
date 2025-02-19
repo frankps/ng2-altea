@@ -150,7 +150,7 @@ export class SlotFinder {
                 let possibleDateRanges = DateRangeSet.empty
 
                 // we reduce by the duration because we want interval with possible start dates
-                availableRange.increaseToWithSeconds(-firstRequestItem.duration.seconds)
+                availableRange.increaseToWithSeconds(-firstRequestItem.durationInSeconds())
 
                 if (availableRange.to < availableRange.from)
                     continue
@@ -158,7 +158,8 @@ export class SlotFinder {
                 possibleDateRanges.addRanges(availableRange)
 
                 // possibleDateRanges only contains 1 range
-                const solutions = possibleDateRanges.toSolutions(resourceRequest, firstRequestItem, false, set.resource)
+                let durationFixed = false
+                const solutions = possibleDateRanges.toSolutions(resourceRequest, firstRequestItem, false, durationFixed, set.resource)
 
                 for (let solution of solutions) {
                     for (let solItem of solution.items)
@@ -225,8 +226,8 @@ export class SlotFinder {
                 if (!solution.offsetRefDate)
                     throw new Error(`solution.offsetRefDate not set!`)
 
-                const from = dateFns.addSeconds(solution.offsetRefDate, requestItem.offset.seconds)
-                const to = dateFns.addSeconds(from, requestItem.duration.seconds)
+                const from = dateFns.addSeconds(solution.offsetRefDate, requestItem.offsetInSeconds(solution))
+                const to = dateFns.addSeconds(from, requestItem.durationInSeconds(solution))
                 const range = new DateRange(from, to)
 
 
@@ -238,7 +239,8 @@ export class SlotFinder {
 
 
                 if (availableResources.length >= requestItem.qty) {
-                    const solutionItem = new SolutionItem(requestItem, range.clone(), true, ...availableResources)
+                    let durationFixed = false
+                    const solutionItem = new SolutionItem(solution, requestItem, range.clone(), true, durationFixed, ...availableResources)
                     solution.add(solutionItem)
 
                     resultSolutions.add(solution.clone())
@@ -293,9 +295,9 @@ export class SlotFinder {
                     throw new Error(`No reference (start) date available`)
 
 
-                const startFrom = dateFns.addSeconds(refFrom, requestItem.offset.seconds)
-                const startTo = dateFns.addSeconds(refTo, requestItem.offset.seconds)
-                const endsOn = dateFns.addSeconds(startTo, requestItem.duration.seconds)
+                const startFrom = dateFns.addSeconds(refFrom, requestItem.offsetInSeconds(solution))
+                const startTo = dateFns.addSeconds(refTo, requestItem.offsetInSeconds(solution))
+                const endsOn = dateFns.addSeconds(startTo, requestItem.durationInSeconds(solution))
 
                 // const startRange = new DateRange(startFrom, startTo)
                 const checkInRange = new DateRange(startFrom, endsOn)
@@ -334,7 +336,7 @@ export class SlotFinder {
                 if (requestItem.productResource.flex)
                     excludeSolutionOccupation = false
 
-                let availableResources = availability.getAvailabilityOfResourcesInRange(possibleResources, checkInRange, requestItem.duration, solution, excludeSolutionOccupation, false, requestItem.personId)
+                let availableResources = availability.getAvailabilityOfResourcesInRange(possibleResources, checkInRange, requestItem.duration(solution), solution, excludeSolutionOccupation, false, requestItem.personId)
 
                 /*
                     below we check resourceQuantityEquals=1 -> quick fix, because if resource.qty > 1 algo not correct yet!!
@@ -345,7 +347,7 @@ export class SlotFinder {
                 if (availableResources.isEmpty()) {
 
 
-                    solution.addNote(`No availability found for '${resourceNames}' in range ${checkInRange.toString()} for ${requestItem.duration.toString()}`)
+                    solution.addNote(`No availability found for '${resourceNames}' in range ${checkInRange.toString()} for ${requestItem.duration(solution).toString()}`)
 
 
                     // const forDebuggingAgain = availability.getAvailabilityOfResourcesInRange(possibleResources, checkInRange, requestItem.duration, solution, excludeSolutionOccupation, false, requestItem.personId)
@@ -380,12 +382,13 @@ export class SlotFinder {
                         if (this.debug && dateFns.format(availableRange.from, 'HH:mm') == '17:10')
                             console.log(availableRange.from)
 
-                        availableRange.to = dateFns.subSeconds(availableRange.to, requestItem.duration.seconds)
+                        availableRange.to = dateFns.subSeconds(availableRange.to, requestItem.durationInSeconds(solution))
 
                         if (availableRange.to < availableRange.from)
                             continue
 
-                        const solutionItem = new SolutionItem(requestItem, availableRange, false, ...resources)
+                        let durationFixed = false
+                        const solutionItem = new SolutionItem(solution, requestItem, availableRange, false, durationFixed, ...resources)
                         newSolution.add(solutionItem)
                         solutionItem.addNote(`Limiting available range: ${availableRange.toString()}`)
 

@@ -10,7 +10,7 @@ import * as Handlebars from "handlebars"
 import * as sc from 'stringcase'
 import { OrderPersonMgr } from "../order-person-mgr";
 import { CancelOrderMessage } from "ts-altea-logic";
-import { TaxLines, TaxLine, VatLine, Branch, Contact, Currency, DepositMode, Invoice, InvoiceTotals, OrderLine, OrderLineSummary, OrderType, Organisation, Payment, PaymentType, PlanningMode, Product, ProductSubType, ProductType, Resource, ResourcePlanning, Subscription, OrderDeclare } from "ts-altea-model";
+import { TaxLines, TaxLine, VatLine, Branch, Contact, Currency, DepositMode, Invoice, InvoiceTotals, OrderLine, OrderLineSummary, OrderType, Organisation, Payment, PaymentType, PlanningMode, Product, ProductSubType, ProductType, Resource, ResourcePlanning, Subscription, OrderDeclare, OrderLineOption } from "ts-altea-model";
 
 
 //import { numberAttribute } from "@angular/core";
@@ -698,6 +698,18 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
   getLineByProduct(productId: string): OrderLine | undefined {
 
     return this.lines?.find(l => l.productId == productId)
+  }
+
+  getLineOption(productId: string, optionId: string): OrderLineOption | undefined {
+
+    const line = this.getLineByProduct(productId)
+
+    if (!line || ArrayHelper.IsEmpty(line.options))
+      return undefined
+
+    const option = line.options.find(o => o.id == optionId)
+
+    return option
   }
 
   getPaymentsAfter(dateNum: number, excludeTypes?: PaymentType[]): Payment[] {

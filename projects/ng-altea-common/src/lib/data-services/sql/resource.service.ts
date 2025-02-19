@@ -45,7 +45,7 @@ export class ResourceService extends BackendHttpServiceBase<Resource> {
   }
 
 
-  async getByType(type: ResourceType, isGroup: boolean = null, includes?: string[]): Promise<Resource[]> {
+  async getByType(type: ResourceType, isGroup: boolean = null, posOnly: boolean | null = null, includes?: string[]): Promise<Resource[]> {
     const query = new DbQuery()
 
 
@@ -54,19 +54,24 @@ export class ResourceService extends BackendHttpServiceBase<Resource> {
     if (isGroup !== null)
       query.and('isGroup', QueryOperator.equals, isGroup)
 
+    if (posOnly !== null)
+      query.and('pos', QueryOperator.equals, posOnly)
+
     if (includes)
       query.includes = includes
 
+
+    query.orderBy('name')
 
     return this.query$(query)
   }
 
   async getHumanResources(includes?: string[]): Promise<Resource[]> {
-    return this.getByType(ResourceType.human, false, includes)
+    return this.getByType(ResourceType.human, false, true, includes)
   }
 
   async getHumanResourcesInclGroups(includes?: string[]): Promise<Resource[]> {
-    return this.getByType(ResourceType.human, null, includes)
+    return this.getByType(ResourceType.human, null, null, includes)
   }
 
   override async export(): Promise<Resource[]> {
@@ -81,4 +86,4 @@ export class ResourceService extends BackendHttpServiceBase<Resource> {
   }
 
 }
- 
+

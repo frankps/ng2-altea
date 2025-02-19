@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ApiListResult, ApiResult, ArrayHelper, DateHelper, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
-import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, PossibleSlots, Organisation, ResourceAvailability2, ResourcePlanning, ReservationOptionSet } from 'ts-altea-model'
+import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, PossibleSlots, Organisation, ResourceAvailability2, ResourcePlanning, ReservationOptionSet, SolutionItem, OrderLineOptionValue } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { AlteaDb } from '../../general/altea-db'
 import { IDb } from '../../interfaces/i-db'
@@ -34,13 +34,13 @@ export class AvailabilityService {
 
     async process(availabilityRequest: AvailabilityRequest): Promise<AvailabilityResponse> {
 
-//        availabilityRequest.to
+        //        availabilityRequest.to
 
-       
-/*         let nowNum = DateHelper.yyyyMMddhhmmss()
 
-        if (availabilityRequest.from < nowNum)
-            availabilityRequest.from = nowNum */
+        /*         let nowNum = DateHelper.yyyyMMddhhmmss()
+        
+                if (availabilityRequest.from < nowNum)
+                    availabilityRequest.from = nowNum */
 
         console.error('OrderGetPossibleDates.process()', availabilityRequest)
 
@@ -85,7 +85,6 @@ export class AvailabilityService {
         const initialResourceRequests = createResourceRequest.create(availabilityCtx)
         if (availabilityRequest.debug) response.debug.resourceRequests.push(...initialResourceRequests)
 
-
         // const noGroupsResourceRequests = ResourceRequestOptimizer.I.replaceResourceGroupsByChildren(...initialResourceRequests)
         // if (availabilityRequest.debug) response.debug.resourceRequests.push(...noGroupsResourceRequests)
 
@@ -118,6 +117,7 @@ export class AvailabilityService {
     }
 
 
+
     /**
      * 
      * @param availabilityRequest 
@@ -126,6 +126,8 @@ export class AvailabilityService {
      */
     doPricing(availabilityRequest: AvailabilityRequest, optionSet: ReservationOptionSet) {
 
+        var productWellnessId = "31eaebbc-af39-4411-a997-f2f286c58a9d"
+        var wellnessDurationOptionId = "bf80e7f0-5fdd-4c5d-9b51-1d73aaef79ee"
 
         let orderMgmtSvc = new OrderMgmtService(this.alteaDb)
 
@@ -135,10 +137,19 @@ export class AvailabilityService {
 
         let specialPriceLines = order.getOrderLinesWithSpecialPricing()
 
-        if (ArrayHelper.IsEmpty(specialPriceLines))
+        let differentFromRequest = false
+
+        if (optionSet.solutionSet)
+            differentFromRequest = optionSet.solutionSet.hasSolutionsDifferentFromRequest()
+
+        if (ArrayHelper.IsEmpty(specialPriceLines) && !differentFromRequest)
             return
 
         for (let option of optionSet.options) {
+
+            let lineOption = null
+            let lineOptionOrigValue = null
+
 
             if (ArrayHelper.IsEmpty(option.solutions))
                 continue
@@ -148,32 +159,57 @@ export class AvailabilityService {
             //let startDate = option.date
             //let orderSpecialPrice = 0
 
+            if (solution.differentFromRequest) {
+
+
+                let items : SolutionItem[] = solution.itemsDifferentFromRequest()
+
+                for (let item of items) {
+
+                    let product = item.request.product
+
+                    let productId = product.id
+                    let durationOptions = product?.options.filter(o => o.hasDuration && o.addDur)
+                   
+
+                    for (let durationOption of durationOptions) {
+
+                        if (durationOption.id == wellnessDurationOptionId) {
+
+                             lineOption = order.getLineOption(productId, durationOption.id)
+
+                             if (lineOption.hasValues()) {
+                                lineOptionOrigValue = lineOption.values[0]
+
+                                let hoursDifference = solution.difference.hours()
+                                let newValueInHours = lineOptionOrigValue.val + hoursDifference
+
+                                let newProductOptionValue = durationOption.values.find(v => v.value == newValueInHours)
+                                let newOrderLineOptionValue = new OrderLineOptionValue(newProductOptionValue)
+
+                                lineOption.values[0] = newOrderLineOptionValue
+                             }
+                        }
+                    }                    
+                }
+ 
+            }
+
+            //order.clone()
+
             order.clearAllPriceChanges()
             order.startDate = option.date
             orderMgmtSvc.doOrderPriceChanges(order)
             order.calculateAll()
             option.price = order.incl
+            
+            if (lineOption && lineOptionOrigValue) {
+                option.order = order.clone()
+                lineOption.values[0] = lineOptionOrigValue
+            }
+
             order.clearAllPriceChanges()
-
-            /*
-                        for (let line of order.lines) {
-            
-                            let unitPrice = line.unit
-            
-                            if (line.hasSpecialPrices()) {
-                                
-                            }
-                                unitPrice = line.calculateUnitPrice(startDate, order.cre)
-            
-                            let lineSpecialPrice = line.qty * unitPrice
-            
-                            orderSpecialPrice += lineSpecialPrice
-                        }*/
-
-            
         }
-
-
     }
 
 

@@ -1,5 +1,5 @@
 import { extend } from "lodash"
-import { ObjectWithId } from "../lib"
+import { ArrayHelper, ObjectWithId } from "../lib"
 import { Type } from "class-transformer"
 
 
@@ -113,6 +113,10 @@ export class PrismaWhere {
 export class QueryWhere {
   or: Array<QueryCondition> = Array<QueryCondition>()
   and: Array<QueryCondition> = new Array<QueryCondition>()
+
+  hasOrConditions() : boolean {
+    return ArrayHelper.NotEmpty(this.or)
+  }
 }
 
 export class DbQueryBase {

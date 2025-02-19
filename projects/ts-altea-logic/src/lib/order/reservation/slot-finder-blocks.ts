@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { AvailabilityContext, DateRange, DateRangeSet, PlanningBlockSeries, PlanningMode, PossibleSlots, Product, Resource, ResourceAvailability2, ResourceRequest, ResourceRequestItem, ResourceType, SlotInfo, Solution, SolutionItem, SolutionNoteLevel, SolutionSet, TimeSpan } from "ts-altea-model";
+import { AvailabilityContext, BranchSchedules, DateRange, DateRangeSet, PlanningBlockSeries, PlanningMode, PossibleSlots, Product, Resource, ResourceAvailability2, ResourceRequest, ResourceRequestItem, ResourceType, Schedule, SlotInfo, Solution, SolutionItem, SolutionNoteLevel, SolutionSet, TimeSpan } from "ts-altea-model";
 import * as _ from "lodash"
 import { ResourceRequestOptimizer } from "./resource-request-optimizer";
 import { scheduled } from "rxjs";
@@ -37,7 +37,7 @@ export class SlotFinderBlocks {
         // most likely there is only 1 resource, example: Wellness
         for (const resource of firstRequestItem.resources) {
 
-            const availabilities = availability.getAvailabilitiesForResource(resource, firstRequestItem.duration)
+            const availabilities = availability.getAvailabilitiesForResource(resource, firstRequestItem.duration())
 
             console.warn(availabilities)
 
@@ -59,10 +59,23 @@ export class SlotFinderBlocks {
                 if (!fromScheduleStart)  // => there is already a booking to the left of availableRange
                     searchForward = true   // => because we want to work forward from an existing booking (to reduce empty spaces in calendar)
 
+                /** Mostly there is only 1 branch schedule (the default operational mode) active in a given dateRange (can be 1 day for instance),
+                *  but exceptionally there can be more branch schedules in a given period (example: normal operations, later followed by holiday period) 
+                * 
+                *  We need the schedules to determine the block series (just because these can vary by schedule)
+                * 
+                **/
+                const schedules = ctx.getBranchSchedules(availableRange)
+                let firstSchedule = schedules.byDate[0]?.schedule
+
+                /** if planning blocks are configured, then a customer might still change the duration via a product option. But, for a certain product & schedule we might disable this (example: wellness during holiday) */
+                const durationFixed = this.preconfiguredBlocksOnly(firstSchedule, product)
+
                 // if the range has no occupations yet
                 if (scheduleIsEmpty) {
-                    possibleDateRanges = this.getFullDayStartDates(product, availableRange, ctx)
-                    const solutions = possibleDateRanges.toSolutions(resourceRequest, firstRequestItem, true, resource)
+                    possibleDateRanges = this.getFullDayStartDates(product, availableRange, ctx, schedules)
+                    
+                    const solutions = possibleDateRanges.toSolutions(resourceRequest, firstRequestItem, true, durationFixed, resource)
                     solutionSet.add(...solutions)
 
                 } else {
@@ -82,6 +95,17 @@ export class SlotFinderBlocks {
         return solutionSet
     }
 
+
+    preconfiguredBlocksOnly(schedule: Schedule, product: Product) : boolean {
+
+        let hifrAfwezig = 'd507d664-3d8f-4ebe-bb3b-86dcd7df6fc8'
+        let wellness = '31eaebbc-af39-4411-a997-f2f286c58a9d'
+
+        if (schedule.id == hifrAfwezig && product.id == wellness)
+            return true
+
+        return false
+    }
 
     findSlotsInRange(searchForward: boolean, resource: Resource, availableRange: DateRange, resReqItem: ResourceRequestItem, resourceRequest: ResourceRequest, availability: ResourceAvailability2, ctx: AvailabilityContext) {
 
@@ -125,7 +149,7 @@ export class SlotFinderBlocks {
             || (!searchForward && offsetRefDate >= availableRange.from)) {
 
 
-                
+
 
             currentSolution = new Solution(resourceRequest)
             currentSolution.offsetRefDate = offsetRefDate
@@ -136,7 +160,7 @@ export class SlotFinderBlocks {
 
             if (isFirstLoop && firstRequestItem.isPrepTime && firstRequestItem.prepOverlap) {
 
-                let solutionItem = this.handlePreparationRequestItem(searchForward, resource, firstRequestItem, availableRange, availability, ctx)
+                let solutionItem = this.handlePreparationRequestItem(currentSolution, searchForward, resource, firstRequestItem, availableRange, availability, ctx)
 
                 // set the reference date for this solution
                 offsetRefDate = dateFns.addSeconds(solutionItem.dateRange.from, -firstRequestItem.offset.seconds)
@@ -202,7 +226,7 @@ export class SlotFinderBlocks {
 
 
 
-    handlePreparationRequestItem(searchForward: boolean, resource: Resource, firstRequestItem: ResourceRequestItem, availableRange: DateRange, availability: ResourceAvailability2, ctx: AvailabilityContext): SolutionItem {
+    handlePreparationRequestItem(solution: Solution, searchForward: boolean, resource: Resource, firstRequestItem: ResourceRequestItem, availableRange: DateRange, availability: ResourceAvailability2, ctx: AvailabilityContext): SolutionItem {
         // this is a preparation block that can overlap with existing (preparations) => try to find one
 
         let existingPrepBlock: DateRange
@@ -219,17 +243,17 @@ export class SlotFinderBlocks {
 
         if (existingPrepBlock) {
 
-            let existingPrepBlockLonger = existingPrepBlock.seconds() >= firstRequestItem.seconds()
+            let existingPrepBlockLonger = existingPrepBlock.seconds() >= firstRequestItem.durationInSeconds(solution)
 
             if (searchForward) {
 
                 if (existingPrepBlockLonger) {
                     // the requested time block fits into the existing one
                     prepTo = existingPrepBlock.to   // same as availableRange.from
-                    prepFrom = dateFns.addSeconds(prepTo, -firstRequestItem.seconds())
+                    prepFrom = dateFns.addSeconds(prepTo, -firstRequestItem.durationInSeconds(solution))
                 } else {
                     prepFrom = existingPrepBlock.from
-                    prepTo = dateFns.addSeconds(prepFrom, firstRequestItem.seconds())
+                    prepTo = dateFns.addSeconds(prepFrom, firstRequestItem.durationInSeconds(solution))
                 }
 
             } else {  // search backward
@@ -238,7 +262,7 @@ export class SlotFinderBlocks {
 
                     // the requested time block fits into the existing one
                     prepFrom = existingPrepBlock.from
-                    prepTo = dateFns.addSeconds(prepFrom, firstRequestItem.seconds())
+                    prepTo = dateFns.addSeconds(prepFrom, firstRequestItem.durationInSeconds(solution))
 
 
                     /* prepTo = existingPrepBlock.to   // same as availableRange.from
@@ -246,7 +270,7 @@ export class SlotFinderBlocks {
                 } else {
 
                     prepTo = existingPrepBlock.to
-                    prepFrom = dateFns.addSeconds(prepTo, -firstRequestItem.seconds())
+                    prepFrom = dateFns.addSeconds(prepTo, -firstRequestItem.durationInSeconds(solution))
 
 
                     /* prepFrom = existingPrepBlock.from
@@ -260,7 +284,7 @@ export class SlotFinderBlocks {
 
             // there is no existing preparation block where we can overlap with => create inside the available range
 
-            const prepTime = firstRequestItem.seconds()
+            const prepTime = firstRequestItem.durationInSeconds(solution)
 
             if (searchForward) {
                 prepFrom = availableRange.from
@@ -274,20 +298,20 @@ export class SlotFinderBlocks {
 
                     // check if preparations can be done outside schedule
                     if (!schedule.prepIncl)
-                        prepFrom = dateFns.addSeconds(availableRange.from, -firstRequestItem.seconds())
+                        prepFrom = dateFns.addSeconds(availableRange.from, -firstRequestItem.durationInSeconds(solution))
                 }
 
             } else {
                 prepFrom = dateFns.addSeconds(availableRange.to, -prepTime)
             }
 
-            prepTo = dateFns.addSeconds(prepFrom, firstRequestItem.seconds())
+            prepTo = dateFns.addSeconds(prepFrom, firstRequestItem.durationInSeconds(solution))
         }
 
         let newPreparationRange = new DateRange(prepFrom, prepTo)
 
-
-        let solutionItem = new SolutionItem(firstRequestItem, newPreparationRange, true, resource)
+        let durationFixed = false
+        let solutionItem = new SolutionItem(solution, firstRequestItem, newPreparationRange, true, durationFixed, resource)
 
         return solutionItem
     }
@@ -298,7 +322,7 @@ export class SlotFinderBlocks {
         for (let i = 0; i < requestItemsSameResource.length; i++) {
 
             let requestItem = requestItemsSameResource[i]
-            let solutionItem = this.handleBasicRequestItem(searchForward, resource, requestItem, startDate, availableRange, availability, ctx)
+            let solutionItem = this.handleBasicRequestItem(searchForward, resource, requestItem, startDate, availableRange, solution, availability, ctx)
 
             solution.add(solutionItem)
 
@@ -313,18 +337,19 @@ export class SlotFinderBlocks {
     }
 
 
-    handleBasicRequestItem(searchForward: boolean, resource: Resource, requestItem: ResourceRequestItem, startDate: Date, availableRange: DateRange
+    handleBasicRequestItem(searchForward: boolean, resource: Resource, requestItem: ResourceRequestItem, startDate: Date, availableRange: DateRange, solution: Solution
         , availability: ResourceAvailability2, ctx: AvailabilityContext): SolutionItem {
 
         let requestFrom = dateFns.addSeconds(startDate, requestItem.offset.seconds)
-        let requestTo = dateFns.addSeconds(requestFrom, requestItem.duration.seconds)
+        let requestTo = dateFns.addSeconds(requestFrom, requestItem.durationInSeconds(solution))
 
         let requestRange = new DateRange(requestFrom, requestTo)
 
         // if requestRange is still within available range: then all is still ok
         let outsideOfRange = !requestRange.isInsideOf(availableRange)
 
-        let solutionItem = new SolutionItem(requestItem, requestRange, true, resource)
+        let durationFixed = false
+        let solutionItem = new SolutionItem(solution, requestItem, requestRange, true, durationFixed, resource)
 
 
         if (outsideOfRange) {
@@ -334,7 +359,7 @@ export class SlotFinderBlocks {
             if (requestItem.isPrepTime) {
 
                 // check if outside 
-                solutionItem = this.handlePreparationRequestItem2(searchForward, resource, requestItem, requestRange, availableRange, availability, ctx)
+                solutionItem = this.handlePreparationRequestItem2(searchForward, resource, requestItem, requestRange, availableRange, availability, ctx, solution)
 
 
             }
@@ -347,9 +372,10 @@ export class SlotFinderBlocks {
         return solutionItem
     }
 
-    handlePreparationRequestItem2(searchForward: boolean, resource: Resource, requestItem: ResourceRequestItem, requestRange: DateRange, availableRange: DateRange, availability: ResourceAvailability2, ctx: AvailabilityContext) {
+    handlePreparationRequestItem2(searchForward: boolean, resource: Resource, requestItem: ResourceRequestItem, requestRange: DateRange, availableRange: DateRange, availability: ResourceAvailability2, ctx: AvailabilityContext, solution: Solution) {
 
-        let solutionItem = new SolutionItem(requestItem, requestRange, true, resource)
+        let durationFixed = false
+        let solutionItem = new SolutionItem(solution, requestItem, requestRange, true, durationFixed, resource)
         solutionItem.valid = false
 
         // check if preparations can be done outside schedule
@@ -428,43 +454,37 @@ export class SlotFinderBlocks {
     }
 
 
-/*
-    findSlots(resReqItem: ResourceRequestItem, inDateRange: DateRange, ctx: AvailabilityContext, availability: ResourceAvailability2): DateRangeSet {
+    /*
+        findSlots(resReqItem: ResourceRequestItem, inDateRange: DateRange, ctx: AvailabilityContext, availability: ResourceAvailability2): DateRangeSet {
+    
+            if (!Array.isArray(resReqItem.resources) || resReqItem.resources.length != 1) {
+    
+                throw new Error(`SlotFinderBlocks`)
+            }
+    
+    
+            // let resource = resReqItem.resources[0]
+    
+            let availabilities = availability.getAvailabilityOfResourcesInRange(resReqItem.resources, inDateRange, resReqItem.duration)
+            console.error(availabilities)
+    
+            const product = resReqItem.product
+    
+            // then we get initial slots from product.plan
+    
+            const dateRanges = this.getFullDayStartDates(product, inDateRange, ctx)
+    
+    
+    
+            return dateRanges
+    
+    
+        }*/
 
-        if (!Array.isArray(resReqItem.resources) || resReqItem.resources.length != 1) {
 
-            throw new Error(`SlotFinderBlocks`)
-        }
+    getFullDayStartDates(product: Product, dateRange: DateRange, ctx: AvailabilityContext, schedules: BranchSchedules): DateRangeSet {
 
 
-        // let resource = resReqItem.resources[0]
-
-        let availabilities = availability.getAvailabilityOfResourcesInRange(resReqItem.resources, inDateRange, resReqItem.duration)
-        console.error(availabilities)
-
-        const product = resReqItem.product
-
-        // then we get initial slots from product.plan
-
-        const dateRanges = this.getFullDayStartDates(product, inDateRange, ctx)
-
-
-
-        return dateRanges
-
-
-    }*/
-   
-
-    getFullDayStartDates(product: Product, dateRange: DateRange, ctx: AvailabilityContext): DateRangeSet {
-
-        /** Mostly there is only 1 branch schedule (the default operational mode) active in a given dateRange (can be 1 day for instance),
-         *  but exceptionally there can be more branch schedules in a given period (example: normal operations, later followed by holiday period) 
-         * 
-         *  We need the schedules to determine the block series (just because these can vary by schedule)
-         * 
-         **/
-        const schedules = ctx.getBranchSchedules(dateRange)
 
         let resultBlocks = new DateRangeSet()
 

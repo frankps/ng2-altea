@@ -15,6 +15,9 @@ export enum PlanningType {
   /** occupied */
   occ = 'occ',   // occupied, typically used for order planning
 
+  /** pre-determined occupations: example if we work with fixed cleaning blocks for welness (when we are abscent, then we preconfigure a mask of cleaning blocks with allocation on group level)*/
+  mask = 'mask', 
+
   /** holiday */
   hol = 'hol',
 
@@ -54,6 +57,10 @@ export class ResourcePlannings {
       return 0
 
     return this.plannings.length
+  }
+
+  getById(id: string): ResourcePlanning {
+    return this.plannings.find(rp => rp.id == id)
   }
 
   add(extraPlannings: ResourcePlannings) {
@@ -154,8 +161,10 @@ export class ResourcePlannings {
 
       let range2Idx = ranges2.indexOfRangeBiggestOverlap(range1)
 
-      if (range2Idx == -1)
+      if (range2Idx == -1) {
         result.push(planning1)
+        continue
+      }
 
       let range2: DateRange = ranges2.ranges[range2Idx]
       let union: DateRange = range1.unionOfOverlapping(range2)

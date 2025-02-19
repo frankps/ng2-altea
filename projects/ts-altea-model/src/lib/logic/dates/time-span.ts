@@ -1,7 +1,7 @@
 import * as dateFns from 'date-fns'
 import { Timestamp } from 'rxjs'
 import { TimeUnit } from '../../altea-schema'
-
+import * as _ from "lodash";
 /* export enum TimeUnit {
     hours,
     minutes,
@@ -19,7 +19,7 @@ export class TimeOfDay {
     }
 
     /** time in format hh:mm */
-    static parse(time: string) : TimeOfDay | undefined {
+    static parse(time: string): TimeOfDay | undefined {
 
         if (!time)
             return undefined
@@ -43,6 +43,13 @@ export class TimeSpan {
         return new TimeSpan(this.seconds)
     }
 
+    minutes(): number {
+        return _.round(this.seconds / 60, 2)
+    }
+
+    hours(): number {
+        return _.round(this.seconds / 3600, 2)
+    }
 
 
     static hours(hours: number, minutes = 0, seconds = 0): TimeSpan {

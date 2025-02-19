@@ -503,13 +503,13 @@ export class OrderMgmtService {
 
             const requestItem = solItem.request
 
-            const newPlannings = this.requestItemToPlannings(requestItem, refDate, order, solItem.resources)
+            const newPlannings = this.requestItemToPlannings(requestItem, refDate, order, solItem.resources, solution)
             plannings.push(...newPlannings)
 
             continue
 
             const startDate = dateFns.addSeconds(refDate, requestItem.offset.seconds)
-            const endDate = dateFns.addSeconds(startDate, requestItem.duration.seconds)
+            const endDate = dateFns.addSeconds(startDate, requestItem.durationInSeconds(solution))
 
             const productInfo = new PlanningProductInfo(requestItem.product.name)
             const contactInfo = new PlanningContactInfo()
@@ -597,7 +597,7 @@ export class OrderMgmtService {
         for (let requestItem of resourceRequest.items) {
 
             const startDate = dateFns.addSeconds(refDate, requestItem.offset.seconds)
-            const endDate = dateFns.addSeconds(startDate, requestItem.duration.seconds)
+            const endDate = dateFns.addSeconds(startDate, requestItem.durationInSeconds(solution))
             let range = new DateRange(startDate, endDate)
 
             //let resources = requestItem.resources
@@ -621,9 +621,10 @@ export class OrderMgmtService {
                 }
             }
 
-            solution.add(new SolutionItem(requestItem, range, true, ...resources))
+            let durationFixed = false
+            solution.add(new SolutionItem(solution, requestItem, range, true, durationFixed, ...resources))
 
-            const newPlannings = this.requestItemToPlannings(requestItem, refDate, order, resources)
+            const newPlannings = this.requestItemToPlannings(requestItem, refDate, order, resources, solution)
             plannings.push(...newPlannings)
 
         }
@@ -634,11 +635,11 @@ export class OrderMgmtService {
 
     }
 
-    private requestItemToPlannings(requestItem: ResourceRequestItem, refDate: Date, order: Order, resources: Resource[]): ResourcePlanning[] {
+    private requestItemToPlannings(requestItem: ResourceRequestItem, refDate: Date, order: Order, resources: Resource[], solution: Solution): ResourcePlanning[] {
         const plannings: ResourcePlanning[] = []
 
         const startDate = dateFns.addSeconds(refDate, requestItem.offset.seconds)
-        const endDate = dateFns.addSeconds(startDate, requestItem.duration.seconds)
+        const endDate = dateFns.addSeconds(startDate, requestItem.durationInSeconds(solution))
 
         const productInfo = new PlanningProductInfo(requestItem.product.name)
         const contactInfo = new PlanningContactInfo()
@@ -655,6 +656,12 @@ export class OrderMgmtService {
         for (let i = 0; i < requestItem.qty; i++) {
 
             const resource = resources[i]
+
+            if (!resource) {
+                console.error(`Resource not found for requestItem ${requestItem}`)
+                continue
+            }
+                
 
             const resPlan = new ResourcePlanning()
 

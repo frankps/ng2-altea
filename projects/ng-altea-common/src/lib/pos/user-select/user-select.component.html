@@ -7,7 +7,7 @@
 
         <ul class="list-group" *ngIf="persons">
             <li class="list-group-item py-3" *ngFor="let person of persons" (click)="selectUser(person, modal)">
-                <i class="fa-solid fa-circle" [style.color]="person.color"></i> &nbsp; {{person.name}}</li>
+                <i class="fa-solid fa-circle" [style.color]="person.color"></i> &nbsp; {{person.shortOrName()}}</li>
             
         </ul>
 

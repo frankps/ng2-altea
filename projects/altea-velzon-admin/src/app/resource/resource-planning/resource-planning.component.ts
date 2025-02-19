@@ -136,7 +136,7 @@ export class ResourcePlanningComponent implements OnInit {
 
     /** we're only interested in general plannings (=> not tied to specific orders) */
     query.and('orderId', QueryOperator.equals, null)
-    query.and('start', QueryOperator.greaterThanOrEqual, startNum)
+    query.and('end', QueryOperator.greaterThanOrEqual, startNum)
     query.take = 200
     query.orderByDesc('start')
     //query.select('id', 'catId', 'name', 'type')

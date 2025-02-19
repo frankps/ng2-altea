@@ -811,6 +811,53 @@ export class ProductResource extends ObjectWithIdPlus {
    */
   back: boolean = false
 
+
+  applyToDateRangeSet(dateRangeSet: DateRangeSet) : DateRangeSet {
+
+    let result = new DateRangeSet()
+
+    if (!dateRangeSet || dateRangeSet.isEmpty())
+      return result
+
+
+    for (let dateRange of dateRangeSet.ranges) {
+
+      let newDateRange = this.applyToDateRange(dateRange)
+
+      console.warn('applyToDateRangeSet', dateRangeSet)
+  
+      result.addRanges(newDateRange)
+    }
+
+    return result
+  }
+
+
+
+
+
+  applyToDateRange(dateRange: DateRange) : DateRange {
+
+    if (!dateRange)
+      return null
+
+    if (this.durationMode != DurationMode.custom)
+      throw new Error('Duration mode is not custom, currently not supported!')
+
+    let from = dateRange.from
+
+    if (this.reference == DurationReference.end)
+      from = dateRange.to
+
+    from = dateFns.addMinutes(from, this.offset)
+
+    let to = dateFns.addMinutes(from, this.duration)
+
+    let result = new DateRange(from, to)
+
+    return result
+  }
+
 }
 
 

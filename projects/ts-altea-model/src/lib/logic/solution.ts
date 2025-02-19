@@ -46,14 +46,39 @@ export class SolutionItem {
 
     count = 0
 
-    constructor(request: ResourceRequestItem, dateRange: DateRange, public exactStart = false, ...resources: Resource[]) {
+    /** during certain operations (holiday periods), the solution date range (of wellness) can be different from the requested range. This is flagged here */
+    differentFromRequest = false
+    difference?: TimeSpan
+
+    constructor(public solution: Solution, request: ResourceRequestItem, dateRange: DateRange, public exactStart = false, public durationFixed = false, ...resources: Resource[]) {
 
         this.request = request
+
+        /** durationFixed => we should follow the duration coming from dateRange (and not from the request)*/
+        if (request && dateRange && durationFixed) {
+
+            let requestedDurationSeconds = request.durationInSeconds()
+            let actualDurationSeconds = dateRange.duration.seconds
+
+            if (requestedDurationSeconds != actualDurationSeconds) {
+                this.request = request.clone()
+                //this.request.duration2 = dateRange.duration
+                let paramId = request.product.id + '_duration'
+                this.solution.overrides.set(paramId, dateRange.duration)
+
+                this.differentFromRequest = true
+                this.difference = new TimeSpan(actualDurationSeconds - requestedDurationSeconds)
+
+                solution.differentFromRequest = true
+                solution.difference = new TimeSpan(actualDurationSeconds - requestedDurationSeconds)
+            }
+        }
+
         this.dateRange = dateRange
 
         if (exactStart) {
-            if (dateRange.duration.seconds > request.duration.seconds) {
-                dateRange.duration = request.duration
+            if (!durationFixed && dateRange.duration.seconds > request.durationInSeconds(solution)) {
+                dateRange.duration = request.duration(solution)
             }
         }
 
@@ -72,7 +97,7 @@ export class SolutionItem {
     }
 
     clone(): SolutionItem {
-        const item = new SolutionItem(this.request, this.dateRange.clone(), this.exactStart, ...this.resources)
+        const item = new SolutionItem(this.solution, this.request, this.dateRange.clone(), this.exactStart, this.durationFixed, ...this.resources)
         item.notes = this.notes
         return item
     }
@@ -122,6 +147,14 @@ export class SolutionItems extends ObjectWithId {
 
     }
 
+    itemsDifferentFromRequest(): SolutionItem[] {
+
+        if (ArrayHelper.IsEmpty(this.items))
+            return []
+
+        return this.items.filter(item => item.differentFromRequest)
+    }
+
     getItemsForResource(resourceId: string): SolutionItems {
         const items = this.items.filter(item => item.containsResource(resourceId))
         return new SolutionItems(items)
@@ -165,7 +198,12 @@ export class SolutionItems extends ObjectWithId {
         const dateRanges = this.items.map(i => i.dateRange)
         const minFrom = _.minBy(dateRanges, 'from')  // from
 
-        const endTimesWithinSolution = this.items.map(i => i.request.offset.add(i.request.duration))  //offset
+        const endTimesWithinSolution = this.items.map(i => {
+            let offset = i.request.offset(i.solution)
+            let duration = i.request.duration(i.solution)
+            return offset.add(duration)
+        })  //offset
+
         const maxEndTime = _.maxBy(endTimesWithinSolution, 'seconds')
 
         const newFrom = minFrom.from
@@ -182,13 +220,23 @@ export class SolutionItems extends ObjectWithId {
         if (this.isEmpty())
             return new TimeSpan(0)
 
+        // we assume all items come from the same solution
+        let solution = this.items[0].solution
+
         let requests = this.items.map(i => i.request)
 
-        let offsets: TimeSpan[] = requests.map(request => request.offset)
+
+
+        let offsets: TimeSpan[] = requests.map(request => request.offset(solution))
 
         let minOffset = _.minBy(offsets, 'seconds')
 
-        let offsetDurations: TimeSpan[] = requests.map(request => request.offset.add(request.duration))
+
+        let offsetDurations: TimeSpan[] = requests.map(request => {
+            let offset = request.offset(solution)
+            let duration = request.duration(solution)
+            return offset.add(duration)
+        })
 
         let maxOffsetDuration = _.maxBy(offsetDurations, 'seconds')
 
@@ -207,11 +255,17 @@ export class SolutionItems extends ObjectWithId {
 
         let requests = this.items.map(i => i.request)
 
-        let offsets: TimeSpan[] = requests.map(request => request.offset)
+        let offsets: TimeSpan[] = requests.map(request => request.offset(solution))
 
         //        let minOffset = _.minBy(offsets, 'seconds')
+        // we assume all items come from the same solution
+        let solution = this.items[0].solution
 
-        let offsetDurations: TimeSpan[] = requests.map(request => request.offset.add(request.duration))
+        let offsetDurations: TimeSpan[] = requests.map(request => {
+            let offset = request.offset(solution)
+            let duration = request.duration(solution)
+            return offset.add(duration)
+        })
 
         let maxOffsetDuration = _.maxBy(offsetDurations, 'seconds')
 
@@ -276,8 +330,25 @@ export class Solution extends SolutionItems {
 
     num: number = -1
 
-    constructor(public request: ResourceRequest, ...items: SolutionItem[]) {
+    /** during certain operations (holiday periods), the solution date range (ex. of wellness) can be different from the requested range. This is flagged here & also in the SolutionItem */
+    differentFromRequest = false
+
+    @Type(() => TimeSpan)
+    difference?: TimeSpan
+
+    @Type(() => ResourceRequest)
+    request: ResourceRequest
+
+
+    /** overrides for duration parameters specified in the request */
+    @Type(() => Map<string, TimeSpan>)
+    overrides: Map<string, TimeSpan> = new Map<string, TimeSpan>()
+
+
+    constructor(request: ResourceRequest, ...items: SolutionItem[]) {
         super(items)
+
+        this.request = request
 
         if (ArrayHelper.NotEmpty(items)) {
 
@@ -325,7 +396,7 @@ export class Solution extends SolutionItems {
                 => possible occupation of this solution is this range extended by actual duration of service (that starts on latest possible date)
                 */
 
-                dateRange.increaseToWithSeconds(item.request.duration.seconds)
+                dateRange.increaseToWithSeconds(item.request.durationInSeconds(this))
             }
 
             return dateRange
@@ -337,10 +408,7 @@ export class Solution extends SolutionItems {
         return new DateRangeSet(dateRangesForResource, resource)
     }
 
-
-
-
-    add(item: SolutionItem, limitOtherItems = true) {
+    push(item: SolutionItem) {
 
         if (!item)
             return
@@ -351,10 +419,17 @@ export class Solution extends SolutionItems {
         this.items.push(item)
         item.num = this.items.length // keep track when item is added (items can be re-ordered)
         item.count = this.count++
+    }
 
+
+
+    add(item: SolutionItem, limitOtherItems = true) {
+
+
+        this.push(item)
 
         if (!this.hasExactStart() && limitOtherItems) {
-            const offsetSeconds = item.request.offset.seconds
+            const offsetSeconds = item.request.offsetInSeconds(this)
 
             const refFrom = dateFns.addSeconds(item.dateRange.from, -offsetSeconds)
 
@@ -385,7 +460,7 @@ export class Solution extends SolutionItems {
 
         for (let item of this.items) {
 
-            const offsetSeconds = item.request.offset.seconds
+            const offsetSeconds = item.request.offsetInSeconds(this)  //.offset.seconds
 
             if (refFrom) {
                 let origFrom = item.dateRange.from
@@ -453,9 +528,15 @@ export class Solution extends SolutionItems {
 
     clone(): Solution {
 
+        // otherwise we have a circular reference
+        this.items.forEach(item => item.solution = null)
 
         let clone = ObjectHelper.clone(this, Solution) as Solution
         clone.newId()
+
+        this.items.forEach(item => item.solution = this)
+        clone.items.forEach(item => item.solution = clone)
+
         return clone
 
 
@@ -567,6 +648,19 @@ export class SolutionSet {
     }
 
 
+    /**
+     * The user might ask for 3hours wellness, but the system might only find a 2.5 hour slot.
+     * @returns 
+     */
+    hasSolutionsDifferentFromRequest(): boolean {
+
+        if (ArrayHelper.IsEmpty(this.solutions))
+            return false
+
+        let differentFromRequest = this.solutions.some(s => s.differentFromRequest)
+
+        return differentFromRequest
+    }
 
 
     getFirstValid(): Solution {

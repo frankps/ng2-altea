@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { OrderLine, OrderPerson, Product, ProductResource, Resource, ResourceType, Schedule } from "ts-altea-model"
-import { OffsetDuration } from "./offset-duration"
+import { OrderLine, OrderPerson, Product, ProductResource, Resource, ResourceType, Schedule, Solution } from "ts-altea-model"
+import { OffsetDuration, OffsetDurationParams } from "./offset-duration"
 import { TimeSpan } from "./dates/time-span"
 import { DateRangeSet } from "./dates"
 import * as _ from "lodash";
 import { Type } from "class-transformer";
 import { ArrayHelper, ObjectWithId } from "ts-common";
-  
+
 export class ResourceRequestItem extends ObjectWithId {
     //person?: OrderPerson
 
@@ -18,13 +18,15 @@ export class ResourceRequestItem extends ObjectWithId {
     resources: Resource[] = []
     personId?: string
 
-    @Type(() => TimeSpan)
-    offset = TimeSpan.zero
+/*     @Type(() => TimeSpan)
+    offset = TimeSpan.zero */
 
-    @Type(() => TimeSpan)
-    duration = TimeSpan.zero
+    @Type(() => OffsetDurationParams)
+    offsetDuration: OffsetDurationParams
 
-    
+
+/*     @Type(() => TimeSpan)
+    private _duration = TimeSpan.zero */
 
     /** the number of resources that should be allocated from the resourceGroup (or from resources) */
     qty = 1
@@ -50,7 +52,36 @@ export class ResourceRequestItem extends ObjectWithId {
         super()
     }
 
-    hasAffinity() : boolean {
+    /** initially, the duration was just a fixed value. Now it can fluctuate based on the solution at hand. 
+     *  The user might request a wellness of 3h (request item is 3h), but the system concludes at a certain moment that only a block of 2h is possible.
+     *  => all request items that are related to this wellness duration should adapt to 3 hours
+     */
+    durationInSeconds(solution?: Solution): number {
+        return this.offsetDuration.calcDurationSeconds(solution)
+    }
+
+    duration(solution?: Solution): TimeSpan {
+        return this.offsetDuration.calcDuration(solution)
+    }
+
+    offsetInSeconds(solution?: Solution): number {
+        return this.offsetDuration.calcOffsetSeconds(solution)
+    }
+
+    offset(solution?: Solution): TimeSpan {
+        return this.offsetDuration.calcOffset(solution)
+    }
+    /*
+    get duration2(): TimeSpan {
+        return this._duration
+    }
+
+    set duration2(value: TimeSpan) {
+        this._duration = value
+    }
+        */
+
+    hasAffinity(): boolean {
         return (this.affinity != null && this.affinity != undefined)
     }
 
@@ -61,8 +92,8 @@ export class ResourceRequestItem extends ObjectWithId {
         clone.resources.push(...this.resources)
         clone.personId = this.personId
 
-        clone.offset = this.offset.clone()
-        clone.duration = this.duration.clone()
+        clone.offsetDuration = this.offsetDuration.clone()
+      //  clone._duration = this._duration.clone()
 
         clone.qty = this.qty
 
@@ -83,8 +114,10 @@ export class ResourceRequestItem extends ObjectWithId {
         return clone
     }
 
-    get endsAt(): TimeSpan {
-        return this.offset.add(this.duration)
+    endsAt(solution?: Solution): TimeSpan {
+        let offset = this.offset(solution)
+        let duration = this.duration(solution)
+        return offset.add(duration)
     }
     //offsetDuration: OffsetDuration = new OffsetDuration()
 
@@ -103,9 +136,10 @@ export class ResourceRequestItem extends ObjectWithId {
         return this.personId == personId
     }
 
+    /*
     seconds(): number {
         return this.duration.seconds
-    }
+    }*/
 
     addResource(resource: Resource) {
         this.resources.push(resource)

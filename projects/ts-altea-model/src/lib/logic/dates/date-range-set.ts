@@ -39,10 +39,12 @@ export class ResourceOccupationSets {
  */
 export class ResourceAvailabilitySets {
 
+    public info: string
+
     /** staff members need to press button when break starts => a break resourcePlanning is created  */
     public hasBreakBlock: boolean = false
 
-    constructor(public resource: Resource, public all: ResourcePlannings, public available: DateRangeSet = DateRangeSet.empty,
+    constructor(public resource: Resource, public all: ResourcePlannings = new ResourcePlannings(), public available: DateRangeSet = DateRangeSet.empty,
         public overlapAllowed: DateRangeSet = DateRangeSet.empty,
         public workingTime: DateRangeSet = DateRangeSet.empty
     ) {
@@ -334,7 +336,10 @@ export class DateRangeSet {
         this.ranges.push(...ranges)
     }
 
-    addRangeByDates(from: Date, to: Date, fromLabel?: string, toLabel?: string): DateRange {
+    addRangeByDates(from: Date, to?: Date, fromLabel?: string, toLabel?: string): DateRange {
+
+        if (!to)
+            to = new Date(2100, 0, 1)
 
         const range = new DateRange(from, to, [fromLabel], [toLabel])
         this.addRanges(range)
@@ -918,23 +923,24 @@ export class DateRangeSet {
  * @param dateRanges 
  * @returns 
  */
-    toSolutions(request: ResourceRequest, requestItem: ResourceRequestItem, exactStart: boolean, resource?: Resource): Solution[] {
-
+    toSolutions(request: ResourceRequest, requestItem: ResourceRequestItem, exactStart: boolean, durationFixed: boolean, resource?: Resource): Solution[] {
 
         if (this.isEmpty())
             return []
 
         const solutions = this.ranges.map(range => {
 
+            const solution = new Solution(request)
+            solution.offsetRefDate = range.from
+
             // we create a solution with 1 solutionItem, because this will be a starting solution where 
             // other solutionItems will be added later on
-            const solutionItem = new SolutionItem(requestItem, range, exactStart)
+            const solutionItem = new SolutionItem(solution, requestItem, range, exactStart, durationFixed)
 
             if (resource)
                 solutionItem.resources.push(resource)
 
-            const solution = new Solution(request, solutionItem)
-            solution.offsetRefDate = range.from
+            solution.push(solutionItem)
 
             return solution
         })

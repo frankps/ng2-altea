@@ -215,11 +215,10 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
         var delPlanning = await this.planningSvc.delete$(orderUi.id)
         console.log(delPlanning)
 
-        var delFirebase = await this.orderSvc.deleteOrderInFirebase(branch.id, orderUi.id)
-        console.log(delPlanning)
-
     }
 
+    var delFirebase = await this.orderSvc.deleteOrderInFirebase(branch.id, orderUi.id)
+    console.log(delFirebase)
 
   }
 

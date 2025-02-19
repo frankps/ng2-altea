@@ -227,6 +227,7 @@ export class AlteaDb {
             qry.and('id', QueryOperator.equals, queryById)
         } else {
 
+
             let paymentFilter = new QueryCondition()
             paymentFilter.and('date', QueryOperator.greaterThanOrEqual, startNum)
             paymentFilter.and('date', QueryOperator.lessThan, endNum)
@@ -407,9 +408,11 @@ export class AlteaDb {
 
         qry.and('id', QueryOperator.in, resourceIds)
 
-        /*         let endFilter = qry.and()
-                endFilter.or('children.child.end', QueryOperator.equals, null)
-                endFilter.or('children.child.end', QueryOperator.greaterThan, 20231231000000) */
+        let activeFilter = qry.and()
+        activeFilter.or('end', QueryOperator.equals, null)
+
+        let now = DateHelper.yyyyMMddhhmmss()
+        activeFilter.or('end', QueryOperator.greaterThan, now)
 
         if (Array.isArray(includes) && includes.length > 0)
             qry.include(...includes)
@@ -418,6 +421,26 @@ export class AlteaDb {
 
         return resources
     }
+
+
+    async getResourcesActive(resourceIds: string[], from?: number, to?: number, ...includes: string[]): Promise<Resource[]> {
+
+        const qry = new DbQueryTyped<Resource>('resource', Resource)
+
+        qry.and('id', QueryOperator.in, resourceIds)
+
+        let activeFilter = qry.and()
+        activeFilter.or('end', QueryOperator.equals, null)
+        activeFilter.or('end', QueryOperator.greaterThan, to)
+
+        if (Array.isArray(includes) && includes.length > 0)
+            qry.include(...includes)
+
+        const resources = await this.db.query$<Resource>(qry)
+
+        return resources
+    }
+
 
     async scheduleGetDefault(branchId: string): Promise<Schedule | null> {
 
@@ -482,16 +505,24 @@ export class AlteaDb {
         }
 
         /** consumers are sometimes creating new orders from same device (without finishing previous order) 
-         *  => exclude plannings coming from same device
+         *  => exclude plannings coming from same device: excludeClientId
          */
 
+        
         if (excludeClientId) {
 
             let lockCheck = qry.and()
             lockCheck.or('orderId', QueryOperator.equals, null)
+            lockCheck.or('order.state', QueryOperator.in, [OrderState.confirmed, OrderState.waitDeposit])
             lockCheck.or('order.lock', QueryOperator.not, excludeClientId)
 
+            let createdBefore = new Date()
+            createdBefore = dateFns.subHours(createdBefore, 6)
+
+            lockCheck.or('order.cre', QueryOperator.lessThan, createdBefore)
+
         }
+    
 
         if (excludeOrderId) {
             qry.or('orderId', QueryOperator.not, excludeOrderId)
@@ -873,7 +904,7 @@ export class AlteaDb {
             if ('ok' in extra)
                 qry.and('ok', QueryOperator.equals, extra.ok)
 
-            if ('positiveAmount')
+            if ('positiveAmount' in extra)
                 qry.and('amount', QueryOperator.greaterThan, 0)
 
             if ('payments' in extra)

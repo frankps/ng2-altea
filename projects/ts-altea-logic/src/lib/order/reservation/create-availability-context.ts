@@ -48,6 +48,7 @@ export class CreateAvailabilityContext {
         resourceIds.push(ctx.branchId)
 
         ctx.configResources = await this.alteaDb.getResources(resourceIds)
+     //   ctx.configResources = await this.alteaDb.getResourcesActive(resourceIds, availabilityRequest.from, availabilityRequest.to)
 
 
         ctx.resourceGroups = await this.loadResourceGroupsWithChildren(ctx.configResources, availabilityRequest.from, availabilityRequest.to)
@@ -68,14 +69,21 @@ export class CreateAvailabilityContext {
         // Already added before: re-check!
         // ctx.allResourceIds.push(ctx.branchId)
 
+        /** We don't want the current order to block itself => exclude previous made plannings for this order */
         let excludeOrderId = ctx.order.id
+
+        
         let clientId = ctx.order.lock
 
         let includeGroupPlannings = true
         ctx.resourcePlannings = await this.loadResourcePlannings(ctx.allResourceIds, availabilityRequest, includeGroupPlannings, excludeOrderId, clientId)
 
 
-
+        // to debug
+        let planId = 'b9f96be6-fda5-476f-9169-74514be783f6'
+        let planning = ctx.resourcePlannings.getById(planId)
+        console.warn('planning', planning)
+        // END debug
 
         /* get resource groups not previously loaded 
         */
@@ -387,7 +395,7 @@ export class CreateAvailabilityContext {
         for (let resource of resources) {
 
             /** clone, otherwise we are changing the master cache (the filters below were changing cache) */
-            let clone = ObjectHelper.clone(resource, Resource)
+            let clone : Resource = ObjectHelper.clone(resource, Resource)
 
             if (ArrayHelper.IsEmpty(clone.children))
                 continue

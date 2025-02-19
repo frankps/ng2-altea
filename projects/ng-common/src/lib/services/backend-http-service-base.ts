@@ -696,9 +696,25 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
 
   }
 
-  checkCondition(obj: ObjectWithId, condition: QueryCondition) {
+  checkCondition(obj: ObjectWithId, condition: QueryCondition): boolean {
+
+
+    if (!condition.field) {  // then we probably have sub-conditions   OR conditions inside a TOP level AND condition
+
+      if (condition?.where?.hasOrConditions()) {
+        for (let subCondition of condition.where.or) {
+          if (this.checkCondition(obj, subCondition))
+            return true
+        }
+      }
+
+      return false
+
+    }
 
     const left = obj[condition.field]
+
+
     let leftString
 
     switch (condition.operator) {
@@ -716,6 +732,18 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
 
       //return leftString.includes(condition.value)
 
+      case QueryOperator.greaterThan:
+        return left > condition.value
+
+      case QueryOperator.greaterThanOrEqual:
+        return left >= condition.value
+
+      case QueryOperator.lessThan:
+        return left < condition.value
+
+      case QueryOperator.lessThanOrEqual:
+        return left <= condition.value
+
       case QueryOperator.startsWith:
         leftString = left as string
         return leftString.startsWith(condition.value)
@@ -724,14 +752,14 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
         leftString = left as string
         return leftString.endsWith(condition.value)
 
-        case QueryOperator.has:
+      case QueryOperator.has:
 
-          if (ArrayHelper.IsEmpty(left))
-            return false
+        if (ArrayHelper.IsEmpty(left))
+          return false
 
-          let arr = left as string[]
+        let arr = left as string[]
 
-          return arr.indexOf(condition.value) >= 0
+        return arr.indexOf(condition.value) >= 0
 
       case QueryOperator.in:
 
@@ -1020,6 +1048,7 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
     return new Response(cs.readable).arrayBuffer()
   }
 
+  /*
   async decompress(
     byteArray: string[],
     encoding = 'gzip' as CompressionFormat
@@ -1032,6 +1061,7 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
     //return arrayBuffer
     return new TextDecoder().decode(arrayBuffer)
   }
+    */
 
   ab2str(buf): string {
 

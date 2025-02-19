@@ -836,6 +836,10 @@ export class OrderMgrUiService {   // implements OnInit
       this.spinner.show()
 
 
+      if (option.order) {
+        me.order = option.order
+      }
+
 
 
 

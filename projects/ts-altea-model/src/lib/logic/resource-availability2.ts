@@ -41,6 +41,32 @@ export class ResourceAvailability2 {
 
             const resourceId = resource.id!
 
+            let noActive = false
+            let noActiveInfo = ''
+
+            if (!resource.act) {
+                noActive = true
+                noActiveInfo = `Resource not active`
+            }
+
+            if (resource.hasStart && resource.start && resource.start > ctx.request.to) {
+                noActive = true
+                noActiveInfo = `Resource not yet started`
+            }
+
+
+            if (resource.hasEnd && resource.end && resource.end < ctx.request.from) {
+                noActive = true
+                noActiveInfo = 'Resource ended'
+            }
+
+            if (noActive) {
+                let noAvailability = new ResourceAvailabilitySets(resource)
+                noAvailability.info = noActiveInfo
+                this.availability.set(resourceId, noAvailability)
+                continue
+            }
+
             /*
             let frankId = 'cc682b80-6243-4ac5-92a9-5ceed36111a4'
             if (resourceId == frankId)
@@ -254,6 +280,15 @@ export class ResourceAvailability2 {
 
     }
 
+    getSetForResource(resourceId: string) {
+
+        if (!this.availability.has(resourceId))
+            return null
+     
+        let availability = this.availability.get(resourceId)
+
+        return availability
+    }
 
 
     getAvailabilitiesForResource(resource: Resource, minTime?: TimeSpan): DateRangeSet {
@@ -270,7 +305,7 @@ export class ResourceAvailability2 {
 
 
         let availability = this.availability.get(resource.id)
-
+       
         let set: DateRangeSet = availability.available
 
         if (minTime)

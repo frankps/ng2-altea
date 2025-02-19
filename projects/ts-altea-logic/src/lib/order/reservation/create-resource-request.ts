@@ -1,7 +1,7 @@
 /* eslint-disable no-case-declarations */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ApiListResult, ArrayHelper, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
-import { DurationMode, Order, AvailabilityContext, OrderLine, OrderPerson, Product, ProductResource, ResourceRequest, ResourceRequestItem, Schedule, SchedulingType, TimeSpan, TimeUnit, OffsetDuration, DurationReference, Resource, ResourceType, OrderLineSummary } from 'ts-altea-model'
+import { DurationMode, Order, AvailabilityContext, OrderLine, OrderPerson, Product, ProductResource, ResourceRequest, ResourceRequestItem, Schedule, SchedulingType, TimeSpan, TimeUnit, OffsetDuration, DurationReference, Resource, ResourceType, OrderLineSummary, OffsetDurationParams } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { AlteaDb } from '../../general/altea-db'
 import { IDb } from '../../interfaces/i-db'
@@ -170,9 +170,10 @@ export class CreateResourceRequest {
                     if (!resource)
                         continue
 
-                    const offsetDuration = this.getDuration(orderLine, product, productResource)
+                    const offsetDuration = this.getOffsetDuration(orderLine, product, productResource)
 
-                    if (offsetDuration.duration.seconds == 0)
+                    const defaultDuration = offsetDuration.defaultDuration()
+                    if (defaultDuration.seconds == 0)
                         continue
 
                     const resReqItem = new ResourceRequestItem(orderLine, product, resource.type!)
@@ -219,7 +220,10 @@ export class CreateResourceRequest {
                         resReqItem.addResource(resource ? resource : productResource.resource!)
 
                     resReqItem.personId = personId
-                    resReqItem.duration = offsetDuration.duration
+
+                    resReqItem.offsetDuration = offsetDuration.clone()
+
+                    resReqItem.duration2 = offsetDuration.duration
 
                     const offset = personInfo.offset.clone()
                     // const offset = personOffset.clone()
@@ -234,10 +238,10 @@ export class CreateResourceRequest {
 
                             if (productResource.flexAfter) {
                                 let item = items[0]
-                                resReqItem.offset = item.offset.add(item.duration)
+                                resReqItem.offset = item.offset.add(item.duration2)
                             } else {
                                 let item = items[items.length - 1]
-                                resReqItem.offset = item.offset.subtract(resReqItem.duration)
+                                resReqItem.offset = item.offset.subtract(resReqItem.duration2)
                             }
                         }
                     }
@@ -395,15 +399,16 @@ export class CreateResourceRequest {
 
         const optionValuesWithDurations = line.allOptionValues(optionIds)
         const optionDuration = _.sumBy(optionValuesWithDurations, 'dur')
-      
+
         return optionDuration
     }
 
-    getDuration(line: OrderLine, product: Product, productResource: ProductResource): OffsetDuration {
+    getOffsetDuration(line: OrderLine, product: Product, productResource: ProductResource): OffsetDurationParams {
 
+        let useParameters = true
+        let productDurationParamId = product.id + '_duration'
 
-        const offsetDuration = new OffsetDuration()
-
+        const offsetDuration = new OffsetDurationParams()
 
         const productDuration = TimeSpan.zero
         productDuration.addMinutes(product.duration)
@@ -435,18 +440,28 @@ export class CreateResourceRequest {
 
 
         let optionIdsAlwaysInclude = product.getOptionIds(o => o.hasDuration && o.addDur)
-        
+
         let optionAlwaysIncludeDuration = this.getDurationOfOptionIds(optionIdsAlwaysInclude, line)
 
         productDuration.addMinutes(optionAlwaysIncludeDuration)
+
+
+
+        if (useParameters) {
+            offsetDuration.defaults.set(productDurationParamId, productDuration.seconds)
+        }
 
         let duration = TimeSpan.zero
 
         switch (productResource.durationMode) {
             case DurationMode.product:
 
+                if (useParameters) {
+                    offsetDuration.durationParams.push(productDurationParamId)
+                } else {
+                    duration = duration.add(productDuration)
+                }
 
-                duration = duration.add(productDuration)
                 break
             case DurationMode.custom:
                 duration.addMinutes(productResource.duration)
@@ -459,8 +474,16 @@ export class CreateResourceRequest {
 
                 }
 
-                if (productResource.reference == DurationReference.end)
-                    offsetDuration.offset = offsetDuration.offset.add(productDuration)
+                if (productResource.reference == DurationReference.end) {
+                    if (useParameters) {
+                        offsetDuration.offsetParams.push(productDurationParamId)
+                    } else {
+                        
+                        offsetDuration.offset = offsetDuration.offset.add(productDuration)
+                    }
+                }
+                    
+                 //   
 
                 if (productResource.offset)
                     offsetDuration.offset.addMinutes(productResource.offset)

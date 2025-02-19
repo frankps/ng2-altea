@@ -1,6 +1,7 @@
 import { ArrayHelper, DateHelper } from "ts-common"
 import { Solution, SolutionSet } from "./solution"
 import * as dateFns from 'date-fns'
+import { Order } from "ts-altea-model"
 
 export class ReservationOption {
 
@@ -10,6 +11,12 @@ export class ReservationOption {
     solutions: Solution[] = []
 
     price: number
+
+
+    /** only set when order is changed by planning logic (ex original request: Wellness 3h, but planning changed to 2h) 
+     * 
+    */
+    order: Order
 
     /**
      * 

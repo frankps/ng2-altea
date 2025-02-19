@@ -197,8 +197,8 @@ export class ResourceRequestOptimizer {
             }
             else {
 
-                if (previousItem.endsAt.seconds == item.offset.seconds) {
-                    previousItem.duration = previousItem.duration.add(item.duration)
+                if (previousItem.endsAt().seconds == item.offsetInSeconds()) {
+                    previousItem.offsetDuration.duration = previousItem.offsetDuration.duration.add(item.offsetDuration.duration)
                 } else {
 
                     mergedItems.push(previousItem)
@@ -283,8 +283,8 @@ export class ResourceRequestOptimizer {
 
         item.offset = items[0].offset
 
-        const seconds = _.sumBy(items, 'duration.seconds')
-        item.duration = new TimeSpan(seconds)
+        const seconds = _.sumBy(items, 'duration2.seconds')
+        item.duration2 = new TimeSpan(seconds)
 
         return item
     }

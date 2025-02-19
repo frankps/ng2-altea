@@ -1,10 +1,10 @@
 import { Component, Input, ViewChild, OnInit } from '@angular/core';
 import { ProductService, PriceService, ResourceService } from 'ng-altea-common'
-import { Gender, OnlineMode, Product, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, Resource, DurationMode, DurationReference, ProductRule, ProductRuleType, Schedule, PlanningMode, PlanningBlockSeries } from 'ts-altea-model'
+import { Gender, OnlineMode, Product, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, Resource, DurationMode, DurationReference, ProductRule, ProductRuleType, Schedule, PlanningMode, PlanningBlockSeries, Branch, ResourceType, DateRange, DateRangeSet, ResourcePlanning, ResourcePlannings, PlanningType } from 'ts-altea-model'
 import { FormCardSectionEventData, TranslationService } from 'ng-common'
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxModalComponent } from 'ng-common';
-import { ListSectionMode, BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, Translation, ObjectHelper, DbQuery, QueryOperator, CollectionChangeTracker, ObjectWithId } from 'ts-common'
+import { ListSectionMode, BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, Translation, ObjectHelper, DbQuery, QueryOperator, CollectionChangeTracker, ObjectWithId, ArrayHelper } from 'ts-common'
 import * as _ from "lodash";
 import { NgxSpinnerService } from "ngx-spinner"
 import { Observable } from 'rxjs';
@@ -34,7 +34,7 @@ export class ProductPlanningComponent implements OnInit {
 
   }
 
-  async ngOnInit() { 
+  async ngOnInit() {
 
     this.schedules = await this.scheduleSvc.getForBranch$(this.sessionSvc.branchId)
   }
@@ -78,4 +78,100 @@ export class ProductPlanningComponent implements OnInit {
   }
 
 
-}
+  doPlanPrepTimes() {
+
+    let from = new Date(2025, 2, 31)
+    let to = new Date(2025, 3, 1)
+    let scheduleId = 'd507d664-3d8f-4ebe-bb3b-86dcd7df6fc8'
+    let prodResId = '7b9d4162-ee61-42f2-84f8-a474b3a92d4d'
+    let branchId = this.sessionSvc.branchId
+
+    this.planPrepTimes(branchId, ResourceType.human, this.product, from, to, scheduleId, prodResId)
+
+  }
+
+  /**
+   * Was introduced for pre-configuring cleaning blocks
+   * 
+   * @param branchId 
+   * @param resType 
+   * @param product 
+   * @param from 
+   * @param to 
+   * @param scheduleId 
+   * @param prodResId 
+   * @returns 
+   */
+  planPrepTimes(branchId: string, resType: ResourceType, product: Product, from: Date, to: Date, scheduleId: string, prodResId: string) {
+
+    // let prodRes = product.resources.filter(prodRes => prodRes.act && prodRes.prep && prodRes.resource?.type == resType && prodRes.scheduleIds.includes(scheduleId))
+
+    let productResources = product.resources.filter(prodRes => prodRes.id == prodResId)
+
+    let blockSeries = product.getBlockSeries(scheduleId)
+
+
+    console.warn('prodRes', productResources)
+
+    console.warn('blockSeries', blockSeries)
+
+    if (ArrayHelper.IsEmpty(blockSeries))
+      return
+
+    let planningRange = new DateRange(from, to)
+
+
+    // let allPrepTimeRanges = new DateRangeSet()
+
+    let resourcePlannings = new ResourcePlannings()
+
+
+    for (let blockSerie of blockSeries) {
+
+      let dateRangeSet = blockSerie.makeBlocks(planningRange)
+
+      for (let productResource of productResources) {
+
+        // console.warn('productResource', productResource)
+
+        let appliedRanges = productResource.applyToDateRangeSet(dateRangeSet)
+        //   allPrepTimeRanges = allPrepTimeRanges.add(appliedRanges)
+
+        for (let dateRange of appliedRanges.ranges) {
+
+          let resourcePlanning = new ResourcePlanning()
+
+          resourcePlanning.branchId = this.sessionSvc.branchId
+
+          resourcePlanning.resourceGroupId = productResource.resourceId
+          resourcePlanning.startDate = dateRange.from
+          resourcePlanning.endDate = dateRange.to
+          resourcePlanning.prep = true
+          resourcePlanning.type = PlanningType.mask
+          resourcePlanning.prep = productResource.prep
+          resourcePlanning.overlap = productResource.prepOverlap
+
+          resourcePlannings.plannings.push(resourcePlanning)
+
+          //resourcePlanning.planningMode = PlanningMode.prepTime
+
+        }
+
+        // console.warn('allPrepTimeRanges', allPrepTimeRanges)
+      }
+    }
+
+
+    console.warn('resourcePlannings', resourcePlannings)
+
+
+
+  }
+
+
+
+
+
+
+
+} 

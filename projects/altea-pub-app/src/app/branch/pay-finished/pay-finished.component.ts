@@ -46,7 +46,7 @@ export class PayFinishedComponent implements OnInit {
       return
     }
 
-    const sessionStatus = await this.stripeSvc.sessionStatus(queryParams.sessionId)
+    const sessionStatus = await this.stripeSvc.sessionStatus('test', queryParams.sessionId)
 
     console.error(sessionStatus)
 

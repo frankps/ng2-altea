@@ -5,7 +5,7 @@
             <div class="col-6 px-3 d-flex align-items-center">
 
                 <i *ngIf="order.src == 'ngApp'" class="fa-solid fa-mobile"></i>
-                <span *ngIf="order.contact"> &nbsp;{{order.contact.name}}</span>
+                <span *ngIf="order.contact"> &nbsp;<a [routerLink]="['/aqua/contacts/',order.contact.id]" style="text-decoration: none; color: inherit;">{{order.contact.name}}</a></span>
 
             </div>
             <div class="col-6 px-3 d-flex justify-content-end align-items-center">
