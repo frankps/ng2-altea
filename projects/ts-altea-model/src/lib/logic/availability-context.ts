@@ -536,13 +536,16 @@ export class AvailabilityContext {
         // if not found, check if plannings are inherited from branch
 
         let branchScheduleIds = resourceSchedules.flatMap(schedule => schedule.scheduleIds)
-        let branchPlannings = this.resourcePlannings.filterBySchedulesDateRange2(branchScheduleIds, date, date)
+
+
+    
+        let branchPlannings = this.resourcePlannings.filterBySchedulesDateRange2(branchScheduleIds, date, date, this.branchId)
 
         if (branchPlannings.notEmpty()) {
             let branchPlanning = branchPlannings.plannings[0]
             let branchScheduleId = branchPlanning.scheduleId
 
-            let schedule = this.schedules.find(schedule => schedule.scheduleIds.indexOf(branchScheduleId) >= 0)
+            let schedule = this.schedules.find(schedule => schedule.resourceId == resourceId && schedule.scheduleIds.indexOf(branchScheduleId) >= 0)
             return schedule
         }
 

@@ -330,12 +330,16 @@ export class ResourcePlannings {
     return new ResourcePlannings(plannings)
   }
 
-  filterBySchedulesDateRange2(scheduleIds: string[], from: Date | number, to: Date | number): ResourcePlannings {
+  filterBySchedulesDateRange2(scheduleIds: string[], from: Date | number, to: Date | number, ...resourceIds: string[]): ResourcePlannings {
 
     let fromNum = from instanceof Date ? DateHelper.yyyyMMddhhmmss(from) : from
     let toNum = to instanceof Date ? DateHelper.yyyyMMddhhmmss(to) : to
 
     let plannings = this.plannings.filter(rp => rp.scheduleId && scheduleIds.indexOf(rp.scheduleId) >= 0 && rp.end > fromNum && rp.start < toNum)
+
+    if (ArrayHelper.NotEmpty(resourceIds)) {
+      plannings = plannings.filter(rp => resourceIds.indexOf(rp.resourceId) >= 0)
+    }
 
     return new ResourcePlannings(plannings)
   }

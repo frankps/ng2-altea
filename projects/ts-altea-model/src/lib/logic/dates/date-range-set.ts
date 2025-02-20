@@ -46,7 +46,8 @@ export class ResourceAvailabilitySets {
 
     constructor(public resource: Resource, public all: ResourcePlannings = new ResourcePlannings(), public available: DateRangeSet = DateRangeSet.empty,
         public overlapAllowed: DateRangeSet = DateRangeSet.empty,
-        public workingTime: DateRangeSet = DateRangeSet.empty
+        public workingTime: DateRangeSet = DateRangeSet.empty,
+        public unavailable: DateRangeSet = DateRangeSet.empty
     ) {
     }
 }
@@ -485,6 +486,30 @@ export class DateRangeSet {
 
     }
 
+    removeOverlappingRanges(other: DateRangeSet): DateRangeSet {
+
+        if (ArrayHelper.IsEmpty(this.ranges))
+            return DateRangeSet.empty
+
+        if (ArrayHelper.IsEmpty(other.ranges))
+            return this.clone()
+
+        let result = new DateRangeSet()
+
+        for (let range of this.ranges) {
+
+            let idx = other.indexOfOverlappingRange(range)
+
+            // if no overlap, then we keep it!
+            if (idx == -1)
+                result.addRanges(range)
+        }
+
+        return result
+    }
+
+
+
     getRangeWhereToEquals(to: Date) {
         const match = this.ranges.find(r => dateFns.isEqual(r.to, to))
         return match
@@ -740,6 +765,15 @@ export class DateRangeSet {
         return -1
     }
 
+    indexOfOverlappingRange(other: DateRange): number {
+        if (ArrayHelper.IsEmpty(this.ranges))
+            return -1
+
+        const result = this.ranges.findIndex(range => range.section(other)?.duration.seconds > 0)
+
+        return result
+    }
+
     indexOfRangeBiggestOverlap(other: DateRange): number {
         if (ArrayHelper.IsEmpty(this.ranges))
             return -1
@@ -818,6 +852,7 @@ export class DateRangeSet {
 
 
     }
+
 
 
     removeBefore(date: Date = new Date()) {

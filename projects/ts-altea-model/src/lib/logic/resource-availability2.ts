@@ -132,9 +132,7 @@ export class ResourceAvailability2 {
             resourceOccupation.overlapAllowed.resource = resource
             workingHours.resource = resource
 
-            let availability = new ResourceAvailabilitySets(resource, resourceOccupation.all, resourceStillAvailable, resourceOccupation.overlapAllowed, workingHours)
-
-
+            let availability = new ResourceAvailabilitySets(resource, resourceOccupation.all, resourceStillAvailable, resourceOccupation.overlapAllowed, workingHours, unavailable)
 
 
             availability.hasBreakBlock = true
@@ -288,6 +286,13 @@ export class ResourceAvailability2 {
         let availability = this.availability.get(resourceId)
 
         return availability
+    }
+
+    getOccupiedRanges(resourceId: string, dateRange: DateRange): DateRangeSet {
+
+        let availability = this.availability.get(resourceId)
+
+        return availability.workingTime
     }
 
 

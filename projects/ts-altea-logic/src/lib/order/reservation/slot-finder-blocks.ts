@@ -72,8 +72,23 @@ export class SlotFinderBlocks {
                 const durationFixed = this.preconfiguredBlocksOnly(firstSchedule, product)
 
                 // if the range has no occupations yet
-                if (scheduleIsEmpty) {
+                if (scheduleIsEmpty || durationFixed) {
                     possibleDateRanges = this.getFullDayStartDates(product, availableRange, ctx, schedules)
+
+
+                    
+                    if (!scheduleIsEmpty) {
+                        // remove occupied ranges from possibleDateRanges   
+                        const resourceAvailability = availability.getSetForResource(resource.id)
+
+                        if (resourceAvailability?.unavailable) {
+                           
+                            possibleDateRanges = possibleDateRanges.removeOverlappingRanges(resourceAvailability.unavailable)
+                        }
+
+
+                        
+                    }
                     
                     const solutions = possibleDateRanges.toSolutions(resourceRequest, firstRequestItem, true, durationFixed, resource)
                     solutionSet.add(...solutions)
