@@ -49,6 +49,7 @@
     "price": "Prijs",
     "print": "Print",
     "qty": "Aantal",
+    "remarks": "Opmerkingen",
     "reply": "Antwoorden",
     "reset-password": "Wachtwoord opnieuw instellen",
     "select": "Selecteer",
@@ -561,6 +562,9 @@
       }
     },
     "order-mgr": {
+      "inform": {
+        "duration_change": "De duurtijd van "
+      },
       "pos": {
         "menu": {
           "start": "Start",

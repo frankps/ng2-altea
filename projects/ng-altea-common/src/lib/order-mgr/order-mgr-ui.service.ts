@@ -89,7 +89,9 @@ export class OrderMgrUiService {   // implements OnInit
   /** available after calling getAvailabilities() */
   availabilityRequest: AvailabilityRequest
   availabilityResponse: AvailabilityResponse
-  options: ReservationOption[]
+  //options: ReservationOption[]
+
+  optionSet: ReservationOptionSet
 
   /** resource plannings associated with current order */
   plannings: ResourcePlanning[]
@@ -233,7 +235,7 @@ export class OrderMgrUiService {   // implements OnInit
 
   hasOptions(): boolean {
 
-    return ArrayHelper.NotEmpty(this.options)
+    return ArrayHelper.NotEmpty(this.optionSet?.options)
 
   }
 
@@ -341,7 +343,9 @@ export class OrderMgrUiService {   // implements OnInit
     this.orderLineOptions = null
     this.orderLine = null
     this.orderDirty = false
-    this.options = null
+
+    this.optionSet = null
+
     this.loyalty = null
     this.showTimer = false
     this.loyalty = null
@@ -754,13 +758,23 @@ export class OrderMgrUiService {   // implements OnInit
 
     this.availabilityResponse = response
 
-    if (this.availabilityResponse?.optionSet?.options)
-      this.options = this.availabilityResponse.optionSet.options
+    if (this.availabilityResponse?.optionSet?.options) {
+      let reservationOptions = this.availabilityResponse.optionSet.options
 
+      //this.options = reservationOptions
+
+      // added later to read the inform messages
+      this.optionSet = this.availabilityResponse.optionSet
+    }
+      
     console.error(request)
     console.error(response)
-
   }
+
+
+
+
+
 
 
 

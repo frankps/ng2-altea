@@ -54,7 +54,7 @@ export class SolutionItem {
 
         this.request = request
 
-        /** durationFixed => we should follow the duration coming from dateRange (and not from the request)*/
+        /** durationFixed => we should follow the duration coming from dateRange (and not from the request), because dateRanges where previously created based on configuration */
         if (request && dateRange && durationFixed) {
 
             let requestedDurationSeconds = request.durationInSeconds()
@@ -71,6 +71,14 @@ export class SolutionItem {
 
                 solution.differentFromRequest = true
                 solution.difference = new TimeSpan(actualDurationSeconds - requestedDurationSeconds)
+
+
+                let msgParams = {
+                    product: request?.product?.name,
+                    newDuration: `${dateRange.duration.hours()}u`,
+                }
+                
+                solution.informCustomer(`duration_change`, msgParams)
             }
         }
 
@@ -310,6 +318,18 @@ export class SolutionNotes {
 
 }
 
+export class CustomerInfo {
+
+    msg: string
+    params: any
+
+    constructor(msg?: string, params?: any) {
+        this.msg = msg
+        this.params = params
+    }
+
+}
+
 /** Short for reservation solution. */
 export class Solution extends SolutionItems {
 
@@ -322,6 +342,9 @@ export class Solution extends SolutionItems {
 
     @Type(() => SolutionNote)
     notes: SolutionNote[] = []
+
+    /** inform customer (ex. duration changes) */
+    customerInform: CustomerInfo[] = []
 
     /** resource ids for which the breaks have been checked */
     breaksChecked: string[] = []
@@ -356,6 +379,14 @@ export class Solution extends SolutionItems {
             items.forEach(item => { item.num = num++ })
 
         }
+    }
+
+    informCustomer(msg: string, params?: any) {
+        this.customerInform.push(new CustomerInfo(msg, params))
+    }
+
+    hasCustomerInforms(): boolean {
+        return ArrayHelper.NotEmpty(this.customerInform)
     }
 
     hasParamOverrides(): boolean {

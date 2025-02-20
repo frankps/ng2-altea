@@ -34,6 +34,8 @@ export class DetermineReservationOptions {
         const uniqResult = this.removeDuplicates(result)
         uniqResult.solutionSet = solutionSet
 
+        uniqResult.compileMessages()
+
         return uniqResult
     }
 

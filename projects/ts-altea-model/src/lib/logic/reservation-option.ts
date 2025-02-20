@@ -3,6 +3,7 @@ import { Solution, SolutionSet } from "./solution"
 import * as dateFns from 'date-fns'
 import { Order } from "ts-altea-model"
 
+
 export class ReservationOption {
 
     /** a reservation option is originating from 1 or more solutions */
@@ -12,6 +13,8 @@ export class ReservationOption {
 
     price: number
 
+    /**  */
+    informIdx: number[] = []
 
     /** only set when order is changed by planning logic (ex original request: Wellness 3h, but planning changed to 2h) 
      * 
@@ -29,12 +32,24 @@ export class ReservationOption {
         return DateHelper.parse(this.dateNum)
     }
 
+    hasInforms(): boolean {
+        return ArrayHelper.NotEmpty(this.informIdx)
+    }
+
     isForcedDate() : boolean {
         return ArrayHelper.IsEmpty(this.solutionIds)
     }
 
     fromSolution() : boolean {
         return ArrayHelper.NotEmpty(this.solutionIds)
+    }
+
+    firstSolution() : Solution {
+
+        if (ArrayHelper.IsEmpty(this.solutions))
+            return null
+
+        return this.solutions[0]
     }
 
     static fromDate(start: Date, solution?: Solution): ReservationOption {
@@ -53,7 +68,8 @@ export class ReservationOption {
 
 export class ReservationOptionSet {
 
-    // options: ReservationOption[] = []
+    /** messages to be displayed to customer */
+    informs: string[] = []
 
     constructor(public options: ReservationOption[] = [], public solutionSet: SolutionSet = SolutionSet.empty) {
     }
@@ -61,6 +77,10 @@ export class ReservationOptionSet {
     static get empty(): ReservationOptionSet {
 
         return new ReservationOptionSet()
+    }
+
+    hasInforms(): boolean {
+        return ArrayHelper.NotEmpty(this.informs)
     }
 
     static fromDates(dates: Date[], solution?: Solution): ReservationOptionSet {
@@ -107,6 +127,66 @@ export class ReservationOptionSet {
 
     
     }
+
+
+
+    compileMessages() {
+
+        this.informs = []
+
+        if (ArrayHelper.IsEmpty(this.options))
+          return
+    
+        for (let option of this.options) {
+
+            let solution = option.firstSolution()
+
+            if (!solution || !solution.hasCustomerInforms())
+                continue
+
+
+            for (let inform of solution.customerInform) {
+
+                let msg
+
+                switch (inform.msg) {
+                    case 'duration_change':
+                        msg = `Duurtijd voor ${inform.params.product} is ${inform.params.newDuration}`
+                        break
+
+
+                    default:
+                        console.error(`Not supported message`)
+                }
+
+                let idx = this.informs.indexOf(msg)
+
+                if (idx == -1)
+                    idx = this.informs.push(msg) - 1
+                
+                option.informIdx.push(idx)
+            }
+
+
+        }
+        /*
+        let solutions = this.options.map(option => option.firstSolution())
+    
+    
+        for (let solution of solutions) {
+          if (solution.customerInform) {
+            messages.push(...solution.customerInform)
+          }
+        }
+    
+        return messages
+        */
+      }
+
+
+
+
+
 
 
 }
