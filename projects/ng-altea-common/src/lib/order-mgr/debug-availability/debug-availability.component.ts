@@ -63,6 +63,9 @@ export class DebugAvailabilityComponent implements OnInit {
 
       this.plannings = this.ctx.resourcePlannings.groupByResource()
 
+      console.error(this.plannings)
+
+
       this.request = this.ctx.request
 
 
@@ -144,6 +147,8 @@ export class DebugAvailabilityComponent implements OnInit {
 
 
   resourceHasplannings(resourceId: string): boolean {
+
+
     if (!this.plannings)
       return false
 

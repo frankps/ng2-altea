@@ -13,15 +13,15 @@
 
                         <span class="badge bg-success mt-4" (click)="selectTimeSlot(option)">{{option.date |
                             date:"HH:mm"}}
+
+                            <span *ngIf="option.hasInforms()" style="font-style: italic;">
+                                <sup *ngFor="let informIdx of option.informIdx">
+                                    ({{informIdx + 1}})
+                                </sup>
+                            </span>
+
                             <div *ngIf="option.price" class="mt-2" style="font-size: small; font-style: italic;">
                                 €{{option.price}}</div>
-
-                            <div *ngIf="option.hasInforms()" class="mt-2" style="font-size: small; font-style: italic;">
-                                <ng-container *ngFor="let informIdx of option.informIdx">
-                                    ({{informIdx + 1}}) &nbsp;
-                                </ng-container>
-                            </div>
-
 
                         </span>
                         &nbsp;

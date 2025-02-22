@@ -360,7 +360,8 @@
       "avl": "Beschikbaar",
       "tsk": "Taak",
       "brk": "Pauze",
-      "pres": "Aanwezigheid"
+      "pres": "Aanwezigheid",
+      "mask": "Masker"
     },
     "product-rule-type": {
       "startAt": "Starttijden dienst",

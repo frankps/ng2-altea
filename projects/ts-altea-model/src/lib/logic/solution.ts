@@ -263,7 +263,7 @@ export class SolutionItems extends ObjectWithId {
 
         let requests = this.items.map(i => i.request)
 
-        let offsets: TimeSpan[] = requests.map(request => request.offset(solution))
+        //let offsets: TimeSpan[] = requests.map(request => request.offset(solution))
 
         //        let minOffset = _.minBy(offsets, 'seconds')
         // we assume all items come from the same solution

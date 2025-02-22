@@ -20,7 +20,22 @@ export class ResourceAvailability2 {
 
     constructor(public ctx: AvailabilityContext) {
 
-        let resources = ctx.getAllNongGroupResources()
+        let groupResources = ctx.getAllGroupResources()
+
+        for (const groupResource of groupResources) {
+            const resourceOccupation = ctx.getResourceOccupation2(groupResource.id, true)
+
+            let groupAvailability = new ResourceAvailabilitySets(groupResource)
+
+            groupAvailability.unavailable = resourceOccupation.unAvailable
+            groupAvailability.overlapAllowed = resourceOccupation.overlapAllowed
+           
+            this.availability.set(groupResource.id, groupAvailability)
+
+        }
+
+
+        let resources = ctx.getAllNonGroupResources()
 
         // make sure the "branch" resource is the first one => determines the outer bounds of other resource availabilities
 
@@ -282,7 +297,7 @@ export class ResourceAvailability2 {
 
         if (!this.availability.has(resourceId))
             return null
-     
+
         let availability = this.availability.get(resourceId)
 
         return availability
@@ -310,7 +325,7 @@ export class ResourceAvailability2 {
 
 
         let availability = this.availability.get(resource.id)
-       
+
         let set: DateRangeSet = availability.available
 
         if (minTime)

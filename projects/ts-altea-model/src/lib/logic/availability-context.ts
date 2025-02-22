@@ -111,12 +111,12 @@ export class AvailabilityContext {
         return this.allResources.find(r => r.id == resourceId)
     }
 
-    getHumanResources() : Resource[] {
+    getHumanResources(): Resource[] {
         if (ArrayHelper.IsEmpty(this.allResources))
             return []
 
         return this.allResources.filter(r => r.type == ResourceType.human)
-        
+
     }
 
     getResources(resourceIds: string[]): Resource[] {
@@ -131,12 +131,22 @@ export class AvailabilityContext {
     }
 
     /** Get all resources that are NOT a group (of other resources). So, these are the real resources: human, room, device */
-    getAllNongGroupResources(): Resource[] {
+    getAllNonGroupResources(): Resource[] {
 
         if (!Array.isArray(this.allResources) || this.allResources.length == 0)
             return []
 
         return this.allResources.filter(r => !r.isGroup)
+
+    }
+
+    /** Get all resources that are a group (of other resources). So, these are the real resources: human, room, device */
+    getAllGroupResources(): Resource[] {
+
+        if (!Array.isArray(this.allResources) || this.allResources.length == 0)
+            return []
+
+        return this.allResources.filter(r => r.isGroup)
 
     }
 
@@ -538,7 +548,7 @@ export class AvailabilityContext {
         let branchScheduleIds = resourceSchedules.flatMap(schedule => schedule.scheduleIds)
 
 
-    
+
         let branchPlannings = this.resourcePlannings.filterBySchedulesDateRange2(branchScheduleIds, date, date, this.branchId)
 
         if (branchPlannings.notEmpty()) {
@@ -576,9 +586,9 @@ export class AvailabilityContext {
 
     }
 
-    getResourceOccupation2(resourceId: string): ResourceOccupationSets {
+    getResourceOccupation2(resourceId: string, isGroup = false): ResourceOccupationSets {
 
-        let planningsForResource = this.resourcePlannings.filterByResource(resourceId)
+        let planningsForResource = this.resourcePlannings.filterByResource(resourceId, isGroup)
 
         // exclusive:  meaning no overlap allowed (can be both available or unavailable)
         const exclusivePlannings = planningsForResource.filterByOverlapAllowed(false)
@@ -594,7 +604,7 @@ export class AvailabilityContext {
             return new ResourceOccupationSets()
 
         const availablePlannings = exclusivePlannings.filterByAvailable()
-        
+
         let extraAvailabilitiesForResource = availablePlannings.filterByOverruleScheduleDay(false)
 
         /** these resourcePlannings (resourcePlanning.ors = true) overrule the default schedule for impacted days */
@@ -605,7 +615,7 @@ export class AvailabilityContext {
 
         const absent = exclusivePlannings.filterByType(...AlteaPlanningQueries.absenceTypes())
 
-        
+
 
         const result = new ResourceOccupationSets(
             planningsForResource,
@@ -627,7 +637,7 @@ export class AvailabilityContext {
         if (!this.groupToChildResources || ArrayHelper.IsEmpty(groupIds))
             return []
 
-        let resourceIds : string[] = []
+        let resourceIds: string[] = []
 
         for (let groupId of groupIds) {
             if (!this.groupToChildResources.has(groupId))

@@ -6,12 +6,14 @@ import { AlteaService, GiftService, InvoiceService, ObjectService, OrderMgrServi
 import * as _ from "lodash";
 import { NgxSpinnerService } from "ngx-spinner"
 import { DashboardService, ToastType } from 'ng-common';
-import { BehaviorSubject, Observable, take, takeUntil } from 'rxjs';
+import { AsyncSubject, BehaviorSubject, Observable, take, takeUntil } from 'rxjs';
 import { AlteaDb, CancelOrder, LoyaltyUi, LoyaltyUiCard, OrderMgmtService, PaymentProcessing } from 'ts-altea-logic';
 import * as dateFns from 'date-fns'
 import { StripeService } from '../stripe.service';
 import { er } from '@fullcalendar/core/internal-common';
 import { OrderReminders } from 'projects/ts-altea-logic/src/lib/order/messaging/order-reminders';
+import { Router } from '@angular/router';
+
 
 
 /** reflects the UI component that should be visible  */
@@ -111,10 +113,12 @@ export class OrderMgrUiService {   // implements OnInit
   isPos: boolean = false
 
 
+
+
   constructor(private productSvc: ProductService, private orderSvc: OrderService, private orderMgrSvc: OrderMgrService
     , protected spinner: NgxSpinnerService, public dbSvc: ObjectService, public alteaSvc: AlteaService, protected sessionSvc: SessionService,
     public dashboardSvc: DashboardService, protected stripeSvc: StripeService, protected resourceSvc: ResourceService, protected giftSvc: GiftService,
-    protected invoiceSvc: InvoiceService
+    protected invoiceSvc: InvoiceService, protected router: Router
   ) {
 
     // this.alteaDb = new AlteaDb(dbSvc)
@@ -339,6 +343,8 @@ export class OrderMgrUiService {   // implements OnInit
   }
 
   clearData() {
+
+
     this.order = null
     this.orderLineOptions = null
     this.orderLine = null
@@ -354,6 +360,13 @@ export class OrderMgrUiService {   // implements OnInit
     this.previewInvoice = false
     this.gift = null
     this.payGifts = []
+
+    this.showTimer = false
+    this.startTimerDate = null
+
+    if (this.interval)
+      clearInterval(this.interval)
+
   }
 
   async newOrder(uiMode: OrderUiMode = OrderUiMode.newOrder, gift?: Gift) {
@@ -766,7 +779,7 @@ export class OrderMgrUiService {   // implements OnInit
       // added later to read the inform messages
       this.optionSet = this.availabilityResponse.optionSet
     }
-      
+
     console.error(request)
     console.error(response)
   }
@@ -895,7 +908,8 @@ export class OrderMgrUiService {   // implements OnInit
 
         await me.refreshOrder(order)
 
-        me.startTimer()
+        if (me.sessionSvc.appMode == AppMode.consum)
+          me.startTimer()
 
         me.orderDirty = false
         me.dashboardSvc.showToastType(ToastType.saveSuccess)
@@ -921,8 +935,12 @@ export class OrderMgrUiService {   // implements OnInit
 
   /** Users  */
   showTimer = false
-  timeLeft = 10
+  startTimerDate: Date
+  timeLeftSecondsInit = 10 * 60
+  timeLeftSeconds = this.timeLeftSecondsInit
   interval
+
+  // timerChanged: BehaviorSubject<number> = new BehaviorSubject<number>(this.timeLeftSeconds)
 
   /**
    * https://www.w3schools.com/jsref/met_win_setinterval.asp
@@ -931,29 +949,78 @@ export class OrderMgrUiService {   // implements OnInit
   startTimer() {
 
     this.showTimer = true
-    this.timeLeft = 10
+
+    this.startTimerDate = new Date()
+    this.timeLeftSeconds = this.timeLeftSecondsInit
 
     this.interval = setInterval(() => {
 
-      if (this.timeLeft > 0) {
-        this.timeLeft--;
-      } else {
-        clearInterval(this.interval)
+      let now = new Date()
+      let diff = dateFns.differenceInSeconds(now, this.startTimerDate)
+
+      this.timeLeftSeconds = this.timeLeftSecondsInit - diff
+
+      if (this.timeLeftSeconds <= 0) {
+        this.stopTimer()
+        this.sessionTimeout()
       }
-    }, 60 * 1000)
+
+      /*
+      if (this.timeLeftSeconds > 0) {
+        this.timeLeftSeconds--
+
+       // this.timerChanged.next(timeLeftSeconds)
+      } else {
+        // this.timerChanged.next(0)
+        //this.timerChanged.complete()
+        //clearInterval(this.interval)
+
+        this.stopTimer()
+        this.sessionTimeout()
+      }*/
+    }, 1000)
 
   }
 
+  stopTimer() {
+
+    if (this.interval)
+      clearInterval(this.interval)
+
+  }
+
+  async sessionTimeout() {
+
+    this.clearData()
+    await this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'menu'])
+  }
+
+
   timerColor(): string {
 
-    if (this.timeLeft >= 3)
+    if (this.timeLeftSeconds >= 180)
       return 'green'
-    else if (this.timeLeft >= 1)
+    else if (this.timeLeftSeconds >= 60)
       return 'orange'
     else
       return 'red'
   }
 
+  timeLeftString(): string {
+
+    const minutes = Math.floor(this.timeLeftSeconds / 60)
+
+/*     if (minutes >= 3)
+      return `${minutes} min`
+*/
+
+    const seconds = this.timeLeftSeconds % 60 
+
+    if (minutes >= 1)
+      return `${minutes} min en ${seconds} sec`
+
+    return `${seconds} sec`
+  }
 
 
 
@@ -1282,7 +1349,7 @@ export class OrderMgrUiService {   // implements OnInit
 
   }
 
-  convertOrderLineOptionsToMap(options?: OrderLineOption[]) : Map<String, String[]> {
+  convertOrderLineOptionsToMap(options?: OrderLineOption[]): Map<String, String[]> {
 
     if (ArrayHelper.IsEmpty(options))
       return null

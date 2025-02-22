@@ -99,11 +99,123 @@ export class DateRangeSets extends SolutionNotes {
             return []
 
         return this.sets.map(set => set.resource)
-
     }
 
 
-    reduce(possibleResourceIds: string[], range: DateRange, qty: number = 1, resources?: Resource[]): DateRangeSets {
+
+    calculateOverlapsBySet(range: DateRange, possibleResourceIds?: string[]): DateRangeSet[] {
+
+        let overlaps = []
+
+        if (this.isEmpty())
+            return overlaps
+
+        for (let set of this.sets) {
+
+            //let setOverlap = 0
+
+            let resourceId = set.resource?.id
+
+            if (possibleResourceIds && possibleResourceIds.indexOf(resourceId) == -1) {
+                overlaps.push(DateRangeSet.empty)
+                continue
+            }
+
+            let section = set.section(range)
+            overlaps.push(section)
+        }
+
+        return overlaps
+    }
+
+    getSetIndexesWithBiggestOverlap(overlapDateRangeSets: DateRangeSet[], range: DateRange, qty: number = 1): number[] {
+
+        let indexes = []
+
+        if (!overlapDateRangeSets || overlapDateRangeSets.length == 0)
+            return indexes
+
+        let overlapsInSeconds = overlapDateRangeSets.map(set => set ? set.duration.seconds : 0)
+
+        const overlapsSortedDesc = _.orderBy(overlapsInSeconds, [], ['desc']);
+
+        let lastOverlap = -1
+        let lastIdx = -1
+
+        for (let i = 0; i < qty; i++) {
+
+            let overlap = overlapsSortedDesc[i]
+
+            let fromIndex = 0
+
+            if (overlap == lastOverlap)
+                fromIndex = lastIdx + 1
+
+            let idx = overlapsInSeconds.indexOf(overlap, fromIndex)
+
+            if (idx == -1)
+                break
+
+            indexes.push(idx)
+
+            lastOverlap = overlap
+            lastIdx = idx
+        }
+
+        return indexes
+    }
+
+    reduceAllowPartialRange(possibleResourceIds: string[], range: DateRange, qty: number = 1, resources?: Resource[]): DateRangeSets {
+
+        let overlapDateRangeSets = this.calculateOverlapsBySet(range, possibleResourceIds)
+        let indexesBiggestOverlaps = this.getSetIndexesWithBiggestOverlap(overlapDateRangeSets, range, qty)
+
+        if (ArrayHelper.IsEmpty(indexesBiggestOverlaps))
+            return this
+
+        let resultSets = new DateRangeSets()
+
+        let idx = 0
+        for (let set of this.sets) {
+
+            let resourceId = set.resource?.id
+
+
+            if (indexesBiggestOverlaps.indexOf(idx) == -1 || resultSets.reduced >= qty) {
+                resultSets.addSet(set)
+                continue
+            }
+
+            let overlap = overlapDateRangeSets[idx]
+            let reducedSet = set.subtract(overlap)
+            resultSets.addSet(reducedSet)
+            resultSets.reduced++
+
+
+
+            // add a note
+            let resourceInfo = resourceId
+            if (resourceId && resources) {
+
+                let resource = resources.find(r => r.id == resourceId)
+
+                if (resource)
+                    resourceInfo = resource.shortOrName()
+            }
+
+            resultSets.addNote(`Group level planning => (partial) removed ${range.toString()} for resource ${resourceInfo}`)
+
+            idx++
+
+
+
+        }
+
+
+        return resultSets
+    }
+
+    reduceFullRangeOnly(possibleResourceIds: string[], range: DateRange, qty: number = 1, resources?: Resource[]): DateRangeSets {
 
         if (ArrayHelper.IsEmpty(this.sets))
             return this
@@ -139,12 +251,13 @@ export class DateRangeSets extends SolutionNotes {
                 continue
             }
 
+
             let reducedSet = set.subtractRange(range)
             resultSets.sets.push(reducedSet)
 
             // add a note
             let resourceInfo = resourceId
-            if (resources) {
+            if (resourceId && resources) {
 
                 let resource = resources.find(r => r.id == resourceId)
 
@@ -237,6 +350,12 @@ export class DateRangeSet {
 
         return set
     }
+
+    get duration(): TimeSpan {
+
+        return new TimeSpan(this.ranges.reduce((acc, range) => acc + (range ? range.duration.seconds : 0), 0))
+    }
+
 
     sortRanges() {
 
@@ -763,6 +882,22 @@ export class DateRangeSet {
         }
 
         return -1
+    }
+
+    section(other: DateRange): DateRangeSet {
+
+        const result = new DateRangeSet()
+
+        for (let range of this.ranges) {
+            const section = range.section(other)
+
+            if (section && section.duration.seconds > 0)
+                result.addRanges(section)
+        }
+
+        result.flatten()
+
+        return result
     }
 
     indexOfOverlappingRange(other: DateRange): number {

@@ -9,7 +9,7 @@ import { AuthService } from '../../auth/auth.service';
 import { environment } from '../../../environments/environment';
 import { NgxSpinnerService } from "ngx-spinner"
 import { ArrayHelper } from 'ts-common';
-
+import { Subscription } from 'rxjs';
 /*
 
 https://stripe.com/docs/payments/accept-a-payment?platform=web&ui=embedded-checkout
@@ -82,6 +82,8 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
    */
   usedGifCodes: string[] = []
 
+  //timerSubscription: Subscription
+
   constructor(protected orderMgrSvc: OrderMgrUiService, protected route: ActivatedRoute, protected sessionSvc: SessionService,
     protected stripeSvc: StripeService, private translationSvc: TranslationService, protected authSvc: AuthService, protected spinner: NgxSpinnerService,
     protected giftSvc: GiftService, protected router: Router
@@ -96,10 +98,36 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
 
     await this.setPaymentOptions()
 
-    // for easy dubugging (auto select first option, go to pay type)
-    // await this.selectPayOption(this.payOptions[0])
+
+/*   
+MOVED to order-mgr-ui.service.ts
+
+this.timerSubscription = this.orderMgrSvc.timerChanged.subscribe(seconds => {
+      console.log('timer changed', seconds)
+
+      if (seconds == 0) {
+        this.sessionTimeout()
+      }
+
+    }) */
 
 
+  }
+
+/*   async sessionTimeout() {
+  
+    this.orderMgrSvc.clearData()
+    await this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'menu'])
+  } */
+
+
+  async ngOnDestroy() {
+
+/*     if (this.timerSubscription) {
+      this.timerSubscription.unsubscribe()
+    } */
+
+    this.checkout?.destroy()
   }
 
 
@@ -279,11 +307,9 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
     await this.startPayment(this.toPay)
   }
 
-  async ngOnDestroy() {
 
-    this.checkout?.destroy()
 
-  }
+
 
   async startPayment(amount: number) {
 
@@ -317,7 +343,8 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
 
     let stripeShowText = 'Aquasense'
 
-    const createCheckout = CreateCheckoutSession.embedded(amount * 100, branch.cur, stripeShowText, returnUrl, this.sessionSvc.stripEnvironment)
+    const stripeEnv = this.sessionSvc.stripEnvironment
+    const createCheckout = CreateCheckoutSession.embedded(amount * 100, branch.cur, stripeShowText, returnUrl, stripeEnv)
     createCheckout.orderId = order.id
 
     if (this.authSvc?.user?.email)
@@ -329,8 +356,10 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
 
     console.error(apiResult)
 
-    const clientSecret = apiResult.object.clientSecret
-    const publicKey = apiResult.object.publicKey
+    const createdSession = apiResult.object
+
+    const clientSecret = createdSession.clientSecret
+    const publicKey = createdSession.publicKey
 
    // const stripe: any = new Stripe('pk_test_lTy1ovFLMXISWhS20E268osc');
     const stripe: any = new Stripe(publicKey)
@@ -339,10 +368,18 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
       clientSecret,
     });
 
+    console.log(me.checkout)
+
 
     // Mount Checkout
     me.checkout.mount('#checkout');
 
+
+/*     
+    var res = await me.stripeSvc.sessionStatus(stripeEnv, createdSession.id)
+
+    console.log(res) */
+    
 
     this.spinner.hide()
 

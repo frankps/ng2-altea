@@ -70,6 +70,9 @@ New firestore service:
     ng generate service data-services/firestore/orderFirestore --project=ng-altea-common
 
 
+    
+
+
 
 
 http://localhost:4200/auth2/test

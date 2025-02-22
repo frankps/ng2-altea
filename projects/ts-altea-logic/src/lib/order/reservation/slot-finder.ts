@@ -114,7 +114,7 @@ export class SlotFinder {
 
 
 
-    createInitialSolutions(availability2: ResourceAvailability2, ctx: AvailabilityContext, resourceRequest: ResourceRequest): SolutionSet {
+    createInitialSolutions(availability: ResourceAvailability2, ctx: AvailabilityContext, resourceRequest: ResourceRequest): SolutionSet {
 
         const solutionSet = new SolutionSet()
 
@@ -128,14 +128,19 @@ export class SlotFinder {
 
         if (product.planMode == PlanningMode.block) {
 
-            const solutionSet = SlotFinderBlocks.I.createInitialSolutions(availability2, ctx, resourceRequest)
+            const solutionSet = SlotFinderBlocks.I.createInitialSolutions(availability, ctx, resourceRequest)
             return solutionSet
         }
 
         // PlanningMode = CONTINOUS
         // ========================
 
-        const firstItemAvailabilities = availability2.getAvailabilities(firstRequestItem.resources)
+        let firstItemAvailabilities = availability.getAvailabilities(firstRequestItem.resources)
+
+
+        // if there are group level reservations, then we need to subtract them from the availabilities
+        let possibleResources = firstRequestItem.resources
+        firstItemAvailabilities = this.subtractGroupLevelReservations(possibleResources, firstItemAvailabilities, ctx, availability)
 
 
         let i = 0
@@ -156,6 +161,9 @@ export class SlotFinder {
                     continue
 
                 possibleDateRanges.addRanges(availableRange)
+
+                
+
 
                 // possibleDateRanges only contains 1 range
                 let durationFixed = false
@@ -423,9 +431,10 @@ export class SlotFinder {
      * @param availabilityForResources the availability for these resources
      * @param ctx 
      * @param availability 
+     * @param solution notes will be added to this solution (if changes were made)
      * @returns 
      */
-    subtractGroupLevelReservations(resourcesChecked: Resource[], availabilityForResources: DateRangeSets, ctx: AvailabilityContext, availability: ResourceAvailability2, solution: Solution): DateRangeSets {
+    subtractGroupLevelReservations(resourcesChecked: Resource[], availabilityForResources: DateRangeSets, ctx: AvailabilityContext, availability: ResourceAvailability2, solution?: Solution): DateRangeSets {
 
         let origResourceIds = resourcesChecked.map(res => res.id)
 
@@ -477,10 +486,11 @@ export class SlotFinder {
 
             let groupId = planning.resourceGroupId
 
+            // first we check if other resources are available for this group planning (ex people not needed for this request)
 
-            otherAvailableResources = otherAvailableResources.reduce(otherPossibleResourceIds, dateRange, 1, ctx.allResources)
+            otherAvailableResources = otherAvailableResources.reduceFullRangeOnly(otherPossibleResourceIds, dateRange, 1, ctx.allResources)
 
-            if (otherAvailableResources.reduced > 0) { // then somebody else (from otherPossibleResources) can fulfill this group planning
+            if (solution && otherAvailableResources.reduced > 0) { // then somebody else (from otherPossibleResources) can fulfill this group planning
                 solution.addNotes(otherAvailableResources.notes)
                 continue
             }
@@ -490,9 +500,27 @@ export class SlotFinder {
 
             let childResourceIdsNotYetChecked = childResourceIds.filter(id => resourcesChecked.findIndex(res => res.id == id) == -1)
 
-            availabilityForResources = availabilityForResources.reduce(childResourceIds, dateRange, 1, ctx.allResources)
+            availabilityForResources = availabilityForResources.reduceFullRangeOnly(childResourceIds, dateRange, 1, ctx.allResources)
 
-            solution.addNotes(availabilityForResources.notes)
+            if (solution && availabilityForResources.reduced > 0) {
+                solution.addNotes(availabilityForResources.notes)
+                continue
+            }
+
+
+            /*
+            When we can't fulfill the group level planning, then we allow partial range
+            (example Lusien start at 9h15, but the grouplevel request is from 9h00 to 9h30
+            => so we can't fulfill [9h00-9h30], but at least we can fulfill [9h15-9h30])
+            */
+
+            availabilityForResources = availabilityForResources.reduceAllowPartialRange(childResourceIds, dateRange, 1, ctx.allResources)
+
+            if (solution && availabilityForResources.reduced > 0) {
+                solution.addNotes(availabilityForResources.notes)
+                continue
+            }
+
 
             //console.warn(childResourceIds)
         }

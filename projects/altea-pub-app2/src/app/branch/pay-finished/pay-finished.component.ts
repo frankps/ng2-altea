@@ -87,6 +87,8 @@ export class PayFinishedComponent implements OnInit {
 
         this.allOk = true
         this.orderMgrSvc.mode = 'order-finished'
+        
+        this.orderMgrSvc.stopTimer()
 
       }
 

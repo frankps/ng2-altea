@@ -29,7 +29,7 @@ class ResourceAvailability_DoNotUse {
 
     constructor(public ctx: AvailabilityContext) {
 
-        const resources = ctx.getAllNongGroupResources()
+        const resources = ctx.getAllNonGroupResources()
 
         for (const resource of resources) {
 

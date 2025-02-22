@@ -9,7 +9,7 @@ import * as _ from "lodash";
 import { NgxSpinnerService } from "ngx-spinner"
 import { Observable } from 'rxjs';
 import { EditProductComponent } from '../edit-product/edit-product.component';
-import { ScheduleService, SessionService } from 'ng-altea-common';
+import { ScheduleService, SessionService, ResourcePlanningService } from 'ng-altea-common';
 
 @Component({
   selector: 'ngx-altea-product-planning',
@@ -29,7 +29,7 @@ export class ProductPlanningComponent implements OnInit {
 
   schedules
 
-  constructor(private scheduleSvc: ScheduleService, private sessionSvc: SessionService) {
+  constructor(private scheduleSvc: ScheduleService, private sessionSvc: SessionService, private planningSvc: ResourcePlanningService) {
 
 
   }
@@ -78,7 +78,7 @@ export class ProductPlanningComponent implements OnInit {
   }
 
 
-  doPlanPrepTimes() {
+  async doPlanPrepTimes() {
 
     let from = new Date(2025, 2, 31)
     let to = new Date(2025, 3, 1)
@@ -86,7 +86,9 @@ export class ProductPlanningComponent implements OnInit {
     let prodResId = '7b9d4162-ee61-42f2-84f8-a474b3a92d4d'
     let branchId = this.sessionSvc.branchId
 
-    this.planPrepTimes(branchId, ResourceType.human, this.product, from, to, scheduleId, prodResId)
+    let res = await this.planPrepTimes(branchId, ResourceType.human, this.product, from, to, scheduleId, prodResId)
+
+    console.warn('res', res)
 
   }
 
@@ -102,7 +104,7 @@ export class ProductPlanningComponent implements OnInit {
    * @param prodResId 
    * @returns 
    */
-  planPrepTimes(branchId: string, resType: ResourceType, product: Product, from: Date, to: Date, scheduleId: string, prodResId: string) {
+  async planPrepTimes(branchId: string, resType: ResourceType, product: Product, from: Date, to: Date, scheduleId: string, prodResId: string): Promise<ResourcePlannings> {
 
     // let prodRes = product.resources.filter(prodRes => prodRes.act && prodRes.prep && prodRes.resource?.type == resType && prodRes.scheduleIds.includes(scheduleId))
 
@@ -110,13 +112,12 @@ export class ProductPlanningComponent implements OnInit {
 
     let blockSeries = product.getBlockSeries(scheduleId)
 
-
     console.warn('prodRes', productResources)
 
     console.warn('blockSeries', blockSeries)
 
     if (ArrayHelper.IsEmpty(blockSeries))
-      return
+      return new ResourcePlannings()
 
     let planningRange = new DateRange(from, to)
 
@@ -164,10 +165,19 @@ export class ProductPlanningComponent implements OnInit {
 
     console.warn('resourcePlannings', resourcePlannings)
 
+    if (!resourcePlannings || resourcePlannings.isEmpty())
+      return resourcePlannings
 
+    let apiBatchProcess = new ApiBatchProcess<ResourcePlanning>()
+    apiBatchProcess.create = resourcePlannings.plannings
+
+    let res = await this.planningSvc.batchProcess$(apiBatchProcess, this.sessionSvc.branchId)
+
+    console.warn('res', res)
+
+    return resourcePlannings
 
   }
-
 
 
 

@@ -29,7 +29,7 @@ export class OrderLineComponent implements OnInit {
 
   showMoreInternal = false
 
-  
+
   constructor(protected orderMgrSvc: OrderMgrUiService, private productSvc: ProductService, public sessionSvc: SessionService) {
   }
 
@@ -69,7 +69,7 @@ export class OrderLineComponent implements OnInit {
     this.setQtyArray(product)
   }
 
-  _orderLine: OrderLine   
+  _orderLine: OrderLine
 
   @Input() set orderLine(line: OrderLine) {
 
@@ -178,8 +178,38 @@ export class OrderLineComponent implements OnInit {
 
   }
 
+
+  canDeleteOrderLine(): boolean {
+
+    const orderLine = this.orderMgrSvc.orderLine
+
+    if (!orderLine)
+      return false
+
+    if (orderLine.json) {
+
+      if (ArrayHelper.NotEmpty(orderLine.json['subs'])) {
+        return false
+      }
+    }
+
+    return true
+  }
+  
+
   deleteOrderLine() {
     const orderLine = this.orderMgrSvc.orderLine
+
+    if (!orderLine)
+      return
+
+    if (orderLine.json) {
+
+      if (ArrayHelper.NotEmpty(orderLine.json['subs'])) {
+        console.error('Cannot delete order line that was used to create subscriptions')
+        return
+      }
+    }
 
     this.orderMgrSvc.deleteCurrentOrderLine()
     this.delete.emit(orderLine)
@@ -294,7 +324,7 @@ export class OrderLineComponent implements OnInit {
 
     if (newIncl != previousIncl)
       this.orderMgrSvc.calculateAll()
-      
+
 
     this.orderLine.markAsUpdated("options")
     this.orderMgrSvc.orderDirty = true

@@ -16,7 +16,7 @@ export enum PlanningType {
   occ = 'occ',   // occupied, typically used for order planning
 
   /** pre-determined occupations: example if we work with fixed cleaning blocks for welness (when we are abscent, then we preconfigure a mask of cleaning blocks with allocation on group level)*/
-  mask = 'mask', 
+  mask = 'mask',
 
   /** holiday */
   hol = 'hol',
@@ -214,9 +214,14 @@ export class ResourcePlannings {
     return newPlannings
   }
 
-  filterByResource(resourceId: string): ResourcePlannings {
+  filterByResource(resourceId: string, isGroup = false): ResourcePlannings {
 
-    const planningsForResource = this.plannings.filter(rp => rp.resourceId == resourceId)
+    let planningsForResource
+
+    if (isGroup)
+      planningsForResource = this.plannings.filter(rp => rp.resourceGroupId == resourceId)
+    else
+      planningsForResource = this.plannings.filter(rp => rp.resourceId == resourceId)
 
     if (!Array.isArray(planningsForResource))
       return new ResourcePlannings()
@@ -435,6 +440,7 @@ export class ResourcePlannings {
     return groupIds
   }
 
+
   groupByResource(): _.Dictionary<ResourcePlanning[]> {
 
     // const map = new Map<Resource, ResourcePlanning[]>()
@@ -442,6 +448,16 @@ export class ResourcePlannings {
 
     const map = _.groupBy(this.plannings, 'resourceId')
 
+    let groupMap = _.groupBy(this.plannings, 'resourceGroupId')
+
+    if (groupMap) {
+      for (const groupId in groupMap) {
+
+        if (groupId != 'null')
+          map[groupId] = groupMap[groupId]
+
+      }
+    }
     return map
 
   }
@@ -534,7 +550,7 @@ export class PlanningInfo {
 
 
 }
-
+  
 
 export class ResourcePlanning extends ObjectWithIdPlus implements IAsDbObject<ResourcePlanning> {
   branchId?: string;
@@ -646,7 +662,7 @@ export class ResourcePlanning extends ObjectWithIdPlus implements IAsDbObject<Re
     let hour = dateFns.format(this.startDate, 'HH:mm')    //DateHelper.parse(this.start)
 
     return hour
-  }  
+  }
 
   set endDate(value: Date) {
     this.end = DateHelper.yyyyMMddhhmmss(value)

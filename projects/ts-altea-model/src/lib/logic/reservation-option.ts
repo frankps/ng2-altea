@@ -151,7 +151,7 @@ export class ReservationOptionSet {
 
                 switch (inform.msg) {
                     case 'duration_change':
-                        msg = `Duurtijd voor ${inform.params.product} is ${inform.params.newDuration}`
+                        msg = `Duurtijd voor ${inform.params.product} is uitzonderlijk ${inform.params.newDuration}`
                         break
 
 

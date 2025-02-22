@@ -36,7 +36,7 @@ export class OrderLineOptionSummary {
     if (isNaN(num))
       return value
     else
-      return '' + _.round(num)
+      return '' + _.round(num, 1)
   }
 
   isZeroOrEmpty() {
