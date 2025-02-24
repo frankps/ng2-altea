@@ -177,10 +177,12 @@ export class DateRange<T = any> {
         return inverted
     }
 
+    /** returns from in format yyyyMMddhhmmss */
     fromToNum() {
         return DateHelper.yyyyMMddhhmmss(this.from)
     }
 
+    /** returns to in format yyyyMMddhhmmss */
     toToNum() {
         return DateHelper.yyyyMMddhhmmss(this.to)
     }

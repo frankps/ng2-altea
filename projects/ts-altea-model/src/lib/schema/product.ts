@@ -226,6 +226,7 @@ export class ProductOptionValue extends ObjectWithIdPlus {
 
 
 export enum ProductRuleType {
+  nonActiveSchedules = 'nonActiveSchedules',
   startAt = 'startAt',
   prePost = 'prePost'
 }
@@ -243,25 +244,24 @@ export class ProductRule {
   idx = 0
 
   /** if rule only applies for certain schedules (typically branch schedules) */
-  scheduleIds?: ObjectReference[]
+  scheduleIds?: string[]
 
+  /*
   startAt?: string[]  // format 09:30, 11:00
 
   optionIds?: ObjectReference[]
 
   operator?: QueryOperator
 
-
   @Type(() => Number)
   value?: number
-
 
   @Type(() => Number)
   preTime?: number
 
-
   @Type(() => Number)
   postTime?: number
+  */
 }
 
 export enum PlanningMode {
@@ -308,24 +308,32 @@ export class PlanningBlockSeries {
 
     console.error('makeBlocks', inRange, this)
 
-    const start = dateFns.parse(this.start, 'HH:mm', inRange.from)
-
     const result = DateRangeSet.empty
 
-    let loop = start
-    let count = 0
+    let fromLoop = inRange.from
 
-    while (loop < inRange.to && (!this.count || count < this.count)) {
+    // for multi-day ranges
+    while (fromLoop < inRange.to) {
 
-      const end = dateFns.addMinutes(loop, this.dur)
+      const start = dateFns.parse(this.start, 'HH:mm', fromLoop)
 
-      if (loop >= inRange.from && end <= inRange.to) {
-        const range = new DateRange(loop, end)
-        result.addRanges(range)
+      let loop = start
+      let count = 0
+
+      while (loop < inRange.to && (!this.count || count < this.count)) {
+
+        const end = dateFns.addMinutes(loop, this.dur)
+
+        if (loop >= inRange.from && end <= inRange.to) {
+          const range = new DateRange(loop, end)
+          result.addRanges(range)
+        }
+
+        loop = dateFns.addMinutes(end, this.post)
+        count++
       }
 
-      loop = dateFns.addMinutes(end, this.post)
-      count++
+      fromLoop = dateFns.addDays(fromLoop, 1)
     }
 
 
@@ -723,15 +731,15 @@ export class Product extends ObjectWithIdPlus {
   }
 
 
-/*   getOptionIdsHavingDurations(): string[] {
-
-    if (!this.hasOptions())
-      return []
-
-    let optionIds = this.options.filter(o => o.hasDuration && o.addDur).map(o => o.id)
-
-    return optionIds
-  } */
+  /*   getOptionIdsHavingDurations(): string[] {
+  
+      if (!this.hasOptions())
+        return []
+  
+      let optionIds = this.options.filter(o => o.hasDuration && o.addDur).map(o => o.id)
+  
+      return optionIds
+    } */
 
   getOptionValues(optionId: string): ProductOptionValue[] {
 
@@ -812,7 +820,7 @@ export class ProductResource extends ObjectWithIdPlus {
   back: boolean = false
 
 
-  applyToDateRangeSet(dateRangeSet: DateRangeSet) : DateRangeSet {
+  applyToDateRangeSet(dateRangeSet: DateRangeSet): DateRangeSet {
 
     let result = new DateRangeSet()
 
@@ -825,7 +833,7 @@ export class ProductResource extends ObjectWithIdPlus {
       let newDateRange = this.applyToDateRange(dateRange)
 
       console.warn('applyToDateRangeSet', dateRangeSet)
-  
+
       result.addRanges(newDateRange)
     }
 
@@ -836,7 +844,7 @@ export class ProductResource extends ObjectWithIdPlus {
 
 
 
-  applyToDateRange(dateRange: DateRange) : DateRange {
+  applyToDateRange(dateRange: DateRange): DateRange {
 
     if (!dateRange)
       return null

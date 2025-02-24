@@ -391,6 +391,23 @@ export class ResourcePlannings {
     return planningsForSchedules[0]
   }
 
+  filterByScheduleDate(scheduleId: string, date: Date): ResourcePlanning {
+
+    if (!scheduleId || !date)
+      return undefined
+
+    const dateNum = DateHelper.yyyyMMddhhmmss(date) //dateRange.fromToNum()
+
+    let planningsForSchedules = this.plannings.filter(rp => rp.scheduleId == scheduleId
+      && rp.start && rp.end && rp.start <= dateNum && dateNum < rp.end)
+
+    if (!Array.isArray(planningsForSchedules) || planningsForSchedules.length == 0)
+      return undefined
+
+    return planningsForSchedules[0]
+  }
+
+
   isFullAvailable(): boolean {
     const unavailable = this.plannings.find(rp => rp.act && !rp.available && !rp.scheduleId)
 

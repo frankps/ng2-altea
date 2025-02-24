@@ -4,7 +4,7 @@ import { Gender, OnlineMode, Product, Price, DaysOfWeekShort, ProductTypeIcons, 
 import { FormCardSectionEventData, TranslationService } from 'ng-common'
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxModalComponent } from 'ng-common';
-import { ListSectionMode, BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, Translation, ObjectHelper, DbQuery, QueryOperator, CollectionChangeTracker, ObjectWithId, ArrayHelper } from 'ts-common'
+import { ListSectionMode, BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, Translation, ObjectHelper, DbQuery, QueryOperator, CollectionChangeTracker, ObjectWithId, ArrayHelper, DateHelper } from 'ts-common'
 import * as _ from "lodash";
 import { NgxSpinnerService } from "ngx-spinner"
 import { Observable } from 'rxjs';
@@ -81,7 +81,7 @@ export class ProductPlanningComponent implements OnInit {
   async doPlanPrepTimes() {
 
     let from = new Date(2025, 2, 31)
-    let to = new Date(2025, 3, 1)
+    let to = new Date(2025, 3, 6)
     let scheduleId = 'd507d664-3d8f-4ebe-bb3b-86dcd7df6fc8'
     let prodResId = '7b9d4162-ee61-42f2-84f8-a474b3a92d4d'
     let branchId = this.sessionSvc.branchId
@@ -91,6 +91,26 @@ export class ProductPlanningComponent implements OnInit {
     console.warn('res', res)
 
   }
+
+  async getExistingMaskPlannings(branchId: string, resourceGroupIds: string[], from: Date, to: Date): Promise<ResourcePlannings> {
+
+    let qry = new DbQuery()
+
+
+    let fromNum = DateHelper.yyyyMMddhhmmss(from)
+    let toNum = DateHelper.yyyyMMddhhmmss(to)
+    qry.and('branchId', QueryOperator.equals, branchId)
+    qry.and('resourceGroupId', QueryOperator.in, resourceGroupIds)
+    qry.and('start', QueryOperator.greaterThanOrEqual, fromNum)
+    qry.and('start', QueryOperator.lessThanOrEqual, toNum)
+    qry.and('type', QueryOperator.equals, PlanningType.mask)
+
+    let res = await this.planningSvc.query$(qry)
+
+    return new ResourcePlannings(res)
+
+  }
+
 
   /**
    * Was introduced for pre-configuring cleaning blocks
@@ -121,10 +141,16 @@ export class ProductPlanningComponent implements OnInit {
 
     let planningRange = new DateRange(from, to)
 
-
     // let allPrepTimeRanges = new DateRangeSet()
 
-    let resourcePlannings = new ResourcePlannings()
+    let resourceIds = productResources.map(prodRes => prodRes.resourceId)
+    resourceIds = _.uniq(resourceIds)
+
+    let existingPlannings = await this.getExistingMaskPlannings(branchId, resourceIds, from, to)
+
+    console.warn('existingPlannings', existingPlannings)
+
+    let newResourcePlannings = new ResourcePlannings()
 
 
     for (let blockSerie of blockSeries) {
@@ -152,7 +178,11 @@ export class ProductPlanningComponent implements OnInit {
           resourcePlanning.prep = productResource.prep
           resourcePlanning.overlap = productResource.prepOverlap
 
-          resourcePlannings.plannings.push(resourcePlanning)
+
+          let existingPlanning = existingPlannings.plannings.find(p => p.start == dateRange.fromToNum() && p.end == dateRange.toToNum() && p.resourceGroupId == productResource.resourceId)
+
+          if (!existingPlanning)
+            newResourcePlannings.plannings.push(resourcePlanning)
 
           //resourcePlanning.planningMode = PlanningMode.prepTime
 
@@ -162,20 +192,22 @@ export class ProductPlanningComponent implements OnInit {
       }
     }
 
+    if (newResourcePlannings.isEmpty())
+      return newResourcePlannings
 
-    console.warn('resourcePlannings', resourcePlannings)
+    console.warn('resourcePlannings', newResourcePlannings)
 
-    if (!resourcePlannings || resourcePlannings.isEmpty())
-      return resourcePlannings
+    if (!newResourcePlannings || newResourcePlannings.isEmpty())
+      return newResourcePlannings
 
     let apiBatchProcess = new ApiBatchProcess<ResourcePlanning>()
-    apiBatchProcess.create = resourcePlannings.plannings
+    apiBatchProcess.create = newResourcePlannings.plannings
 
     let res = await this.planningSvc.batchProcess$(apiBatchProcess, this.sessionSvc.branchId)
 
     console.warn('res', res)
 
-    return resourcePlannings
+    return newResourcePlannings
 
   }
 

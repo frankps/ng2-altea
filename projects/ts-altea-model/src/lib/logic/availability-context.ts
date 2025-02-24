@@ -313,6 +313,7 @@ export class AvailabilityContext {
     }
 
 
+
     /** returns all the schedules ordered per date within requested dateRange, starting with the schedule on dateRange.from, and ending with the schedule on dateRange.to.
      * So the array contains at least 2 items.
     */

@@ -1,11 +1,11 @@
-import { DateHelper } from "ts-common";
+import { ArrayHelper, DateHelper } from "ts-common";
 import { Order } from "ts-altea-model"
 import { AvailabilityContext } from "./availability-context";
 import { ResourceRequest } from "./resource-request";
 import * as _ from "lodash"
 import * as dateFns from 'date-fns'
 import { DateRange } from "./dates";
-import { SolutionSet } from "./solution";
+import { CustomerInfo, SolutionSet } from "./solution";
 import { ReservationOptionSet } from "./reservation-option";
 import { ResourceAvailability2 } from "./resource-availability2";
 
@@ -36,15 +36,15 @@ export class AvailabilityRequest {
         let to = dateFns.addDays(from, 1)
 
         this.from = DateHelper.yyyyMMdd000000(from)    //order!.start!
-        this.to =  DateHelper.yyyyMMdd000000(to)   //order!.start!
+        this.to = DateHelper.yyyyMMdd000000(to)   //order!.start!
 
         /*
         this.from = order!.start!
         this.to = order!.start! */
-        
+
     }
 
-    getDateRange() : DateRange {
+    getDateRange(): DateRange {
 
         return DateRange.fromNumbers(this.from, this.to)
 
@@ -158,7 +158,18 @@ export class AvailabilityResponse {
 
     debug = new AvailabilityDebugInfo()
 
+    /** inform customer (ex. service not available) */
+    informs: CustomerInfo[] = []
+
     constructor(orders: Order[] = []) {
         this.orders = orders
+    }
+
+    informCustomer(msg: string, params?: any) {
+        this.informs.push(new CustomerInfo(msg, params))
+    }
+
+    hasInforms(): boolean {
+        return ArrayHelper.NotEmpty(this.informs)
     }
 }

@@ -158,6 +158,18 @@ const dateToClass = () => v => {
   return v.value ? new Date(v.value) : v.value
 };
 
+export class NamedId  {
+  id?: string
+
+  /** name of the object */
+  nm?: string
+
+  constructor(id?: string, name?: string) {
+    this.id = id || '';
+    this.nm = name || '';
+}
+}
+
 export abstract class ObjectWithIdPlus extends ObjectWithId {
 
   /** object is active */

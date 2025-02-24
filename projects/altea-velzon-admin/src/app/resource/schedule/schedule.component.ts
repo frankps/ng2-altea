@@ -3,8 +3,10 @@ import { Schedule, ScheduleTimeBlock, WeekSchedule } from 'ts-altea-model'
 import { SelectedDay } from '../schedule-day/schedule-day.component';
 import { EditResourceComponent } from '../edit-resource/edit-resource.component';
 import { ScheduleSchedulingComponent } from '../schedule-scheduling/schedule-scheduling.component';
-import { DateHelper } from 'ts-common';
+import { DateHelper, NamedId } from 'ts-common';
 import { ScheduleService, SessionService } from 'ng-altea-common';
+import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { SearchProductComponent } from '../../product/search-product/search-product.component';
 
 @Component({
   selector: 'ngx-altea-schedule',
@@ -15,6 +17,8 @@ export class ScheduleComponent implements OnInit {
 
   @ViewChild('schedulingComponent') schedulingComponent: ScheduleSchedulingComponent;
 
+
+  @ViewChild('searchProductModal') public searchProductModal: SearchProductComponent;
   // weeks: WeekSchedule[] = []
   //days = [1, 2, 3, 4, 5, 6,7]
 
@@ -29,7 +33,7 @@ export class ScheduleComponent implements OnInit {
   branchSchedules: Schedule[]
   //startDate: Date
 
-  constructor(protected scheduleSvc: ScheduleService, protected sessionSvc: SessionService) {
+  constructor(protected scheduleSvc: ScheduleService, protected sessionSvc: SessionService, protected modalService: NgbModal) {
     //this.schedule.scheduling
     // this.createDemoSchedule1()
 
@@ -49,11 +53,31 @@ export class ScheduleComponent implements OnInit {
 
   }
 
+  selectProduct() {
+    this.searchProductModal.show()
+  }
+
+  addExclusionProduct(prod: any) {
+
+    if (!prod || !prod.id)
+      return
+
+    if (!this.schedule.exclProds)
+      this.schedule.exclProds = []
+
+    this.schedule.exclProds.push(new NamedId(prod.id, prod.name))
+
+    console.warn(prod)
+  }
+
+  removeExclProd(exclProd: NamedId) {
+    this.schedule.exclProds = this.schedule.exclProds.filter(p => p.id != exclProd.id)
+  }
+
   set startDate(value: Date) {
     this.schedule.start = DateHelper.yyyyMMdd(value)
     console.warn(this.schedule)
   }
-
 
   _startDate: Date
   get startDate() {
@@ -65,6 +89,7 @@ export class ScheduleComponent implements OnInit {
     this._startDate = date
     return date
   }
+
 
 
 

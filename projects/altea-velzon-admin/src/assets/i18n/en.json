@@ -365,7 +365,8 @@
     },
     "product-rule-type": {
       "startAt": "Starttijden dienst",
-      "prePost": "Voor & na tijden"
+      "prePost": "Voor & na tijden",
+      "nonActiveSchedules": "Niet actieve planningen"
     },
     "resource-type": {
       "human": "Personeel",

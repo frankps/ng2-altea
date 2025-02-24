@@ -3,7 +3,7 @@
 import { Branch,  DaysOfWeekShort,  DepositMode, Gender, Gift, Invoice, LoyaltyCard, Order, OrderLine, OrderType, Organisation, PlanningMode, Product, ProductResource, ProductType, Resource, ResourcePlanning, Subscription, User, UserBase } from "ts-altea-model";
 import { Exclude, Type, Transform } from "class-transformer";
 import 'reflect-metadata';
-import { ArrayHelper, ConnectTo, DateHelper, DbObjectCreate, IAsDbObject, ManagedObject, ObjectHelper, ObjectMgmt, ObjectReference, ObjectWithId, ObjectWithIdPlus, QueryOperator, TimeHelper } from 'ts-common'
+import { ArrayHelper, ConnectTo, DateHelper, DbObjectCreate, IAsDbObject, ManagedObject, NamedId, ObjectHelper, ObjectMgmt, ObjectReference, ObjectWithId, ObjectWithIdPlus, QueryOperator, TimeHelper } from 'ts-common'
 import * as _ from "lodash";
 import { PersonLine } from "../person-line";
 import { DateRange, DateRangeSet, TimeBlock, TimeBlockSet, TimeSpan } from "../logic";
@@ -183,6 +183,10 @@ export class Schedule extends ObjectWithIdPlus {
     /** re-use the plannings from these branch schedule ids  */
     scheduleIds: string[] = []
   
+
+    @Type(() => NamedId)
+    /** Excluded products from this schedule  */
+    exclProds: NamedId[] = []
   
     //scheduling?: Scheduling[];
   
@@ -209,6 +213,7 @@ export class Schedule extends ObjectWithIdPlus {
     }
   
   
+
   
   
     isInsideSchedule(dateRange: DateRange) {

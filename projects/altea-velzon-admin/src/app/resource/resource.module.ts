@@ -24,6 +24,7 @@ import { ResourceGroupsComponent } from './resource-groups/resource-groups.compo
 import { ResourcePlanningComponent } from './resource-planning/resource-planning.component';
 import { NgCommonModule } from 'ng-common';
 import { ResourceUserLinkComponent } from './resource-user-link/resource-user-link.component';
+import { ProductModule } from '../product/product.module';
 @NgModule({
   declarations: [
     ManageResourcesComponent,
@@ -49,7 +50,8 @@ import { ResourceUserLinkComponent } from './resource-user-link/resource-user-li
     BsDatepickerModule,
    // TimepickerModule,
     NgxSpinnerModule,
-    NgCommonModule
+    NgCommonModule,
+    ProductModule
   ],
 })
 export class ResourceModule {}

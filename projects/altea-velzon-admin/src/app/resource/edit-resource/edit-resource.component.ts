@@ -85,7 +85,7 @@ export class EditResourceComponent extends NgEditBaseComponent<Resource> impleme
 
 
     this.scheduleChanges = new CollectionChangeTracker<Schedule>(this.object.schedules, Schedule, {
-      propsToUpdate: ['weeks', 'name', 'default', 'prepIncl', 'start', 'scheduleIds'], propsToRemove: ['planning']
+      propsToUpdate: ['weeks', 'name', 'default', 'prepIncl', 'start', 'scheduleIds', 'exclProds'], propsToRemove: ['planning']
     })
 
     if (!this.object.schedules)

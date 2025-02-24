@@ -77,7 +77,7 @@ export class SolutionItem {
                     product: request?.product?.name,
                     newDuration: `${dateRange.duration.hours()}u`,
                 }
-                
+
                 solution.informCustomer(`duration_change`, msgParams)
             }
         }
@@ -328,6 +328,25 @@ export class CustomerInfo {
         this.params = params
     }
 
+
+    toString(): string {
+
+        switch (this.msg) {
+            case 'products_not_available':
+
+                let plural = this.params.products.length > 1
+
+                let thisProduct = plural ? 'de producten' : 'het product'
+                let products = this.params.products.join(', ')
+
+                return `Volgende producten zijn uitzonderlijk niet beschikbaar in de periode ${this.params.period}: ${products}. Kies een datum buiten deze periode of verwijder ${thisProduct}: ${products}.`
+
+            default:
+                return this.msg
+        }
+
+    }
+
 }
 
 /** Short for reservation solution. */
@@ -391,7 +410,7 @@ export class Solution extends SolutionItems {
 
     hasParamOverrides(): boolean {
 
-        return this.overrides?this.overrides.size > 0:false
+        return this.overrides ? this.overrides.size > 0 : false
     }
 
 

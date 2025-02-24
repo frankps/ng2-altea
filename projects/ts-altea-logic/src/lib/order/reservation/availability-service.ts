@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ApiListResult, ApiResult, ArrayHelper, DateHelper, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
-import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, PossibleSlots, Organisation, ResourceAvailability2, ResourcePlanning, ReservationOptionSet, SolutionItem, OrderLineOptionValue } from 'ts-altea-model'
+import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, PossibleSlots, Organisation, ResourceAvailability2, ResourcePlanning, ReservationOptionSet, SolutionItem, OrderLineOptionValue, ExcludedProducts } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { AlteaDb } from '../../general/altea-db'
 import { IDb } from '../../interfaces/i-db'
@@ -32,6 +32,45 @@ export class AvailabilityService {
 
     }
 
+
+    checkExcludedProducts(availabilityRequest: AvailabilityRequest, ctx: AvailabilityContext) : ExcludedProducts {
+
+        const branchModeRanges = ctx.getBranchModeRanges(ctx.request.getDateRange())
+
+
+        for (let branchModeRange of branchModeRanges) {
+
+            let schedule = branchModeRange.schedule
+            
+
+            if (ArrayHelper.IsEmpty(schedule.exclProds))
+                continue
+
+            let exclProds = schedule.exclProds
+            let exclProdIds = exclProds.map(p => p.id)
+
+            let products = availabilityRequest.order?.getProducts()
+
+
+            let excludedProducts = products.filter(p => exclProdIds.includes(p.id))
+
+
+            if (ArrayHelper.NotEmpty(excludedProducts)) {
+
+                /* get the full date range when these products are not available (to show to user)
+                remark: branch mode range is just the search range (just 1 day) 
+                */
+                let planning = ctx.resourcePlannings.filterByScheduleDate(schedule.id, branchModeRange.from)
+                let dateRange = planning.toDateRange()
+
+                return new ExcludedProducts(schedule, excludedProducts, dateRange)
+            }
+                
+        }
+        
+        return ExcludedProducts.empty
+    }
+
     async process(availabilityRequest: AvailabilityRequest): Promise<AvailabilityResponse> {
 
         //        availabilityRequest.to
@@ -49,6 +88,7 @@ export class AvailabilityService {
 
         const response = new AvailabilityResponse()
 
+
         const requestDate = new Date()
 
         //const schedule = await this.alteaDb.scheduleGetDefault(order.branchId!)
@@ -64,6 +104,19 @@ export class AvailabilityService {
         const createAvailabilityContext = new CreateAvailabilityContext(this.alteaDb)
         const availabilityCtx = await createAvailabilityContext.create(availabilityRequest)
         if (availabilityRequest.debug) response.debug.ctx = availabilityCtx
+
+
+
+        const excludedProducts = this.checkExcludedProducts(availabilityRequest, availabilityCtx)
+
+        if (excludedProducts.hasProducts()) {
+            console.error('Excluded products found', excludedProducts)
+            response.informCustomer('products_not_available', { 
+                products: excludedProducts.getProductNames(),
+                period: excludedProducts.dateRange.toString('dd/MM')
+            })
+            return response
+        }
 
         /**
          *  Calculate the final availability of all the resources based on all the data previously fetched (availability context)

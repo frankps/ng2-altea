@@ -4,6 +4,8 @@
 
 <ng-container *ngIf="schedule">
 
+    <ngx-altea-search-product #searchProductModal (select)="addExclusionProduct($event)"></ngx-altea-search-product>
+
 
 
 
@@ -54,6 +56,23 @@
             </div>
 
         </div>
+
+
+
+        <button type="button" class="btn btn-primary btn-sm me-2" (click)="selectProduct()">Exclude product</button>
+
+        <h5>
+            <ng-container *ngFor="let exclProd of schedule.exclProds">
+                <span class="badge text-bg-warning me-2" >
+                    {{exclProd.nm}} <i class="fa-solid fa-circle-xmark" (click)="removeExclProd(exclProd)"></i>
+                </span>
+            </ng-container>
+        </h5>
+       
+
+
+
+
 
 
     </ng-container>

@@ -766,13 +766,14 @@ export class OrderMgrUiService {   // implements OnInit
 
     console.log('availabilityRequest', request)
 
+    this.availabilityResponse = null
+    this.optionSet = null
 
-    const response = await this.alteaSvc.availabilityService.process(request)
+    this.availabilityResponse = await this.alteaSvc.availabilityService.process(request)
 
-    this.availabilityResponse = response
 
     if (this.availabilityResponse?.optionSet?.options) {
-      let reservationOptions = this.availabilityResponse.optionSet.options
+     // let reservationOptions = this.availabilityResponse.optionSet.options
 
       //this.options = reservationOptions
 
@@ -781,7 +782,7 @@ export class OrderMgrUiService {   // implements OnInit
     }
 
     console.error(request)
-    console.error(response)
+   // console.error(response)
   }
 
 

@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ProductRule, ProductRuleType, Schedule } from 'ts-altea-model';
 import { DbQuery, QueryOperator, Translation } from 'ts-common';
 import { TranslationService } from 'ng-common'
@@ -10,7 +10,7 @@ import * as _ from "lodash"
   templateUrl: './product-rule.component.html',
   styleUrls: ['./product-rule.component.scss'],
 })
-export class ProductRuleComponent {
+export class ProductRuleComponent implements OnInit {
 
   ruleTypes: Translation[] = []
 
@@ -28,13 +28,17 @@ export class ProductRuleComponent {
 
   constructor(private translationSvc: TranslationService, private sessionSvc: SessionService) {
 
-    this.translationSvc.translateEnum(ProductRuleType, 'enums.gender.', this.ruleTypes)
+    
 
 
   }
 
+  async ngOnInit() {
+    await this.translationSvc.translateEnum(ProductRuleType, 'enums.product-rule-type.', this.ruleTypes)
+  }
 
-  addTime() {
+
+/*   addTime() {
 
     if (!this.rule.startAt)
       this.rule.startAt = []
@@ -52,7 +56,7 @@ export class ProductRuleComponent {
     _.remove(this.rule.startAt, t => t === time)
 
 
-  }
+  } */
 
 
 }
