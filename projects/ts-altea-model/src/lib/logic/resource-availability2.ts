@@ -29,7 +29,7 @@ export class ResourceAvailability2 {
 
             groupAvailability.unavailable = resourceOccupation.unAvailable
             groupAvailability.overlapAllowed = resourceOccupation.overlapAllowed
-           
+
             this.availability.set(groupResource.id, groupAvailability)
 
         }
@@ -341,8 +341,12 @@ export class ResourceAvailability2 {
         return set
     }
 
+    breakStillPossible(resource: Resource, dateRange: DateRange): boolean {
 
-    getAvailableResourcesInRange(resources: Resource[], dateRange: DateRange, requestItem: ResourceRequestItem, solution: Solution, durationAlreadyIncluded: boolean, stopWhenFound = false): ResultWithSolutionNotes<Resource[]> {
+        return true
+    }
+
+    getAvailableResourcesInRange(resources: Resource[], dateRange: DateRange, requestItem: ResourceRequestItem, solution: Solution, durationAlreadyIncluded: boolean, stopWhenFound = false, checkBreaks = false): ResultWithSolutionNotes<Resource[]> {
 
         let isPrepTime = requestItem.isPrepTime
 
@@ -353,6 +357,8 @@ export class ResourceAvailability2 {
             return result
 
         const availableResources = []
+
+        const staffBreaks = this.ctx.getStaffBreakRanges(this)
 
         for (const resource of resources) {
 
@@ -379,9 +385,24 @@ export class ResourceAvailability2 {
             }
 
             if (resourceAvailabilities.contains(dateRange)) {
-                availableResources.push(resource)
 
-                continue
+                if (checkBreaks && resource.type == ResourceType.human) {
+
+                    let breakStillPossible = staffBreaks.breakStillPossible(resource.id, dateRange)
+
+                    if (breakStillPossible.possible) {
+                        availableResources.push(resource)
+                        continue
+                    } else {
+                        solution.addNote(`Break not possible for ${resource.name} if we allocate ${dateRange.toString()}  (break remaining: ${breakStillPossible.remaining?.toString()})`)
+                    }
+                        
+                }
+                else {
+                    availableResources.push(resource)
+                    continue
+                }
+                    
             }
 
             /*

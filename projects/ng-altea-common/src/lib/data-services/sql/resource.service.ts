@@ -66,8 +66,8 @@ export class ResourceService extends BackendHttpServiceBase<Resource> {
     return this.query$(query)
   }
 
-  async getHumanResources(includes?: string[]): Promise<Resource[]> {
-    return this.getByType(ResourceType.human, false, true, includes)
+  async getHumanResources(posOnly: boolean = true, includes?: string[]): Promise<Resource[]> {
+    return this.getByType(ResourceType.human, false, posOnly, includes)
   }
 
   async getHumanResourcesInclGroups(includes?: string[]): Promise<Resource[]> {

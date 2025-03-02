@@ -154,15 +154,17 @@ export class SlotFinder {
 
                 let possibleDateRanges = DateRangeSet.empty
 
+                let duration = firstRequestItem.durationInSeconds()
+
                 // we reduce by the duration because we want interval with possible start dates
-                availableRange.increaseToWithSeconds(-firstRequestItem.durationInSeconds())
+                availableRange.increaseToWithSeconds(-duration)
 
                 if (availableRange.to < availableRange.from)
                     continue
 
                 possibleDateRanges.addRanges(availableRange)
 
-                
+
 
 
                 // possibleDateRanges only contains 1 range
@@ -241,7 +243,8 @@ export class SlotFinder {
 
                 // the notes are for extra debug info
                 let durationIncluded = true
-                const resourcesWithNotes = availability.getAvailableResourcesInRange(requestItem.resources, range, requestItem, solution, durationIncluded, true)
+                let checkBreaks = (requestItem.resourceType == ResourceType.human)
+                const resourcesWithNotes = availability.getAvailableResourcesInRange(requestItem.resources, range, requestItem, solution, durationIncluded, true, checkBreaks)
                 const availableResources = resourcesWithNotes.result
                 solution.addNotes(resourcesWithNotes.notes)
 
@@ -436,6 +439,9 @@ export class SlotFinder {
      */
     subtractGroupLevelReservations(resourcesChecked: Resource[], availabilityForResources: DateRangeSets, ctx: AvailabilityContext, availability: ResourceAvailability2, solution?: Solution): DateRangeSets {
 
+        let staffBreaks = ctx.getStaffBreakRanges(availability)
+
+
         let origResourceIds = resourcesChecked.map(res => res.id)
 
         let outerRange = availabilityForResources.outerRange()
@@ -488,10 +494,13 @@ export class SlotFinder {
 
             // first we check if other resources are available for this group planning (ex people not needed for this request)
 
-            otherAvailableResources = otherAvailableResources.reduceFullRangeOnly(otherPossibleResourceIds, dateRange, 1, ctx.allResources)
+            otherAvailableResources = otherAvailableResources.reduceFullRangeOnly(otherPossibleResourceIds, dateRange, 1, ctx.allResources, staffBreaks)
 
-            if (solution && otherAvailableResources.reduced > 0) { // then somebody else (from otherPossibleResources) can fulfill this group planning
+            if (solution)
                 solution.addNotes(otherAvailableResources.notes)
+
+            if (otherAvailableResources.reduced > 0) { // then somebody else (from otherPossibleResources) can fulfill this group planning
+
                 continue
             }
 
@@ -500,10 +509,12 @@ export class SlotFinder {
 
             let childResourceIdsNotYetChecked = childResourceIds.filter(id => resourcesChecked.findIndex(res => res.id == id) == -1)
 
-            availabilityForResources = availabilityForResources.reduceFullRangeOnly(childResourceIds, dateRange, 1, ctx.allResources)
+            availabilityForResources = availabilityForResources.reduceFullRangeOnly(childResourceIds, dateRange, 1, ctx.allResources, staffBreaks)
 
-            if (solution && availabilityForResources.reduced > 0) {
+            if (solution)
                 solution.addNotes(availabilityForResources.notes)
+
+            if (availabilityForResources.reduced > 0) {
                 continue
             }
 
@@ -514,10 +525,13 @@ export class SlotFinder {
             => so we can't fulfill [9h00-9h30], but at least we can fulfill [9h15-9h30])
             */
 
-            availabilityForResources = availabilityForResources.reduceAllowPartialRange(childResourceIds, dateRange, 1, ctx.allResources)
+            availabilityForResources = availabilityForResources.reduceAllowPartialRange(childResourceIds, dateRange, 1, ctx.allResources, staffBreaks)
 
-            if (solution && availabilityForResources.reduced > 0) {
-                solution.addNotes(availabilityForResources.notes)
+            if (availabilityForResources.reduced > 0) {
+
+                if (solution)
+                    solution.addNotes(availabilityForResources.notes)
+
                 continue
             }
 
@@ -582,12 +596,14 @@ export class SlotFinder {
     }
 
 
-    checkStaffBreaks(solutionSet: SolutionSet, availability2: ResourceAvailability2, ctx: AvailabilityContext, breakTimeInMinutes: number = 40) {
+    checkStaffBreaks(solutionSet: SolutionSet, availability2: ResourceAvailability2, ctx: AvailabilityContext) {
 
         /** can contain breaks for multiple days! */
-        const breaksByResourceId = ctx.getStaffBreakRanges(availability2)
+        // const breaksByResourceId = ctx.getStaffBreakRanges(availability2)
 
-        const staffBreak = TimeSpan.minutes(breakTimeInMinutes)
+        const staffBreaks = ctx.getStaffBreakRanges(availability2)
+
+        const staffBreak = TimeSpan.minutes(staffBreaks.breakTimeInMinutes)
 
         // we will invalidate some solutions and replace with new solutions to allow breaks for staff
         // const newSolutions: Solution[] = []
@@ -629,7 +645,7 @@ export class SlotFinder {
 
 
                 // the outer official break windows wherin we need to forsee a break
-                let breaksForStaffMember = breaksByResourceId.get(human.id)
+                let breaksForStaffMember = staffBreaks.get(human.id)
 
 
                 if (!breaksForStaffMember || breaksForStaffMember.isEmpty())
@@ -637,9 +653,7 @@ export class SlotFinder {
 
                 let nrOfBreaks = breaksForStaffMember.count
 
-                // we need to subtract what is already booked
-                const alreadyOccupied = ctx.getResourceOccupation2(human.id)
-                breaksForStaffMember = breaksForStaffMember.subtract(alreadyOccupied.unAvailable)
+
 
 
                 const staffSolItems = humanResourcesItems.getItemsForResource(human.id)
@@ -650,7 +664,7 @@ export class SlotFinder {
                 let dayBreaksForStaffMember = breaksForStaffMember.getRangesForSameDay(solution.offsetRefDate)
 
                 // remove parts of break (caused by other bookings in middle of break) that are too small 
-                let minDayBreaksForStaffMember = dayBreaksForStaffMember.minimum(TimeSpan.minutes(breakTimeInMinutes))
+                let minDayBreaksForStaffMember = dayBreaksForStaffMember.minimum(staffBreak)
 
                 if (!minDayBreaksForStaffMember || minDayBreaksForStaffMember.isEmpty()) {
                     // we don't have a minimum break window => we continue with the biggest window (knowing it is officially not enough)
@@ -754,7 +768,7 @@ export class SlotFinder {
 
 
 
-                        const startOfLastBreak = dateFns.subMinutes(breakWindow.to, breakTimeInMinutes)
+                        const startOfLastBreak = dateFns.subMinutes(breakWindow.to, staffBreaks.breakTimeInMinutes)
 
                         solution.valid = false
                         solution.addNote(`${human.name} can't have a break within ${breakWindow.toString()}: we will create new solutions (if possible) before & after possible break`)
@@ -789,7 +803,7 @@ export class SlotFinder {
 
                         // Create second solution (after break)
 
-                        const endOfFirstBreak = dateFns.addMinutes(breakWindow.from, breakTimeInMinutes)
+                        const endOfFirstBreak = dateFns.addMinutes(breakWindow.from, staffBreaks.breakTimeInMinutes)
 
                         //const lastPossibleStartOfSolution = dateFns.subSeconds(startOfLastBreak, staffOccupationFromStart.seconds)
 

@@ -7,6 +7,7 @@ import { ResourceOccupationSets, DateRange, DateRangeSet } from "./dates";
 import { BranchModeRange } from "./branch-mode";
 import { ArrayHelper, DateHelper } from "ts-common";
 import { AlteaPlanningQueries } from "ts-altea-logic";
+import { StaffBreaks } from "./staff-breaks";
 
 
 export class BranchSchedule {
@@ -170,23 +171,29 @@ export class AvailabilityContext {
     }
 
 
+    staffBreaks: StaffBreaks = null
+
     /**
      * Is staff starts before 10h, then break should be between 12h20 & 14h40
      * If staff starts before 13h, then break between 17h and 19h
      * If later, then break between 17h20 and 19h
      * 
+     * The already occupied ranges (existing bookings) are subtracted from the break ranges
      * 
      * @returns 
      */
-    getStaffBreakRanges(availability2: ResourceAvailability2): Map<string, DateRangeSet> {
+    getStaffBreakRanges(availability2: ResourceAvailability2): StaffBreaks {
 
+        if (this.staffBreaks)
+            return this.staffBreaks
 
-        const breaksByResourceId = new Map<string, DateRangeSet>()
+        this.staffBreaks = new StaffBreaks()
+        // const breaksByResourceId = new Map<string, DateRangeSet>()
 
         const humanResources = this.allResources.filter(r => r.type == ResourceType.human && !r.isGroup)
 
         if (ArrayHelper.IsEmpty(humanResources))
-            return breaksByResourceId
+            return this.staffBreaks
 
         const minTimeForBreak = TimeSpan.hours(6)
 
@@ -203,7 +210,7 @@ export class AvailabilityContext {
             */
 
             let breakRangesForResource = new DateRangeSet()
-            breaksByResourceId.set(human.id, breakRangesForResource)
+            
 
             for (let range of schedule.ranges) {
 
@@ -238,11 +245,19 @@ export class AvailabilityContext {
             }
 
             // there might already be plannings during (part of) the break => the possible break ranges decreases
-            const alreadyOccupied = this.resourcePlannings.filterByResource(human.id)
-            breakRangesForResource = breakRangesForResource.subtract(alreadyOccupied.toDateRangeSet())
+            // const alreadyOccupied = this.resourcePlannings.filterByResource(human.id)
+
+
+            const availability = availability2.getSetForResource(human.id)
+
+            if (availability)
+                breakRangesForResource = breakRangesForResource.subtract(availability.allocated)
+
+            this.staffBreaks.breaksByResourceId.set(human.id, breakRangesForResource)
+
         }
 
-        return breaksByResourceId
+        return this.staffBreaks
 
 
 

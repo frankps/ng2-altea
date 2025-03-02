@@ -361,7 +361,8 @@
       "tsk": "Taak",
       "brk": "Pauze",
       "pres": "Aanwezigheid",
-      "mask": "Masker"
+      "mask": "Masker",
+      "comp": "Compensatie"
     },
     "product-rule-type": {
       "startAt": "Starttijden dienst",

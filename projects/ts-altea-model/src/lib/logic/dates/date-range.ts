@@ -93,6 +93,14 @@ export class DateRange<T = any> {
 
     }
 
+    toHtml(format: string = 'HH:mm', fromStyle?: string): string {   //  'dd/MM HH:mm'
+
+        let html = `[<span style="${fromStyle}">${dateFns.format(this.from, format)}</span>-${dateFns.format(this.to, format)}]`
+
+        return html
+
+    }
+
     get duration(): TimeSpan {
 
         const dif = dateFns.differenceInSeconds(this.to, this.from)
@@ -281,6 +289,10 @@ export class DateRange<T = any> {
     */
 
     intersectsWith(range: DateRange) {
+
+        if (!range)
+            return false
+
         const ourFromTime = this.from.getTime();
         const ourToTime = this.to.getTime();
         const theirFromTime = range.from.getTime();

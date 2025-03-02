@@ -32,15 +32,17 @@ export enum PlanningType {
   avl = 'avl',    // available
   sch = 'sch',    // planning schedule
 
-  /** presence */
+  /** presence: staff batches when coming in/going home */
   pres = 'pres',
 
   /**  break (such as lunch break): at work, but not working */
   brk = 'brk',
 
   /* task (such as a treatment) */
-  tsk = 'tsk'     // task
+  tsk = 'tsk',     
 
+  /** compensation (for extra hours worked previously)   */
+  comp = 'comp'
 
 }
 
@@ -50,6 +52,10 @@ export class ResourcePlannings {
 
   constructor(public plannings: ResourcePlanning[] = []) {
 
+  }
+
+  toString(dateFormat: string = 'HH:mm'): string {
+    return this.plannings.map(rp => rp.toString(dateFormat)).join(', ')
   }
 
   count() {
@@ -118,6 +124,35 @@ export class ResourcePlannings {
   }
 
 
+  filterByDateRange(from: Date | number, to: Date | number): ResourcePlannings {
+
+    let fromNum = from instanceof Date ? DateHelper.yyyyMMddhhmmss(from) : from
+    let toNum = to instanceof Date ? DateHelper.yyyyMMddhhmmss(to) : to
+
+
+    const plannings = this.plannings.filter(rp => rp.end > fromNum && rp.start < toNum)
+
+    if (!Array.isArray(plannings))
+      return new ResourcePlannings()
+
+    return new ResourcePlannings(plannings)
+  }
+
+
+  filterByDateRangeType(from: Date | number, to: Date | number, ...types: PlanningType[]): ResourcePlannings {
+
+    let fromNum = from instanceof Date ? DateHelper.yyyyMMddhhmmss(from) : from
+    let toNum = to instanceof Date ? DateHelper.yyyyMMddhhmmss(to) : to
+
+
+    const plannings = this.plannings.filter(rp => types.indexOf(rp.type) >= 0
+      && rp.end > fromNum && rp.start < toNum)
+
+    if (!Array.isArray(plannings))
+      return new ResourcePlannings()
+
+    return new ResourcePlannings(plannings)
+  }
 
 
 
@@ -567,7 +602,7 @@ export class PlanningInfo {
 
 
 }
-  
+
 
 export class ResourcePlanning extends ObjectWithIdPlus implements IAsDbObject<ResourcePlanning> {
   branchId?: string;
@@ -768,6 +803,11 @@ export class ResourcePlanning extends ObjectWithIdPlus implements IAsDbObject<Re
     return range
   }
 
+  toDateRangeSet(): DateRangeSet {
+
+    return new DateRangeSet([this.toDateRange()])
+  }
+
   setResource(resource: Resource) {
 
     if (!resource)
@@ -777,6 +817,14 @@ export class ResourcePlanning extends ObjectWithIdPlus implements IAsDbObject<Re
     this.resource = resource
 
   }
+
+  override toString(dateFormat: string = 'HH:mm'): string {   //  'dd/MM HH:mm'
+
+    let full = this.ors? ' FULL-DAY': ''
+
+    return `[${this.type}: ${dateFns.format(this.startDate, dateFormat)}-${dateFns.format(this.endDate, dateFormat)}${full}]`
+
+}
 
 }
 

@@ -271,6 +271,22 @@ export class CreateResourceRequest {
                         personOffsetToAdd.seconds = offsetDuration.duration.seconds
 
 
+                    /** sometimes duration is also encoded via parameters (it allows the resource request to adapt)
+                     * Introduced for wellness (ex: customer request is 3 hours, but system decides to offer only 2 hours)
+                     */
+
+                    if (ArrayHelper.NotEmpty(offsetDuration.durationParams)) {
+
+                        for (let durationParam of offsetDuration.durationParams) {
+
+                            let val = offsetDuration.defaults.get(durationParam)
+                            
+                            if (val) 
+                                personOffsetToAdd = personOffsetToAdd.add(val)
+                        
+                        }
+                    }
+
                 }
 
                 personInfo.offset.addInternal(personOffsetToAdd)
@@ -413,7 +429,9 @@ export class CreateResourceRequest {
 
         let wellnessId = '31eaebbc-af39-4411-a997-f2f286c58a9d'
 
-        let useParameters = (product?.id == wellnessId)  // this should come from a DB setting in future
+     let useParameters = (product?.id == wellnessId)  // this should come from a DB setting in future
+
+        //let useParameters = false
 
         let productDurationParamId = product.id + '_duration'
         let productDurationParamUsed = false

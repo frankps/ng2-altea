@@ -5,9 +5,10 @@ import * as _ from "lodash"
 import * as dateFns from 'date-fns'
 import { ResourceRequest, ResourceRequestItem } from "../resource-request"
 import { Solution, SolutionItem, SolutionNotes, SolutionSet } from "../solution"
-import { Resource, ResourcePlanning, ResourcePlannings } from "ts-altea-model"
+import { AvailabilityContext, Resource, ResourcePlanning, ResourcePlannings } from "ts-altea-model"
 import { TimeSpan } from "./time-span"
 import { ArrayHelper, DateHelper } from "ts-common"
+import { StaffBreaks } from "../staff-breaks"
 
 /**
  * This class focuses on pure DB data for a resource (coming from ResourcePlanning)
@@ -44,11 +45,15 @@ export class ResourceAvailabilitySets {
     /** staff members need to press button when break starts => a break resourcePlanning is created  */
     public hasBreakBlock: boolean = false
 
+    /** (busy time) allocated = unavailable + overlapAllowed */
+    public allocated: DateRangeSet = DateRangeSet.empty
+
     constructor(public resource: Resource, public all: ResourcePlannings = new ResourcePlannings(), public available: DateRangeSet = DateRangeSet.empty,
         public overlapAllowed: DateRangeSet = DateRangeSet.empty,
         public workingTime: DateRangeSet = DateRangeSet.empty,
         public unavailable: DateRangeSet = DateRangeSet.empty
     ) {
+        this.allocated = this.unavailable.union(this.overlapAllowed)
     }
 }
 
@@ -165,7 +170,7 @@ export class DateRangeSets extends SolutionNotes {
         return indexes
     }
 
-    reduceAllowPartialRange(possibleResourceIds: string[], range: DateRange, qty: number = 1, resources?: Resource[]): DateRangeSets {
+    reduceAllowPartialRange(possibleResourceIds: string[], range: DateRange, qty: number = 1, resources?: Resource[], staffBreaks?: StaffBreaks): DateRangeSets {
 
         let overlapDateRangeSets = this.calculateOverlapsBySet(range, possibleResourceIds)
         let indexesBiggestOverlaps = this.getSetIndexesWithBiggestOverlap(overlapDateRangeSets, range, qty)
@@ -180,13 +185,35 @@ export class DateRangeSets extends SolutionNotes {
 
             let resourceId = set.resource?.id
 
+            let match = true
 
             if (indexesBiggestOverlaps.indexOf(idx) == -1 || resultSets.reduced >= qty) {
-                resultSets.addSet(set)
-                continue
+                match = false
             }
 
             let overlap = overlapDateRangeSets[idx]
+
+
+            if (match && staffBreaks) {
+
+                let overlapOuter = overlap.outerRange()
+
+                let breakStillPossible = staffBreaks.breakStillPossible(resourceId, overlapOuter)
+
+                if (!breakStillPossible.possible) {
+                    match = false
+                    resultSets.addNote(`Break not possible for ${set.resource?.name} if we allocate ${range.toString()}  (break remaining: ${breakStillPossible.remaining?.toString()})`)
+                    //  solution.addNote(`Break not possible for ${resource.name} if we allocate ${dateRange.toString()}  (break remaining: ${breakStillPossible.remaining?.toString()})`)
+                }
+            }
+
+            if (!match) {
+                resultSets.sets.push(set)
+                continue
+            }
+
+
+
             let reducedSet = set.subtract(overlap)
             resultSets.addSet(reducedSet)
             resultSets.reduced++
@@ -215,7 +242,7 @@ export class DateRangeSets extends SolutionNotes {
         return resultSets
     }
 
-    reduceFullRangeOnly(possibleResourceIds: string[], range: DateRange, qty: number = 1, resources?: Resource[]): DateRangeSets {
+    reduceFullRangeOnly(possibleResourceIds: string[], range: DateRange, qty: number = 1, resources?: Resource[], staffBreaks?: StaffBreaks): DateRangeSets {
 
         if (ArrayHelper.IsEmpty(this.sets))
             return this
@@ -246,11 +273,23 @@ export class DateRangeSets extends SolutionNotes {
             if (!set.contains(range))
                 match = false
 
+
+
+            if (staffBreaks) {
+
+                let breakStillPossible = staffBreaks.breakStillPossible(resourceId, range)
+
+                if (!breakStillPossible.possible) {
+                    match = false
+                    resultSets.addNote(`Break not possible for ${set.resource?.name} if we allocate ${range.toString()}  (break remaining: ${breakStillPossible.remaining?.toString()})`)
+                    //  solution.addNote(`Break not possible for ${resource.name} if we allocate ${dateRange.toString()}  (break remaining: ${breakStillPossible.remaining?.toString()})`)
+                }
+            }
+
             if (!match) {
                 resultSets.sets.push(set)
                 continue
             }
-
 
             let reducedSet = set.subtractRange(range)
             resultSets.sets.push(reducedSet)
@@ -356,6 +395,12 @@ export class DateRangeSet {
         return new TimeSpan(this.ranges.reduce((acc, range) => acc + (range ? range.duration.seconds : 0), 0))
     }
 
+
+    firstRange(): DateRange {
+        if (this.notEmpty())
+            return this.ranges[0]
+        else return null
+    }
 
     sortRanges() {
 
@@ -479,6 +524,13 @@ export class DateRangeSet {
     }
 
 
+    lowestDate(): Date {
+        if (ArrayHelper.IsEmpty(this.ranges))
+            return null
+
+        return _.minBy(this.ranges, 'from').from
+    }
+    
 
     outerRange(): DateRange {
 

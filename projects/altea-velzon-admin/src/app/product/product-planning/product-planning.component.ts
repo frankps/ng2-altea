@@ -80,8 +80,8 @@ export class ProductPlanningComponent implements OnInit {
 
   async doPlanPrepTimes() {
 
-    let from = new Date(2025, 2, 31)
-    let to = new Date(2025, 3, 6)
+    let from = new Date(2025, 2, 11)
+    let to = new Date(2025, 2, 12)
     let scheduleId = 'd507d664-3d8f-4ebe-bb3b-86dcd7df6fc8'
     let prodResId = '7b9d4162-ee61-42f2-84f8-a474b3a92d4d'
     let branchId = this.sessionSvc.branchId

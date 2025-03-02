@@ -1,4 +1,3 @@
-
 <!-- 
 <ng-select id="humanResources" name="humanResources" [items]="humanResources"
 placeholder="Personeel" bindLabel="name" bindValue="id" [clearable]="true" [multiple]="true"
@@ -34,5 +33,19 @@ placeholder="Personeel" bindLabel="name" bindValue="id" [clearable]="true" [mult
             <i class="ms-3 fas fa-trash" (click)="deletePlanning(hol, holidays)"></i>
         </div>
     </div>
+
+
+
+    <div class="row">
+        <div class="col-4">
+            <ng-select id="staff" name="staff" [items]="staff" bindLabel="name" [clearable]="false" [multiple]="false"
+                (change)="showMonthReport($event)">
+            </ng-select>
+        </div>
+    </div>
+
+
+
+    <div *ngIf="htmlReport" [innerHTML]="htmlReport"></div>
 
 </ng-container>

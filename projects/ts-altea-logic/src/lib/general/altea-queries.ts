@@ -11,6 +11,10 @@ export class AlteaPlanningQueries {
         return [PlanningType.avl]
     }
 
+    static staffTypes() {
+        return [PlanningType.pres, PlanningType.brk ]
+    }
+
     static extraTypes() {
         return [...this.absenceTypes(), ...this.availableTypes()]
     }

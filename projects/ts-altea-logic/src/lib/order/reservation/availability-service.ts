@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ApiListResult, ApiResult, ArrayHelper, DateHelper, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
-import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, PossibleSlots, Organisation, ResourceAvailability2, ResourcePlanning, ReservationOptionSet, SolutionItem, OrderLineOptionValue, ExcludedProducts } from 'ts-altea-model'
+import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, PossibleSlots, Organisation, ResourceAvailability2, ResourcePlanning, ReservationOptionSet, SolutionItem, OrderLineOptionValue, ExcludedProducts, BranchModeRange } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { AlteaDb } from '../../general/altea-db'
 import { IDb } from '../../interfaces/i-db'
@@ -32,42 +32,76 @@ export class AvailabilityService {
 
     }
 
-
-    checkExcludedProducts(availabilityRequest: AvailabilityRequest, ctx: AvailabilityContext) : ExcludedProducts {
+    checkScheduleLimitations(availabilityRequest: AvailabilityRequest, ctx: AvailabilityContext, response: AvailabilityResponse): boolean {
 
         const branchModeRanges = ctx.getBranchModeRanges(ctx.request.getDateRange())
+
+        for (let branchModeRange of branchModeRanges) {
+
+            const excludedProducts = this.checkExcludedProducts(branchModeRange, availabilityRequest, ctx)
+
+            if (excludedProducts.hasProducts()) {
+                console.error('Excluded products found', excludedProducts)
+                response.informCustomer('products_not_available', {
+                    products: excludedProducts.getProductNames(),
+                    period: excludedProducts.dateRange.toString('dd/MM')
+                })
+                return false
+            }
+
+
+        }
+
+        return true
+       // const excludedProducts = this.checkExcludedProducts(availabilityRequest, availabilityCtx)
+
+
+
+
+    }
+
+
+    checkExcludedProducts(branchModeRange: BranchModeRange, availabilityRequest: AvailabilityRequest, ctx: AvailabilityContext): ExcludedProducts {
+
+/*         const branchModeRanges = ctx.getBranchModeRanges(ctx.request.getDateRange())
 
 
         for (let branchModeRange of branchModeRanges) {
 
-            let schedule = branchModeRange.schedule
-            
-
-            if (ArrayHelper.IsEmpty(schedule.exclProds))
-                continue
-
-            let exclProds = schedule.exclProds
-            let exclProdIds = exclProds.map(p => p.id)
-
-            let products = availabilityRequest.order?.getProducts()
 
 
-            let excludedProducts = products.filter(p => exclProdIds.includes(p.id))
-
-
-            if (ArrayHelper.NotEmpty(excludedProducts)) {
-
-                /* get the full date range when these products are not available (to show to user)
-                remark: branch mode range is just the search range (just 1 day) 
-                */
-                let planning = ctx.resourcePlannings.filterByScheduleDate(schedule.id, branchModeRange.from)
-                let dateRange = planning.toDateRange()
-
-                return new ExcludedProducts(schedule, excludedProducts, dateRange)
-            }
-                
         }
-        
+
+        let schedule = branchModeRange.schedule
+ */
+
+        let schedule = branchModeRange.schedule
+
+        if (ArrayHelper.IsEmpty(schedule.exclProds))
+            return ExcludedProducts.empty
+
+        let exclProds = schedule.exclProds
+        let exclProdIds = exclProds.map(p => p.id)
+
+        let products = availabilityRequest.order?.getProducts()
+
+
+        let excludedProducts = products.filter(p => exclProdIds.includes(p.id))
+
+
+        if (ArrayHelper.NotEmpty(excludedProducts)) {
+
+            /* get the full date range when these products are not available (to show to user)
+            remark: branch mode range is just the search range (just 1 day) 
+            */
+            let planning = ctx.resourcePlannings.filterByScheduleDate(schedule.id, branchModeRange.from)
+            let dateRange = planning.toDateRange()
+
+            return new ExcludedProducts(schedule, excludedProducts, dateRange)
+        }
+
+
+
         return ExcludedProducts.empty
     }
 
@@ -106,18 +140,23 @@ export class AvailabilityService {
         if (availabilityRequest.debug) response.debug.ctx = availabilityCtx
 
 
+        const preChecksOk = this.checkScheduleLimitations(availabilityRequest, availabilityCtx, response)
 
+        if (!preChecksOk)
+            return response
+
+/*
         const excludedProducts = this.checkExcludedProducts(availabilityRequest, availabilityCtx)
 
         if (excludedProducts.hasProducts()) {
             console.error('Excluded products found', excludedProducts)
-            response.informCustomer('products_not_available', { 
+            response.informCustomer('products_not_available', {
                 products: excludedProducts.getProductNames(),
                 period: excludedProducts.dateRange.toString('dd/MM')
             })
             return response
         }
-
+*/
         /**
          *  Calculate the final availability of all the resources based on all the data previously fetched (availability context)
          */
@@ -215,7 +254,7 @@ export class AvailabilityService {
             if (solution.differentFromRequest) {
 
 
-                let items : SolutionItem[] = solution.itemsDifferentFromRequest()
+                let items: SolutionItem[] = solution.itemsDifferentFromRequest()
 
                 for (let item of items) {
 
@@ -223,15 +262,15 @@ export class AvailabilityService {
 
                     let productId = product.id
                     let durationOptions = product?.options.filter(o => o.hasDuration && o.addDur)
-                   
+
 
                     for (let durationOption of durationOptions) {
 
                         if (durationOption.id == wellnessDurationOptionId) {
 
-                             lineOption = order.getLineOption(productId, durationOption.id)
+                            lineOption = order.getLineOption(productId, durationOption.id)
 
-                             if (lineOption.hasValues()) {
+                            if (lineOption.hasValues()) {
                                 lineOptionOrigValue = lineOption.values[0]
 
                                 let hoursDifference = solution.difference.hours()
@@ -241,11 +280,11 @@ export class AvailabilityService {
                                 let newOrderLineOptionValue = new OrderLineOptionValue(newProductOptionValue)
 
                                 lineOption.values[0] = newOrderLineOptionValue
-                             }
+                            }
                         }
-                    }                    
+                    }
                 }
- 
+
             }
 
             //order.clone()
@@ -255,7 +294,7 @@ export class AvailabilityService {
             orderMgmtSvc.doOrderPriceChanges(order)
             order.calculateAll()
             option.price = order.incl
-            
+
             if (lineOption && lineOptionOrigValue) {
                 option.order = order.clone()
                 lineOption.values[0] = lineOptionOrigValue

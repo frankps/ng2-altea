@@ -8,13 +8,31 @@ export class HtmlTable {
     headerRow: boolean = false
 
     styles = {
-        th: null
+        th: null,
+        td: null
     }
 
     addRow(cols: string[]) {
         this.rows.push(cols)
     }
 
+    addRowAtStart(cols: string[]) {
+        this.rows.unshift(cols)
+    }
+
+    styleString(object: any) : string {
+
+        if (!object)
+            return ''
+
+        let style = ''
+
+        for (let key in object) {   
+            style += `${key}: ${object[key]}; `
+        }
+
+        return style
+    }
 
     toHtmlString(): string {
 
@@ -45,7 +63,7 @@ export class HtmlTable {
                 colTag = 'th'
 
                 if (this.styles.th)
-                    style = ` style="${this.styles.th}"`   // padding:20px
+                    style = ` style="${this.styleString(this.styles.th)}"`   // padding:20px
             }
 
 
@@ -53,7 +71,8 @@ export class HtmlTable {
 
                 let colString = col ? col : ''
 
-
+                if ((rowIdx > 0 || !this.headerRow) && this.styles.td)
+                    style = ` style="${this.styleString(this.styles.td)}"` 
 
                 htmlLines.push(`<${colTag}${style}>${colString}</${colTag}>`)   //  style="padding:20px"
 
