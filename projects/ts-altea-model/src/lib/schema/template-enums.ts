@@ -28,10 +28,15 @@ export enum TemplateCode {
   resv_satisfaction = 'resv_satisfaction',
   resv_internal_cancel = 'resv_internal_cancel',
   resv_footer = 'resv_footer',
+  resv_door_info = 'resv_door_info',
+  resv_door_info2 = 'resv_door_info2',
+  
   gift_online = 'gift_online',
 
   order_compensate_gift = 'order_compensate_gift',
-  order_outstanding_balance = 'order_outstanding_balance'
+  order_outstanding_balance = 'order_outstanding_balance',
+
+
 } 
 
 export enum GiftTemplateCode {

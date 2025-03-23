@@ -73,6 +73,12 @@
                     </div>
                 </div>
 
+                <div class="row" *ngIf="orderMgrSvc.giftNotFound">
+                    <div class="col">
+                        <button type="button" class="btn btn-warning btn-sm float-end" (click)="orderMgrSvc.fixNonExistingGift(order)">Fix gift</button>
+                    </div>
+                </div>
+
             </div>
         </div>
 

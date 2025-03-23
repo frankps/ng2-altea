@@ -11,7 +11,8 @@ https://www.npmjs.com/package/ngx-printer#rendering-time
 
     <div class="row my-2">
         <div class="col">
-            <img width='100%' src='https://marketing-image-production.s3.amazonaws.com/uploads/17ae7951ff4ef38519fa1a715981599a402f7e4d4b05f8508a5bdf2ff5f738656a4b382fde86d71f28e68b0f9b2124d322ce2b1afdd6028244e8ce986823557f.jpg'>
+            <img width='100%'
+                src='https://marketing-image-production.s3.amazonaws.com/uploads/17ae7951ff4ef38519fa1a715981599a402f7e4d4b05f8508a5bdf2ff5f738656a4b382fde86d71f28e68b0f9b2124d322ce2b1afdd6028244e8ce986823557f.jpg'>
         </div>
     </div>
 
@@ -69,20 +70,30 @@ https://www.npmjs.com/package/ngx-printer#rendering-time
             <div class="col-2 d-flex justify-content-end"><b>Prijs</b></div>
             <div class="col-2 d-flex justify-content-end"><b>Totaal</b></div>
             <div class="col-3 d-flex justify-content-end"><b>BTW</b></div>
-          </div>
-      
+        </div>
 
 
-        <ng-container *ngFor="let order of invoice.orders">
+
+        <ng-container *ngFor="let order of invoice.orders; let orderIdx = index">
 
 
             <ng-container *ngIf="order.hasLines()">
 
-                <div class="row" *ngFor="let line of order.lines">
-                    <div class="col-4">{{line.descr}}</div>
+                <div class="row" *ngFor="let line of order.lines; let lineIdx = index">
+                     <div class="col-4" *ngIf="!invoice.useAlter; else alternateText">{{line.descr}}</div>
+
+
+                    <ng-template #alternateText>
+                        <div class="col-4">
+                            <span *ngIf="orderIdx + lineIdx == 0">{{invoice.alter}}</span>
+                        </div>
+                    </ng-template>
+
+
+
                     <div class="col-1 d-flex justify-content-end">{{line.qty}}</div>
                     <div class="col-2 d-flex justify-content-end">{{line.unit}}</div>
-                  <!--   <div class="col-3">{{line.vat | currency:branch.cur}}</div> -->
+                    <!--   <div class="col-3">{{line.vat | currency:branch.cur}}</div> -->
                     <div class="col-2 d-flex justify-content-end">{{line.incl}}</div>
                     <div class="col-3">{{line?.vatPct}}% <span class="float-end">{{line.vat}}</span></div>
                 </div>

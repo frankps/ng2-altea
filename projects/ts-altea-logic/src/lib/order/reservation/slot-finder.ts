@@ -430,6 +430,7 @@ export class SlotFinder {
     /**
      * Some resource plannings are not for specific resources, but on resource group level
      * (=> it is not so important which exact resource is reserved, as long we have 1 or more available from a group) 
+     * availabilityForResources will be reduced (by group level plannings)
      * @param resourcesChecked the resources previously checked upon availability
      * @param availabilityForResources the availability for these resources
      * @param ctx 

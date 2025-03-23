@@ -132,7 +132,7 @@ export class AlteaDb {
         return orders
     }
 
-    async getOrdersStartingBetween(from: number, to: number) {
+    async getOrdersStartingBetween(from: number, to: number, extra: any = null) {
 
         const qry = new DbQueryTyped<Order>('order', Order)
 
@@ -143,6 +143,17 @@ export class AlteaDb {
         qry.and('msg', QueryOperator.equals, true)
         qry.and('act', QueryOperator.equals, true)
         qry.and('state', QueryOperator.in, [OrderState.created, OrderState.waitDeposit, OrderState.confirmed])
+
+        if (extra) {
+
+            if (extra.contactId)
+                qry.and('contactId', QueryOperator.equals, extra.contactId)
+
+            if (ArrayHelper.NotEmpty(extra.branchIds))
+                qry.and('branchId', QueryOperator.in, extra.branchIds)
+
+        }
+
 
         const orders = await this.db.query$<Order>(qry)
 
@@ -950,9 +961,9 @@ export class AlteaDb {
         return objects
     }
 
-    async getPlanningsByTypes(resourceIds: string[], from: Date, to: Date, types: PlanningType[], branchId?: string): Promise<ResourcePlannings> {
+    async getPlanningsByTypes(resourceIds: string[], resourceGroupIds: string[], from: Date, to: Date, types: PlanningType[], branchId?: string): Promise<ResourcePlannings> {
 
-        var qry = AlteaPlanningQueries.getByTypes(resourceIds, from, to, types, branchId)
+        var qry = AlteaPlanningQueries.getByTypes(resourceIds, resourceGroupIds, from, to, types, branchId)
         console.warn(qry)
         const result = await this.db.query$<ResourcePlanning>(qry)
 

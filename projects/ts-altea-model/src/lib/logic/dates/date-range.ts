@@ -27,17 +27,15 @@ export class DateRange<T = any> {
     public tag: T
 
     constructor(public from: Date, public to: Date, public fromLabels: string[] = [], public toLabels: string[] = []) {
+        if (to < from)
+            to = from
+/*        
         if (to < from) {
             throw new Error(`DateRange: Date to is smaller than date from!
       From: ${from}
       To: ${to}`);
         }
-
-        /*         if (fromLabel)
-                    this.fromLabels.push(fromLabel)
-        
-                if (toLabel)
-                    this.toLabels.push(toLabel) */
+*/
     }
 
 
@@ -115,6 +113,26 @@ export class DateRange<T = any> {
 
         this.to = dateFns.addSeconds(this.from, value.seconds)
 
+    }
+
+    changeMinutes(addMinutesFrom: number, addMinutesTo: number) : DateRange {
+
+        let newRange = this.clone()
+
+        newRange.from = dateFns.addMinutes(newRange.from, addMinutesFrom)
+        newRange.to = dateFns.addMinutes(newRange.to, addMinutesTo)
+
+        return newRange
+    }
+
+    extend(timeSpan: TimeSpan) {
+
+        if (!timeSpan)
+            return this
+
+        this.to = dateFns.addSeconds(this.to, timeSpan.seconds)
+
+        return this
     }
 
     removeBefore(date: Date = new Date()) {
@@ -499,6 +517,17 @@ export class DateRange<T = any> {
         }
 
         return dates
+    }
+
+
+    lessThan(timeSpan: TimeSpan, orEqual = true): boolean {
+
+        const diff = Math.abs(dateFns.differenceInSeconds(this.to, this.from))
+
+        if (orEqual)
+            return diff <= timeSpan.seconds
+
+        return diff < timeSpan.seconds
     }
 
 

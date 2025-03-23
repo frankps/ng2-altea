@@ -154,7 +154,7 @@ export class OrderCancel {
 export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  // 
 
   static defaultInclude = ['lines:orderBy=idx', 'contact', 'payments:orderBy=idx', 'planning']   // .product.items
-  static jsonProps = ['vatLines', 'persons', 'info', 'sum', 'extIds']
+  static jsonProps = ['vatLines', 'persons', 'info', 'sum', 'extIds', 'tags']
 
   organisation?: Organisation;
   orgId?: string;
@@ -262,7 +262,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
   /** messaging (email,sms) to customer enabled */
   msg = true
-
+  
   msgOn?: number   // format: yyyyMMddhhmmss
   msgCode?: string
 
@@ -287,6 +287,9 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
   /** external ids for this order (for instance: used for Stripe payment intends) */
   //extIds?: string[] = []
 
+  /** logic can add tags to order to know if certain actions were performed (ex. certain message was sent to customer) */
+  tags?: string[] = []
+
   constructor(codePrefix?: string, markAsNew = false, createContact: boolean = false) {
     super()
 
@@ -301,6 +304,23 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
       this.m.n = true
   }
 
+
+  addTag(tag: string) : boolean {
+    if (!this.tags)
+      this.tags = []
+
+    if (this.tags.indexOf(tag) < 0) {
+      this.tags.push(tag)
+      return true
+    }
+
+    return false
+      
+  }
+
+  hasTag(tag: string): boolean {
+    return this.tags.indexOf(tag) >= 0
+  }
 
   msgOnDate(): Date | null {
 
@@ -421,13 +441,42 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
   }
 
 
+  /** then we use 'today' or 'tomorrow'  */
+  relativeStartDate(timeFormat: string = 'HH:mm'): string {
+
+    const startDate = this.startDate
+
+    if (!startDate)
+      return ''
+
+    let relativeDay = null
+
+    if (dateFns.isToday(startDate))
+      relativeDay = 'vandaag'
+    else if (dateFns.isTomorrow(startDate))
+      relativeDay = 'morgen'
+    else {
+
+      let dayAfterTomorrowCheck = dateFns.subDays(startDate, 1)
+
+      if (dateFns.isTomorrow(dayAfterTomorrowCheck))
+        relativeDay = 'overmorgen'
+      else
+        relativeDay = `op ${dateFns.format(startDate, 'd/M')}`
+    }
+
+    let time = dateFns.format(startDate, timeFormat)
+
+    return `${relativeDay} om ${time}`
+  }
+
   startDateFormat(format: string = 'd/M HH:mm'): string {
     const startDate = this.startDate
 
     if (!startDate)
       return ''
 
-    const short = dateFns.format(startDate, 'd/M HH:mm')
+    const short = dateFns.format(startDate, format)
 
     return short
   }
@@ -611,6 +660,13 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
     return payments
 
+  }
+
+  hasProduct(productId: string): boolean {
+    if (!this.hasLines())
+      return false
+
+    return this.lines.findIndex(l => l.productId == productId) >= 0
   }
 
   hasServices(): boolean {
@@ -1152,7 +1208,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
           vatLine = new VatLine(vatPct, 0, 0, 0)
           vatMap.set(vatPct, vatLine)
         }
-  
+
         vatLine.vat += orderLine.vat
         vatLine.excl += orderLine.excl
         vatLine.incl += orderLine.incl

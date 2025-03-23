@@ -1,5 +1,5 @@
 import { Component, ViewChild, inject } from '@angular/core';
-import { Contact, DateRangeTests, Message, Order, PaymentType, PriceCondition, PriceConditionType, Product, SmsMessage, User, ValueComparator } from 'ts-altea-model';
+import { Contact, DateRangeTests, Message, MsgType, Order, PaymentType, PriceCondition, PriceConditionType, Product, SmsMessage, TemplateChannel, User, ValueComparator } from 'ts-altea-model';
 import { SearchContactComponent } from '../../contact/search-contact/search-contact.component';
 import { AlteaService, BranchService, ObjectService, OrderService, ProductService, ResourceService, ScheduleService, SessionService, TemplateService, UserService } from 'ng-altea-common';
 import { AlteaDb, CheckDeposists, OrderCronJobs, OrderMessaging, OrderMgmtService } from 'ts-altea-logic';
@@ -50,7 +50,8 @@ export class DemoComponent {
 
   constructor(private http: HttpClient, public dbSvc: ObjectService, protected translationSvc: TranslationService, protected backEndSvc: ObjectService
     , protected userSvc: UserService, protected resourceSvc: ResourceService, protected anySvc: ScheduleService, protected productSvc: ProductService, protected orderSvc: OrderService,
-    protected messagingSvc: MessagingService, protected stripeSvc: StripeService, protected sessionSvc: SessionService) {
+    protected messagingSvc: MessagingService, protected stripeSvc: StripeService, protected sessionSvc: SessionService,
+    protected templateSvc: TemplateService) {
 
   }
 
@@ -74,6 +75,39 @@ export class DemoComponent {
   }
 
 
+
+  async doorOpenedWhatsapp() {
+
+    let alteaDb = new AlteaDb(this.dbSvc)
+
+    let msgSvc = new OrderMessaging(alteaDb)
+
+    let branch = await this.sessionSvc.branch$()
+
+    let template = await alteaDb.getTemplate(this.sessionSvc.branchId, 'door_opened2', MsgType.wa)
+    console.warn(template)
+
+    let order = await alteaDb.getOrder('c954ce18-0998-4fdf-b774-00d9625e3896', 'contact')
+    console.warn(order)
+
+    const msg = template.mergeWithOrder(order, branch, true)
+
+    msg.type = MsgType.wa
+    msg.orderId = order?.id
+
+    msg.addTo('+32478336034', 'Frank Paepens')
+    console.warn(msg)
+
+    const sendRes = await alteaDb.db.sendMessage$(msg)
+    //const sendRes = new ApiResult(msg)
+    
+    console.warn(sendRes)
+
+
+
+    // await msgSvc.sendWhatsAppMessage(template, order, branch, false)
+
+  }
 
   stripeEvents: any[]
 

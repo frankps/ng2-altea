@@ -23,12 +23,20 @@ export class ContactService extends BackendHttpServiceBase<Contact> {
     return this.queryFirst$(query)
   }
 
+  isNumeric(str: string): boolean {
+    return /^\d+$/.test(str);
+  }
+
   async searchByString$(searchFor: string): Promise<Contact[]> {
 
     let query = new DbQuery()
 
+    if (this.isNumeric(searchFor)) {
+      query.and('mobile', QueryOperator.contains, searchFor)
+    } else {
+      query.and('name', QueryOperator.contains, searchFor)
+    }
 
-    query.and('name', QueryOperator.contains, searchFor)
     query.and('act', QueryOperator.equals, true)
 
     /*   if (contact.last)

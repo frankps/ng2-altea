@@ -1,3 +1,6 @@
+<a href="https://altea.dvit.local/install-cert" target="_blank">Certificaat</a><br>
+
+
 <ng-container *ngIf="luxomStates">
     <button type="button" class="btn btn-{{state.style()}} me-2 mt-2" *ngFor="let state of luxomStates"
         (click)="clickLuxom(state.addr)">{{state.addr.info}} <sup *ngIf="state.hex" style="color: black;">{{state.getPct()}}%</sup></button>

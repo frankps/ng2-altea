@@ -169,6 +169,28 @@ export class OrderLineOption extends ObjectWithId {
     return ArrayHelper.NotEmpty(this.values)
   }
 
+  hasValueVal(val: number): boolean {
+
+    if (!this.hasValues())
+      return false
+
+    return this.values.findIndex(v => v.val == val) >= 0
+  }
+
+  getValueVals(): number[] {
+    if (!this.hasValues())
+      return []
+
+    return this.values.map(v => v.val)
+  }
+
+  getValueValFirst(returnNoValue: number = null): number {
+    if (!this.hasValues())
+      return returnNoValue
+
+    return this.values[0].val
+  }
+
   hasNonDefaultValues(): boolean {
 
     if (!this.hasValues())

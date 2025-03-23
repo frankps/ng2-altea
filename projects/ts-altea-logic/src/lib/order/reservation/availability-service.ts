@@ -36,6 +36,8 @@ export class AvailabilityService {
 
         const branchModeRanges = ctx.getBranchModeRanges(ctx.request.getDateRange())
 
+        let allOk = true
+
         for (let branchModeRange of branchModeRanges) {
 
             const excludedProducts = this.checkExcludedProducts(branchModeRange, availabilityRequest, ctx)
@@ -46,34 +48,114 @@ export class AvailabilityService {
                     products: excludedProducts.getProductNames(),
                     period: excludedProducts.dateRange.toString('dd/MM')
                 })
-                return false
+                allOk = false
             }
 
+            let checkOk = this.checkProductOptions(branchModeRange, availabilityRequest, ctx, response)
+            if (!checkOk)
+                allOk = false
 
         }
 
-        return true
-       // const excludedProducts = this.checkExcludedProducts(availabilityRequest, availabilityCtx)
+        return allOk
+        // const excludedProducts = this.checkExcludedProducts(availabilityRequest, availabilityCtx)
+
+    }
 
 
 
+    checkProductOptions(branchModeRange: BranchModeRange, availabilityRequest: AvailabilityRequest, ctx: AvailabilityContext, response: AvailabilityResponse): boolean {
 
+        let schedule = branchModeRange.schedule
+
+        let hifrAfwezig = 'd507d664-3d8f-4ebe-bb3b-86dcd7df6fc8'
+        if (schedule.id != hifrAfwezig)
+            return true
+
+        let branchAquasense = '66e77bdb-a5f5-4d3d-99e0-4391bded4c6c'
+        if (ctx.branchId != branchAquasense)
+            return true
+
+        let prodWellness = '31eaebbc-af39-4411-a997-f2f286c58a9d'
+
+        let order = ctx.order
+        if (!order.hasProduct(prodWellness))
+            return true
+
+        let optionAdults = '004e75c1-92b1-4e3b-8551-735f5b55c3c1'
+        let optionChildren = '4f607e4c-b5e0-46e3-9221-fc25b0528a1c'
+
+        let allOk = true
+
+        let planning = ctx.resourcePlannings.filterByScheduleDate(schedule.id, branchModeRange.from)
+        let period = planning.toDateRange().extend(TimeSpan.hours(-1))
+
+        for (let line of order.lines) {
+
+            if (line.productId != prodWellness)
+                continue
+
+            let product = line.product
+
+            //let productOptions = product.options
+
+            let optionAdultsValue = line.getOptionById(optionAdults)
+            let optionChildrenValue = line.getOptionById(optionChildren)
+
+            let adults = optionAdultsValue.getValueValFirst(0)
+            let children = optionChildrenValue.getValueValFirst(0)
+
+            let total = adults + children
+
+            if (total > 4) {
+
+                let remarks = []
+                if (adults == 1)
+                    remarks.push(`1 volwassene`)
+                else if (adults > 1)
+                    remarks.push(`${adults} volwassenen`)
+
+                if (children == 1)
+                    remarks.push(`1 kind`)
+                else if (children > 1)
+                    remarks.push(`${children} kinderen`)
+
+                let remark = remarks.join(' + ')
+
+                let periodStr = ''
+
+                let lessThanADay = period.lessThan(TimeSpan.days(1), true)
+
+                if (lessThanADay)
+                    periodStr = `Op ${dateFns.format(period.from, 'dd/MM')}`
+                else {
+                    periodStr = `Tijdens de periode ${period.toString('dd/MM')}`    
+                }
+
+                response.informCustomer(`${periodStr} kan de wellness enkel geboekt worden voor max 4 personen (huidige selectie = ${remark}). Kies ofwel een andere datum, of pas het aantal personen aan. Dank voor uw begrip!`)
+                /*
+                response.informCustomer(`Tijdens de periode ${period.toString('dd/MM')} kan de wellness enkel geboekt worden voor 2 personen.`, {
+                    option: optionAdultsValue.name,
+                    expected: [2],
+                    actual: optionAdultsValue.getValueVals(),
+                    period: period.toString('dd/MM')
+                })*/
+                allOk = false
+
+            }
+
+
+            console.error('optionAdultsValue', optionAdultsValue)
+            console.error('optionChildrenValue', optionChildrenValue)
+
+        }
+
+        return allOk
     }
 
 
     checkExcludedProducts(branchModeRange: BranchModeRange, availabilityRequest: AvailabilityRequest, ctx: AvailabilityContext): ExcludedProducts {
 
-/*         const branchModeRanges = ctx.getBranchModeRanges(ctx.request.getDateRange())
-
-
-        for (let branchModeRange of branchModeRanges) {
-
-
-
-        }
-
-        let schedule = branchModeRange.schedule
- */
 
         let schedule = branchModeRange.schedule
 
@@ -145,18 +227,18 @@ export class AvailabilityService {
         if (!preChecksOk)
             return response
 
-/*
-        const excludedProducts = this.checkExcludedProducts(availabilityRequest, availabilityCtx)
-
-        if (excludedProducts.hasProducts()) {
-            console.error('Excluded products found', excludedProducts)
-            response.informCustomer('products_not_available', {
-                products: excludedProducts.getProductNames(),
-                period: excludedProducts.dateRange.toString('dd/MM')
-            })
-            return response
-        }
-*/
+        /*
+                const excludedProducts = this.checkExcludedProducts(availabilityRequest, availabilityCtx)
+        
+                if (excludedProducts.hasProducts()) {
+                    console.error('Excluded products found', excludedProducts)
+                    response.informCustomer('products_not_available', {
+                        products: excludedProducts.getProductNames(),
+                        period: excludedProducts.dateRange.toString('dd/MM')
+                    })
+                    return response
+                }
+        */
         /**
          *  Calculate the final availability of all the resources based on all the data previously fetched (availability context)
          */

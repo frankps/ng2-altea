@@ -158,19 +158,121 @@ export abstract class CalendarBase {
 
         if (this.showPlanning) {
             await this.showPlanningBetween(start, end)
-
-
         }
 
         this.refreshSchedule()
-
-
     }
 
 
     refreshEvents() {
         this.showEventsBetween(this.startOfVisible, this.endOfVisible)
     }
+
+
+
+    /**
+     * When managers are not on-site (HiFr afwezig), then we preconfigure masks for the cleaning blocks
+     * convert these mask resource plannings in base events
+     *  
+     * @param extraPlannings 
+     * @returns 
+     */
+    async doMasks(extraPlannings: ResourcePlannings): Promise<BaseEvent[]> {
+
+        var masks = extraPlannings.filterByType(PlanningType.mask)
+
+        const maskEvents: BaseEvent[] = []
+
+        if (masks.notEmpty()) {
+
+            var groupIds = masks.plannings.map(mask => mask.resourceGroupId).filter(id => id != null && id != undefined)
+            groupIds = _.uniq(groupIds)
+
+            if (ArrayHelper.NotEmpty(groupIds)) {
+
+                var groupResources = await this.resourceSvc.getMany$(groupIds)
+
+                for (let groupResource of groupResources) {
+
+                    var groupMasks = masks.filterByResource(groupResource.id, true)
+
+                    var dateRangeSet = groupMasks.toDateRangeSet()
+
+                    const events = dateRangeSet.ranges.map(range => BaseEvent.newResourceSchedule(groupResource, range.from, range.to, range.tag))
+
+                    maskEvents.push(...events)
+                }
+
+            }
+        }
+
+        return maskEvents
+
+    }
+
+
+    /**
+     * Groups an array of objects by multiple properties (including nested ones) and counts items in each group
+     * @param array The array of objects to group
+     * @param keys The property names to group by (can include dot notation for nested properties)
+     * @returns A map where keys are JSON stringified arrays of property values and values are counts
+     */
+    groupByAndCount<T>(array: T[], keys: string[]): Map<string, number> {
+        // Using Map instead of object to allow arrays as keys
+        const groupMap = new Map<string, number>();
+
+        for (const item of array) {
+            // Create array of values for the specified properties, handling nested properties
+            const groupValues = keys.map(key => {
+                if (key.includes('.')) {
+                    const [parentKey, childKey] = key.split('.');
+                    // Need to check if parentKey exists and is an object
+                    const parent = item[parentKey as keyof T];
+                    if (parent && typeof parent === 'object') {
+                        return parent[childKey as keyof typeof parent];
+
+                    }
+                    return undefined; // Handle case when parent doesn't exist or isn't an object
+                } else {
+                    return item[key as keyof T];
+                }
+            });
+
+            // Convert to string for use as Map key
+            const groupKey = JSON.stringify(groupValues);
+
+            // Increment the count for this group
+            groupMap.set(groupKey, (groupMap.get(groupKey) || 0) + 1);
+        }
+
+        return groupMap;
+    }
+
+
+    uniqEvents(events: BaseEvent[]) {
+
+        if (ArrayHelper.IsEmpty(events))
+            return
+
+        let me = this
+
+        const groupedByDeptAndRole = me.groupByAndCount(events, ['ResourceId', 'StartTimeNum']);
+
+        // To display the results in a readable format:
+        for (const [key, count] of groupedByDeptAndRole.entries()) {
+
+            if (count <= 1)
+                continue
+
+            const keyValues = JSON.parse(key);
+            console.log(`Group: ${keyValues}, Count: ${count}`);
+        }
+       
+
+    }
+
+
+
 
     /** -----------------   For HR view  -------------------------- */
     /*  =========================================================== */
@@ -186,12 +288,36 @@ export abstract class CalendarBase {
         var humanResourceIds = humanResources.map(hr => hr.id)
 
         var getResourceIds = [...humanResourceIds, branchId]
+        var resourceGroupIds = []
 
-        var extraPlannings = await this.alteaDb.getPlanningsByTypes(getResourceIds, start, end, AlteaPlanningQueries.extraTypes(), branchId)
 
+
+
+        let planningTypes = AlteaPlanningQueries.extraTypes()
+
+
+        let aquasenseId = '66e77bdb-a5f5-4d3d-99e0-4391bded4c6c'
+        if (branchId == aquasenseId) {  // to support planning masks (fixed cleaning blocks wellness)
+            let wellnessSupervisorId = '4a03c24f-286a-493d-8a1b-bb2b82d4e781'
+            resourceGroupIds.push(wellnessSupervisorId)
+            planningTypes.push(PlanningType.mask)
+        }
+
+        var extraPlannings = await this.alteaDb.getPlanningsByTypes(getResourceIds, resourceGroupIds, start, end, planningTypes, branchId)
 
         var absencePlannings = extraPlannings.filterByType(...AlteaPlanningQueries.absenceTypes())
         var availablePlannings = extraPlannings.filterByType(...AlteaPlanningQueries.availableTypes())
+
+
+        const allEvents: BaseEvent[] = []
+
+
+        let maskEvents = await this.doMasks(extraPlannings)
+        allEvents.push(...maskEvents)
+
+
+
+
 
         var specialPlannings = extraPlannings.filterByType(PlanningType.edu)
 
@@ -199,7 +325,6 @@ export abstract class CalendarBase {
 
         console.warn(absencePlannings)
 
-        const allEvents: BaseEvent[] = []
 
 
         var branchClosed = absencePlannings.filterByResource(branchId).toDateRangeSet()
@@ -282,6 +407,8 @@ export abstract class CalendarBase {
             }
         }
 
+
+
         return allEvents
 
 
@@ -341,9 +468,9 @@ export abstract class CalendarBase {
             context.events = []
         else
             context.events.splice(0, context.events.length)
-
+    
         context.events.push(...events)
-*/
+    */
 
         this.refreshSchedule()
     }
@@ -399,6 +526,8 @@ export abstract class CalendarBase {
      */
     async updateEvents(eventType: BaseEventType, events: any[]) {
 
+        let me =this
+
         await this.mutex.runExclusive(async () => {
 
             console.warn('updateEvents', eventType, events)
@@ -419,6 +548,9 @@ export abstract class CalendarBase {
                     this.events.splice(idx, 1)
 
             }
+
+
+         //   me.uniqEvents(me.events as BaseEvent[])
 
             this.events.push(...events)
 
@@ -445,6 +577,9 @@ export abstract class CalendarBase {
         }
 
         console.log(events)
+
+
+
 
         await context.updateEvents(BaseEventType.OrderPlanning, events)
 

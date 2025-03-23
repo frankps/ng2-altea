@@ -30,7 +30,8 @@ https://ej2.syncfusion.com/angular/documentation/schedule/getting-started
  -->
 
 <ejs-schedule #schedule [eventSettings]='eventSettings' [timeFormat]="timeFormat" [firstDayOfWeek]="1" startHour="08:00"
-  endHour="23:00" (navigating)="navigating($event)" (eventRendered)="oneventRendered($event)" (actionBegin)="onActionBegin($event)">
+  endHour="23:00" (navigating)="navigating($event)" (eventRendered)="oneventRendered($event)"
+  (actionBegin)="onActionBegin($event)">
 
   <!-- Content Template -->
   <ng-template #quickInfoTemplatesContent let-data>
@@ -63,6 +64,9 @@ https://ej2.syncfusion.com/angular/documentation/schedule/getting-started
       <br>
       <div class="start-time" style="padding-bottom:10px">Start: {{data.StartTime | date:"dd/MM HH:mm"}} -
         {{data.EndTime | date:"HH:mm"}}</div>
+
+      <div [innerHTML]="data.ResourceId"></div>
+      <br>
       <!-- <div class="end-time" style="padding-bottom:10px">End: {{data.EndTime.toLocaleString()}}</div>
       <div class="location" style="padding-bottom:10px">Location: {{data.Location}}</div>
       <div class="description" style="padding-bottom:10px">Description: {{data.Description}}</div> -->

@@ -21,9 +21,11 @@ export enum OrderTemplate {
 */
 export const orderTemplates = ['resv_wait_deposito', 'resv_remind_deposit', 'resv_confirmation',
   'resv_no_deposit_cancel', 'resv_in_time_cancel', 'resv_late_cancel', 'resv_change_date',
-  'resv_reminder', 'resv_no_show', 'resv_satisfaction', 'resv_internal_cancel', 'gift_online', 'gift_online_from', 'gift_online_to', 'order_compensate_gift', 'order_outstanding_balance']
+  'resv_reminder', 'resv_no_show', 'resv_satisfaction', 'resv_internal_cancel',
+  'gift_online', 'gift_online_from', 'gift_online_to', 'order_compensate_gift', 'order_outstanding_balance',
+  'resv_reminder_door_code', 'door_opened', 'door_opened2', 'resv_door_info', 'resv_door_info2']
 
-  
+
 export class Template extends ObjectWithParameters {
 
   orgId?: string
@@ -32,7 +34,7 @@ export class Template extends ObjectWithParameters {
 
   to: string[] = []
   channels: string[] = []
-   
+
   /** category (example: order) */
   cat?: string
 
@@ -357,65 +359,17 @@ export class Template extends ObjectWithParameters {
     return map
   }
 
-  /**
-   * 
-   * @param order 
-   * @param branch 
-   * @param addParamsForRemoteTemplating some services (like WhatsApp) do the templating themselves => we need to prepare the params to send over
-   * @returns 
-   */
-  mergeWithOrder(order: Order, branch: Branch, addParamsForRemoteTemplating: boolean = false): Message {
+
+  merge(branch: Branch, replacements: any, orderId: string, addParamsForRemoteTemplating: boolean = false): Message {
 
     const message = new Message()
 
-    message.branchId = order.branchId
-    message.orderId = order.id
+    message.branchId = branch.id
+    message.orderId = orderId
     message.code = this.code
     message.dir = MessageDirection.out
     message.auto = true   //this is automatic message
     message.fmt = this.format
-
-    const payLinkPath = `branch/aqua/order/${order.id}/pay-online`
-    const payLink = `https://book.birdy.life/${payLinkPath}`
-
-    const headerImage = `<img width='600' class='max-width' style='display:block;color:#000000;text-decoration:none;font-family:Helvetica, arial, sans-serif;font-size:16px;max-width:100% !important;width:100%;height:auto !important;' alt='' src='https://marketing-image-production.s3.amazonaws.com/uploads/17ae7951ff4ef38519fa1a715981599a402f7e4d4b05f8508a5bdf2ff5f738656a4b382fde86d71f28e68b0f9b2124d322ce2b1afdd6028244e8ce986823557f.jpg' border='0'>
-<div>&nbsp;</div>`
-
-    const replacements = {
-      'header-image': headerImage,
-      'branch': branch.name,
-      'branch-unique': branch.unique,
-      'deposit': `€${order.deposit}`,
-      'paid': `€${order.paid}`,
-      'cancel-time': '',
-      'deposit-time': order.depositTime(),
-      'deposit-date': order.depositDate(),
-      // term: this.getTerm_old(order),
-      'first': order?.contact?.first,
-      'order-id': order?.id,
-      'start-date': order.startDateFormat(),
-      'order-lines-html': order.sumToString(),
-      'order-lines-text': order.sumToString(true, '\n'),
-      'footer': branch.comm?.footer,
-      'product-informs': order.productInforms(),
-      'pay-link': payLink,
-      'pay-link-path': payLinkPath
-      //'start-time': order.start
-      //'url-path': 'branch/aqua/order/a420eb76-497d-4b4a-a22d-90f9e78d6113/pos-summary'
-      // info: "baby giraffe"
-    }
-
-    console.warn(replacements)
-
-    // https://altea-pub-app2.web.app/branch/{{branch-short}}/order/{{order-id}}/pos-summary
-
-    console.warn(replacements)
-
-    /** important remark: 
-     *  Whats App will not use message.body or message.subj, this is just for local storage of messages
-     *  => instead we pass parameters (see addParamsForRemoteTemplating): WhatsApp will do the merge of text with parameters
-     */
-
 
     if (this.body) {
       const hbTemplate = Handlebars.compile(this.body)
@@ -427,7 +381,10 @@ export class Template extends ObjectWithParameters {
       message.subj = hbTemplate(replacements)
     }
 
-
+    /** important remark: 
+ *  Whats App will not use message.body or message.subj, this is just for local storage of messages
+ *  => instead we pass parameters (see addParamsForRemoteTemplating): WhatsApp will do the merge of text with parameters
+ */
 
     /** local templating */
     if (addParamsForRemoteTemplating) {
@@ -471,13 +428,6 @@ export class Template extends ObjectWithParameters {
 
       }
 
-
-      /*
-            message.addTextParameter('branch', 'Aquasense')
-            message.addTextParameter('deposit', '€85')
-            message.addTextParameter('term', '13h')
-      */
-
     }
 
 
@@ -485,6 +435,60 @@ export class Template extends ObjectWithParameters {
     message.type = this.msgType()
 
     return message
+
+  }
+
+
+  /**
+   * 
+   * @param order 
+   * @param branch 
+   * @param addParamsForRemoteTemplating some services (like WhatsApp) do the templating themselves => we need to prepare the params to send over
+   * @returns 
+   */
+  mergeWithOrder(order: Order, branch: Branch, addParamsForRemoteTemplating: boolean = false): Message {
+
+
+    const payLinkPath = `branch/aqua/order/${order.id}/pay-online`
+    const payLink = `https://book.birdy.life/${payLinkPath}`
+
+    const headerImage = `<img width='600' class='max-width' style='display:block;color:#000000;text-decoration:none;font-family:Helvetica, arial, sans-serif;font-size:16px;max-width:100% !important;width:100%;height:auto !important;' alt='' src='https://marketing-image-production.s3.amazonaws.com/uploads/17ae7951ff4ef38519fa1a715981599a402f7e4d4b05f8508a5bdf2ff5f738656a4b382fde86d71f28e68b0f9b2124d322ce2b1afdd6028244e8ce986823557f.jpg' border='0'>
+<div>&nbsp;</div>`
+
+    const replacements = {
+      'header-image': headerImage,
+      'branch': branch.name,
+      'branch-unique': branch.unique,
+      'deposit': `€${order.deposit}`,
+      'paid': `€${order.paid}`,
+      'cancel-time': '',
+      'deposit-time': order.depositTime(),
+      'deposit-date': order.depositDate(),
+      // term: this.getTerm_old(order),
+      'first': order?.contact?.first,
+      'name': order?.contact?.name,
+      'order-id': order?.id,
+      'start-date': order.startDateFormat(),
+      'order-lines-html': order.sumToString(),
+      'order-lines-text': order.sumToString(true, '\n'),
+      'footer': branch.comm?.footer,
+      'product-informs': order.productInforms(),
+      'pay-link': payLink,
+      'pay-link-path': payLinkPath
+      //'start-time': order.start
+      //'url-path': 'branch/aqua/order/a420eb76-497d-4b4a-a22d-90f9e78d6113/pos-summary'
+      // info: "baby giraffe"
+    }
+
+    console.warn(replacements)
+
+    // https://altea-pub-app2.web.app/branch/{{branch-short}}/order/{{order-id}}/pos-summary
+
+    // console.warn(replacements)
+
+    let msg = this.merge(branch, replacements, order.id, addParamsForRemoteTemplating)
+
+    return msg
 
   }
 

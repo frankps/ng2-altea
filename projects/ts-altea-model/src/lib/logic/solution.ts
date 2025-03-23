@@ -341,6 +341,9 @@ export class CustomerInfo {
 
                 return `Volgende producten zijn uitzonderlijk niet beschikbaar in de periode ${this.params.period}: ${products}. Kies een datum buiten deze periode of verwijder ${thisProduct}: ${products}.`
 
+            case 'invalid_option_value':
+                return `De waarde ${this.params.actual} is niet geldig voor ${this.params.option} tijdens de periode ${this.params.period}.`
+
             default:
                 return this.msg
         }

@@ -112,6 +112,8 @@ export class OrderMgrUiService {   // implements OnInit
 
   isPos: boolean = false
 
+  /**  */
+  giftNotFound: boolean = false
 
 
 
@@ -363,6 +365,8 @@ export class OrderMgrUiService {   // implements OnInit
 
     this.showTimer = false
     this.startTimerDate = null
+
+    this.giftNotFound = false
 
     if (this.interval)
       clearInterval(this.interval)
@@ -677,8 +681,11 @@ export class OrderMgrUiService {   // implements OnInit
     if (order.gift) {
       this.gift = await this.giftSvc.getByOrderId$(orderId)
 
-      if (!this.gift)
+      if (!this.gift) {
+        this.giftNotFound = true
         this.dashboardSvc.showErrorToast('Could not find gift for this order!')
+      }
+
     }
 
     this.upgradeOrder(order)
@@ -773,7 +780,7 @@ export class OrderMgrUiService {   // implements OnInit
 
 
     if (this.availabilityResponse?.optionSet?.options) {
-     // let reservationOptions = this.availabilityResponse.optionSet.options
+      // let reservationOptions = this.availabilityResponse.optionSet.options
 
       //this.options = reservationOptions
 
@@ -782,7 +789,7 @@ export class OrderMgrUiService {   // implements OnInit
     }
 
     console.error(request)
-   // console.error(response)
+    // console.error(response)
   }
 
 
@@ -1011,11 +1018,11 @@ export class OrderMgrUiService {   // implements OnInit
 
     const minutes = Math.floor(this.timeLeftSeconds / 60)
 
-/*     if (minutes >= 3)
-      return `${minutes} min`
-*/
+    /*     if (minutes >= 3)
+          return `${minutes} min`
+    */
 
-    const seconds = this.timeLeftSeconds % 60 
+    const seconds = this.timeLeftSeconds % 60
 
     if (minutes >= 1)
       return `${minutes} min en ${seconds} sec`
@@ -1091,6 +1098,34 @@ export class OrderMgrUiService {   // implements OnInit
       }
     }
 
+  }
+
+
+  async fixNonExistingGift(order: Order) {
+    let gift = new Gift()
+
+    gift.branchId = order.branchId
+    gift.orderId = order.id
+
+    gift.fromId = order.contactId
+
+    gift.syncFromOrder(this.order)
+
+    if (order.giftCode)
+      gift.code = order.giftCode
+
+    console.warn(gift)
+
+    let giftRes = await this.giftSvc.create$(gift, this.dashboardSvc.resourceId)
+
+    console.log(giftRes)
+
+    if (giftRes.isOk) {
+      this.giftNotFound = false
+      this.dashboardSvc.showToastType(ToastType.saveSuccess)
+    } else {
+      this.dashboardSvc.showToastType(ToastType.saveError)
+    }
   }
 
   async saveOrder(autoChangeState: boolean = false): Promise<Order> {
@@ -1481,13 +1516,16 @@ export class OrderMgrUiService {   // implements OnInit
 
     let me = this
 
+    if (qty == 0) {
+      console.error('qty == 0')
+    }
 
     console.error(product)
 
     me.orderLineIsNew = true
     await me.prepareProduct(product)
 
-    if (qty < product.minQty)
+    if (qty > 0 && qty < product.minQty)
       qty = product.minQty
 
     me.orderLine = new OrderLine(product, qty, initOptionValues)

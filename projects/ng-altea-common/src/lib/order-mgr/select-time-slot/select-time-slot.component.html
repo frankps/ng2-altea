@@ -100,3 +100,8 @@
     <button type="button" class="btn btn-outline-primary float-end" (click)="selectOtherDate()"
         translate>ui.order-mgr.select-time-slot.other-date</button>
 </div>
+
+<div class="d-grid mt-3" *ngIf="otherDateButton">
+    <button type="button" class="btn btn-outline-secondary float-end" (click)="editOrder()"
+        translate>ui.order-mgr.select-time-slot.edit-order</button>
+</div>

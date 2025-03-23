@@ -14,8 +14,9 @@ export const environment = {
       appId: "1:75363142531:web:3019579db680c76a4bc4b6",
       measurementId: "G-2VD4P10F7W"
     },
-   //backend: 'https://dvit-477c9.uc.r.appspot.com',
+   // backend: 'https://dvit-477c9.uc.r.appspot.com',
     backend: 'http://localhost:8080',
+    localServer:  'http://localhost:3005', // 'https://altea.dvit.local', //'http://localhost:3005',   // 'https://localhost', //
     userSelectIdleTime: 300
   };
   

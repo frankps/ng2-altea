@@ -420,7 +420,11 @@
       "gift_online_from": "Cadeaubon schenker",
       "gift_online_to": "Cadeaubon ontvanger",
       "order_compensate_gift": "Compensatie cadeaubon",
-      "order_outstanding_balance": "Openstaand saldo"
+      "order_outstanding_balance": "Openstaand saldo",
+      "resv_reminder_door_code": "Herinnering + deurcode",
+      "door_opened": "Deur geopend",
+      "door_opened2": "Deur geopend",
+      "resv_door_info": "Deur info"
     },
     "compensation-gift-reason": {
       "overpaid": "Omzetting teveel betaald naar cadeaubon"
@@ -594,7 +598,8 @@
       "select-time-slot": {
         "title": "Mogelijkheden op",
         "no-slots": "Er zijn geen mogelijkheden",
-        "other-date": "Kies andere datum"
+        "other-date": "Kies andere datum",
+        "edit-order": "Order aanpassen"
       },
       "contacts": {
         "title": "Zoek klant"

@@ -59,5 +59,13 @@ export class Events {
         return ev
     }
 
+
+    find2(orderId: string, type: string, date: number, resourceId?: string): Event {
+
+        const ev = this.events.find(e => e.orderId == orderId && e.type == type && e.date == date && (!resourceId || e.resourceId == resourceId))
+
+        return ev
+    }
+
 }
 

@@ -27,6 +27,15 @@ export class LocalService extends HttpClientService {
   }
 
 
+  async deleteDoorAccessUsers$(uuids: string[]): Promise<any> {
+
+    let result: any = await this.post$(`door-access/delete-users`, uuids)
+
+    return result
+  }
+
+
+
   /**
    * 
    * @param date format yyyymmdd
@@ -44,6 +53,13 @@ export class LocalService extends HttpClientService {
   async deleteAllEvents$(): Promise<any> {
 
     let result: any[] = await this.delete$(`events/all`)
+
+    return result
+  }
+
+  async truncateAllEvents$(): Promise<any> {
+
+    let result: any[] = await this.delete$(`events/truncate`)
 
     return result
   }
@@ -81,6 +97,8 @@ export class LocalService extends HttpClientService {
   async runDoorEntry$(): Promise<any> {
 
     let result: any = await this.get$(`events/runDoorEntry`)
+
+    console.warn(result)
 
     // let events : Event[] = plainToInstance(Event, result)
 

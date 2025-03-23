@@ -5,16 +5,16 @@ import { ArrayHelper } from "./array-helper";
 
 export class StringHelper {
 
-    static isNullOrUndefined(str) : boolean {
+    static isNullOrUndefined(str): boolean {
         return str === undefined || str === null
     }
 
-    static isDefined(str) : boolean {
+    static isDefined(str): boolean {
         return str !== undefined && str !== null
     }
 
 
-    static isEmptyOrSpaces(str) : boolean {
+    static isEmptyOrSpaces(str): boolean {
         return str === undefined || str === null || str.match(/^ *$/) !== null;
     }
 
@@ -49,11 +49,11 @@ export class ObjectHelper {
     }
 
 
-    static isNullOrUndefined(obj) : boolean {
+    static isNullOrUndefined(obj): boolean {
         return obj === undefined || obj === null
     }
 
-    static notNullOrUndefined(obj) : boolean {
+    static notNullOrUndefined(obj): boolean {
         return obj !== undefined && obj !== null
     }
 
@@ -108,21 +108,63 @@ export class ObjectHelper {
         });
     }
 
+
+
     static createRandomNumberString(length, chars = "0123456789") {
         return ObjectHelper.createRandomString(length, chars)
     }
 
     static createRandomString(length, chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789") {
 
+        let doCrypto //= crypto
+
+
+        try {
+            doCrypto = typeof window !== 'undefined' ? (window.crypto) : null //(typeof require !== 'undefined' ? require('crypto') : null)
+        } catch (e) {
+            console.error(e)
+        }
+
+
+
+
+        if (!doCrypto)
+            return ObjectHelper.generateRandomNumberString(length)
+
         // const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"  // "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         let result = "";
         const randomArray = new Uint8Array(length);
-        crypto.getRandomValues(randomArray);
+        doCrypto.getRandomValues(randomArray);
         randomArray.forEach((number) => {
             result += chars[number % chars.length];
         });
         return result;
     }
+
+
+    /**
+ * Generates a random string of numbers with the specified length
+ * Works in both Node.js and browser environments
+ * 
+ * @param {number} length - The length of the random number string to generate
+ * @returns {string} A string of random numbers with the specified length
+ */
+    static generateRandomNumberString(length) {
+        if (!Number.isInteger(length) || length <= 0) {
+            throw new Error('Length must be a positive integer');
+        }
+
+        let result = '';
+
+        // Method 1: Using Math.random (works in both Node.js and browser)
+        for (let i = 0; i < length; i++) {
+            result += Math.floor(Math.random() * 10);
+        }
+
+        return result;
+    }
+
+
 
 
     /**
@@ -227,11 +269,11 @@ export class ObjectHelper {
 
     static nextIdx(collection: any[], idxProperty: string = 'idx', idxStep = 100) {
         if (ArrayHelper.IsEmpty(collection))
-          return idxStep
-    
+            return idxStep
+
         const maxObject = _.maxBy(collection, idxProperty)
-    
+
         return maxObject[idxProperty] + idxStep
-      }
+    }
 
 }

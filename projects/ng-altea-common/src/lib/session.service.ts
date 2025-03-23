@@ -61,7 +61,7 @@ export class SessionService implements OnInit {
   public backend // = "https://dvit-477c9.uc.r.appspot.com"
   //public backend = "http://localhost:8080"
 
-  public localServer = "http://altea.dvit.local:3000"
+  public localServer //= "http://altea.dvit.local:3000"
   //  public localServer = "http://localhost:3000"
 
   /** for internal use (POS): the current user working with the app */
@@ -119,6 +119,7 @@ export class SessionService implements OnInit {
 
   init(environment: any) {
     this.backend = environment.backend
+    this.localServer = environment.localServer
   }
 
   get stripeTest(): boolean {

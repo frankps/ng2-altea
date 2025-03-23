@@ -43,6 +43,10 @@ export class SelectTimeSlotComponent {
     this.changeDate.emit()
   }
 
+  editOrder() {
+    this.orderMgrSvc.changeUiState('order')
+  }
+
   async customTimeSlot() {
 
     let date = this.orderMgrSvc.availabilityRequestFromDate()

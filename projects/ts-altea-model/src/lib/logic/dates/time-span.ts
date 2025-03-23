@@ -51,6 +51,9 @@ export class TimeSpan {
         return _.round(this.seconds / 3600, 2)
     }
 
+    static days(days = 1): TimeSpan {
+        return this.hours(days * 24)
+    }
 
     static hours(hours: number, minutes = 0, seconds = 0): TimeSpan {
         return new TimeSpan(hours * 3600 + minutes * 60 + seconds)

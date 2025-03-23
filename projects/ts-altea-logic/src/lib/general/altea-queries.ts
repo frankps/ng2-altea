@@ -12,7 +12,7 @@ export class AlteaPlanningQueries {
     }
 
     static staffTypes() {
-        return [PlanningType.pres, PlanningType.brk ]
+        return [PlanningType.pres, PlanningType.brk]
     }
 
     static extraTypes() {
@@ -20,7 +20,7 @@ export class AlteaPlanningQueries {
     }
 
 
-    static getByTypes(resourceIds: string[], from: Date, to: Date, types: PlanningType[], branchId?: string) : DbQueryTyped<ResourcePlanning> {
+    static getByTypes(resourceIds: string[], resourceGroupIds: string[], from: Date, to: Date, types: PlanningType[], branchId?: string): DbQueryTyped<ResourcePlanning> {
         const qry = new DbQueryTyped<ResourcePlanning>('resourcePlanning', ResourcePlanning)
 
         if (branchId)
@@ -29,9 +29,17 @@ export class AlteaPlanningQueries {
         qry.and('end', QueryOperator.greaterThanOrEqual, DateHelper.yyyyMMddhhmmss(from))
         qry.and('start', QueryOperator.lessThanOrEqual, DateHelper.yyyyMMddhhmmss(to))
         qry.and('act', QueryOperator.equals, true)
-        qry.and('resourceId', QueryOperator.in, resourceIds)
+
+        let resourceFilter = qry.and()
+
+        if (ArrayHelper.NotEmpty(resourceIds))
+            resourceFilter.or('resourceId', QueryOperator.in, resourceIds)
+
+        if (ArrayHelper.NotEmpty(resourceGroupIds))
+            resourceFilter.or('resourceGroupId', QueryOperator.in, resourceGroupIds)
+
         qry.and('type', QueryOperator.in, types)
-       
+
         return qry
     }
 

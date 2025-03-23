@@ -49,6 +49,7 @@
     "price": "Prijs",
     "print": "Print",
     "qty": "Aantal",
+    "remarks": "Opmerkingen",
     "reply": "Antwoorden",
     "reset-password": "Wachtwoord opnieuw instellen",
     "select": "Selecteer",
@@ -359,11 +360,14 @@
       "avl": "Beschikbaar",
       "tsk": "Taak",
       "brk": "Pauze",
-      "pres": "Aanwezigheid"
+      "pres": "Aanwezigheid",
+      "mask": "Masker",
+      "comp": "Compensatie"
     },
     "product-rule-type": {
       "startAt": "Starttijden dienst",
-      "prePost": "Voor & na tijden"
+      "prePost": "Voor & na tijden",
+      "nonActiveSchedules": "Niet actieve planningen"
     },
     "resource-type": {
       "human": "Personeel",
@@ -379,6 +383,10 @@
         "product": "Hou deze resource bezet gedurende de volledige duurtijd van deze dienst",
         "custom": "Definieer zelf een aangepaste bezetting"
       }
+    },
+    "prod-opt-dur-mode": {
+      "add": "Toevoegen aan totale duurtijd",
+      "custom": "Definieer zelf een aangepaste bezetting (sectie Resources)"
     },
     "duration-reference": {
       "start": "het begin van deze dienst",
@@ -557,6 +565,9 @@
       }
     },
     "order-mgr": {
+      "inform": {
+        "duration_change": "De duurtijd van "
+      },
       "pos": {
         "menu": {
           "start": "Start",
@@ -583,7 +594,8 @@
       "select-time-slot": {
         "title": "Mogelijkheden op",
         "no-slots": "Er zijn geen mogelijkheden",
-        "other-date": "Kies andere datum"
+        "other-date": "Kies andere datum",
+        "edit-order": "Order aanpassen"
       },
       "contacts": {
         "title": "Zoek klant"
@@ -869,7 +881,9 @@
     },
     "gift": {
       "_single": "Cadeaubon",
+      "article": "de",
       "code": "Code",
+      "invoice": "Te facturen",
       "value": "Waarde",
       "vatPct": "BTW percentage",
       "used": "Gebruikt",
@@ -905,6 +919,15 @@
       "smsOn": "Verstuur SMS berichten naar klanten",
       "cancel": "Minimum tijd voor kosteloze annulatie",
       "inv": {
+        "on": "Facturatie",
+        "year": "Boekjaar",
+        "next": "Volgend factuurnummer"
+      },
+      "acc": {  
+        "closed": {
+          "year": "Afsluiting van jaar",
+          "month": "Laatst afgesloten maand"
+        },
         "on": "Facturatie",
         "year": "Boekjaar",
         "next": "Volgend factuurnummer"
@@ -1047,12 +1070,14 @@
       "article": "de",
       "qty": "Aantal",
       "hasStart": "Stel startdatum in",
-      "start": "Vanaf",
+      "start": "Vanaf", 
+      "short": "Korte naam",
       "hasEnd": "Stel einddatum in",
       "end": "Tot en met",
       "isGroup": "Groep",
       "customSchedule": "Aangepast uurrooster",
       "online": "Klanten kunnen deze persoon selecteren",
+      "pos": "Toon in kassa",
       "user": "Gelinkt met gebruiker",
       "help": {
         "device-name": "De naam van het toestel",
@@ -1131,6 +1156,7 @@
       "multiSelect": "Er kan meer dan 1 waarde selecteerd worden",
       "persons": "Waarde van deze optie bepaalt aantal personen",
       "hasDuration": "Deze optie heeft een duurtijd",
+      "addDur": "Voeg duurtijd van optie automatisch toe aan totale duurtijd van dienst",
       "hasPrice": "Deze optie heeft een prijs",
       "hasValue": "Deze optie heeft een waarde",
       "hasFormula": "Deze optie heeft een formule",
@@ -1158,6 +1184,9 @@
       "prepOverlap": "Voorbereiding & opkuis overlappen elkaar",
       "flex": "Flexibele start (bij duo's)",
       "flexAfter": "Start na vorige inplanning",
+      "optionDur": "Voeg tijden van opties toe",
+      "optionIds": "Product opties",
+      "back": "Tel terug (vanaf referentiepunt)",
       "help": {
         "offset": "Je kan ervoor kiezen om de bezetting van deze resource niet exact te laten aanvangen vanaf het begin of einde (bovenstaande keuze), maar wel met een correctie (in minuten)",
         "duration": "Gedurende deze tijd (minuten) wordt de resource bezet gehouden",
@@ -1336,7 +1365,8 @@
       "sub": {
         "transactions": "Transacties",
         "payments": "Betalingen",
-        "hr-dashboard": "Personeel"
+        "hr-dashboard": "Personeel",
+        "checks": "Controles"
       }
     },
     "platform": {

@@ -78,6 +78,12 @@ export class JobsComponent {
     console.error(res)
   }
 
+  async truncateEvents(): Promise<any> {
+    console.log('truncate events')
+    const res = await this.localSvc.truncateAllEvents$()
+    console.error(res)
+  }
+
 
   async getJobs(eventId: string): Promise<Job[]> {
 

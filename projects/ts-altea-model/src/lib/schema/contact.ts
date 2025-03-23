@@ -191,6 +191,9 @@ export class Contact extends UserBase {
   /** a unique code to automatically enter the shop/business (code panel/QR) */
   entry?: string
 
+  /** the uuid of this contact in the entry system */
+  entryId?: string
+
   gender: Gender = Gender.unknown
   birth?: number;  // format: yyyyMMdd
   email?: string;
@@ -251,6 +254,8 @@ export class Contact extends UserBase {
 
   constructor() {
     super()
+
+    this.entry = ObjectHelper.createRandomNumberString(4)
   }
 
   getAddress(sep: string = '\n') : string {

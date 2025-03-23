@@ -182,7 +182,7 @@ export class HrDashboardComponent implements OnInit {
 
     let planningTypes = [...AlteaPlanningQueries.extraTypes(), ...AlteaPlanningQueries.staffTypes()]
 
-    var plannings = await alteaDb.getPlanningsByTypes([resource.id, resource.branchId], start, end, planningTypes, resource.branchId)
+    var plannings = await alteaDb.getPlanningsByTypes([resource.id, resource.branchId], [], start, end, planningTypes, resource.branchId)
 
 
     var staffPlannings = plannings.filterByResource(resource.id)

@@ -39,7 +39,7 @@
 <ng-container *ngIf="initialized">
 
 
-    <div class="row">
+<!--     <div class="row">
 
 
         <div class="col-3">
@@ -64,9 +64,9 @@
 
     <ng-select id="subscriptionUnitProducts" name="subscriptionUnitProducts" [items]="subscriptionUnitProducts"
         bindLabel="name" bindValue="id" [clearable]="false" [multiple]="true" [(ngModel)]="cond.ids">
-    </ng-select>
+    </ng-select> -->
 
-
+    <button type="button" class="btn btn-primary btn-sm mx-3 my-3" (click)="doorOpenedWhatsapp()">Whatsapp</button>
 
 
 
@@ -80,6 +80,9 @@
 
 
     <div class="col-4">
+
+
+       
 
 
         <!-- 

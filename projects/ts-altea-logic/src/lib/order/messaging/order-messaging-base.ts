@@ -1,4 +1,4 @@
-import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MessageAddress, TemplateCode } from 'ts-altea-model'
+import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MessageAddress, TemplateCode, Contact } from 'ts-altea-model'
 import { AlteaDb } from '../../general/altea-db'
 import { IDb } from '../../interfaces/i-db'
 import { ApiListResult, ApiResult, ApiStatus, ArrayHelper } from 'ts-common'
@@ -73,7 +73,7 @@ export class OrderMessagingBase {
             }
 
 
-            var sendResult = await this.sendMessage(type, template, order, branch, send)
+            var sendResult = await this.sendTemplate(type, template, order, branch, send)
 
             if (!sendResult.isOk)
                 fullResult.status = sendResult.status
@@ -102,7 +102,7 @@ export class OrderMessagingBase {
     }
 
 
-    async sendMessage(type: MsgType, template: Template, order: Order, branch: Branch, send: boolean = true): Promise<ApiResult<Message>> {
+    async sendTemplate(type: MsgType, template: Template, order: Order, branch: Branch, send: boolean = true): Promise<ApiResult<Message>> {
 
         if (!order.msg) // messaging disabled for order
             return ApiResult.warning('Messaging disabled for order!')
@@ -110,17 +110,68 @@ export class OrderMessagingBase {
         switch (type) {
 
             case MsgType.email:
-                return await this.sendEmailMessage(template, order, branch, send)
+                return await this.sendEmailTemplate(template, order, branch, send)
             case MsgType.sms:
-                return await this.sendSmsMessage(template, order, branch, send)
+                return await this.sendSmsTemplate(template, order, branch, send)
             case MsgType.wa:
-                return await this.sendWhatsAppMessage(template, order, branch, send)
+                return await this.sendWhatsAppTemplate(template, order, branch, send)
             default:
                 throw `Message type ${type} not supported!`
         }
     }
 
-    async sendWhatsAppMessage(template: Template, order: Order, branch: Branch, send: boolean = true): Promise<ApiResult<Message>> {
+    async sendMessage(msg: Message, order: Order, contact: Contact, branch: Branch, send: boolean = true): Promise<ApiResult<Message>> {
+    
+        if (!order.msg) // messaging disabled for order
+            return ApiResult.warning('Messaging disabled for order!')
+
+        
+        if (!msg.conIds)
+            msg.conIds = []
+
+        if (msg.conIds.indexOf(contact.id) < 0)
+            msg.conIds.push(contact.id)
+
+
+        switch (msg.type) {
+
+            case MsgType.wa:
+
+                if (!contact.mobile)
+                    return ApiResult.error(`Can't send Whatsapp: contact has no mobile number`)
+
+                msg.addTo(contact.mobile, contact.name, contact.id)  // contact.email
+                break
+
+            case MsgType.email:
+
+                if (!contact.email)
+                    return ApiResult.error(`Can't send email: contact has no email address`)
+
+                msg.from = new MessageAddress(branch.emailFrom, branch.name)
+
+                msg.addTo(contact?.email, contact.name, contact.id)
+        
+                if (branch.emailBcc)
+                    msg.addBcc(branch.emailBcc)
+        }
+
+        // msg.type = MsgType.wa
+        msg.orderId = order?.id
+
+        if (send) {
+
+            const sendRes = await this.alteaDb.db.sendMessage$(msg)
+            //const sendRes = new ApiResult(msg)
+            console.warn(sendRes)
+
+        }
+
+        return new ApiResult(msg)
+        
+    }
+
+    async sendWhatsAppTemplate(template: Template, order: Order, branch: Branch, send: boolean = true): Promise<ApiResult<Message>> {
 
         if (!order.msg) // messaging disabled for order
             return ApiResult.warning('Messaging disabled for order!')
@@ -158,7 +209,7 @@ export class OrderMessagingBase {
         return new ApiResult(msg)
     }
 
-    async sendEmailMessage(template: Template, order: Order, branch: Branch, send: boolean = true): Promise<ApiResult<Message>> {
+    async sendEmailTemplate(template: Template, order: Order, branch: Branch, send: boolean = true): Promise<ApiResult<Message>> {
 
         if (!order.msg) // messaging disabled for order
             return ApiResult.warning('Messaging disabled for order!')
@@ -175,6 +226,8 @@ export class OrderMessagingBase {
 
         msg.from = new MessageAddress(branch.emailFrom, branch.name)
 
+        msg.addTo(contact?.email, contact.name, contact.id)
+
         if (branch.emailBcc)
             msg.addBcc(branch.emailBcc)
 
@@ -185,9 +238,6 @@ export class OrderMessagingBase {
             msg.conIds = []
 
         msg.conIds.push(contact.id)
-
-        msg.addTo(contact?.email, contact.name, contact.id)
-        //msg.addTo('frank@dvit.eu', contact.name, contact.id)  // contact.email
 
         msg.type = MsgType.email
         msg.orderId = order?.id
@@ -201,7 +251,7 @@ export class OrderMessagingBase {
         return new ApiResult(msg)
     }
 
-    async sendSmsMessage(template: Template, order: Order, branch: Branch, send: boolean = true): Promise<ApiResult<Message>> {
+    async sendSmsTemplate(template: Template, order: Order, branch: Branch, send: boolean = true): Promise<ApiResult<Message>> {
 
         if (!order.msg) // messaging disabled for order
             return ApiResult.warning('Messaging disabled for order!')

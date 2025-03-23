@@ -346,6 +346,12 @@ export class ResourceAvailability2 {
         return true
     }
 
+
+
+
+
+
+
     getAvailableResourcesInRange(resources: Resource[], dateRange: DateRange, requestItem: ResourceRequestItem, solution: Solution, durationAlreadyIncluded: boolean, stopWhenFound = false, checkBreaks = false): ResultWithSolutionNotes<Resource[]> {
 
         let isPrepTime = requestItem.isPrepTime
@@ -376,6 +382,11 @@ export class ResourceAvailability2 {
              */
             var resourceAvailabilities = this.getAvailabilitiesForResource(resource)
 
+
+           // resourceAvailabilities = this.subtractGroupLevelReservations(possibleResources, resourceAvailabilities, ctx, availability, solution)
+
+
+           
             /** The current solution might already occupy this resource */
             if (solution) {
                 var resourceAlreadyOccupiedInSolution = solution.getOccupationForResource(resource, durationAlreadyIncluded)
@@ -396,13 +407,13 @@ export class ResourceAvailability2 {
                     } else {
                         solution.addNote(`Break not possible for ${resource.name} if we allocate ${dateRange.toString()}  (break remaining: ${breakStillPossible.remaining?.toString()})`)
                     }
-                        
+
                 }
                 else {
                     availableResources.push(resource)
                     continue
                 }
-                    
+
             }
 
             /*

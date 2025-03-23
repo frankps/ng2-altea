@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbQuery, DbQueryTyped, HtmlTable, ObjectHelper, QueryOperator } from 'ts-common'
-import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, TemplateCode, CustomerCancelReasons, MessageAddress, MessageDirection, TemplateFormat } from 'ts-altea-model'
+import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbObject, DbQuery, DbQueryTyped, HtmlTable, ObjectHelper, QueryOperator } from 'ts-common'
+import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, TemplateCode, CustomerCancelReasons, MessageAddress, MessageDirection, TemplateFormat, Contact } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import * as dateFns from 'date-fns'
 import * as Handlebars from "handlebars"
@@ -8,6 +8,7 @@ import * as _ from "lodash"
 import { AlteaDb } from '../../general/altea-db'
 import { IDb } from '../../interfaces/i-db'
 import { OrderMessagingBase } from './order-messaging-base'
+import { logger } from 'handlebars'
 
 /**
  * Mogelijkheden:
@@ -365,7 +366,7 @@ export class OrderMessaging extends OrderMessagingBase {
             const template = templates.find(t => t.channels.indexOf(msg.type) >= 0 && t.code == code)
 
             if (template)
-                await this.sendMessage(msg.type, template, order, branch)
+                await this.sendTemplate(msg.type, template, order, branch)
 
 
         }
@@ -469,9 +470,211 @@ export class OrderMessaging extends OrderMessagingBase {
 
 
 
-    async reminderMessaging2(dayMin: number = 2, msgType: MsgType = MsgType.email): Promise<string> {
+    /**
+     * Send door info messages to customers
+     * @param dayMin 
+     * @returns 
+     */
+    async doorMessaging(dayMin: number = 1, msgTypes: MsgType[] = [MsgType.wa, MsgType.email]) {   // MsgType.wa , MsgType.email
+
+        const templateCode = TemplateCode.resv_door_info2
+
+        let today = new Date()
+        today = dateFns.startOfDay(today)
+
+        let from = dateFns.addDays(today, dayMin)
+        let to = dateFns.addDays(from, 1)
+
+        let fromNum = DateHelper.yyyyMMdd000000(from)
+        let toNum = DateHelper.yyyyMMdd000000(to)
+
+        let extra = {
+            contactId: '8fdbf31f-1c6d-459a-b997-963dcd0740d8',
+            branchIds: ['66e77bdb-a5f5-4d3d-99e0-4391bded4c6c']
+        }
+
+        const orders = await this.alteaDb.getOrdersStartingBetween(fromNum, toNum, extra)
+
+
+        let branchIds = orders.map(o => o.branchId)
+        branchIds = _.uniq(branchIds)
+
+        const branches = await this.alteaDb.getBranches(branchIds)
+
+        let errorCount = 0
+        let reminderCount = 0
 
         const htmlBody: string[] = []
+        try {
+
+
+            htmlBody.push(`<h2>Door messaging</h2>`)
+
+            htmlBody.push(`<p>Voor boekingen tussen ${dateFns.format(from, 'dd/MM')} en ${dateFns.format(to, 'dd/MM')}</p>`)
+
+            for (let branch of branches) {
+
+                htmlBody.push(`<h4>${branch.name}</h4>`)
+
+                const reminderTable = new HtmlTable()
+
+                //const template = await this.alteaDb.getTemplate(branch.id, templateCode, msgType)
+
+                const templates = await this.alteaDb.getTemplates(branch.id, templateCode)
+
+                if (ArrayHelper.IsEmpty(templates))
+                    console.warn(`Branch '${branch.name}'has no templates '${templateCode}'`)
+
+
+                const templatesByType = new Map<MsgType, Template>()
+                const msgTypesToSend : MsgType[] = []
+
+                for (let msgType of msgTypes) {
+
+                    const template = templates.find(t => t.channels.indexOf(msgType) >= 0)
+
+                    if (!template) {
+                        console.warn(`Branch '${branch.name}' has no template '${templateCode}' for '${msgType}'`)
+                        continue
+                    }
+
+                    templatesByType.set(msgType, template)
+                    msgTypesToSend.push(msgType)
+                }
+
+                // const msgTypesToSend = templatesByType.keys()
+
+                let branchOrders = orders.filter(o => o.branchId == branch.id)
+
+                const header = []
+                header.push('Klant')
+                header.push('Aanvang')
+                header.push('Status')
+                header.push('Voorschot')
+                header.push('Betaald')
+
+
+                for (let order of branchOrders) {
+
+                    const cols = []
+                    reminderTable.addRow(cols)
+
+                    cols.push(order.for)
+                    cols.push(DateHelper.dateToString_DM_HHmm(order.startDate))
+                    cols.push(order.state)
+                    cols.push(order.depo ? order.deposit : '')
+                    cols.push(order.paid)
+                    cols.push(order.sumToString(false))
+
+
+                    if (!order.contact) {
+                        cols.push('No contact')
+                        continue
+                    }
+
+                    let contact = order.contact
+
+                    if (!contact.entry) {
+
+                        contact.entry = ObjectHelper.createRandomNumberString(4)
+                        let contactId = contact.id
+                        let dbObj = new DbObject<Contact>('contact', Contact, { id: contactId, entry: contact.entry })
+
+                        const updatedResult = await this.alteaDb.db.update$<Contact>(dbObj)
+
+                        if (updatedResult.status != ApiStatus.ok) {
+                            let msg = `Could not set entry code '${contact.entry}' for contact ${contact.name}`
+                            cols.push(msg)
+                            continue
+                        }
+
+                        contact = updatedResult.object
+
+                        console.log(updatedResult)
+                    }
+
+
+                    for (let msgType of msgTypesToSend) {
+
+                        let template = templatesByType.get(msgType)
+
+                        try {
+
+                            let replacements = {
+                                'door-code': contact.entry,
+                                'relative-date-time': order.relativeStartDate()
+                            }
+
+                            let message = template.merge(branch, replacements, order.id, true)
+                            message.type = msgType
+
+                            let res = await this.sendMessage(message, order, contact, branch, true)
+
+                            if (!res.isOk) {
+                                errorCount++
+
+                                cols.push(`Problem: ${res.message}`)
+                            } else {
+                                cols.push('OK')
+                                reminderCount++
+                            }
+
+                        } catch (error) {
+
+                            cols.push(`exception: ${error}`)
+                        }
+
+                    }
+
+                    const newTag = order.addTag(templateCode)
+
+                    if (newTag) {
+                        let orderUpdate = new DbObject<Order>('order', Order, { id: order.id, tags: order.tags })
+                        const updatedResult = await this.alteaDb.db.update$<Order>(orderUpdate)
+
+                        console.log(orderUpdate, updatedResult)
+                    }
+
+                }
+
+                htmlBody.push(reminderTable.toHtmlString())
+
+            }
+
+
+
+
+        } catch (err) {
+
+            htmlBody.push(err)
+            errorCount++
+
+        } finally {
+
+            let html = htmlBody.join('<br>\n')
+
+            let errorMsg = 'OK'
+            if (errorCount > 0)
+                errorMsg = `! Problems=${errorCount} !`
+
+            let subject = `Door entry codes day-${dayMin} ${msgTypes}: ${reminderCount} (${errorMsg})`
+
+            await this.sendAdminMessage(subject, html)
+
+            return `<h1>${subject}</h1><br><br>${html}`
+
+        }
+
+
+
+
+    }
+
+
+
+    async reminderMessaging2(dayMin: number = 2, msgType: MsgType = MsgType.email): Promise<string> {
+
+
 
         const templateCode = TemplateCode.resv_reminder
 
@@ -497,6 +700,7 @@ export class OrderMessaging extends OrderMessagingBase {
 
         let errorCount = 0
 
+        const htmlBody: string[] = []
         try {
 
 
@@ -540,7 +744,7 @@ export class OrderMessaging extends OrderMessagingBase {
                     cols.push(order.sumToString(false))
 
                     try {
-                        let res = await this.sendEmailMessage(template, order, branch, true)
+                        let res = await this.sendEmailTemplate(template, order, branch, true)
 
                         if (!res.isOk) {
                             errorCount++
