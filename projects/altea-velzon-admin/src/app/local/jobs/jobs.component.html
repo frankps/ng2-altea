@@ -7,6 +7,8 @@
 
     <div class="col">
         
+        <button type="button" class="btn btn-primary btn-sm" (click)="debug()">Debug</button>
+
         <button type="button" class="btn btn-primary btn-sm" (click)="runWellness()">Wellness</button>
 
         <button type="button" class="btn btn-primary btn-sm ms-3" (click)="runDoorEntry()">Doors</button>
@@ -15,7 +17,8 @@
 
         <button type="button" class="btn btn-primary btn-sm ms-3" (click)="truncateEvents()">Truncate</button>
 
-        <button type="button" class="btn btn-primary btn-sm ms-3" (click)="dialogflowWebhook()">Dialogflow webhook</button>
+        <button type="button" class="btn btn-primary btn-sm ms-3" (click)="dialogflowWebhook()">Dialogflow
+            webhook</button>
     </div>
     <!--   <div class="col-3"></div>
     <div class="col-3"></div> -->
@@ -38,10 +41,23 @@
                 <li class="list-group-item" *ngFor="let event of events" (click)="toggleEvent(event)">
 
                     <div class="row">
-                        <div class="col-12">{{event.type}}</div>
-                        <div class="col-12">{{event.jsDate() | date:"dd/MM/yyyy HH:mm"}} </div>
+                        <div class="col-6">
+                            <div class="row">
+                                <div class="col-12">{{event.type}}</div>
+                                <div class="col-12">{{event.jsDate() | date:"dd/MM/yyyy HH:mm"}} </div>
+                            </div>
 
+                        </div>
+                        <div class="col-6">
+                            <div class="row" *ngIf="event.custom">
+                                <div class="col-12" *ngFor="let key of Object.keys(event.custom)">
+                                    {{event.custom[key]}}
+                                </div>
+                            </div>  
+
+                        </div>
                     </div>
+
 
                 </li>
             </ul>
@@ -106,10 +122,13 @@
                                     <ng-container *ngSwitchCase="'doorAccess'">
                                         enable={{action.args['enable']}} <br>
                                         doors={{action.args['doors']}} <br>
-                                        contact=<a [routerLink]="['/', 'aqua','contacts', action.args['contactId']]">{{action.args['contactName']}}</a> <br>
+                                        contact=<a
+                                            [routerLink]="['/', 'aqua','contacts', action.args['contactId']]">{{action.args['contactName']}}</a>
+                                        <br>
                                         code={{action.args['code']}} <br>
-                                        orderId=<a [routerLink]="['/', 'aqua','orders', 'manage', action.args['orderId']]">{{action.args['orderId']}}</a>
-                                    
+                                        orderId=<a
+                                            [routerLink]="['/', 'aqua','orders', 'manage', action.args['orderId']]">{{action.args['orderId']}}</a>
+
                                     </ng-container>
                                     <ng-container *ngSwitchDefault>
                                     </ng-container>
@@ -119,7 +138,7 @@
 
 
 
-<!--
+                            <!--
                             [{"args": {"code": "5776", "doors": ["gr17a"], "enable": true, "orderId": "44f457d5-341a-4d14-87d1-b6c697a80880", "contactId": "1311dbd6-73b2-44c1-9dca-8d222c0c8387", "contactName": "Ingrid Vandeputte"}, 
                             "type": "doorAccess"}]
                             -->

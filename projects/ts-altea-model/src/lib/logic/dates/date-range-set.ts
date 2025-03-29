@@ -727,6 +727,14 @@ export class DateRangeSet {
         return this.ranges.length
     }
 
+    atLeastOne(time: TimeSpan): boolean {
+
+        const idx = this.ranges.findIndex(r => r.duration.seconds >= time.seconds)
+
+        return idx >= 0
+    }
+
+
     allAtLeast(time: TimeSpan): boolean {
 
         const idx = this.ranges.findIndex(r => r.duration.seconds < time.seconds)

@@ -18,7 +18,17 @@ export class StringHelper {
         return str === undefined || str === null || str.match(/^ *$/) !== null;
     }
 
+    static isEmail(email: string): boolean {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    static isMobileNumber(mobile: string): boolean {
+        return StringHelper.isDefined(mobile) && mobile.length >= 8
+    }
+
 }
+
+
 
 export class TypeHelper {
 
@@ -108,6 +118,18 @@ export class ObjectHelper {
         });
     }
 
+
+    /** https://www.30secondsofcode.org/js/s/stringify-circular-json/ */
+    static stringifyCircularJSON(obj) {
+        const seen = new WeakSet();
+        return JSON.stringify(obj, (k, v) => {
+            if (v !== null && typeof v === 'object') {
+                if (seen.has(v)) return;
+                seen.add(v);
+            }
+            return v;
+        });
+    };
 
 
     static createRandomNumberString(length, chars = "0123456789") {

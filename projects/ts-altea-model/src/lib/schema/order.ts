@@ -304,6 +304,20 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
       this.m.n = true
   }
 
+  /** add tags to order, returns true if at least 1 new tag was added */
+  addTags(tags: string[]) : boolean {
+    if (ArrayHelper.IsEmpty(tags))
+      return false
+
+    let newTag = false
+
+    for (let tag of tags) {
+      if (this.addTag(tag))
+        newTag = true
+    }
+
+    return newTag
+  }
 
   addTag(tag: string) : boolean {
     if (!this.tags)

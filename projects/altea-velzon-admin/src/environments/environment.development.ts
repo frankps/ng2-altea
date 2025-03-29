@@ -16,7 +16,7 @@ export const environment = {
     },
    // backend: 'https://dvit-477c9.uc.r.appspot.com',
     backend: 'http://localhost:8080',
-    localServer:  'http://localhost:3005', // 'https://altea.dvit.local', //'http://localhost:3005',   // 'https://localhost', //
+    localServer:  'https://altea.dvit.local', // 'https://altea.dvit.local', //'http://localhost:3005',   // 'https://localhost', //
     userSelectIdleTime: 300
   };
   

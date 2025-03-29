@@ -142,7 +142,7 @@ export class AlteaDb {
         qry.and('start', QueryOperator.lessThanOrEqual, to)
         qry.and('msg', QueryOperator.equals, true)
         qry.and('act', QueryOperator.equals, true)
-        qry.and('state', QueryOperator.in, [OrderState.created, OrderState.waitDeposit, OrderState.confirmed])
+        qry.and('state', QueryOperator.notIn, [OrderState.cancelled, OrderState.creation])
 
         if (extra) {
 

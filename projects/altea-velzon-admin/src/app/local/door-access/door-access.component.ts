@@ -27,7 +27,13 @@ export class DoorAccessComponent implements OnInit {
 
   async loadUsers() {
 
+    this.spinner.show()
+
     this.users = await this.localSvc.getDoorAccessUsers$()
+
+
+
+    this.spinner.hide()
 
     console.log(this.users)
 
@@ -93,6 +99,16 @@ export class DoorAccessComponent implements OnInit {
 
 
 
+
+  }
+
+  async openDoor(uuid: string) {
+
+    this.spinner.show()
+
+    await this.localSvc.doorOpened$('gr17a', uuid)
+
+    this.spinner.hide()
 
   }
 }

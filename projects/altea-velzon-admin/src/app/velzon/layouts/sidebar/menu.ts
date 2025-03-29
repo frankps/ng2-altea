@@ -218,30 +218,34 @@ export const MENU: MenuItem[] = [
     id: 15,
     label: 'menu.local.label',
     icon: 'share-2',
-    roles: ['admin'],
+    roles: [],
     subItems: [
       {
         id: 151,
         label: 'menu.local.sub.domo',
         link: '/%branch%/local/domo',
+        roles: [],
         parentId: 15
       },
       {
         id: 152,
         label: 'menu.local.sub.jobs',
         link: '/%branch%/local/jobs',
+        roles: ['admin'],
         parentId: 15
       },
       {
         id: 153,
         label: 'menu.local.sub.dialogflow',
         link: '/%branch%/local/dialogflow',
+        roles: ['admin'],
         parentId: 15
       },
       {
         id: 154,
         label: 'menu.local.sub.doorAccess',
         link: '/%branch%/local/door-access',
+        roles: ['admin'],
         parentId: 15
       }
 

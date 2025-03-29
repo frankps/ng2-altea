@@ -700,20 +700,26 @@ export class SlotFinder {
 
                     // check if solution items (for staff member) has overlap with break
 
-                    const staffDateRange = staffSolItems.getOuterRange2()
+                    const staffOuterDateRange = staffSolItems.getOuterRange2()
 
                     // if no potential overlap with breaks, then no problem
 
-                    if (!dayBreaksForStaffMember.hasOverlapWith(staffDateRange))
+                    if (!dayBreaksForStaffMember.hasOverlapWith(staffOuterDateRange))
                         continue
 
 
                     // if remaining of break window is still big enough, then no problem
 
-                    const remainingOfBreaks = dayBreaksForStaffMember.subtractRange(staffDateRange)
-                    if (remainingOfBreaks.count >= nrOfBreaks
-                        && remainingOfBreaks.allAtLeast(staffBreak))
+                    const staffDateRangeSet = staffSolItems.getFullRanges()
+
+                    const remainingOfBreaks = dayBreaksForStaffMember.subtract(staffDateRangeSet)  //.subtractRange(staffOuterDateRange)
+
+                    if (remainingOfBreaks.atLeastOne(staffBreak))
                         continue
+                    
+                    /*if (remainingOfBreaks.count >= nrOfBreaks
+                        && remainingOfBreaks.allAtLeast(staffBreak))
+                        continue */
 
                     /* check if overlap with break windows too small => always still possible to have a pause
                       

@@ -2,7 +2,7 @@
 import { Branch, DepositMode, Gender, Gift, Invoice, LoyaltyCard, MsgType, Order, OrderLine, OrderType, Organisation, PlanningMode, Product, ProductResource, ProductType, ProviderInfo, Resource, ResourcePlanning, Schedule, Subscription } from "ts-altea-model";
 import { Exclude, Type, Transform } from "class-transformer";
 import 'reflect-metadata';
-import { ArrayHelper, ConnectTo, DateHelper, DbObjectCreate, IAsDbObject, ManagedObject, ObjectHelper, ObjectMgmt, ObjectReference, ObjectWithId, ObjectWithIdPlus, QueryOperator, TimeHelper } from 'ts-common'
+import { ArrayHelper, ConnectTo, DateHelper, DbObjectCreate, IAsDbObject, ManagedObject, ObjectHelper, ObjectMgmt, ObjectReference, ObjectWithId, ObjectWithIdPlus, QueryOperator, StringHelper, TimeHelper } from 'ts-common'
 import * as _ from "lodash";
 import { PersonLine } from "../person-line";
 import { DateRange, DateRangeSet, TimeBlock, TimeBlockSet, TimeSpan } from "../logic";
@@ -46,7 +46,7 @@ export class UserBase extends ObjectWithIdPlus {
       thisMsg = this.msg.sort()
 
     const isEqual = _.isEqual(thisMsg, other)
-    
+
     return isEqual
   }
 
@@ -258,7 +258,25 @@ export class Contact extends UserBase {
     this.entry = ObjectHelper.createRandomNumberString(4)
   }
 
-  getAddress(sep: string = '\n') : string {
+  canSendMessageType(msgType: MsgType): boolean {
+
+    if (!this.msgTypeSelected(msgType))
+      return false
+
+    switch (msgType) {
+      case MsgType.email:
+        return StringHelper.isEmail(this.email)
+
+      case MsgType.wa:
+      case MsgType.sms:
+        return StringHelper.isMobileNumber(this.mobile)
+
+    }
+
+    return false
+  }
+
+  getAddress(sep: string = '\n'): string {
     return `${this.str} ${this.strNr}${sep}${this.postal} ${this.city}`
   }
 

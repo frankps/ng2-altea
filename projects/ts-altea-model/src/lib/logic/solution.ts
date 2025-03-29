@@ -222,6 +222,36 @@ export class SolutionItems extends ObjectWithId {
     }
 
 
+    getFullRanges(): DateRangeSet {
+
+        if (this.isEmpty())
+            return DateRangeSet.empty
+
+
+        const dateRanges = this.items.map(item => {
+
+            let solution = item.solution
+
+            let offset = item.request.offset(solution)
+            let duration = item.request.duration(solution)
+
+            let from = dateFns.addSeconds(solution.offsetRefDate, offset.seconds)
+            let to = dateFns.addSeconds(from, duration.seconds)
+
+            from = item.dateRange.from
+            to = dateFns.addSeconds(item.dateRange.to, duration.seconds)
+
+
+            return new DateRange(from, to)
+        })
+
+        const set = new DateRangeSet(dateRanges)
+
+
+        return set
+    }
+
+
     /** from the start of the earliest request, till the end of the latest request */
     totalRequestDuration(): TimeSpan {
 

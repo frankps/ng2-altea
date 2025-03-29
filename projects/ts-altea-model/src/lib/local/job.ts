@@ -33,10 +33,17 @@ export class ScriptLog {
 
 export class Job extends Script {
 
+    static jsonProps = ['actions', 'custom']
+
     date: number
     eventId: string
     
     status: JobStatus = JobStatus.scheduled
+
+    /** external identifier corresponding to this job (example uuid of user in door entry system) */
+    extId?: string
+
+    custom?: any
 
     constructor(name: string, date: number, eventId: string, id?: string) {
         super(name, id)

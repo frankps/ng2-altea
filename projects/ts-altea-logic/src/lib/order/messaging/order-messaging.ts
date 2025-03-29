@@ -489,12 +489,17 @@ export class OrderMessaging extends OrderMessagingBase {
         let toNum = DateHelper.yyyyMMdd000000(to)
 
         let extra = {
-            contactId: '8fdbf31f-1c6d-459a-b997-963dcd0740d8',
+            //  contactId: '8fdbf31f-1c6d-459a-b997-963dcd0740d8',
             branchIds: ['66e77bdb-a5f5-4d3d-99e0-4391bded4c6c']
         }
 
         const orders = await this.alteaDb.getOrdersStartingBetween(fromNum, toNum, extra)
 
+        if (ArrayHelper.IsEmpty(orders)) {
+            let msg = `No orders found for door messaging: day-${dayMin} ${msgTypes}`
+            console.warn(msg)
+            return msg
+        }
 
         let branchIds = orders.map(o => o.branchId)
         branchIds = _.uniq(branchIds)
@@ -527,7 +532,7 @@ export class OrderMessaging extends OrderMessagingBase {
 
 
                 const templatesByType = new Map<MsgType, Template>()
-                const msgTypesToSend : MsgType[] = []
+                const msgTypesToSend: MsgType[] = []
 
                 for (let msgType of msgTypes) {
 
@@ -555,6 +560,7 @@ export class OrderMessaging extends OrderMessagingBase {
 
 
                 for (let order of branchOrders) {
+
 
                     const cols = []
                     reminderTable.addRow(cols)
@@ -588,15 +594,33 @@ export class OrderMessaging extends OrderMessagingBase {
                             continue
                         }
 
-                        contact = updatedResult.object
+                        //contact.entry = updatedResult.object
 
                         console.log(updatedResult)
                     }
 
+                    let newOrderTags = []
 
                     for (let msgType of msgTypesToSend) {
 
+                        cols.push(msgType)
+
+                        let orderTag = `${templateCode}-${msgType}`
+
+                        if (ArrayHelper.NotEmpty(order.tags)
+                            && order.tags.indexOf(orderTag) >= 0)
+                            continue  // then this message was already sent
+                     
+
+
                         let template = templatesByType.get(msgType)
+
+                        let canSend = contact.canSendMessageType(msgType)   //canSendMsg(msgType)
+
+                        if (!canSend) {
+                            cols.push(`Cannot send ${msgType}`)
+                            continue
+                        }
 
                         try {
 
@@ -608,7 +632,7 @@ export class OrderMessaging extends OrderMessagingBase {
                             let message = template.merge(branch, replacements, order.id, true)
                             message.type = msgType
 
-                            let res = await this.sendMessage(message, order, contact, branch, true)
+                             let res = await this.sendMessage(message, order, contact, branch, true)
 
                             if (!res.isOk) {
                                 errorCount++
@@ -617,7 +641,8 @@ export class OrderMessaging extends OrderMessagingBase {
                             } else {
                                 cols.push('OK')
                                 reminderCount++
-                            }
+                                newOrderTags.push(orderTag)
+                            } 
 
                         } catch (error) {
 
@@ -626,7 +651,7 @@ export class OrderMessaging extends OrderMessagingBase {
 
                     }
 
-                    const newTag = order.addTag(templateCode)
+                    const newTag = order.addTags(newOrderTags)
 
                     if (newTag) {
                         let orderUpdate = new DbObject<Order>('order', Order, { id: order.id, tags: order.tags })

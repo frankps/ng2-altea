@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { plainToInstance } from 'class-transformer';
 import { BotService, LocalService } from 'ng-altea-common';
 import { Action, ActionType, Event, LuxomAddress, LuxomState, LuxomGetState, Job, DialogflowWebhookRequest } from 'ts-altea-model';
-import { ArrayHelper, DateHelper } from 'ts-common';
+import { ArrayHelper, DateHelper, StringHelper } from 'ts-common';
 import { DashboardService, ToastType } from 'ng-common'
 
 @Component({
@@ -22,6 +22,7 @@ export class JobsComponent {
 
   //actions: Action[]
 
+  Object = Object
 
 
 
@@ -39,6 +40,24 @@ export class JobsComponent {
 
   }
 
+
+  debug() {
+
+    console.warn(StringHelper.isMobileNumber('+32 049'))
+    console.warn(StringHelper.isMobileNumber('04983838383'))
+    console.warn(StringHelper.isMobileNumber('049838383838'))
+    console.warn(StringHelper.isMobileNumber('0498383838383'))
+    console.warn(StringHelper.isMobileNumber('04983838383838'))
+    console.warn(StringHelper.isMobileNumber('049838383838383'))
+    console.warn(StringHelper.isMobileNumber('0498383838383838'))
+    console.warn(StringHelper.isMobileNumber('04983838383838383'))
+    console.warn(StringHelper.isMobileNumber('049838383838383838'))
+    console.warn(StringHelper.isMobileNumber('0498383838383838383'))
+    console.warn(StringHelper.isMobileNumber('04983838383838383838'))
+    console.warn(StringHelper.isEmail('frank@dvit.eu.com.au.au'))
+    
+
+  }
   
   async dialogflowWebhook() {
 
@@ -143,7 +162,7 @@ export class JobsComponent {
 
   async executeAction(action: Action, job: Job) {
 
-    const res = await this.localSvc.executeAction$(action)
+    const res = await this.localSvc.executeAction$(action, job?.id)
 
     if (res.isOk)
       this.dashboardSvc.showToastType(ToastType.saveSuccess)

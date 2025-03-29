@@ -34,7 +34,13 @@ export class LocalService extends HttpClientService {
     return result
   }
 
+  // /door-opened/:door/:uuid
+  async doorOpened$(door: string, uuid: string): Promise<any> {
 
+    let result: any = await this.get$(`door-access/door-opened/${door}/${uuid}`)
+
+    return result
+  }
 
   /**
    * 
@@ -76,9 +82,14 @@ export class LocalService extends HttpClientService {
   }
 
 
-  async executeAction$(action: Action): Promise<ApiListResult<any>> {
+  async executeAction$(action: Action, jobId?: string): Promise<ApiListResult<any>> {
 
-    let result = await this.post$(`actions/execute`, action)
+    let url = `actions/execute`
+
+    if (jobId)
+      url += `/${jobId}`
+
+    let result = await this.post$(url, action)
 
     return plainToInstance(ApiListResult<any>, result)
 
