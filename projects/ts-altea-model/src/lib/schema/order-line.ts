@@ -951,16 +951,20 @@ export class OrderLine extends ObjectWithIdPlus {
 
         let optionPrices = 0
 
-        for (let productItemOption of productItem.options) {
+        if (productItem.hasOptions()) {
 
-          let orderLineOption = this.getOptionById(productItemOption.id)
+          for (let productItemOption of productItem.options) {
 
-          optionPrices = _.sumBy(orderLineOption.values, 'prc')
-
-          if (optionPrices)
-            unitPrice += qty * optionPrices
-
+            let orderLineOption = this.getOptionById(productItemOption.id)
+  
+            optionPrices = _.sumBy(orderLineOption.values, 'prc')
+  
+            if (optionPrices)
+              unitPrice += qty * optionPrices
+  
+          }
         }
+
 
       }
     }

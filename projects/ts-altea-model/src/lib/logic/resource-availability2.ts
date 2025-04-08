@@ -94,8 +94,10 @@ export class ResourceAvailability2 {
             if (resource.customSchedule)
                 normalScheduleRanges = ctx.scheduleDateRanges.get(resourceId)
             else
-                normalScheduleRanges = branchAvailability.clone()   //ctx.scheduleDateRanges.get(ctx.branchId)
+                normalScheduleRanges = branchAvailability   //ctx.scheduleDateRanges.get(ctx.branchId)
 
+
+            normalScheduleRanges = normalScheduleRanges.clone()
 
             // for resources with multiple instances
             if (resource.qty > 1) {
@@ -124,16 +126,17 @@ export class ResourceAvailability2 {
             if (resourceOccupation.extraAvailable.notEmpty())
                 extendedSchedule = extendedSchedule.union(resourceOccupation.extraAvailable)
 
-            extendedSchedule.removeBefore()
-
-            let workingHours = extendedSchedule.subtract(resourceOccupation.absent)
-
+            extendedSchedule = extendedSchedule.subtract(resourceOccupation.absent)
+            
+            let workingHours = extendedSchedule.clone()
+           
             if (workingHours.notEmpty()) {
                 workingHours.sortRanges()
                 workingHours.ranges[0].addFromLabel('START')
                 workingHours.ranges[workingHours.ranges.length - 1].addToLabel('END')
             }
 
+            extendedSchedule.removeBefore()
 
             //resourceOccupation.unAvailable
             let unavailable = resourceOccupation.unAvailable

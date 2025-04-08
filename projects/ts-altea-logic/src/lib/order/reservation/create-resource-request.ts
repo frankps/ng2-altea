@@ -223,13 +223,13 @@ export class CreateResourceRequest {
 
                     resReqItem.offsetDuration = offsetDuration.clone()
 
-                 //   resReqItem.duration2 = offsetDuration.duration
+                    //   resReqItem.duration2 = offsetDuration.duration
 
-                    const personOffset : TimeSpan = personInfo.offset.clone()
+                    const personOffset: TimeSpan = personInfo.offset.clone()
                     // const offset = personOffset.clone()
-                   
-                   // resReqItem.offset = personOffset.add(offsetDuration.offset)
-                   resReqItem.offsetDuration.addToOffset(personOffset)
+
+                    // resReqItem.offset = personOffset.add(offsetDuration.offset)
+                    resReqItem.offsetDuration.addToOffset(personOffset)
 
                     if (productResource.flex) {
 
@@ -280,10 +280,10 @@ export class CreateResourceRequest {
                         for (let durationParam of offsetDuration.durationParams) {
 
                             let val = offsetDuration.defaults.get(durationParam)
-                            
-                            if (val) 
+
+                            if (val)
                                 personOffsetToAdd = personOffsetToAdd.add(val)
-                        
+
                         }
                     }
 
@@ -429,7 +429,14 @@ export class CreateResourceRequest {
 
         let wellnessId = '31eaebbc-af39-4411-a997-f2f286c58a9d'
 
-     let useParameters = (product?.id == wellnessId)  // this should come from a DB setting in future
+        let gelId = 'dfc76cad-8957-4ed5-9782-7a4e2044bd9b'
+        let suikerId = '5e0f259f-b57c-4e45-b75f-1aad81a29cf6'  // suikerontharing vrouw
+        let laserId = '5e0f259f-b57c-4e45-b75f-1aad81a29aaa'
+
+        let customDurationIds = [wellnessId, gelId, suikerId, laserId]
+
+
+        let useParameters = product.id && customDurationIds.indexOf(product?.id) >= 0 // (product?.id == wellnessId || product?.id == gelId)  // this should come from a DB setting in future
 
         //let useParameters = false
 
@@ -503,12 +510,12 @@ export class CreateResourceRequest {
                         offsetDuration.offsetParams.push(productDurationParamId)
                         productDurationParamUsed = true
                     } else {
-                        
+
                         offsetDuration.offset = offsetDuration.offset.add(productDuration)
                     }
                 }
-                    
-                 //   
+
+                //   
 
                 if (productResource.offset)
                     offsetDuration.offset.addMinutes(productResource.offset)

@@ -375,7 +375,7 @@ export class DateRangeSet {
     constructor(public ranges: DateRange[] = [], public resource?: Resource) {
 
         if (ArrayHelper.NotEmpty(ranges)) 
-            ranges = ranges.filter(r => r.isValid())
+            ranges = ranges.filter(r => r?.isValid())
 
     }
 

@@ -19,6 +19,20 @@ export class StaffBreaks {
     get(resourceId: string): DateRangeSet {
         return this.breaksByResourceId.get(resourceId)
     }
+
+
+    breakTimeTimeSpan(): TimeSpan {
+
+        let staffBreak = TimeSpan.minutes(this.breakTimeInMinutes)
+
+        // to fix some issues during our holiday
+        let now = new Date()
+        if (now < new Date(2025, 3, 6))
+            staffBreak = TimeSpan.minutes(25)
+
+        return staffBreak
+
+    }
     
     breakStillPossible(resourceId: string, allocateForWork: DateRange): StaffBreakPossible {
 
@@ -29,7 +43,8 @@ export class StaffBreaks {
 
         const remaining = breakRangeSet.subtractRange(allocateForWork)
 
-        const staffBreak = TimeSpan.minutes(this.breakTimeInMinutes)    
+        const staffBreak = this.breakTimeTimeSpan()
+        //TimeSpan.minutes(this.breakTimeInMinutes)    
 
         const possibleBreaks = remaining.atLeast(staffBreak)
 

@@ -130,7 +130,7 @@ export class HrDashboardComponent implements OnInit {
   async showMonthReport(resource: Resource) {
 
 
-    let month = new Date(2025, 1, 1)
+    let month = new Date(2025, 2, 1)
 
     console.error(resource, month)
 

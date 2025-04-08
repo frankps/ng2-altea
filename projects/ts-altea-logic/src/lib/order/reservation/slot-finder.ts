@@ -92,18 +92,22 @@ export class SlotFinder {
          */
         let solutionSet = this.createInitialSolutions(availability2, ctx, resourceRequest)
 
-        if (resourceRequest.items.length == 1)
-            return solutionSet
+        if (resourceRequest.items.length > 1) {
 
-        /**
-         *  Given the initial solution, we need to check availabilities for other resource request items
-         */
+            /**
+             *  Given the initial solution, we need to check availabilities for other resource request items
+             */
 
-        while (resourceRequest.hasItemsToProcess()) {
-            const requestItem = resourceRequest.nextItemToProcess()
+            while (resourceRequest.hasItemsToProcess()) {
+                const requestItem = resourceRequest.nextItemToProcess()
 
-            solutionSet = this.handleResourceRequestItem(requestItem, solutionSet, availability2, ctx)
+                solutionSet = this.handleResourceRequestItem(requestItem, solutionSet, availability2, ctx)
+            }
+
         }
+
+  
+
 
         this.checkStaffBreaks(solutionSet, availability2, ctx)
 
@@ -116,8 +120,16 @@ export class SlotFinder {
 
     createInitialSolutions(availability: ResourceAvailability2, ctx: AvailabilityContext, resourceRequest: ResourceRequest): SolutionSet {
 
-        const solutionSet = new SolutionSet()
 
+        let gelId = 'dfc76cad-8957-4ed5-9782-7a4e2044bd9b'
+        let suikerId = '5e0f259f-b57c-4e45-b75f-1aad81a29cf6'  // suikerontharing vrouw
+        let laserId = '5e0f259f-b57c-4e45-b75f-1aad81a29aaa'
+
+        let hrMarieId = 'cbbe5335-077f-478c-b31e-e425bd856909'
+        let hrHeraId = 'cc241d0c-b650-429c-86d6-f3cbd5c32e88'
+        let hrLusienId = '1b6f35ea-1152-4435-83c7-617c75e13897'
+
+        const solutionSet = new SolutionSet()
 
         const firstRequestItem = resourceRequest.items[0]
 
@@ -156,6 +168,46 @@ export class SlotFinder {
 
                 let duration = firstRequestItem.durationInSeconds()
 
+                /** Marie is faster then other employees for certain services => we need to take this into account.
+                 *  We need to make this code more general (setting coming from DB)
+                 * 
+                */
+
+                let durationOverride = null
+                switch (firstRequestItem.product?.id) {
+                    case gelId:
+                        switch (set.resource?.id) {
+                            case hrMarieId:
+                                durationOverride = `${gelId}_duration`
+                                duration = duration * 0.7
+                                break
+                            case hrHeraId:
+                                durationOverride = `${gelId}_duration`
+                                duration = duration * 0.8
+                                break
+                        }
+                        break
+
+                    case suikerId:
+                        switch (set.resource?.id) {
+                            case hrMarieId:
+                                durationOverride = `${suikerId}_duration`
+                                duration = duration * 0.8
+                                break
+                            case hrHeraId:
+                                durationOverride = `${suikerId}_duration`
+                                duration = duration * 0.9
+                                break
+                        }
+                        break
+
+                    case laserId:
+                        durationOverride = `${laserId}_duration`
+                        duration = duration * 0.8
+                        break
+                }
+
+
                 // we reduce by the duration because we want interval with possible start dates
                 availableRange.increaseToWithSeconds(-duration)
 
@@ -165,13 +217,16 @@ export class SlotFinder {
                 possibleDateRanges.addRanges(availableRange)
 
 
-
-
                 // possibleDateRanges only contains 1 range
                 let durationFixed = false
                 const solutions = possibleDateRanges.toSolutions(resourceRequest, firstRequestItem, false, durationFixed, set.resource)
 
+
                 for (let solution of solutions) {
+
+                    if (durationOverride)
+                        solution.overrides.set(durationOverride, new TimeSpan(duration))
+
                     for (let solItem of solution.items)
                         solItem.addNote(`Initial range ${solItem.dateRange.toString()}`)
                 }
@@ -604,7 +659,10 @@ export class SlotFinder {
 
         const staffBreaks = ctx.getStaffBreakRanges(availability2)
 
-        const staffBreak = TimeSpan.minutes(staffBreaks.breakTimeInMinutes)
+        let staffBreak = staffBreaks.breakTimeTimeSpan()
+        //TimeSpan.minutes(staffBreaks.breakTimeInMinutes)
+
+
 
         // we will invalidate some solutions and replace with new solutions to allow breaks for staff
         // const newSolutions: Solution[] = []
@@ -716,7 +774,7 @@ export class SlotFinder {
 
                     if (remainingOfBreaks.atLeastOne(staffBreak))
                         continue
-                    
+
                     /*if (remainingOfBreaks.count >= nrOfBreaks
                         && remainingOfBreaks.allAtLeast(staffBreak))
                         continue */
@@ -774,8 +832,8 @@ export class SlotFinder {
                         const staffOccupationFromStart: TimeSpan = staffSolItems.totalRequestDurationInclOffset()
 
 
-
-                        const startOfLastBreak = dateFns.subMinutes(breakWindow.to, staffBreaks.breakTimeInMinutes)
+                        let staffBreak = staffBreaks.breakTimeTimeSpan()
+                        const startOfLastBreak = dateFns.subMinutes(breakWindow.to, staffBreak.minutes())
 
                         solution.valid = false
                         solution.addNote(`${human.name} can't have a break within ${breakWindow.toString()}: we will create new solutions (if possible) before & after possible break`)
@@ -809,8 +867,8 @@ export class SlotFinder {
 
 
                         // Create second solution (after break)
-
-                        const endOfFirstBreak = dateFns.addMinutes(breakWindow.from, staffBreaks.breakTimeInMinutes)
+                        // let staffBreak = staffBreaks.breakTimeTimeSpan()
+                        const endOfFirstBreak = dateFns.addMinutes(breakWindow.from, staffBreak.minutes())
 
                         //const lastPossibleStartOfSolution = dateFns.subSeconds(startOfLastBreak, staffOccupationFromStart.seconds)
 
