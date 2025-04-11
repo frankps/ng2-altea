@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Year } from '@syncfusion/ej2-angular-schedule';
 import { BranchService, ObjectService, OrderService, SessionService } from 'ng-altea-common';
-import { AlteaDb, ConsistencyReport, MonthClosing, MonthClosingResult, MonthClosingUpdate, MonthConsistencyReportBuilder } from 'ts-altea-logic';
+import { AlteaDb, CheckContactLoyalty, ConsistencyReport, ContactLoyaltyReport, MonthClosing, MonthClosingResult, MonthClosingUpdate, MonthConsistencyReportBuilder } from 'ts-altea-logic';
 import { YearMonth } from 'ts-common';
 import * as _ from "lodash";
 import { NgxSpinnerService } from "ngx-spinner"
@@ -291,5 +291,22 @@ export class OrderCheckComponent implements OnInit {
   }
 
 
+  async checkContactLoyalty() {
+
+    let me = this
+
+    let alteaDb = new AlteaDb(this.objSvc)
+
+    let report = new ContactLoyaltyReport(alteaDb)
+
+
+     await report.loadContactData('f3c4cbdd-8ad9-4327-ba08-ce282271ac64')  //checkContact('f3c4cbdd-8ad9-4327-ba08-ce282271ac64')
+
+    let html = report.toHtml()
+
+    me.htmlReport = this.sanitizer.bypassSecurityTrustHtml(html)
+
+
+  }
 
 }

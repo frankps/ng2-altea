@@ -18,15 +18,15 @@ export class ResourceRequestItem extends ObjectWithId {
     resources: Resource[] = []
     personId?: string
 
-/*     @Type(() => TimeSpan)
-    offset = TimeSpan.zero */
+    /*     @Type(() => TimeSpan)
+        offset = TimeSpan.zero */
 
     @Type(() => OffsetDurationParams)
     offsetDuration: OffsetDurationParams
 
 
-/*     @Type(() => TimeSpan)
-    private _duration = TimeSpan.zero */
+    /*     @Type(() => TimeSpan)
+        private _duration = TimeSpan.zero */
 
     /** the number of resources that should be allocated from the resourceGroup (or from resources) */
     qty = 1
@@ -64,12 +64,12 @@ export class ResourceRequestItem extends ObjectWithId {
         return this.offsetDuration.calcDuration(solution)
     }
 
-    offsetInSeconds(solution?: Solution): number {
-        return this.offsetDuration.calcOffsetSeconds(solution)
+    offsetInSeconds(paramValues?: Map<string, TimeSpan>): number {
+        return this.offsetDuration.calcOffsetSeconds(paramValues)
     }
 
-    offset(solution?: Solution): TimeSpan {
-        return this.offsetDuration.calcOffset(solution)
+    offset(paramValues?: Map<string, TimeSpan>): TimeSpan {
+        return this.offsetDuration.calcOffset(paramValues)
     }
     /*
     get duration2(): TimeSpan {
@@ -93,7 +93,7 @@ export class ResourceRequestItem extends ObjectWithId {
         clone.personId = this.personId
 
         clone.offsetDuration = this.offsetDuration.clone()
-      //  clone._duration = this._duration.clone()
+        //  clone._duration = this._duration.clone()
 
         clone.qty = this.qty
 
@@ -115,7 +115,7 @@ export class ResourceRequestItem extends ObjectWithId {
     }
 
     endsAt(solution?: Solution): TimeSpan {
-        let offset = this.offset(solution)
+        let offset = this.offset(solution.overrides)
         let duration = this.duration(solution)
         return offset.add(duration)
     }
@@ -186,7 +186,31 @@ export class ResourceRequest {
 
     items: ResourceRequestItem[] = []
 
+
+    /** defaults for parameters specified in the request */
+    @Type(() => Map<string, TimeSpan>)
+    defaults: Map<string, TimeSpan> = new Map<string, TimeSpan>()
+
+
     constructor(public info = "") { }
+
+    addDefaults(defaultValues: Map<string, TimeSpan>) {
+
+        if (!defaultValues)
+            return
+
+        for (let param of defaultValues.keys()) {
+
+            if (!this.defaults.has(param)) {
+                let value = defaultValues.get(param)
+                this.defaults.set(param, value)
+            }
+        }
+    }
+
+    hasDefaults(): boolean {
+        return this.defaults ? this.defaults.size > 0 : false
+    }
 
     clone(clonePersons = true, cloneItems = true): ResourceRequest {
 

@@ -178,7 +178,7 @@ export class SlotFinderBlocks {
                 let solutionItem = this.handlePreparationRequestItem(currentSolution, searchForward, resource, firstRequestItem, availableRange, availability, ctx)
 
                 // set the reference date for this solution
-                offsetRefDate = dateFns.addSeconds(solutionItem.dateRange.from, -firstRequestItem.offsetInSeconds(currentSolution))
+                offsetRefDate = dateFns.addSeconds(solutionItem.dateRange.from, -firstRequestItem.offsetInSeconds(currentSolution.overrides))
                 currentSolution.offsetRefDate = offsetRefDate
 
                 //  solutionSet.add(new Solution(solutionItem))
@@ -355,7 +355,7 @@ export class SlotFinderBlocks {
     handleBasicRequestItem(searchForward: boolean, resource: Resource, requestItem: ResourceRequestItem, startDate: Date, availableRange: DateRange, solution: Solution
         , availability: ResourceAvailability2, ctx: AvailabilityContext): SolutionItem {
 
-        let requestFrom = dateFns.addSeconds(startDate, requestItem.offsetInSeconds(solution))
+        let requestFrom = dateFns.addSeconds(startDate, requestItem.offsetInSeconds(solution.overrides))
         let requestTo = dateFns.addSeconds(requestFrom, requestItem.durationInSeconds(solution))
 
         let requestRange = new DateRange(requestFrom, requestTo)

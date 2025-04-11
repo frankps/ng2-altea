@@ -5,6 +5,8 @@ export class HtmlTable {
 
     rows: any[] = []
 
+    class: string
+
     headerRow: boolean = false
 
     styles = {
@@ -44,8 +46,13 @@ export class HtmlTable {
         const htmlLines: string[] = []
 
 
+        let tableClass = ''
 
-        htmlLines.push('<table>')
+        if (this.class)
+            tableClass = ` class="${this.class}"`
+
+
+        htmlLines.push(`<table${tableClass}>`)
 
         let rowIdx = 0
 

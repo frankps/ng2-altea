@@ -291,7 +291,7 @@ export class SlotFinder {
                 if (!solution.offsetRefDate)
                     throw new Error(`solution.offsetRefDate not set!`)
 
-                const from = dateFns.addSeconds(solution.offsetRefDate, requestItem.offsetInSeconds(solution))
+                const from = dateFns.addSeconds(solution.offsetRefDate, requestItem.offsetInSeconds(solution.overrides))
                 const to = dateFns.addSeconds(from, requestItem.durationInSeconds(solution))
                 const range = new DateRange(from, to)
 
@@ -361,8 +361,8 @@ export class SlotFinder {
                     throw new Error(`No reference (start) date available`)
 
 
-                const startFrom = dateFns.addSeconds(refFrom, requestItem.offsetInSeconds(solution))
-                const startTo = dateFns.addSeconds(refTo, requestItem.offsetInSeconds(solution))
+                const startFrom = dateFns.addSeconds(refFrom, requestItem.offsetInSeconds(solution.overrides))
+                const startTo = dateFns.addSeconds(refTo, requestItem.offsetInSeconds(solution.overrides))
                 const endsOn = dateFns.addSeconds(startTo, requestItem.durationInSeconds(solution))
 
                 // const startRange = new DateRange(startFrom, startTo)

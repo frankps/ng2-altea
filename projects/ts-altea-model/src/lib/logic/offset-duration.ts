@@ -49,18 +49,33 @@ export class OffsetDurationParams extends OffsetDuration {
         return duration
     }
 
+    hasOffsetParams() : boolean {
+        return ArrayHelper.NotEmpty(this.offsetParams)
+    }
+
+    hasDurationParams() : boolean {
+        return ArrayHelper.NotEmpty(this.durationParams)
+    }
+
+    addToOffsetAndParams(timespan: TimeSpan, params: string[]) {
+        this.addToOffset(timespan)
+
+        if (ArrayHelper.NotEmpty(params))
+            this.offsetParams.push(...params)
+    }
+
     clone(): OffsetDurationParams {
         let clone = ObjectHelper.clone(this, OffsetDurationParams)
         return clone
     }
-    
+
     hasParams(): boolean {
 
-        return this.defaults?this.defaults.size > 0:false
+        return this.defaults ? this.defaults.size > 0 : false
     }
 
 
-    calcDuration(solution?: Solution): TimeSpan  {
+    calcDuration(solution?: Solution): TimeSpan {
 
         let duration = this.duration
 
@@ -71,7 +86,7 @@ export class OffsetDurationParams extends OffsetDuration {
 
             let paramValue: TimeSpan
 
-            if (solution?.overrides?.has(paramId)) 
+            if (solution?.overrides?.has(paramId))
                 paramValue = solution.overrides.get(paramId)
             else
                 paramValue = this.defaults.get(paramId)
@@ -83,12 +98,12 @@ export class OffsetDurationParams extends OffsetDuration {
         return duration
     }
 
-    calcDurationSeconds(solution?: Solution): number  {
+    calcDurationSeconds(solution?: Solution): number {
         let timespan = this.calcDuration(solution)
         return timespan.seconds
     }
 
-    calcOffset(solution?: Solution): TimeSpan  {
+    calcOffset(paramValues: Map<string, TimeSpan>): TimeSpan {
 
         let offset = this.offset
 
@@ -99,8 +114,8 @@ export class OffsetDurationParams extends OffsetDuration {
 
             let paramValue: TimeSpan
 
-            if (solution?.overrides?.has(paramId)) 
-                paramValue = solution.overrides.get(paramId)
+            if (paramValues?.has(paramId))
+                paramValue = paramValues.get(paramId)
             else
                 paramValue = this.defaults.get(paramId)
 
@@ -111,8 +126,8 @@ export class OffsetDurationParams extends OffsetDuration {
         return offset
     }
 
-    calcOffsetSeconds(solution?: Solution): number  {
-        let timespan = this.calcOffset(solution)
+    calcOffsetSeconds(paramValues: Map<string, TimeSpan>): number {
+        let timespan = this.calcOffset(paramValues)
         return timespan.seconds
     }
 

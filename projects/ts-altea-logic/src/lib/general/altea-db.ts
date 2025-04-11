@@ -1,9 +1,10 @@
 import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbObject, DbObjectCreate, DbObjectMulti, DbObjectMultiCreate, DbQuery, DbQueryBaseTyped, DbQueryTyped, DbUpdateManyWhere, ObjectHelper, ObjectWithId, QueryCondition, QueryOperator, SortOrder, TypeHelper, YearMonth } from 'ts-common'
-import { Branch, Gift, Subscription, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template, OrderLine, BankTransaction, Message, LoyaltyProgram, LoyaltyCard, PlanningType, ResourcePlannings, TemplateCode, MsgType, LoyaltyCardChange, Payment, PaymentType, BankTxType, Payments, ReportMonth, ReportMonths } from 'ts-altea-model'
+import { Branch, Gift, Subscription, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template, OrderLine, BankTransaction, Message, LoyaltyProgram, LoyaltyCard, PlanningType, ResourcePlannings, TemplateCode, MsgType, LoyaltyCardChange, Payment, PaymentType, BankTxType, Payments, ReportMonth, ReportMonths, Contact } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { IDb } from '../interfaces/i-db'
 import { AlteaPlanningQueries } from './altea-queries'
 import * as dateFns from 'date-fns'
+import { orderBy } from 'lodash'
 
 export class AlteaDb {
 
@@ -90,6 +91,12 @@ export class AlteaDb {
         return branches
     }
 
+    async getContactById(id: string): Promise<Contact> {
+        const object = await this.getObjectById$('contact', Contact, id)
+        return object
+    }
+
+
     async getExpiredDepositOrders(date: Date = new Date()): Promise<Order[]> {
 
         const dateNum = DateHelper.yyyyMMddhhmmss(date)
@@ -104,6 +111,7 @@ export class AlteaDb {
 
         return expiredDepositOrders
     }
+
 
     async getOrder(orderId: string, ...includes: string[]): Promise<Order> {
 
@@ -161,12 +169,18 @@ export class AlteaDb {
 
     }
 
-    async getOrdersForContact(contactId: string): Promise<Order[]> {
+    async getOrdersForContact(contactId: string, includes?: string[], take: number = 100, orderBy?: string, sort: SortOrder = SortOrder.asc): Promise<Order[]> {
 
         const qry = new DbQueryTyped<Order>('order', Order)
 
+        if (includes)
+            qry.include(...includes)
+
         qry.and('contactId', QueryOperator.equals, contactId)
-        qry.take = 500
+        qry.take = take
+
+        if (orderBy)
+            qry.orderBy(orderBy, sort)
 
         const orders = await this.db.query$<Order>(qry)
         return orders
@@ -519,7 +533,7 @@ export class AlteaDb {
          *  => exclude plannings coming from same device: excludeClientId
          */
 
-        
+
         if (excludeClientId) {
 
             let lockCheck = qry.and()
@@ -533,7 +547,7 @@ export class AlteaDb {
             lockCheck.or('order.cre', QueryOperator.lessThan, createdBefore)
 
         }
-    
+
 
         if (excludeOrderId) {
             qry.or('orderId', QueryOperator.not, excludeOrderId)
@@ -1036,12 +1050,15 @@ export class AlteaDb {
     }
 
 
-    async getLoyaltyCards(contactId?: string): Promise<LoyaltyCard[]> {
+    async getLoyaltyCards(contactId?: string, includes?: string[]): Promise<LoyaltyCard[]> {
 
         if (!contactId)
             contactId = this.branchId
 
         const qry = new DbQueryTyped<LoyaltyCard>('loyaltyCard', LoyaltyCard)
+
+        if (includes)
+            qry.include(...includes)
 
         qry.and('contactId', QueryOperator.equals, contactId)
 
@@ -1243,7 +1260,7 @@ export class AlteaDb {
         if (latestOnly)
             qry.and('latest', QueryOperator.equals, true)
 
-      //  qry.orderBy('year', SortOrder.desc).orderBy('month', SortOrder.desc)
+        //  qry.orderBy('year', SortOrder.desc).orderBy('month', SortOrder.desc)
 
         qry.orderBy('year').orderBy('month')
 

@@ -11,18 +11,30 @@
     </div>
 
 
+    <ng-container *ngIf="request.hasDefaults()">
+        <div class="row">
+            <div class="col-3">Param</div>
+            <div class="col-2">Value</div>
+        </div>
+        <div class="row" *ngFor="let param of request.defaults.keys()">
+            <div class="col-3"><span style="font-size: x-small;">{{param}}</span></div>
+            <div class="col-2">{{request.defaults.get(param)}}</div>
+        </div>
+    </ng-container>
+
+
     <div class="row">
-        <div class="col-2">Resource type</div>
+        <div class="col-1">Resource type</div>
         <div class="col-2">Resource group</div>
         <div class="col-2">Resources</div>
-        <div class="col-2">Order person</div>
-        <div class="col-2">Offset</div>
-        <div class="col-2">Duration</div>
+        <div class="col-1">Order person</div>
+        <div class="col-3">Offset</div>
+        <div class="col-3">Duration</div>
     </div>
 
     <ng-container *ngFor="let item of request.items">
         <div class="row">
-            <div class="col-2">{{item.resourceType}}</div>
+            <div class="col-1">{{item.resourceType}}</div>
             <div class="col-2"> {{item.qty}} x <span class="badge bg-secondary" *ngIf="item.resourceGroup">
                     {{item.resourceGroup.shortOrName()}}</span> </div>
             <div class="col-2">
@@ -30,9 +42,27 @@
                     <span class="badge bg-secondary">{{resource.shortOrName()}}</span>&nbsp;
                 </ng-container>
             </div>
-            <div class="col-2">{{item.personId}}</div>
-            <div class="col-2">{{item.offset().toString()}}</div>
-            <div class="col-2">{{item.duration().toString()}}</div>
+            <div class="col-1">{{item.personId}}</div>
+            <div class="col-3">{{item.offset(request.defaults).toString()}}
+
+                <ng-container *ngIf="item.offsetDuration.hasOffsetParams()">
+                    <ng-container *ngFor="let param of item.offsetDuration.offsetParams">
+                        <br><span style="font-size: x-small;">{{param}}</span>
+                    </ng-container>
+                </ng-container>
+
+
+
+            </div>
+            <div class="col-3">{{item.duration().toString()}}
+
+                <ng-container *ngIf="item.offsetDuration.hasDurationParams">
+                    <ng-container *ngFor="let param of item.offsetDuration.durationParams">
+                        <br><span style="font-size: x-small;">{{param}}</span>
+                    </ng-container>
+                </ng-container>
+
+            </div>
         </div>
 
         <ng-container *ngIf="item.offsetDuration.hasParams()">
@@ -40,7 +70,7 @@
                 <div class="col-2"><span class="float-end">Params:</span></div>
                 <div class="col-10">
                     <div class="row" *ngFor="let key of item.offsetDuration.defaults.keys()">
-                        <div class="col-4"><span class="float-end">{{key}}:</span></div>
+                        <div class="col-4"><span class="float-end" style="font-size: x-small;">{{key}}:</span></div>
                         <div class="col-2">{{item.offsetDuration.defaults.get(key)?.seconds}} sec</div>
                     </div>
 

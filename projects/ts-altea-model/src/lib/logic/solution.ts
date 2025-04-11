@@ -207,7 +207,7 @@ export class SolutionItems extends ObjectWithId {
         const minFrom = _.minBy(dateRanges, 'from')  // from
 
         const endTimesWithinSolution = this.items.map(i => {
-            let offset = i.request.offset(i.solution)
+            let offset = i.request.offset(i.solution.overrides)
             let duration = i.request.duration(i.solution)
             return offset.add(duration)
         })  //offset
@@ -232,7 +232,7 @@ export class SolutionItems extends ObjectWithId {
 
             let solution = item.solution
 
-            let offset = item.request.offset(solution)
+            let offset = item.request.offset(solution.overrides)
             let duration = item.request.duration(solution)
 
             let from = dateFns.addSeconds(solution.offsetRefDate, offset.seconds)
@@ -265,13 +265,13 @@ export class SolutionItems extends ObjectWithId {
 
 
 
-        let offsets: TimeSpan[] = requests.map(request => request.offset(solution))
+        let offsets: TimeSpan[] = requests.map(request => request.offset(solution.overrides))
 
         let minOffset = _.minBy(offsets, 'seconds')
 
 
         let offsetDurations: TimeSpan[] = requests.map(request => {
-            let offset = request.offset(solution)
+            let offset = request.offset(solution.overrides)
             let duration = request.duration(solution)
             return offset.add(duration)
         })
@@ -300,7 +300,7 @@ export class SolutionItems extends ObjectWithId {
         let solution = this.items[0].solution
 
         let offsetDurations: TimeSpan[] = requests.map(request => {
-            let offset = request.offset(solution)
+            let offset = request.offset(solution.overrides)
             let duration = request.duration(solution)
             return offset.add(duration)
         })
@@ -415,7 +415,7 @@ export class Solution extends SolutionItems {
     request: ResourceRequest
 
 
-    /** overrides for duration parameters specified in the request */
+    /** overrides/values for parameters specified in the request */
     @Type(() => Map<string, TimeSpan>)
     overrides: Map<string, TimeSpan> = new Map<string, TimeSpan>()
 
@@ -444,6 +444,27 @@ export class Solution extends SolutionItems {
     hasParamOverrides(): boolean {
 
         return this.overrides ? this.overrides.size > 0 : false
+    }
+
+    setParamOverrides(defaults: Map<string, TimeSpan>) {
+
+        if (!defaults)
+            return
+
+        let params = defaults.keys()
+
+        for (let param of params) {
+            let value = defaults.get(param)
+
+            let existing = this.overrides.has(param)
+
+            if (!existing) {
+                
+                this.overrides.set(param, value)
+            }
+
+        }
+
     }
 
 
@@ -516,7 +537,7 @@ export class Solution extends SolutionItems {
         this.push(item)
 
         if (!this.hasExactStart() && limitOtherItems) {
-            const offsetSeconds = item.request.offsetInSeconds(this)
+            const offsetSeconds = item.request.offsetInSeconds(this.overrides)
 
             const refFrom = dateFns.addSeconds(item.dateRange.from, -offsetSeconds)
 
@@ -547,7 +568,7 @@ export class Solution extends SolutionItems {
 
         for (let item of this.items) {
 
-            const offsetSeconds = item.request.offsetInSeconds(this)  //.offset.seconds
+            const offsetSeconds = item.request.offsetInSeconds(this.overrides)  //.offset.seconds
 
             if (refFrom) {
                 let origFrom = item.dateRange.from

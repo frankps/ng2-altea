@@ -11,9 +11,10 @@ import * as _ from "lodash";
 export class PersonInfo {
     offset: TimeSpan = TimeSpan.zero
 
+    offsetParams: string[] = []
+
     // affinity for staff (same person should be treated by same staff member)
     staff: ResourceRequestItem = null
-
 
     // affinity for other resources (same location, etc...)
     resourceGroups: Map<string, ResourceRequestItem> = new Map<string, ResourceRequestItem>()
@@ -149,7 +150,7 @@ export class CreateResourceRequest {
             let allocateResources = true
 
             let personOffsetToAdd = TimeSpan.zero
-
+            let personOffsetParamsToAdd = []
 
             /* most of the time there will be only 1 personId
             Important: we will break this loop if personIdx >= orderLine.qty (see last line)
@@ -160,10 +161,9 @@ export class CreateResourceRequest {
                 const personInfo = personInfos.get(personId)!
 
                 personOffsetToAdd = TimeSpan.zero
+                personOffsetParamsToAdd = []
 
                 for (const productResource of productResources) {
-
-
 
                     let resource = availabilityCtx.getResource(productResource.resourceId!)
 
@@ -171,6 +171,9 @@ export class CreateResourceRequest {
                         continue
 
                     const offsetDuration = this.getOffsetDurationParams(orderLine, product, productResource)
+
+                    if (offsetDuration.hasParams()) 
+                        resourceRequest.addDefaults(offsetDuration.defaults)
 
                     const defaultDuration = offsetDuration.defaultDuration()
                     if (defaultDuration.seconds == 0)
@@ -222,14 +225,14 @@ export class CreateResourceRequest {
                     resReqItem.personId = personId
 
                     resReqItem.offsetDuration = offsetDuration.clone()
-
+                    
                     //   resReqItem.duration2 = offsetDuration.duration
 
                     const personOffset: TimeSpan = personInfo.offset.clone()
                     // const offset = personOffset.clone()
 
-                    // resReqItem.offset = personOffset.add(offsetDuration.offset)
-                    resReqItem.offsetDuration.addToOffset(personOffset)
+                    // resReqItem.offsetDuration.addToOffset(personOffset)    
+                    resReqItem.offsetDuration.addToOffsetAndParams(personOffset, personInfo.offsetParams)
 
                     if (productResource.flex) {
 
@@ -266,30 +269,47 @@ export class CreateResourceRequest {
                         }
                     } */
 
-                    // at the end we will increment 
-                    if (offsetDuration.duration.seconds > personOffsetToAdd.seconds)
-                        personOffsetToAdd.seconds = offsetDuration.duration.seconds
+                    /* at the end we will increment
+                    
+                    an orderline can have multiple productResources (room + staff member for instance), we want to keep track if the max duration
+                    */
+
+                    if (!productResource.prep) {    // preparation times do not influence customer (=persons)
+
+                        if (offsetDuration.duration.seconds > personOffsetToAdd.seconds) {
+
+                            personOffsetToAdd.seconds = offsetDuration.duration.seconds
+    
+                        }
+    
+                        if (ArrayHelper.NotEmpty(offsetDuration.durationParams)) {
+    
+                            for (let param of offsetDuration.durationParams) {
+                                if (personOffsetParamsToAdd.indexOf(param) == -1)
+                                    personOffsetParamsToAdd.push(param)
+                            }                            
+                        }
+
+                    }
+
+
+
 
 
                     /** sometimes duration is also encoded via parameters (it allows the resource request to adapt)
                      * Introduced for wellness (ex: customer request is 3 hours, but system decides to offer only 2 hours)
                      */
 
+
+                    /* 
                     if (ArrayHelper.NotEmpty(offsetDuration.durationParams)) {
-
-                        for (let durationParam of offsetDuration.durationParams) {
-
-                            let val = offsetDuration.defaults.get(durationParam)
-
-                            if (val)
-                                personOffsetToAdd = personOffsetToAdd.add(val)
-
-                        }
-                    }
+                        personOffsetParamsToAdd.push(offsetDuration.durationParams)
+                    } */
 
                 }
 
                 personInfo.offset.addInternal(personOffsetToAdd)
+                personInfo.offsetParams.push(...personOffsetParamsToAdd)
                 //   personOffset.addInternal(personOffsetToAdd)
 
                 personIdx++
@@ -309,6 +329,7 @@ export class CreateResourceRequest {
 
                     const personInfo = personInfos.get(personId)!
                     personInfo.offset.addInternal(personOffsetToAdd)
+                    personInfo.offsetParams.push(...personOffsetParamsToAdd)
 
                     //                    const personOffset = offsetPerPerson.get(personId)!
                     //                  personOffset.addInternal(personOffsetToAdd)

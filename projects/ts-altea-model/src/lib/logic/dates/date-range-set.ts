@@ -1166,6 +1166,12 @@ export class DateRangeSet {
             const solution = new Solution(request)
             solution.offsetRefDate = range.from
 
+            /** copy over defaults, so that further logic can use it */
+            if (request.hasDefaults()) {
+                solution.setParamOverrides(request.defaults)
+            }
+
+
             // we create a solution with 1 solutionItem, because this will be a starting solution where 
             // other solutionItems will be added later on
             const solutionItem = new SolutionItem(solution, requestItem, range, exactStart, durationFixed)

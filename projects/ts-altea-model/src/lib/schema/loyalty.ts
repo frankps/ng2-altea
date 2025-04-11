@@ -1,6 +1,6 @@
 
 
-import { Branch, Contact, DepositMode, Invoice, Order, OrderLine, OrderType, Organisation, PlanningMode, Product, ProductResource, ProductSubType, ProductType, ResourcePlanning, Schedule, User } from "ts-altea-model";
+import { Branch, Contact, DepositMode, Invoice, Order, OrderLine, OrderType, Organisation, PlanningMode, Product, ProductResource, ProductSubType, ProductType, Resource, ResourcePlanning, Schedule, User } from "ts-altea-model";
 import { Exclude, Type, Transform } from "class-transformer";
 import 'reflect-metadata';
 import { ArrayHelper, ConnectTo, DateHelper, DbObjectCreate, IAsDbObject, ManagedObject, ObjectHelper, ObjectMgmt, ObjectReference, ObjectWithId, ObjectWithIdPlus, QueryOperator, TimeHelper } from 'ts-common'
@@ -368,10 +368,16 @@ export class LoyaltyCardChange extends ObjectWithId {
 
   value: number = 0
 
+  total: number = 0
+
   isReward: boolean = false
   reward: any
 
   orderId?: string
+
+  @Type(() => Order)
+  order?: Order
+
   rewardId?: string
 
   info?: string
@@ -408,9 +414,17 @@ export class LoyaltyCard extends ObjectWithIdPlus {
   value: number = 0
 
   hasChanges() {
-
     return ArrayHelper.NotEmpty(this.changes)
+  }
 
+  getChangesByInfo(info: string) : LoyaltyCardChange[] {
+
+    if (!this.hasChanges())
+      return null
+
+    let changes = this.changes.filter(c => c.info?.indexOf(info) >= 0)
+
+    return changes
   }
 
 }

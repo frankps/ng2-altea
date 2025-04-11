@@ -138,6 +138,14 @@ export class LoyaltyByProgram {
 
     }
 
+    hasValue(programId: string): boolean {
+
+        if (!this.values)
+            return false
+
+        return this.values.has(programId)
+    }
+
 }
 
 export class LoyaltyMgmtService {
@@ -281,10 +289,14 @@ export class LoyaltyMgmtService {
 
     }
 
-
-
-    /** Calculates new loyalty points per program */
-    async calculateLoyalty(order: Order): Promise<LoyaltyByProgram> {
+    /**
+     * Calculates new loyalty points per program 
+     * @param order 
+     * @param loyaltyPrograms if programs are passed in, then they are not fetched from backend 
+     * @param recalculate used to check and recalculate 
+     * @returns 
+     */
+    async calculateLoyalty(order: Order, loyaltyPrograms?: LoyaltyProgram[], recalculate: boolean = false): Promise<LoyaltyByProgram> {
 
         const result = new LoyaltyByProgram()
 
@@ -294,12 +306,13 @@ export class LoyaltyMgmtService {
             return result
         }*/
 
-        if (order.loyal) {
+        if (!recalculate && order.loyal) {
             result.msg = `Loyalty already applied!`
             return result
         }
-
-        var loyaltyPrograms = await this.alteaDb.getLoyaltyPrograms(order.branchId)
+        
+        if (ArrayHelper.IsEmpty(loyaltyPrograms))
+            loyaltyPrograms = await this.alteaDb.getLoyaltyPrograms(order.branchId)
 
         if (ArrayHelper.IsEmpty(loyaltyPrograms)) {
             result.msg = `No loyalty programs found for branch ${order.branchId}!`
@@ -339,11 +352,12 @@ export class LoyaltyMgmtService {
                                 validTotal -= line.incl
                                 result.addLoyalty(loyaltyProgram.id, line.qty)
                             }
-                            
+
                             break
                         default: {
                             let extraLoyalty = Math.min(validTotal, line.incl)
-                            extraLoyalty = _.round(extraLoyalty, 2)
+                            //extraLoyalty = _.round(extraLoyalty, 2)
+                            extraLoyalty = Math.floor(extraLoyalty)
                             validTotal -= extraLoyalty
                             result.addLoyalty(loyaltyProgram.id, extraLoyalty)
                             break

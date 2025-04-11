@@ -10,7 +10,7 @@ import * as Handlebars from "handlebars"
 import * as sc from 'stringcase'
 import { OrderPersonMgr } from "../order-person-mgr";
 import { CancelOrderMessage } from "ts-altea-logic";
-import { TaxLines, TaxLine, VatLine, Branch, Contact, Currency, DepositMode, Invoice, InvoiceTotals, OrderLine, OrderLineSummary, OrderType, Organisation, Payment, PaymentType, PlanningMode, Product, ProductSubType, ProductType, Resource, ResourcePlanning, Subscription, OrderDeclare, OrderLineOption } from "ts-altea-model";
+import { TaxLines, TaxLine, VatLine, Branch, Contact, Currency, DepositMode, Invoice, InvoiceTotals, OrderLine, OrderLineSummary, OrderType, Organisation, Payment, PaymentType, PlanningMode, Product, ProductSubType, ProductType, Resource, ResourcePlanning, Subscription, OrderDeclare, OrderLineOption, LoyaltyCardChange } from "ts-altea-model";
 
 
 //import { numberAttribute } from "@angular/core";
@@ -262,7 +262,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
   /** messaging (email,sms) to customer enabled */
   msg = true
-  
+
   msgOn?: number   // format: yyyyMMddhhmmss
   msgCode?: string
 
@@ -274,6 +274,10 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
   /** Loyalty is/is not applied for this order */
   loyal: boolean = false
+
+  @Type(() => LoyaltyCardChange)
+  loyalty?: LoyaltyCardChange[]
+
 
   /** Order needs special attention (use privNote for more details) */
   attn: boolean = false
@@ -305,7 +309,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
   }
 
   /** add tags to order, returns true if at least 1 new tag was added */
-  addTags(tags: string[]) : boolean {
+  addTags(tags: string[]): boolean {
     if (ArrayHelper.IsEmpty(tags))
       return false
 
@@ -319,7 +323,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     return newTag
   }
 
-  addTag(tag: string) : boolean {
+  addTag(tag: string): boolean {
     if (!this.tags)
       this.tags = []
 
@@ -329,7 +333,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     }
 
     return false
-      
+
   }
 
   hasTag(tag: string): boolean {
@@ -495,6 +499,27 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     return short
   }
 
+
+  startOrCreationDate() {
+
+    if (this.start && Number.isInteger(this.start))
+      return this.startDate
+    else
+      return this.cre
+
+  }
+
+  startOrCreationDateFormat(format: string = 'd/M HH:mm'): string {
+
+    let date = this.startOrCreationDate()
+
+    if (!date)
+      return ''
+
+    const short = dateFns.format(date, format)
+
+    return short
+  }
 
 
   clearMsgCode() {
@@ -912,6 +937,17 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     return _.round(this.incl - this.paid, 2)
   }
 
+  hasLoyalty(): boolean {
+    return ArrayHelper.NotEmpty(this.loyalty)
+  }
+
+  getLoyaltyForCard(cardId: string): LoyaltyCardChange[] {
+
+    if (!this.loyalty)
+      return []
+
+    return this.loyalty.filter(l => l.cardId == cardId)
+  }
 
   makePayTotals() {
 

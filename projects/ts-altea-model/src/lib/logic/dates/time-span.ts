@@ -80,6 +80,9 @@ export class TimeSpan {
     }
 
     addInternal(timeSpan: TimeSpan): void {
+        if (!timeSpan)
+            return
+        
         this.seconds += timeSpan.seconds
     }
 
