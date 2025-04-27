@@ -1,5 +1,5 @@
 import { Action, ActionType } from "./action"
-import { ArrayHelper, ObjectHelper } from "ts-common"
+import { ArrayHelper, DateHelper, ObjectHelper } from "ts-common"
 import { Job } from "./job"
 import * as dateFns from 'date-fns'
 
@@ -38,9 +38,13 @@ export class Script {
         return idx >= 0
     }
 
-    makeJob(date: number, eventId: string, offsetMinutes = 0) : Job {
+    makeJob(date: number, eventId: string, offsetMinutes = 0): Job {
 
-        const jobDate = dateFns.addMinutes(date, offsetMinutes)
+        if (offsetMinutes) {
+            let jobDate = DateHelper.parse(date)
+            jobDate = dateFns.addMinutes(jobDate, offsetMinutes)
+            date = DateHelper.yyyyMMddhhmmss(jobDate)
+        }
 
         const job = new Job(this.name, date, eventId)
         job.actions = this.actions

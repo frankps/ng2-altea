@@ -1,5 +1,6 @@
 export enum ActionType {
     sendMail = 'sendMail',
+    ntfy = 'ntfy',
     luxom = 'luxom',
     luxomState = 'luxomState',
     script = 'script',

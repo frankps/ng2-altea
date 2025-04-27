@@ -4,8 +4,7 @@ import { LuxomState } from "./luxom-cmd"
 
 export class LuxomAddress {
 
-    constructor(public grp: string, public addr: string, public info?: string) {
-    }
+    constructor(public grp: string, public addr: string, public info?: string) { }
 
     static get spotsKelder(): LuxomAddress { return new LuxomAddress('1', '34', 'Spots kelder') }
     static get wandTrapInkom(): LuxomAddress { return new LuxomAddress('2', '12', 'Wand trap inkom') }

@@ -29,13 +29,13 @@ export class DateRange<T = any> {
     constructor(public from: Date, public to: Date, public fromLabels: string[] = [], public toLabels: string[] = []) {
         if (to < from)
             to = from
-/*        
-        if (to < from) {
-            throw new Error(`DateRange: Date to is smaller than date from!
-      From: ${from}
-      To: ${to}`);
-        }
-*/
+        /*        
+                if (to < from) {
+                    throw new Error(`DateRange: Date to is smaller than date from!
+              From: ${from}
+              To: ${to}`);
+                }
+        */
     }
 
 
@@ -50,7 +50,7 @@ export class DateRange<T = any> {
         return range
     }
 
-    
+
 
     isValid(): boolean {
         return (this.from < this.to)
@@ -85,6 +85,21 @@ export class DateRange<T = any> {
         return new DateRange(from, to);
     }
 
+    /**
+     * Creates interval [from - hoursBefore, from + hoursAfter], where from is by default current date
+     * @param hoursBefore 
+     * @param hoursAfter 
+     * @param from 
+     * @returns 
+     */
+    static hourInterval(hoursBefore: number, hoursAfter: number, from: Date = new Date()) {
+
+        const to = dateFns.addHours(from, hoursAfter)
+        from = dateFns.subHours(from, hoursBefore)
+
+        return new DateRange(from, to);
+    }
+
     toString(format: string = 'HH:mm'): string {   //  'dd/MM HH:mm'
 
         return `[${dateFns.format(this.from, format)}-${dateFns.format(this.to, format)}]`
@@ -115,7 +130,7 @@ export class DateRange<T = any> {
 
     }
 
-    changeMinutes(addMinutesFrom: number, addMinutesTo: number) : DateRange {
+    changeMinutes(addMinutesFrom: number, addMinutesTo: number): DateRange {
 
         let newRange = this.clone()
 
@@ -343,6 +358,14 @@ export class DateRange<T = any> {
         return (this.from <= other.from && this.to >= other.to)
     }
 
+    containsDate(date: Date | number): boolean {
+
+        if (typeof date === 'number')
+            date = DateHelper.parse(date)
+
+        return (this.from <= date && date < this.to)
+    }
+
 
     containsSet(dateRanges: DateRangeSet): boolean {
 
@@ -421,7 +444,7 @@ export class DateRange<T = any> {
      * @param other 
      * @returns 
      */
-    unionOfOverlapping(other: DateRange) : DateRange {
+    unionOfOverlapping(other: DateRange): DateRange {
 
         if (!other)
             return this
@@ -462,12 +485,12 @@ export class DateRange<T = any> {
                     return section
                 }
             case OverlapMode.otherOverlapsRight:  // this range overlaps the other at the start (of this range)
-            {
-                let section = this.clone()
-                section.from = other.from
-            
-                return section
-            }
+                {
+                    let section = this.clone()
+                    section.from = other.from
+
+                    return section
+                }
         }
 
         return null

@@ -101,6 +101,20 @@ export class LoyaltyComponent implements OnInit {
 
   }
 
+  canAddLoyalty() : boolean {
+
+    let order = this.order
+    let now = new Date()
+
+    if (order.start) {
+
+      if (order.startDate > now)
+        return false
+
+    }
+
+    return this.loyalty.newLoyalty && (order?.contactId != null)
+  }
 
   async addLoyalty() {
 

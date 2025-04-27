@@ -1096,6 +1096,11 @@ export class AlteaDb {
         return createResult
     }
 
+    async updateLoyaltyCardChanges(loyaltyCardChanges: LoyaltyCardChange[], propertiesToUpdate: string[]): Promise<ApiListResult<LoyaltyCardChange>> {
+        let updateResult = await this.updateObjects('loyaltyCardChange', LoyaltyCardChange, loyaltyCardChanges, propertiesToUpdate)
+        return updateResult
+    }
+
     async getLoyaltyPrograms(branchId?: string): Promise<LoyaltyProgram[]> {
 
         if (!branchId)
@@ -1249,13 +1254,15 @@ export class AlteaDb {
     async getReportMonthsPeriod(branchId: string, from: YearMonth, toInclusive: YearMonth, latestOnly: boolean): Promise<ReportMonths> {
         const qry = new DbQueryTyped<ReportMonth>('reportMonth', ReportMonth)
 
+
         qry.and('branchId', QueryOperator.equals, branchId)
 
+
         qry.and('year', QueryOperator.greaterThanOrEqual, from.y)
-        qry.and('month', QueryOperator.greaterThanOrEqual, from.m)
+        //qry.and('month', QueryOperator.greaterThanOrEqual, from.m)
 
         qry.and('year', QueryOperator.lessThanOrEqual, toInclusive.y)
-        qry.and('month', QueryOperator.lessThanOrEqual, toInclusive.m)
+        //qry.and('month', QueryOperator.lessThanOrEqual, toInclusive.m)
 
         if (latestOnly)
             qry.and('latest', QueryOperator.equals, true)

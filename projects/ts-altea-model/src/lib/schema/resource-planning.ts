@@ -39,7 +39,7 @@ export enum PlanningType {
   brk = 'brk',
 
   /* task (such as a treatment) */
-  tsk = 'tsk',     
+  tsk = 'tsk',
 
   /** compensation (for extra hours worked previously)   */
   comp = 'comp'
@@ -123,8 +123,21 @@ export class ResourcePlannings {
     return new ResourcePlannings(plannings)
   }
 
+  filterByDateRange(range: DateRange): ResourcePlannings {
 
-  filterByDateRange(from: Date | number, to: Date | number): ResourcePlannings {
+    let fromNum = range.fromToNum()
+    let toNum = range.toToNum()
+
+    const plannings = this.plannings.filter(rp => rp.end > fromNum && rp.start < toNum)
+
+    if (!Array.isArray(plannings))
+      return new ResourcePlannings()
+
+    return new ResourcePlannings(plannings)
+  }
+
+
+  filterByRange(from: Date | number, to: Date | number): ResourcePlannings {
 
     let fromNum = from instanceof Date ? DateHelper.yyyyMMddhhmmss(from) : from
     let toNum = to instanceof Date ? DateHelper.yyyyMMddhhmmss(to) : to
@@ -139,7 +152,7 @@ export class ResourcePlannings {
   }
 
 
-  filterByDateRangeType(from: Date | number, to: Date | number, ...types: PlanningType[]): ResourcePlannings {
+  filterByRangeType(from: Date | number, to: Date | number, ...types: PlanningType[]): ResourcePlannings {
 
     let fromNum = from instanceof Date ? DateHelper.yyyyMMddhhmmss(from) : from
     let toNum = to instanceof Date ? DateHelper.yyyyMMddhhmmss(to) : to
@@ -155,6 +168,71 @@ export class ResourcePlannings {
   }
 
 
+  findFirstOnStartDate(startDate: Date | number): ResourcePlanning {
+
+    if (startDate instanceof Date)
+      startDate = DateHelper.yyyyMMddhhmmss(startDate)
+
+    const planning = this.plannings.find(rp => rp.start == startDate)
+    return planning
+  }
+
+  findFirstStartingAfter(after: Date | number): ResourcePlanning {
+
+    if (ArrayHelper.IsEmpty(this.plannings))
+      return null
+
+    let afterNum: number
+
+    if (after instanceof Date)
+      afterNum = DateHelper.yyyyMMddhhmmss(after)
+    else
+      afterNum = after
+
+    let plannings: ResourcePlanning[] = _.orderBy(this.plannings, 'start')
+
+    const planning = plannings.find(rp => rp.start && rp.start > afterNum)
+
+    return planning
+  }
+
+  findFirstEndingAfter(after: Date | number): ResourcePlanning {
+
+    if (ArrayHelper.IsEmpty(this.plannings))
+      return null
+
+    let afterNum: number
+
+    if (after instanceof Date)
+      afterNum = DateHelper.yyyyMMddhhmmss(after)
+    else
+      afterNum = after
+
+    let plannings: ResourcePlanning[] = _.orderBy(this.plannings, 'end')
+
+    const planning = plannings.find(rp => rp.end && rp.end > afterNum)
+
+    return planning
+  }
+
+  findLastEndingBefore(before: Date | number): ResourcePlanning {
+
+    if (ArrayHelper.IsEmpty(this.plannings))
+      return null
+
+    let beforeNum: number
+
+    if (before instanceof Date)
+      beforeNum = DateHelper.yyyyMMddhhmmss(before)
+    else
+      beforeNum = before
+
+    let plannings = _.orderBy(this.plannings, ['end'], ['desc'])
+
+    const planning = plannings.find(rp => rp.end && rp.end < beforeNum)
+
+    return planning
+  }
 
 
   groupByOrderId(plannings: ResourcePlanning[]): Map<string, ResourcePlanning[]> {
@@ -757,6 +835,20 @@ export class ResourcePlanning extends ObjectWithIdPlus implements IAsDbObject<Re
       return -1
   }
 
+  timeBetween(other: ResourcePlanning): TimeSpan {
+
+    if (!other)
+      return null
+
+    if (other.start > this.end)
+      return TimeSpan.between(this.endDate, other.startDate)
+    else if (other.end < this.start)
+      return TimeSpan.between(other.endDate, this.startDate)
+    else
+      return TimeSpan.zero
+
+  }
+
 
   /**
    * 
@@ -820,11 +912,11 @@ export class ResourcePlanning extends ObjectWithIdPlus implements IAsDbObject<Re
 
   override toString(dateFormat: string = 'HH:mm'): string {   //  'dd/MM HH:mm'
 
-    let full = this.ors? ' FULL-DAY': ''
+    let full = this.ors ? ' FULL-DAY' : ''
 
     return `[${this.type}: ${dateFns.format(this.startDate, dateFormat)}-${dateFns.format(this.endDate, dateFormat)}${full}]`
 
-}
+  }
 
 }
 

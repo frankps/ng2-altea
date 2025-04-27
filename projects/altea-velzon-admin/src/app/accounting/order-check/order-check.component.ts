@@ -48,16 +48,42 @@ export class OrderCheckComponent implements OnInit {
 
   async doChecks(year, month) {
 
-    let branchId = this.sessionSvc.branchId
-    let report = new MonthConsistencyReportBuilder(branchId, this.objSvc)
+    let me = this
 
-    let yearMonth = new YearMonth(year, month)
-    // let pays = await report.checkPayments(yearMonth)
-    // console.log(pays)
 
-    this.report = await report.checkAll(yearMonth)
+    let error
 
-    console.log(this.report)
+    try {
+      me.spinner.show()
+
+
+      let branchId = me.sessionSvc.branchId
+      let report = new MonthConsistencyReportBuilder(branchId, me.objSvc)
+
+      let yearMonth = new YearMonth(year, month)
+
+
+      me.report = await report.checkAll(me.branch, yearMonth)
+
+      console.log(me.report)
+
+    } catch (err) {
+
+      console.error(err)
+      error = err
+
+    } finally {
+
+      me.spinner.hide()
+
+      if (error)
+        me.dashboardSvc.showErrorToast(error)
+      else
+      me.dashboardSvc.showSuccessToast('Checks finished')
+
+    }
+
+
 
   }
 
@@ -244,7 +270,9 @@ export class OrderCheckComponent implements OnInit {
 
   }
 
-  async getReportMonths() : Promise<ReportMonths> {
+  async getReportMonths(): Promise<ReportMonths> {
+
+    console.log('getReportMonths')
 
     let me = this
 
@@ -252,8 +280,8 @@ export class OrderCheckComponent implements OnInit {
 
     let branchId = me.sessionSvc.branchId
 
-    let from = new YearMonth(2024, 10)
-    let to = from.add(2)
+    let from = new YearMonth(2025, 1)
+    let to = new YearMonth(2025, 4) // (2025, 1)
 
     let reportMonths = await alteaDb.getReportMonthsPeriod(branchId, from, to, true)
 
@@ -261,14 +289,14 @@ export class OrderCheckComponent implements OnInit {
   }
 
   async showTaxReport() {
-    
+
     let me = this
 
     me.customReport = ''
 
     let reportMonths = await this.getReportMonths()
 
-    let htmlTable = reportMonths.taxReport()
+    let htmlTable = reportMonths.taxReport('.')
     let htmlString = htmlTable.toHtmlString()
 
     me.customReport = this.sanitizer.bypassSecurityTrustHtml(htmlString)
@@ -276,7 +304,7 @@ export class OrderCheckComponent implements OnInit {
   }
 
   async showIncomeReport() {
-    
+
     let me = this
 
     me.customReport = ''
@@ -290,6 +318,7 @@ export class OrderCheckComponent implements OnInit {
 
   }
 
+  loyaltyReport: ContactLoyaltyReport
 
   async checkContactLoyalty() {
 
@@ -297,15 +326,25 @@ export class OrderCheckComponent implements OnInit {
 
     let alteaDb = new AlteaDb(this.objSvc)
 
-    let report = new ContactLoyaltyReport(alteaDb)
+    this.loyaltyReport = new ContactLoyaltyReport(alteaDb)
 
 
-     await report.loadContactData('f3c4cbdd-8ad9-4327-ba08-ce282271ac64')  //checkContact('f3c4cbdd-8ad9-4327-ba08-ce282271ac64')
+    await this.loyaltyReport.loadContactData('f3c4cbdd-8ad9-4327-ba08-ce282271ac64')  //checkContact('f3c4cbdd-8ad9-4327-ba08-ce282271ac64')
 
-    let html = report.toHtml()
+    let html = this.loyaltyReport.toHtml()
 
     me.htmlReport = this.sanitizer.bypassSecurityTrustHtml(html)
 
+
+  }
+
+  async fixContactLoyalty() {
+
+    let me = this
+
+    let res = await this.loyaltyReport.fixLoyalty()
+
+    console.log(res)
 
   }
 

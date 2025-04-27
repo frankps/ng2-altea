@@ -97,6 +97,11 @@ export class BankTransactionsComponent implements OnInit {
 
   }
 
+  fromChanged(newFrom: Date) {
+    this.bank.to = dateFns.addMonths(newFrom, 1)
+  }
+
+
   toggleEditPayment(payment: Payment) {
 
     console.log(payment)
@@ -527,13 +532,14 @@ export class BankTransactionsComponent implements OnInit {
   async findMissingPaysInDb(tx: BankTransaction, refDate: Date, missing: number[]): Promise<Payment[]> {
     let me = this
 
-    let candidates = await me.getMissingPaysFromDb(refDate, missing)
+    let candidates = await me.getMissingPaysFromDb(tx, refDate, missing)
 
     if (ArrayHelper.NotEmpty(candidates)) {
 
       this.addLabel(candidates, 'xtr')
-      me.pays.push(...candidates)
-      me.pays = _.orderBy(me.pays, ['date'], ['desc'])
+      let pays = new Payments(me.pays)
+      pays.add(...candidates)
+      me.pays = pays.orderByDate()
 
       // we try again with the extra retrieved payments
       let matchingPayments = me.tryToFindMatchingPayments(tx, me.pays)
@@ -543,17 +549,36 @@ export class BankTransactionsComponent implements OnInit {
     return []
   }
 
-  async getMissingPaysFromDb(refDate: Date, missing: number[]): Promise<Payment[]> {
+  async getMissingPaysFromDb(tx: BankTransaction, refDate: Date, missing: number[]): Promise<Payment[]> {
     let me = this
 
-    let fromDate = dateFns.subDays(refDate, 15)
-    let toDate = dateFns.addDays(refDate, 15)
+    let fromDate = dateFns.subDays(refDate, 10)
+    let toDate = dateFns.addDays(refDate, 2)
 
     const qry = new DbQuery()
     qry.include('order')
-    qry.and('date', QueryOperator.greaterThanOrEqual, DateHelper.yyyyMMddhhmmss(fromDate))
-    qry.and('date', QueryOperator.lessThanOrEqual, DateHelper.yyyyMMddhhmmss(toDate))
-    qry.and('amount', QueryOperator.in, missing)
+
+  
+
+
+    if (tx.type == BankTxType.terminalCredit) {
+
+      let fromDate2 = dateFns.subDays(refDate, 2)
+      let toDate2 = dateFns.addDays(refDate, 2)
+
+      qry.and('type', QueryOperator.equals, PaymentType.credit)
+      qry.and('date', QueryOperator.greaterThanOrEqual, DateHelper.yyyyMMddhhmmss(fromDate2))
+      qry.and('date', QueryOperator.lessThanOrEqual, DateHelper.yyyyMMddhhmmss(toDate2))
+
+    } else {
+      qry.and('date', QueryOperator.greaterThanOrEqual, DateHelper.yyyyMMddhhmmss(fromDate))
+      qry.and('date', QueryOperator.lessThanOrEqual, DateHelper.yyyyMMddhhmmss(toDate))
+      qry.and('type', QueryOperator.in, [PaymentType.credit, PaymentType.debit, PaymentType.transfer])
+      qry.and('bankTxId', QueryOperator.equals, null)
+    }
+
+    
+
 
     let sameAmountPays = await me.paySvc.query$(qry)
 

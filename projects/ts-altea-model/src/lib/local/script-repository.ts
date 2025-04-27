@@ -3,7 +3,7 @@ import { Script } from "./script";
 import { LuxomAddress } from "./luxom-address";
 import { LuxomState } from "./luxom-cmd";
 import { ArrayHelper } from "ts-common";
-
+import { NtfyArgs } from "./ntfy-args";
 
 export class ScriptRepository {
 
@@ -11,14 +11,14 @@ export class ScriptRepository {
 
 
     static init() {
-        const all : Script[] = ScriptRepository.all = []
+        const all: Script[] = ScriptRepository.all = []
 
         all.push(ScriptRepository.wellness_start_min15)
         all.push(ScriptRepository.wellness_start_min4)
         all.push(ScriptRepository.wellness_start_min2)
         all.push(ScriptRepository.wellness_end_min10)
         all.push(ScriptRepository.wellness_end_plus2)
-       
+
         return all
     }
 
@@ -32,16 +32,46 @@ export class ScriptRepository {
         return script
     }
 
+    static get test_script(): Script {
 
+        const script = new Script("Test script", "wellness_start_min15")
+
+        //script.addAction(ActionType.luxom, LuxomState.clear(LuxomAddress.wandTrapInkom))
+
+        script.addAction(ActionType.luxom, LuxomState.setPctg(LuxomAddress.gogglesTrapWellness, "25"))
+        script.addAction(ActionType.ntfy, new NtfyArgs('domo', 'Goggles on', 'Goggles on'))
+
+        return script
+    }
+
+    static get sauna_start(): Script {
+        const script = new Script("Sauna start", "sauna_start")
+
+        // -15 mins
+        script.addAction(ActionType.luxom, LuxomState.toggle(LuxomAddress.saunaStoombad, 'assert-sauna-off'))
+        script.addAction(ActionType.ntfy, new NtfyArgs('domo', 'Sauna on', 'Sauna is on'))
+
+        return script
+    }
+
+    static get sauna_end(): Script {
+        const script = new Script("Sauna end", "sauna_end")
+
+        // -15 mins
+        script.addAction(ActionType.luxom, LuxomState.toggle(LuxomAddress.saunaStoombad, 'assert-sauna-on'))
+        script.addAction(ActionType.ntfy, new NtfyArgs('domo', 'Sauna off', 'Sauna is off'))
+
+        return script
+    }
 
     static get wellness_start_min15(): Script {
         const script = new Script("Wellness Start -15", "wellness_start_min15")
 
-       // -15 mins
-       script.addAction(ActionType.luxom, LuxomState.set(LuxomAddress.spotsKelder))
-       script.addAction(ActionType.luxom, LuxomState.set(LuxomAddress.wandTrapInkom))
-       script.addAction(ActionType.luxom, LuxomState.setPctg(LuxomAddress.gogglesTrapWellness, "25"))
-       script.addAction(ActionType.luxom, LuxomState.set(LuxomAddress.vloerTrapWellness))
+        // -15 mins
+        script.addAction(ActionType.luxom, LuxomState.set(LuxomAddress.spotsKelder))
+        script.addAction(ActionType.luxom, LuxomState.set(LuxomAddress.wandTrapInkom))
+        script.addAction(ActionType.luxom, LuxomState.setPctg(LuxomAddress.gogglesTrapWellness, "25"))
+        script.addAction(ActionType.luxom, LuxomState.set(LuxomAddress.vloerTrapWellness))
 
         return script
     }
@@ -58,7 +88,7 @@ export class ScriptRepository {
         script.addAction(ActionType.luxom, LuxomState.set(LuxomAddress.toiletWellness))
         script.addAction(ActionType.luxom, LuxomState.setPctg(LuxomAddress.jacuzziTL, "0"))
         script.addAction(ActionType.luxom, LuxomState.setPctg(LuxomAddress.tuinTL, "0"))
-        
+
         return script
     }
 
@@ -66,7 +96,7 @@ export class ScriptRepository {
         const script = new Script("Wellness Start -2", "wellness_start_min2")
 
         // -2
-        script.addAction(ActionType.luxom, LuxomState.toggle(LuxomAddress.saunaStoombad))
+        // script.addAction(ActionType.luxom, LuxomState.toggle(LuxomAddress.saunaStoombad))
 
         return script
     }
@@ -91,7 +121,7 @@ export class ScriptRepository {
         // 2 mins
         script.addAction(ActionType.luxom, LuxomState.clear(LuxomAddress.spotsJacuzzi))
         script.addAction(ActionType.luxom, LuxomState.clear(LuxomAddress.spotsStraat))
-        script.addAction(ActionType.luxom, LuxomState.toggle(LuxomAddress.saunaStoombad))
+        // script.addAction(ActionType.luxom, LuxomState.toggle(LuxomAddress.saunaStoombad))
         script.addAction(ActionType.luxom, LuxomState.clear(LuxomAddress.zwembadLampen))
         script.addAction(ActionType.luxom, LuxomState.clear(LuxomAddress.jacuzziLamp))
 

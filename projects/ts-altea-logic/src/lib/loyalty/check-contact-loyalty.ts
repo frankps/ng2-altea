@@ -72,8 +72,11 @@ export class ContactLoyaltyReport {
 
     lines: ContactLoyaltyLine[] = []
 
-    totals: Map<string, number> = new Map<string, number>()
+    // init values, indexed by cardId
+    inits: Map<string, number> = new Map<string, number>()
 
+    // totals, indexed by cardId
+    totals: Map<string, number> = new Map<string, number>()
 
     orders: Order[]
     cards: LoyaltyCard[]
@@ -90,7 +93,7 @@ export class ContactLoyaltyReport {
     }
 
 
-    /*
+    /*  
         constructor1(public loyaltyMgmtSvc: LoyaltyMgmtService, public orders: Order[], public cards: LoyaltyCard[], public loyaltyPrograms: LoyaltyProgram[]) {
     
     
@@ -112,7 +115,15 @@ export class ContactLoyaltyReport {
             for (let card of cards) {
 
                 let inits = card.getChangesByInfo('INIT')
-                initLine.addLoyalty(card.id, ...inits)
+
+                if (ArrayHelper.NotEmpty(inits)) {
+                    initLine.addLoyalty(card.id, ...inits)
+
+                    let initValue = _.sumBy(inits, 'value')
+                    this.inits.set(card.id, initValue)
+                } else {
+                    this.inits.set(card.id, 0)
+                }
 
             }
 
@@ -172,6 +183,9 @@ export class ContactLoyaltyReport {
 
             let total = this.getTotal(cardId)
 
+            // we want the rewards (negative loyalty) to be first
+            loyalties = _.orderBy(loyalties, l => l.value)
+
             for (let loyalty of loyalties) {
 
                 total += loyalty.value
@@ -184,10 +198,29 @@ export class ContactLoyaltyReport {
         this.lines.push(line)
     }
 
+    resetTotals() {
 
-    fixLoyalty() {
+        this.totals = new Map<string, number>()
+
+        for (let cardId of this.inits.keys()) {
+            this.totals.set(cardId, this.inits.get(cardId))
+        }
+    }
+
+
+    async fixLoyalty() {
+
+        let me = this
 
         // copy over from toHtml()
+
+        if (ArrayHelper.IsEmpty(this.lines))
+            return
+
+        let cardChangeUpdates: LoyaltyCardChange[] = []
+        let newCardChanges: LoyaltyCardChange[] = []
+
+        me.resetTotals()
 
         for (let line of this.lines) {
             switch (line.type) {
@@ -195,6 +228,90 @@ export class ContactLoyaltyReport {
                     let order = line.order
 
                     for (let card of this.cards) {
+
+                        let total = this.getTotal(card.id)
+
+                        let loyalties = order.getLoyaltyForCard(card.id)
+
+                        let extraLoyalty: LoyaltyCardChange[] = []
+                        let rewards: LoyaltyCardChange[] = []
+
+                        let existingForCard = 0, nrOfLoyalties = 0
+
+                        if (ArrayHelper.NotEmpty(loyalties)) {
+                            extraLoyalty = loyalties.filter(l => l.value >= 0)
+                            rewards = loyalties.filter(l => l.value < 0)
+
+                            existingForCard = _.sumBy(extraLoyalty, 'value')
+                            nrOfLoyalties = extraLoyalty.length
+                        }
+
+                        if (ArrayHelper.NotEmpty(rewards)) {
+
+                            for (let reward of rewards) {
+                                total += reward.value
+
+                                if (reward.total != total) {
+                                    reward.total = total
+                                    cardChangeUpdates.push(reward)
+                                }
+                            }
+                        }
+
+                        let expectedForCard = 0
+
+                        if (line.recalculated?.hasValue(card.programId)) {
+                            expectedForCard = line.recalculated.getValue(card.programId)
+
+                        }
+
+                        total += expectedForCard
+
+                        let totalUpdated = false
+
+                        if (existingForCard != expectedForCard) {
+                            console.log(`${order.id} ${card.name} ${existingForCard} != ${expectedForCard}`)
+
+                            let amountToAdd = expectedForCard - existingForCard
+
+                            if (nrOfLoyalties > 0) {
+                                // then there exists at least 1 loyaltyCardChange => we need to update
+
+                                let loyaltyCardChange = extraLoyalty[0]
+                                loyaltyCardChange.value += amountToAdd
+                                loyaltyCardChange.total = total
+                                totalUpdated = true
+
+                                cardChangeUpdates.push(loyaltyCardChange)
+
+                            } else {
+
+                                let loyaltyCardChange = new LoyaltyCardChange()
+                                loyaltyCardChange.cardId = card.id
+                                loyaltyCardChange.value = amountToAdd
+                                loyaltyCardChange.total = total
+                                loyaltyCardChange.orderId = order.id
+                                loyaltyCardChange.date = order.startOrCreationDate()
+
+                                totalUpdated = true
+
+                                newCardChanges.push(loyaltyCardChange)
+
+                            }
+
+                        }
+
+                        if (!totalUpdated && nrOfLoyalties > 0) {
+                            let loyaltyCardChange = extraLoyalty[0]
+
+                            if (loyaltyCardChange.total != total) {
+                                loyaltyCardChange.total = total
+                                cardChangeUpdates.push(loyaltyCardChange)
+                            }
+                        }
+
+                        this.setTotal(card.id, total)
+
 
                     }
 
@@ -204,10 +321,48 @@ export class ContactLoyaltyReport {
         }
 
 
+        console.log('Card change updates:', cardChangeUpdates)
+        console.log('New card changes:', newCardChanges)
+
+        let cardUpdates: LoyaltyCard[] = []
+
+        for (let card of this.cards) {
+
+            let total = this.getTotal(card.id)
+
+            if (total != card.value) {
+                card.value = total
+                cardUpdates.push(card)
+            }
+        }
+
+        console.log('Card updates:', cardUpdates)
+
+
+ 
+        if (ArrayHelper.NotEmpty(cardChangeUpdates)) {
+            let result = await this.alteaDb.updateLoyaltyCardChanges(cardChangeUpdates, ['value', 'total'])
+            console.log('Update changes result:', result)
+        }
+
+       
+        if (ArrayHelper.NotEmpty(newCardChanges)) {
+            let result = await this.alteaDb.createLoyaltyCardChanges(newCardChanges)
+            console.log('Create changes result:', result)
+        }
+
+
+        if (ArrayHelper.NotEmpty(cardUpdates)) {
+            let result = await this.alteaDb.updateLoyaltyCards(cardUpdates, ['value'])
+            console.log('Update result:', result)
+        }
+
 
     }
 
     toHtml() {
+
+        let now = new Date()
 
         console.log(this)
 
@@ -293,6 +448,7 @@ export class ContactLoyaltyReport {
 
                             let expectedValue = 0
 
+
                             if (line.recalculated?.hasValue(card.programId)) {
                                 expectedValue = line.recalculated.getValue(card.programId)
 
@@ -304,6 +460,7 @@ export class ContactLoyaltyReport {
                                 else
                                     lineCols.push('')
                             }
+
 
 
                         }

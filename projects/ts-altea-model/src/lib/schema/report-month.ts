@@ -195,7 +195,7 @@ export class ReportMonths {
         return table
     }
 
-    taxReport(): HtmlTable {
+    taxReport(decimalSeparator: string = '.'): HtmlTable {
 
         console.log('taxReport')
 
@@ -245,9 +245,9 @@ export class ReportMonths {
                 let excl = _.round(incl / (1 + pctg / 100), 2)
                 let vat = _.round(incl - excl, 2)
 
-                let inclStr = `${incl}`.replace('.',',')
-                let exclStr = `${excl}`.replace('.',',')
-                let vatStr = `${vat}`.replace('.',',')
+                let inclStr = `${incl}`.replace('.',decimalSeparator)
+                let exclStr = `${excl}`.replace('.',decimalSeparator)
+                let vatStr = `${vat}`.replace('.',decimalSeparator)
 
                 cols.push(inclStr, exclStr, vatStr)
 
@@ -263,7 +263,7 @@ export class ReportMonths {
             }
 
             lineTotalIncl = _.round(lineTotalIncl, 2)
-            let lineTotalInclStr = `${lineTotalIncl}`.replace('.',',')
+            let lineTotalInclStr = `${lineTotalIncl}`.replace('.',decimalSeparator)
             cols.push(`<b>${lineTotalInclStr}</b>`)
         }
 

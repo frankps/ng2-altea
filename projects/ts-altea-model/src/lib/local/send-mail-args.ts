@@ -6,3 +6,5 @@ export class SendMailArgs extends ActionArgs {
         super()
     }
 }
+
+

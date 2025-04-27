@@ -37,6 +37,8 @@ export class UploadComponent {
 
   uploadListener($event: any): void {
 
+    console.log('UPLOAD BANK')
+
     let me = this
 
     /*     console.error('Start UPLOAD !!')

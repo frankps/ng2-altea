@@ -1,13 +1,15 @@
 import { ArrayHelper, DateHelper, ObjectHelper } from "ts-common"
 import { Job } from "./job"
+import { DateRange } from "../logic"
 import { Type } from "class-transformer"
-import { th } from "date-fns/locale"
 
 export enum EventType {
     wellness_start = 'wellness_start',
     wellness_end = 'wellness_end',
     door_enable = 'door_enable',
     door_disable = 'door_disable',
+    sauna_start = 'sauna_start',
+    sauna_end = 'sauna_end',
 }
 
 export class Event {
@@ -23,20 +25,22 @@ export class Event {
     @Type(() => Job)
     jobs: Job[]
 
-    constructor(type: string, date: number, resourceId?: string, id?: string) {
+    constructor(type: string, date: number, resourceId?: string, orderId?: string, contactId?: string, contactName?: string) {
 
-        if (id)
-            this.id = id
-        else
-            this.id =  ObjectHelper.newGuid()
+        /*  if (id)
+             this.id = id
+         else */
+        this.id = ObjectHelper.newGuid()
 
         this.type = type
         this.date = date
         this.resourceId = resourceId
-
+        this.orderId = orderId
+        this.contactId = contactId
+        this.contactName = contactName
     }
 
-    jsDate() : Date {
+    jsDate(): Date {
 
         if (!this.date)
             return undefined
@@ -54,7 +58,7 @@ export class Events {
 
     find(type: string, date: number, resourceId?: string): Event {
 
-        const ev = this.events.find(e =>  e.type == type && e.date == date && (!resourceId || e.resourceId == resourceId))
+        const ev = this.events.find(e => e.type == type && e.date == date && (!resourceId || e.resourceId == resourceId))
 
         return ev
     }
@@ -65,6 +69,10 @@ export class Events {
         const ev = this.events.find(e => e.orderId == orderId && e.type == type && e.date == date && (!resourceId || e.resourceId == resourceId))
 
         return ev
+    }
+
+    inRange(range: DateRange): Events {
+        return new Events(this.events.filter(e => range.containsDate(e.date)))
     }
 
 }

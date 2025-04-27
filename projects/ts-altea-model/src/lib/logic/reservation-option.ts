@@ -21,6 +21,9 @@ export class ReservationOption {
     */
     order: Order
 
+    /** when a specific time-slot is forced (user doesn't take slot proposed by system) */
+    forced: boolean = false
+
     /**
      * 
      * @param dateNum date number in format: yyyyMMddhhmmss
@@ -36,9 +39,9 @@ export class ReservationOption {
         return ArrayHelper.NotEmpty(this.informIdx)
     }
 
-    isForcedDate() : boolean {
+/*     isForcedDate() : boolean {
         return ArrayHelper.IsEmpty(this.solutionIds)
-    }
+    } */
 
     fromSolution() : boolean {
         return ArrayHelper.NotEmpty(this.solutionIds)
@@ -52,7 +55,7 @@ export class ReservationOption {
         return this.solutions[0]
     }
 
-    static fromDate(start: Date, solution?: Solution): ReservationOption {
+    static fromDate(start: Date, solution?: Solution, forced: boolean = false): ReservationOption {
 
         const dateNum = DateHelper.yyyyMMddhhmmss(start)
         const option = new ReservationOption(dateNum)
@@ -61,6 +64,8 @@ export class ReservationOption {
             option.solutionIds.push(solution.id)
             option.solutions.push(solution)
         }
+
+        option.forced = forced
 
         return option
     }

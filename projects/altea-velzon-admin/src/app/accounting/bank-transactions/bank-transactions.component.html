@@ -2,7 +2,7 @@
 
 <div class="row my-3">
     <div class="col-2">
-        <input type="text" placeholder="Datepicker" class="form-control" bsDatepicker [(ngModel)]="bank.from">
+        <input type="text" placeholder="Datepicker" class="form-control" bsDatepicker [(ngModel)]="bank.from" (bsValueChange)="fromChanged($event)">
     </div>
     <div class="col-2">
         <input type="text" placeholder="Datepicker" class="form-control" bsDatepicker [(ngModel)]="bank.to">

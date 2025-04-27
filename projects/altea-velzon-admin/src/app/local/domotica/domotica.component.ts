@@ -27,6 +27,17 @@ export class DomoticaComponent implements OnInit {
     //await this.getLuxomState()
   }
 
+  async getSaunaState() {
+
+    
+    const luxomState = new LuxomGetState([LuxomAddress.saunaStoombad ])
+
+    const action = new Action(ActionType.luxomState, luxomState)
+
+    const res = await this.localSvc.executeAction$(action)
+
+    console.warn(res)
+  }
 
 
   async getLuxomState() {

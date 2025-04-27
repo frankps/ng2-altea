@@ -5,7 +5,8 @@
             <div class="col-6 px-3 d-flex align-items-center">
 
                 <i *ngIf="order.src == 'ngApp'" class="fa-solid fa-mobile"></i>
-                <span *ngIf="order.contact"> &nbsp;<a [routerLink]="['/aqua/contacts/',order.contact.id]" style="text-decoration: none; color: inherit;">{{order.contact.name}}</a></span>
+                <span *ngIf="order.contact"> &nbsp;<a [routerLink]="['/aqua/contacts/',order.contact.id]"
+                        style="text-decoration: none; color: inherit;">{{order.contact.name}}</a></span>
 
             </div>
             <div class="col-6 px-3 d-flex justify-content-end align-items-center">
@@ -75,7 +76,8 @@
 
                 <div class="row" *ngIf="orderMgrSvc.giftNotFound">
                     <div class="col">
-                        <button type="button" class="btn btn-warning btn-sm float-end" (click)="orderMgrSvc.fixNonExistingGift(order)">Fix gift</button>
+                        <button type="button" class="btn btn-warning btn-sm float-end"
+                            (click)="orderMgrSvc.fixNonExistingGift(order)">Fix gift</button>
                     </div>
                 </div>
 
@@ -95,10 +97,10 @@
 
         </ng-container>
 
-        <ng-container *ngFor="let line of order.lines">
-            <div (click)="selectOrderLine(line)">
+        <ng-container *ngFor="let line of order.lines; let idx = index">
+            <div>
                 <div class="row mt-2">
-                    <div class="col-8">{{line.qty}} x <small>{{line.descr}}</small>
+                    <div class="col-8" (click)="selectOrderLine(line)">{{line.qty}} x <small>{{line.descr}}</small>
 
                         <small>
 
@@ -113,6 +115,25 @@
                         <span *ngIf="show.extra">{{line.vatPct}}%</span>
 
                         <!-- If no date is specified (order.start not set), and product has flexible price (priceFrom) -->
+
+                        <div *ngIf="show.extra" class="float-end ms-1">
+                            <div class="row">
+                                <div class="col">
+                                    <span class="badge bg-secondary" (click)="orderMgrSvc.moveOrderLineUp(line, idx)">
+                                        <i class="fa-solid fa-arrow-up"></i></span>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col">
+                                    <span class="badge bg-secondary" (click)="orderMgrSvc.moveOrderLineDown(line, idx)">
+                                        <i class="fa-solid fa-arrow-down"></i></span>
+                                </div>
+                            </div>
+                        </div>
+
+
+
 
                         <span class="float-end">€ {{line.incl}}</span>
 
@@ -170,7 +191,6 @@
                         <div class="col-1"></div>
                         <div class="col-6">{{option.name}}</div>
                         <div class="col-5">
-
 
                             <div *ngFor="let value of option.values">
                                 {{value.name}}
@@ -552,7 +572,7 @@
 
                 <div class="row mt-1" *ngIf="order.hasVatLines(2)">
                     <div class="col-9  d-flex justify-content-center">
-                     
+
                     </div>
                     <div class="col-3  d-flex justify-content-end">
                         <b>{{order.totalVatIncl()}}</b>
@@ -608,7 +628,7 @@
 
                 <div class="row mt-1" *ngIf="order.tax.hasLines(2)">
                     <div class="col-9  d-flex justify-content-center">
-                     
+
                     </div>
                     <div class="col-3  d-flex justify-content-end">
                         <b>{{order.tax.totalIncl()}}</b>
@@ -621,7 +641,7 @@
         </ng-container>
 
 
-<!--         <span *ngIf="orderMgrSvc.showTimer" class="float-end" [style.color]="orderMgrSvc.timerColor()">Gelieve af te
+        <!--         <span *ngIf="orderMgrSvc.showTimer" class="float-end" [style.color]="orderMgrSvc.timerColor()">Gelieve af te
             werken binnen de {{orderMgrSvc.timeLeftString()}}.</span> -->
 
 

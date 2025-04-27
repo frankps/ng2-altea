@@ -67,6 +67,13 @@ export class TimeSpan {
         return new TimeSpan(seconds, TimeUnit.seconds)
     }
 
+    static between(start: Date, end: Date): TimeSpan {
+
+        let milliSeconds = end.getTime() - start.getTime()
+        let seconds = Math.round(milliSeconds / 1000)
+        return new TimeSpan(seconds)
+    }
+
     add(timeSpan: TimeSpan): TimeSpan {
         return new TimeSpan(this.seconds + timeSpan.seconds)
     }

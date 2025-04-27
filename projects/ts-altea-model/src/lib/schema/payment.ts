@@ -138,7 +138,7 @@ export class Payments {
     if (!this.hasPayments())
       return []
 
-    var giftPays = this.list.filter(p => p.type == PaymentType.gift && p.gift.orderId)
+    var giftPays = this.list.filter(p => p.type == PaymentType.gift && p.gift?.orderId)
 
     if (ArrayHelper.IsEmpty(giftPays))
       return []

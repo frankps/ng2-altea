@@ -169,15 +169,7 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
 
         }
 
-        if (tx.details.indexOf('INSTANTOVERSCHRIJVING') >= 0) {
-            txType = BankTxType.transfer;
 
-            let txInfo = new BankTxInfo(txType)
-
-            txInfo.forDate = tx.execDate
-
-            return txInfo
-        }
 
         if (txType == BankTxType.terminalBC || txType == BankTxType.onlineBC) {
 
@@ -254,6 +246,17 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
             }
 
 
+        }
+
+
+        if (tx.details.indexOf('OVERSCHRIJVING') >= 0) {
+            txType = BankTxType.transfer;
+
+            let txInfo = new BankTxInfo(txType)
+
+            txInfo.forDate = tx.execDate
+
+            return txInfo
         }
 
 

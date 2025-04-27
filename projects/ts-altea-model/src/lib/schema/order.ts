@@ -941,12 +941,23 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     return ArrayHelper.NotEmpty(this.loyalty)
   }
 
-  getLoyaltyForCard(cardId: string): LoyaltyCardChange[] {
+  /**
+   * Negative loyalty are rewards 
+   * @param cardId 
+   * @param onlyPositive 
+   * @returns 
+   */
+  getLoyaltyForCard(cardId: string, onlyPositive: boolean = false): LoyaltyCardChange[] {
 
     if (!this.loyalty)
       return []
 
-    return this.loyalty.filter(l => l.cardId == cardId)
+    let loyalties = this.loyalty.filter(l => l.cardId == cardId)
+
+    if (onlyPositive && loyalties)
+      loyalties = loyalties.filter(l => l.value > 0)
+
+    return loyalties
   }
 
   makePayTotals() {
@@ -1698,10 +1709,22 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
     let newPays = this.getPaymentsAfter(firstDayNextMonth, [PaymentType.subs, PaymentType.loyal])
 
+    let giftPays = newPays.filter(p => p.type == PaymentType.gift)
+
+    if (ArrayHelper.NotEmpty(giftPays)) {
+      console.log('giftPays', giftPays)
+
+      let giftPays2 = giftPays.filter(p => !p.gift)
+
+      if (ArrayHelper.NotEmpty(giftPays2)) {
+        console.log('Missing payments', giftPays2)
+      }
+
+    }
 
     /* Also filter out gift payments where the gift was already declared (because gift was invoiced or OLD gift)
     */
-    newPays = newPays.filter(p => p.type != PaymentType.gift || (p.type == PaymentType.gift && !p.gift.decl))
+    newPays = newPays.filter(p => p.type != PaymentType.gift || (p.type == PaymentType.gift && p.gift && !p.gift.decl))
 
     let positivePays = newPays.filter(p => p.amount > 0)
     let negativePays = newPays.filter(p => p.amount < 0)

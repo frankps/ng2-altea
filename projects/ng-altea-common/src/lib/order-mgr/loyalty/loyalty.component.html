@@ -37,7 +37,7 @@
 
     <div *ngIf="!order.loyal && loyalty.newLoyalty && !order.isNew()">
         <div class="col d-grid mt-2">
-            <button type="button" [disabled]="!loyalty?.newLoyalty || !order?.contactId" class="btn btn-primary btn-sm" (click)="addLoyalty()" translate>dic.add</button>
+            <button type="button" [disabled]="!canAddLoyalty()" class="btn btn-primary btn-sm" (click)="addLoyalty()" translate>dic.add</button>
 
         </div>
     </div>

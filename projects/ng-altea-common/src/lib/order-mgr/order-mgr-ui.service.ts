@@ -532,6 +532,61 @@ export class OrderMgrUiService {   // implements OnInit
 
   }
 
+  moveOrderLineUp(line: OrderLine, idx: number) {
+
+    console.warn(line)
+
+    if (idx > 0) {
+
+      let prevLine = this.order.lines[idx - 1]
+
+      let lineIdx = line.idx
+
+      this.order.lines[idx - 1] = line
+      line.idx = prevLine.idx
+
+      this.order.lines[idx] = prevLine
+      prevLine.idx = lineIdx
+
+      line.markAsUpdated('idx')
+      prevLine.markAsUpdated('idx')
+
+      //this.order.markAsUpdated('lines')
+      
+      this.orderDirty = true
+
+    }
+      
+  }
+
+  moveOrderLineDown(line: OrderLine, idx: number) {
+
+    console.warn(line)
+
+    let nrOfLines = this.order.lines.length
+
+    if (idx < nrOfLines - 1) {
+
+      let nextLine = this.order.lines[idx + 1]
+
+      let lineIdx = line.idx
+
+      this.order.lines[idx + 1] = line
+      line.idx = nextLine.idx
+
+      this.order.lines[idx] = nextLine
+      nextLine.idx = lineIdx
+
+      line.markAsUpdated('idx')
+      nextLine.markAsUpdated('idx')
+
+      //this.order.markAsUpdated('lines')
+      
+      this.orderDirty = true
+
+    }
+      
+  }
 
   async selectExistingOrderLine(line: OrderLine) {
 
@@ -876,7 +931,9 @@ export class OrderMgrUiService {   // implements OnInit
       }
 
 
-
+      if (option.forced) {
+        me.order.tags.push('forced')
+      }
 
 
       // determine how much time customer has to pay deposit

@@ -425,6 +425,9 @@ export class Solution extends SolutionItems {
 
         this.request = request
 
+        if (request?.hasDefaults())
+            this.setParamOverrides(request.defaults)
+
         if (ArrayHelper.NotEmpty(items)) {
 
             let num = 1
@@ -459,7 +462,7 @@ export class Solution extends SolutionItems {
             let existing = this.overrides.has(param)
 
             if (!existing) {
-                
+
                 this.overrides.set(param, value)
             }
 

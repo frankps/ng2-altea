@@ -319,11 +319,15 @@ export class LoyaltyMgmtService {
             return result
         }
 
+        if (order.start && order.startDate > new Date()) {
+            result.msg = `Order in the future!`
+            return result
+        }
+
         result.setPrograms(loyaltyPrograms)
 
         if (!order.hasLines())
             return result
-
 
         var validLoyaltyPays = order.getPaymentsNotOfTypes(PaymentType.loyal, PaymentType.gift, PaymentType.subs)
 

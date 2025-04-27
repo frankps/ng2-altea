@@ -3,7 +3,7 @@ import { IDb } from '../interfaces/i-db'
 import * as dateFns from 'date-fns'
 import * as Handlebars from "handlebars"
 import * as _ from "lodash"
-import { BankTransaction, BankTxType, Invoice, Order, Payment, PaymentInfo, Payments, PaymentType, StripePayout } from 'ts-altea-model'
+import { BankTransaction, BankTxType, Branch, Invoice, Order, Payment, PaymentInfo, Payments, PaymentType, StripePayout } from 'ts-altea-model'
 import { ApiStatus, ArrayHelper, DateHelper, YearMonth } from 'ts-common'
 
 
@@ -38,7 +38,7 @@ export class BankTransactionCheckResult {
 }
 
 export class CheckResult {
-  
+
   constructor(public msg: string, public order?: Order) {
 
   }
@@ -99,13 +99,17 @@ export class MonthConsistencyReportBuilder {
   }
 
 
-  async checkAll(yearMonth: YearMonth): Promise<ConsistencyReport> {
+  async checkAll(branch: Branch, yearMonth: YearMonth): Promise<ConsistencyReport> {
 
     let report = new ConsistencyReport()
 
     console.warn('checkAll')
 
-    report.cash = await this.cashPayments(yearMonth)
+
+    let closed = branch.acc.closed
+
+    if (yearMonth.y > closed.year || (yearMonth.y == closed.year && yearMonth.m > closed.month))
+      report.cash = await this.cashPayments(yearMonth)
 
     report.invoices = await this.invoiceChecks(yearMonth)
 
@@ -335,7 +339,69 @@ export class MonthConsistencyReportBuilder {
   }
 
 
+  doOrderCash(order: Order, startNum: number, endNum: number, paysToUpdate: Payment[], result: CheckResults, mode: { fullCashOnly: boolean, min: number }, totals: { noDeclare: number, ids: string[] }) {
+    if (order.toInvoice || order.invoiced || order.gift || order.giftCode)
+      return
+
+    let cashPays = order.getPaymentsBetween(startNum, endNum, [PaymentType.cash])
+
+    if (ArrayHelper.IsEmpty(cashPays))
+      return
+
+    if (!totals.ids.includes(order.id)) {
+      let noDeclTotal = _.sumBy(cashPays, 'noDecl')  // already done before
+      totals.noDeclare += noDeclTotal
+      totals.ids.push(order.id)
+    } else {
+      console.log(`already added order ${order.id}`)
+    }
+
+    cashPays = cashPays.filter(p => p.amount > mode.min && p.noDecl == 0)
+
+    if (ArrayHelper.IsEmpty(cashPays))
+      return
+
+    let totalPays = order.nrOfPayments()
+    let numOfCashPays = cashPays.length
+    let totalCashPays = _.sumBy(cashPays, 'amount')
+
+    let startDateNum = order.start
+
+    /** Only cash used and order serviced with period  */
+    if ((!mode.fullCashOnly || numOfCashPays == totalPays) && startDateNum && startDateNum >= startNum && startDateNum < endNum) {
+      let paysToReduce = cashPays
+      for (let pay of paysToReduce) {
+        pay.noDecl = pay.amount
+
+        paysToUpdate.push(pay)
+        totals.noDeclare += pay.noDecl
+
+        result.addMsg(`noDecl ${pay.noDecl} @ ${pay.date} for ${order.for} (${totals.noDeclare})`, order)
+      }
+    }
+  }
+
+
+  getTotal(orders: Order[], payType: PaymentType, startNum: number, endNum: number): number {
+
+    if (ArrayHelper.IsEmpty(orders))
+      return 0
+
+    let total = 0
+
+    let pays = orders.flatMap(o => o.payments)
+
+    pays = pays.filter(p => p && p.type == payType && p.date >= startNum && p.date < endNum)
+
+    total = _.sumBy(pays, 'amount')
+
+    return total
+  }
+
+
   async cashPayments(yearMonth: YearMonth): Promise<CheckResults> {
+
+    let me = this
 
     let result = new CheckResults()
 
@@ -349,50 +415,51 @@ export class MonthConsistencyReportBuilder {
 
     let orders = await this.alteaDb.getOrdersWithPaymentsBetween(start, end, null, 1000, [PaymentType.cash])
 
-    let totalNoDeclare = 0
+    if (ArrayHelper.IsEmpty(orders))
+      return result.addMsg('No cash orders found!')
+
+    let total = me.getTotal(orders, PaymentType.cash, startNum, endNum)
+
+    let totals = {
+      noDeclare: 0, ids: []
+    }
+
 
     let paysToUpdate = []
 
+    let max = total / 2
+
+    //return result.addMsg(`Max cash payments (/2)= ${max}`)
+
     for (let order of orders) {
 
-      if (order.toInvoice || order.invoiced || order.gift)
-        continue
+      me.doOrderCash(order, startNum, endNum, paysToUpdate, result, { fullCashOnly: true, min: 30 }, totals)
 
-      let cashPays = order.getPaymentsBetween(startNum, endNum, [PaymentType.cash])
-
-      if (ArrayHelper.IsEmpty(cashPays))
-        continue
-
-      cashPays = cashPays.filter(p => p.amount > 0)
-
-      if (ArrayHelper.IsEmpty(cashPays))
-        continue
-
-      let totalPays = order.nrOfPayments()
-      let numOfCashPays = cashPays.length
-      let totalCashPays = _.sumBy(cashPays, 'amount')
-
-      let startDateNum = order.start
-
-      /** Only cash used and order serviced with period  */
-      if (numOfCashPays == totalPays && startDateNum && startDateNum >= startNum && startDateNum < endNum) {
-        let paysToReduce = cashPays
-        for (let pay of paysToReduce) {
-          pay.noDecl = pay.amount
-
-          result.addMsg(`noDecl ${pay.noDecl} for ${order.for}`, order)
-
-          paysToUpdate.push(pay)
-          totalNoDeclare += pay.noDecl
-        }
-      }
+      if (totals.noDeclare > max)
+        break
     }
+
+    //max = 1600
+
+    if (totals.noDeclare < max) {
+
+      for (let order of orders) {
+
+        me.doOrderCash(order, startNum, endNum, paysToUpdate, result, { fullCashOnly: false, min: 30 }, totals)
+
+        if (totals.noDeclare > max)
+          break
+      }
+
+
+    }
+
 
     var payUpdateRes = await this.alteaDb.updatePayments(paysToUpdate, ['noDecl'])
 
     console.log(payUpdateRes)
     console.log(orders)
-    console.log(totalNoDeclare)
+    console.log(totals.noDeclare)
 
     return result
   }

@@ -35,6 +35,7 @@ export class EditInvoiceComponent {
 
   checkDate() {
 
+    console.log('CHECK DATE')
     if (ArrayHelper.IsEmpty(this.invoice.orders)) {
       console.log('Invoice has no associated orders...')
       return
@@ -43,12 +44,15 @@ export class EditInvoiceComponent {
 
     let order = this.invoice.orders[0]
 
-    if (order.gift) {
+    if (order.gift || !order.start) {
       this.invoice.date = DateHelper.yyyyMMdd(order.cre)
     } else if (order.start) {
       let start = order.startDate
       this.invoice.date = DateHelper.yyyyMMdd(start)
     }
+
+    console.log('invoice.date: ')
+    console.log(this.invoice.date)
 
   }
 

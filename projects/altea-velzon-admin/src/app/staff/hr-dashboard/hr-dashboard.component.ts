@@ -259,7 +259,7 @@ export class HrDashboardComponent implements OnInit {
 
       // Presence column (related to batching in/out)
 
-      let staffPlanningsForDay = staffPlannings.filterByDateRangeType(loopDay, loopDayEnd, PlanningType.pres)
+      let staffPlanningsForDay = staffPlannings.filterByRangeType(loopDay, loopDayEnd, PlanningType.pres)
 
       let presenceRange : DateRange = null, presence = 0, actualStart: Date = null
       if (staffPlanningsForDay.notEmpty()) {
@@ -272,10 +272,10 @@ export class HrDashboardComponent implements OnInit {
 
       let dayScheduleSet = new DateRangeSet(daySchedule)
 
-      let dayAbsencePlannings = absencePlannings.filterByDateRange(loopDay, loopDayEnd)
+      let dayAbsencePlannings = absencePlannings.filterByRange(loopDay, loopDayEnd)
       let dayAbsence = dayAbsencePlannings.toDateRangeSet()
 
-      let dayExtraPlannings = availablePlannings.filterByDateRange(loopDay, loopDayEnd)
+      let dayExtraPlannings = availablePlannings.filterByRange(loopDay, loopDayEnd)
      // let dayExtra = dayExtraPlannings.toDateRangeSet()
 
       if (dayScheduleSet.notEmpty())
