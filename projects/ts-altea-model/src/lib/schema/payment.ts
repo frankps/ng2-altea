@@ -239,6 +239,12 @@ export class Payment extends ObjectWithIdPlus {
   /** provider id, if payment executed by external provider (example: Stripe payment intent id) */
   provId: string
 
+  /** processed by logic: used for gift payments (true if corresponding gift was processed) */
+  proc: boolean = false
+ 
+  /** valid: used for gift payments, true if corresponding gift was processed (proc=true) & operation was successfully */
+  vld: boolean = false
+
   constructor() {
     super()
 

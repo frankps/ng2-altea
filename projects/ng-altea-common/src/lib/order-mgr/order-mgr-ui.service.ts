@@ -397,6 +397,7 @@ export class OrderMgrUiService {   // implements OnInit
 
     if (gift) {
       this.order.giftCode = gift.code
+      this.order.toInvoice = true
       this.gift = gift
     }
 
@@ -502,6 +503,7 @@ export class OrderMgrUiService {   // implements OnInit
     const availableAmount = gift.availableAmount()
 
     await this.newOrder()
+
 
     this.payGifts.push(gift)
 
@@ -807,7 +809,7 @@ export class OrderMgrUiService {   // implements OnInit
         return */
 
 
-    this.payGifts
+   // this.payGifts
 
     let order = this.order
 

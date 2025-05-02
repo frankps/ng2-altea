@@ -126,6 +126,8 @@ export class ResourcePlanningComponent implements OnInit {
     }
 
     let startDate = new Date()
+    startDate = dateFns.startOfMonth(startDate)
+    startDate = dateFns.subMonths(startDate, 3)
     let startNum = DateHelper.yyyyMMdd000000(startDate)
 
 
@@ -138,7 +140,7 @@ export class ResourcePlanningComponent implements OnInit {
     query.and('orderId', QueryOperator.equals, null)
     query.and('end', QueryOperator.greaterThanOrEqual, startNum)
     query.take = 200
-    query.orderByDesc('start')
+    query.orderBy('start')
     //query.select('id', 'catId', 'name', 'type')
 
     this.planningSvc.query(query).subscribe(res => {

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ObjectService, OrderService, ResourcePlanningService, ResourceService, SessionService } from 'ng-altea-common';
 import { AppComponent } from '../../app.component';
 import { TranslationService } from 'ng-common'
-import { ResourcePlanning, PlanningType, Resource, ResourceRequest, DateRange, DateRangeSet, TimeSpan } from 'ts-altea-model';
+import { ResourcePlanning, PlanningType, Resource, ResourceRequest, DateRange, DateRangeSet, TimeSpan, ResourcePlannings } from 'ts-altea-model';
 import { HtmlTable, ArrayHelper, DateHelper, DbQuery, QueryOperator } from 'ts-common';
 import * as dateFns from 'date-fns'
 import * as _ from "lodash";
@@ -16,6 +16,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 })
 export class HrDashboardComponent implements OnInit {
 
+  bankHolidays: ResourcePlannings = new ResourcePlannings()
   holidays: ResourcePlanning[] = []
   holidayRequests: ResourcePlanning[] = []
 
@@ -40,28 +41,53 @@ export class HrDashboardComponent implements OnInit {
   }
 
 
+  async getBankHolidays(dateRange: DateRange) : Promise<ResourcePlannings> {
+
+    let qry = new DbQuery()
+    qry.and("branchId", QueryOperator.equals, this.sessionSvc.branchId)
+    qry.and("type", QueryOperator.equals, PlanningType.bnk)
+    qry.and("act", QueryOperator.equals, true)
+    qry.and("start", QueryOperator.lessThanOrEqual, dateRange.toToNum())
+    qry.and("end", QueryOperator.greaterThanOrEqual, dateRange.fromToNum())
+
+    let bankHolidays = await this.planningSvc.query$(qry)
+
+    console.error('bankHolidays', bankHolidays)
+
+    return new ResourcePlannings(bankHolidays)
+  }
+
 
   async getHolidays() {
 
+    //this.bankHolidays = []
     this.holidays = []
     this.holidayRequests = []
 
     var qry = new DbQuery()
 
     qry.and("branchId", QueryOperator.equals, this.sessionSvc.branchId)
-    qry.and("type", QueryOperator.in, ['hol', 'holReq'])
+    qry.and("type", QueryOperator.in, ['hol', 'holReq', 'bnk'])
     qry.and("act", QueryOperator.equals, true)
 
     qry.include("resource")
 
-    let startOfDay = dateFns.startOfDay(new Date())
+    let startOfDay = dateFns.startOfMonth(new Date())
     let startOfDayNum = DateHelper.yyyyMMddhhmmss(startOfDay)
 
     qry.and("start", QueryOperator.greaterThanOrEqual, startOfDayNum)
 
+    qry.orderBy("start")
+
     let holidays = await this.planningSvc.query$(qry)
 
+    
+
     if (ArrayHelper.NotEmpty(holidays)) {
+
+      this.bankHolidays = new ResourcePlannings(holidays.filter(p => p.type == PlanningType.bnk))
+      console.warn('bankHolidays')
+      console.error(this.bankHolidays)
 
       let hols = holidays.filter(p => p.type == PlanningType.hol)
       this.holidays = _.orderBy(hols, 'start')
@@ -129,8 +155,16 @@ export class HrDashboardComponent implements OnInit {
 
   async showMonthReport(resource: Resource) {
 
+    let date = new Date()
 
-    let month = new Date(2025, 2, 1)
+    let dayOfMonth = date.getDate()
+
+    let month = dateFns.startOfMonth(date)
+
+    if (dayOfMonth < 15)
+      month = dateFns.subMonths(date, 1)
+
+   // month = dateFns.addMonths(month, 1)
 
     console.error(resource, month)
 
@@ -165,6 +199,9 @@ export class HrDashboardComponent implements OnInit {
     start = dateFns.startOfMonth(start)
     let end = dateFns.endOfMonth(start)
 
+    let dateRange = new DateRange(start, end)
+
+    let bankHolidays = await this.getBankHolidays(dateRange)
 
     console.error(resource)
 
@@ -261,7 +298,7 @@ export class HrDashboardComponent implements OnInit {
 
       let staffPlanningsForDay = staffPlannings.filterByRangeType(loopDay, loopDayEnd, PlanningType.pres)
 
-      let presenceRange : DateRange = null, presence = 0, actualStart: Date = null
+      let presenceRange: DateRange = null, presence = 0, actualStart: Date = null
       if (staffPlanningsForDay.notEmpty()) {
         presenceRange = staffPlanningsForDay.toDateRangeSet().firstRange()
         actualStart = presenceRange.from
@@ -276,7 +313,12 @@ export class HrDashboardComponent implements OnInit {
       let dayAbsence = dayAbsencePlannings.toDateRangeSet()
 
       let dayExtraPlannings = availablePlannings.filterByRange(loopDay, loopDayEnd)
-     // let dayExtra = dayExtraPlannings.toDateRangeSet()
+
+      // add bank holidays to dayExtraPlannings
+      let bankHolidayForDay = bankHolidays.filterByRange(loopDay, loopDayEnd)
+      dayExtraPlannings.add(bankHolidayForDay)
+
+      // let dayExtra = dayExtraPlannings.toDateRangeSet()
 
       if (dayScheduleSet.notEmpty())
         console.error('dayScheduleSet', dayScheduleSet)
@@ -295,7 +337,7 @@ export class HrDashboardComponent implements OnInit {
 
 
       dayActual = dayActual.subtract(dayAbsence)
-      
+
 
       let expectedStart = dayActual.lowestDate()
 
@@ -356,7 +398,9 @@ export class HrDashboardComponent implements OnInit {
 
 
       cols.push(`${dayAbsencePlannings.toString()}`)
+
       cols.push(`${dayExtraPlannings.toString()}`)
+
 
 
 

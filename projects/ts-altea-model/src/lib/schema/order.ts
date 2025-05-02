@@ -821,15 +821,37 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     return pays
   }
 
+  getPaymentTypes(): PaymentType[] {
+    if (ArrayHelper.IsEmpty(this.payments))
+      return []
+
+    let types = this.payments.map(p => p.type)
+    types = _.uniq(types)
+
+    return types
+  }
+
+  hasPaymentType(type: PaymentType): boolean {
+    let types = this.getPaymentTypes()
+
+    return types.indexOf(type) >= 0
+  }
+
+  hasOnlyPaymentType(type: PaymentType): boolean {
+    let types = this.getPaymentTypes()
+
+    return types.length == 1 && types[0] == type
+  }
+
   getPaymentsByType(type: PaymentType): Payment[] {
 
     if (ArrayHelper.IsEmpty(this.payments))
       return []
 
-
     return this.payments.filter(pay => pay.type == type)
-
   }
+
+
 
   getPaymentsBetween(start: number, end: number, types: PaymentType[]) {
     let pays = this.payments.filter(p => p.date >= start && p.date < end && types.indexOf(p.type) >= 0)

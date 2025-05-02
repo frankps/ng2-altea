@@ -284,15 +284,20 @@ export class AlteaDb {
 
         const qry = new DbQueryTyped<Order>('order', Order)
 
+
+        qry.include('payments')
+
         qry.and('state', QueryOperator.equals, OrderState.creation)
         qry.and('contactId', QueryOperator.equals, null)
         qry.and('src', QueryOperator.equals, 'pos')
         qry.and('paid', QueryOperator.equals, 0)
 
-        let maxCreationDate = new Date()
-        maxCreationDate = dateFns.subMinutes(maxCreationDate, 15)
+        let now = new Date()
+        let maxCreationDate = dateFns.subMinutes(now, 15)
+        let minCreationDate = dateFns.subDays(now, 2)
         qry.and('cre', QueryOperator.lessThan, maxCreationDate)
-
+        qry.and('cre', QueryOperator.greaterThanOrEqual, minCreationDate)
+        
         const orders = await this.db.query$<Order>(qry)
 
         return orders
@@ -303,15 +308,23 @@ export class AlteaDb {
 
         const qry = new DbQueryTyped<Order>('order', Order)
 
+        qry.include('payments')
+
         qry.and('state', QueryOperator.equals, OrderState.creation)
-        qry.and('paid', QueryOperator.equals, 0)
+        
         //qry.and('contactId', QueryOperator.equals, null)
         qry.and('src', QueryOperator.equals, 'ngApp')
         // qry.include('contact')
 
-        let maxCreationDate = new Date()
-        maxCreationDate = dateFns.subMinutes(maxCreationDate, 20)
+        qry.or('paid', QueryOperator.equals, 0)
+        qry.or('contactId', QueryOperator.equals, null)
+
+        let now = new Date()
+        let maxCreationDate = dateFns.subMinutes(now, 20)
+        let minCreationDate = dateFns.subDays(now, 2)
+
         qry.and('cre', QueryOperator.lessThan, maxCreationDate)
+        qry.and('cre', QueryOperator.greaterThanOrEqual, minCreationDate)
 
         const orders = await this.db.query$<Order>(qry)
 

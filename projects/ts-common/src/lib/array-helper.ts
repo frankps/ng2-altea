@@ -4,6 +4,11 @@ export class ArrayHelper {
         return (Array.isArray(array) && array.length > 0)
     }
 
+    // same as AtLeastOneItem
+    static HasItems(array: any): boolean {
+        return (Array.isArray(array) && array.length > 0)
+    }
+
     static NotEmpty(array: any): boolean {
         return (Array.isArray(array) && array.length > 0)
     }

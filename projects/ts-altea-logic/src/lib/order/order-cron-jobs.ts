@@ -46,6 +46,101 @@ export class OrderCronJobs {
 
     }
 
+    async doOrderCleanup(orders: Order[], html: HtmlTable, cleanup: { orderCount: number, ids: string[], orders: Order[] }) {
+
+        if (ArrayHelper.IsEmpty(orders))
+            return
+
+        let me = this
+
+        try {
+
+
+            cleanup.orderCount += orders.length
+
+            let ordersToUpdate = []
+            const canceledOrderIds = []
+
+            for (let order of orders) {
+
+                const cols = []
+
+                let cancelOrder = true
+
+                /** Should not happen: order has processed gift payments! */
+                let processedGiftPay = null
+
+                order.makePayTotals()
+
+                if (order.paid > 0) {
+
+                    if (order.hasOnlyPaymentType(PaymentType.gift)) {
+
+                        let processedGiftPays = order.payments.filter(p => p.type == PaymentType.gift && p.proc)
+    
+                        if (ArrayHelper.HasItems(processedGiftPays)) {
+                            processedGiftPay = processedGiftPays[0]
+                            cancelOrder = false
+
+                        }
+                    } else {
+                        // there is some othe payment on this order => no cancel
+                        cancelOrder = false
+                    }
+                }
+
+
+                let previousState = order.state
+
+
+                cols.push(`<a href="https://pos.birdy.life/aqua/orders/manage/${order.id}">${order.id}</a>`)
+
+                if (cancelOrder) {
+                    ordersToUpdate.push(order)
+                    canceledOrderIds.push(order.id)
+                    order.cancel = new OrderCancel()
+                    order.state = OrderState.cancelled
+                    order.cancel.by = OrderCancelBy.int
+                    order.cancel.reason = InternalCancelReasons.clean
+                }
+
+
+                cols.push(order.src)
+
+                cols.push(order.for)
+
+                cols.push(order.startDateFormat())
+
+                cols.push(order.paid)
+
+                cols.push(previousState)
+                cols.push(order.state)
+
+                if (processedGiftPay)
+                    cols.push(`Order has processed gift pays => no cancel! ${processedGiftPay.amount} ${processedGiftPay.info}`)
+
+                html.addRow(cols)
+            }
+
+            cleanup.ids.push(...canceledOrderIds)
+            cleanup.orders.push(...ordersToUpdate)
+            /*
+            if (ArrayHelper.HasItems(canceledOrderIds)) {
+                const deletePlanningsRes = await me.alteaDb.deletePlanningsForOrders(canceledOrderIds)
+                html.addRow(['Delete plannings'])
+
+                const updateOrdersRes = await me.alteaDb.updateOrders(ordersToUpdate, ['state', 'cancel'])
+
+                html.addRow([`Cancel orders: ${updateOrdersRes.isOk}`])
+            }
+                */
+
+        } catch (error) {
+
+            html.addRow(['Error', '' + error])
+
+        }
+    }
 
     async cleanupOrders() {
 
@@ -53,14 +148,19 @@ export class OrderCronJobs {
 
         let msg = new Message()
         msg.subj = 'Cleanup Orders'
-        let orderCount = 0
+        //let orderCount = 0
 
+        let cleanup = { orderCount: 0, ids: [], orders: [] }
 
         let html = new HtmlTable()
         try {
 
             let posOrders = await me.alteaDb.getPosOrdersToCleanup()
+            await this.doOrderCleanup(posOrders, html, cleanup)
+
+
             let appOrders = await me.alteaDb.getAppOrdersToCleanup()
+            await this.doOrderCleanup(appOrders, html, cleanup)
 
             let allOrders = [...posOrders, ...appOrders]
 
@@ -80,45 +180,17 @@ export class OrderCronJobs {
                 html.addRow(header)
             }
 
-            orderCount = allOrders.length
-            msg.subj = `Cleanup Orders: ${orderCount}`
+            msg.subj = `Cleanup Orders: ${cleanup.orderCount}`
 
-            const orderIds = allOrders.map(o => o.id)
+            if (ArrayHelper.HasItems(cleanup.ids)) {
+                const deletePlanningsRes = await me.alteaDb.deletePlanningsForOrders(cleanup.ids)
 
-            for (let order of allOrders) {
+                html.addRow(['Delete plannings'])
 
-                const cols = []
+                const updateOrdersRes = await me.alteaDb.updateOrders(cleanup.orders, ['state', 'cancel'])
 
-                let previousState = order.state
-                order.state = OrderState.cancelled
-
-                cols.push(`<a href="https://pos.birdy.life/aqua/orders/manage/${order.id}">${order.id}</a>`)
-
-                order.cancel = new OrderCancel()
-                order.cancel.by = OrderCancelBy.int
-                order.cancel.reason = InternalCancelReasons.clean
-
-                cols.push(order.src)
-
-                cols.push(order.for)
-
-                cols.push(order.startDateFormat())
-
-                cols.push(order.paid)
-
-                cols.push(previousState)
-                cols.push(order.state)
-
-                html.addRow(cols)
+                html.addRow([`Cancel orders: ${updateOrdersRes.isOk}`])
             }
-
-            const deletePlanningsRes = await me.alteaDb.deletePlanningsForOrders(orderIds)
-
-            html.addRow(['Delete plannings'])
-
-            const updateOrdersRes = await me.alteaDb.updateOrders(allOrders, ['state', 'cancel'])
-
-            html.addRow([`Cancel orders: ${updateOrdersRes.isOk}`])
 
         } catch (error) {
 
@@ -128,7 +200,7 @@ export class OrderCronJobs {
 
             msg.body = html.toHtmlString()
 
-            if (orderCount > 0)
+            if (cleanup.orderCount > 0)
                 await me.sendMessage(msg)
 
             return msg.body

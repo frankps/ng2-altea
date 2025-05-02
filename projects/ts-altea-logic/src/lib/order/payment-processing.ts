@@ -59,7 +59,7 @@ export class PaymentProcessing {
                 allOk = false
                 this.addMessage(`Loyalty card ${cardId} not found!`, messages)
                 continue
-            } 
+            }
 
             let program = await this.alteaDb.getLoyaltyProgramById(card.programId)
 
@@ -67,22 +67,22 @@ export class PaymentProcessing {
                 allOk = false
                 this.addMessage(`Loyalty program ${card.programId} for card ${cardId} not found!`, messages)
                 continue
-            } 
+            }
 
             let reward = program.getRewardById(loyalPayInfo.rewardId)
-            
+
             if (!reward) {
                 allOk = false
                 this.addMessage(`Loyalty reward ${loyalPayInfo.rewardId} for program ${card.programId} not found!`, messages)
                 continue
-            } 
+            }
 
             card.value -= reward.amount
             await this.alteaDb.updateLoyaltyCard(card, ['value'])
 
             const loyaltyChange = LoyaltyCardChange.newReward(orderId, cardId, reward.id, reward.amount)
             cardChanges.push(loyaltyChange)
-            
+
         }
 
         const res = await this.alteaDb.createLoyaltyCardChanges(cardChanges)
@@ -101,16 +101,17 @@ export class PaymentProcessing {
 
         let newPayments: Payment[] = []
 
-        newPayments = payments.filter(pay => pay?.m?.n === true)
+        // newPayments = payments.filter(pay => pay?.m?.n === true)
 
-        const newGiftPayments = newPayments.filter(pay => pay.type == PaymentType.gift)
+        // non processed gift payments
+        const newGiftPayments = payments.filter(pay => pay.type == PaymentType.gift && !pay.proc && pay.date > 20250428160000)
 
-        if (newGiftPayments.length == 0)
+        if (ArrayHelper.IsEmpty(newGiftPayments))
             return new ApiListResult([], ApiStatus.ok, 'No gift payments to process!')
 
         const giftIds = newGiftPayments.map(pay => pay.giftId)
 
-        let gifts: Gift[] = await this.alteaDb.getGiftsByIds(giftIds)   
+        let gifts: Gift[] = await this.alteaDb.getGiftsByIds(giftIds)
 
         console.info('gifts', gifts)
 
@@ -132,11 +133,29 @@ export class PaymentProcessing {
                 if (canUse.valid && canUse.amount > 0) {
                     gift.use(canUse.amount)
                     giftsToUpdate.push(gift)
+
+                    giftPayment.vld = true
                 }
                 else {
+                    giftPayment.vld = false
+
                     result.status = ApiStatus.error
                     result.message += canUse.msg + " "
                 }
+
+                giftPayment.proc = true
+
+                if (!giftPayment.m.n)  // if not new (new will be saved anyway), then update
+                {
+                    giftPayment.m.u = true
+
+                    if (!giftPayment.m.f)
+                        giftPayment.m.f = []
+
+                    giftPayment.m.f.push('vld', 'proc')
+                }
+                    
+
             }
         }
 
