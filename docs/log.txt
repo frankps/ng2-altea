@@ -5,6 +5,19 @@ http://localhost:4300/branch/aqua/menu
 http://localhost:4300/staff/dashboard
 
 
+ngx-charts
+
+  https://swimlane.gitbook.io/ngx-charts
+
+  Line charts: https://swimlane.gitbook.io/ngx-charts/examples/line-area-charts/line-chart
+  
+
+  https://stackblitz.com/edit/swimlane-line-chart?embed=1&file=app/app.component.ts
+
+
+
+
+
 
 Sync Fusion
 

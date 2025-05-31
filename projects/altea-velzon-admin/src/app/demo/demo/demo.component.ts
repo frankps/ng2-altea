@@ -2,7 +2,7 @@ import { Component, ViewChild, inject } from '@angular/core';
 import { Contact, DateRangeTests, Message, MsgType, Order, PaymentType, PriceCondition, PriceConditionType, Product, SmsMessage, TemplateChannel, User, ValueComparator } from 'ts-altea-model';
 import { SearchContactComponent } from '../../contact/search-contact/search-contact.component';
 import { AlteaService, BranchService, ObjectService, OrderService, ProductService, ResourceService, ScheduleService, SessionService, TemplateService, UserService } from 'ng-altea-common';
-import { AlteaDb, CheckDeposists, OrderCronJobs, OrderMessaging, OrderMgmtService } from 'ts-altea-logic';
+import { AlteaDb, CheckDeposists, CreateReportingData, OrderCronJobs, OrderMessaging, OrderMgmtService } from 'ts-altea-logic';
 import { TranslationService } from 'ng-common'
 import { Country } from 'ts-altea-model'
 import { DbQuery, ObjectHelper, QueryOperator, Translation } from 'ts-common';
@@ -74,6 +74,43 @@ export class DemoComponent {
         console.warn(this.country) */
   }
 
+
+  async createReports() {
+
+    let alteaDb = new AlteaDb(this.dbSvc)
+
+    let createReportingData = new CreateReportingData(alteaDb)
+
+    let branchId = this.sessionSvc.branchId
+
+    let startDate = new Date(2025, 4, 20)
+    let endDate = new Date(2025, 4, 30)
+
+    /*
+    const days : Date[] = dateFns.eachDayOfInterval({
+      start: startDate,
+      end: endDate
+    });
+
+    days.forEach(async day => {
+
+      let res = await createReportingData.createForDay(branchId, day.getFullYear(), day.getMonth() + 1, day.getDate())
+
+      console.error(res)
+
+    })
+    */
+
+    let res = await createReportingData.createForDays(branchId, startDate, endDate)
+
+    console.error(res)
+
+
+  //  let res = await createReportingData.createForDay(branchId, 2025, 5, 29)
+
+  //  console.error(res)
+
+  }
 
 
   async doorOpenedWhatsapp() {

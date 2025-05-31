@@ -104,7 +104,7 @@ export class PaymentProcessing {
         // newPayments = payments.filter(pay => pay?.m?.n === true)
 
         // non processed gift payments
-        const newGiftPayments = payments.filter(pay => pay.type == PaymentType.gift && !pay.proc && pay.date > 20250428160000)
+        const newGiftPayments = payments.filter(pay => pay.type == PaymentType.gift && !pay.proc && pay.date > 20250429000000)
 
         if (ArrayHelper.IsEmpty(newGiftPayments))
             return new ApiListResult([], ApiStatus.ok, 'No gift payments to process!')

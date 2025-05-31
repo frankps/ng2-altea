@@ -212,39 +212,55 @@ this.timerSubscription = this.orderMgrSvc.timerChanged.subscribe(seconds => {
     let now = new Date()
     let startDate = order.startDate
 
-    if ((!startDate || now < startDate) && deposit && deposit > 0) { // && alreadyPaid < deposit
 
-      const openDeposit = deposit - alreadyPaid
+    const openDeposit = deposit - alreadyPaid
 
-      if (openDeposit > 0) {
-        const depositPayOption = new PaymentOption(openDeposit, 'deposit', `Voorschot betalen €${openDeposit}`)
-        this.payOptions.push(depositPayOption)
-      } else {
 
-        const depositPayOption = new PaymentOption(0, 'confirm', `Confirmeren`)
-        this.payOptions.push(depositPayOption)
+    if (order.gift && alreadyPaid == 0 && deposit == total) {  
 
+      const fullPayOption = new PaymentOption(total, 'full', `Volledige bedrag betalen €${total}`)
+      this.payOptions.push(fullPayOption)
+    
+    } else {
+
+
+      if ((!startDate || now < startDate) && deposit && deposit > 0) { // && alreadyPaid < deposit
+
+        if (openDeposit > 0) {
+          const depositPayOption = new PaymentOption(openDeposit, 'deposit', `Voorschot betalen €${openDeposit}`)
+          this.payOptions.push(depositPayOption)
+        } else {
+  
+          const depositPayOption = new PaymentOption(0, 'confirm', `Confirmeren`)
+          this.payOptions.push(depositPayOption)
+  
+        }
+  
       }
+  
+      if (total && total > deposit && alreadyPaid < total) {
+  
+        if ((!startDate || now < startDate) && alreadyPaid == 0) {
+  
+          const fullPayOption = new PaymentOption(total, 'full', `Volledige bedrag betalen €${total}`)
+          this.payOptions.push(fullPayOption)
+  
+        } else {
+          const saldo = total - alreadyPaid
+  
+          const fullPayOption = new PaymentOption(saldo, 'balance', `Saldo betalen van €${saldo}`)
+          this.payOptions.push(fullPayOption)
+  
+        }
+  
+  
+      }
+
 
     }
 
-    if (total && total > deposit && alreadyPaid < total) {
-
-      if ((!startDate || now < startDate) && alreadyPaid == 0) {
-
-        const fullPayOption = new PaymentOption(total, 'full', `Volledige bedrag betalen €${total}`)
-        this.payOptions.push(fullPayOption)
-
-      } else {
-        const saldo = total - alreadyPaid
-
-        const fullPayOption = new PaymentOption(saldo, 'balance', `Saldo betalen van €${saldo}`)
-        this.payOptions.push(fullPayOption)
-
-      }
 
 
-    }
 
     console.log(this.payOptions)
 

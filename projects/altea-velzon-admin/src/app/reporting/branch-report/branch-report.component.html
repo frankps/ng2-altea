@@ -1,0 +1,33 @@
+<div class="row">
+    <div class="col-12">
+        <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
+            <input type="checkbox" class="btn-check" id="btncheck1" autocomplete="off" [(ngModel)]="options.cumul"
+                (click)="generateReport('cumul', !options.cumul)">
+            <label class="btn btn-outline-primary my-0" for="btncheck1"> Cumul </label>
+
+            <input type="checkbox" class="btn-check" id="btncheck2" autocomplete="off" [(ngModel)]="options.showNew"
+            (click)="generateReport('showNew', !options.showNew)">
+            <label class="btn btn-outline-primary my-0" for="btncheck2"> Total in</label>
+
+        </div>
+    </div>
+</div>
+
+<!-- 
+<i class="fa-solid fa-sigma"></i>
+<i class="fa-regular fa-sigma"></i> -->
+
+<div class="row">
+    <div class="col-12" style="height: 80vh;">
+
+
+        <ngx-charts-line-chart [view]="view" [scheme]="colorScheme" [legend]="legend" [showXAxisLabel]="showXAxisLabel"
+            [showYAxisLabel]="showYAxisLabel" [xAxis]="xAxis" [yAxis]="yAxis" [xAxisLabel]="xAxisLabel"
+            [yAxisLabel]="yAxisLabel" [timeline]="timeline" [results]="data" (select)="onSelect($event)"
+            (activate)="onActivate($event)" (deactivate)="onDeactivate($event)">
+        </ngx-charts-line-chart>
+
+    </div>
+
+
+</div>

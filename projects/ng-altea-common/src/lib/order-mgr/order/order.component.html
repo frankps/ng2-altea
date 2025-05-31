@@ -201,9 +201,17 @@
                 </ng-container>
 
             </div>
+
+
+<!--             <div class="row">
+                <div class="col">{{line.product?.isSubscription()}}</div>
+                <div class="col">{{line.subscriptionsCreated()}}</div>
+            </div> -->
+
+
             <ng-container *ngIf="line.product?.isSubscription()">
 
-                <div class="row"> <!-- && !line.subscriptionsCreated() -->
+                <div class="row"> <!--  -->
                     <div class="col">
                         <button type="button" *ngIf="sessionSvc.isPos() && !line.subscriptionsCreated()"
                             class="btn btn-secondary btn-sm float-end"

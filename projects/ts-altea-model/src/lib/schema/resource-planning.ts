@@ -65,8 +65,20 @@ export class ResourcePlannings {
     return this.plannings.length
   }
 
+  getIds(): string[] {
+
+    if (this.isEmpty())
+      return []
+
+    return this.plannings.map(rp => rp.id)
+  }
+
   getById(id: string): ResourcePlanning {
     return this.plannings.find(rp => rp.id == id)
+  }
+
+  push(...plannings: ResourcePlanning[]) {
+    this.plannings.push(...plannings)
   }
 
   add(extraPlannings: ResourcePlannings) {
@@ -77,6 +89,10 @@ export class ResourcePlannings {
 
     this.plannings.push(...extraPlannings.plannings)
 
+  }
+
+  remove(planning: ResourcePlanning) {
+    this.plannings = this.plannings.filter(p => p.id != planning.id)
   }
 
   minTime(): TimeSpan {
@@ -403,6 +419,13 @@ export class ResourcePlannings {
     return new ResourcePlannings(planningsForResource)
   }
 
+  filterByResourceGroupsOnly(type?: PlanningType) {
+
+    const planningsForResource = this.plannings.filter(rp => rp.resourceGroupId && !rp.resourceId && (!type || rp.type == type))
+
+    return new ResourcePlannings(planningsForResource)
+  }
+
   filterByDateRangeResourceGroupsOnly(groupResourceIds: string[], from: Date | number, to: Date | number): ResourcePlannings {
 
     let fromNum = from instanceof Date ? DateHelper.yyyyMMddhhmmss(from) : from
@@ -570,6 +593,27 @@ export class ResourcePlannings {
     return groupIds
   }
 
+  getGroupPlannings(type?: PlanningType): ResourcePlannings {
+
+    if (this.isEmpty())
+      return new ResourcePlannings()
+
+    let plannings = this.plannings.filter(pl => pl.resourceGroupId != null && (!type || pl.type == type))
+
+    return new ResourcePlannings(plannings)
+  }
+
+  getGroupPlanning(resourceGroupId: string, minStart: number, maxEnd: number, type?: PlanningType) {
+
+    if (this.isEmpty())
+      return null
+
+    let planning = this.plannings.find(pl => pl.resourceGroupId == resourceGroupId
+      && (!type || pl.type == type)
+      && pl.start >= minStart && pl.end <= maxEnd)
+
+    return planning
+  }
 
   groupByResource(): _.Dictionary<ResourcePlanning[]> {
 

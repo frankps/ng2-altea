@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { BankTransactionService, ObjectService, PaymentService } from 'ng-altea-common';
+import { BankTransactionService, ObjectService, PaymentService, SessionService } from 'ng-altea-common';
 import { ApiListResult, ApiStatus, ArrayHelper, DateHelper, DbQuery, ObjectHelper, QueryOperator, Translation } from 'ts-common';
 import * as dateFns from 'date-fns'
 import { BankTransaction, BankTxType, Payment, Payments, PaymentType, StripeGetPayouts, StripePayout } from 'ts-altea-model';
@@ -77,7 +77,7 @@ export class BankTransactionsComponent implements OnInit {
 
   init = false
 
-  constructor(protected txSvc: BankTransactionService, protected paySvc: PaymentService, protected objSvc: ObjectService,
+  constructor(protected sessionSvc: SessionService, protected txSvc: BankTransactionService, protected paySvc: PaymentService, protected objSvc: ObjectService,
     protected stripeSvc: StripeService, protected objectSvc: ObjectService, private translationSvc: TranslationService, public dashboardSvc: DashboardService) {
 
   }
@@ -85,7 +85,10 @@ export class BankTransactionsComponent implements OnInit {
   async ngOnInit() {
 
     this.alteaDb = new AlteaDb(this.objectSvc)
-    this.bankTransactionLinking = new BankTransactionLinking(this.alteaDb)
+
+    const branchId = this.sessionSvc.branchId
+
+    this.bankTransactionLinking = new BankTransactionLinking(branchId, this.alteaDb)
 
     this.initFilters()
     await this.getTransactions()

@@ -12,7 +12,7 @@ export class BankTransactionLinking {
 
   alteaDb: AlteaDb
 
-  constructor(db: IDb | AlteaDb) {
+  constructor(public branchId: string, db: IDb | AlteaDb) {
 
     if (db instanceof AlteaDb)
       this.alteaDb = db
@@ -166,7 +166,7 @@ export class BankTransactionLinking {
     }
 
 
-    let payments = await this.alteaDb.getPaymentsBetween(start, end, [PaymentType.stripe], false)
+    let payments = await this.alteaDb.getPaymentsBetween(this.branchId, start, end, [PaymentType.stripe], false)
     let totalsByDay = payments.getTotalsByDay()
 
     let days = totalsByDay.keys()

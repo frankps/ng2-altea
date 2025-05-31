@@ -23,6 +23,7 @@ export class SelectTimeSlotComponent {
   message: string = ""
 
 
+  /** is Point of Sale (in shop) => not the customer app */
   isPos: boolean
   forceTime: string = "15:00"
 

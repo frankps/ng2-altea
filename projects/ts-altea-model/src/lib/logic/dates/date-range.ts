@@ -232,6 +232,7 @@ export class DateRange<T = any> {
         this.to = dateFns.addSeconds(this.to, seconds)
     }
 
+    
     getBorders(): DateBorder[] {
 
         const dateBorders = []

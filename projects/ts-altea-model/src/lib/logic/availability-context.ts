@@ -59,7 +59,7 @@ export class AvailabilityContext {
     timeUnite = TimeUnit.minutes
 
     products: Product[] = []
-    productIds: string[] = []
+    //productIds: string[] = []
 
     productResources: ProductResource[] = []
 
@@ -95,6 +95,15 @@ export class AvailabilityContext {
         return this._scheduleDateRangeKeys
     }
 
+    hasProduct(productId: string): boolean {
+
+        if (ArrayHelper.IsEmpty(this.products))
+            return false
+
+        let productIdx = this.products.findIndex(p => p.id == productId) 
+
+        return productIdx != -1
+    }
 
     getProduct(productId: string): Product | undefined {
         return this.products.find(p => p.id == productId)
@@ -646,6 +655,13 @@ export class AvailabilityContext {
 
         return result
 
+    }
+
+    getChildResources(...groupIds: string[]): Resource[] {
+
+        let childResourceIds = this.getChildResourceIds(...groupIds)
+
+        return this.getResources(childResourceIds) 
     }
 
     getChildResourceIds(...groupIds: string[]): string[] {

@@ -273,7 +273,7 @@ export class MonthConsistencyReportBuilder {
     let start = yearMonth.startDate()
     let end = dateFns.addMonths(start, 1)
 
-    let giftPays = await this.alteaDb.getPaymentsBetween(start, end, [PaymentType.gift], true, ['gift'])
+    let giftPays = await this.alteaDb.getPaymentsBetween(this.branchId, start, end, [PaymentType.gift], true, ['gift'])
 
     if (!giftPays || !giftPays.hasPayments())
       return result.addMsg(`No gift payments in period ${yearMonthNum}`)
@@ -470,7 +470,7 @@ export class MonthConsistencyReportBuilder {
     let start = yearMonth.startDate()
     let end = dateFns.addMonths(start, 1)  // yearMonth.endDate()
 
-    let pays = await this.alteaDb.getPaymentsBetween(start, end, [PaymentType.credit, PaymentType.debit, PaymentType.stripe, PaymentType.transfer], true, ['order'])
+    let pays = await this.alteaDb.getPaymentsBetween(this.branchId, start, end, [PaymentType.credit, PaymentType.debit, PaymentType.stripe, PaymentType.transfer], true, ['order'])
 
     return pays
 

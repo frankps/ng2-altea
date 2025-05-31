@@ -38,6 +38,7 @@
     "@ngx-translate/core": "^15.0.0",
     "@ngx-translate/http-loader": "^8.0.0",
     "@popperjs/core": "^2.11.8",
+    "@swimlane/ngx-charts": "^20.5.0",
     "@syncfusion/ej2-angular-schedule": "^25.2.7",
     "angular-archwizard": "^7.0.0",
     "angular-count-to": "^0.0.3",

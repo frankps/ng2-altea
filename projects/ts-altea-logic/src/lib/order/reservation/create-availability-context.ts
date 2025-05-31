@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ApiListResult, ArrayHelper, DbQuery, DbQueryTyped, ObjectHelper, QueryOperator } from 'ts-common'
-import { AvailabilityRequest, Order, AvailabilityContext, Resource, ResourcePlanning, ResourceType, Schedule, SchedulingType, DateRangeSet, ResourcePlannings, BranchModeRange, DateRange } from 'ts-altea-model'
+import { AvailabilityRequest, Order, AvailabilityContext, Resource, ResourcePlanning, ResourceType, Schedule, SchedulingType, DateRangeSet, ResourcePlannings, BranchModeRange, DateRange, PlanningType } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { AlteaDb } from '../../general/altea-db'
 import { IDb } from '../../interfaces/i-db'
@@ -80,9 +80,9 @@ export class CreateAvailabilityContext {
 
 
         // to debug
-        let planId = 'b9f96be6-fda5-476f-9169-74514be783f6'
+/*         let planId = 'b9f96be6-fda5-476f-9169-74514be783f6'
         let planning = ctx.resourcePlannings.getById(planId)
-        console.warn('planning', planning)
+        console.warn('planning', planning) */
         // END debug
 
         /* get resource groups not previously loaded 
@@ -137,6 +137,7 @@ export class CreateAvailabilityContext {
 
         return ctx
     }
+
 
 
 
@@ -318,7 +319,7 @@ export class CreateAvailabilityContext {
         const productIds = order.getNotLoadedProductIds()
 
         if (productIds.length == 0)
-            return []
+            return order.getProducts()
 
         const products = await this.alteaDb.getProducts(productIds, 'resources.resource', 'prices')
 
@@ -334,7 +335,7 @@ export class CreateAvailabilityContext {
             }
         }
 
-        return products
+        return order.getProducts()
     }
 
 
@@ -521,12 +522,46 @@ export class CreateAvailabilityContext {
         const resourcePlannings = await this.alteaDb.resourcePlannings(availabilityRequest.from, availabilityRequest.to, resourceIds, includeGroupPlannings, excludeOrderId, clientId)
 
 
-        return new ResourcePlannings(resourcePlannings)
+        let plannings = new ResourcePlannings(resourcePlannings)
 
+        plannings = this.removeMasksAlreadyPlanned(plannings)
 
+        return plannings
 
     }
 
+
+
+    /**
+     * Remove masks that are already planned in the same period
+     * @param plannings 
+     * @returns 
+     */
+    removeMasksAlreadyPlanned(plannings: ResourcePlannings) : ResourcePlannings {
+
+        if (!plannings)
+            return plannings
+
+        let groupMaskPlannings = plannings.getGroupPlannings(PlanningType.mask)
+
+        if (groupMaskPlannings.isEmpty())
+            return plannings
+
+        let groupConcretePlannings = plannings.getGroupPlannings(PlanningType.occ)
+
+        for (let groupPlanning of groupConcretePlannings.plannings) {
+
+            let groupId = groupPlanning.resourceGroupId
+
+            let maskPlanning = groupMaskPlannings.getGroupPlanning(groupId, groupPlanning.start, groupPlanning.end)
+
+            if (maskPlanning) {
+                plannings.remove(maskPlanning)
+            }
+        }
+
+        return plannings
+    }
 
 
 

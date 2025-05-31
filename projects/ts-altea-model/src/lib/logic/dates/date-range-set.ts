@@ -108,6 +108,7 @@ export class DateRangeSets extends SolutionNotes {
 
 
 
+    /** Calculates overlaps with range for each set (in this.sets). The returned array has exact the same length as this.sets */
     calculateOverlapsBySet(range: DateRange, possibleResourceIds?: string[]): DateRangeSet[] {
 
         let overlaps = []
@@ -133,7 +134,7 @@ export class DateRangeSets extends SolutionNotes {
         return overlaps
     }
 
-    getSetIndexesWithBiggestOverlap(overlapDateRangeSets: DateRangeSet[], range: DateRange, qty: number = 1): number[] {
+    getIndexesWithBiggestOverlap(overlapDateRangeSets: DateRangeSet[], range: DateRange, qty: number = 1): number[] {
 
         let indexes = []
 
@@ -173,7 +174,7 @@ export class DateRangeSets extends SolutionNotes {
     reduceAllowPartialRange(possibleResourceIds: string[], range: DateRange, qty: number = 1, resources?: Resource[], staffBreaks?: StaffBreaks): DateRangeSets {
 
         let overlapDateRangeSets = this.calculateOverlapsBySet(range, possibleResourceIds)
-        let indexesBiggestOverlaps = this.getSetIndexesWithBiggestOverlap(overlapDateRangeSets, range, qty)
+        let indexesBiggestOverlaps = this.getIndexesWithBiggestOverlap(overlapDateRangeSets, range, qty)
 
         if (ArrayHelper.IsEmpty(indexesBiggestOverlaps))
             return this
@@ -202,20 +203,28 @@ export class DateRangeSets extends SolutionNotes {
 
                 if (!breakStillPossible.possible) {
                     match = false
-                    resultSets.addNote(`Break not possible for ${set.resource?.name} if we allocate ${range.toString()}  (break remaining: ${breakStillPossible.remaining?.toString()})`)
+                    resultSets.addNote(`Break not possible 2 for ${set.resource?.name} if we allocate ${range.toString()}  (break remaining: ${breakStillPossible.remaining?.toString()})`)
                     //  solution.addNote(`Break not possible for ${resource.name} if we allocate ${dateRange.toString()}  (break remaining: ${breakStillPossible.remaining?.toString()})`)
                 }
             }
 
+            let reducedSet = set.subtract(overlap)
+            resultSets.addSet(reducedSet)
+
+            if (!match) {
+                continue
+            }
+
+            /*
             if (!match) {
                 resultSets.sets.push(set)
                 continue
             }
+                */
 
 
 
-            let reducedSet = set.subtract(overlap)
-            resultSets.addSet(reducedSet)
+  
             resultSets.reduced++
 
 
@@ -262,16 +271,19 @@ export class DateRangeSets extends SolutionNotes {
 
             let resourceId = set.resource?.id
 
-            let match = true
+            let perfectMatch = true
 
             if (!resourceId)
-                match = false
+                perfectMatch = false
 
             if (possibleResourceIds.indexOf(resourceId) == -1)
-                match = false
+                perfectMatch = false
 
-            if (!set.contains(range))
-                match = false
+
+            let setContainsRange = set.contains(range)
+
+            if (!setContainsRange)
+                perfectMatch = false
 
 
 
@@ -280,19 +292,24 @@ export class DateRangeSets extends SolutionNotes {
                 let breakStillPossible = staffBreaks.breakStillPossible(resourceId, range)
 
                 if (!breakStillPossible.possible) {
-                    match = false
-                    resultSets.addNote(`Break not possible for ${set.resource?.name} if we allocate ${range.toString()}  (break remaining: ${breakStillPossible.remaining?.toString()})`)
+                    perfectMatch = false
+                    resultSets.addNote(`Break not possible 3 for ${set.resource?.name} if we allocate ${range.toString()}  (break remaining: ${breakStillPossible.remaining?.toString()})`)
                     //  solution.addNote(`Break not possible for ${resource.name} if we allocate ${dateRange.toString()}  (break remaining: ${breakStillPossible.remaining?.toString()})`)
                 }
             }
+        
+            let reducedSet = set
+            
 
-            if (!match) {
-                resultSets.sets.push(set)
+            /** typically used for group level reservations: Wellness supervisor needed for certain time */
+            if (setContainsRange) 
+                reducedSet = set.subtractRange(range)
+            
+            resultSets.sets.push(reducedSet)
+
+            if (!perfectMatch) {
                 continue
             }
-
-            let reducedSet = set.subtractRange(range)
-            resultSets.sets.push(reducedSet)
 
             // add a note
             let resourceInfo = resourceId
@@ -500,8 +517,10 @@ export class DateRangeSet {
         return set
     }
 
-    addRanges(...ranges: DateRange[]) {
+    addRanges(...ranges: DateRange[]): DateRangeSet {
         this.ranges.push(...ranges)
+
+        return this
     }
 
     addRangeByDates(from: Date, to?: Date, fromLabel?: string, toLabel?: string): DateRange {

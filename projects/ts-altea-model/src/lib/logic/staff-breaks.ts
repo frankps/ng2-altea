@@ -7,9 +7,9 @@ export class StaffBreakPossible {
 
 export class StaffBreaks {
 
-    breakTimeInMinutes: number = 40
+    breakTimeInMinutes: number = 35
 
-    breaksByResourceId: Map<string, DateRangeSet> 
+    breaksByResourceId: Map<string, DateRangeSet>
 
 
     constructor(breaksByResourceId: Map<string, DateRangeSet> = new Map()) {
@@ -26,22 +26,29 @@ export class StaffBreaks {
         let staffBreak = TimeSpan.minutes(this.breakTimeInMinutes)
 
         // to fix some issues during our holiday
+        /*
         let now = new Date()
         if (now < new Date(2025, 3, 6))
             staffBreak = TimeSpan.minutes(25)
+        */
 
         return staffBreak
 
     }
-    
-    breakStillPossible(resourceId: string, allocateForWork: DateRange): StaffBreakPossible {
 
-        const breakRangeSet = this.get(resourceId)
+    breakStillPossible(resourceId: string, allocateForWork?: DateRange | DateRangeSet): StaffBreakPossible {
 
-        if (breakRangeSet.isEmpty())  // no break is planned => (no) break is possible
+        let remaining: DateRangeSet = this.get(resourceId)
+
+        if (remaining.isEmpty())  // no break is planned => (no) break is possible
             return new StaffBreakPossible(true)
 
-        const remaining = breakRangeSet.subtractRange(allocateForWork)
+        if (allocateForWork) {
+            if (allocateForWork instanceof DateRange)
+                remaining = remaining.subtractRange(allocateForWork)
+            else
+                remaining = remaining.subtract(allocateForWork)
+        }
 
         const staffBreak = this.breakTimeTimeSpan()
         //TimeSpan.minutes(this.breakTimeInMinutes)    

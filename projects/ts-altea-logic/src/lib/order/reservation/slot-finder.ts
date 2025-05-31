@@ -106,7 +106,7 @@ export class SlotFinder {
 
         }
 
-  
+
 
 
         this.checkStaffBreaks(solutionSet, availability2, ctx)
@@ -152,6 +152,7 @@ export class SlotFinder {
 
         // if there are group level reservations, then we need to subtract them from the availabilities
         let possibleResources = firstRequestItem.resources
+
         firstItemAvailabilities = this.subtractGroupLevelReservations(possibleResources, firstItemAvailabilities, ctx, availability)
 
 
@@ -309,7 +310,9 @@ export class SlotFinder {
                     const solutionItem = new SolutionItem(solution, requestItem, range.clone(), true, durationFixed, ...availableResources)
                     solution.add(solutionItem)
 
-                    resultSolutions.add(solution.clone())
+                    let solutionClone = solution.clone()
+
+                    resultSolutions.add(solutionClone)
 
                 } else {
 
@@ -336,8 +339,11 @@ export class SlotFinder {
 
 
 
-                    if (trackInvalidSolutions)
-                        resultSolutions.add(solution.clone())
+                    if (trackInvalidSolutions) {
+
+                        let solutionClone = solution.clone()
+                        resultSolutions.add(solutionClone)
+                    }
 
                 }
 
@@ -420,13 +426,21 @@ export class SlotFinder {
 
                     solution.valid = false
 
-                    if (trackInvalidSolutions)
-                        resultSolutions.add(solution)
+                    if (trackInvalidSolutions) {
+                        let solutionClone = solution.clone()
+                        resultSolutions.add(solutionClone)
+                    }
+
                     continue
                 }
 
-                // tempory disabled
-                availableResources = this.subtractGroupLevelReservations(possibleResources, availableResources, ctx, availability, solution)
+                console.warn(requestItem)
+
+                if (requestItem.resourceType == ResourceType.human)
+                    availableResources = this.subtractGroupLevelReservations(possibleResources, availableResources, ctx, availability, solution)
+
+
+                // let staffBreaks = ctx.getStaffBreakRanges(availability)
 
                 /* Create a new solution for each possible availability
                 */
@@ -454,7 +468,7 @@ export class SlotFinder {
                             continue
 
                         let durationFixed = false
-                        const solutionItem = new SolutionItem(solution, requestItem, availableRange, false, durationFixed, ...resources)
+                        const solutionItem = new SolutionItem(newSolution, requestItem, availableRange, false, durationFixed, ...resources)
                         newSolution.add(solutionItem)
                         solutionItem.addNote(`Limiting available range: ${availableRange.toString()}`)
 
@@ -469,6 +483,7 @@ export class SlotFinder {
                     if (this.debug && i == 0)
                         break
                 }
+
 
                 console.warn(availableResources)
                 //availability.getAvailability()
@@ -517,12 +532,27 @@ export class SlotFinder {
 
         let groupLevelPlannings = ctx.resourcePlannings.filterByDateRangeResourceGroupsOnly(groupResourceIds, outerRange.from, outerRange.to)
 
-        groupLevelPlannings = groupLevelPlannings.groupByOverlapAllowed()
-
-
         if (!groupLevelPlannings || groupLevelPlannings.isEmpty())
             return availabilityForResources
 
+        /**
+         *  not 100% sure if we can/should process  groupLevelPlannings only once        
+         * 
+           let initialNrOfGroupPlannings = groupLevelPlannings.count()
+
+           if (solution) {
+            groupLevelPlannings = solution.filterPlanningGroupIdsNotYetProcessed(groupLevelPlannings)
+
+            let notYetProcessed = groupLevelPlannings.count()
+
+            if (notYetProcessed != initialNrOfGroupPlannings) {
+                console.warn(`Not yet processed group level plannings: ${notYetProcessed} <> ${initialNrOfGroupPlannings}`)
+            }
+        }
+         */
+
+            
+        groupLevelPlannings = groupLevelPlannings.groupByOverlapAllowed()
 
 
         /* the group level plannings will always overlap the outer range, but can go over boundaries of outerRange
@@ -543,14 +573,15 @@ export class SlotFinder {
         let otherAvailableResources = availability.getAvailabilityOfResourcesInRange(otherPossibleResources, outerRange, groupPlanningMinTime, solution, false, false)
 
 
-        for (let planning of groupLevelPlannings.plannings) {
-            let dateRange = planning.toDateRange()
+        for (let groupPlanning of groupLevelPlannings.plannings) {
 
-            let groupId = planning.resourceGroupId
+            let groupDateRange = groupPlanning.toDateRange()
 
-            // first we check if other resources are available for this group planning (ex people not needed for this request)
+            let groupId = groupPlanning.resourceGroupId
 
-            otherAvailableResources = otherAvailableResources.reduceFullRangeOnly(otherPossibleResourceIds, dateRange, 1, ctx.allResources, staffBreaks)
+            // first we check if other resources are available for this group planning (ex people not possible for this request), also check if they still can have their break (in case of staff = human resources)
+
+            otherAvailableResources = otherAvailableResources.reduceFullRangeOnly(otherPossibleResourceIds, groupDateRange, 1, ctx.allResources, staffBreaks)
 
             if (solution)
                 solution.addNotes(otherAvailableResources.notes)
@@ -565,7 +596,7 @@ export class SlotFinder {
 
             let childResourceIdsNotYetChecked = childResourceIds.filter(id => resourcesChecked.findIndex(res => res.id == id) == -1)
 
-            availabilityForResources = availabilityForResources.reduceFullRangeOnly(childResourceIds, dateRange, 1, ctx.allResources, staffBreaks)
+            availabilityForResources = availabilityForResources.reduceFullRangeOnly(childResourceIds, groupDateRange, 1, ctx.allResources, staffBreaks)
 
             if (solution)
                 solution.addNotes(availabilityForResources.notes)
@@ -581,7 +612,7 @@ export class SlotFinder {
             => so we can't fulfill [9h00-9h30], but at least we can fulfill [9h15-9h30])
             */
 
-            availabilityForResources = availabilityForResources.reduceAllowPartialRange(childResourceIds, dateRange, 1, ctx.allResources, staffBreaks)
+            availabilityForResources = availabilityForResources.reduceAllowPartialRange(childResourceIds, groupDateRange, 1, ctx.allResources, staffBreaks)
 
             if (availabilityForResources.reduced > 0) {
 
@@ -690,6 +721,25 @@ export class SlotFinder {
 
             for (var human of humanResources) {
 
+                let breakInitialPossible = staffBreaks.breakStillPossible(human.id)
+
+                
+                if (!breakInitialPossible.possible) {
+                    solution.addNote(`Remark: full break not possible for ${human.name} (even before this order), so we accept without checking breaks any further`, SolutionNoteLevel.info)
+                    continue
+                }
+            
+
+                // the outer official break windows wherin we need to forsee a break
+                let breaksForStaffMember = staffBreaks.get(human.id)
+
+
+                if (!breaksForStaffMember || breaksForStaffMember.isEmpty())
+                    continue
+
+
+
+
                 let solutionStart = solution.offsetRefDate
 
                 if (solution.breaksChecked.indexOf(human.id) >= 0)
@@ -703,14 +753,9 @@ export class SlotFinder {
                 }
 
 
-                // the outer official break windows wherin we need to forsee a break
-                let breaksForStaffMember = staffBreaks.get(human.id)
 
 
-                if (!breaksForStaffMember || breaksForStaffMember.isEmpty())
-                    continue
-
-                let nrOfBreaks = breaksForStaffMember.count
+                //let nrOfBreaks = breaksForStaffMember.count
 
 
 
@@ -739,9 +784,22 @@ export class SlotFinder {
                 }
 
 
+
+
+
                 if (solution.hasExactStart()) {
 
+                    let breakOverlap = dayBreaksForStaffMember.hasOverlapWithSet(staffDateRanges)
+
+                    if (!breakOverlap) {
+                        solution.addNote(`OK: no overlap with breaks for ${human.name}`, SolutionNoteLevel.info)
+                        continue
+                    }
+
                     const newBreaks = dayBreaksForStaffMember.subtract(staffDateRanges)
+
+
+
 
                     const possibleBreaks = newBreaks.atLeast(staffBreak)
 

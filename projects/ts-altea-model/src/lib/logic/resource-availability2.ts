@@ -11,6 +11,7 @@ import { Solution, SolutionNote, SolutionNoteLevel } from "./solution";
 import * as dateFns from 'date-fns'
 import { ResourceRequestItem } from "./resource-request";
 import { ResultWithSolutionNotes } from "./resource-availability";
+import { StaffBreaks } from "./staff-breaks";
 
 
 export class ResourceAvailability2 {
@@ -111,7 +112,7 @@ export class ResourceAvailability2 {
             }
 
             // get both the available & un-available date ranges
-            const resourceOccupation = ctx.getResourceOccupation2(resourceId)
+            const resourceOccupation: ResourceOccupationSets = ctx.getResourceOccupation2(resourceId)
             console.error(resourceOccupation)
 
             let extendedSchedule = normalScheduleRanges
@@ -127,9 +128,9 @@ export class ResourceAvailability2 {
                 extendedSchedule = extendedSchedule.union(resourceOccupation.extraAvailable)
 
             extendedSchedule = extendedSchedule.subtract(resourceOccupation.absent)
-            
+
             let workingHours = extendedSchedule.clone()
-           
+
             if (workingHours.notEmpty()) {
                 workingHours.sortRanges()
                 workingHours.ranges[0].addFromLabel('START')
@@ -163,6 +164,15 @@ export class ResourceAvailability2 {
             }
 
         }
+
+
+        let wellnessId = '31eaebbc-af39-4411-a997-f2f286c58a9d'
+        let orderHasWellness = this.ctx.hasProduct(wellnessId)
+
+        if (!orderHasWellness)
+            this.allocateGroupPlannings()
+
+
     }
 
     getPreparationBlockJustBefore(resourceId: string, date: Date): DateRange {
@@ -241,7 +251,7 @@ export class ResourceAvailability2 {
 
 
     /** check the availability of given resources inside range (insideRange), only return blocks > minTime */
-    getAvailabilityOfResourcesInRange(resources: Resource[], insideRange: DateRange, minTime: TimeSpan, solution: Solution, excludeSolutionOccupation: boolean, durationAlreadyIncluded: boolean, personId?: string): DateRangeSets {
+    getAvailabilityOfResourcesInRange(resources: Resource[], insideRange: DateRange, minTime: TimeSpan, solution?: Solution, excludeSolutionOccupation: boolean = false, durationAlreadyIncluded: boolean = false, personId?: string): DateRangeSets {
 
         if (ArrayHelper.IsEmpty(resources))
             return DateRangeSets.empty
@@ -250,7 +260,7 @@ export class ResourceAvailability2 {
 
         for (const resource of resources) {
 
-            let availabilitiesForResource = this.getAvailabilitiesForResource(resource)
+            let availabilitiesForResource: DateRangeSet = this.getAvailabilitiesForResource(resource)
 
             if (availabilitiesForResource.isEmpty())
                 continue
@@ -355,9 +365,9 @@ export class ResourceAvailability2 {
 
 
 
-    getAvailableResourcesInRange(resources: Resource[], dateRange: DateRange, requestItem: ResourceRequestItem, solution: Solution, durationAlreadyIncluded: boolean, stopWhenFound = false, checkBreaks = false): ResultWithSolutionNotes<Resource[]> {
+    getAvailableResourcesInRange(resources: Resource[], dateRange: DateRange, requestItem?: ResourceRequestItem, solution?: Solution, durationAlreadyIncluded: boolean = true, stopWhenFound = false, checkBreaks = false): ResultWithSolutionNotes<Resource[]> {
 
-        let isPrepTime = requestItem.isPrepTime
+        let isPrepTime = requestItem ? requestItem.isPrepTime : false
 
         let result = new ResultWithSolutionNotes<Resource[]>()
         result.result = []
@@ -367,14 +377,17 @@ export class ResourceAvailability2 {
 
         const availableResources = []
 
-        const staffBreaks = this.ctx.getStaffBreakRanges(this)
+        let staffBreaks: StaffBreaks
+
+        if (checkBreaks)
+            staffBreaks = this.ctx.getStaffBreakRanges(this)
 
         for (const resource of resources) {
 
             if (resource.isGroup)
                 continue
 
-            if (stopWhenFound && availableResources.length >= requestItem.qty)
+            if (stopWhenFound && requestItem && availableResources.length >= requestItem.qty)
                 break
 
 
@@ -386,10 +399,10 @@ export class ResourceAvailability2 {
             var resourceAvailabilities = this.getAvailabilitiesForResource(resource)
 
 
-           // resourceAvailabilities = this.subtractGroupLevelReservations(possibleResources, resourceAvailabilities, ctx, availability, solution)
+            // resourceAvailabilities = this.subtractGroupLevelReservations(possibleResources, resourceAvailabilities, ctx, availability, solution)
 
 
-           
+
             /** The current solution might already occupy this resource */
             if (solution) {
                 var resourceAlreadyOccupiedInSolution = solution.getOccupationForResource(resource, durationAlreadyIncluded)
@@ -402,13 +415,16 @@ export class ResourceAvailability2 {
 
                 if (checkBreaks && resource.type == ResourceType.human) {
 
+                    let breakInitialPossible = staffBreaks.breakStillPossible(resource.id)
+
                     let breakStillPossible = staffBreaks.breakStillPossible(resource.id, dateRange)
 
-                    if (breakStillPossible.possible) {
+                    // !breakInitialPossible.possible: if the break was initially not possible (=> this order is not making the break inpossible), then considered a possible resource
+                    if (breakStillPossible.possible || !breakInitialPossible.possible) {
                         availableResources.push(resource)
                         continue
                     } else {
-                        solution.addNote(`Break not possible for ${resource.name} if we allocate ${dateRange.toString()}  (break remaining: ${breakStillPossible.remaining?.toString()})`)
+                        solution?.addNote(`Break not possible 1 for ${resource.name} if we allocate ${dateRange.toString()}  (break remaining: ${breakStillPossible.remaining?.toString()})`)
                     }
 
                 }
@@ -466,7 +482,7 @@ export class ResourceAvailability2 {
                 }
 
                 // if we are inside a working schedule and overlap of preparations is allowed
-                if (insideSchedule && requestItem.prepOverlap) {
+                if (insideSchedule && requestItem && requestItem.prepOverlap) {
 
                     let existingPlannings = this.ctx.resourcePlannings.filterByResourceDateRange(resource.id, dateRange.from, dateRange.to)
 
@@ -484,6 +500,133 @@ export class ResourceAvailability2 {
     }
 
 
+    setResourceUnavailable(resourceId: string, dateRange: DateRange) {
+
+        let availability = this.availability.get(resourceId)
+
+        if (!availability) {
+            console.error(`Availability for resource ${resourceId} not found`)
+            return
+        }
+
+        availability.available = availability.available.subtractRange(dateRange)
+        availability.unavailable = availability.unavailable.addRanges(dateRange)
+
+        //availability.
+
+
+        availability.allocated = availability.allocated.addRanges(dateRange)
+    }
+
+
+    /**
+ *  When there are group level plannings, and only 1 staff member can fulfill such a planning, then we pre-allocate this group planning to the staff member
+ * @param ctx 
+ */
+    allocateGroupPlannings() {
+
+        let me = this
+        let ctx = this.ctx
+
+        let groupPlannings = ctx.resourcePlannings.filterByResourceGroupsOnly()  // PlanningType.mask
+
+        if (!groupPlannings || groupPlannings.isEmpty())
+            return
+
+        for (let groupPlanning of groupPlannings.plannings) {
+
+            let groupDateRange = groupPlanning.toDateRange()
+
+            let childResources = ctx.getChildResources(groupPlanning.resourceGroupId)
+
+            if (ArrayHelper.IsEmpty(childResources))
+                continue
+
+            let checkBreaks = false // essential: since the breaks are calculated on first call and then cached (first this procedured needs to be finished 100% before calculating breaks)
+            let availableResources = this.getAvailableResourcesInRange(childResources, groupDateRange, null, null, true, false, checkBreaks)
+
+            console.error(availableResources)
+
+            let resources: Resource[] = availableResources?.result
+
+
+            if (ArrayHelper.IsEmpty(resources))  // this is a problem, because we have no-one to allocate this group planning to
+                continue
+
+            let resource: Resource = resources[0]
+
+            if (resources.length > 1) {
+
+                // there are multiple resources available, so we need to find the best candidate
+                resource = this.bestCandidate(resources, groupDateRange)
+
+
+            }
+
+            if (resource) {
+                groupPlanning.resourceId = resource.id
+                this.setResourceUnavailable(resource.id, groupDateRange)
+            }
+
+
+
+
+
+
+        }
+    }
+
+
+    /**
+     * Currently the best candidate (staff member) to fullfill a mask planning (wellness cleaning) is the one that is most occupied around this block, but still free (we assume the resources are still available during given range)
+     * => we pick the one with the least free time
+     * 
+     * @param resources 
+     * @param range 
+     * @returns 
+     */
+    bestCandidate(resources: Resource[], range: DateRange) : Resource | null {
+
+        if (ArrayHelper.IsEmpty(resources))
+            return null
+
+        let frankId = 'cc682b80-6243-4ac5-92a9-5ceed36111a4'
+        let hildeId = 'e738d496-a66d-414e-a098-d5ca84403e9d'
+        let hulpId = 'a24c4fac-69ca-49c4-9864-175da528b7fe' 
+
+        let prefferedResources = [frankId, hildeId, hulpId]
+        let prefferedResource = resources.find(r => prefferedResources.includes(r.id))
+
+        if (prefferedResource)
+            return prefferedResource
+
+        let minTime = TimeSpan.minutes(5)
+
+        let extendedRange = range.clone()
+        extendedRange.from = dateFns.subMinutes(extendedRange.from, 40)
+        extendedRange.to = dateFns.addMinutes(extendedRange.to, 40)
+
+        let availabilities: DateRangeSets = this.getAvailabilityOfResourcesInRange(resources, extendedRange, minTime)
+
+        let bestResource: Resource
+
+        let bestDuration: TimeSpan = TimeSpan.max
+
+        for (const availability of availabilities.sets) {
+
+            let resource = availability.resource
+            let duration = availability.duration
+           
+            if (duration.seconds < bestDuration.seconds) {
+                bestDuration = duration
+                bestResource = resource
+            }
+
+        }
+
+        return bestResource
+
+    }
 
 
 

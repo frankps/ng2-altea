@@ -420,6 +420,9 @@ export class Solution extends SolutionItems {
     overrides: Map<string, TimeSpan> = new Map<string, TimeSpan>()
 
 
+    planningGroupIdsProcessed: string[] = []
+
+
     constructor(request: ResourceRequest, ...items: SolutionItem[]) {
         super(items)
 
@@ -435,6 +438,25 @@ export class Solution extends SolutionItems {
 
         }
     }
+
+    /** group level plannings need to be allocated once, therefor we keep track which ones are already processed by solution */
+    filterPlanningGroupIdsNotYetProcessed(plannings: ResourcePlannings) : ResourcePlannings {
+
+        if (plannings.isEmpty())
+            return plannings
+
+        let result = new ResourcePlannings()
+
+        for (let planning of plannings.plannings) {
+            if (!this.planningGroupIdsProcessed.includes(planning.id)) {
+                result.push(planning)
+                this.planningGroupIdsProcessed.push(planning.id)
+            }
+        }
+        return result
+    }
+
+
 
     informCustomer(msg: string, params?: any) {
         this.customerInform.push(new CustomerInfo(msg, params))

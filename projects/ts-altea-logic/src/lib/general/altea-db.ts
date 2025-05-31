@@ -1,5 +1,5 @@
-import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbObject, DbObjectCreate, DbObjectMulti, DbObjectMultiCreate, DbQuery, DbQueryBaseTyped, DbQueryTyped, DbUpdateManyWhere, ObjectHelper, ObjectWithId, QueryCondition, QueryOperator, SortOrder, TypeHelper, YearMonth } from 'ts-common'
-import { Branch, Gift, Subscription, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template, OrderLine, BankTransaction, Message, LoyaltyProgram, LoyaltyCard, PlanningType, ResourcePlannings, TemplateCode, MsgType, LoyaltyCardChange, Payment, PaymentType, BankTxType, Payments, ReportMonth, ReportMonths, Contact } from 'ts-altea-model'
+import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbObject, DbObjectCreate, DbObjectMulti, DbObjectMultiCreate, DbQuery, DbQueryBaseTyped, DbQueryTyped, DbUpdateManyWhere, ObjectHelper, ObjectWithId, QueryCondition, QueryOperator, SortOrder, StringHelper, TypeHelper, YearMonth } from 'ts-common'
+import { Branch, Gift, Subscription, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template, OrderLine, BankTransaction, Message, LoyaltyProgram, LoyaltyCard, PlanningType, ResourcePlannings, TemplateCode, MsgType, LoyaltyCardChange, Payment, PaymentType, BankTxType, Payments, ReportMonth, ReportMonths, Contact, ReportPeriod, ReportType, ReportLine } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { IDb } from '../interfaces/i-db'
 import { AlteaPlanningQueries } from './altea-queries'
@@ -140,11 +140,14 @@ export class AlteaDb {
         return orders
     }
 
-    async getOrdersStartingBetween(from: number, to: number, extra: any = null) {
+    async getOrdersStartingBetween(from: number, to: number, extra: any = null, includes?: string[]) {
 
         const qry = new DbQueryTyped<Order>('order', Order)
 
-        qry.include('contact')
+        if (ArrayHelper.IsEmpty(includes))
+            qry.include('contact')
+        else
+            qry.include(...includes)
 
         qry.and('start', QueryOperator.greaterThanOrEqual, from)
         qry.and('start', QueryOperator.lessThanOrEqual, to)
@@ -297,7 +300,7 @@ export class AlteaDb {
         let minCreationDate = dateFns.subDays(now, 2)
         qry.and('cre', QueryOperator.lessThan, maxCreationDate)
         qry.and('cre', QueryOperator.greaterThanOrEqual, minCreationDate)
-        
+
         const orders = await this.db.query$<Order>(qry)
 
         return orders
@@ -311,7 +314,7 @@ export class AlteaDb {
         qry.include('payments')
 
         qry.and('state', QueryOperator.equals, OrderState.creation)
-        
+
         //qry.and('contactId', QueryOperator.equals, null)
         qry.and('src', QueryOperator.equals, 'ngApp')
         // qry.include('contact')
@@ -1170,7 +1173,7 @@ export class AlteaDb {
 
     }
 
-    async getPaymentsBetween(start: number | Date, end: number | Date, types: PaymentType[], notLinkedToBankTx = false, includes?: string[]): Promise<Payments> {
+    async getPaymentsBetween(branchId: string, start: number | Date, end: number | Date, types: PaymentType[], notLinkedToBankTx = false, includes?: string[]): Promise<Payments> {
 
         let startNum: number
         let endNum: number
@@ -1187,6 +1190,8 @@ export class AlteaDb {
 
 
         const qry = new DbQueryTyped<Payment>('payment', Payment)
+
+        qry.and('order.branchId', QueryOperator.equals, branchId)
 
         qry.and('date', QueryOperator.greaterThanOrEqual, startNum)
         qry.and('date', QueryOperator.lessThanOrEqual, endNum)
@@ -1212,6 +1217,8 @@ export class AlteaDb {
         return new Payments(payments)
 
     }
+
+
 
     async updatePayments(payments: Payment[], propertiesToUpdate: string[]): Promise<ApiListResult<Payment>> {
         let updateResult = await this.updateObjects('payment', Payment, payments, propertiesToUpdate)
@@ -1316,6 +1323,82 @@ export class AlteaDb {
 
     async updateReportMonths(reportMonths: ReportMonth[], propertiesToUpdate: string[]): Promise<ApiListResult<ReportMonth>> {
         let updateResult = await this.updateObjects('reportMonth', ReportMonth, reportMonths, propertiesToUpdate)
+        return updateResult
+    }
+
+
+    async getReportLinesBetween(branchId: string, per: ReportPeriod, type: ReportType, from: Date, to: Date) {
+
+        const qry = new DbQueryTyped<ReportLine>('reportLine', ReportLine)
+
+        qry.and('branchId', QueryOperator.equals, branchId)
+        qry.and('per', QueryOperator.equals, per)
+        qry.and('type', QueryOperator.equals, type)
+
+        let fromNum = DateHelper.yyyyMMdd(from)
+        let toNum = DateHelper.yyyyMMdd(to)
+
+        qry.and('date', QueryOperator.greaterThanOrEqual, fromNum)
+        qry.and('date', QueryOperator.lessThanOrEqual, toNum)
+
+        qry.orderBy('date')
+
+        const lines = await this.db.query$<ReportLine>(qry)
+
+        return lines
+    }
+
+
+
+    async getReportLinesOn(branchId: string, per: ReportPeriod, type: ReportType, year: number, num: number, month?: number, resourceId?: string) {
+
+        const qry = new DbQueryTyped<ReportLine>('reportLine', ReportLine)
+
+        qry.and('branchId', QueryOperator.equals, branchId)
+        qry.and('per', QueryOperator.equals, per)
+        qry.and('type', QueryOperator.equals, type)
+        qry.and('year', QueryOperator.equals, year)
+        qry.and('num', QueryOperator.equals, num)
+
+        if (month)
+            qry.and('month', QueryOperator.equals, month)
+
+        if (resourceId)
+            qry.and('resId', QueryOperator.equals, resourceId)
+
+        const lines = await this.db.query$<ReportLine>(qry)
+
+        return lines
+    }
+
+
+    async getReportLineById(id: string): Promise<ReportLine> {
+        const object = await this.getObjectById$('reportLine', ReportLine, id)
+        return object
+    }
+    async getReportLinesByIds(ids: string[]): Promise<ReportLine[]> {
+        const objects = await this.getObjectsByIds('reportLine', ReportLine, ids)
+        return objects
+    }
+
+
+    async createReportLine(reportLine: ReportLine): Promise<ApiResult<ReportLine>> {
+        let createResult = await this.createObject('reportLine', ReportLine, reportLine)
+        return createResult
+    }
+
+    async createReportLines(reportLines: ReportLine[]): Promise<ApiListResult<ReportLine>> {
+        let createResult = await this.createObjects('reportLine', ReportLine, reportLines)
+        return createResult
+    }
+
+    async updateReportLine(reportLine: ReportLine, propertiesToUpdate?: string[]): Promise<ApiResult<ReportLine>> {
+        let updateResult = await this.updateObject('reportLine', ReportLine, reportLine, propertiesToUpdate)
+        return updateResult
+    }
+
+    async updateReportLines(reportLines: ReportLine[], propertiesToUpdate: string[]): Promise<ApiListResult<ReportLine>> {
+        let updateResult = await this.updateObjects('reportLine', ReportLine, reportLines, propertiesToUpdate)
         return updateResult
     }
 

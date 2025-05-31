@@ -71,6 +71,26 @@ export class Payments {
     return ArrayHelper.NotEmpty(this.list)
   }
 
+  count(): number {
+
+    if (!this.hasPayments())
+      return 0
+
+    return this.list.length
+  }
+
+  totalAmount(payTypes?: PaymentType[]): number {
+    if (!this.hasPayments())
+      return 0
+
+    let pays = this.list
+
+    if (ArrayHelper.NotEmpty(payTypes))
+      pays = pays.filter(p => payTypes.includes(p.type))
+
+    return _.sumBy(pays, 'amount')
+  }
+
   add(...pays: Payment[]) {
 
     if (ArrayHelper.IsEmpty(pays))
@@ -93,6 +113,21 @@ export class Payments {
     this.list = _.orderBy(this.list, ['date'], ['desc'])
 
     return this.list
+
+  }
+
+  getTotalsByType(): any {
+
+    let map = {}
+
+    if (!this.hasPayments())
+      return map
+
+    for (let pay of this.list) {
+      map[pay.type] = (map[pay.type] || 0) + pay.amount
+    }
+
+    return map
 
   }
 
@@ -228,7 +263,7 @@ export class Payment extends ObjectWithIdPlus {
 
   /** amount is fully linked to a banktransaction */
   lnk: boolean = false
-  
+
   /** amount is declared */
   decl: boolean = false
 
@@ -241,7 +276,7 @@ export class Payment extends ObjectWithIdPlus {
 
   /** processed by logic: used for gift payments (true if corresponding gift was processed) */
   proc: boolean = false
- 
+
   /** valid: used for gift payments, true if corresponding gift was processed (proc=true) & operation was successfully */
   vld: boolean = false
 

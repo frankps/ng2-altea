@@ -30,7 +30,7 @@ export const appRoutes: Route[] = [
       { path: "loyalty", loadChildren: () => import(`./loyalty/loyalty.module`).then(m => m.LoyaltyModule) },
       { path: "subscriptions", loadChildren: () => import(`./subscription/subscription.module`).then(m => m.SubscriptionModule) },
       { path: "messaging", loadChildren: () => import(`./messaging/messaging.module`).then(m => m.MessagingModule) },
-
+      { path: "reporting", loadChildren: () => import(`./reporting/reporting.module`).then(m => m.ReportingModule) },
       { path: "local", loadChildren: () => import(`./local/local.module`).then(m => m.LocalModule) },
       { path: "staff", loadChildren: () => import(`./staff/staff.module`).then(m => m.StaffModule) },
       

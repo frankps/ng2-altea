@@ -150,4 +150,8 @@ export class TimeSpan {
     static get zero() {
         return new TimeSpan()
     }
+
+    static get max() {
+        return new TimeSpan(Number.MAX_SAFE_INTEGER, TimeUnit.seconds)
+    }
 }

@@ -204,6 +204,13 @@ export const MENU: MenuItem[] = [
         link: '/%branch%/accounting/checks',
         roles: ['admin', 'posAdmin'],
         parentId: 17
+      },
+      {
+        id: 174,
+        label: 'menu.accounting.sub.checks',
+        link: '/%branch%/reporting/branch-report',
+        roles: ['admin', 'posAdmin'],
+        parentId: 17
       }
     ]
   },

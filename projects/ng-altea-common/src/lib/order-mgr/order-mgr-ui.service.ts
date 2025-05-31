@@ -115,6 +115,8 @@ export class OrderMgrUiService {   // implements OnInit
   /**  */
   giftNotFound: boolean = false
 
+  /** true if a user can force a time slot (even if not suggested by system) */
+  canForce: boolean = false
 
 
   constructor(private productSvc: ProductService, private orderSvc: OrderService, private orderMgrSvc: OrderMgrService
@@ -368,6 +370,8 @@ export class OrderMgrUiService {   // implements OnInit
 
     this.giftNotFound = false
 
+    this.canForce = false
+
     if (this.interval)
       clearInterval(this.interval)
 
@@ -397,7 +401,7 @@ export class OrderMgrUiService {   // implements OnInit
 
     if (gift) {
       this.order.giftCode = gift.code
-      this.order.toInvoice = true
+      this.order.toInvoice = gift.invoice
       this.gift = gift
     }
 
@@ -799,6 +803,7 @@ export class OrderMgrUiService {   // implements OnInit
     return from
   }
 
+  
 
   async getAvailabilities() {
 
@@ -825,8 +830,8 @@ export class OrderMgrUiService {   // implements OnInit
     request.debug = true
     request.from = this.from
 
-    const toDate = DateHelper.parse(request.from)
-    request.to = DateHelper.yyyyMMdd000000(dateFns.addDays(toDate, 1))
+    const fromDate = DateHelper.parse(request.from)
+    request.to = DateHelper.yyyyMMdd000000(dateFns.addDays(fromDate, 1))
 
     console.log('availabilityRequest', request)
 
@@ -843,6 +848,20 @@ export class OrderMgrUiService {   // implements OnInit
 
       // added later to read the inform messages
       this.optionSet = this.availabilityResponse.optionSet
+    }
+
+
+    /** set the canForce flag: only internal users (shop) can force during default schedule (= normal operations) */
+    if (this.availabilityResponse.debug.ctx) {
+      let ctx = this.availabilityResponse.debug.ctx
+      const branchSchedule = this.availabilityResponse.debug.ctx.getBranchScheduleOnDate(fromDate)
+
+      if (branchSchedule?.default && this.isPos) 
+        this.canForce = true
+      else
+        this.canForce = false
+       
+      console.error(branchSchedule)
     }
 
     console.error(request)
