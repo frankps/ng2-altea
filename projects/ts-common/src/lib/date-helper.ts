@@ -333,6 +333,11 @@ export class DateHelper {
         return Number(res)
     }
 
+    static isoWeekToDate(year, weekNumber) {
+        // Use January 4th as reference (always in the first ISO week)
+        const referenceDate = new Date(year, 0, 4);
+        return dateFns.startOfISOWeek(dateFns.setISOWeek(referenceDate, weekNumber));
+    }
 
 
     /*

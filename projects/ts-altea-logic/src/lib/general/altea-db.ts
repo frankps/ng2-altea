@@ -1327,28 +1327,42 @@ export class AlteaDb {
     }
 
 
-    async getReportLinesBetween(branchId: string, per: ReportPeriod, type: ReportType, from: Date, to: Date) {
+    async getReportLinesBetween(branchId: string, from: Date | number, to: Date | number, type?: ReportType, period?: ReportPeriod) {
 
         const qry = new DbQueryTyped<ReportLine>('reportLine', ReportLine)
 
         qry.and('branchId', QueryOperator.equals, branchId)
-        qry.and('per', QueryOperator.equals, per)
-        qry.and('type', QueryOperator.equals, type)
 
-        let fromNum = DateHelper.yyyyMMdd(from)
-        let toNum = DateHelper.yyyyMMdd(to)
+        if (period)
+            qry.and('per', QueryOperator.equals, period)
 
-        qry.and('date', QueryOperator.greaterThanOrEqual, fromNum)
-        qry.and('date', QueryOperator.lessThanOrEqual, toNum)
+        if (type)
+            qry.and('type', QueryOperator.equals, type)
 
-        qry.orderBy('date')
+        if (from instanceof Date) {
+            from = DateHelper.yyyyMMdd(from)
+        }
+        else {
+            from = from as number
+        }
+
+        if (to instanceof Date) {
+            to = DateHelper.yyyyMMdd(to)
+        }
+        else {
+            to = to as number
+        }
+
+
+        qry.and('end', QueryOperator.greaterThan, from)
+        qry.and('start', QueryOperator.lessThanOrEqual, to)
+
+        qry.orderBy('start')
 
         const lines = await this.db.query$<ReportLine>(qry)
 
         return lines
     }
-
-
 
     async getReportLinesOn(branchId: string, per: ReportPeriod, type: ReportType, year: number, num: number, month?: number, resourceId?: string) {
 

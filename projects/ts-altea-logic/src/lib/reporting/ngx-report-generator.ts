@@ -85,7 +85,7 @@ export class NgxReportGenerator {
 
     async loadData(branchId: string, from: Date, to: Date) {
 
-        this.reportLines = await this.alteaDb.getReportLinesBetween(branchId, ReportPeriod.day, ReportType.v1, from, to)
+        this.reportLines = await this.alteaDb.getReportLinesBetween(branchId, from, to, ReportType.v1, ReportPeriod.day)
     }
 
     create(options: ReportOptions): NgxChart {
@@ -97,6 +97,9 @@ export class NgxReportGenerator {
         let cumuls = new Map<string, number>()
 
         cumuls.set('new', 0)
+        cumuls.set('served-excl', 0)
+        cumuls.set('served-incl', 0)
+
         if (options.cumul)
             allPayTypes.forEach(payType => cumuls.set(payType, 0))
 
@@ -114,6 +117,29 @@ export class NgxReportGenerator {
                 chartLine.addPoint(reportLine.date, value)
             }
 
+            if (reportLine.served) {
+
+
+                let servedExcl = reportLine.served.excl
+                let servedIncl = reportLine.served.incl
+
+                if (options.cumul) {
+                    servedExcl += cumuls.get('served-excl')
+                    cumuls.set('served-excl', servedExcl)
+                    servedIncl += cumuls.get('served-incl')
+                    cumuls.set('served-incl', servedIncl)
+                }
+
+
+                let servedExclLine = chart.getLine(`served-excl`)
+                let servedInclLine = chart.getLine(`served-incl`)
+
+                servedExclLine.addPoint(reportLine.date, servedExcl)
+                servedInclLine.addPoint(reportLine.date, servedIncl)
+
+
+            }
+
             if (reportLine.pays?.byType) {
 
                 let byType = reportLine.pays.byType
@@ -127,7 +153,7 @@ export class NgxReportGenerator {
                     let value = byType[payType]
 
                     if (options.cumul) {
-                        value = cumuls.get(payType) + value
+                        value += cumuls.get(payType) //+ value
                         cumuls.set(payType, value)
                     }
 

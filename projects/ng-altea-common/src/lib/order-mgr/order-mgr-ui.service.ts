@@ -558,11 +558,11 @@ export class OrderMgrUiService {   // implements OnInit
       prevLine.markAsUpdated('idx')
 
       //this.order.markAsUpdated('lines')
-      
+
       this.orderDirty = true
 
     }
-      
+
   }
 
   moveOrderLineDown(line: OrderLine, idx: number) {
@@ -587,11 +587,11 @@ export class OrderMgrUiService {   // implements OnInit
       nextLine.markAsUpdated('idx')
 
       //this.order.markAsUpdated('lines')
-      
+
       this.orderDirty = true
 
     }
-      
+
   }
 
   async selectExistingOrderLine(line: OrderLine) {
@@ -803,7 +803,7 @@ export class OrderMgrUiService {   // implements OnInit
     return from
   }
 
-  
+
 
   async getAvailabilities() {
 
@@ -814,7 +814,7 @@ export class OrderMgrUiService {   // implements OnInit
         return */
 
 
-   // this.payGifts
+    // this.payGifts
 
     let order = this.order
 
@@ -850,19 +850,24 @@ export class OrderMgrUiService {   // implements OnInit
       this.optionSet = this.availabilityResponse.optionSet
     }
 
+    if (this.sessionSvc.isPosAdmin())  // pos admin can always force
+      this.canForce = true
+    else {
+      /** set the canForce flag: only internal users (shop) can force during default schedule (= normal operations) */
+      if (this.availabilityResponse.debug.ctx) {
+        let ctx = this.availabilityResponse.debug.ctx
+        const branchSchedule = this.availabilityResponse.debug.ctx.getBranchScheduleOnDate(fromDate)
 
-    /** set the canForce flag: only internal users (shop) can force during default schedule (= normal operations) */
-    if (this.availabilityResponse.debug.ctx) {
-      let ctx = this.availabilityResponse.debug.ctx
-      const branchSchedule = this.availabilityResponse.debug.ctx.getBranchScheduleOnDate(fromDate)
+        if (branchSchedule?.default && this.isPos)
+          this.canForce = true
+        else
+          this.canForce = false
 
-      if (branchSchedule?.default && this.isPos) 
-        this.canForce = true
-      else
-        this.canForce = false
-       
-      console.error(branchSchedule)
+        console.error(branchSchedule)
+      }
     }
+
+
 
     console.error(request)
     // console.error(response)

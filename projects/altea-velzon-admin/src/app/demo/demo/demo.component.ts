@@ -74,6 +74,16 @@ export class DemoComponent {
         console.warn(this.country) */
   }
 
+  async aggregateReportData() {
+    let alteaDb = new AlteaDb(this.dbSvc)
+    let createReportingData = new CreateReportingData(alteaDb)
+
+/*     console.error('aggregateReportData')
+    return */
+
+
+    await createReportingData.aggregateAll(this.sessionSvc.branchId, new Date(2025, 5, 1), new Date(2025, 5, 9))
+  }
 
   async createReports() {
 
@@ -83,8 +93,8 @@ export class DemoComponent {
 
     let branchId = this.sessionSvc.branchId
 
-    let startDate = new Date(2025, 4, 20)
-    let endDate = new Date(2025, 4, 30)
+    let startDate = new Date(2025, 5, 1)
+    let endDate = new Date(2025, 5, 9)
 
     /*
     const days : Date[] = dateFns.eachDayOfInterval({
@@ -106,9 +116,9 @@ export class DemoComponent {
     console.error(res)
 
 
-  //  let res = await createReportingData.createForDay(branchId, 2025, 5, 29)
+    //  let res = await createReportingData.createForDay(branchId, 2025, 5, 29)
 
-  //  console.error(res)
+    //  console.error(res)
 
   }
 
@@ -137,7 +147,7 @@ export class DemoComponent {
 
     const sendRes = await alteaDb.db.sendMessage$(msg)
     //const sendRes = new ApiResult(msg)
-    
+
     console.warn(sendRes)
 
 

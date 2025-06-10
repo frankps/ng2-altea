@@ -61,7 +61,7 @@ export class CreateReportingData {
             console.error(res)
 
         })
-    }  
+    }
 
     async createForDay(branchId: string, year: number, month: number, day: number) {
 
@@ -73,7 +73,7 @@ export class CreateReportingData {
         if (ArrayHelper.NotEmpty(reportLines)) {
             dayLine = reportLines[0]
         } else {
-            dayLine = ReportLine.newWithMonth(branchId, ReportPeriod.day, ReportType.v1, year, month, day)
+            dayLine = ReportLine.new(branchId, ReportPeriod.day, ReportType.v1, year, month, day)
             isNew = true
         }
 
@@ -135,8 +135,8 @@ export class CreateReportingData {
             return reportOrders
 
         reportOrders.qty = orders.length
-        reportOrders.incl = _.sumBy(orders, 'incl')
-        reportOrders.excl = _.sumBy(orders, 'excl')
+        reportOrders.incl = _.round(_.sumBy(orders, 'incl'), 2)
+        reportOrders.excl = _.round(_.sumBy(orders, 'excl'), 2)
 
         for (let order of orders) {
 
@@ -166,4 +166,141 @@ export class CreateReportingData {
 
         return reportOrders
     }
+
+
+    async aggregateAll(branchId: string, startDate: Date, endDate?: Date) {
+
+        if (!endDate)
+            endDate = startDate
+
+        let startOfIsoWeek = dateFns.startOfISOWeek(startDate)
+        let endOfIsoWeek = dateFns.endOfISOWeek(endDate)
+
+        let startOfMonth = dateFns.startOfMonth(startDate)
+        let endOfMonth = dateFns.endOfMonth(endDate)
+
+
+        let minDate = dateFns.min([startOfIsoWeek, startOfMonth])
+        let maxDate = dateFns.max([endOfIsoWeek, endOfMonth])
+
+        // let reportLines = await this.alteaDb.getReportLinesOn(branchId, ReportPeriod.day, ReportType.v1, year, day, month)
+
+        // we load all report data for the given period: day, week, month, ...
+        let reportLines = await this.alteaDb.getReportLinesBetween(branchId, minDate, maxDate, ReportType.v1)
+
+        await this.aggregateWeeks(branchId, startOfIsoWeek, endOfIsoWeek, reportLines)
+
+        await this.aggregateMonths(branchId, startOfMonth, endOfMonth, reportLines)
+
+    }
+
+    async aggregateWeeks(branchId: string, startOfIsoWeek: Date, endOfIsoWeek: Date, reportLines: ReportLine[]) {
+        const weeks = dateFns.eachWeekOfInterval({
+            start: startOfIsoWeek,
+            end: endOfIsoWeek
+        }, { weekStartsOn: 1 }) // 0 = Sunday, 1 = Monday, etc.)
+
+
+        weeks.forEach(async (weekStart, index) => {
+            const weekEnd = dateFns.endOfWeek(weekStart, { weekStartsOn: 1 });
+            // console.log(`Week ${index + 1}: ${weekStart.toDateString()} - ${weekEnd.toDateString()}`);
+            const weekNumber = dateFns.getISOWeek(weekStart);
+            const yearWeek = weekStart.getFullYear() * 100 + weekNumber
+
+            const weekStartNum = DateHelper.yyyyMMdd(weekStart)
+            const weekEndNum = DateHelper.yyyyMMdd(weekEnd)
+
+            let dayLinesInWeek = reportLines.filter(line => line.per == ReportPeriod.day && line.date >= weekStartNum && line.date <= weekEndNum)
+
+            let existingWeek = reportLines.find(line => line.per == ReportPeriod.week && line.date == yearWeek)
+            let aggregatedLine = this.aggregateLines(dayLinesInWeek, existingWeek)
+
+            if (!existingWeek) {
+                aggregatedLine.setHeader(branchId, ReportPeriod.week, ReportType.v1)
+                aggregatedLine.setWeek(weekStart.getFullYear(), weekNumber)
+                reportLines.push(aggregatedLine)
+
+                let createResult = await this.alteaDb.createReportLine(aggregatedLine)
+
+                console.error(createResult)
+            } else {
+                let createResult = await this.alteaDb.updateReportLine(existingWeek)
+
+                console.error(createResult)
+            }
+
+        });
+    }
+
+    async aggregateMonths(branchId: string, startOfMonth: Date, endOfMonth: Date, reportLines: ReportLine[]) {
+
+        const months = dateFns.eachMonthOfInterval({
+            start: startOfMonth,
+            end: endOfMonth
+        })
+
+        months.forEach(async (monthStart, index) => {
+            const monthEnd = dateFns.endOfMonth(monthStart)
+            const monthNumber = monthStart.getMonth() + 1
+            const yearMonth = monthStart.getFullYear() * 100 + monthNumber
+
+            const monthStartNum = DateHelper.yyyyMMdd(monthStart)
+            const monthEndNum = DateHelper.yyyyMMdd(monthEnd)
+
+            let dayLinesInMonth = reportLines.filter(line => line.per == ReportPeriod.day && line.date >= monthStartNum && line.date <= monthEndNum)
+
+            let existingMonth = reportLines.find(line => line.per == ReportPeriod.month && line.date == yearMonth)
+            let aggregatedLine = this.aggregateLines(dayLinesInMonth, existingMonth)
+
+            if (!existingMonth) {
+                aggregatedLine.setHeader(branchId, ReportPeriod.month, ReportType.v1)
+                aggregatedLine.setMonth(monthStart.getFullYear(), monthNumber)
+                reportLines.push(aggregatedLine)
+
+                let createResult = await this.alteaDb.createReportLine(aggregatedLine)
+
+                console.error(createResult)
+            } else {
+                let createResult = await this.alteaDb.updateReportLine(existingMonth)
+
+                console.error(createResult)
+            }
+        })
+    }
+
+
+    aggregateLines(reportLines: ReportLine[], existingTotal?: ReportLine): ReportLine {
+
+        let result: ReportLine // = new ReportLine()
+
+        if (existingTotal) {
+            result = existingTotal
+        } else {
+            result = new ReportLine()
+        }
+
+        let totalPays = new ReportPayments()
+        result.pays = totalPays
+
+        for (let line of reportLines) {
+
+            if (line.pays) {
+                totalPays.qty += line.pays.qty
+                totalPays.new += line.pays.new
+
+                if (line.pays.byType) {
+                    for (let type in line.pays.byType) {
+
+                        if (!totalPays.byType[type])
+                            totalPays.byType[type] = 0
+
+                        totalPays.byType[type] += line.pays.byType[type]
+                    }
+                }
+            }
+        }
+
+        return result
+    }
+
 }
