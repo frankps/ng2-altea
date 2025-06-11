@@ -91,6 +91,7 @@ export class ProductOption extends ObjectWithIdPlus {
   idx = 0
   name?: string
   short?: string
+  slug?: string
   descr?: string
   public = true
   required = true
@@ -392,6 +393,9 @@ export class Product extends ObjectWithIdPlus {
 
   name?: string;
   short?: string;
+
+  /** to be used in url (open product page from website) */
+  slug?: string;
 
   type?: ProductType = ProductType.prod
 

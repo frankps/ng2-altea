@@ -12,6 +12,7 @@ import { MessagingService } from 'projects/ng-altea-common/src/lib/messaging.ser
 import { StripeService } from 'projects/ng-altea-common/src/lib/stripe.service';
 import { deleteDoc, getDocs, limit, or, orderBy, query, where } from 'firebase/firestore';
 import { Firestore, collection, collectionData, addDoc, CollectionReference, updateDoc, serverTimestamp, doc, docData, DocumentChange, DocumentData } from '@angular/fire/firestore';
+import { NgxSpinnerService } from "ngx-spinner"
 
 // Volgnummer;Uitvoeringsdatum;Valutadatum;Bedrag;Valuta rekening;Rekeningnummer;Type verrichting;Tegenpartij;Naam van de tegenpartij;
 // Mededeling;Details;Status;Reden van weigering
@@ -51,7 +52,7 @@ export class DemoComponent {
   constructor(private http: HttpClient, public dbSvc: ObjectService, protected translationSvc: TranslationService, protected backEndSvc: ObjectService
     , protected userSvc: UserService, protected resourceSvc: ResourceService, protected anySvc: ScheduleService, protected productSvc: ProductService, protected orderSvc: OrderService,
     protected messagingSvc: MessagingService, protected stripeSvc: StripeService, protected sessionSvc: SessionService,
-    protected templateSvc: TemplateService) {
+    protected templateSvc: TemplateService, protected spinner: NgxSpinnerService) {
 
   }
 
@@ -78,11 +79,11 @@ export class DemoComponent {
     let alteaDb = new AlteaDb(this.dbSvc)
     let createReportingData = new CreateReportingData(alteaDb)
 
-/*     console.error('aggregateReportData')
-    return */
+/*      console.error('aggregateReportData')
+    return  */
 
 
-    await createReportingData.aggregateAll(this.sessionSvc.branchId, new Date(2025, 5, 1), new Date(2025, 5, 9))
+    await createReportingData.aggregateAll(this.sessionSvc.branchId, new Date(2025, 3, 1), new Date())
   }
 
   async createReports() {
@@ -93,8 +94,8 @@ export class DemoComponent {
 
     let branchId = this.sessionSvc.branchId
 
-    let startDate = new Date(2025, 5, 1)
-    let endDate = new Date(2025, 5, 9)
+    let startDate = new Date(2025, 3, 1)
+    let endDate = new Date()
 
     /*
     const days : Date[] = dateFns.eachDayOfInterval({
@@ -111,9 +112,13 @@ export class DemoComponent {
     })
     */
 
+   this.spinner.show()
+
     let res = await createReportingData.createForDays(branchId, startDate, endDate)
 
     console.error(res)
+
+    this.spinner.hide()
 
 
     //  let res = await createReportingData.createForDay(branchId, 2025, 5, 29)

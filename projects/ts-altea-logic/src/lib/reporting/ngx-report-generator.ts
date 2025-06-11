@@ -1,6 +1,6 @@
 
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbObjectCreate, DbObjectMulti, DbObjectMultiCreate, DbQuery, DbQueryTyped, ObjectHelper, QueryOperator } from 'ts-common'
+import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbObjectCreate, DbObjectMulti, DbObjectMultiCreate, DbQuery, DbQueryTyped, NumberHelper, ObjectHelper, QueryOperator } from 'ts-common'
 import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, OrderLine, Subscription, Product, PriceChangeType, ReportType, ReportPeriod, ReportLine, PaymentType, ReportPayments, ReportOrders, ReportProduct } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { AlteaDb } from '../general/altea-db'
@@ -59,6 +59,25 @@ export class NgxChart {
 export class ReportOptions {
     cumul: boolean = true
     showNew: boolean = true
+
+    period: ReportPeriod = ReportPeriod.day
+
+    get day(): boolean {
+        return this.period == ReportPeriod.day
+    }
+
+
+    get week(): boolean {
+        return this.period == ReportPeriod.week
+    }
+
+    get month(): boolean {
+        return this.period == ReportPeriod.month
+    }
+
+    get year(): boolean {
+        return this.period == ReportPeriod.year
+    }
 }
 
 /**
@@ -72,20 +91,25 @@ export class ReportOptions {
 export class NgxReportGenerator {
 
     alteaDb: AlteaDb
-
+    branchId: string
+    type: ReportType
+    
     reportLines: ReportLine[] = []
 
-    constructor(db: IDb | AlteaDb) {
+    constructor(db: IDb | AlteaDb, branchId: string, type: ReportType) {
 
         if (db instanceof AlteaDb)
             this.alteaDb = db
         else
             this.alteaDb = new AlteaDb(db)
+
+        this.branchId = branchId
+        this.type = type
     }
 
-    async loadData(branchId: string, from: Date, to: Date) {
+    async loadData(period: ReportPeriod, from: Date, to: Date) {
 
-        this.reportLines = await this.alteaDb.getReportLinesBetween(branchId, from, to, ReportType.v1, ReportPeriod.day)
+        this.reportLines = await this.alteaDb.getReportLinesBetween(this.branchId, from, to, this.type, period)
     }
 
     create(options: ReportOptions): NgxChart {
@@ -100,8 +124,10 @@ export class NgxReportGenerator {
         cumuls.set('served-excl', 0)
         cumuls.set('served-incl', 0)
 
+        
         if (options.cumul)
             allPayTypes.forEach(payType => cumuls.set(payType, 0))
+
 
         for (let reportLine of this.reportLines) {
 
@@ -140,6 +166,9 @@ export class NgxReportGenerator {
 
             }
 
+
+            
+  
             if (reportLine.pays?.byType) {
 
                 let byType = reportLine.pays.byType
@@ -148,11 +177,21 @@ export class NgxReportGenerator {
 
                 for (let payType of payTypes) {
 
-                    let chartLine = chart.getLine(payType)
-
                     let value = byType[payType]
 
+                    if (!NumberHelper.isNumber(value)) {
+                        continue
+                    }
+                        
+
+                    let chartLine = chart.getLine(payType)
+
                     if (options.cumul) {
+
+                        if (!cumuls.has(payType)) {
+                            cumuls.set(payType, 0)
+                        }
+
                         value += cumuls.get(payType) //+ value
                         cumuls.set(payType, value)
                     }

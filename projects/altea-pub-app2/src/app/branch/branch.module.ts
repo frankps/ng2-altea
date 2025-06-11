@@ -21,6 +21,7 @@ import { AuthModule } from '../auth/auth.module';
 import { ProfileComponent } from './profile/profile.component';
 import { FormsModule } from '@angular/forms';
 import { OrderFinishedComponent } from './order-finished/order-finished.component';
+import { OpenComponent } from './open/open.component';
 
 @NgModule({
   declarations: [
@@ -37,7 +38,8 @@ import { OrderFinishedComponent } from './order-finished/order-finished.componen
      UserContactMatchComponent,
      MyOrdersComponent,
      ProfileComponent,
-     OrderFinishedComponent
+     OrderFinishedComponent,
+     OpenComponent
   ],
   imports: [
     CommonModule,

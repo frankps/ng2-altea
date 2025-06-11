@@ -6,19 +6,23 @@ import * as _ from "lodash";
 //import currency = require('currency.js')   
 //import currency from 'currency.js';
 // added to tsconfig: "allowSyntheticDefaultImports": true
-   
+
 // https://github.com/scurker/currency.js/issues/73
-     
+
 
 export class NumberHelper {
 
-    static round(num: number) : number {
-        //  return +(Math.round(number + "e+2") + "e-2");
+  static round(num: number): number {
+    //  return +(Math.round(number + "e+2") + "e-2");
 
-       // let rounded = currency(num).value
-    
-        return _.round(num, 2)
-    
-      }  
-    
+    // let rounded = currency(num).value
+
+    return _.round(num, 2)
+
+  }
+
+  static isNumber(value: unknown): boolean {
+    return typeof value === 'number' && !isNaN(value);
+  }
+
 }

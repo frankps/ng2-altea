@@ -185,6 +185,9 @@ ng generate component branch/profile --project altea-pub-app2
 ng generate component branch/order-finished --project altea-pub-app2
 
 
+ng generate component branch/open --project altea-pub-app2
+
+
 ng generate module info --project altea-pub-app2 --routing
 ng generate component info/privacy --project altea-pub-app2
 ng generate component info/user-data-deletion --project altea-pub-app2

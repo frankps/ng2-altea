@@ -1,12 +1,36 @@
 <div class="row">
-    <div class="col-12">
+    <div class="col-4">
+        
+        <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
+            <input type="checkbox" class="btn-check" id="btnDay" autocomplete="off" [ngModel]="options.day"
+                (click)="changePeriod(ReportPeriod.day)">
+            <label class="btn btn-outline-primary my-0" for="btnDay"> Day </label>
+
+            <input type="checkbox" class="btn-check" id="btnWeek" autocomplete="off" [ngModel]="options.week"
+                (click)="changePeriod(ReportPeriod.week)">
+            <label class="btn btn-outline-primary my-0" for="btnWeek"> Week </label>
+
+
+            <input type="checkbox" class="btn-check" id="btnMonth" autocomplete="off" [ngModel]="options.month"
+                (click)="changePeriod(ReportPeriod.month)">
+            <label class="btn btn-outline-primary my-0" for="btnMonth"> Month </label>
+
+            <input type="checkbox" class="btn-check" id="btnYear" autocomplete="off" [ngModel]="options.year"
+                (click)="changePeriod(ReportPeriod.year)">
+            <label class="btn btn-outline-primary my-0" for="btnYear"> Year </label>
+            
+            
+        </div>
+    </div>
+    <div class="col-4">
+
         <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
             <input type="checkbox" class="btn-check" id="btncheck1" autocomplete="off" [(ngModel)]="options.cumul"
                 (click)="generateReport('cumul', !options.cumul)">
             <label class="btn btn-outline-primary my-0" for="btncheck1"> Cumul </label>
 
             <input type="checkbox" class="btn-check" id="btncheck2" autocomplete="off" [(ngModel)]="options.showNew"
-            (click)="generateReport('showNew', !options.showNew)">
+                (click)="generateReport('showNew', !options.showNew)">
             <label class="btn btn-outline-primary my-0" for="btncheck2"> Total in</label>
 
         </div>

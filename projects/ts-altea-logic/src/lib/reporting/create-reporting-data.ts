@@ -147,8 +147,8 @@ export class CreateReportingData {
 
                 let reportProduct = reportOrders.getReportProduct(line.productId, line.descr)
                 reportProduct.qty += line.qty
-                reportProduct.incl += line.incl
-                reportProduct.excl += line.excl
+                reportProduct.incl = _.round(reportProduct.incl + line.incl, 2)
+                reportProduct.excl = _.round(reportProduct.excl + line.excl, 2)
 
                 if (line.hasOptions()) {
                     for (let option of line.options) {
@@ -282,6 +282,9 @@ export class CreateReportingData {
         let totalPays = new ReportPayments()
         result.pays = totalPays
 
+        let totalServed = new ReportOrders()
+        result.served = totalServed
+
         for (let line of reportLines) {
 
             if (line.pays) {
@@ -298,6 +301,22 @@ export class CreateReportingData {
                     }
                 }
             }
+
+            if (line.served) {
+                totalServed.qty += line.served.qty
+                totalServed.incl += line.served.incl
+                totalServed.excl += line.served.excl
+
+                if (line.served.prods) {
+                    for (let prod of line.served.prods) {
+                        let reportProduct = totalServed.getReportProduct(prod.id, prod.name)
+                        reportProduct.qty += prod.qty
+                        reportProduct.incl = _.round(reportProduct.incl + prod.incl, 2)
+                        reportProduct.excl = _.round(reportProduct.excl + prod.excl, 2)
+                    }
+                }
+            }
+
         }
 
         return result

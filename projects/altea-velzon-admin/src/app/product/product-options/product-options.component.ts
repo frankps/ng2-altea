@@ -40,7 +40,7 @@ export class ProductOptionsComponent implements OnInit {
       }
 
       this.optionChanges = new CollectionChangeTracker<ProductOption>(value.options, ProductOption, {
-        propsToUpdate: ['name', 'short', 'required', 'multiSelect', 'persons', 'hasDuration', 'addDur', 'hasValue', 'hasPrice', 'pvt', 'hasFormula', 'formula', 'prev'],
+        propsToUpdate: ['name', 'short', 'slug', 'required', 'multiSelect', 'persons', 'hasDuration', 'addDur', 'hasValue', 'hasPrice', 'pvt', 'hasFormula', 'formula', 'prev'],
         propsToRemove: ['values']
       })
     }

@@ -119,6 +119,8 @@ export class OrderMgrUiService {   // implements OnInit
   canForce: boolean = false
 
 
+  slugProduct: Product
+
   constructor(private productSvc: ProductService, private orderSvc: OrderService, private orderMgrSvc: OrderMgrService
     , protected spinner: NgxSpinnerService, public dbSvc: ObjectService, public alteaSvc: AlteaService, protected sessionSvc: SessionService,
     public dashboardSvc: DashboardService, protected stripeSvc: StripeService, protected resourceSvc: ResourceService, protected giftSvc: GiftService,
@@ -449,8 +451,6 @@ export class OrderMgrUiService {   // implements OnInit
     const me = this
 
 
-
-
     this.spinner.show()
 
     if (!productId) {
@@ -488,6 +488,24 @@ export class OrderMgrUiService {   // implements OnInit
     return products
   }
 
+  async loadProductBySlug(productSlug: string): Promise<Product> {
+    const me = this
+
+    this.spinner.show()
+
+    const query = new DbQuery()
+    query.and('slug', QueryOperator.equals, productSlug)
+
+    query.include('options:orderBy=idx.values:orderBy=idx', 'resources.resource', 'items', 'prices')
+
+    let product = await me.productSvc.queryFirst$(query)
+
+    this.slugProduct = product
+
+    me.spinner.hide()
+
+    return product
+  }
 
 
 
@@ -1507,8 +1525,25 @@ export class OrderMgrUiService {   // implements OnInit
     console.warn(this.order)
   }
 
+  
+  async openProductBySlug(productSlug: string, qty = 1): Promise<OrderLine> {
 
-  /** method used to add products (used in demo orders) */
+    const product = await this.loadProductBySlug(productSlug)
+
+    if (!product) {
+      console.error(`Product not found: ${productSlug}`)
+      return null
+    }
+
+   // const optionMap = this.convertOrderLineOptionsToMap(options)
+    const orderLine = await this.newOrderLine(product, qty)
+
+    return orderLine
+    
+  }
+  
+
+  /** method used to add products (used in demo orders). When product is a bundle, then it will result in multiple orderLines */
   async addProduct(product: Product, qty = 1, initOptionValues?: Map<String, String[]>): Promise<OrderLine[]> {
 
     if (product.sub == ProductSubType.bundle) {

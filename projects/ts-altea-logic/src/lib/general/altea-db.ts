@@ -1359,6 +1359,8 @@ export class AlteaDb {
 
         qry.orderBy('start')
 
+        qry.take = 10000
+
         const lines = await this.db.query$<ReportLine>(qry)
 
         return lines

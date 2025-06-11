@@ -3,6 +3,7 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
 //import { multi } from './data'
 import { AlteaService, BranchService, ObjectService, OrderService, ProductService, ResourceService, ScheduleService, SessionService, TemplateService, UserService } from 'ng-altea-common';
 import { NgxReportGenerator, ReportOptions } from 'ts-altea-logic';
+import { ReportPeriod, ReportType } from 'ts-altea-model';
 
 /**
  * Examples:
@@ -45,10 +46,11 @@ export class BranchReportComponent implements OnInit {
 
   reportGenerator: NgxReportGenerator
 
-  options: ReportOptions = {
-    cumul: true,
-    showNew: true
-  }
+  options: ReportOptions = new ReportOptions()
+  ReportPeriod = ReportPeriod
+
+  startDate = new Date(2025, 3, 1)
+  endDate = new Date()
 
   constructor(public dbSvc: ObjectService, public sessionSvc: SessionService) {
 
@@ -57,6 +59,15 @@ export class BranchReportComponent implements OnInit {
   async ngOnInit() {
 
     await this.loadData()
+
+    this.generateReport()
+  }
+
+  async changePeriod(period: ReportPeriod) {
+    console.log(period)
+    this.options.period = period
+
+    await this.reportGenerator.loadData(this.options.period, this.startDate, this.endDate)
 
     this.generateReport()
   }
@@ -78,13 +89,12 @@ export class BranchReportComponent implements OnInit {
     
     let branchId = this.sessionSvc.branchId
 
-    let startDate = new Date(2025, 4, 20)
-    let endDate = new Date()
 
 
-    this.reportGenerator = new NgxReportGenerator(this.dbSvc)
 
-    await this.reportGenerator.loadData(branchId, startDate, endDate)
+    this.reportGenerator = new NgxReportGenerator(this.dbSvc, branchId, ReportType.v1)
+
+    await this.reportGenerator.loadData(this.options.period, this.startDate, this.endDate)
   }
 
   onSelect(data): void {

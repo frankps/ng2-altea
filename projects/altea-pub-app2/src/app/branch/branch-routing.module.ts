@@ -13,6 +13,7 @@ import { MySubsComponent } from './my-subs/my-subs.component';
 import { UserContactMatchComponent } from './user-contact-match/user-contact-match.component';
 import { MyOrdersComponent } from './my-orders/my-orders.component';
 import { ProfileComponent } from './profile/profile.component';
+import { OpenComponent } from './open/open.component';
 
 const routes: Routes = [{
   path: ':branch', component: BranchComponent,
@@ -21,6 +22,8 @@ const routes: Routes = [{
     { path: "order", component: OrderComponent },
     { path: "order/:id/:mode", component: OrderComponent },
     { path: "orderMode/:mode", component: OrderComponent },
+    { path: "open/:slug", component: OpenComponent },
+    { path: "open/:slug/:options", component: OpenComponent },
     { path: "use-gift", component: UseGiftComponent },
     { path: "buy-gift", component: BuyGiftComponent },
     { path: "pay-online", component: PayOnlineComponent },
@@ -31,7 +34,7 @@ const routes: Routes = [{
     { path: "profile", component: ProfileComponent },
     { path: "user-contact", component: UserContactMatchComponent },
   ]
-}]
+}]  
 
 // my-subs
 

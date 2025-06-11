@@ -21,25 +21,30 @@
         <li class="list-group-item" *ngFor="let option of product.options; let optionIdx = index">
 
           <div class="row">
-            <div class="col-6">
+            <div class="col-8">
 
               <h6 *ngIf="option !== optionInEdit; else editOptionName">{{option.name}}</h6>
 
               <ng-template #editOptionName>
 
                 <div class="row">
-                  <div class="col-6">
+                  <div class="col-4">
 
                     <input type="text" id="name_{{option.id}}" name="name_{{option.id}}" required
                       class="form-control form-control-sm" [(ngModel)]="option.name" />
 
                   </div>
-                  <div class="col-6">
+                  <div class="col-4">
 
                     <input type="text" id="short_{{option.id}}" name="short_{{option.id}}"
                       class="form-control form-control-sm" [(ngModel)]="option.short" />
 
                   </div>
+                  <div class="col-4">
+                    <input type="text" id="slug_{{option.id}}" name="slug_{{option.id}}"
+                      class="form-control form-control-sm" [(ngModel)]="option.slug" />
+                  </div>
+
                 </div>
 
 
@@ -48,7 +53,7 @@
               </ng-template>
 
             </div>
-            <div class="col-6">
+            <div class="col-4">
 
               <ng-container *ngIf="sectionInEdit(ListSectionMode.readOnly)">
                 <i class="fas fa-trash float-end" (click)="deleteOption(option)"></i>
