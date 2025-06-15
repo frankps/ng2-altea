@@ -1096,6 +1096,7 @@
       "pronoun": "dit",
       "short": "Korte omschrijving",
       "slug": "Slug",
+      "url": "URL",
       "descr": "Omschrijving",
       "inform": "Informeer klant",
       "no-descr": "Er is geen omschrijving",
@@ -1134,6 +1135,7 @@
       "help": {
         "short": "Wordt getoond in product overzichten (menu's & zoekopdracheten) ",
         "slug": "Slug: URL-safe naam voor product",
+        "url": "Link naar product op website",
         "customers": "Aantal klanten dat gelijktijdig wordt bediend",
         "prod-name": "De naam van het product",
         "svc-name": "De naam van de dienst",

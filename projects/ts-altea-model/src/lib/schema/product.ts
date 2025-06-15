@@ -91,6 +91,8 @@ export class ProductOption extends ObjectWithIdPlus {
   idx = 0
   name?: string
   short?: string
+
+  /** used to pass option via URL (to open product with options pre-selected) */
   slug?: string
   descr?: string
   public = true
@@ -171,6 +173,12 @@ export class ProductOption extends ObjectWithIdPlus {
     return values
   }
 
+  getValueByValue(value: number): ProductOptionValue {
+    if (ArrayHelper.IsEmpty(this.values))
+      return null
+
+    return this.values.find(v => v.value == value)
+  }
 
   toProductItemOptionValues(): ProductItemOptionValue[] {
 
@@ -394,7 +402,10 @@ export class Product extends ObjectWithIdPlus {
   name?: string;
   short?: string;
 
-  /** to be used in url (open product page from website) */
+  /** link to product page on commercial website */
+  url?: string;
+
+  /** to identify product in URL (ex. open product page from website) */
   slug?: string;
 
   type?: ProductType = ProductType.prod
@@ -715,6 +726,17 @@ export class Product extends ObjectWithIdPlus {
 
     return null
 
+  }
+
+
+  getOptionBySlug(optionSlug: string): ProductOption {
+
+    if (!this.hasOptions() || !optionSlug)
+      return null
+
+    let option = this.options.find(o => o.slug == optionSlug)
+
+    return option
   }
 
 

@@ -139,6 +139,15 @@
 
             {{product?.descr}}
 
+            <ng-container *ngIf="product?.url">
+                <div class="row">
+                    <div class="col-12">
+                        <a href="https://aquasense.be/{{product.url}}" class="float-end" style="font-size: smaller;" target="_blank">Meer info over {{product.name}} op website</a>
+                    </div>
+                </div>
+               
+            </ng-container>
+
             <ng-container *ngIf="orderLineOptions && product">   <!-- orderLineOptions -->
                 <div class="mt-4">
                     <ng-container *ngFor="let option of orderLineOptions; let idx = index">

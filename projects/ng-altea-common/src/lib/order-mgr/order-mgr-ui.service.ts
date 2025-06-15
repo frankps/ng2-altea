@@ -1526,7 +1526,7 @@ export class OrderMgrUiService {   // implements OnInit
   }
 
   
-  async openProductBySlug(productSlug: string, qty = 1): Promise<OrderLine> {
+  async openProductBySlug(productSlug: string, params: any, qty = 1): Promise<OrderLine> {
 
     const product = await this.loadProductBySlug(productSlug)
 
@@ -1535,8 +1535,32 @@ export class OrderMgrUiService {   // implements OnInit
       return null
     }
 
+    const initOptionValues = new Map<String, String[]>()
+    
+    if (params) {
+
+      console.error(params)
+
+      for (const optionSlug of Object.keys(params)) {
+
+        let optionValue = params[optionSlug as keyof typeof params]
+
+        console.log(optionSlug, params[optionSlug as keyof typeof params]);
+      
+        let productOption = product.getOptionBySlug(optionSlug)
+
+        if (productOption) {
+          let productOptionValue = productOption.getValueByValue(optionValue)
+
+          if (productOptionValue) {
+            initOptionValues.set(productOption.id, [productOptionValue.id])
+          }
+        }
+      }
+    }
+
    // const optionMap = this.convertOrderLineOptionsToMap(options)
-    const orderLine = await this.newOrderLine(product, qty)
+    const orderLine = await this.newOrderLine(product, qty, initOptionValues)
 
     return orderLine
     

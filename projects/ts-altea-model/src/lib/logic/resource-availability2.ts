@@ -165,12 +165,15 @@ export class ResourceAvailability2 {
 
         }
 
+        /*
 
         let wellnessId = '31eaebbc-af39-4411-a997-f2f286c58a9d'
         let orderHasWellness = this.ctx.hasProduct(wellnessId)
 
         if (!orderHasWellness)
             this.allocateGroupPlannings()
+
+        */
 
 
     }
