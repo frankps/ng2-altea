@@ -17,7 +17,7 @@ http://localhost:4350/branch/aqua/order/01e28ce2-0014-4dfe-8e81-d4f77460ee09/con
 })
 export class OrderComponent implements OnInit {
 
- // mode: string = 'browse-catalog'  //'demo-orders'
+  // mode: string = 'browse-catalog'  //'demo-orders'
 
   contact: Contact  // (branch) contact matching user
 
@@ -97,7 +97,8 @@ export class OrderComponent implements OnInit {
   }
 
   browseCatalog() {
-    this.mode = 'browse-catalog'
+    this.gotoMode('browse-catalog')
+    //this.mode = 'browse-catalog'
   }
 
   async newDemoOrder() {
@@ -105,44 +106,52 @@ export class OrderComponent implements OnInit {
     var order = await this.orderMgrSvc.saveOrder()
 
     console.log(order)
-    this.mode = 'pay-online'
+    this.gotoMode('pay-online')
+    //this.mode = 'pay-online'
   }
 
   productSelected() {
-    this.mode = 'order-line'
+    this.gotoMode('order-line')
+    //this.mode = 'order-line'
   }
 
   newOrderLine() {
-    this.mode = 'order'
+    this.gotoMode('order')
+    //this.mode = 'order'
   }
 
   deleteOrderLine() {
 
     if (this.orderMgrSvc.nrOfOrderLines() == 0)
-      this.mode = 'browse-catalog'
+      this.gotoMode('browse-catalog')
     else
-      this.mode = 'order'
+      this.gotoMode('order')
   }
 
   showCatalog() {
-    this.mode = 'browse-catalog'
+    this.gotoMode('browse-catalog')
+    //this.mode = 'browse-catalog'
   }
 
   orderLineSelected(line: OrderLine) {
-    this.mode = 'order-line'
+    this.gotoMode('order-line')
+    //this.mode = 'order-line'
   }
 
   closeOrderLine() {
-    this.mode = 'order'
+    this.gotoMode('order')
+    //this.mode = 'order'
   }
 
 
   selectDate() {
-    this.mode = "select-date"
+    this.gotoMode("select-date")
+    //this.mode = "select-date"
   }
 
   dateSelected(date: Date) {
-    this.mode = "select-time-slot"
+    this.gotoMode("select-time-slot")
+    //this.mode = "select-time-slot"
   }
 
   /**
@@ -166,7 +175,8 @@ export class OrderComponent implements OnInit {
 
     console.warn('Current contact', this.contact)
 
-    this.mode = 'contact-select'
+    this.gotoMode("contact-select")
+    //this.mode = 'contact-select'
   }
 
 
@@ -179,6 +189,10 @@ export class OrderComponent implements OnInit {
 
   }
 
+  async gotoMode(mode: string) {
+    this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'orderMode', mode])
+  }
+
 
   async collectUserInfo() {
 
@@ -186,7 +200,9 @@ export class OrderComponent implements OnInit {
 
       this.authSvc.redirect = ['branch', 'aqua', 'orderMode', 'continue-after-sign-in']
 
-      this.mode = 'sign-in'
+      //this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'orderMode', 'sign-in'])
+      this.gotoMode('sign-in')
+      //this.mode = 'sign-in'
     }
     else {
 
@@ -219,10 +235,14 @@ export class OrderComponent implements OnInit {
 
   payOnline() {
     //  this.mode = 'pay-online'
-    this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'orderMode', 'pay-online'])
+    //this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'orderMode', 'pay-online'])
+
+    this.gotoMode('pay-online')
   }
 
   nextMode(currentMode: string) {
+
+    console.error('nextMode() triggered, current mode:', currentMode)
 
     const modes = ['browse-catalog', 'order-line', 'order', 'person-select', 'staff-select', 'select-date', 'select-time-slot', 'contact-select', 'pos-summary', 'pos-contact', 'pay-online']
 
@@ -272,7 +292,14 @@ export class OrderComponent implements OnInit {
   }
 
   gotoNextMode() {
-    this.mode = this.nextMode(this.mode)
+
+    let nextMode = this.nextMode(this.mode)
+    // this.mode = nextMode
+
+    this.gotoMode(nextMode)
+
+    //this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'orderMode', nextMode])
+
   }
 
   staffSelected(staff: string[]) {
@@ -304,7 +331,9 @@ export class OrderComponent implements OnInit {
 
   posShowContact() {
 
-    this.mode = 'contact-edit'
+   // this.mode = 'contact-edit'
+
+    this.gotoMode('contact-edit')
 
   }
 

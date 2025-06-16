@@ -70,6 +70,29 @@ export class ProductResourcesComponent implements OnInit {
     console.error(this.branchSchedules)
   }
 
+  moveUp(obj: ProductResource, idx: number) {
+
+    console.error(this.collection)
+
+    let prev = this.collection[idx - 1]
+
+    let currentIdx = obj.idx
+    obj.idx = prev.idx
+
+    prev.idx = currentIdx
+
+
+    this.collection = _.sortBy(this.collection, 'idx')
+
+    this.parent.resourceChanges?.updateId(obj.id)
+    this.parent.resourceChanges?.updateId(prev.id)
+
+    this.dirty = true
+
+    console.error(obj)
+
+  }
+
 
   getScheduleName(scheduleId: string) {
     if (!Array.isArray(this.branchSchedules) || this.branchSchedules.length == 0)

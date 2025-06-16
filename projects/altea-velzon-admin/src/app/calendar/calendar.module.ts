@@ -17,6 +17,7 @@ import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { TimepickerModule } from 'ngx-bootstrap/timepicker';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerModule } from 'ngx-spinner';
+import { TaskModule } from '../task/task.module';
 
 @NgModule({
   declarations: [CalendarComponent, SyncFusSchedulerComponent],
@@ -29,7 +30,8 @@ import { NgxSpinnerModule } from 'ngx-spinner';
     ModalModule,
     BsDatepickerModule,
     TimepickerModule,
-    NgxSpinnerModule
+    NgxSpinnerModule,
+    TaskModule
   ],
 })
 export class CalendarModule { }

@@ -97,6 +97,10 @@ export class ContactSelect2Component implements OnInit {
 
   async ngOnInit() {
 
+    let me = this
+
+    console.log(me.contact)
+
     this.appMode = this.sessionSvc.appMode
 
     if (this.appMode == AppMode.pos)
@@ -114,6 +118,7 @@ export class ContactSelect2Component implements OnInit {
     this.translateParam = { company: this.branch.name }
     console.log(this.translateParam)
 
+    console.log(me.contact)
     // this.demoData()
 
     this.initialized = true

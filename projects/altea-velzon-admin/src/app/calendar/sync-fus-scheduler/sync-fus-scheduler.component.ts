@@ -3,8 +3,8 @@ import { DayService, WeekService, WorkWeekService, MonthService, AgendaService, 
 import { DataManager, ODataV4Adaptor, Query } from '@syncfusion/ej2-data';
 import * as dateFns from 'date-fns'
 import { Unsubscribe } from 'firebase/firestore';
-import { ObjectService, OrderFirestoreService, OrderService, ResourcePlanningService, ResourceService, SessionService } from 'ng-altea-common';
-import { Order, OrderUi, Resource, ResourcePlanningUi } from 'ts-altea-model';
+import { ObjectService, OrderFirestoreService, OrderService, ResourcePlanningService, ResourceService, SessionService, TaskService } from 'ng-altea-common';
+import { Order, OrderUi, Resource, ResourcePlanningUi, Task, TaskSchedule, TaskStatus } from 'ts-altea-model';
 import { ApiListResult, DbQuery, QueryOperator, Translation, ApiResult, ApiStatus, DateHelper, ArrayHelper } from 'ts-common'
 import { CalendarBase, BaseEvent } from '../calendar-base';
 import { AlteaDb } from 'ts-altea-logic';
@@ -51,12 +51,14 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
   currentView: "Day" | "Week" | "Month" | "WorkWeek" | "Agenda" = "Week"
 
 
+  showTasks: boolean = false
+
   public eventSettings: EventSettingsModel = {
     dataSource: this.events
 
   }
 
-  constructor(sessionSvc: SessionService, private planningSvc: ResourcePlanningService, orderFirestore: OrderFirestoreService, resourceSvc: ResourceService, protected objSvc: ObjectService, protected orderSvc: OrderService) {
+  constructor(protected taskSvc: TaskService, sessionSvc: SessionService, private planningSvc: ResourcePlanningService, orderFirestore: OrderFirestoreService, resourceSvc: ResourceService, protected objSvc: ObjectService, protected orderSvc: OrderService) {
     super(sessionSvc, orderFirestore, resourceSvc, new AlteaDb(objSvc))
 
     //this.implementation = this
@@ -78,6 +80,15 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
 
     // await this.showPlanningWeek()
     // await this.showOrderWeek()
+  }
+
+  get calendarColSize() {
+    return this.showTasks ? 9 : 12
+  }
+
+
+  toggleShowTasks() {
+    this.showTasks = !this.showTasks
   }
 
   filterChanged(filterName: string) {
@@ -224,6 +235,8 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
     console.log(delFirebase)
 
   }
+
+
 
 
 

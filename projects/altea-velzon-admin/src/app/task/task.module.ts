@@ -17,13 +17,18 @@ import { TimepickerModule } from 'ngx-bootstrap/timepicker';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { TaskDashboardComponent } from './task-dashboard/task-dashboard.component';
+import { TodosComponent } from './todos/todos.component';
 
 @NgModule({
   declarations: [
     EditTaskComponent,
     ManageTasksComponent,
     TaskListComponent,
-    TaskDashboardComponent
+    TaskDashboardComponent,
+    TodosComponent
+  ],
+  exports: [
+    TodosComponent
   ],
   imports: [
     CommonModule,

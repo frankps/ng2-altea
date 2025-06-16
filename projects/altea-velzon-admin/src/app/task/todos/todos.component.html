@@ -1,0 +1,66 @@
+
+<!-- 
+(click)="editTask(task)" -->
+
+<ul class="list-group">
+
+    <li class="list-group-item active" aria-current="true" style="text-align: center;">Dagelijkse magie</li>
+
+    <li class="list-group-item" *ngFor="let task of todo" >
+
+
+        <div class="row">
+            <div class="col">
+
+                <!-- *ngIf="task.prio >= 20" -->
+
+                <i class="fa-solid fa-triangle-exclamation" [style]="task.htmlStyle()"></i>
+                {{task.loc}}
+                <span class="badge rounded-pill text-bg-primary float-end ms-2"
+                    *ngIf="task.by">{{task.by}}</span>
+
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col">{{task.name}}</div>
+
+        </div>
+        <div class="row mt-2" *ngIf="task.info">
+            <div class="col" style="text-align: center; font-style: italic; font-size: smaller;">
+                {{task.info}}
+            </div>
+        </div>
+        <div class="row mt-1">
+
+            <div class="col">
+                <!-- <button type="button" class="btn btn-sm btn-outline-primary" (click)="changeStatus(task, TaskStatus.progress)">Bezig</button> -->
+                <button type="button" class="ms-2 btn btn-sm btn-primary" (click)="changeStatus(task, TaskStatus.done)">Gedaan</button>
+            </div>
+            <div class="col">
+
+                <!--  *ngIf="task.isRecurrent()" -->
+
+<!--                         <span style="font-size: x-small;">{{'enums.task-schedule.' +
+                    task.schedule | translate}}&nbsp;<i class="fa-solid fa-rotate-right"></i></span> -->
+
+                    <span *ngIf="task.plan">{{task.date}}  {{task.time}}</span>
+
+                        <span class="badge rounded-pill text-bg-secondary float-end ms-2" *ngIf="task.origSched"
+                   ><i class="fa-solid fa-rotate-right"></i> &nbsp; {{'enums.task-schedule.' + task.origSched | translate}}</span>
+
+
+<!--                 <span class="badge rounded-pill text-bg-primary float-end ms-2"
+                    *ngFor="let id of task.hrIds">{{getResourceName(id)}}</span> -->
+
+            </div>
+
+
+
+        </div>
+
+
+
+
+    </li>
+</ul>
