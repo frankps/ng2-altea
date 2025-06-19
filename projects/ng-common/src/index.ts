@@ -10,6 +10,7 @@ export * from './lib/bootstrap5/ngx-modal/ngx-modal.component'
 //export * from './lib/services/search.service';
 export * from './lib/services/dashboard.service'
 export * from './lib/services/translation.service'
+
 export * from './lib/bootstrap5/delete-modal/delete-modal.component'
 export * from './lib/common/ng-base-component'
 export * from './lib/common/ng-base-list-component'
@@ -19,4 +20,3 @@ export * from './lib/common/ng-edit-base-component'
 export * from './lib/bootstrap5'
 export * from './lib/pipes'
 export * from './lib/controls'
-    

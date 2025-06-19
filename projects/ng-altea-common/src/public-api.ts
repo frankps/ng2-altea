@@ -15,4 +15,5 @@ export * from './lib/local.service'
 export * from './lib/messaging.service' 
 export * from './lib/bot.service' 
 export * from './lib/new-branch'
+export * from './lib/idle-notification.service'
 

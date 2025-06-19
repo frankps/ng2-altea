@@ -39,6 +39,8 @@ export class TodosComponent {
 
     query.and('status', QueryOperator.in, [TaskStatus.todo])
     query.and('schedule', QueryOperator.equals, TaskSchedule.once)
+    query.and('origSched', QueryOperator.equals, TaskSchedule.daily)
+    query.take = 5
 
     query.orderByDesc('prio').orderBy('loc').orderBy('name')
 

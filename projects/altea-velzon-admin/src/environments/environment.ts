@@ -12,6 +12,9 @@ export const environment = {
     },
     backend: 'https://dvit-477c9.uc.r.appspot.com',
     localServer: 'https://altea.dvit.local',
-    userSelectIdleTime: 300  
+    idleTime: {
+      userSelect: 300,
+      showTaks: 10
+    }
   };
   

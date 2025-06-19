@@ -171,6 +171,8 @@ ng generate service data-services/sql/payment --project ng-altea-common
 ng generate service data-services/sql/loyaltyCardChange --project ng-altea-common
 
 
+ng generate service IdleNotification --project ng-common
+
 ng generate service stripe --project ng-altea-common
 
 ng generate service messaging --project ng-altea-common

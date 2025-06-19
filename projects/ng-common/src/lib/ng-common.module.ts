@@ -21,6 +21,6 @@ import { NgSelectModule } from '@ng-select/ng-select';
     NgSelectModule
   ],
   declarations: [IntdatePipe, TimePickerComponent],
-  exports: [NgxModalComponent, IntdatePipe, TimePickerComponent],
+  exports: [NgxModalComponent, IntdatePipe, TimePickerComponent ],
 })
 export class NgCommonModule { }

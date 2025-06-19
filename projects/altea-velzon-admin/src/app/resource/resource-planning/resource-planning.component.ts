@@ -127,7 +127,7 @@ export class ResourcePlanningComponent implements OnInit {
 
     let startDate = new Date()
     startDate = dateFns.startOfMonth(startDate)
-    startDate = dateFns.subMonths(startDate, 3)
+    //startDate = dateFns.subMonths(startDate, 1)
     let startNum = DateHelper.yyyyMMdd000000(startDate)
 
 

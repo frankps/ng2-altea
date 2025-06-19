@@ -1,19 +1,21 @@
 import { AfterContentChecked, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
-import { BranchService, LoyaltyProgramService, ObjectService, ProductService, ResourceService, ScheduleService, SessionService, TemplateService, TypeInfoService } from 'ng-altea-common';
+import { BranchService, IdleNotificationService, LoyaltyProgramService, ObjectService, ProductService, ResourceService, ScheduleService, SessionService, TemplateService, TypeInfoService, IdleNotification } from 'ng-altea-common';
 import { BsLocaleService } from 'ngx-bootstrap/datepicker';
 import { AppMode, Branch, LoyaltyProgram, Product, Resource, Template, TypeInfo } from 'ts-altea-model';
 import { DbQuery, QueryOperator } from 'ts-common';
-import { Idle, DEFAULT_INTERRUPTSOURCES } from '@ng-idle/core';
+//import { Idle, DEFAULT_INTERRUPTSOURCES } from '@ng-idle/core';
+//import { Idle, IdleExpiry, LocalStorageExpiry, DEFAULT_INTERRUPTSOURCES } from '@ng-idle/core';
 import { UserSelectComponent } from 'projects/ng-altea-common/src/lib/pos/user-select/user-select.component';
 import { DashboardService } from 'ng-common';
 import { environment } from '../environments/environment';
 import { Router } from '@angular/router';
-
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'ngx-altea-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
+
 })
 export class AppComponent implements OnInit {
   title = 'altea-velzon-admin';
@@ -25,54 +27,41 @@ export class AppComponent implements OnInit {
 
   @ViewChild('userSelect') public userSelect: UserSelectComponent;
 
-  constructor(private idle: Idle, private localeService: BsLocaleService, private branchSvc: BranchService, private sessionSvc: SessionService, private dashboardSvc: DashboardService
+  currentState: IdleNotification = {
+    isIdle: false,
+    idleTimeSeconds: 0,
+    totalIdleTimeSeconds: 0,
+    isWarning: false,
+    timestamp: new Date()
+  };
+
+
+  private idleSubscription?: Subscription;
+
+
+
+
+  constructor(private localeService: BsLocaleService, private branchSvc: BranchService, private sessionSvc: SessionService, private dashboardSvc: DashboardService, private idleService: IdleNotificationService
     , private productSvc: ProductService, private resourceSvc: ResourceService, private typeInfoSvc: TypeInfoService,
     private scheduleSvc: ScheduleService, private loyaltyProgramSvc: LoyaltyProgramService, private templateSvc: TemplateService, private objectSvc: ObjectService, protected router: Router) {
     this.localeService.use('nl-be');
 
-    this.configUserSelectOnIdle(idle)
+
 
   }
 
-  
-  configUserSelectOnIdle(idle: Idle) {
-
-    if (Number.isInteger(environment.userSelectIdleTime) && environment.userSelectIdleTime > 0) {
-
-      // sets an idle timeout of 5 seconds, for testing purposes.
-      idle.setIdle(environment.userSelectIdleTime);
-      // sets the default interrupts, in this case, things like clicks, scrolls, touches to the document
-      idle.setInterrupts(DEFAULT_INTERRUPTSOURCES);
-
-      idle.onIdleEnd.subscribe(() => {
-        this.idleState = 'No longer idle.'
-        console.warn(this.idleState)
-      });
-      idle.onTimeout.subscribe(() => {
-        this.idleState = 'Timed out!';
-        this.timedOut = true;
-        console.warn(this.idleState)
-      });
-      idle.onIdleStart.subscribe(() => {
-        this.idleState = 'You\'ve gone idle!'
-        console.warn(this.idleState)
-
+  /*
+  to do on idle: 
         if (this.userSelect && !this.userSelect.open)
-          this.userSelect.show()
-      });
+          this.userSelect.show() 
+  */
 
-      idle.onTimeoutWarning.subscribe((countdown) => this.idleState = 'You will time out in ' + countdown + ' seconds!');
 
-      this.resetIdle()
-    }
-
-  }
-
-  resetIdle() {
-    this.idle.watch();
-    this.idleState = 'Started.';
-    this.timedOut = false;
-  }
+  /*   resetIdle() {
+  
+      this.idleState = 'Started.';
+      this.timedOut = false;
+    } */
 
 
   userSelected(humanResource: Resource) {
@@ -82,21 +71,55 @@ export class AppComponent implements OnInit {
     this.dashboardSvc.resourceId = humanResource?.id
   }
 
+  initIdle() {
+
+    // Subscribe to idle notifications
+    this.idleSubscription = this.idleService.idleNotification$.subscribe(
+      (notification: IdleNotification) => {
+        this.currentState = notification;
+
+        // Component-specific logic
+        this.handleIdleStateChange(notification);
+
+        console.log('[SCHEDULER] Idle notification:', notification);
+      }
+    );
+  }
+
+  private handleIdleStateChange(notification: IdleNotification): void {
+
+    // Auto-save if user has been idle for more than 2 minutes
+    let reactToIdle = notification.isIdle && notification.idleTimeSeconds > 20;
+
+    if (reactToIdle) {
+      if (this.userSelect && !this.userSelect.open)
+        this.userSelect.show()
+    }
+
+
+  }
 
 
   async ngOnInit() {
 
+    // Initialize the idle service with custom config, all in seconds
+    this.idleService.initialize({
+      idleTimeSeconds: 10,              // 5 minutes before idle
+      timeoutWarningSeconds: 60,         // 1 minute warning
+      notificationIntervalSeconds: 5    // Notify every 30 seconds
+    });
 
+    //this.configUserSelectOnIdle(this.idle)
 
     this.sessionSvc.appMode = AppMode.pos
 
     // await this.configureCaches()
 
-  
+
     const branch = await this.branchSvc.get$(this.sessionSvc.branchId)
     this.sessionSvc.branch = branch
     console.error(branch)
-    
+
 
     this.appReady = true
 
@@ -110,11 +133,18 @@ export class AppComponent implements OnInit {
         // this.router.navigate([branch.unique, 'branch'])
 
       }
-        
-    
+
+
     })
 
+    this.initIdle()
 
+
+  }
+
+
+  ngOnDestroy(): void {
+    this.idleSubscription?.unsubscribe();
   }
 
 
@@ -152,7 +182,7 @@ export class AppComponent implements OnInit {
     await this.resourceSvc.initCache(typeInfos)
     this.objectSvc.typeCaches.set(Resource, this.resourceSvc)
 
-    
+
 
 
     const loyaltyProgramQry = new DbQuery()

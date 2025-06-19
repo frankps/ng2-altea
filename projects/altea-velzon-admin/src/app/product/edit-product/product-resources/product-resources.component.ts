@@ -72,6 +72,23 @@ export class ProductResourcesComponent implements OnInit {
 
   moveUp(obj: ProductResource, idx: number) {
 
+    // first make sure all indexes are unique (otherwise the move up/down will not work)
+    const uniqueIndexes = _.uniqBy(this.collection, 'idx')
+
+    if (uniqueIndexes.length != this.collection.length) {
+      let idx = 0
+      for (let prodRes of this.collection) {
+
+        if (prodRes.idx != idx) {
+          prodRes.idx = idx
+
+          this.parent.resourceChanges?.updateId(prodRes.id)
+        }
+
+        idx += 100
+      }
+    }
+
     console.error(this.collection)
 
     let prev = this.collection[idx - 1]
@@ -79,7 +96,10 @@ export class ProductResourcesComponent implements OnInit {
     let currentIdx = obj.idx
     obj.idx = prev.idx
 
-    prev.idx = currentIdx
+    if (currentIdx > prev.idx)
+      prev.idx = currentIdx
+    else
+      prev.idx = obj.idx + 1
 
 
     this.collection = _.sortBy(this.collection, 'idx')

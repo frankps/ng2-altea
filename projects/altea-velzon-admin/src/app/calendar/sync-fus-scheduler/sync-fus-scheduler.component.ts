@@ -3,11 +3,17 @@ import { DayService, WeekService, WorkWeekService, MonthService, AgendaService, 
 import { DataManager, ODataV4Adaptor, Query } from '@syncfusion/ej2-data';
 import * as dateFns from 'date-fns'
 import { Unsubscribe } from 'firebase/firestore';
-import { ObjectService, OrderFirestoreService, OrderService, ResourcePlanningService, ResourceService, SessionService, TaskService } from 'ng-altea-common';
+import { ObjectService, OrderFirestoreService, OrderService, ResourcePlanningService, ResourceService, SessionService, TaskService, IdleNotificationService, IdleNotification } from 'ng-altea-common';
 import { Order, OrderUi, Resource, ResourcePlanningUi, Task, TaskSchedule, TaskStatus } from 'ts-altea-model';
 import { ApiListResult, DbQuery, QueryOperator, Translation, ApiResult, ApiStatus, DateHelper, ArrayHelper } from 'ts-common'
 import { CalendarBase, BaseEvent } from '../calendar-base';
 import { AlteaDb } from 'ts-altea-logic';
+//import { Idle, DEFAULT_INTERRUPTSOURCES } from '@ng-idle/core';
+//import { Idle, IdleExpiry, LocalStorageExpiry, DEFAULT_INTERRUPTSOURCES } from '@ng-idle/core';
+import { environment } from '../../../environments/environment';
+import { Subscription } from 'rxjs';
+
+
 /*
 https://ej2.syncfusion.com/angular/documentation/schedule/getting-started
 
@@ -40,7 +46,8 @@ export class SyncFusSchedulerEvent {
   selector: 'app-sync-fus-scheduler',
   templateUrl: './sync-fus-scheduler.component.html',
   styleUrls: ['./sync-fus-scheduler.component.scss'],
-  providers: [DayService, WeekService, WorkWeekService, MonthService, AgendaService, MonthAgendaService, TimelineViewsService, TimelineMonthService]
+  providers: [DayService, WeekService, WorkWeekService, MonthService, AgendaService, MonthAgendaService, TimelineViewsService, TimelineMonthService
+  ]
 })
 export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
 
@@ -50,7 +57,6 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
   public timeFormat: string = "HH:mm";
   currentView: "Day" | "Week" | "Month" | "WorkWeek" | "Agenda" = "Week"
 
-
   showTasks: boolean = false
 
   public eventSettings: EventSettingsModel = {
@@ -58,13 +64,29 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
 
   }
 
-  constructor(protected taskSvc: TaskService, sessionSvc: SessionService, private planningSvc: ResourcePlanningService, orderFirestore: OrderFirestoreService, resourceSvc: ResourceService, protected objSvc: ObjectService, protected orderSvc: OrderService) {
+
+  currentState: IdleNotification = {
+    isIdle: false,
+    idleTimeSeconds: 0,
+    totalIdleTimeSeconds: 0,
+    isWarning: false,
+    timestamp: new Date()
+  };
+  
+
+  private idleSubscription?: Subscription;
+
+
+
+  constructor(private idleService: IdleNotificationService, protected taskSvc: TaskService, sessionSvc: SessionService, private planningSvc: ResourcePlanningService, orderFirestore: OrderFirestoreService, resourceSvc: ResourceService, protected objSvc: ObjectService, protected orderSvc: OrderService) {
     super(sessionSvc, orderFirestore, resourceSvc, new AlteaDb(objSvc))
 
     //this.implementation = this
     console.log(this.events)
 
     //this.orderFirestore.getOrders()
+
+
 
   }
 
@@ -80,7 +102,49 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
 
     // await this.showPlanningWeek()
     // await this.showOrderWeek()
+
+    this.initIdle()
   }
+
+  ngOnDestroy(): void {
+    this.idleSubscription?.unsubscribe();
+  }
+
+
+  initIdle() {
+
+    // Subscribe to idle notifications
+    this.idleSubscription = this.idleService.idleNotification$.subscribe(
+      (notification: IdleNotification) => {
+        this.currentState = notification;
+        
+        // Component-specific logic
+        this.handleIdleStateChange(notification);
+        
+        console.log('[SCHEDULER] Idle notification:', notification);
+      }
+    );
+  }
+
+  private handleIdleStateChange(notification: IdleNotification): void {
+
+    // Auto-save if user has been idle for more than 2 minutes
+    let reactToIdle = notification.isIdle && notification.idleTimeSeconds > 10;
+
+    if (reactToIdle) {
+      this.showTasks = true
+    }
+    
+
+  }
+  // for the idle functionality
+/*     idleState = 'Not started.';
+    timedOut = false; */
+
+
+
+
+
 
   get calendarColSize() {
     return this.showTasks ? 9 : 12
