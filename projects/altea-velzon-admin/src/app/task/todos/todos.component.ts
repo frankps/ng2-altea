@@ -37,10 +37,10 @@ export class TodosComponent {
   getTodoQuery() {
     const query = new DbQuery()
 
-    query.and('status', QueryOperator.in, [TaskStatus.todo])
+    query.and('status', QueryOperator.in, [TaskStatus.todo, TaskStatus.progress])
     query.and('schedule', QueryOperator.equals, TaskSchedule.once)
     query.and('origSched', QueryOperator.equals, TaskSchedule.daily)
-    query.take = 5
+    query.take = 50
 
     query.orderByDesc('prio').orderBy('loc').orderBy('name')
 
@@ -52,14 +52,19 @@ export class TodosComponent {
 
     console.error('changeStatus', task, newStatus)
 
+    if (newStatus == TaskStatus.progress && task.status == TaskStatus.progress) {
+      newStatus = TaskStatus.todo
+    }
+    
     task.status = newStatus
 
     const update: any = {}
     update['id'] = task.id
     update['status'] = newStatus
 
-    if (newStatus == TaskStatus.progress)
+    if (newStatus == TaskStatus.progress) {       
       update['startedAt'] = new Date()
+    }
 
     if (newStatus == TaskStatus.done || newStatus == TaskStatus.skip)
       update['finishedAt'] = new Date()

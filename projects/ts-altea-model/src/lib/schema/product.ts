@@ -1,5 +1,5 @@
 
-import { Branch, DepositMode, DurationMode, DurationReference, Gender, Gift, Invoice, LoyaltyCard, OnlineMode, Order, OrderLine, OrderType, Organisation, ProductOnlineIcons, ProductTypeIcons, Resource, ResourcePlanning, Schedule, Subscription, User, UserBase } from "ts-altea-model";
+import { Branch, DepositMode, DurationMode, DurationReference, Gender, Gift, Invoice, LoyaltyCard, OnlineMode, Order, OrderLine, OrderType, Organisation, ProductOnlineIcons, ProductTypeIcons, Resource, ResourcePlanning, Schedule, Subscription, Task, User, UserBase } from "ts-altea-model";
 import { Exclude, Type, Transform } from "class-transformer";
 import 'reflect-metadata';
 import { ArrayHelper, ConnectTo, DateHelper, DbObjectCreate, IAsDbObject, ManagedObject, ObjectHelper, ObjectMgmt, ObjectReference, ObjectWithId, ObjectWithIdPlus, QueryOperator, TimeHelper } from 'ts-common'
@@ -386,6 +386,10 @@ export class Product extends ObjectWithIdPlus {
   resources?: ProductResource[]
 
   lines?: OrderLine[]
+
+  /** certain tasks are related to a product (make a dish, clean-up) */
+  @Type(() => Task)
+  tasks?: Task[]
 
   //  bundle: boolean = false
 

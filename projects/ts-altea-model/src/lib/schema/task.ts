@@ -75,6 +75,10 @@ export class Task extends ObjectWithIdPlus {
   /* name of user executing/executed task */
   by?: string
 
+  /** certain tasks are related to a product (make a dish, clean-up) */
+  productId?: string
+  product?: Product
+
   status = TaskStatus.todo
 
   imp?: string  // important

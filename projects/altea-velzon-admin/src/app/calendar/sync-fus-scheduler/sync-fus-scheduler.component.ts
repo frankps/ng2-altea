@@ -12,6 +12,7 @@ import { AlteaDb } from 'ts-altea-logic';
 //import { Idle, IdleExpiry, LocalStorageExpiry, DEFAULT_INTERRUPTSOURCES } from '@ng-idle/core';
 import { environment } from '../../../environments/environment';
 import { Subscription } from 'rxjs';
+import { DashboardService } from 'ng-common';
 
 
 /*
@@ -72,19 +73,22 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
     isWarning: false,
     timestamp: new Date()
   };
-  
+
 
   private idleSubscription?: Subscription;
 
 
 
-  constructor(private idleService: IdleNotificationService, protected taskSvc: TaskService, sessionSvc: SessionService, private planningSvc: ResourcePlanningService, orderFirestore: OrderFirestoreService, resourceSvc: ResourceService, protected objSvc: ObjectService, protected orderSvc: OrderService) {
+  constructor(private idleService: IdleNotificationService, protected taskSvc: TaskService, sessionSvc: SessionService, private planningSvc: ResourcePlanningService,
+    orderFirestore: OrderFirestoreService, resourceSvc: ResourceService, protected objSvc: ObjectService, protected orderSvc: OrderService,
+    private dashboardSvc: DashboardService) {
     super(sessionSvc, orderFirestore, resourceSvc, new AlteaDb(objSvc))
 
     //this.implementation = this
     console.log(this.events)
 
     //this.orderFirestore.getOrders()
+
 
 
 
@@ -103,6 +107,11 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
     // await this.showPlanningWeek()
     // await this.showOrderWeek()
 
+
+    /** we need to have enough screen space to show tasks */
+/*     if (!this.dashboardSvc.isMobile)
+      this.showTasks = true */
+
     this.initIdle()
   }
 
@@ -117,10 +126,10 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
     this.idleSubscription = this.idleService.idleNotification$.subscribe(
       (notification: IdleNotification) => {
         this.currentState = notification;
-        
+
         // Component-specific logic
         this.handleIdleStateChange(notification);
-        
+
         console.log('[SCHEDULER] Idle notification:', notification);
       }
     );
@@ -129,17 +138,21 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
   private handleIdleStateChange(notification: IdleNotification): void {
 
     // Auto-save if user has been idle for more than 2 minutes
-    let reactToIdle = notification.isIdle && notification.idleTimeSeconds > 10;
+    let reactToIdle = notification.isIdle && notification.idleTimeSeconds > 30;
 
     if (reactToIdle) {
-      this.showTasks = true
+
+      /** we need to have enough screen space to show tasks */
+      if (!this.dashboardSvc.isMobile)
+        this.showTasks = true
+
     }
-    
+
 
   }
   // for the idle functionality
-/*     idleState = 'Not started.';
-    timedOut = false; */
+  /*     idleState = 'Not started.';
+      timedOut = false; */
 
 
 

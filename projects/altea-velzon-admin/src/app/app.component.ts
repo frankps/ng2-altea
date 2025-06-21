@@ -89,7 +89,7 @@ export class AppComponent implements OnInit {
   private handleIdleStateChange(notification: IdleNotification): void {
 
     // Auto-save if user has been idle for more than 2 minutes
-    let reactToIdle = notification.isIdle && notification.idleTimeSeconds > 20;
+    let reactToIdle = notification.isIdle && notification.idleTimeSeconds > 30;
 
     if (reactToIdle) {
       if (this.userSelect && !this.userSelect.open)
@@ -104,9 +104,10 @@ export class AppComponent implements OnInit {
 
     // Initialize the idle service with custom config, all in seconds
     this.idleService.initialize({
-      idleTimeSeconds: 10,              // 5 minutes before idle
+      idleTimeSeconds: 60,              // seconds before idle
       timeoutWarningSeconds: 60,         // 1 minute warning
-      notificationIntervalSeconds: 5    // Notify every 30 seconds
+      notificationIntervalSeconds: 5,    // Notify every 30 seconds
+      enableHealthChecks: false  // Disable if causing problems
     });
 
     //this.configUserSelectOnIdle(this.idle)
