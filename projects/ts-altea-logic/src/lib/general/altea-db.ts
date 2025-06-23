@@ -239,6 +239,29 @@ export class AlteaDb {
         return orders
     }
 
+    async getOrdersForProducts(start: Date, end: Date, productIds: string[]): Promise<Order[]> {
+
+        const qry = new DbQueryTyped<Order>('order', Order)
+
+        qry.include('lines.product')
+
+        let startNum = DateHelper.yyyyMMddhhmmss(start)
+        let endNum = DateHelper.yyyyMMddhhmmss(end)
+
+
+        qry.and('start', QueryOperator.greaterThanOrEqual, startNum)
+        qry.and('start', QueryOperator.lessThanOrEqual, endNum)
+
+        let orderLineFilter = new QueryCondition()
+        orderLineFilter.and('productId', QueryOperator.in, productIds)
+
+        qry.and('lines', QueryOperator.some, orderLineFilter)
+
+        const orders = await this.db.query$<Order>(qry)
+
+        return orders
+
+    }
     async getOrdersWithPaymentsBetween(start: Date, end: Date, lastId?: string, take: number = 25, types?: PaymentType[]): Promise<Order[]> {   // , types?: PaymentType[]
 
         let startNum = DateHelper.yyyyMMddhhmmss(start)
@@ -603,7 +626,33 @@ export class AlteaDb {
 
     }
 
+    async getProductRelatedTasks() {
 
+        const qry = new DbQueryTyped<Task>('task', Task)
+
+        qry.include('product')
+
+        qry.and('schedule', QueryOperator.equals, TaskSchedule.product)
+        qry.and('act', QueryOperator.equals, true)
+
+        const tasks = await this.db.query$<Task>(qry)
+
+        return tasks
+    }
+
+    async getTasksForOrders(orderIds: string[]) {
+
+        const qry = new DbQueryTyped<Task>('task', Task)
+
+        qry.include('product')
+
+        qry.and('orderId', QueryOperator.in, orderIds)
+        qry.and('act', QueryOperator.equals, true)
+
+        const tasks = await this.db.query$<Task>(qry)
+
+        return tasks
+    }
 
 
     async getRecurringTasks() {
@@ -713,12 +762,6 @@ export class AlteaDb {
 
         let objectsToUpdate = ObjectHelper.extractArrayProperties(objects, ['id', ...propertiesToUpdate])
 
-        /*
-        let dbObjectMany = new DbObjectMulti(typeName, type, objectsToUpdate)
-
-        let updateResult = await this.db.updateMany$<ObjectWithId, T>(dbObjectMany)
-*/
-
         let updateResult = await this.updatePartialObjects(typeName, type, objectsToUpdate)
 
         return updateResult
@@ -743,6 +786,22 @@ export class AlteaDb {
 
         return createResult
     }
+
+    async deleteObjectsByIds<T extends ObjectWithId>(typeName: string, type: { new(): T; }, objectIds: string[]): Promise<ApiResult<T>> {
+
+        if (ArrayHelper.IsEmpty(objectIds))
+            return ApiResult.ok('No objects to delete!')
+
+        const qry = new DbQueryBaseTyped<T>(typeName, type)
+        qry.and('id', QueryOperator.in, objectIds)
+
+        const res = await this.db.deleteMany$(qry)
+
+        return ApiResult.ok()
+    }
+
+
+    /*
 
 
 
@@ -1418,5 +1477,39 @@ export class AlteaDb {
         return updateResult
     }
 
+
+    /** Tasks */
+
+
+    async getTasksByIds(ids: string[]): Promise<Task[]> {
+
+        const objects = await this.getObjectsByIds('task', Task, ids)
+        return objects
+    }
+
+    async createTasks(tasks: Task[]): Promise<ApiListResult<Task>> {
+
+        let createResult = await this.createObjects('task', Task, tasks)
+        return createResult
+
+    }
+
+    async updateTask(task: Task, propertiesToUpdate: string[]): Promise<ApiResult<Task>> {
+
+        let updateResult = await this.updateObject('task', Task, task, propertiesToUpdate)
+        return updateResult
+    }
+
+    async updateTasks(tasks: Task[], propertiesToUpdate: string[]): Promise<ApiListResult<Task>> {
+
+        let updateResult = await this.updateObjects('task', Task, tasks, propertiesToUpdate)
+        return updateResult
+
+    }
+
+    async deleteTasks(ids: string[]): Promise<any> {
+        let deleteResult = await this.deleteObjectsByIds('task', Task, ids)
+        return deleteResult
+    }
 
 }

@@ -69,8 +69,6 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
   currentState: IdleNotification = {
     isIdle: false,
     idleTimeSeconds: 0,
-    totalIdleTimeSeconds: 0,
-    isWarning: false,
     timestamp: new Date()
   };
 
@@ -138,9 +136,9 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
   private handleIdleStateChange(notification: IdleNotification): void {
 
     // Auto-save if user has been idle for more than 2 minutes
-    let reactToIdle = notification.isIdle && notification.idleTimeSeconds > 30;
+  
 
-    if (reactToIdle) {
+    if (notification.isIdle) {
 
       /** we need to have enough screen space to show tasks */
       if (!this.dashboardSvc.isMobile)

@@ -2,7 +2,7 @@ import { Component, ViewChild, inject } from '@angular/core';
 import { Contact, DateRangeTests, Message, MsgType, Order, PaymentType, PriceCondition, PriceConditionType, Product, SmsMessage, TemplateChannel, User, ValueComparator } from 'ts-altea-model';
 import { SearchContactComponent } from '../../contact/search-contact/search-contact.component';
 import { AlteaService, BranchService, ObjectService, OrderService, ProductService, ResourceService, ScheduleService, SessionService, TemplateService, UserService } from 'ng-altea-common';
-import { AlteaDb, CheckDeposists, CreateReportingData, OrderCronJobs, OrderMessaging, OrderMgmtService } from 'ts-altea-logic';
+import { AlteaDb, CheckDeposists, CreateReportingData, OrderCronJobs, OrderMessaging, OrderMgmtService, TaskSchedulingService } from 'ts-altea-logic';
 import { TranslationService } from 'ng-common'
 import { Country } from 'ts-altea-model'
 import { DbQuery, ObjectHelper, QueryOperator, Translation } from 'ts-common';
@@ -79,11 +79,23 @@ export class DemoComponent {
     let alteaDb = new AlteaDb(this.dbSvc)
     let createReportingData = new CreateReportingData(alteaDb)
 
-/*      console.error('aggregateReportData')
-    return  */
+    /*      console.error('aggregateReportData')
+        return  */
 
 
     await createReportingData.aggregateAll(this.sessionSvc.branchId, new Date(2025, 3, 1), new Date())
+  }
+
+
+  async prepareProductTasks() {
+    let alteaDb = new AlteaDb(this.dbSvc)
+
+    let taskSvc = new TaskSchedulingService(alteaDb)
+
+    let res = await taskSvc.instantiateProductRelatedTasks()
+
+    console.error(res)
+
   }
 
   async createReports() {
@@ -112,7 +124,7 @@ export class DemoComponent {
     })
     */
 
-   this.spinner.show()
+    this.spinner.show()
 
     let res = await createReportingData.createForDays(branchId, startDate, endDate)
 

@@ -1,7 +1,7 @@
 
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbObjectCreate, DbObjectMulti, DbObjectMultiCreate, DbQuery, DbQueryTyped, ObjectHelper, QueryOperator } from 'ts-common'
-import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, OrderLine, Subscription, Product, PriceChangeType } from 'ts-altea-model'
+import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, OrderLine, Subscription, Product, PriceChangeType, OrderLineOption } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { AlteaDb } from '../general/altea-db'
 import { IDb } from '../interfaces/i-db'
@@ -70,27 +70,32 @@ export class SubscriptionMgmtService {
 
             let qty = prodItem.qty 
 
-            if (prodItem.optionQty) {
-                let option = orderLine.getOptionById(prodItem.optionId)
+            let optionDefiningQty: OrderLineOption = null
 
-                if (!option) {
+            if (prodItem.optionQty) {
+                optionDefiningQty = orderLine.getOptionById(prodItem.optionId)
+
+                if (!optionDefiningQty) {
                     let msg = `Option defining subscription quantity not found: ${prodItem.optionId}`
                     console.error(msg)
                 }
 
-                if (!option.hasValues()) {
-                    let msg = `Option defining subscription quantity has no selected values: ${option.name}`
+                if (!optionDefiningQty.hasValues()) {
+                    let msg = `Option defining subscription quantity has no selected values: ${optionDefiningQty.name}`
                     console.error(msg)
                 }
 
-                let value = option.values[0]
+                let value = optionDefiningQty.values[0]
                 qty = _.round(value.val, 0)
             } 
         
             qty = (qty + extraQtyAbs) * extraQtyPct
             qty = _.round(qty,0)
-            
 
+            /** when qty is coming from option, user might have selected 0 */
+            if (qty == 0)
+                continue
+            
             for (let i = 0; i < orderLine.qty; i++) {
 
                 const sub = new Subscription()
@@ -99,6 +104,10 @@ export class SubscriptionMgmtService {
                 sub.contactId = order.contactId
                 sub.orderId = order.id
                 sub.name = prod.name
+
+                if (optionDefiningQty?.name) {
+                    sub.name += `: ${optionDefiningQty.name}`
+                }
 
                 sub.subscriptionProductId = prod.id
                 sub.unitProductId = prodItem.productId

@@ -1,6 +1,11 @@
+<ngx-altea-search-product #searchProductModal (select)="productSelected($event)"></ngx-altea-search-product>
+
+
 <button type="button" class="btn btn-primary btn-sm" (click)="scheduleTasks()">Schedule tasks</button>
 
 <button type="button" class="btn btn-primary btn-sm" (click)="gotoOther()">Other task</button>
+
+
 
 
 
@@ -39,6 +44,8 @@
         [editSectionId]="editSectionId" (save)="save()" (cancel)="cancel()" (editModeChanged)="editModeChanged($event)"
         [enableSave]="!taskForm?.form.pristine && taskForm?.form.valid">
 
+
+
         <ng-container readonly>
 
             <div class="row">
@@ -67,6 +74,13 @@
                 <div class="col-6"> <ngx-altea-label-value label="objects.task.hrIds"
                         [value]="hrNames"></ngx-altea-label-value> </div>
             </div>
+
+            <div class="row" *ngIf="object.schedule == TaskSchedule.product">
+                <div class="col">Gelinkt aan product: {{object.product?.name}}</div>
+                
+            </div>
+
+
 
         </ng-container>
 
@@ -115,11 +129,32 @@
                     </div>
                 </div>
 
+                <div class="row {{css_cls_row}}" *ngIf="object.schedule == TaskSchedule.product">
+                    <div class="col-6">{{object.product?.name}}</div>
+                    <div class="col-6">
+
+                        <button type="button" class="btn btn-primary btn-sm" (click)="searchProduct()">Zoek
+                            product</button>
+
+                        <button type="button" *ngIf="object.productId" class="btn btn-primary btn-sm" (click)="clearProduct()">Clear
+                            product</button>
+
+                    </div>
+                </div>
+
                 <div class="row {{css_cls_row}}">
-                    <div class="col">
+                    <div class="col-6">
                         <ngx-altea-label-control label="objects.task.time" for="time">
                             <input type="time" id="time" name="time" class="form-control" [(ngModel)]="object.time" />
                         </ngx-altea-label-control>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="bef" name="bef" [(ngModel)]="object.bef" />
+                            <label class="form-check-label" for="bef" translate="objects.task.bef"></label>
+                        </div>
+
+
                     </div>
                 </div>
                 <div class="row {{css_cls_row}}">
@@ -150,7 +185,6 @@
                         </ngx-altea-label-control>
                     </div>
                 </div>
-
 
 
 

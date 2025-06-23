@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { TaskService } from 'ng-altea-common';
+import { SessionService, TaskService } from 'ng-altea-common';
 import { Task, TaskSchedule, TaskStatus } from 'ts-altea-model';
 import { ApiStatus, DbQuery, QueryOperator } from 'ts-common';
 
@@ -17,13 +17,13 @@ export class TodosComponent {
 
   TaskStatus = TaskStatus
 
-  constructor(protected taskSvc: TaskService) {
+  constructor(protected taskSvc: TaskService, protected sessionSvc: SessionService) {
 
   }
 
   async ngOnInit() {
 
-    await this.refresh()  
+    await this.refresh()
 
   }
 
@@ -55,14 +55,17 @@ export class TodosComponent {
     if (newStatus == TaskStatus.progress && task.status == TaskStatus.progress) {
       newStatus = TaskStatus.todo
     }
-    
+
     task.status = newStatus
 
     const update: any = {}
     update['id'] = task.id
     update['status'] = newStatus
 
-    if (newStatus == TaskStatus.progress) {       
+    if (this.sessionSvc.humanResource)
+      update['hrExecId'] = this.sessionSvc.humanResource.id
+
+    if (newStatus == TaskStatus.progress) {
       update['startedAt'] = new Date()
     }
 
@@ -82,9 +85,9 @@ export class TodosComponent {
     const res = await this.taskSvc.update$(update)
 
     if (res.status == ApiStatus.ok) {
-      
+
       this.errorMsg = ''
-      
+
     } else {
       this.errorMsg = res.message
       console.error(res)

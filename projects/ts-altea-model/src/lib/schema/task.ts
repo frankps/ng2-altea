@@ -24,7 +24,8 @@ export enum TaskSchedule {
   monthly = 'monthly',
   quarterly = 'quarterly',
   yearly = 'yearly',
-  manual = 'manual'
+  manual = 'manual',
+  product = 'product'
 }
 
 export enum TaskStatus {
@@ -53,7 +54,10 @@ export class Task extends ObjectWithIdPlus {
   date?: number // format: yyyymmdd  
   time: string // format: hh:mm
 
-  // the parent recurring task
+  /** if true, then the task is scheduled 'time' (ex 02:00) before the product/service is planned */
+  bef = false 
+
+  /** the parent recurring task */
   rTaskId?: string
 
   schedule = TaskSchedule.once
@@ -75,9 +79,12 @@ export class Task extends ObjectWithIdPlus {
   /* name of user executing/executed task */
   by?: string
 
-  /** certain tasks are related to a product (make a dish, clean-up) */
+  /** certain tasks are related to a product/service (make a dish, clean-up):  schedule='product' */
   productId?: string
   product?: Product
+
+  /** when product related tasks are scheduled, the orderId is set and schedule becomes 'once' */
+  orderId?: string
 
   status = TaskStatus.todo
 

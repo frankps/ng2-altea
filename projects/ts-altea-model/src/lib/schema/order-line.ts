@@ -177,6 +177,13 @@ export class OrderLineOption extends ObjectWithId {
     return this.values.findIndex(v => v.val == val) >= 0
   }
 
+  firstValueVal(): number {
+    if (!this.hasValues())
+      return 0
+
+    return this.values[0].val
+  }
+
   getValueVals(): number[] {
     if (!this.hasValues())
       return []
@@ -395,6 +402,15 @@ export class PriceChange {
 
   /** is a promotion */
   promo: boolean = false
+
+  static new(id: string, val: number, promo: boolean = false, info: string = '') : PriceChange {
+    let pc = new PriceChange()
+    pc.id = id
+    pc.val = val
+    pc.promo = promo
+    pc.info = info
+    return pc
+  }
 
   isPrice() {
     return this.tp == PriceChangeType.price
@@ -659,6 +675,15 @@ export class OrderLine extends ObjectWithIdPlus {
 
   hasOptions(): boolean {
     return (ArrayHelper.NotEmpty(this.options))
+  }
+
+  getOptionValues(): OrderLineOptionValue[] {
+
+    if (!this.hasOptions())
+      return []
+
+    return this.options.flatMap(o => o.values)
+
   }
 
   getOptionValueIds(optionId: string): string[] {
@@ -956,12 +981,12 @@ export class OrderLine extends ObjectWithIdPlus {
           for (let productItemOption of productItem.options) {
 
             let orderLineOption = this.getOptionById(productItemOption.id)
-  
+
             optionPrices = _.sumBy(orderLineOption.values, 'prc')
-  
+
             if (optionPrices)
               unitPrice += qty * optionPrices
-  
+
           }
         }
 
@@ -990,10 +1015,12 @@ export class OrderLine extends ObjectWithIdPlus {
         // unitPrice += orderLineOptionValue.getPrice(formula, this.options)
         // totalDuration += value.duration
       }
-
-
     }
 
+    let bodySculptorAboId = '3a52a26d-6cf7-4f56-bfcc-049d44fd9402'
+
+    if (this.productId == bodySculptorAboId)
+      this.doBodySculptorSubscriptionPricing()
 
     /*
     for (const option of this.options) {
@@ -1013,6 +1040,62 @@ export class OrderLine extends ObjectWithIdPlus {
       unitPrice += priceChange
 
     return unitPrice
+  }
+
+  doBodySculptorSubscriptionPricing() {
+
+    this.removePriceChanges('bodySculptorSubscription')
+
+    let optionValues = this.getOptionValues()
+
+    if (ArrayHelper.IsEmpty(optionValues))
+      return
+
+    let optionValueSum = _.sumBy(optionValues, 'val')
+
+    if (!optionValueSum || optionValueSum < 8)
+      return
+
+    console.warn('optionValueSum', optionValueSum)
+
+    let globalPriceLevel = optionValueSum / 4
+
+
+    /**
+     * if number of sessions >= 8: 5 euro discount / session   => priceLevel = 2
+     * if number of sessions >= 12: 10 euro discount / session => priceLevel = 3
+     */
+
+    let totalDiscount = 0
+
+    for (let option of this.options) {
+
+      let qty = option.firstValueVal()
+
+      if (!qty)
+        continue
+
+      let priceLevel = qty / 4
+
+      console.warn('priceLevel', priceLevel)
+
+      let diff = globalPriceLevel - priceLevel
+
+      let discount = diff * qty * 5
+      totalDiscount += discount
+    }
+
+    
+
+    let priceChange = PriceChange.new('bodySculptorSubscription', -totalDiscount, true, 'BodySculptor Promo')
+
+    this.addPriceChange(priceChange)
+
+    console.warn('totalDiscount', totalDiscount)
+
+
+
+
   }
 
 

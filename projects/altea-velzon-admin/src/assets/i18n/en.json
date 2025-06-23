@@ -191,7 +191,8 @@
       "monthly": "Maand",
       "quarterly": "Kwartaal",
       "yearly": "Jaar",
-      "manual": "Manueel"
+      "manual": "Manueel",
+      "product": "Product"
     },
     "task-status": {
       "todo": "Todo",
@@ -1278,6 +1279,7 @@
       "prio": "Prioriteit",
       "date": "Datum",
       "time": "Start op/vanaf",
+      "bef": "Vooraf",
       "status": "Status"
     }
   },

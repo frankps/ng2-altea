@@ -83,6 +83,12 @@ export class ApiResult<T = null> extends ApiResultBase {
 
   }
 
+  static ok(message?: string, obj?) : ApiResult {
 
+    let res = new ApiResult(obj, ApiStatus.ok, message)
+    
+    return res
+
+  }
 
 }

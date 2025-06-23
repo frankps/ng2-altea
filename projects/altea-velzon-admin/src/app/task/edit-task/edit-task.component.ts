@@ -1,7 +1,7 @@
 
 import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core'
 import { NgForm } from '@angular/forms'
-import { Task, Resource, ResourceType, TaskPriority, TaskSchedule, TaskStatus, AvailabilityRequest, Order, OrderLine, ResourceAvailability2, ResourceAvailabilitySets } from 'ts-altea-model'
+import { Task, Resource, ResourceType, TaskPriority, TaskSchedule, TaskStatus, AvailabilityRequest, Order, OrderLine, ResourceAvailability2, ResourceAvailabilitySets, Product } from 'ts-altea-model'
 import { DashboardService, NgEditBaseComponent, TranslationService } from 'ng-common'
 import { DbQuery, ObjectHelper, QueryOperator, Translation } from 'ts-common'
 import { AlteaService, ObjectService, ProductService, ResourceService, SessionService, TaskService } from 'ng-altea-common'
@@ -15,6 +15,7 @@ import { ReplaySubject, take } from 'rxjs';
 import { AlteaDb, AvailabilityService, TaskSchedulingService } from 'ts-altea-logic'
 import * as dateFns from 'date-fns'
 import { CreateAvailabilityContext } from 'projects/ts-altea-logic/src/lib/order/reservation/create-availability-context'
+import { SearchProductComponent } from '../../product/search-product/search-product.component'
 
 @Component({
   selector: 'app-edit-task',
@@ -22,6 +23,8 @@ import { CreateAvailabilityContext } from 'projects/ts-altea-logic/src/lib/order
   styleUrls: ['./edit-task.component.scss']
 })
 export class EditTaskComponent extends NgEditBaseComponent<Task> {
+
+  @ViewChild('searchProductModal') public searchProductModal: SearchProductComponent;
 
   @ViewChild('deleteModal') public deleteModal: DeleteModalComponent;
 
@@ -53,18 +56,19 @@ export class EditTaskComponent extends NgEditBaseComponent<Task> {
 
   guid = ObjectHelper.newSmallGuid()
 
+  TaskSchedule = TaskSchedule
+
   /* 	constructor(protected translationSvc: TranslationService, protected resourceSvc: ResourceService) {
   
-      
     } */
 
   constructor(protected taskSvc: TaskService, protected resourceSvc: ResourceService, protected productSvc: ProductService, protected translationSvc: TranslationService, route: ActivatedRoute, router: Router,
     spinner: NgxSpinnerService, private modalService: NgbModal, dashboardSvc: DashboardService, protected sessionSvc: SessionService, protected backEndSvc: ObjectService) {
-    super('task', Task, ''
+    super('task', Task, 'product'
       , taskSvc
       , router, route, spinner, dashboardSvc)
 
-    this.sectionProps.set('general', ['name', 'loc', 'info', 'prio', 'date', 'time', 'hrIds', 'schedule', 'cmt', 'status', 'dur'])
+    this.sectionProps.set('general', ['name', 'loc', 'info', 'prio', 'date', 'time', 'hrIds', 'schedule', 'cmt', 'status', 'dur', 'productId', 'bef'])
 
 
   }
@@ -246,6 +250,26 @@ export class EditTaskComponent extends NgEditBaseComponent<Task> {
     this.deleteConfig.successUrl = '/aqua/tasks/' 
     this.deleteConfig.successUrlMobile = '/aqua/tasks/' 
     this.deleteModal?.delete()
+  }
+
+
+  searchProduct() {
+    this.searchProductModal.show()
+  }
+
+  productSelected(product: Product) {
+    console.error(product)
+
+    this.object.productId = product.id
+    this.object.product = product
+
+    this.recurringTaskForm.form.markAsDirty()
+
+  }
+
+  clearProduct() {
+    this.object.productId = null
+    this.object.product = null
   }
 
   /*   save(recurTask) {

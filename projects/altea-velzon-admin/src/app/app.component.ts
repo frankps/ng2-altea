@@ -29,9 +29,7 @@ export class AppComponent implements OnInit {
 
   currentState: IdleNotification = {
     isIdle: false,
-    idleTimeSeconds: 0,
-    totalIdleTimeSeconds: 0,
-    isWarning: false,
+    idleTimeSeconds: 15,
     timestamp: new Date()
   };
 
@@ -78,10 +76,11 @@ export class AppComponent implements OnInit {
       (notification: IdleNotification) => {
         this.currentState = notification;
 
+        console.log('[SCHEDULER] Idle notification:', notification);
         // Component-specific logic
         this.handleIdleStateChange(notification);
 
-        console.log('[SCHEDULER] Idle notification:', notification);
+        
       }
     );
   }
@@ -89,9 +88,9 @@ export class AppComponent implements OnInit {
   private handleIdleStateChange(notification: IdleNotification): void {
 
     // Auto-save if user has been idle for more than 2 minutes
-    let reactToIdle = notification.isIdle && notification.idleTimeSeconds > 30;
+   // let reactToIdle = notification.isIdle && notification.idleTimeSeconds > 30;
 
-    if (reactToIdle) {
+    if (notification.isIdle) {
       if (this.userSelect && !this.userSelect.open)
         this.userSelect.show()
     }
@@ -104,10 +103,7 @@ export class AppComponent implements OnInit {
 
     // Initialize the idle service with custom config, all in seconds
     this.idleService.initialize({
-      idleTimeSeconds: 60,              // seconds before idle
-      timeoutWarningSeconds: 60,         // 1 minute warning
-      notificationIntervalSeconds: 5,    // Notify every 30 seconds
-      enableHealthChecks: false  // Disable if causing problems
+      idleTimeSeconds: 90,              // seconds before idle
     });
 
     //this.configUserSelectOnIdle(this.idle)

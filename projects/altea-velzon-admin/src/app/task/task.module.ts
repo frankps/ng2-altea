@@ -18,6 +18,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { TaskDashboardComponent } from './task-dashboard/task-dashboard.component';
 import { TodosComponent } from './todos/todos.component';
+import { ProductModule } from '../product/product.module';
+
 
 @NgModule({
   declarations: [
@@ -25,7 +27,7 @@ import { TodosComponent } from './todos/todos.component';
     ManageTasksComponent,
     TaskListComponent,
     TaskDashboardComponent,
-    TodosComponent
+    TodosComponent,
   ],
   exports: [
     TodosComponent
@@ -42,6 +44,7 @@ import { TodosComponent } from './todos/todos.component';
     BsDatepickerModule,
     TimepickerModule,
     NgxSpinnerModule,
+    ProductModule
   ]
 })
 export class TaskModule { }

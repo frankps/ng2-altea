@@ -1,7 +1,7 @@
 
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { ApiListResult, ApiResult, ApiStatus, DateHelper, DbObjectMulti, DbObjectMultiCreate, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
-import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, OrderLine, Subscription, TaskSchedule, Task, TaskStatus } from 'ts-altea-model'
+import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbObjectMulti, DbObjectMultiCreate, DbQuery, DbQueryTyped, QueryOperator } from 'ts-common'
+import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, OrderLine, Subscription, TaskSchedule, Task, TaskStatus, TimeOfDay } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { AlteaDb } from '../general/altea-db'
 import { IDb } from '../interfaces/i-db'
@@ -24,7 +24,101 @@ export class TaskSchedulingService {
     }
 
 
-    async instantiateRecurringTasks(includeLessFrequentTasks: boolean = true) : Promise<ApiListResult<Task>> {
+    /** Product related tasks are definde by schedule='product' and are triggered by upcoming orders for these products/services */
+    async instantiateProductRelatedTasks(): Promise<ApiListResult<Task>> {
+
+        console.log('instantiateProductRelatedTasks')
+        //return new ApiListResult<Task>([], ApiStatus.ok, 'Not implemented!')
+
+        /** get tasks that are triggered by planning of products/services (schedule='product') */
+        const productRelatedTasks = await this.alteaDb.getProductRelatedTasks()
+
+        if (ArrayHelper.IsEmpty(productRelatedTasks))
+            return new ApiListResult<Task>([], ApiStatus.ok, 'No product related tasks!')
+
+        let productIds = _.uniq(productRelatedTasks.map(t => t.productId))
+
+        let from = new Date()
+        let to = dateFns.addHours(from, 6)
+
+        /** check if there are upcoming orders for these products */
+        const upcomingOrders = await this.alteaDb.getOrdersForProducts(from, to, productIds)
+
+        if (ArrayHelper.IsEmpty(upcomingOrders))
+            return new ApiListResult<Task>([], ApiStatus.ok, 'No orders scheduled for products!')
+
+        let orderIds = _.uniq(upcomingOrders.map(t => t.id))
+
+        /** check if tasks already scheduled for these orders */
+        const existingTasksForOrders = await this.alteaDb.getTasksForOrders(orderIds)
+
+        let newTasks: Task[] = []
+        let taskIdsToDelete: string[] = []
+
+        /** loop through tasks */
+        for (let task of productRelatedTasks) {
+
+            /** check if there are orders for this task */
+            let ordersWithTasks = upcomingOrders.filter(o => o.lines.some(l => l.productId == task.productId))
+
+            if (ArrayHelper.IsEmpty(ordersWithTasks))
+                continue
+
+            for (let order of ordersWithTasks) {
+
+                /** check if we already created specific tasks for this order */
+                let existingTasksForOrder = existingTasksForOrders.find(t => t.rTaskId == task.id && t.orderId == order.id)
+
+                if (order.state != OrderState.cancelled) {
+                    if (existingTasksForOrder)  // tasks already planned
+                        continue   // maybe we need to replan
+
+                    let newTask = task.toInstance()
+                    newTask.orderId = order.id
+                    
+                    delete newTask.product
+
+                    // determine the date/time of the task
+                    let date = DateHelper.parse(order.start)
+                    let time = TimeOfDay.parse(task.time)
+
+                    let taskDate = date
+
+                    if (task.bef) {
+                        taskDate = dateFns.subHours(date, time.hours)
+                        taskDate = dateFns.subMinutes(date, time.minutes)
+                    }
+                    else {
+                        taskDate = dateFns.addHours(date, time.hours)
+                        taskDate = dateFns.addMinutes(date, time.minutes)
+                    }
+
+                    // date = dateFns.set(date, { hours: time.hours, minutes: time.minutes })
+
+                    newTask.date = DateHelper.yyyyMMdd(date)
+                    newTask.time = time.toString()  // format: hh:mm
+
+                    newTasks.push(newTask)
+                } else {
+
+                    if (ArrayHelper.NotEmpty(existingTasksForOrder))
+                        taskIdsToDelete.push(existingTasksForOrder.id)
+                }
+            }
+        }
+
+        if (ArrayHelper.NotEmpty(newTasks)) {
+            let res = await this.alteaDb.createTasks(newTasks) 
+        }
+
+        if (ArrayHelper.NotEmpty(taskIdsToDelete)) {
+            let res = await this.alteaDb.deleteTasks(taskIdsToDelete)
+        }
+
+        return new ApiListResult<Task>([], ApiStatus.ok, 'Not implemented!')
+    }
+
+    async instantiateRecurringTasks(includeLessFrequentTasks: boolean = true): Promise<ApiListResult<Task>> {
 
         try {
 
