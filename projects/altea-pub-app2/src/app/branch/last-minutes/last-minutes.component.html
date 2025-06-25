@@ -1,0 +1,27 @@
+<p>Onze last minutes: </p>
+
+
+
+<ul class="list-group" *ngIf="haveLastMinutes()">
+    <li class="list-group-item" *ngFor="let lm of lastMinutes">
+        <div class="row">
+            <div class="col">
+                {{lm.title}} {{lm.date | date:"dd/MM"}} om {{lm.date | date:"HH:mm"}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col d-flex justify-content-end">
+                Prijs: €{{lm.price}}
+            </div>
+        </div>
+         
+    </li>
+</ul>
+
+<ng-container *ngIf="searching">
+    Zoeken naar last minutes ... even geduld ...
+</ng-container>
+
+<ng-container *ngIf="!searching && !haveLastMinutes()">
+    Geen last minutes gevonden ...
+</ng-container>

@@ -72,7 +72,7 @@ export class AppComponent implements OnInit {
   initIdle() {
 
     // Subscribe to idle notifications
-    this.idleSubscription = this.idleService.idleNotification$.subscribe(
+    this.idleSubscription = this.idleService.idleNotification$?.subscribe(
       (notification: IdleNotification) => {
         this.currentState = notification;
 
@@ -102,9 +102,11 @@ export class AppComponent implements OnInit {
   async ngOnInit() {
 
     // Initialize the idle service with custom config, all in seconds
+    /*
     this.idleService.initialize({
       idleTimeSeconds: 90,              // seconds before idle
     });
+*/
 
     //this.configUserSelectOnIdle(this.idle)
 

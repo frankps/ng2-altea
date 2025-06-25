@@ -178,9 +178,9 @@
     },
     "task-priority": {
       "0": "Niet dringend",
-      "10": "Normaal",
-      "20": "Zo snel mogelijk",
-      "30": "Dringend"
+      "100": "Normaal",
+      "200": "Zo snel mogelijk",
+      "300": "Dringend"
     },
     "task-schedule": {
       "once": "Eénmalig",
@@ -775,6 +775,10 @@
       "logout": {
         "h1": "Uitloggen",
         "inf": "Beheer uw afspraken"
+      },
+      "last-minutes": {
+        "h1": "Last minutes",
+        "inf": "Bekijk onze last minutes"
       }
     },
     "payment": {

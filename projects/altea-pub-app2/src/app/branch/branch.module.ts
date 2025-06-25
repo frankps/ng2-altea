@@ -22,6 +22,7 @@ import { ProfileComponent } from './profile/profile.component';
 import { FormsModule } from '@angular/forms';
 import { OrderFinishedComponent } from './order-finished/order-finished.component';
 import { OpenComponent } from './open/open.component';
+import { LastMinutesComponent } from './last-minutes/last-minutes.component';
 
 @NgModule({
   declarations: [
@@ -39,7 +40,8 @@ import { OpenComponent } from './open/open.component';
      MyOrdersComponent,
      ProfileComponent,
      OrderFinishedComponent,
-     OpenComponent
+     OpenComponent,
+     LastMinutesComponent
   ],
   imports: [
     CommonModule,

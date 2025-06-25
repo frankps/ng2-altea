@@ -1690,6 +1690,10 @@ export class OrderMgrUiService {   // implements OnInit
 
       for (let price of prices) {
 
+        /** if there are price conditions, then we will not pre-select automatically */
+        if (price.hasConditions())
+          continue
+
         if (orderLine.hasPriceChange(price.id))
           continue
 

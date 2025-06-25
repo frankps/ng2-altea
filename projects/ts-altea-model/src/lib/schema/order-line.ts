@@ -840,11 +840,12 @@ export class OrderLine extends ObjectWithIdPlus {
 
     priceChange.info = price.title
 
+
     this.addPriceChange(priceChange)
   }
 
 
-  addPriceChange(priceChange: PriceChange) {
+  addPriceChange(priceChange: PriceChange, addToEnd: boolean = true) {
 
     if (!priceChange)
       return
@@ -852,7 +853,10 @@ export class OrderLine extends ObjectWithIdPlus {
     if (!this.pc)
       this.pc = []
 
-    this.pc.push(priceChange)
+    if (addToEnd)
+      this.pc.push(priceChange)
+    else
+      this.pc.unshift(priceChange)
 
     //this.calculateAll()
 
@@ -1057,14 +1061,17 @@ export class OrderLine extends ObjectWithIdPlus {
       return
 
     console.warn('optionValueSum', optionValueSum)
-
-    let globalPriceLevel = optionValueSum / 4
-
-
     /**
      * if number of sessions >= 8: 5 euro discount / session   => priceLevel = 2
      * if number of sessions >= 12: 10 euro discount / session => priceLevel = 3
+     * => priceLevel is max 3
      */
+
+
+    let globalPriceLevel = optionValueSum / 4
+    globalPriceLevel = Math.min(globalPriceLevel, 3)  
+
+
 
     let totalDiscount = 0
 
@@ -1089,7 +1096,8 @@ export class OrderLine extends ObjectWithIdPlus {
 
     let priceChange = PriceChange.new('bodySculptorSubscription', -totalDiscount, true, 'BodySculptor Promo')
 
-    this.addPriceChange(priceChange)
+    // add to beginning of array
+    this.addPriceChange(priceChange, false)
 
     console.warn('totalDiscount', totalDiscount)
 
@@ -1130,11 +1138,13 @@ export class OrderLine extends ObjectWithIdPlus {
     if (ArrayHelper.IsEmpty(this.pc))
       return 0
 
-    let delta = 0
+    let totalDelta = 0
 
     let priceChanges = this.pc.filter(pc => pc.tp == PriceChangeType.price)
 
     for (const priceChange of priceChanges) {
+
+      let delta = 0
 
       if (!priceChange.val)
         continue
@@ -1145,9 +1155,12 @@ export class OrderLine extends ObjectWithIdPlus {
       } else {
         delta += _.round(priceChange.val, 2)
       }
+
+      unitPrice += delta
+      totalDelta += delta
     }
 
-    return _.round(delta, 2)
+    return _.round(totalDelta, 2)
   }
 
 

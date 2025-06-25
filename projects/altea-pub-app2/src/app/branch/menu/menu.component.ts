@@ -16,7 +16,7 @@ export class MenuComponent implements OnInit {
   initialized = false
 
   menu = []
-
+  
   constructor(protected sessionSvc: SessionService, protected router: Router, protected orderMgrSvc: OrderMgrUiService,
     protected authSvc: AuthService
   ) { }
@@ -26,8 +26,10 @@ export class MenuComponent implements OnInit {
     this.menu = [
       new MenuItem('login', 'loggedOff'),
       new MenuItem('new-reserv', 'always'),
+      
       new MenuItem('use-gift', 'always'),
       new MenuItem('buy-gift', 'always'),
+      new MenuItem('last-minutes', 'always'),
       new MenuItem('my-subs', 'loggedOn'),
       new MenuItem('my-orders', 'loggedOn'),
       new MenuItem('logout', 'loggedOn'),

@@ -14,6 +14,7 @@ import { UserContactMatchComponent } from './user-contact-match/user-contact-mat
 import { MyOrdersComponent } from './my-orders/my-orders.component';
 import { ProfileComponent } from './profile/profile.component';
 import { OpenComponent } from './open/open.component';
+import { LastMinutesComponent } from './last-minutes/last-minutes.component';
 
 const routes: Routes = [{
   path: ':branch', component: BranchComponent,
@@ -33,6 +34,7 @@ const routes: Routes = [{
     { path: "task", component: TaskComponent },
     { path: "profile", component: ProfileComponent },
     { path: "user-contact", component: UserContactMatchComponent },
+    { path: "last-minutes", component: LastMinutesComponent },
   ]
 }]  
 

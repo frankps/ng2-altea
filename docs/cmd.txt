@@ -187,6 +187,12 @@ ng generate component branch/mySubs --project altea-pub-app2
 ng generate component branch/profile --project altea-pub-app2
 ng generate component branch/order-finished --project altea-pub-app2
 
+ng generate component branch/last-minutes --project altea-pub-app2
+
+
+ng generate component branch/profile --project altea-pub-app2
+
+
 
 ng generate component branch/open --project altea-pub-app2
 

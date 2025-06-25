@@ -58,7 +58,7 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
   public timeFormat: string = "HH:mm";
   currentView: "Day" | "Week" | "Month" | "WorkWeek" | "Agenda" = "Week"
 
-  showTasks: boolean = false
+  showTasks: boolean = true
 
   public eventSettings: EventSettingsModel = {
     dataSource: this.events
@@ -98,8 +98,8 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
 
 
     await this.showWeekEvents(refDate)
-    this.currentView = "Week"
-    this.schedule.currentView = "Week"  //changeView("Day")
+    this.currentView = "Day"
+    this.schedule.currentView = "Day"  //changeView("Day")
     this.schedule.selectedDate = refDate // dateFns.addHours(refDate, 12)
 
     // await this.showPlanningWeek()
@@ -121,7 +121,7 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
   initIdle() {
 
     // Subscribe to idle notifications
-    this.idleSubscription = this.idleService.idleNotification$.subscribe(
+    this.idleSubscription = this.idleService.idleNotification$?.subscribe(
       (notification: IdleNotification) => {
         this.currentState = notification;
 

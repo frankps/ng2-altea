@@ -37,9 +37,9 @@ export enum TaskStatus {
 
 export enum TaskPriority {
   notUrgent = 0,
-  normal = 10,
-  asap = 20,
-  urgent = 30
+  normal = 100,
+  asap = 200,
+  urgent = 300
 }
 
 export class Task extends ObjectWithIdPlus {
