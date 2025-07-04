@@ -62,7 +62,6 @@ export class PayFinishedComponent implements OnInit {
       await this.orderMgrSvc.loadOrder$(queryParams.orderId)
     }
 
-
     if (!queryParams.sessionId) {
       console.error('Stripe sessionId required!')
       return
@@ -74,9 +73,6 @@ export class PayFinishedComponent implements OnInit {
 
     const sessionStatus = res.object
     
-
-
-
     console.error(sessionStatus)
 
     this.spinner.hide()

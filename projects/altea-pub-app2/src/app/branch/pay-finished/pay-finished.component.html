@@ -1,8 +1,5 @@
-
-
-
 <ng-container *ngIf="!sessionStatus">
-    Even geduld.... wij controleren de betaling... 
+    Even geduld.... wij controleren de betaling...
 </ng-container>
 
 
@@ -10,12 +7,45 @@
 
 
     <ng-container *ngIf="allOk">
-        Wij hebben uw betaling goed ontvangen!
+
+        <ng-container *ngIf="!orderMgrSvc.order.gift">
+            Wij hebben uw betaling goed ontvangen!
+
+            <order-mgr-order-summary [order]="orderMgrSvc.order"></order-mgr-order-summary>
+
+        </ng-container>
+
+        <ng-container *ngIf="orderMgrSvc.order.gift">
+            Wij hebben de betaling voor uw cadeaubon goed ontvangen!<br>
+
+            <ng-container *ngIf="orderMgrSvc.gift">
+                Deze cadeaubon heeft de code: {{orderMgrSvc.gift.code}}<br><br>
+
+                <b>U ontvangt de cadeaubon op de volgende manier:</b><br>
+                <ul>
+                    <li *ngIf="orderMgrSvc.gift.methods.emailFrom">
+                        U ontvangt de cadeaubon per email op {{orderMgrSvc.gift.fromEmail}}
+                    </li>
+
+                    <li *ngIf="orderMgrSvc.gift.methods.emailTo">
+                        De cadeaubon wordt verstuurd naar {{orderMgrSvc.gift.toEmail}}
+                    </li>
+
+                    <li *ngIf="orderMgrSvc.gift.methods.postal">
+                        U ontvangt de cadeaubon per post naar {{orderMgrSvc.gift.toAddress}}
+                    </li>
+
+                    <li *ngIf="orderMgrSvc.gift.methods.pos">
+                        U komt de bon afhalen bij Aquasense
+                    </li>
+                </ul>
 
 
-        <order-mgr-order-summary [order]="orderMgrSvc.order"></order-mgr-order-summary>
+            </ng-container>
 
-        
+        </ng-container>
+
+
 
     </ng-container>
 

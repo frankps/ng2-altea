@@ -319,6 +319,10 @@ this.timerSubscription = this.orderMgrSvc.timerChanged.subscribe(seconds => {
 
     // const toPay = this.calculateToPay()
 
+    /** If timer is not shown, then start it. Normally timer is already activated at moment time slot is selected,
+     * but for orders without time (gifts) we need to start it here */
+    if (!this.orderMgrSvc.showTimer)
+      this.orderMgrSvc.startTimer()
 
     await this.startPayment(this.toPay)
   }

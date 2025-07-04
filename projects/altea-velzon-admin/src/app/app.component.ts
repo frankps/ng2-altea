@@ -48,6 +48,49 @@ export class AppComponent implements OnInit {
 
   }
 
+
+  async ngOnInit() {
+
+    // Initialize the idle service with custom config, all in seconds
+    
+    this.idleService.initialize({
+      idleTimeSeconds: 90,              // seconds before idle
+    });
+
+
+    //this.configUserSelectOnIdle(this.idle)
+
+    this.sessionSvc.appMode = AppMode.pos
+
+    // await this.configureCaches()
+
+
+    const branch = await this.branchSvc.get$(this.sessionSvc.branchId)
+    this.sessionSvc.branch = branch
+    console.error(branch)
+
+
+    this.appReady = true
+
+    this.sessionSvc.branchSub.subscribe(async branch => {
+      console.warn('branch', branch)
+
+      if (branch?.id) {
+
+        await this.configureCaches(branch.id)
+
+        // this.router.navigate([branch.unique, 'branch'])
+
+      }
+
+
+    })
+
+    this.initIdle()
+
+
+  }
+
   /*
   to do on idle: 
         if (this.userSelect && !this.userSelect.open)
@@ -98,48 +141,6 @@ export class AppComponent implements OnInit {
 
   }
 
-
-  async ngOnInit() {
-
-    // Initialize the idle service with custom config, all in seconds
-    /*
-    this.idleService.initialize({
-      idleTimeSeconds: 90,              // seconds before idle
-    });
-*/
-
-    //this.configUserSelectOnIdle(this.idle)
-
-    this.sessionSvc.appMode = AppMode.pos
-
-    // await this.configureCaches()
-
-
-    const branch = await this.branchSvc.get$(this.sessionSvc.branchId)
-    this.sessionSvc.branch = branch
-    console.error(branch)
-
-
-    this.appReady = true
-
-    this.sessionSvc.branchSub.subscribe(async branch => {
-      console.warn('branch', branch)
-
-      if (branch?.id) {
-
-        await this.configureCaches(branch.id)
-
-        // this.router.navigate([branch.unique, 'branch'])
-
-      }
-
-
-    })
-
-    this.initIdle()
-
-
-  }
 
 
   ngOnDestroy(): void {

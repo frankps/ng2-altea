@@ -215,12 +215,15 @@ export class OrderComponent implements OnInit {
   }
 
 
-  orderFinished() {
+  async orderFinished() {
 
     switch (this.orderMgrSvc.uiMode) {
 
       /** for a new gift, we will pay */
       case OrderUiMode.newGift:
+
+        await this.orderMgrSvc.saveOrder()  // we had the issue that order was not existing
+
         this.payOnline()
         break
 

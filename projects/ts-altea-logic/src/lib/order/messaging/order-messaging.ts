@@ -375,13 +375,6 @@ export class OrderMessaging extends OrderMessagingBase {
 
 
 
-    giftMessaging(order: Order) {
-
-        order
-
-    }
-
-
 
 
     /** Send message to admin about cancelled orders (due to expired deposits) */

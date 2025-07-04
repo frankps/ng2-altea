@@ -47,6 +47,9 @@ export class SubscriptionMgmtService {
         // check if there is a price change causing extra subscription qty
         let extraQtyAbs = 0
         let extraQtyPct = 1
+
+        /** a subscription product can result in multiple subscriptions (defined by product.items, but mostly just 1), is extra qty for all these items? */
+        let extraQtyForAllProductItems = false
         
         if (orderLine.hasPriceChanges()) {
             let qtyChanges = orderLine.pc.filter(pc => pc.tp == PriceChangeType.subsQty)
