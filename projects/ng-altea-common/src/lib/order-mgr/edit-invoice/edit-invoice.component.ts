@@ -1,6 +1,6 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { BranchService, InvoiceService, OrderMgrUiService, SessionService } from 'ng-altea-common';
-import { Branch, Invoice } from 'ts-altea-model';
+import { Branch, Invoice, Order } from 'ts-altea-model';
 import { ArrayHelper, DateHelper, ObjectHelper } from 'ts-common';
 
 @Component({
@@ -8,7 +8,7 @@ import { ArrayHelper, DateHelper, ObjectHelper } from 'ts-common';
   templateUrl: './edit-invoice.component.html',
   styleUrls: ['./edit-invoice.component.css']
 })
-export class EditInvoiceComponent {
+export class EditInvoiceComponent implements OnInit {
 
   _invoice: Invoice = new Invoice()
 
@@ -29,8 +29,41 @@ export class EditInvoiceComponent {
 
   existingInvoiceNum: string = ''
 
+  order: Order
+
   constructor(private branchSvc: BranchService, private sessionSvc: SessionService, private invoiceSvc: InvoiceService, private orderMgrUiSvc: OrderMgrUiService) {
 
+  }
+
+  ngOnInit() {
+
+    this.order = this.orderMgrUiSvc.order
+
+  }
+
+  useOrderInvoiceInfo() {
+    let invoice = this.invoice
+
+    if (!this.order.info['invoice'])
+      return
+
+    let invoiceInfo = this.order.info['invoice']
+
+    if (invoiceInfo.company)
+      invoice.company = invoiceInfo.company
+
+    if (invoiceInfo.vatNum)
+      invoice.vatNum = invoiceInfo.vatNum
+
+    if (invoiceInfo.address)
+      invoice.address = invoiceInfo.address
+
+    if (invoiceInfo.email)
+      invoice.email = invoiceInfo.email
+
+    // invoice.mobile = this.order.info.mobile
+
+    // this.invoice = invoice
   }
 
   checkDate() {

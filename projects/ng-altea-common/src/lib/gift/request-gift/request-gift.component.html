@@ -177,7 +177,7 @@
 
         <!-- Select invoice -->
 
-        <ng-container *ngIf="gift.isAmount()">
+        <ng-container>
 
             <div class="row mt-3">
                 <div class="col">
@@ -191,7 +191,7 @@
                 </div>
             </div>
 
-            <ng-container *ngIf="shouldSelectVatPct()">
+            <ng-container *ngIf="gift.isAmount() &&shouldSelectVatPct()">
 
                 <div class="row mt-3">
                     <div class="col-1"></div>

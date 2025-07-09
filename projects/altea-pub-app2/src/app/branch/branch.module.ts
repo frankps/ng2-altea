@@ -23,6 +23,7 @@ import { FormsModule } from '@angular/forms';
 import { OrderFinishedComponent } from './order-finished/order-finished.component';
 import { OpenComponent } from './open/open.component';
 import { LastMinutesComponent } from './last-minutes/last-minutes.component';
+import { Bootstrap5Module } from 'ng-common';
 
 @NgModule({
   declarations: [
@@ -50,7 +51,8 @@ import { LastMinutesComponent } from './last-minutes/last-minutes.component';
     OrderMgrModule,
     TranslateModule,
     AuthModule,
-    FormsModule
+    FormsModule,
+    Bootstrap5Module
   ]
 })
 export class BranchModule { }

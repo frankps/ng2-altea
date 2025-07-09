@@ -75,15 +75,20 @@ export class TimeInterval {
     [TimeIntervalType.ms]: () => dateFns.subMilliseconds,
   };
 
-  protected addToDate = TimeInterval.incrementMap[this.type]();
-  protected removeDifference = TimeInterval.decrementMap[this.differenceType]();
 
   constructor(
     public readonly interval: number,
     public readonly type: TimeIntervalType,
     public readonly difference = 1,
     public readonly differenceType = TimeIntervalType.secs,
-  ) {}
+  ) {
+    this.addToDate = TimeInterval.incrementMap[this.type]();
+    this.removeDifference = TimeInterval.decrementMap[this.differenceType]();
+  }
+
+  protected addToDate: (date: Date, amount: number) => Date;
+  protected removeDifference: (date: Date, amount: number) => Date;
+
 
   /**
    * Returns the number of intervals possible withing the range

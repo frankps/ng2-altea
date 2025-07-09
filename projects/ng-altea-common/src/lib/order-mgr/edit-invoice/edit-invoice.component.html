@@ -1,5 +1,62 @@
+<ng-container *ngIf="order?.info?.invoice">
 
-<div class="row">
+    <div class="row mt-1">
+        <div class="col-12">
+            <small>De klant heeft devolgende gegevens ingevuld bij zijn order:</small>
+        </div>
+    </div>
+
+    <div class="row mt-1" *ngIf="order.info.invoice.company">
+        <div class="col-3">
+            Bedrijf
+        </div>
+        <div class="col-9">
+            {{order.info.invoice.company}}
+        </div>
+    </div>
+    <div class="row mt-1" *ngIf="order.info.invoice.vatNum">
+        <div class="col-3">
+            BTW
+        </div>
+        <div class="col-9">
+                {{order.info.invoice.vatNum}}
+        </div>
+    </div>
+    <div class="row mt-1" *ngIf="order.info.invoice.address">
+        <div class="col-3">
+            Adres
+        </div>
+        <div class="col-9">
+            <pre>{{order.info.invoice.address}}</pre>
+        </div>
+    </div>
+    <div class="row mt-1" *ngIf="order.info.invoice.email">
+        <div class="col-3">
+            Email
+        </div>
+        <div class="col-9">
+                {{order.info.invoice.email}}
+        </div>
+    </div>
+    <div class="row mt-1" *ngIf="order.info.invoice.mobile">
+        <div class="col-3">
+            Telefoon
+        </div>
+        <div class="col-9">
+                {{order.info.invoice.mobile}}
+        </div>
+    </div>
+    <div class="row mt-1">
+        <div class="col-12">
+            <button type="button" class="btn btn-primary btn-sm float-end" (click)="useOrderInvoiceInfo()">Gebruik deze
+                gegevens</button>
+        </div>
+
+    </div>
+</ng-container>
+
+
+<div class="row mt-2">
 
     <div class="col-6">
         <ngx-altea-label-control label="objects.invoice.num" for="num">
@@ -8,7 +65,8 @@
     </div>
 
     <div class="col-6">
-        <button type="button" class="btn btn-primary btn-sm" (click)="addToExistingInvoiceNum(existingInvoiceNum)">Toevoegen</button>
+        <button type="button" class="btn btn-primary btn-sm"
+            (click)="addToExistingInvoiceNum(existingInvoiceNum)">Toevoegen</button>
 
     </div>
 </div>
@@ -17,12 +75,15 @@
 <div class="row" *ngIf="branch">
 
     <div class="col-12">
-        <button type="button" class="btn btn-primary btn-sm" (click)="assignInvoiceNum()">Gebruik {{branch.inv.year}}.{{branch.inv.next}}</button>
+        <button type="button" class="btn btn-primary btn-sm" (click)="assignInvoiceNum()">Gebruik
+            {{branch.inv.year}}.{{branch.inv.next}}</button>
 
         <button type="button" class="btn btn-primary btn-sm ms-2" (click)="checkDate()">Check datum</button>
 
     </div>
 </div>
+
+
 
 
 <div class="row mt-2">

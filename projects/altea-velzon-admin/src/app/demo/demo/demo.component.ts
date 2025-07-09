@@ -2,7 +2,7 @@ import { Component, ViewChild, inject } from '@angular/core';
 import { Contact, DateRangeTests, Message, MsgType, Order, PaymentType, PriceCondition, PriceConditionType, Product, SmsMessage, TemplateChannel, User, ValueComparator } from 'ts-altea-model';
 import { SearchContactComponent } from '../../contact/search-contact/search-contact.component';
 import { AlteaService, BranchService, ObjectService, OrderService, ProductService, ResourceService, ScheduleService, SessionService, TemplateService, UserService } from 'ng-altea-common';
-import { AlteaDb, CheckDeposists, CreateReportingData, OrderCronJobs, OrderMessaging, OrderMgmtService, TaskSchedulingService } from 'ts-altea-logic';
+import { AlteaDb, CheckDeposists, CreateReportingData, OrderCronJobs, OrderMessaging, OrderMgmtService, ProductReporting, TaskSchedulingService } from 'ts-altea-logic';
 import { TranslationService } from 'ng-common'
 import { Country } from 'ts-altea-model'
 import { DbQuery, ObjectHelper, QueryOperator, Translation } from 'ts-common';
@@ -83,9 +83,37 @@ export class DemoComponent {
         return  */
 
 
-    await createReportingData.aggregateAll(this.sessionSvc.branchId, new Date(2025, 3, 1), new Date())
+    await createReportingData.aggregateAll(this.sessionSvc.branchId, new Date(2024, 9, 1), new Date())
   }
 
+
+  downloadCSV(csvString: string, filename: string = 'data.csv') {
+    // Create a Blob from the CSV string
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+
+    // Create a temporary link element
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  async bodySculptorReporting() {
+    let alteaDb = new AlteaDb(this.dbSvc)
+    let productReporting = new ProductReporting(alteaDb)
+    let report = await productReporting.bodySculptorReporting()
+
+    let csvString = report.toCsv()
+    console.error(csvString)
+
+    this.downloadCSV(csvString, 'body-sculptor-report.csv')
+  }
 
   async prepareProductTasks() {
     let alteaDb = new AlteaDb(this.dbSvc)

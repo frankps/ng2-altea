@@ -15,37 +15,116 @@
 
         </ng-container>
 
-        <ng-container *ngIf="orderMgrSvc.order.gift">
+        <ng-container *ngIf="gift">
             Wij hebben de betaling voor uw cadeaubon goed ontvangen!<br>
 
-            <ng-container *ngIf="orderMgrSvc.gift">
-                Deze cadeaubon heeft de code: {{orderMgrSvc.gift.code}}<br><br>
+            <ng-container *ngIf="gift">
+                Deze cadeaubon heeft de code: {{gift.code}}<br><br>
 
                 <b>U ontvangt de cadeaubon op de volgende manier:</b><br>
                 <ul>
-                    <li *ngIf="orderMgrSvc.gift.methods.emailFrom">
-                        U ontvangt de cadeaubon per email op {{orderMgrSvc.gift.fromEmail}}
+                    <li *ngIf="gift.methods.emailFrom">
+                        U ontvangt de cadeaubon per email op {{gift.fromEmail}}
                     </li>
 
-                    <li *ngIf="orderMgrSvc.gift.methods.emailTo">
-                        De cadeaubon wordt verstuurd naar {{orderMgrSvc.gift.toEmail}}
+                    <li *ngIf="gift.methods.emailTo">
+                        De cadeaubon wordt verstuurd naar {{gift.toEmail}}
                     </li>
 
-                    <li *ngIf="orderMgrSvc.gift.methods.postal">
-                        U ontvangt de cadeaubon per post naar {{orderMgrSvc.gift.toAddress}}
+                    <li *ngIf="gift.methods.postal">
+                        U ontvangt de cadeaubon per post naar {{gift.toAddress}}
                     </li>
 
-                    <li *ngIf="orderMgrSvc.gift.methods.pos">
+                    <li *ngIf="gift.methods.pos">
                         U komt de bon afhalen bij Aquasense
                     </li>
                 </ul>
 
 
             </ng-container>
+            <!-- 
+             -->
+
+
 
         </ng-container>
 
+        <form #invoiceForm="ngForm">
 
+            <div class="row mt-3">
+                <div class="col">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="toInvoice" name="toInvoice"
+                            [(ngModel)]="order.toInvoice" (change)="toggleToInvoice()" />
+                        <label class="form-check-label" for="toInvoice">Ik wens een factuur</label>
+                    </div>
+
+                </div>
+            </div>
+
+            <ng-container *ngIf="order.toInvoice && invoiceInfo">
+
+
+
+
+
+                <div class="row">
+                    <div class="col-12">
+                        Om uw factuur te kunnen opmaken, hebben wij volgende gegevens nodig:
+                    </div>
+                    <div class="col-12 mt-1">
+                        <ngx-altea-label-control label="objects.contact.company" for="company">
+                            <input required type="text" id="company" name="company" class="form-control"
+                                [(ngModel)]="invoiceInfo.company">
+                        </ngx-altea-label-control>
+                    </div>
+
+                    <div class="col-12 mt-1">
+                        <ngx-altea-label-control label="objects.contact.vatNum" for="vatNum">
+                            <input required type="text" id="vatNum" name="vatNum" class="form-control"
+                                [(ngModel)]="invoiceInfo.vatNum">
+                        </ngx-altea-label-control>
+                    </div>
+
+                    <div class="col-12 mt-1 ms-0">
+                        <ngx-altea-label-control label="objects.invoice.address" for="address">
+                            <textarea required rows="3" class="form-control" id="address" name="address"
+                                style="height: 80px" [(ngModel)]="invoiceInfo.address"></textarea>
+                        </ngx-altea-label-control>
+                    </div>
+
+                    <div class="col-12 mt-1">
+                        <ngx-altea-label-control label="objects.contact.email" for="email">
+                            <input required type="text" id="email" name="email" class="form-control"
+                                [(ngModel)]="invoiceInfo.email">
+                        </ngx-altea-label-control>
+                    </div>
+
+                    <div class="col-12 mt-1">
+                        <ngx-altea-label-control label="objects.contact.mobile" for="mobile">
+                            <input required type="text" id="mobile" name="mobile" class="form-control"
+                                [(ngModel)]="invoiceInfo.mobile">
+                        </ngx-altea-label-control>
+                    </div>
+
+                </div>
+
+                <div class="row mt-1">
+                    <div class="col-12">
+                        <button class="btn btn-primary float-end"
+                            [disabled]="invoiceForm.form.pristine || !invoiceForm.form.valid"
+                            (click)="saveInvoiceInfo()">Opslaan</button>
+                    </div>
+                </div>
+
+                <div class="row mt-1" *ngIf="invoiceInfoSaved">
+                    <div class="col-12">
+                        Uw gegevens werden opgeslaan.
+                    </div>
+                </div>
+
+            </ng-container>
+        </form>
 
     </ng-container>
 

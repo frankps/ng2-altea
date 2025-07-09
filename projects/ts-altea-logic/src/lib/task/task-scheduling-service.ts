@@ -41,8 +41,9 @@ export class TaskSchedulingService {
         let from = new Date()
         let to = dateFns.addHours(from, 6)
 
+        let branchId = '66e77bdb-a5f5-4d3d-99e0-4391bded4c6c'
         /** check if there are upcoming orders for these products */
-        const upcomingOrders = await this.alteaDb.getOrdersForProducts(from, to, productIds)
+        const upcomingOrders = await this.alteaDb.getOrdersForProducts(branchId, from, to, productIds)
 
         if (ArrayHelper.IsEmpty(upcomingOrders))
             return new ApiListResult<Task>([], ApiStatus.ok, 'No orders scheduled for products!')

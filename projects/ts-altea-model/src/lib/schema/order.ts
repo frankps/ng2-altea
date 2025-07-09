@@ -149,7 +149,14 @@ export class OrderCancel {
 
 }
 
-
+/** stored in order.info, filled in by customers that are not logged in who want to invoice their order */
+export class OrderInvoiceInfo {
+  company?: string
+  vatNum?: string
+  address?: string
+  email?: string
+  mobile?: string
+}
 
 export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  // 
 
@@ -244,8 +251,10 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
   state: OrderState = OrderState.creation
 
-  /** extra info about order: to reduce joins */
-  info?: string = ''
+  /** extra info about order: to reduce joins, can be used for instance to store the invoice info (when contact is not yet linked)
+   *  info.invoice: OrderInvoiceInfo (when toInvoice is true, and customer has filled in the invoice info)
+   */
+  info?: any = {}
 
   /** public note => customer can see */
   pubNote?: string = undefined
@@ -372,6 +381,17 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
       invoice.vatNum = contact.vatNum
     }
 
+
+    if (this.gift || !this.start) {
+      invoice.date = DateHelper.yyyyMMdd(this.cre)
+    } else if (this.start) {
+      let start = this.startDate
+      invoice.date = DateHelper.yyyyMMdd(start)
+    }
+
+
+    invoice.orders = [this]
+    invoice.updateFromOrders()
 
     return invoice
   }

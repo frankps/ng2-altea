@@ -239,23 +239,52 @@ export class AlteaDb {
         return orders
     }
 
-    async getOrdersForProducts(start: Date, end: Date, productIds: string[]): Promise<Order[]> {
+    async getOrdersForProducts(branchId: string, start: Date, end: Date, productIds: string[], options?: { noStates?: OrderState[], includes?: string[], useCreationDate?: boolean }): Promise<Order[]> {
 
         const qry = new DbQueryTyped<Order>('order', Order)
 
         qry.include('lines.product')
 
-        let startNum = DateHelper.yyyyMMddhhmmss(start)
-        let endNum = DateHelper.yyyyMMddhhmmss(end)
 
 
-        qry.and('start', QueryOperator.greaterThanOrEqual, startNum)
-        qry.and('start', QueryOperator.lessThanOrEqual, endNum)
+        qry.and('branchId', QueryOperator.equals, branchId)
+
+        if (options?.useCreationDate) {
+            qry.and('cre', QueryOperator.greaterThanOrEqual, start)
+            qry.and('cre', QueryOperator.lessThanOrEqual, end)
+            qry.orderBy('cre')
+        } else {
+            let startNum = DateHelper.yyyyMMddhhmmss(start)
+            let endNum = DateHelper.yyyyMMddhhmmss(end)
+            
+            qry.and('start', QueryOperator.greaterThanOrEqual, startNum)
+            qry.and('start', QueryOperator.lessThanOrEqual, endNum)
+            qry.orderBy('start')
+        }
+
+        qry.take = 1000
 
         let orderLineFilter = new QueryCondition()
         orderLineFilter.and('productId', QueryOperator.in, productIds)
 
         qry.and('lines', QueryOperator.some, orderLineFilter)
+
+        
+
+        if (options) {
+
+            if (options.noStates)
+                qry.and('state', QueryOperator.notIn, options.noStates)
+
+            if (ArrayHelper.NotEmpty(options.includes)) {
+                for (let include of options.includes) {
+
+                    if (!qry.includes.includes(include))
+                        qry.include(include)
+                }
+            }
+
+        }
 
         const orders = await this.db.query$<Order>(qry)
 
