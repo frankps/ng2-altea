@@ -1035,7 +1035,10 @@ export class DateRangeSet {
 
         let toSubtractDedup = setToSubtract.deduplicate()
 
+        let loopIdx = -1
+
         for (let rangeToSubtract of toSubtractDedup.ranges) {
+            loopIdx++
 
             let idx = subtractFrom.indexOfRangeContaining(rangeToSubtract)
 
@@ -1063,6 +1066,8 @@ export class DateRangeSet {
                 subtractFrom.addRanges(...diff)
 
             }
+
+            
         }
 
         return subtractFrom
@@ -1070,6 +1075,22 @@ export class DateRangeSet {
 
     }
 
+    removeBetween(start: Date, end: Date): DateRangeSet {
+
+        let toRemove = new DateRange(start, end)
+
+        let result = new DateRangeSet()
+
+        for (let range of this.ranges) {
+            let ranges = range.subtract(toRemove)
+
+            if (ArrayHelper.NotEmpty(ranges))
+                result.addRanges(...ranges)
+        }
+
+        return result
+            
+    }
 
 
     removeBefore(date: Date = new Date()) {

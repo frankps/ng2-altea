@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import { Injectable, OnInit } from '@angular/core';
-import { AppMode, AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Branch, ConfirmOrderResponse, Contact, CreateCheckoutSession, DateBorder, DepositMode, Gift, GiftLine, GiftType, Invoice, Order, OrderLine, OrderLineOption, OrderSource, OrderState, Payment, PaymentType, Price, Product, ProductItem, ProductSubType, ProductType, ProductTypeIcons, RedeemGift, ReservationOption, ReservationOptionSet, Resource, ResourcePlanning, ResourceType } from 'ts-altea-model'
+import { AddVoucherResult, AppMode, AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Branch, ConfirmOrderResponse, Contact, CreateCheckoutSession, DateBorder, DepositMode, Gift, GiftLine, GiftType, Invoice, Order, OrderLine, OrderLineOption, OrderSource, OrderState, Payment, PaymentType, Price, Product, ProductItem, ProductSubType, ProductType, ProductTypeIcons, RedeemGift, ReservationOption, ReservationOptionSet, Resource, ResourcePlanning, ResourceType } from 'ts-altea-model'
 import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbQuery, QueryOperator, Translation, YearMonth } from 'ts-common'
 import { AlteaService, GiftService, InvoiceService, ObjectService, OrderMgrService, OrderService, ProductService, ResourceService, SessionService } from 'ng-altea-common'
 import * as _ from "lodash";
@@ -1525,7 +1525,7 @@ export class OrderMgrUiService {   // implements OnInit
     console.warn(this.order)
   }
 
-  
+
   async openProductBySlug(productSlug: string, params: any, qty = 1): Promise<OrderLine> {
 
     const product = await this.loadProductBySlug(productSlug)
@@ -1536,7 +1536,7 @@ export class OrderMgrUiService {   // implements OnInit
     }
 
     const initOptionValues = new Map<String, String[]>()
-    
+
     if (params) {
 
       console.error(params)
@@ -1546,7 +1546,7 @@ export class OrderMgrUiService {   // implements OnInit
         let optionValue = params[optionSlug as keyof typeof params]
 
         console.log(optionSlug, params[optionSlug as keyof typeof params]);
-      
+
         let productOption = product.getOptionBySlug(optionSlug)
 
         if (productOption) {
@@ -1559,13 +1559,13 @@ export class OrderMgrUiService {   // implements OnInit
       }
     }
 
-   // const optionMap = this.convertOrderLineOptionsToMap(options)
+    // const optionMap = this.convertOrderLineOptionsToMap(options)
     const orderLine = await this.newOrderLine(product, qty, initOptionValues)
 
     return orderLine
-    
+
   }
-  
+
 
   /** method used to add products (used in demo orders). When product is a bundle, then it will result in multiple orderLines */
   async addProduct(product: Product, qty = 1, initOptionValues?: Map<String, String[]>): Promise<OrderLine[]> {
@@ -1947,6 +1947,72 @@ STRIPE integration
     window.location.href = stripPaymentUrl;
 
 */
+
+  removeVoucher(voucher: string): boolean {
+    let removed = this.order.removeVoucher(voucher)
+
+    if (removed)
+      this.orderDirty = true
+
+    return removed
+  }
+
+
+  addVoucher(voucher: string): AddVoucherResult {
+
+    if (!voucher)
+      return new AddVoucherResult(voucher, false, 'Ongeldige voucher')
+
+    if (this.order.hasVoucher(voucher)) {
+      return new AddVoucherResult(voucher, false, 'Voucher al toegepast')
+    }
+
+
+    voucher = voucher.trim().toUpperCase()
+
+    if (voucher == 'CAVA25' || voucher == 'KADO25') {
+
+      if (voucher == 'CAVA25') {
+        if (this.order.hasVoucher('KADO25'))
+          this.order.removeVoucher('KADO25')
+
+      }
+
+      if (voucher == 'KADO25') {
+        if (this.order.hasVoucher('CAVA25'))
+          this.order.removeVoucher('CAVA25')
+         
+      }
+
+      let startDate = this.order.startDate
+
+      let wellnessId = '31eaebbc-af39-4411-a997-f2f286c58a9d'
+      if (!this.order.hasProduct(wellnessId)) {
+        return new AddVoucherResult(voucher, false, 'Gelieve eerst een wellness-boeking toe te voegen')
+      }
+
+      if (!startDate) {
+        return new AddVoucherResult(voucher, false, 'Selecteer eerst een datum voor uw order!')
+      }
+
+      let sept_1_2025 = new Date(2025, 8, 1)
+      if (startDate > sept_1_2025) {
+        return new AddVoucherResult(voucher, false, 'Voucher enkel geldig voor boekingen tot 31 augustus 2025')
+      }
+
+      let start = '08:30'
+      let end = '17:30'
+      if (!DateHelper.isTimeBetween(startDate, start, end)) {
+        return new AddVoucherResult(voucher, false, `Voucher enkel geldig voor boekingen tussen ${start} en ${end}`)
+      }
+
+      this.order.addVoucher(voucher)
+      this.orderDirty = true
+      return new AddVoucherResult(voucher, true, `Voucher ${voucher} toegepast!`)
+    }
+
+    return new AddVoucherResult(voucher, false, 'Ongeldige voucher')
+  }
 
 
 

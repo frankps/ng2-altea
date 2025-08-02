@@ -1,0 +1,21 @@
+#voucher::placeholder {
+    color: black;
+}
+
+.badge-dismissible {
+    padding-right: 0.5em;  /* For Option 1 & 4 */
+  }
+  
+  .badge-dismissible .btn-close {
+    font-size: 0.7em;      /* For Option 1 specifically */
+    width: 12px;
+    height: 12px;
+  }
+  
+  .cursor-pointer {
+    cursor: pointer;       /* For Option 2 & 3 (Font Awesome & × character) */
+  }
+  
+  .badge-dismissible:hover {
+    opacity: 0.8;          /* For all options */
+  }

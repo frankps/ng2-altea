@@ -11,7 +11,7 @@
 
     </ng-container>
 
-    
+
     <ng-container *ngIf="payOption && !orderMgrSvc.gift">
         <b>{{ 'app.payment.' + payOption.type | translate }}:</b> €{{payOption?.amount}} <br>
     </ng-container>
@@ -69,48 +69,58 @@
 
         <ng-container *ngTemplateOutlet="orderSummary"></ng-container>
 
-        <!-- if user is buying a gift => we don't allow to pay with other gift code -->
-        <ng-container *ngIf="!orderMgrSvc.gift">
-            
-            <div class="row my-2">
-                <div class="col">
-                    <b>Betalen met cadeaubon:</b>
-                </div>
-            </div>
-    
-            <div class="row">
-                <div class="col-6">
-                    <input type="text" id="giftCode" name="giftCode" class="form-control" placeholder="Cadeaubon nummer"
-                        [(ngModel)]="giftCode" />
-                </div>
-                <div class="col-6 d-grid gap-2">
-                    <button type="button" class="btn btn-primary" [disabled]="!giftCode"
-                        (click)="tryPayGift(giftCode)">Cadeaubon valideren</button>
-                </div>
-            </div>
-
-        </ng-container>
 
 
-        <div class="row" *ngIf="giftMessage">
-            <div class="col-12">
-                {{giftMessage}}
-            </div>
-        </div>
+
+
 
         <div class="row mt-4 mb-2">
             <div class="col">
                 <b>Online betalen:</b>
             </div>
         </div>
-
-        <div class="row justify-content-center">
+        <div class="row justify-content-center mb-4">
 
             <div class="col-6 align-self-center d-grid gap-2">
                 <button type="button" class="btn btn-primary" (click)="payOnline()">€{{toPay}} {{'dic.payOnline' |
                     translate }}</button>
             </div>
         </div>
+
+        <!-- if user is buying a gift => we don't allow to pay with other gift code -->
+        <ng-container *ngIf="!orderMgrSvc.gift">
+
+<!--             <div class="row my-2">
+                <div class="col">
+                    <b>Betalen met cadeaubon:</b>
+                </div>
+            </div> -->
+
+            <div class="row">
+                <div class="col"> 
+                    <input type="text" id="giftCode" name="giftCode" style="background-color: whitesmoke; color: black;" class="form-control" placeholder="Heb je een cadeaubon? Vul code hier in..."
+                        [(ngModel)]="giftCode" />
+                </div>
+                <div class="col d-grid gap-2" *ngIf="giftCode">
+                    <button type="button" class="btn btn-primary" [disabled]="!giftCode"
+                        (click)="tryPayGift(giftCode)">Cadeaubon valideren</button>
+                </div>
+            </div>
+
+            <div class="row" *ngIf="giftMessage">
+                <div class="col-12">
+                    {{giftMessage}}
+                </div>
+            </div>
+
+        </ng-container>
+
+
+        <order-mgr-voucher></order-mgr-voucher>
+
+
+
+
 
     </ng-container>
 
@@ -129,6 +139,7 @@
 
 
 </ng-container>
+
 
 
 

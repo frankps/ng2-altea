@@ -624,11 +624,7 @@
               "browserTarget": "altea-pub-app2:build:development"
             }
           },
-          "defaultConfiguration": "development",
-          "options": {
-            "historyApiFallback": true
-
-          }
+          "defaultConfiguration": "development"
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",

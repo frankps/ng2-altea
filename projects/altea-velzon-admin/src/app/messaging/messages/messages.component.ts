@@ -113,7 +113,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
 
     const AND = [directionFilter, typeFilter]  // 
 
-    const qry = query(msgCol, ...AND, orderBy('sent', 'desc'), limit(20))  // 
+    const qry = query(msgCol, ...AND, orderBy('sent', 'desc'), limit(40))  // 
 
     this.messageSubscription = collectionData(qry).subscribe(dataSet => {
 

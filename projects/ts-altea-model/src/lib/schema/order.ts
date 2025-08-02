@@ -979,6 +979,49 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     return _.round(this.incl - this.paid, 2)
   }
 
+  hasVouchers(): boolean {
+    return ArrayHelper.NotEmpty(this.info?.vouchers)
+  }
+
+  getVouchers(): string[] {
+    return this.info?.vouchers
+  }
+
+
+  hasVoucher(voucher: string): boolean {
+  
+    let vouchers: string[] = this.info?.vouchers
+
+    if (ArrayHelper.IsEmpty(vouchers))
+      return false
+
+    return vouchers.indexOf(voucher) >= 0
+
+  }
+
+  addVoucher(voucher: string) {
+    if (!this.info?.vouchers)
+      this.info.vouchers = []
+
+    this.info.vouchers.push(voucher)
+    this.markAsUpdated('info')
+  }
+
+  removeVoucher(voucher: string) : boolean {
+    if (ArrayHelper.IsEmpty(this.info?.vouchers))
+      return false
+
+    const idx = this.info.vouchers.indexOf(voucher)
+
+    if (idx >= 0) {
+      this.info.vouchers.splice(idx, 1)
+      this.markAsUpdated('info')
+      return true
+    }
+
+    return false
+  }
+
   hasLoyalty(): boolean {
     return ArrayHelper.NotEmpty(this.loyalty)
   }

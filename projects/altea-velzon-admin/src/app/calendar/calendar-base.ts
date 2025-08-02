@@ -1,4 +1,4 @@
-import { EventType, OrderUi, PlanningType, Resource, ResourcePlanning, ResourcePlanningUi, ResourcePlannings } from "ts-altea-model"
+import { EventType, OrderUi, PlanningType, Resource, ResourcePlanning, ResourcePlanningUi, ResourcePlannings, Schedule } from "ts-altea-model"
 import * as dateFns from 'date-fns'
 import { Unsubscribe } from 'firebase/firestore';
 import { OrderFireFilters, OrderFirestoreService, ResourcePlanningService, ResourceService, SessionService } from "ng-altea-common";
@@ -332,12 +332,54 @@ export abstract class CalendarBase {
 
         for (let humanResource of humanResources) {
 
-            var defaultSchedule = humanResource.schedules.find(schedule => schedule.default)
+            /*
+            let schedule = new Schedule()
+            schedule.planning
+            */
+
+            var defaultSchedule = humanResource.schedules?.find(schedule => schedule.default)
 
             if (!defaultSchedule)
                 continue
 
             var dateRangeSet = defaultSchedule.toDateRangeSet(start, end)
+
+            // check if there are other overruling schedules
+            let overrulingSchedules = humanResource.schedules.filter(schedule => schedule.id != defaultSchedule.id 
+                && schedule.hasPlanningsBetween(start, end) )
+
+
+            if (ArrayHelper.NotEmpty(overrulingSchedules)) {
+
+                for (let overrulingSchedule of overrulingSchedules) {
+
+                    let plannings = overrulingSchedule.getPlanningsBetween(start, end)
+
+                    if (ArrayHelper.IsEmpty(plannings)) 
+                        continue
+
+                    for (let planning of plannings) {
+
+                        let overRuleStart = planning.startDate > start ? planning.startDate : start
+                        let overRuleEnd = planning.endDate < end ? planning.endDate : end
+                        
+                        dateRangeSet = dateRangeSet.removeBetween(overRuleStart, overRuleEnd)
+
+                        let overRuleRangeSet = overrulingSchedule.toDateRangeSet(overRuleStart, overRuleEnd)
+
+                        dateRangeSet = dateRangeSet.union(overRuleRangeSet)
+
+
+                    }
+
+
+                    //dateRangeSet = dateRangeSet.subtract(overrulingSchedule.toDateRangeSet(start, end))
+                }
+            }
+
+
+
+
             dateRangeSet.resource = humanResource
 
             var absencesForResource = absencePlannings.filterByResource(humanResource.id).toDateRangeSet()

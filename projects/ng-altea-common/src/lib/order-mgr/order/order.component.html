@@ -257,6 +257,13 @@
         </div>
 
 
+        <ng-container *ngIf="isPOS() && order.hasLines() && order.start">
+
+            <order-mgr-voucher></order-mgr-voucher>
+
+        </ng-container>
+
+
 
 
         <div class="row mt-4" style="font-weight: bolder;">

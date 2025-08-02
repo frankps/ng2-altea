@@ -1,0 +1,29 @@
+<div class="row my-2" *ngIf="order.hasVouchers() || orderMgrSvc.isPos">
+    <div class="col">
+        <span class="badge text-bg-info me-2" *ngFor="let voucher of order.getVouchers()">{{voucher}}
+            <button type="button" class="btn-close btn-close-white ms-2" (click)="removeVoucher(voucher)"></button>
+        </span>
+    </div>
+
+    <div class="col" *ngIf="orderMgrSvc.isPos">
+        <span class="badge text-bg-success ms-2 float-end" (click)="validateVoucher('KADO25')">KADO25</span>
+        <span class="badge text-bg-success ms-2 float-end" (click)="validateVoucher('CAVA25')">CAVA25</span>
+    </div>
+
+</div>
+
+
+<div class="row mt-2">
+    <div class="col">
+        <input type="text" id="voucher" name="voucher" style="background-color: whitesmoke;" class="form-control" placeholder="Heb je een voucher? Vul in..."
+            [(ngModel)]="voucher" />
+    </div>
+    <div class="col d-grid gap-2" *ngIf="voucher">
+        <button type="button" class="btn btn-primary" [disabled]="!voucher"
+            (click)="validateVoucher()">Voucher valideren</button>
+    </div>
+</div>
+<div class="row" *ngIf="voucherMessage">
+    <div class="col">{{voucherMessage}}</div>
+</div>
+

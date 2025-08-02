@@ -65,6 +65,9 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
 
   giftMessage = ''
 
+  voucher: string
+  voucherMessage = ''
+
 
   mode: 'Init' | 'SelectOption' | 'PayMethod' | 'PayOnline' = 'Init'
 
@@ -129,7 +132,6 @@ this.timerSubscription = this.orderMgrSvc.timerChanged.subscribe(seconds => {
 
     this.checkout?.destroy()
   }
-
 
 
 
@@ -327,6 +329,14 @@ this.timerSubscription = this.orderMgrSvc.timerChanged.subscribe(seconds => {
     await this.startPayment(this.toPay)
   }
 
+  async validateVoucher(voucher: string) {
+   /* this.voucher = voucher
+    this.voucherMessage = ''*/
+
+    const result = this.orderMgrSvc.addVoucher(voucher)
+
+    this.voucherMessage = result.message
+  }
 
 
 

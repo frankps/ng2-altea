@@ -212,9 +212,52 @@ export class Schedule extends ObjectWithIdPlus {
       return DateHelper.parse(this.start)
     }
   
-  
+    clone(): Schedule {
 
-  
+      let clone = ObjectHelper.clone(this, Schedule)
+      clone.id = ObjectHelper.newGuid()
+      clone.cre = new Date()
+
+      return clone
+    }
+
+    hasPlannings(): boolean {
+      return ArrayHelper.NotEmpty(this.planning)
+    }
+
+    hasPlanningsBetween(start: Date, end: Date): boolean {
+      if (ArrayHelper.IsEmpty(this.planning))
+        return false
+
+      let startNum = DateHelper.yyyyMMddhhmmss(start)
+      let endNum = DateHelper.yyyyMMddhhmmss(end)
+
+      for (let planning of this.planning) {
+        if (planning.start < endNum && planning.end > startNum)
+          return true
+      }
+
+      return false
+    }
+
+    getPlanningsBetween(start: Date, end: Date): ResourcePlanning[] {
+      if (ArrayHelper.IsEmpty(this.planning))
+        return []
+
+      let plannings: ResourcePlanning[] = []
+
+      let startNum = DateHelper.yyyyMMddhhmmss(start)
+      let endNum = DateHelper.yyyyMMddhhmmss(end)
+
+      for (let planning of this.planning) {
+        if (planning.start < endNum && planning.end > startNum)
+          plannings.push(planning)
+      }
+
+      return plannings
+    }
+
+    
   
     isInsideSchedule(dateRange: DateRange) {
   

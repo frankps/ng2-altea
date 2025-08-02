@@ -111,15 +111,15 @@ export class OrderComponent implements OnInit {
     this.order.attn = !this.order.attn
   }
 
-  attentionColor() : string {
+  attentionColor(): string {
 
-   // 
+    // 
 
     if (this.order.attn)
-      return 'btn-danger' 
+      return 'btn-danger'
     else
       return 'btn-light'
-  
+
   }
 
 
@@ -150,7 +150,7 @@ export class OrderComponent implements OnInit {
     this.order.makePayTotals()
     this.orderMgrSvc.orderDirty = true
 
-    
+
   }
 
   /**
@@ -332,9 +332,11 @@ export class OrderComponent implements OnInit {
     let payDate = pay.dateTyped
     if (payDate && payDate < this.accountingFrozenUntil)
       return false
-    
+
     return true
   }
+
+
 
 
 

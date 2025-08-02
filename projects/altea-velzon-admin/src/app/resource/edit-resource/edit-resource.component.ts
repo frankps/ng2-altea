@@ -278,6 +278,22 @@ export class EditResourceComponent extends NgEditBaseComponent<Resource> impleme
 
   }
 
+  cloneSchedule(schedule: Schedule) {
 
+    console.error(schedule)
+
+    const newSchedule = schedule.clone()
+
+    newSchedule.idx = this.scheduleChanges.maxValue('idx') + this.sessionSvc.idxStep
+    newSchedule.default = !this.scheduleChanges.hasPropertyValue('default', true)
+
+    this.scheduleChanges.add(newSchedule)   //  createId(newSchedule.id)
+
+    console.error(newSchedule)
+
+
+   // this.object.schedules.push(newSchedule)
+
+  }
 
 }

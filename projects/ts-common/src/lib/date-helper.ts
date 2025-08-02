@@ -126,6 +126,20 @@ export class DateHelper {
         return utcDate
     }
 
+    static isTimeBetween(
+        date: Date,
+        startTime: string, // format: 'HH:mm'
+        endTime: string     // format: 'HH:mm'
+      ): boolean {
+        const [startHour, startMinute] = startTime.split(':').map(Number);
+        const [endHour, endMinute] = endTime.split(':').map(Number);
+      
+        const timeInMinutes = date.getHours() * 60 + date.getMinutes();
+        const startInMinutes = startHour * 60 + startMinute;
+        const endInMinutes = endHour * 60 + endMinute;
+      
+        return timeInMinutes >= startInMinutes && timeInMinutes <= endInMinutes;
+      }
     
 
     /**

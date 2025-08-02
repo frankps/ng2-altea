@@ -767,7 +767,10 @@ export class ResourcePlanning extends ObjectWithIdPlus implements IAsDbObject<Re
 
   type = PlanningType.occ
 
+  /** format: yyyyMMddhhmmss */
   start?: number = DateHelper.yyyyMMddhhmmss(new Date())
+
+  /** format: yyyyMMddhhmmss */
   end?: number = DateHelper.yyyyMMddhhmmss(new Date())
 
   /** date format: 

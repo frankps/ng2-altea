@@ -280,6 +280,9 @@
         <!-- {{schedule.id}} -->
         <ngx-altea-schedule [readonly]="true" [schedule]="schedule"></ngx-altea-schedule>
 
+
+        <button type="button" class="btn btn-primary" (click)="cloneSchedule(schedule)">Copy</button>
+        
       </ng-container>
 
       <ng-container edit>
@@ -287,6 +290,7 @@
 
 
         <ngx-altea-schedule [parent]="this" [readonly]="false" [schedule]="schedule"></ngx-altea-schedule>
+
 
 
       </ng-container>
