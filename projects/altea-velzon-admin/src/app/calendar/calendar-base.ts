@@ -31,6 +31,8 @@ export class BaseEvent {
 
     order: OrderUi
 
+    vouchers: string[]
+
     static newEventBase(id: string, type: BaseEventType, subject: string, from: Date, to: Date, color: string) {
         const event = new BaseEvent()
 
@@ -60,6 +62,13 @@ export class BaseEvent {
         event.color = resource?.color
 
         return event
+    }
+
+    vouchersToString() {
+        if (ArrayHelper.IsEmpty(this.vouchers))
+            return ''
+
+        return this.vouchers.join(' ')
     }
 }
 
@@ -483,7 +492,12 @@ export abstract class CalendarBase {
 
     orderUiToEventBase(orderUi: OrderUi): BaseEvent {
 
-        return BaseEvent.newEventBase(orderUi.id, BaseEventType.Order, orderUi.shortInfo(), orderUi.startDate, orderUi.endDate, 'green')
+        let baseEvent = BaseEvent.newEventBase(orderUi.id, BaseEventType.Order, orderUi.shortInfo(), orderUi.startDate, orderUi.endDate, 'green')
+
+
+
+           
+        return baseEvent
     }
 
     /** This is a callback function that is called by the OrderFirestoreService whenever there are changes to the visible orders 
@@ -552,7 +566,18 @@ export abstract class CalendarBase {
 
         const baseEvent = BaseEvent.newEventBase(planningUi.id, BaseEventType.OrderPlanning, planningUi.order?.shortInfo(), planningUi.startDate, planningUi.endDate, (planningUi.resource as Resource)?.color)
 
-        baseEvent.order = planningUi.order
+        let orderUi = planningUi.order
+
+
+        baseEvent.order = orderUi
+
+
+
+         if (orderUi && ArrayHelper.NotEmpty(orderUi.vouchers)) {
+            console.warn('Vouchers', orderUi.vouchers)
+            baseEvent.vouchers = orderUi.vouchers
+        } 
+
 
         //  baseEvent.contact = planningUi.
         return baseEvent
@@ -614,6 +639,9 @@ export abstract class CalendarBase {
             console.warn(planningUis)
 
             const baseEvents = planningUis.map(planningUi => context.planningUiToEventBase(planningUi))
+
+
+
             events = baseEvents.map(baseEvent => context.baseEventToEvent(baseEvent))
 
         }

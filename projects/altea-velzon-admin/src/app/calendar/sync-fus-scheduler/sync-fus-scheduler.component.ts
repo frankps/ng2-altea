@@ -229,7 +229,7 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
 
 
 
-    return {
+    let event = {
       Id: eventBase.id,
 
       // always copy over the type
@@ -248,10 +248,14 @@ export class SyncFusSchedulerComponent extends CalendarBase implements OnInit {
 
       ResourceId: eventBase.resource?.id,
 
+      Vouchers: eventBase.vouchersToString()
+
       //  Type: eventBase.type,
-
-
     }
+
+
+    return event
+
   }
 
   async onActionBegin($event: any) {

@@ -240,6 +240,10 @@ export class OrderUi extends ObjectUi {
     /** if not specified, it is an order. Otherwise it is a task or (resource)planning  */
     type?: '' | 'order' | 'task' | 'planning' = ''
 
+    info?: any = {}
+
+    vouchers?: string[] = []
+
     get startDate() {
         return DateHelper.parse(this.start)
     }
@@ -311,6 +315,12 @@ export class OrderUi extends ObjectUi {
         if (this.isOrder() && pay)
             info += ` €${this.paid}/${this.incl}`
 
+
+        if (ArrayHelper.NotEmpty(this.vouchers)) {
+            info += ` ${this.vouchers.join('-')}`
+        }
+
+
         return info
 
     }
@@ -328,6 +338,11 @@ export class OrderUi extends ObjectUi {
         orderUi.deposit = order.deposit
         orderUi.incl = order.incl
         orderUi.state = order.state
+
+        if (order.info?.vouchers) {
+            orderUi.vouchers = order.info.vouchers
+        }
+            
 
         if (order.contact)
             orderUi.contact = ContactUi.fromContact(order.contact)

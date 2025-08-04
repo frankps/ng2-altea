@@ -52,6 +52,7 @@ https://ej2.syncfusion.com/angular/documentation/schedule/getting-started
             <div style="padding:10px">
               <input class="location e-field" type="text" name="Location" placeholder="Location" style="width:100%">
             </div>
+
           </form>
         </div>
       </ng-template>
@@ -71,8 +72,12 @@ https://ej2.syncfusion.com/angular/documentation/schedule/getting-started
             {{data.EndTime | date:"HH:mm"}}</div>
 
           <div [innerHTML]="data.ResourceId"></div>
+
+          <span class="ms-2 badge text-bg-info me-2 float-end" >{{data.Vouchers}}</span>
           <br>
-          <!-- <div class="end-time" style="padding-bottom:10px">End: {{data.EndTime.toLocaleString()}}</div>
+          <!-- 
+          [innerHTML]="data.Vouchers"
+          <div class="end-time" style="padding-bottom:10px">End: {{data.EndTime.toLocaleString()}}</div>
       <div class="location" style="padding-bottom:10px">Location: {{data.Location}}</div>
       <div class="description" style="padding-bottom:10px">Description: {{data.Description}}</div> -->
         </div>

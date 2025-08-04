@@ -83,6 +83,14 @@
 
                 {{uiOrder.start| intdate}}
 
+<!-- 
+                badge text-bg-info me-2  float-end -->
+
+                <ng-container *ngIf="uiOrder.hasVouchers()">
+                    <span class="ms-2 badge text-bg-info me-2 float-end fs-7" *ngFor="let voucher of uiOrder.getVouchers()">{{voucher}} </span>
+                </ng-container>
+
+
                 <span *ngIf="uiOrder.invoiceNum" class="badge text-bg-info mx-3">{{uiOrder.invoiceNum}}</span>
 
 
