@@ -249,7 +249,9 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
         }
 
 
-        if (tx.details.indexOf('OVERSCHRIJVING') >= 0) {
+        // "MOBIELE BETALING OPDRACHTGEVER REKENING : BE69 7330 2217 9078 BIC KREDBEBB BANCONTACT BANKREFERENTIE : 2505100304020058 VALUTADATUM : 12/05/2025"
+
+        if (tx.details.indexOf('OVERSCHRIJVING') >= 0 || tx.details.indexOf('MOBIELE BETALING') >= 0) {
             txType = BankTxType.transfer;
 
             let txInfo = new BankTxInfo(txType)

@@ -105,7 +105,7 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
       , contactSvc
       , router, route, spinner, dashboardSvc)
 
-    this.sectionProps.set('general', ['first', 'last', 'gender', 'birth', 'email', 'emailRemind', 'mobile', 'smsRemind', 'language', 'deposit', 'depositPct', 'act'])
+    this.sectionProps.set('general', ['name', 'first', 'last', 'gender', 'birth', 'email', 'emailRemind', 'mobile', 'smsRemind', 'language', 'deposit', 'depositPct', 'act'])
     this.translationSvc.translateEnum(Gender, 'enums.gender.', this.gender)
     this.translationSvc.translateEnum(Language, 'enums.language.', this.language)
     this.translationSvc.translateEnum(DepositMode, 'enums.deposit-mode.', this.depositMode)
@@ -131,6 +131,25 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
 */
   }
 
+  nameChanged() {
+
+    let nameParts = []
+
+    if (this.object.first) {
+      this.object.first = this.object.first.trim()
+      nameParts.push(this.object.first)
+    }
+
+    if (this.object.last) {
+      this.object.last = this.object.last.trim()
+      nameParts.push(this.object.last)
+    }
+
+    this.object.name = nameParts.join(' ')
+
+    console.error('New name: ' + this.object.name)
+
+  }
 
   searchContact() {
     this.searchContactModal.show()

@@ -7,6 +7,45 @@
 <button type="button" class="btn btn-primary btn-sm me-2" (click)="doChecks(2025,2)">Feb</button>
 <button type="button" class="btn btn-primary btn-sm me-2" (click)="doChecks(2025,3)">Mrt</button>
 
+<button type="button" class="btn btn-primary btn-sm ms-4 me-2" (click)="doChecks(2025,4)">Apr</button>
+<button type="button" class="btn btn-primary btn-sm me-2" (click)="doChecks(2025,5)">Mei</button>
+<button type="button" class="btn btn-primary btn-sm me-2" (click)="doChecks(2025,6)">Jun</button>
+
+<div class="row mt-3">
+
+
+        <div class="col-3">
+
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="calculateNoDecl" name="calculateNoDecl"
+                    [(ngModel)]="calculateNoDecl" />
+                <label class="form-check-label" for="calculateNoDecl">Calc No Decl</label>
+            </div>
+
+        </div>
+
+        <div class="col-3">
+
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="resetNoDecl" name="resetNoDecl"
+                    [(ngModel)]="resetNoDecl" />
+                <label class="form-check-label" for="resetNoDecl">Reset No Decl</label>
+            </div>
+
+        </div>
+
+        <div class="col-3">
+
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="fixToInvoice" name="fixToInvoice"
+                    [(ngModel)]="fixToInvoice" />
+                <label class="form-check-label" for="resetNoDecl">toInvoice=false</label>
+            </div>
+
+        </div>
+
+</div>
+
 <ng-container *ngIf="report">
 
     <ng-container *ngIf="report.invoices">
@@ -33,7 +72,7 @@
         <h5>No declares</h5>
 
         <div class="row ms-3" *ngFor="let result of report.cash.results">
-            <div class="col">{{result.msg}} <a [routerLink]="['/aqua/orders/manage',result.order.id]">Open {{result.order.for}}</a> </div>
+            <div class="col">{{result.msg}} <a *ngIf="result.order" [routerLink]="['/aqua/orders/manage',result.order.id]">Open {{result.order.for}}</a> </div>
         </div>
     </ng-container>
 

@@ -4,6 +4,7 @@ import { plainToInstance } from 'class-transformer';
 import { th } from 'date-fns/locale';
 import { ContactService } from 'ng-altea-common';
 import { Contact } from 'ts-altea-model';
+import { DbQuery, QueryOperator } from 'ts-common';
 
 @Component({
   selector: 'altea-search-contact',
@@ -37,7 +38,23 @@ export class SearchContactComponent {
 
     console.error(this.search)
 
-    let contacts = await this.contactSvc.search$(this.search)
+    if (!this.search || this.search.length < 3) {
+      this.contacts = []
+      return
+    }
+
+    let query = new DbQuery()
+
+    if (this.search.includes('@')) {
+      query.and('email', QueryOperator.contains, this.search)
+    } else {
+      query.and('name', QueryOperator.contains, this.search)
+    }
+
+
+    let contacts = await this.contactSvc.query$(query)
+
+    //let contacts = await this.contactSvc.search$(this.search)
     
     this.contacts = plainToInstance(Contact, contacts)
 

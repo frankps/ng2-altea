@@ -45,7 +45,10 @@
 
         <ul class="list-group mt-3">
             <li class="list-group-item" (click)="selectContact(contact, popup)" *ngFor="let contact of contacts">
-                {{contact.name}}</li>
+                {{contact.name}} <small *ngIf="contact.email">&nbsp;{{contact.email}}</small>
+                <small *ngIf="contact.mobile">&nbsp;{{contact.mobile}}</small>&nbsp;
+                <span class="badge bg-danger" *ngIf="!contact.act">Niet actief</span>
+            </li>
         </ul>
 
     </ng-container>

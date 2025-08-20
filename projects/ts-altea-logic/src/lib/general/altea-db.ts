@@ -197,9 +197,12 @@ export class AlteaDb {
         qry.include('invoice.orders')
 
         qry.and('branchId', QueryOperator.equals, branchId)
+       // qry.and('invoiced', QueryOperator.equals, true)
+       
         qry.and('toInvoice', QueryOperator.equals, true)
 
-        qry.or('invoiced', QueryOperator.equals, false)
+        qry.or('invoiced', QueryOperator.equals, false) 
+
         qry.or('invoiceId', QueryOperator.equals, null)
         qry.or('invoiceNum', QueryOperator.equals, null)
         qry.take = 500
@@ -895,6 +898,35 @@ export class AlteaDb {
 
 
     /** Subscriptions */
+/*
+    async getLoyaltyCards(contactId?: string, includes?: string[]): Promise<LoyaltyCard[]> {
+
+        if (!contactId)
+            contactId = this.branchId
+
+        const qry = new DbQueryTyped<LoyaltyCard>('loyaltyCard', LoyaltyCard)
+
+        if (includes)
+            qry.include(...includes)
+
+        qry.and('contactId', QueryOperator.equals, contactId)
+
+        const cards = await this.db.query$<LoyaltyCard>(qry)
+
+        return cards
+    }*/
+
+        async getSubscriptionsForContact(contactId: string): Promise<Subscription[]> {
+
+            const qry = new DbQueryTyped<Subscription>('subscription', Subscription)
+            qry.and('contactId', QueryOperator.equals, contactId)
+
+    
+            let objects = await this.db.query$<Subscription>(qry)
+    
+            return objects
+        }
+
 
     async getSubscriptionsByOrderId(orderId: string): Promise<Subscription[]> {
 
@@ -1154,6 +1186,7 @@ export class AlteaDb {
     }
 
 
+
     async getLoyaltyCards(contactId?: string, includes?: string[]): Promise<LoyaltyCard[]> {
 
         if (!contactId)
@@ -1367,10 +1400,10 @@ export class AlteaDb {
 
 
         qry.and('year', QueryOperator.greaterThanOrEqual, from.y)
-        //qry.and('month', QueryOperator.greaterThanOrEqual, from.m)
+        qry.and('month', QueryOperator.greaterThanOrEqual, from.m)
 
         qry.and('year', QueryOperator.lessThanOrEqual, toInclusive.y)
-        //qry.and('month', QueryOperator.lessThanOrEqual, toInclusive.m)
+        qry.and('month', QueryOperator.lessThanOrEqual, toInclusive.m)
 
         if (latestOnly)
             qry.and('latest', QueryOperator.equals, true)

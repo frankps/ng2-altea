@@ -30,6 +30,9 @@ export class OrderCheckComponent implements OnInit {
 
   branch: Branch
 
+  calculateNoDecl = false
+  resetNoDecl = false
+  fixToInvoice = false
 
   constructor(protected orderSvc: OrderService, protected objSvc: ObjectService, protected spinner: NgxSpinnerService, public dashboardSvc: DashboardService,
     public sessionSvc: SessionService, private sanitizer: DomSanitizer, public branchSvc: BranchService, private ngZone: NgZone
@@ -62,8 +65,10 @@ export class OrderCheckComponent implements OnInit {
 
       let yearMonth = new YearMonth(year, month)
 
+      console.log('No decl', me.calculateNoDecl, me.resetNoDecl)
 
-      me.report = await report.checkAll(me.branch, yearMonth)
+      
+      me.report = await report.checkAll(me.branch, yearMonth, me.calculateNoDecl, me.resetNoDecl, me.fixToInvoice)
 
       console.log(me.report)
 
@@ -280,8 +285,8 @@ export class OrderCheckComponent implements OnInit {
 
     let branchId = me.sessionSvc.branchId
 
-    let from = new YearMonth(2025, 1)
-    let to = new YearMonth(2025, 4) // (2025, 1)
+    let from = new YearMonth(2025, 4)
+    let to = new YearMonth(2025, 7) // (2025, 1)
 
     let reportMonths = await alteaDb.getReportMonthsPeriod(branchId, from, to, true)
 
