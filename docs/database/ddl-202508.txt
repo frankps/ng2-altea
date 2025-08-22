@@ -1,0 +1,1252 @@
+-- public."BankAccount" definition
+
+-- Drop table
+
+-- DROP TABLE public."BankAccount";
+
+CREATE TABLE public."BankAccount" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	"orgId" UUID NULL,
+	"branchId" UUID NULL,
+	iban STRING NOT NULL,
+	act BOOL NOT NULL DEFAULT true,
+	del BOOL NOT NULL DEFAULT false,
+	upd TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	cre TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC)
+);
+
+
+-- public."BankTransaction" definition
+
+-- Drop table
+
+-- DROP TABLE public."BankTransaction";
+
+CREATE TABLE public."BankTransaction" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	"accountId" UUID NULL,
+	num STRING NULL,
+	"numInt" INT4 NULL,
+	"execDate" INT4 NULL,
+	"valDate" INT4 NULL,
+	"refDate" INT4 NULL,
+	amount DECIMAL(65,30) NOT NULL DEFAULT 0:::DECIMAL,
+	orig DECIMAL(65,30) NOT NULL DEFAULT 0:::DECIMAL,
+	cost DECIMAL(65,30) NOT NULL DEFAULT 0:::DECIMAL,
+	"check" DECIMAL(65,30) NOT NULL DEFAULT 0:::DECIMAL,
+	cur STRING NULL,
+	"remoteAccount" STRING NULL,
+	"remoteName" STRING NULL,
+	details STRING NULL,
+	ok BOOL NOT NULL DEFAULT false,
+	"createdAt" TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	"shortInfo" STRING NULL,
+	info STRING NULL,
+	type STRING NULL,
+	"providerRef" STRING NULL,
+	cre TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	upd TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	prov JSONB NULL,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC)
+);
+
+
+-- public."CustomJson" definition
+
+-- Drop table
+
+-- DROP TABLE public."CustomJson";
+
+CREATE TABLE public."CustomJson" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	"objId" UUID NULL,
+	type STRING NULL,
+	label STRING NULL,
+	json JSONB NULL,
+	act BOOL NOT NULL DEFAULT true,
+	del BOOL NOT NULL DEFAULT false,
+	upd TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	cre TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC)
+);
+
+
+-- public."List" definition
+
+-- Drop table
+
+-- DROP TABLE public."List";
+
+CREATE TABLE public."List" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	"orgId" UUID NULL,
+	"branchId" UUID NULL,
+	name STRING NOT NULL,
+	code STRING NOT NULL,
+	lang STRING NOT NULL,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC)
+);
+
+
+-- public."LoyaltyProgram" definition
+
+-- Drop table
+
+-- DROP TABLE public."LoyaltyProgram";
+
+CREATE TABLE public."LoyaltyProgram" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	name STRING NULL,
+	descr STRING NULL,
+	"maxValue" INT4 NOT NULL DEFAULT (-1):::INT8,
+	"maxDaysValid" INT4 NOT NULL DEFAULT (-1):::INT8,
+	rewards JSONB NULL,
+	"branchId" UUID NOT NULL,
+	"orgId" UUID NULL,
+	act BOOL NOT NULL DEFAULT true,
+	del BOOL NOT NULL DEFAULT false,
+	upd TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	cre TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	excl JSONB NULL,
+	incl JSONB NULL,
+	track public."LoyaltyUnit" NOT NULL DEFAULT 'qty':::public."LoyaltyUnit",
+	prod BOOL NOT NULL DEFAULT true,
+	promo BOOL NOT NULL DEFAULT false,
+	svc_basic BOOL NOT NULL DEFAULT true,
+	svc_bundle BOOL NOT NULL DEFAULT true,
+	svc_subs BOOL NOT NULL DEFAULT true,
+	idx INT4 NOT NULL DEFAULT 0:::INT8,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC)
+);
+
+
+-- public."Message" definition
+
+-- Drop table
+
+-- DROP TABLE public."Message";
+
+CREATE TABLE public."Message" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	"branchId" STRING NOT NULL,
+	"orderId" STRING NULL,
+	type STRING NULL,
+	subject STRING NULL,
+	body STRING NULL,
+	log STRING NULL,
+	state public."MessageState" NOT NULL DEFAULT 'notSent':::public."MessageState",
+	code STRING NULL,
+	sent INT8 NULL,
+	act BOOL NOT NULL DEFAULT true,
+	del BOOL NOT NULL DEFAULT false,
+	upd TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	cre TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	"conIds" STRING[] NULL,
+	dir public."MessageDirection" NOT NULL,
+	prov JSONB NULL,
+	"from" JSONB NULL,
+	"to" JSONB NULL,
+	cc JSONB NULL,
+	bcc JSONB NULL,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC),
+	INDEX idx_message_orderid ("orderId" ASC)
+);
+
+
+-- public."ObjectLog" definition
+
+-- Drop table
+
+-- DROP TABLE public."ObjectLog";
+
+CREATE TABLE public."ObjectLog" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	"branchId" STRING NULL,
+	"parentId" STRING NULL,
+	"objId" STRING NULL,
+	action STRING NULL,
+	type STRING NULL,
+	date TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	data JSONB NULL,
+	"resId" STRING NULL,
+	"usrId" STRING NULL,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC)
+);
+
+
+-- public."Organisation" definition
+
+-- Drop table
+
+-- DROP TABLE public."Organisation";
+
+CREATE TABLE public."Organisation" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	idx INT4 NOT NULL DEFAULT 0:::INT8,
+	name STRING NOT NULL,
+	short STRING NULL,
+	"unique" STRING NULL,
+	email STRING NULL,
+	url STRING NULL,
+	mobile STRING NULL,
+	phone STRING NULL,
+	category STRING NULL,
+	descr STRING NULL,
+	"multiBranch" BOOL NOT NULL DEFAULT false,
+	"agreeTerms" BOOL NOT NULL DEFAULT false,
+	"optInNews" BOOL NOT NULL DEFAULT false,
+	act BOOL NOT NULL DEFAULT true,
+	del BOOL NOT NULL DEFAULT false,
+	upd TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	cre TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC)
+);
+
+
+-- public."ReportLine" definition
+
+-- Drop table
+
+-- DROP TABLE public."ReportLine";
+
+CREATE TABLE public."ReportLine" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	"orgId" UUID NULL,
+	"branchId" UUID NULL,
+	"resId" UUID NULL,
+	per STRING NOT NULL,
+	type STRING NOT NULL,
+	year INT4 NOT NULL DEFAULT (-1):::INT8,
+	month INT4 NULL,
+	num INT4 NULL,
+	qty INT4 NOT NULL DEFAULT 0:::INT8,
+	incl DECIMAL(65,30) NOT NULL DEFAULT 0:::DECIMAL,
+	excl DECIMAL(65,30) NOT NULL DEFAULT 0:::DECIMAL,
+	upd TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	cre TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	json JSONB NULL,
+	created JSONB NULL,
+	pays JSONB NULL,
+	served JSONB NULL,
+	date INT4 NULL,
+	"end" INT4 NULL,
+	start INT4 NULL,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC)
+);
+
+
+-- public."ReportMonth" definition
+
+-- Drop table
+
+-- DROP TABLE public."ReportMonth";
+
+CREATE TABLE public."ReportMonth" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	"orgId" UUID NULL,
+	"branchId" UUID NULL,
+	year INT4 NOT NULL DEFAULT 2000:::INT8,
+	month INT4 NOT NULL DEFAULT 1:::INT8,
+	tax JSONB NULL,
+	cash JSONB NULL,
+	act BOOL NOT NULL DEFAULT true,
+	del BOOL NOT NULL DEFAULT false,
+	upd TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	cre TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	inc JSONB NULL,
+	"out" JSONB NULL,
+	"noDecl" DECIMAL(65,30) NOT NULL DEFAULT 0:::DECIMAL,
+	latest BOOL NOT NULL DEFAULT true,
+	version INT4 NOT NULL DEFAULT 1:::INT8,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC)
+);
+
+
+-- public."ScheduleLine" definition
+
+-- Drop table
+
+-- DROP TABLE public."ScheduleLine";
+
+CREATE TABLE public."ScheduleLine" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	wk INT4 NOT NULL DEFAULT (-1):::INT8,
+	dow INT4 NOT NULL DEFAULT (-1):::INT8,
+	"from" TIMESTAMP(3) NOT NULL,
+	"to" TIMESTAMP(3) NOT NULL,
+	act BOOL NOT NULL DEFAULT true,
+	del BOOL NOT NULL DEFAULT false,
+	upd TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	cre TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC)
+);
+
+
+-- public."Template" definition
+
+-- Drop table
+
+-- DROP TABLE public."Template";
+
+CREATE TABLE public."Template" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	"orgId" UUID NULL,
+	"branchId" UUID NOT NULL,
+	idx INT4 NOT NULL DEFAULT 0:::INT8,
+	"to" STRING[] NULL,
+	channels STRING[] NULL,
+	code STRING NULL,
+	name STRING NULL,
+	subject STRING NULL,
+	body STRING NULL,
+	short STRING NULL,
+	remind INT4 NOT NULL DEFAULT 60:::INT8,
+	cat STRING NULL,
+	act BOOL NOT NULL DEFAULT true,
+	del BOOL NOT NULL DEFAULT false,
+	upd TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	cre TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	lang STRING NULL,
+	actions JSONB NULL,
+	footer STRING NULL,
+	format public."TemplateFormat" NOT NULL DEFAULT 'text':::public."TemplateFormat",
+	"extId" STRING NULL,
+	params JSONB NULL,
+	hash STRING NULL,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC)
+);
+
+
+-- public."TypeInfo" definition
+
+-- Drop table
+
+-- DROP TABLE public."TypeInfo";
+
+CREATE TABLE public."TypeInfo" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	name STRING NOT NULL,
+	"lastCreated" TIMESTAMP(3) NULL,
+	"lastUpdated" TIMESTAMP(3) NULL,
+	"lastDeleted" TIMESTAMP(3) NULL,
+	"branchId" UUID NULL,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC),
+	UNIQUE INDEX "TypeInfo_branchId_name_key" ("branchId" ASC, name ASC)
+);
+
+
+-- public."User" definition
+
+-- Drop table
+
+-- DROP TABLE public."User";
+
+CREATE TABLE public."User" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	prov STRING NULL,
+	"provId" STRING NULL,
+	"provEmail" STRING NULL,
+	email STRING NULL,
+	mobile STRING NULL,
+	first STRING NULL,
+	last STRING NULL,
+	uid STRING NULL,
+	act BOOL NOT NULL DEFAULT true,
+	del BOOL NOT NULL DEFAULT false,
+	upd TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	cre TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	conf STRING[] NULL DEFAULT ARRAY[]:::STRING[],
+	msg STRING[] NULL DEFAULT ARRAY[]:::STRING[],
+	prv JSONB NULL,
+	"prvOrig" JSONB NULL,
+	login TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	alert STRING NULL,
+	block BOOL NOT NULL DEFAULT false,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC)
+);
+
+
+-- public."Branch" definition
+
+-- Drop table
+
+-- DROP TABLE public."Branch";
+
+CREATE TABLE public."Branch" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	idx INT4 NOT NULL DEFAULT 0:::INT8,
+	"orgId" UUID NOT NULL,
+	name STRING NOT NULL,
+	"unique" STRING NULL,
+	short STRING NULL,
+	descr STRING NULL,
+	postal STRING NULL,
+	country STRING NULL,
+	city STRING NULL,
+	"emailFrom" STRING NULL,
+	"emailBcc" STRING NULL,
+	"vatIncl" BOOL NOT NULL DEFAULT true,
+	"vatPct" DECIMAL(65,30) NOT NULL DEFAULT 0:::DECIMAL,
+	"depositPct" DECIMAL(65,30) NOT NULL DEFAULT 0:::DECIMAL,
+	"depositTerms" JSONB NULL,
+	reminders JSONB NULL,
+	"vatPcts" DECIMAL(65,30)[] NULL,
+	"smsOn" BOOL NOT NULL DEFAULT false,
+	"vatNr" STRING NULL,
+	"giftOn" BOOL NOT NULL DEFAULT true,
+	gift JSONB NULL,
+	cur STRING NULL,
+	email STRING NULL,
+	mobile STRING NULL,
+	phone STRING NULL,
+	act BOOL NOT NULL DEFAULT true,
+	del BOOL NOT NULL DEFAULT false,
+	upd TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	cancel INT4 NOT NULL DEFAULT 0:::INT8,
+	cre TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	lang STRING NULL,
+	str STRING NULL,
+	"strNr" STRING NULL,
+	"prodSales" JSONB NULL,
+	comm JSONB NULL,
+	inv JSONB NULL,
+	acc JSONB NULL,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC),
+	CONSTRAINT "Branch_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES public."Organisation"(id) ON DELETE RESTRICT ON UPDATE CASCADE NOT VALID
+);
+
+
+-- public."Contact" definition
+
+-- Drop table
+
+-- DROP TABLE public."Contact";
+
+CREATE TABLE public."Contact" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	"orgId" UUID NULL,
+	"branchId" UUID NOT NULL,
+	name STRING NOT NULL,
+	first STRING NULL,
+	last STRING NULL,
+	alert STRING NULL,
+	remark STRING NULL,
+	color STRING NULL,
+	gender public."Gender" NOT NULL DEFAULT 'unknown':::public."Gender",
+	email STRING NULL,
+	mobile STRING NULL,
+	phone STRING NULL,
+	company STRING NULL,
+	"vatNum" STRING NULL,
+	website STRING NULL,
+	postal STRING NULL,
+	country STRING NULL,
+	branches STRING[] NULL,
+	"depositPct" DECIMAL(65,30) NULL,
+	city STRING NULL,
+	"emailConf" BOOL NOT NULL DEFAULT false,
+	"mobileConf" BOOL NOT NULL DEFAULT false,
+	news BOOL NOT NULL DEFAULT false,
+	rules BOOL NOT NULL DEFAULT false,
+	birth INT4 NULL,
+	act BOOL NOT NULL DEFAULT true,
+	del BOOL NOT NULL DEFAULT false,
+	upd TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	cre TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	lang STRING NULL,
+	str STRING NULL,
+	"strNr" STRING NULL,
+	msg STRING[] NULL DEFAULT ARRAY[]:::STRING[],
+	"userId" UUID NULL,
+	deposit public."DepositMode" NULL,
+	entry STRING NULL,
+	"entryId" STRING NULL,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC),
+	CONSTRAINT "Contact_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES public."Organisation"(id) ON DELETE SET NULL ON UPDATE CASCADE NOT VALID,
+	CONSTRAINT "Contact_branchId_fkey" FOREIGN KEY ("branchId") REFERENCES public."Branch"(id) ON DELETE RESTRICT ON UPDATE CASCADE NOT VALID,
+	CONSTRAINT "Contact_userId_fkey" FOREIGN KEY ("userId") REFERENCES public."User"(id) ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+
+-- public."Gift" definition
+
+-- Drop table
+
+-- DROP TABLE public."Gift";
+
+CREATE TABLE public."Gift" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	"orgId" UUID NULL,
+	"branchId" UUID NOT NULL,
+	"orderId" UUID NULL,
+	type public."GiftType" NOT NULL DEFAULT 'amount':::public."GiftType",
+	code STRING NOT NULL,
+	descr STRING NULL,
+	"expiresOn" TIMESTAMP(3) NULL,
+	value DECIMAL(65,30) NOT NULL DEFAULT 0:::DECIMAL,
+	used DECIMAL(65,30) NOT NULL DEFAULT 0:::DECIMAL,
+	"isConsumed" BOOL NOT NULL DEFAULT false,
+	"fromName" STRING NULL,
+	"fromEmail" STRING NULL,
+	"toName" STRING NULL,
+	"toEmail" STRING NULL,
+	"toAddress" STRING NULL,
+	"toMessage" STRING NULL,
+	"fromId" UUID NULL,
+	"toId" UUID NULL,
+	methods JSONB NULL,
+	invoice BOOL NOT NULL DEFAULT false,
+	lines JSONB NULL,
+	"vatPct" DECIMAL(65,30) NOT NULL DEFAULT 0:::DECIMAL,
+	act BOOL NOT NULL DEFAULT true,
+	del BOOL NOT NULL DEFAULT false,
+	upd TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	cre TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	decl BOOL NOT NULL DEFAULT false,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC),
+	CONSTRAINT "Gift_fromId_fkey" FOREIGN KEY ("fromId") REFERENCES public."Contact"(id) ON DELETE SET NULL ON UPDATE CASCADE,
+	CONSTRAINT "Gift_toId_fkey" FOREIGN KEY ("toId") REFERENCES public."Contact"(id) ON DELETE SET NULL ON UPDATE CASCADE,
+	UNIQUE INDEX uk_gift_code_branch (code ASC, "branchId" ASC)
+);
+
+
+-- public."Invoice" definition
+
+-- Drop table
+
+-- DROP TABLE public."Invoice";
+
+CREATE TABLE public."Invoice" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	"orgId" UUID NULL,
+	"branchId" UUID NOT NULL,
+	num STRING NULL,
+	address STRING NULL,
+	alter STRING NULL,
+	company STRING NULL,
+	country STRING NULL DEFAULT 'BEL':::STRING,
+	email STRING NULL,
+	state public."InvoiceState" NOT NULL DEFAULT 'toInvoice':::public."InvoiceState",
+	act BOOL NOT NULL DEFAULT true,
+	del BOOL NOT NULL DEFAULT false,
+	upd TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	cre TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	"toId" UUID NULL,
+	date INT8 NULL,
+	totals JSONB NULL,
+	"vatNum" STRING NULL,
+	"useAlter" BOOL NOT NULL DEFAULT false,
+	"vatLines" JSONB NULL,
+	"orderCount" INT4 NOT NULL DEFAULT 0:::INT8,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC),
+	CONSTRAINT "Invoice_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES public."Organisation"(id) ON DELETE SET NULL ON UPDATE CASCADE NOT VALID,
+	CONSTRAINT "Invoice_branchId_fkey" FOREIGN KEY ("branchId") REFERENCES public."Branch"(id) ON DELETE RESTRICT ON UPDATE CASCADE NOT VALID,
+	CONSTRAINT "Invoice_toId_fkey" FOREIGN KEY ("toId") REFERENCES public."Contact"(id) ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+
+-- public."ListItem" definition
+
+-- Drop table
+
+-- DROP TABLE public."ListItem";
+
+CREATE TABLE public."ListItem" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	"listId" UUID NOT NULL,
+	name STRING NOT NULL,
+	code STRING NOT NULL,
+	value DECIMAL(65,30) NOT NULL DEFAULT 0:::DECIMAL,
+	info STRING NOT NULL,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC),
+	CONSTRAINT "ListItem_listId_fkey" FOREIGN KEY ("listId") REFERENCES public."List"(id) ON DELETE RESTRICT ON UPDATE CASCADE NOT VALID
+);
+
+
+-- public."LoyaltyCard" definition
+
+-- Drop table
+
+-- DROP TABLE public."LoyaltyCard";
+
+CREATE TABLE public."LoyaltyCard" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	"contactId" UUID NOT NULL,
+	"programId" UUID NOT NULL,
+	name STRING NULL,
+	value INT4 NOT NULL DEFAULT 0:::INT8,
+	act BOOL NOT NULL DEFAULT true,
+	del BOOL NOT NULL DEFAULT false,
+	upd TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	cre TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC),
+	CONSTRAINT "LoyaltyCard_contactId_fkey" FOREIGN KEY ("contactId") REFERENCES public."Contact"(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT "LoyaltyCard_programId_fkey" FOREIGN KEY ("programId") REFERENCES public."LoyaltyProgram"(id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+
+-- public."Order" definition
+
+-- Drop table
+
+-- DROP TABLE public."Order";
+
+CREATE TABLE public."Order" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	"orgId" UUID NULL,
+	"branchId" UUID NOT NULL,
+	"contactId" UUID NULL,
+	"invoiceId" UUID NULL,
+	appointment BOOL NOT NULL DEFAULT true,
+	start INT8 NULL,
+	"end" INT8 NULL,
+	descr STRING NULL,
+	type public."OrderType" NOT NULL DEFAULT 'sales':::public."OrderType",
+	excl DECIMAL(65,30) NOT NULL DEFAULT 0:::DECIMAL,
+	vat DECIMAL(65,30) NOT NULL DEFAULT 0:::DECIMAL,
+	incl DECIMAL(65,30) NOT NULL DEFAULT 0:::DECIMAL,
+	paid DECIMAL(65,30) NOT NULL DEFAULT 0:::DECIMAL,
+	"nrOfPersons" DECIMAL(65,30) NOT NULL DEFAULT 1:::DECIMAL,
+	persons JSONB NULL,
+	"toInvoice" BOOL NOT NULL DEFAULT false,
+	invoiced BOOL NOT NULL DEFAULT false,
+	"invoiceNum" STRING NULL,
+	gift BOOL NOT NULL DEFAULT false,
+	"giftCode" STRING NULL,
+	code STRING NULL,
+	info JSONB NULL,
+	"privNote" STRING NULL,
+	"pubNote" STRING NULL,
+	state public."OrderState" NOT NULL DEFAULT 'creation':::public."OrderState",
+	deposit DECIMAL(65,30) NOT NULL DEFAULT 0:::DECIMAL,
+	"int" BOOL NOT NULL DEFAULT true,
+	msg BOOL NOT NULL DEFAULT true,
+	"vatLines" JSONB NULL,
+	"resPrefs" JSONB NULL,
+	"msgCode" STRING NULL,
+	"msgOn" INT8 NULL,
+	act BOOL NOT NULL DEFAULT true,
+	del BOOL NOT NULL DEFAULT false,
+	upd TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	cancel JSONB NULL,
+	cre TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	src STRING NULL,
+	"for" STRING NULL,
+	sum JSONB NULL,
+	depo BOOL NOT NULL DEFAULT true,
+	"depoBy" INT8 NULL,
+	"depoMins" INT4 NULL,
+	loyal BOOL NOT NULL DEFAULT false,
+	attn BOOL NOT NULL DEFAULT false,
+	lock STRING NULL DEFAULT '':::STRING,
+	tax JSONB NULL,
+	tags STRING[] NULL,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC),
+	CONSTRAINT "Order_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES public."Organisation"(id) ON DELETE SET NULL ON UPDATE CASCADE NOT VALID,
+	CONSTRAINT "Order_branchId_fkey" FOREIGN KEY ("branchId") REFERENCES public."Branch"(id) ON DELETE RESTRICT ON UPDATE CASCADE NOT VALID,
+	CONSTRAINT "Order_contactId_fkey" FOREIGN KEY ("contactId") REFERENCES public."Contact"(id) ON DELETE SET NULL ON UPDATE CASCADE NOT VALID,
+	CONSTRAINT "Order_invoiceId_fkey" FOREIGN KEY ("invoiceId") REFERENCES public."Invoice"(id) ON DELETE SET NULL ON UPDATE CASCADE NOT VALID,
+	INDEX idx_order_contact_start ("contactId" ASC, start DESC)
+);
+
+
+-- public."Product" definition
+
+-- Drop table
+
+-- DROP TABLE public."Product";
+
+CREATE TABLE public."Product" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	"orgId" UUID NULL,
+	"branchId" UUID NOT NULL,
+	"catId" UUID NULL,
+	idx INT4 NOT NULL DEFAULT 0:::INT8,
+	name STRING NOT NULL,
+	short STRING NULL,
+	type public."ProductType" NOT NULL DEFAULT 'svc':::public."ProductType",
+	descr STRING NULL,
+	"showPrice" BOOL NOT NULL DEFAULT true,
+	"showDuration" BOOL NOT NULL DEFAULT true,
+	public BOOL NOT NULL DEFAULT true,
+	"showPos" BOOL NOT NULL DEFAULT true,
+	online public."OnlineMode" NOT NULL DEFAULT 'reserve':::public."OnlineMode",
+	gender public."Gender" NOT NULL DEFAULT 'unisex':::public."Gender",
+	"minOrder" INT4 NOT NULL DEFAULT 1:::INT8,
+	customers INT4 NOT NULL DEFAULT 1:::INT8,
+	"planOrder" INT4 NOT NULL DEFAULT 0:::INT8,
+	duration INT4 NOT NULL DEFAULT 0:::INT8,
+	"hasPre" BOOL NOT NULL DEFAULT false,
+	"preTime" INT4 NOT NULL DEFAULT 0:::INT8,
+	"preMaxGap" INT4 NOT NULL DEFAULT 0:::INT8,
+	"hasPost" BOOL NOT NULL DEFAULT false,
+	"postTime" INT4 NOT NULL DEFAULT 0:::INT8,
+	"postMaxGap" INT4 NOT NULL DEFAULT 0:::INT8,
+	stock INT4 NOT NULL DEFAULT 0:::INT8,
+	"minStock" INT4 NOT NULL DEFAULT 0:::INT8,
+	"salesPrice" DECIMAL(65,30) NOT NULL DEFAULT 0:::DECIMAL,
+	"advPricing" BOOL NOT NULL DEFAULT false,
+	"vatPct" DECIMAL(65,30) NOT NULL DEFAULT 0:::DECIMAL,
+	color STRING NULL,
+	branches UUID[] NULL,
+	"branchMode" public."BranchMode" NOT NULL DEFAULT 'single':::public."BranchMode",
+	rules JSONB NULL,
+	"personSelect" BOOL NOT NULL DEFAULT true,
+	"staffSelect" BOOL NOT NULL DEFAULT true,
+	"planMode" public."PlanningMode" NOT NULL DEFAULT 'continuous':::public."PlanningMode",
+	plan JSONB NULL,
+	"depositPct" DECIMAL(65,30) NULL,
+	sub public."ProductSubType" NOT NULL DEFAULT 'basic':::public."ProductSubType",
+	act BOOL NOT NULL DEFAULT true,
+	del BOOL NOT NULL DEFAULT false,
+	upd TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	cancel INT4 NULL,
+	cre TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	inform STRING NULL,
+	"priceFrom" BOOL NOT NULL DEFAULT false,
+	"priceInfo" STRING NULL,
+	"minQty" INT4 NOT NULL DEFAULT 1:::INT8,
+	slug STRING NULL,
+	url STRING NULL,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC),
+	CONSTRAINT "Product_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES public."Organisation"(id) ON DELETE SET NULL ON UPDATE CASCADE NOT VALID,
+	CONSTRAINT "Product_branchId_fkey" FOREIGN KEY ("branchId") REFERENCES public."Branch"(id) ON DELETE RESTRICT ON UPDATE CASCADE NOT VALID,
+	CONSTRAINT "Product_catId_fkey" FOREIGN KEY ("catId") REFERENCES public."Product"(id) ON DELETE SET NULL ON UPDATE CASCADE NOT VALID
+);
+
+
+-- public."ProductItem" definition
+
+-- Drop table
+
+-- DROP TABLE public."ProductItem";
+
+CREATE TABLE public."ProductItem" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	"parentId" UUID NOT NULL,
+	"productId" UUID NOT NULL,
+	idx INT4 NOT NULL DEFAULT 0:::INT8,
+	name STRING NOT NULL,
+	qty INT4 NOT NULL DEFAULT 1:::INT8,
+	options JSONB NULL,
+	act BOOL NOT NULL DEFAULT true,
+	del BOOL NOT NULL DEFAULT false,
+	upd TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	cre TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	"optionId" UUID NULL,
+	"optionQty" BOOL NOT NULL DEFAULT false,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC),
+	CONSTRAINT "ProductItem_parentId_fkey" FOREIGN KEY ("parentId") REFERENCES public."Product"(id) ON DELETE RESTRICT ON UPDATE CASCADE NOT VALID,
+	CONSTRAINT "ProductItem_productId_fkey" FOREIGN KEY ("productId") REFERENCES public."Product"(id) ON DELETE RESTRICT ON UPDATE CASCADE NOT VALID,
+	INDEX idx_productitem_product ("productId" ASC),
+	INDEX idx_pi_parent_idx ("parentId" ASC, idx ASC)
+);
+
+
+-- public."ProductOption" definition
+
+-- Drop table
+
+-- DROP TABLE public."ProductOption";
+
+CREATE TABLE public."ProductOption" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	"productId" UUID NOT NULL,
+	idx INT4 NOT NULL DEFAULT 0:::INT8,
+	name STRING NOT NULL,
+	descr STRING NULL,
+	public BOOL NOT NULL DEFAULT true,
+	required BOOL NOT NULL DEFAULT true,
+	"multiSelect" BOOL NOT NULL DEFAULT false,
+	"hasDuration" BOOL NOT NULL DEFAULT false,
+	"hasPrice" BOOL NOT NULL DEFAULT false,
+	"hasValue" BOOL NOT NULL DEFAULT false,
+	"hasFormula" BOOL NOT NULL DEFAULT false,
+	formula JSONB NULL,
+	pvt BOOL NOT NULL DEFAULT false,
+	act BOOL NOT NULL DEFAULT true,
+	del BOOL NOT NULL DEFAULT false,
+	upd TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	cre TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	prev JSONB NULL,
+	persons BOOL NOT NULL DEFAULT false,
+	short STRING NULL,
+	"addDur" BOOL NOT NULL DEFAULT true,
+	slug STRING NULL,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC),
+	CONSTRAINT "ProductOption_productId_fkey" FOREIGN KEY ("productId") REFERENCES public."Product"(id) ON DELETE RESTRICT ON UPDATE CASCADE NOT VALID
+);
+
+
+-- public."ProductOptionValue" definition
+
+-- Drop table
+
+-- DROP TABLE public."ProductOptionValue";
+
+CREATE TABLE public."ProductOptionValue" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	"optionId" UUID NOT NULL,
+	idx INT4 NOT NULL DEFAULT 0:::INT8,
+	name STRING NOT NULL,
+	descr STRING NULL,
+	duration INT4 NOT NULL DEFAULT 0:::INT8,
+	price DECIMAL(65,30) NOT NULL DEFAULT 0:::DECIMAL,
+	value DECIMAL(65,30) NOT NULL DEFAULT 0:::DECIMAL,
+	pvt BOOL NOT NULL DEFAULT false,
+	"default" BOOL NOT NULL DEFAULT false,
+	act BOOL NOT NULL DEFAULT true,
+	del BOOL NOT NULL DEFAULT false,
+	upd TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	cre TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC),
+	CONSTRAINT "ProductOptionValue_optionId_fkey" FOREIGN KEY ("optionId") REFERENCES public."ProductOption"(id) ON DELETE RESTRICT ON UPDATE CASCADE NOT VALID
+);
+
+
+-- public."Resource" definition
+
+-- Drop table
+
+-- DROP TABLE public."Resource";
+
+CREATE TABLE public."Resource" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	"orgId" UUID NULL,
+	"branchId" UUID NOT NULL,
+	name STRING NOT NULL,
+	short STRING NULL,
+	descr STRING NULL,
+	color STRING NULL,
+	qty INT4 NOT NULL DEFAULT 1:::INT8,
+	start INT8 NULL,
+	"end" INT8 NULL,
+	label STRING NULL,
+	prio INT4 NOT NULL DEFAULT 0:::INT8,
+	tel STRING NULL,
+	email STRING NULL,
+	type public."ResourceType" NOT NULL DEFAULT 'human':::public."ResourceType",
+	branches UUID[] NULL,
+	"isGroup" BOOL NOT NULL DEFAULT false,
+	"customSchedule" BOOL NOT NULL DEFAULT false,
+	online BOOL NULL DEFAULT false,
+	"userId" UUID NULL,
+	act BOOL NOT NULL DEFAULT true,
+	del BOOL NOT NULL DEFAULT false,
+	upd TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	cre TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	pos BOOL NOT NULL DEFAULT false,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC),
+	CONSTRAINT "Resource_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES public."Organisation"(id) ON DELETE SET NULL ON UPDATE CASCADE NOT VALID,
+	CONSTRAINT "Resource_branchId_fkey" FOREIGN KEY ("branchId") REFERENCES public."Branch"(id) ON DELETE RESTRICT ON UPDATE CASCADE NOT VALID,
+	CONSTRAINT "Resource_userId_fkey" FOREIGN KEY ("userId") REFERENCES public."User"(id) ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+
+-- public."ResourceLink" definition
+
+-- Drop table
+
+-- DROP TABLE public."ResourceLink";
+
+CREATE TABLE public."ResourceLink" (
+	"groupId" UUID NOT NULL,
+	"childId" UUID NOT NULL,
+	pref INT4 NOT NULL DEFAULT 0:::INT8,
+	act BOOL NOT NULL DEFAULT true,
+	del BOOL NOT NULL DEFAULT false,
+	upd TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	cre TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	CONSTRAINT "ResourceLink_pkey" PRIMARY KEY ("groupId" ASC, "childId" ASC),
+	CONSTRAINT "ResourceLink_groupId_fkey" FOREIGN KEY ("groupId") REFERENCES public."Resource"(id) ON DELETE RESTRICT ON UPDATE CASCADE NOT VALID,
+	CONSTRAINT "ResourceLink_childId_fkey" FOREIGN KEY ("childId") REFERENCES public."Resource"(id) ON DELETE RESTRICT ON UPDATE CASCADE NOT VALID,
+	INDEX idx_reslink_child ("childId" ASC)
+);
+
+
+-- public."Satisfaction" definition
+
+-- Drop table
+
+-- DROP TABLE public."Satisfaction";
+
+CREATE TABLE public."Satisfaction" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	"orderId" UUID NOT NULL,
+	subject STRING NULL,
+	score INT4 NOT NULL DEFAULT 0:::INT8,
+	remark STRING NULL,
+	act BOOL NOT NULL DEFAULT true,
+	del BOOL NOT NULL DEFAULT false,
+	upd TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	cre TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC),
+	CONSTRAINT "Satisfaction_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES public."Order"(id) ON DELETE RESTRICT ON UPDATE CASCADE NOT VALID,
+	UNIQUE INDEX "Satisfaction_orderId_key" ("orderId" ASC)
+);
+
+
+-- public."Schedule" definition
+
+-- Drop table
+
+-- DROP TABLE public."Schedule";
+
+CREATE TABLE public."Schedule" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	idx INT4 NOT NULL DEFAULT 0:::INT8,
+	"default" BOOL NOT NULL DEFAULT false,
+	"branchId" UUID NULL,
+	"resourceId" UUID NOT NULL,
+	name STRING NULL,
+	start INT8 NULL,
+	weeks JSONB NULL,
+	"prepIncl" BOOL NOT NULL DEFAULT true,
+	act BOOL NOT NULL DEFAULT true,
+	del BOOL NOT NULL DEFAULT false,
+	upd TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	"scheduleIds" UUID[] NULL,
+	cre TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	"exclProds" JSONB NULL,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC),
+	CONSTRAINT "Schedule_resourceId_fkey" FOREIGN KEY ("resourceId") REFERENCES public."Resource"(id) ON DELETE RESTRICT ON UPDATE CASCADE NOT VALID,
+	INDEX idx_schedule_resource_default ("resourceId" ASC, "default" ASC)
+);
+
+
+-- public."Subscription" definition
+
+-- Drop table
+
+-- DROP TABLE public."Subscription";
+
+CREATE TABLE public."Subscription" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	"orgId" UUID NULL,
+	"branchId" UUID NOT NULL,
+	"contactId" UUID NOT NULL,
+	"orderId" UUID NULL,
+	name STRING NOT NULL,
+	remark STRING NULL,
+	"subscriptionProductId" UUID NULL,
+	"unitProductId" UUID NOT NULL,
+	"firstUsedOn" TIMESTAMP(3) NULL,
+	"expiresOn" TIMESTAMP(3) NULL,
+	"totalQty" INT4 NOT NULL DEFAULT 0:::INT8,
+	"usedQty" INT4 NOT NULL DEFAULT 0:::INT8,
+	act BOOL NOT NULL DEFAULT true,
+	del BOOL NOT NULL DEFAULT false,
+	upd TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	cre TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	options JSONB NULL,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC),
+	CONSTRAINT "Subscription_contactId_fkey" FOREIGN KEY ("contactId") REFERENCES public."Contact"(id) ON DELETE RESTRICT ON UPDATE CASCADE NOT VALID,
+	CONSTRAINT "Subscription_subscriptionProductId_fkey" FOREIGN KEY ("subscriptionProductId") REFERENCES public."Product"(id) ON DELETE SET NULL ON UPDATE CASCADE NOT VALID,
+	CONSTRAINT "Subscription_unitProductId_fkey" FOREIGN KEY ("unitProductId") REFERENCES public."Product"(id) ON DELETE RESTRICT ON UPDATE CASCADE NOT VALID,
+	CONSTRAINT "Subscription_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES public."Order"(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+
+-- public."Task" definition
+
+-- Drop table
+
+-- DROP TABLE public."Task";
+
+CREATE TABLE public."Task" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	"rTaskId" UUID NULL,
+	"hrExecId" UUID NULL,
+	name STRING NOT NULL,
+	loc STRING NULL,
+	info STRING NULL,
+	status public."TaskStatus" NOT NULL DEFAULT 'todo':::public."TaskStatus",
+	"createdAt" TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	"startedAt" TIMESTAMP(3) NULL,
+	"finishedAt" TIMESTAMP(3) NULL,
+	cmt STRING NULL,
+	"branchId" UUID NOT NULL,
+	date INT4 NULL,
+	"hrIds" UUID[] NULL,
+	prio INT4 NOT NULL DEFAULT 0:::INT8,
+	schedule public."TaskSchedule" NOT NULL DEFAULT 'once':::public."TaskSchedule",
+	"time" STRING NULL,
+	active BOOL NOT NULL DEFAULT true,
+	"deletedAt" TIMESTAMP(3) NULL,
+	"updatedAt" TIMESTAMP(3) NULL,
+	"origSched" public."TaskSchedule" NULL,
+	"userId" UUID NULL,
+	by STRING NULL,
+	imp STRING NULL,
+	act BOOL NOT NULL DEFAULT true,
+	del BOOL NOT NULL DEFAULT false,
+	upd TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	cre TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	block BOOL NOT NULL DEFAULT false,
+	dur INT4 NOT NULL DEFAULT 0:::INT8,
+	plan BOOL NOT NULL DEFAULT false,
+	bef BOOL NOT NULL DEFAULT false,
+	"productId" UUID NULL,
+	"orderId" UUID NULL,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC),
+	CONSTRAINT "Task_hrExecId_fkey" FOREIGN KEY ("hrExecId") REFERENCES public."Resource"(id) ON DELETE SET NULL ON UPDATE CASCADE,
+	CONSTRAINT "Task_productId_fkey" FOREIGN KEY ("productId") REFERENCES public."Product"(id) ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+
+-- public."Address" definition
+
+-- Drop table
+
+-- DROP TABLE public."Address";
+
+CREATE TABLE public."Address" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	"contactId" UUID NOT NULL,
+	postal STRING NULL,
+	country STRING NULL,
+	city STRING NULL,
+	act BOOL NOT NULL DEFAULT true,
+	del BOOL NOT NULL DEFAULT false,
+	upd TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	cre TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	"defInv" BOOL NOT NULL DEFAULT false,
+	"defShip" BOOL NOT NULL DEFAULT false,
+	str STRING NULL,
+	"strNr" STRING NULL,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC),
+	CONSTRAINT "Address_contactId_fkey" FOREIGN KEY ("contactId") REFERENCES public."Contact"(id) ON DELETE RESTRICT ON UPDATE CASCADE NOT VALID
+);
+
+
+-- public."LoyaltyCardChange" definition
+
+-- Drop table
+
+-- DROP TABLE public."LoyaltyCardChange";
+
+CREATE TABLE public."LoyaltyCardChange" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	"cardId" UUID NOT NULL,
+	value INT4 NOT NULL DEFAULT 0:::INT8,
+	"isReward" BOOL NOT NULL DEFAULT false,
+	reward JSONB NULL,
+	"orderId" UUID NULL,
+	date TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	"rewardId" UUID NULL,
+	info STRING NULL,
+	total INT4 NOT NULL DEFAULT 0:::INT8,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC),
+	CONSTRAINT "LoyaltyCardChange_cardId_fkey" FOREIGN KEY ("cardId") REFERENCES public."LoyaltyCard"(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT "LoyaltyCardChange_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES public."Order"(id) ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+
+-- public."OrderLine" definition
+
+-- Drop table
+
+-- DROP TABLE public."OrderLine";
+
+CREATE TABLE public."OrderLine" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	idx INT4 NOT NULL DEFAULT 0:::INT8,
+	"orderId" UUID NOT NULL,
+	"productId" UUID NULL,
+	descr STRING NULL,
+	start INT8 NULL,
+	"end" INT8 NULL,
+	qty DECIMAL(65,30) NOT NULL DEFAULT 0:::DECIMAL,
+	base DECIMAL(65,30) NOT NULL DEFAULT 0:::DECIMAL,
+	unit DECIMAL(65,30) NOT NULL DEFAULT 0:::DECIMAL,
+	excl DECIMAL(65,30) NOT NULL DEFAULT 0:::DECIMAL,
+	vat DECIMAL(65,30) NOT NULL DEFAULT 0:::DECIMAL,
+	"vatPct" DECIMAL(65,30) NOT NULL DEFAULT 0:::DECIMAL,
+	incl DECIMAL(65,30) NOT NULL DEFAULT 0:::DECIMAL,
+	persons STRING[] NULL,
+	tag STRING NULL,
+	options JSONB NULL,
+	json JSONB NULL,
+	act BOOL NOT NULL DEFAULT true,
+	del BOOL NOT NULL DEFAULT false,
+	upd TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	cre TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	pc JSONB NULL,
+	cust BOOL NOT NULL DEFAULT false,
+	"nrPers" INT4 NULL,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC),
+	CONSTRAINT "OrderLine_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES public."Order"(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT "OrderLine_productId_fkey" FOREIGN KEY ("productId") REFERENCES public."Product"(id) ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+
+-- public."Payment" definition
+
+-- Drop table
+
+-- DROP TABLE public."Payment";
+
+CREATE TABLE public."Payment" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	idx INT4 NOT NULL DEFAULT 0:::INT8,
+	"orderId" UUID NOT NULL,
+	type STRING NULL,
+	loc STRING NULL,
+	"bankTxId" UUID NULL,
+	"bankTxNum" STRING NULL,
+	info STRING NULL,
+	amount DECIMAL(65,30) NOT NULL DEFAULT 0:::DECIMAL,
+	"giftId" UUID NULL,
+	"subsId" UUID NULL,
+	decl BOOL NOT NULL DEFAULT false,
+	act BOOL NOT NULL DEFAULT true,
+	del BOOL NOT NULL DEFAULT false,
+	upd TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	cre TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	date INT8 NULL,
+	"provId" STRING NULL,
+	"loyalId" UUID NULL,
+	loyal JSONB NULL,
+	fee DECIMAL(65,30) NOT NULL DEFAULT 0:::DECIMAL,
+	lnk BOOL NOT NULL DEFAULT false,
+	"noDecl" DECIMAL(65,30) NOT NULL DEFAULT 0:::DECIMAL,
+	proc BOOL NOT NULL DEFAULT false,
+	vld BOOL NOT NULL DEFAULT false,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC),
+	CONSTRAINT "Payment_giftId_fkey" FOREIGN KEY ("giftId") REFERENCES public."Gift"(id) ON DELETE SET NULL ON UPDATE CASCADE,
+	CONSTRAINT "Payment_subsId_fkey" FOREIGN KEY ("subsId") REFERENCES public."Subscription"(id) ON DELETE SET NULL ON UPDATE CASCADE,
+	CONSTRAINT "Payment_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES public."Order"(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT "Payment_bankTxId_fkey" FOREIGN KEY ("bankTxId") REFERENCES public."BankTransaction"(id) ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+
+-- public."Price" definition
+
+-- Drop table
+
+-- DROP TABLE public."Price";
+
+CREATE TABLE public."Price" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	"productId" UUID NOT NULL,
+	type public."PriceType" NOT NULL DEFAULT 'sales':::public."PriceType",
+	value DECIMAL(65,30) NOT NULL DEFAULT 0:::DECIMAL,
+	"isQty" BOOL NOT NULL DEFAULT false,
+	"isDay" BOOL NOT NULL DEFAULT false,
+	"isTime" BOOL NOT NULL DEFAULT false,
+	qty INT4 NOT NULL DEFAULT 1:::INT8,
+	ref public."ReferenceDate" NOT NULL DEFAULT 'app':::public."ReferenceDate",
+	idx INT4 NOT NULL DEFAULT 0:::INT8,
+	days BOOL[] NULL DEFAULT ARRAY[]:::BOOL[],
+	"from" STRING NULL,
+	"to" STRING NULL,
+	"productItemId" UUID NULL,
+	start INT8 NULL,
+	"end" INT8 NULL,
+	"hasOptions" BOOL NOT NULL DEFAULT false,
+	mode public."PriceMode" NOT NULL DEFAULT 'pct':::public."PriceMode",
+	options JSONB NULL,
+	descr STRING NULL,
+	"isPromo" BOOL NOT NULL DEFAULT false,
+	title STRING NULL,
+	act BOOL NOT NULL DEFAULT true,
+	del BOOL NOT NULL DEFAULT false,
+	upd TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	cre TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	dates JSONB NULL,
+	"hasDates" BOOL NOT NULL DEFAULT false,
+	"giftOpt" BOOL NOT NULL DEFAULT false,
+	"extraQty" JSONB NULL,
+	cond JSONB NULL,
+	"hasPeriods" BOOL NOT NULL DEFAULT false,
+	periods JSONB NULL,
+	"on" BOOL NOT NULL DEFAULT true,
+	skip BOOL NOT NULL DEFAULT false,
+	"skipLast" INT8 NULL,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC),
+	CONSTRAINT "Price_productId_fkey" FOREIGN KEY ("productId") REFERENCES public."Product"(id) ON DELETE RESTRICT ON UPDATE CASCADE NOT VALID
+);
+
+
+-- public."ProductResource" definition
+
+-- Drop table
+
+-- DROP TABLE public."ProductResource";
+
+CREATE TABLE public."ProductResource" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	"productId" UUID NOT NULL,
+	"resourceId" UUID NOT NULL,
+	idx INT4 NOT NULL DEFAULT 0:::INT8,
+	"durationMode" public."DurationMode" NOT NULL DEFAULT 'product':::public."DurationMode",
+	reference public."DurationReference" NOT NULL DEFAULT 'start':::public."DurationReference",
+	"offset" INT4 NOT NULL DEFAULT 0:::INT8,
+	duration INT4 NOT NULL DEFAULT 0:::INT8,
+	"scheduleIds" STRING[] NULL,
+	"groupAlloc" BOOL NOT NULL DEFAULT false,
+	"groupQty" INT4 NOT NULL DEFAULT 1:::INT8,
+	label STRING NULL,
+	prep BOOL NOT NULL DEFAULT false,
+	"prepOverlap" BOOL NOT NULL DEFAULT false,
+	act BOOL NOT NULL DEFAULT true,
+	del BOOL NOT NULL DEFAULT false,
+	upd TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	cre TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	flex BOOL NOT NULL DEFAULT false,
+	"flexAfter" BOOL NOT NULL DEFAULT true,
+	back BOOL NOT NULL DEFAULT false,
+	"optionDur" BOOL NOT NULL DEFAULT false,
+	"optionIds" STRING[] NULL,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC),
+	CONSTRAINT "ProductResource_productId_fkey" FOREIGN KEY ("productId") REFERENCES public."Product"(id) ON DELETE RESTRICT ON UPDATE CASCADE NOT VALID,
+	CONSTRAINT "ProductResource_resourceId_fkey" FOREIGN KEY ("resourceId") REFERENCES public."Resource"(id) ON DELETE RESTRICT ON UPDATE CASCADE NOT VALID
+);
+
+
+-- public."ResourcePlanning" definition
+
+-- Drop table
+
+-- DROP TABLE public."ResourcePlanning";
+
+CREATE TABLE public."ResourcePlanning" (
+	id UUID NOT NULL DEFAULT gen_random_uuid(),
+	"branchId" UUID NOT NULL,
+	"resourceId" UUID NULL,
+	"resourceGroupId" UUID NULL,
+	"orderLineId" UUID NULL,
+	"autoResourceId" UUID NULL,
+	"scheduleId" UUID NULL,
+	type STRING NOT NULL DEFAULT 'occ':::STRING,
+	start INT8 NULL,
+	"end" INT8 NULL,
+	prio INT4 NOT NULL DEFAULT 0:::INT8,
+	pre INT4 NOT NULL DEFAULT 0:::INT8,
+	post INT4 NOT NULL DEFAULT 0:::INT8,
+	label STRING NULL,
+	info JSONB NULL,
+	"orderId" UUID NULL,
+	prep BOOL NOT NULL DEFAULT false,
+	overlap BOOL NOT NULL DEFAULT false,
+	act BOOL NOT NULL DEFAULT true,
+	del BOOL NOT NULL DEFAULT false,
+	upd TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	cre TIMESTAMP(3) NOT NULL DEFAULT current_timestamp():::TIMESTAMP,
+	"taskId" UUID NULL,
+	fmt STRING NULL,
+	ors BOOL NOT NULL DEFAULT false,
+	rem STRING NULL,
+	CONSTRAINT newtable_pk PRIMARY KEY (id ASC),
+	CONSTRAINT "ResourcePlanning_resourceId_fkey" FOREIGN KEY ("resourceId") REFERENCES public."Resource"(id) ON DELETE SET NULL ON UPDATE CASCADE NOT VALID,
+	CONSTRAINT "ResourcePlanning_resourceGroupId_fkey" FOREIGN KEY ("resourceGroupId") REFERENCES public."Resource"(id) ON DELETE SET NULL ON UPDATE CASCADE NOT VALID,
+	CONSTRAINT "ResourcePlanning_orderLineId_fkey" FOREIGN KEY ("orderLineId") REFERENCES public."OrderLine"(id) ON DELETE SET NULL ON UPDATE CASCADE NOT VALID,
+	CONSTRAINT "ResourcePlanning_scheduleId_fkey" FOREIGN KEY ("scheduleId") REFERENCES public."Schedule"(id) ON DELETE SET NULL ON UPDATE CASCADE NOT VALID,
+	CONSTRAINT "ResourcePlanning_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES public."Order"(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT "ResourcePlanning_taskId_fkey" FOREIGN KEY ("taskId") REFERENCES public."Task"(id) ON DELETE SET NULL ON UPDATE CASCADE,
+	INDEX idx_rp_scheduleid ("scheduleId" ASC),
+	INDEX idx_rp_resource_start_end_active ("resourceId" ASC, start ASC, "end" ASC) WHERE act AND (NOT del),
+	INDEX idx_rp_resource_period_type ("resourceId" ASC, start ASC, "end" ASC, type ASC),
+	INDEX idx_rp_group_period ("resourceGroupId" ASC, start ASC, "end" ASC)
+);

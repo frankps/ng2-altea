@@ -1029,7 +1029,8 @@ export class DateRangeSet {
             return null
     }
 
-    subtractMany(setToSubtract: DateRangeSet, mode: subtractManyMode = subtractManyMode.biggestOverlap): DateRangeSet {
+    /* subtractMany was not working correctly for multiple ranges, only first range was subtracted  */
+    subtractManyOld(setToSubtract: DateRangeSet, mode: subtractManyMode = subtractManyMode.biggestOverlap): DateRangeSet {
 
         let subtractFrom = this.clone()
 
@@ -1064,6 +1065,59 @@ export class DateRangeSet {
 
                 let diff = substractFrom.subtract(rangeToSubtract)
                 subtractFrom.addRanges(...diff)
+
+            }
+
+            
+        }
+
+        return subtractFrom
+
+
+    }
+
+
+    subtractMany(setToSubtract: DateRangeSet, mode: subtractManyMode = subtractManyMode.biggestOverlap): DateRangeSet {
+
+        let subtractFrom = this.clone()
+
+        let toSubtractDedup = setToSubtract.deduplicate()
+
+        let loopIdx = -1
+
+        for (let rangeToSubtract of toSubtractDedup.ranges) {
+            loopIdx++
+
+            let idx = subtractFrom.indexOfRangeBiggestOverlap(rangeToSubtract)
+
+            if (idx == -1)
+                continue
+
+            let substractFrom = subtractFrom.ranges[idx]
+            subtractFrom.removeRangeAtIndex(idx)
+
+            // if qty > 1, then we need to keep all but one
+            if (substractFrom.qty > 1) {
+
+                let substractFromQtyMinus1 = substractFrom.clone()
+                substractFromQtyMinus1.qty--
+                subtractFrom.addRanges(substractFromQtyMinus1)
+
+                substractFrom.qty = 1
+            }
+
+            if (!substractFrom.equals(rangeToSubtract)) {
+
+                let diff = substractFrom.subtract(rangeToSubtract)
+                subtractFrom.addRanges(...diff)
+
+                // check if there is still a left over (we need to subtract later)
+
+                let subtractLater = rangeToSubtract.subtract(substractFrom)
+
+                if (ArrayHelper.NotEmpty(subtractLater))
+                    toSubtractDedup.ranges.push(...subtractLater)
+
 
             }
 
@@ -1146,6 +1200,7 @@ export class DateRangeSet {
         }
 
         while (subtractFrom) {
+
 
             const overlappingRanges = toSubtractRanges.filter(toSubtract => subtractFrom!.intersectsWith(toSubtract))
 

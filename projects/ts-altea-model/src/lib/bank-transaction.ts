@@ -87,18 +87,47 @@ export class BankTransaction extends ObjectWithId {
     @Type(() => Payment)
     payments?: Payment[] = []
 
-    clone() : BankTransaction {
+    hasPayments(): boolean {
+        return ArrayHelper.NotEmpty(this.payments)
+    }
+
+    /**
+     * Make sure that payments.order is included! Otherwise wrong result!
+     * @returns 
+     */
+    hasInvoice(): boolean {
+        return this.payments.findIndex(p => p.order?.invoiced) >= 0
+    }
+
+    invoicedPayments(): Payment[] {
+        return this.payments.filter(p => p.order?.invoiced)
+    }
+
+    /**
+ * Make sure that payments.order is included! Otherwise wrong result!
+ * @returns 
+ */
+    hasGift(): boolean {
+        return this.payments.findIndex(p => p.order?.gift) >= 0
+    }
+
+    paymentsForGiftNotInvoiced(): Payment[] {
+        return this.payments.filter(p => p.order?.gift && !p.order?.invoiced)
+    }
+
+
+    clone(): BankTransaction {
         let clone = ObjectHelper.clone(this, BankTransaction)
         delete clone._info1
 
         return clone
     }
 
-    amountRounded() : number {
+    amountRounded(): number {
         return _.round(this.amount, 2)
     }
 
-    amountToLink() : number {
+    amountToLink(): number {
 
         let amount = this.amount
 
@@ -108,9 +137,9 @@ export class BankTransaction extends ObjectWithId {
         return _.round(amount, 2)
     }
 
-    getYearFromNum() : number {
+    getYearFromNum(): number {
 
-        if (!this.num) 
+        if (!this.num)
             return -1
 
         let items = this.num.split('-')
@@ -121,9 +150,9 @@ export class BankTransaction extends ObjectWithId {
         return +items[0]
     }
 
-    getSequenceNumberFromNum() : number {
+    getSequenceNumberFromNum(): number {
 
-        if (!this.num) 
+        if (!this.num)
             return -1
 
         let items = this.num.split('-')

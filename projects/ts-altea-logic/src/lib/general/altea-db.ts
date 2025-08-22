@@ -1036,6 +1036,24 @@ export class AlteaDb {
         return tx
     }
 
+    async getBankTransactionNumberRange(accountId: string, from: number, to: number, ...includes: string[]): Promise<BankTransaction[]> {
+
+        const qry = new DbQueryTyped<BankTransaction>('bankTransaction', BankTransaction)
+
+
+        qry.include(...includes)
+
+        qry.and('accountId', QueryOperator.equals, accountId)
+        qry.and('numInt', QueryOperator.greaterThanOrEqual, from)
+        qry.and('numInt', QueryOperator.lessThanOrEqual, to)
+
+        qry.orderBy('numInt', SortOrder.asc)
+
+        const transactions = await this.db.query$<BankTransaction>(qry)
+
+        return transactions
+    }
+
     async getBankTransactionsBetween(start: number | Date, end: number | Date, types?: BankTxType[], extra?: any): Promise<BankTransaction[]> {
 
         let startNum: number
@@ -1077,9 +1095,9 @@ export class AlteaDb {
 
         qry.orderBy('num')
 
-        const payments = await this.db.query$<BankTransaction>(qry)
+        const transactions = await this.db.query$<BankTransaction>(qry)
 
-        return payments
+        return transactions
 
     }
 

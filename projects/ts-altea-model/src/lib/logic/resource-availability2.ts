@@ -145,12 +145,23 @@ export class ResourceAvailability2 {
 
             /** switch to new subtract */
 
-            /*
-            Issue 30/7/25: subtractMany was not working correctly for multiple ranges, only first range was subtracted
-                let resourceStillAvailable = extendedSchedule.subtractMany(unavailable)
-            */
-            let resourceStillAvailable = extendedSchedule.subtract(unavailable, true)
+
+
+            /*  New solution: with problems!!  Does not work when qty > 1   !!! > investigate !!!            */
+/*             let resourceStillAvailable = extendedSchedule.subtract(unavailable, false)
             resourceStillAvailable = resourceStillAvailable.subtract(resourceOccupation.overlapAllowed, true)
+  
+ */
+            /*
+            Old solution
+            Issue 30/7/25: subtractMany was not working correctly for multiple ranges, only first range was subtracted   
+            >> fixed this solution on 20/8  
+            */
+
+            let resourceStillAvailable = extendedSchedule.subtractMany(unavailable)
+            resourceStillAvailable = resourceStillAvailable.subtractMany(resourceOccupation.overlapAllowed)
+
+
 
             resourceStillAvailable.resource = resource
             resourceOccupation.overlapAllowed.resource = resource
