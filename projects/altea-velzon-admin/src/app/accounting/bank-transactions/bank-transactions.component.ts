@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { BankTransactionService, ObjectService, PaymentService, SessionService } from 'ng-altea-common';
+import { BankTransactionService, BranchService, ObjectService, PaymentService, SessionService } from 'ng-altea-common';
 import { ApiListResult, ApiStatus, ArrayHelper, DateHelper, DbQuery, ObjectHelper, QueryOperator, Translation } from 'ts-common';
 import * as dateFns from 'date-fns'
 import { BankTransaction, BankTxType, Payment, Payments, PaymentType, StripeGetPayouts, StripePayout } from 'ts-altea-model';
@@ -7,6 +7,8 @@ import { AlteaDb, BankTransactionLinking, FortisBankImport } from 'ts-altea-logi
 import * as _ from "lodash";
 import { StripeService } from 'projects/ng-altea-common/src/lib/stripe.service';
 import { DashboardService, ToastType, TranslationService } from 'ng-common'
+import { BankToWingsExport, BankToWingsExportRequest } from 'ts-altea-logic';
+import { saveAs } from 'file-saver'
 
 @Component({
   selector: 'app-bank-transactions',
@@ -77,8 +79,11 @@ export class BankTransactionsComponent implements OnInit {
 
   init = false
 
+  showWingsDownload = false
+  wingsExport = new BankToWingsExportRequest()
+
   constructor(protected sessionSvc: SessionService, protected txSvc: BankTransactionService, protected paySvc: PaymentService, protected objSvc: ObjectService,
-    protected stripeSvc: StripeService, protected objectSvc: ObjectService, private translationSvc: TranslationService, public dashboardSvc: DashboardService) {
+    protected stripeSvc: StripeService, protected objectSvc: ObjectService, private translationSvc: TranslationService, public dashboardSvc: DashboardService, protected branchSvc: BranchService) {
 
   }
 
@@ -406,7 +411,7 @@ export class BankTransactionsComponent implements OnInit {
 
     qry.orderByDesc('num')
 
-    qry.take = 300
+    qry.take = 1000
     qry.include('payments.order')
 
     console.warn(qry)
@@ -438,7 +443,7 @@ export class BankTransactionsComponent implements OnInit {
 
     or1.and('type', QueryOperator.in, payTypes)
 
-    qry.take = 50
+    qry.take = 1000
 
     let payments = await me.paySvc.query$(qry)
 
@@ -840,7 +845,7 @@ export class BankTransactionsComponent implements OnInit {
 
 
 
-
+  
 
 
     console.error(`${minDate} - ${maxDate}`)
@@ -907,10 +912,71 @@ export class BankTransactionsComponent implements OnInit {
 
   }
 
+  //wingsYearMonth: number = -1
 
+  async initDownloadInterval() {
+    let me = this
+
+    let wingsSettings = this.sessionSvc.branch.acc.wings
+
+    this.wingsExport.yearMonth = wingsSettings.yearMonth
+
+    this.wingsExport.from = wingsSettings.txFromNum
+    this.wingsExport.to = wingsSettings.txToNum
+
+    if (!this.showWingsDownload)
+      return
+
+
+    console.log('Getting numbers...')
+  }
+
+  async downloadWings() {
+    let me = this
+
+    // let request = new BankToWingsExportRequest()
+
+
+    var bankToWingsExport = new BankToWingsExport(me.alteaDb)
+
+    let response = await bankToWingsExport.export(this.wingsExport)
+
+    console.error(response)
+
+    var fileName = `bank-to-wings-${this.wingsExport.from}-${this.wingsExport.to}.xml`
+
+    const blob = new Blob([response.xmlString], { type: 'application/xml;charset=utf-8' });
+    saveAs(blob, fileName);
+
+  }
+
+  async nextWingsMonth() {
+    await this.saveWingsSettings()
+  }
+
+  async saveWingsSettings() {
+    let me = this
+    let branch = me.sessionSvc.branch
+    let branchAcc = branch.acc
+    let wingsSettings = branchAcc.wings
+    wingsSettings.yearMonth = me.wingsExport.yearMonth
+    wingsSettings.txFromNum = me.wingsExport.from
+    wingsSettings.txToNum = me.wingsExport.to
+
+    let update = {
+      id: branch.id,
+      acc: branchAcc
+    }
+
+    let res = await me.branchSvc.update$(update)
+  }
 
 
 
 }
 
+/*
 
+{"closed": {"month": 6, "year": 2025}, "wings": {"txFromNum": 202401051, "txToNum": 202401076, "yearMonth": 202410}, "wingsYearMonth": 202410}
+
+*/

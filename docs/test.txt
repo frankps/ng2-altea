@@ -1,11 +1,299 @@
-
-
-
-http://localhost:4350/branch/aqua/order/a420eb76-497d-4b4a-a22d-90f9e78d6113/pos-summary
-
-
-a420eb76-497d-4b4a-a22d-90f9e78d6113
-
-
-
-
+<?xml version="1.0" encoding="UTF-8"?>
+<WingsAccounting xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Session>
+    <Connection>
+      <RootPath>/Users/frankpaepens/code/altea/ng2-altea/interfaces</RootPath>
+      <DossierID>0001</DossierID>
+    </Connection>
+    <BookingBatch>
+      <Booking>
+        <Header>
+          <Action>1</Action>
+          <BookCode>BANK</BookCode>
+          <RunningNumber>1234567890</RunningNumber>
+          <OpDate>20250823</OpDate>
+          <HdrCurrencyID>EUR</HdrCurrencyID>
+        </Header>
+        <Detail>
+          <AccountType>1</AccountType>
+          <AccountID>BE12001328191492</AccountID>
+          <LineAmountDC>0</LineAmountDC>
+          <LineAmountHC>0</LineAmountHC>
+        </Detail>
+        <Detail>
+          <AccountType>2</AccountType>
+          <AccountID>00000022</AccountID>
+          <LineAmountDC>-867</LineAmountDC>
+          <LineAmountHC>-867</LineAmountHC>
+          <Comment>2024-01051 26/09/24 tx type: stripe</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>3</AccountType>
+          <AccountID>00000672</AccountID>
+          <LineAmountDC>8.25</LineAmountDC>
+          <LineAmountHC>8.25</LineAmountHC>
+          <Comment>*2024-01051 01/10/24 kost Stripe *26/09</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>2</AccountType>
+          <AccountID>00000022</AccountID>
+          <LineAmountDC>-463.44</LineAmountDC>
+          <LineAmountHC>-463.44</LineAmountHC>
+          <Comment>2024-01052 30/09/24 tx type: terminalBC</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>2</AccountType>
+          <AccountID>00000022</AccountID>
+          <LineAmountDC>-15.25</LineAmountDC>
+          <LineAmountHC>-15.25</LineAmountHC>
+          <Comment>2024-01053 27/09/24 tx type: terminalCredit</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>3</AccountType>
+          <AccountID>00000534</AccountID>
+          <LineAmountDC>45.31</LineAmountDC>
+          <LineAmountHC>45.31</LineAmountHC>
+          <Comment>2024-01054 01/10/24</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>2</AccountType>
+          <AccountID>00000185</AccountID>
+          <LineAmountDC>-100</LineAmountDC>
+          <LineAmountHC>-100</LineAmountHC>
+          <Comment>2024-01055 02/10/24 cadeau: 3FF49</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>2</AccountType>
+          <AccountID>00000022</AccountID>
+          <LineAmountDC>-175.5</LineAmountDC>
+          <LineAmountHC>-175.5</LineAmountHC>
+          <Comment>2024-01055 01/10/24 tx type: terminalBC</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>2</AccountType>
+          <AccountID>00000022</AccountID>
+          <LineAmountDC>-270</LineAmountDC>
+          <LineAmountHC>-270</LineAmountHC>
+          <Comment>2024-01056 27/09/24 tx type: stripe</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>3</AccountType>
+          <AccountID>00000672</AccountID>
+          <LineAmountDC>3.43</LineAmountDC>
+          <LineAmountHC>3.43</LineAmountHC>
+          <Comment>*2024-01056 02/10/24 kost Stripe *27/09</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>2</AccountType>
+          <AccountID>00000185</AccountID>
+          <LineAmountDC>-222</LineAmountDC>
+          <LineAmountHC>-222</LineAmountHC>
+          <Comment>*2024-01057 03/10/24 factuur: 2024.059 *28/09</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>2</AccountType>
+          <AccountID>00000185</AccountID>
+          <LineAmountDC>-60</LineAmountDC>
+          <LineAmountHC>-60</LineAmountHC>
+          <Comment>*2024-01057 03/10/24 cadeau: 236D5 *28/09</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>2</AccountType>
+          <AccountID>00000022</AccountID>
+          <LineAmountDC>-1921</LineAmountDC>
+          <LineAmountHC>-1921</LineAmountHC>
+          <Comment>2024-01057 28/09/24 tx type: stripe</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>3</AccountType>
+          <AccountID>00000672</AccountID>
+          <LineAmountDC>13.87</LineAmountDC>
+          <LineAmountHC>13.87</LineAmountHC>
+          <Comment>*2024-01057 03/10/24 kost Stripe *28/09</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>2</AccountType>
+          <AccountID>00000022</AccountID>
+          <LineAmountDC>-397.93</LineAmountDC>
+          <LineAmountHC>-397.93</LineAmountHC>
+          <Comment>2024-01058 02/10/24 tx type: terminalBC</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>2</AccountType>
+          <AccountID>00000022</AccountID>
+          <LineAmountDC>-25</LineAmountDC>
+          <LineAmountHC>-25</LineAmountHC>
+          <Comment>2024-01059 01/10/24 tx type: terminalCredit</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>1</AccountType>
+          <AccountID>656100</AccountID>
+          <LineAmountDC>0.28</LineAmountDC>
+          <LineAmountHC>0.28</LineAmountHC>
+          <Comment>2024-01059 03/10/24 kost creditkaart</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>3</AccountType>
+          <AccountID>00000534</AccountID>
+          <LineAmountDC>6191.54</LineAmountDC>
+          <LineAmountHC>6191.54</LineAmountHC>
+          <Comment>2024-01060 03/10/24</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>3</AccountType>
+          <AccountID>00000534</AccountID>
+          <LineAmountDC>1440.67</LineAmountDC>
+          <LineAmountHC>1440.67</LineAmountHC>
+          <Comment>2024-01061 03/10/24</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>3</AccountType>
+          <AccountID>00000534</AccountID>
+          <LineAmountDC>354.63</LineAmountDC>
+          <LineAmountHC>354.63</LineAmountHC>
+          <Comment>2024-01062 03/10/24</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>2</AccountType>
+          <AccountID>00000185</AccountID>
+          <LineAmountDC>-50</LineAmountDC>
+          <LineAmountHC>-50</LineAmountHC>
+          <Comment>2024-01063 04/10/24 cadeau: 4766D</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>2</AccountType>
+          <AccountID>00000022</AccountID>
+          <LineAmountDC>-810.5</LineAmountDC>
+          <LineAmountHC>-810.5</LineAmountHC>
+          <Comment>2024-01063 01/10/24 tx type: stripe</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>3</AccountType>
+          <AccountID>00000672</AccountID>
+          <LineAmountDC>4.55</LineAmountDC>
+          <LineAmountHC>4.55</LineAmountHC>
+          <Comment>2024-01063 04/10/24 kost Stripe</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>2</AccountType>
+          <AccountID>00000185</AccountID>
+          <LineAmountDC>-200</LineAmountDC>
+          <LineAmountHC>-200</LineAmountHC>
+          <Comment>2024-01064 04/10/24 factuur: 2024.057 en cadeau:B4A79</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>2</AccountType>
+          <AccountID>00000185</AccountID>
+          <LineAmountDC>-200</LineAmountDC>
+          <LineAmountHC>-200</LineAmountHC>
+          <Comment>2024-01064 04/10/24 factuur: 2024.057 en cadeau:709E2</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>2</AccountType>
+          <AccountID>00000022</AccountID>
+          <LineAmountDC>-239</LineAmountDC>
+          <LineAmountHC>-239</LineAmountHC>
+          <Comment>2024-01064 03/10/24 tx type: terminalBC</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>3</AccountType>
+          <AccountID>00000534</AccountID>
+          <LineAmountDC>154.04</LineAmountDC>
+          <LineAmountHC>154.04</LineAmountHC>
+          <Comment>2024-01065 05/10/24</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>3</AccountType>
+          <AccountID>00000534</AccountID>
+          <LineAmountDC>11.25</LineAmountDC>
+          <LineAmountHC>11.25</LineAmountHC>
+          <Comment>2024-01066 05/10/24</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>3</AccountType>
+          <AccountID>00000534</AccountID>
+          <LineAmountDC>6</LineAmountDC>
+          <LineAmountHC>6</LineAmountHC>
+          <Comment>2024-01067 05/10/24</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>3</AccountType>
+          <AccountID>00000534</AccountID>
+          <LineAmountDC>3.63</LineAmountDC>
+          <LineAmountHC>3.63</LineAmountHC>
+          <Comment>2024-01068 05/10/24</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>2</AccountType>
+          <AccountID>00000022</AccountID>
+          <LineAmountDC>-881</LineAmountDC>
+          <LineAmountHC>-881</LineAmountHC>
+          <Comment>2024-01069 04/10/24 tx type: terminalBC</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>2</AccountType>
+          <AccountID>00000022</AccountID>
+          <LineAmountDC>-472.09</LineAmountDC>
+          <LineAmountHC>-472.09</LineAmountHC>
+          <Comment>2024-01070 05/10/24 tx type: terminalBC</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>2</AccountType>
+          <AccountID>00000022</AccountID>
+          <LineAmountDC>-463</LineAmountDC>
+          <LineAmountHC>-463</LineAmountHC>
+          <Comment>2024-01071 02/10/24 tx type: stripe</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>3</AccountType>
+          <AccountID>00000672</AccountID>
+          <LineAmountDC>1.4</LineAmountDC>
+          <LineAmountHC>1.4</LineAmountHC>
+          <Comment>2024-01071 07/10/24 kost Stripe</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>2</AccountType>
+          <AccountID>00000022</AccountID>
+          <LineAmountDC>-185</LineAmountDC>
+          <LineAmountHC>-185</LineAmountHC>
+          <Comment>2024-01072 06/10/24 tx type: terminalBC</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>2</AccountType>
+          <AccountID>00000022</AccountID>
+          <LineAmountDC>-1084</LineAmountDC>
+          <LineAmountHC>-1084</LineAmountHC>
+          <Comment>2024-01073 07/10/24 tx type: terminalBC</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>2</AccountType>
+          <AccountID>00000022</AccountID>
+          <LineAmountDC>-453</LineAmountDC>
+          <LineAmountHC>-453</LineAmountHC>
+          <Comment>2024-01074 03/10/24 tx type: stripe</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>3</AccountType>
+          <AccountID>00000672</AccountID>
+          <LineAmountDC>2.1</LineAmountDC>
+          <LineAmountHC>2.1</LineAmountHC>
+          <Comment>2024-01074 08/10/24 kost Stripe</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>2</AccountType>
+          <AccountID>00000022</AccountID>
+          <LineAmountDC>-125</LineAmountDC>
+          <LineAmountHC>-125</LineAmountHC>
+          <Comment>2024-01075 08/10/24</Comment>
+        </Detail>
+        <Detail>
+          <AccountType>2</AccountType>
+          <AccountID>00000022</AccountID>
+          <LineAmountDC>-61</LineAmountDC>
+          <LineAmountHC>-61</LineAmountHC>
+          <Comment>2024-01076 05/10/24 tx type: terminalCredit</Comment>
+        </Detail>
+      </Booking>
+    </BookingBatch>
+  </Session>
+</WingsAccounting>

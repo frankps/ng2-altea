@@ -68,6 +68,10 @@
         bindLabel="name" bindValue="id" [clearable]="false" [multiple]="true" [(ngModel)]="cond.ids">
     </ng-select> -->
 
+
+    <button type="button" class="btn btn-primary btn-sm mx-3 my-3" (click)="getSubscriptions()">Subscriptions</button>
+
+
     <button type="button" class="btn btn-primary btn-sm mx-3 my-3" (click)="doorOpenedWhatsapp()">Whatsapp</button>
 
 
@@ -84,7 +88,7 @@
 
 </ng-container>
 
-
+<div *ngIf="customReport" [innerHTML]="customReport"></div>
 
 <div class="row">
 

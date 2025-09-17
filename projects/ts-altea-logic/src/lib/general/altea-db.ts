@@ -1043,11 +1043,13 @@ export class AlteaDb {
 
         qry.include(...includes)
 
-        qry.and('accountId', QueryOperator.equals, accountId)
+       // qry.and('accountId', QueryOperator.equals, accountId)
         qry.and('numInt', QueryOperator.greaterThanOrEqual, from)
         qry.and('numInt', QueryOperator.lessThanOrEqual, to)
 
         qry.orderBy('numInt', SortOrder.asc)
+
+        qry.take = 1000
 
         const transactions = await this.db.query$<BankTransaction>(qry)
 
@@ -1075,6 +1077,8 @@ export class AlteaDb {
         qry.and('execDate', QueryOperator.greaterThanOrEqual, startNum)
         qry.and('execDate', QueryOperator.lessThanOrEqual, endNum)
 
+        qry.take = 1000
+        
         if (ArrayHelper.NotEmpty(types))
             qry.and('type', QueryOperator.in, types)
 

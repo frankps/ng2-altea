@@ -114,6 +114,14 @@ export class AccountingConfig {
         month: 1
     }
 
+    
+    wings = {
+        yearMonth: 202410,     // the month accounting is currently processing 
+        txFromNum: 202401051,  // the first transaction number to process (in that month)
+        txToNum: 202401076     // the last transaction number to process (in that month)
+    }
+
+    //wingsYearMonth: 202410
 }
 
 
@@ -281,7 +289,7 @@ export class Branch extends ObjectWithIdPlus {
 
 
 
-    accountingClosedUntil() : Date {
+    accountingClosedUntil(): Date {
 
         if (!this.acc.closed)
             return new Date(2000, 0, 1)

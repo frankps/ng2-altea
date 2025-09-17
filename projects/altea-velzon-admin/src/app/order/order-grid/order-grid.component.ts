@@ -362,6 +362,9 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
         filter.or('contact.name', QueryOperator.contains, orderSearch.searchFor)
         filter.or('contact.mobile', QueryOperator.contains, orderSearch.searchFor)
         filter.or('contact.email', QueryOperator.contains, orderSearch.searchFor)
+        filter.or('giftCode', QueryOperator.contains, orderSearch.searchFor)
+        filter.or('invoice.num', QueryOperator.contains, orderSearch.searchFor)
+        // filter.or('giftCode', QueryOperator.contains, orderSearch.searchFor)
       }
     }
 

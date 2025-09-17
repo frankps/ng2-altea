@@ -110,6 +110,11 @@ export class EditBranchComponent extends NgEditBaseComponent<Branch> implements 
     if (!branch.acc)
       branch.acc = new AccountingConfig()
 
+    if (!branch.acc.wings) {
+      let acc = new AccountingConfig()
+      branch.acc.wings = acc.wings
+    }
+
     if (!branch.prodSales) {
       branch.prodSales = new ProdSalesConfig()
 

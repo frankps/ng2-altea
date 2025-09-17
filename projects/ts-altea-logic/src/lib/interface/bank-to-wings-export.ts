@@ -9,29 +9,40 @@ import { fragment, create } from 'xmlbuilder2';
 import * as _ from "lodash";
 import { XMLBuilder } from "xmlbuilder2/lib/interfaces"
 
+
 /*
 
 https://www.npmjs.com/package/xmlbuilder2
 */
 
 export class BankToWingsExportRequest {
+
+    yearMonth: number = -1  // yyyyMM
+
     accountId: string = 'BE12001328191492'
-    from: number
-    to: number
+    from: number = 202401050
+    to: number = 202401075
     /*     opDate: Date
         runningNumber: string */
-    dagBoek: string
-    runningNumber: string
-    dossierId: string
-    rekening: string
-    defaultWingsSupplierId: string
-    defaultWingsCustomerId: string
+    dagBoek: string = 'BANK'
+    runningNumber: string = null
+    dossierId: string = '0001'
+    rekening: string = '550000'
+    defaultWingsSupplierId: string = '00000534'
+    defaultWingsCustomerId: string = '00000185'
 
 
-    rootPath: string
+    rootPath: string = '/Users/frankpaepens/code/altea/ng2-altea/interfaces'
 
 
     // , string dossierId, string dagBoek, string rekening, string defaultWingsSupplierId, string defaultWingsCustomerId
+}
+
+export class BankToWingsExportResponse {
+
+    message: string
+    xmlString: string
+
 }
 
 export class BankToWingsExport {
@@ -47,8 +58,10 @@ export class BankToWingsExport {
     }
 
 
-    async export(request: BankToWingsExportRequest) {
+    async export(request: BankToWingsExportRequest): Promise<BankToWingsExportResponse> {
 
+
+        console.log('BankToWingsExport started', request)
 
         var txs = await this.alteaDb.getBankTransactionNumberRange(request.accountId, request.from, request.to, 'payments.order')
 
@@ -56,8 +69,15 @@ export class BankToWingsExport {
         let totalAmount = _.sumBy(txs, 'amount')
 
 
-        var xmlBookings = this.createXmlHeader(request.dagBoek, '1234567890', new Date(), request.accountId, 0)
+        // DateHelper.yyyyMMdd(new Date())
 
+        const yearMonth = `${request.yearMonth}`
+
+        const runningNumber = ("00" + yearMonth.slice(-2)).slice(-3)
+        
+        var xmlBookings = this.createXmlHeader(request.dagBoek, runningNumber, new Date(), request.accountId, totalAmount)
+
+        var bookingTag = xmlBookings.first()
 
         const wingsDagontvangstenCustomerId = "00000022";
 
@@ -105,7 +125,7 @@ export class BankToWingsExport {
                         var xmlDetail = this.createDetailWithDates(accountType, request.defaultWingsCustomerId, lineAmountDC,
                             tx.num, tx.execDateObject(), invoiceDetails, tx.refDateObject())
 
-                        xmlBookings.root().import(xmlDetail)
+                        bookingTag.import(xmlDetail)
 
                         nrOfInvoicesForTx++
                     }
@@ -134,7 +154,7 @@ export class BankToWingsExport {
                         var xmlDetail = this.createDetailWithDates(accountType, request.defaultWingsCustomerId, lineAmountDC,
                             tx.num, tx.execDateObject(), giftDetails, tx.refDateObject())
 
-                        xmlBookings.root().import(xmlDetail)
+                        bookingTag.import(xmlDetail)
 
                         nrOfInvoicesForTx++
                     }
@@ -203,14 +223,14 @@ export class BankToWingsExport {
                 var xmlDetail = this.createDetailWithDates(accountType, accountId, lineAmountDC,
                     tx.num, tx.refDateObject() ?? tx.execDateObject(), extraInfo)
 
-                xmlBookings.root().import(xmlDetail)
+                bookingTag.import(xmlDetail)
 
 
             }
 
 
             if (extraCost != null)
-                xmlBookings.root().import(extraCost)
+                bookingTag.import(extraCost)
 
             //    booking.Add(extraCost);
 
@@ -220,27 +240,17 @@ export class BankToWingsExport {
         }
 
         var xmlDoc = this.buildWingsAccounting(request.rootPath, request.dossierId, xmlBookings)
-    
+
 
         const xmlString = xmlDoc.end({
-            prettyPrint: true,        
-            headless: false,      
-                
-           
-          });
-          
-          console.log(xmlString);
+            prettyPrint: true,
+            headless: false,
+        });
 
-          
-
-
-
-
-
-        /*
-        let tx = new BankTransaction()
-        tx.payments.forEach(p => p.order)
-        */
+        const response = new BankToWingsExportResponse()
+        response.message = "OK"
+        response.xmlString = xmlString
+        return response
     }
 
 
@@ -256,9 +266,9 @@ export class BankToWingsExport {
             .up()
             .ele('Detail')
             .ele('AccountType').txt('1').up()
-            .ele('AccountID').txt(rekening).up()
-            .ele('LineAmountDC').txt(totalAmount.toString()).up()
-            .ele('LineAmountHC').txt(totalAmount.toString()).up()
+            .ele('AccountID').txt('550000').up()
+            .ele('LineAmountDC').txt(totalAmount.toFixed(4)).up()
+            .ele('LineAmountHC').txt(totalAmount.toFixed(4)).up()
             .up()
             .up();
 
@@ -300,7 +310,7 @@ export class BankToWingsExport {
 
         return this.createDetail(accountType, accountId, lineAmountDC, comment);
     }
-
+ 
     /** Base overload: returns a <Detail> node */
     createDetail(
         accountType: string,
@@ -314,8 +324,8 @@ export class BankToWingsExport {
             .ele('Detail')
             .ele('AccountType').txt(accountType).up()
             .ele('AccountID').txt(accountId).up()
-            .ele('LineAmountDC').txt(lineAmountDC.toString()).up()
-            .ele('LineAmountHC').txt(lineAmountDC.toString()).up()
+            .ele('LineAmountDC').txt(lineAmountDC.toFixed(4)).up()
+            .ele('LineAmountHC').txt(lineAmountDC.toFixed(4)).up()
             .ele('Comment').txt(comment).up()
             .up();
         return detail;
@@ -327,21 +337,21 @@ export class BankToWingsExport {
         const ns = "http://www.w3.org/2001/XMLSchema-instance"
         const doc = create({ version: '1.0', encoding: 'UTF-8' });
         const root = doc.ele('WingsAccounting').att('xmlns:xsi', ns);
-    
+
         const session = root.ele('Session');
         const connection = session.ele('Connection');
         connection.ele('RootPath').txt(rootPath).up();
         connection.ele('DossierID').txt(dossierId).up();
-    
+
         const bookingBatch = session.ele('BookingBatch');
-    
+
         // If `this.booking` is a fragment/element, import it directly.
         // If it's a full document, import its root: `bookingBatch.import(this.booking.root())`.
         bookingBatch.import(booking);
-    
+
         // move back up to the document root to return the full builder
         return doc;
-      }
+    }
 
 
 

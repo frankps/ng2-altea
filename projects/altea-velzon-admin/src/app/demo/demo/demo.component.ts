@@ -1,11 +1,11 @@
 import { Component, ViewChild, inject } from '@angular/core';
-import { Contact, DateRangeTests, Message, MsgType, Order, PaymentType, PriceCondition, PriceConditionType, Product, SmsMessage, TemplateChannel, User, ValueComparator } from 'ts-altea-model';
+import { Contact, DateRangeTests, Message, MsgType, Order, PaymentType, PriceCondition, PriceConditionType, Product, SmsMessage, Subscription, TemplateChannel, User, ValueComparator } from 'ts-altea-model';
 import { SearchContactComponent } from '../../contact/search-contact/search-contact.component';
 import { AlteaService, BranchService, ObjectService, OrderService, ProductService, ResourceService, ScheduleService, SessionService, TemplateService, UserService } from 'ng-altea-common';
 import { AlteaDb, CheckDeposists, CreateReportingData, OrderCronJobs, OrderMessaging, OrderMgmtService, ProductReporting, TaskSchedulingService } from 'ts-altea-logic';
 import { TranslationService } from 'ng-common'
 import { Country } from 'ts-altea-model'
-import { DbQuery, ObjectHelper, QueryOperator, Translation } from 'ts-common';
+import { DbQuery, DbQueryTyped, HtmlTable, ObjectHelper, QueryOperator, Translation } from 'ts-common';
 import { HttpClient } from '@angular/common/http';
 import * as dateFns from 'date-fns'
 import { MessagingService } from 'projects/ng-altea-common/src/lib/messaging.service';
@@ -13,6 +13,8 @@ import { StripeService } from 'projects/ng-altea-common/src/lib/stripe.service';
 import { deleteDoc, getDocs, limit, or, orderBy, query, where } from 'firebase/firestore';
 import { Firestore, collection, collectionData, addDoc, CollectionReference, updateDoc, serverTimestamp, doc, docData, DocumentChange, DocumentData } from '@angular/fire/firestore';
 import { NgxSpinnerService } from "ngx-spinner"
+import * as _ from "lodash";
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 // Volgnummer;Uitvoeringsdatum;Valutadatum;Bedrag;Valuta rekening;Rekeningnummer;Type verrichting;Tegenpartij;Naam van de tegenpartij;
 // Mededeling;Details;Status;Reden van weigering
@@ -52,7 +54,7 @@ export class DemoComponent {
   constructor(private http: HttpClient, public dbSvc: ObjectService, protected translationSvc: TranslationService, protected backEndSvc: ObjectService
     , protected userSvc: UserService, protected resourceSvc: ResourceService, protected anySvc: ScheduleService, protected productSvc: ProductService, protected orderSvc: OrderService,
     protected messagingSvc: MessagingService, protected stripeSvc: StripeService, protected sessionSvc: SessionService,
-    protected templateSvc: TemplateService, protected spinner: NgxSpinnerService) {
+    protected templateSvc: TemplateService, protected spinner: NgxSpinnerService, protected sanitizer: DomSanitizer) {
 
   }
 
@@ -352,6 +354,73 @@ export class DemoComponent {
 
     console.warn('Dif', dif)
   }
+
+  customReport: SafeHtml
+
+  async getSubscriptions() {
+
+    let me = this
+
+    let alteaDb = new AlteaDb(this.dbSvc)
+
+    //let res = await alteaDb.getSu
+
+    let subsQry = new DbQueryTyped<Subscription>('subscription', Subscription)
+    //subsQry.take = 5
+    subsQry.include('contact')
+    subsQry.and('subscriptionProductId', QueryOperator.equals, '3a52a26d-6cf7-4f56-bfcc-049d44fd9402')  // '83c7a2b4-83b8-49af-adbb-cc107649f0c2'
+    // qry.and('usedQty', QueryOperator.lessThan, 'totalQty')
+
+    let subs = await this.dbSvc.query$<Subscription>(subsQry)
+
+    let contactIds = subs.map(sub => sub.contactId)
+    contactIds = _.uniq(contactIds)
+
+    let ordersQry = new DbQueryTyped<Order>('order', Order)
+    ordersQry.include('lines.product')
+    ordersQry.and('contactId', QueryOperator.in, contactIds)
+    ordersQry.and('start', QueryOperator.greaterThan, 20250829000000)
+    ordersQry.orderBy('start')
+    ordersQry.take = 1000
+
+    let orders = await this.dbSvc.query$<Order>(ordersQry)
+
+    console.error(subs)
+    console.error(orders)
+
+
+
+    let table = new HtmlTable()
+
+    table.headerRow = true
+
+    table.styles.th = "padding-right:100px"
+    let header: string[] = []
+    table.addRow(header)
+
+    header.push('Klant', 'Mobile', 'Email', 'Subscription', 'Open/Total')
+
+
+    for (let sub of subs) {
+      table.addRow([sub.contact?.name, sub.contact?.mobile, sub.contact?.email, sub.name, `${sub.openQty()}/${sub.totalQty}`])
+
+      let contactOrders = orders.filter(o => o.contactId === sub.contactId)
+
+      for (let order of contactOrders) {
+        table.addRow(['',order.startDateFormat(), order.lines.map(l => l.product.name).join(', ')])
+      }
+
+
+
+    }
+
+    let htmlString = table.toHtmlString()
+    console.error(table.toHtmlString())
+    me.customReport = this.sanitizer.bypassSecurityTrustHtml(htmlString)
+
+
+  }
+
 
 
   async filterProducts() {
