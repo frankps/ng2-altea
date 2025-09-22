@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Year } from '@syncfusion/ej2-angular-schedule';
 import { BranchService, ObjectService, OrderService, SessionService } from 'ng-altea-common';
-import { AlteaDb, CheckContactLoyalty, ConsistencyReport, ContactLoyaltyReport, MonthClosing, MonthClosingResult, MonthClosingUpdate, MonthConsistencyReportBuilder } from 'ts-altea-logic';
+import { AlteaDb, CheckContactLoyalty, ConsistencyReport, ContactLoyaltyReport, MonthClosing, MonthClosingResult, MonthClosingUpdate, MonthConsistencyReportBuilder, WingsReporting } from 'ts-altea-logic';
 import { YearMonth } from 'ts-common';
 import * as _ from "lodash";
 import { NgxSpinnerService } from "ngx-spinner"
@@ -9,7 +9,7 @@ import { DashboardService } from 'ng-common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Branch, ReportMonth, ReportMonths } from 'ts-altea-model';
 import { NgZone } from '@angular/core';
-
+import { saveAs } from 'file-saver'
 @Component({
   selector: 'app-order-check',
   templateUrl: './order-check.component.html',
@@ -350,6 +350,28 @@ export class OrderCheckComponent implements OnInit {
     let res = await this.loyaltyReport.fixLoyalty()
 
     console.log(res)
+
+  }
+
+  async downloadWingsReport() {
+    let me = this
+
+    let alteaDb = new AlteaDb(this.objSvc)
+
+    let wingsReporting = new WingsReporting(alteaDb)
+
+    let yearMonth = new YearMonth(2024, 10)
+
+    let report = await wingsReporting.create(yearMonth, me.sessionSvc.branchId)
+
+
+    var fileName = `wings-checks-${yearMonth.y}-${yearMonth.m}.csv`
+
+    let csvString = report.toCsv()
+    console.error(csvString)
+
+    const blob = new Blob([csvString], { type: 'application/csv;charset=utf-8' });
+    saveAs(blob, fileName);
 
   }
 

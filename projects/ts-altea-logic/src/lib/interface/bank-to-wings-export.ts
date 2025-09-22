@@ -32,7 +32,7 @@ export class BankToWingsExportRequest {
     defaultWingsCustomerId: string = '00000185'
 
 
-    rootPath: string = '/Users/frankpaepens/code/altea/ng2-altea/interfaces'
+    rootPath: string = 'C:\\Program Files\\Wings'
 
 
     // , string dossierId, string dagBoek, string rekening, string defaultWingsSupplierId, string defaultWingsCustomerId

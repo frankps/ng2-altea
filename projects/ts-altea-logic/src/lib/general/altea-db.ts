@@ -1036,6 +1036,41 @@ export class AlteaDb {
         return tx
     }
 
+    async getLatestBankTransactionInMonth(yearMonth: YearMonth): Promise<BankTransaction> {
+
+        const qry = new DbQueryTyped<BankTransaction>('bankTransaction', BankTransaction)
+
+        const lastDayOfMonth = yearMonth.lastDayOfMonth()
+        const maxExecDate = DateHelper.yyyyMMdd(lastDayOfMonth)
+        qry.and('execDate', QueryOperator.lessThanOrEqual, maxExecDate)
+      
+
+        qry.orderBy('execDate', SortOrder.desc)
+        qry.orderBy('numInt', SortOrder.desc)
+
+        const tx = await this.db.queryFirst$<BankTransaction>(qry)
+
+        return tx
+    }
+
+    async getFirstBankTransactionInMonth(yearMonth: YearMonth): Promise<BankTransaction> {
+
+        const qry = new DbQueryTyped<BankTransaction>('bankTransaction', BankTransaction)
+
+        const firstDayOfMonth = yearMonth.firstDayOfMonth()
+        const minExecDate = DateHelper.yyyyMMdd(firstDayOfMonth)
+        qry.and('execDate', QueryOperator.greaterThanOrEqual, minExecDate)
+      
+        qry.orderBy('execDate', SortOrder.asc)
+        qry.orderBy('numInt', SortOrder.asc)
+
+        const tx = await this.db.queryFirst$<BankTransaction>(qry)
+
+        console.error(tx)
+
+        return tx
+    }
+
     async getBankTransactionNumberRange(accountId: string, from: number, to: number, ...includes: string[]): Promise<BankTransaction[]> {
 
         const qry = new DbQueryTyped<BankTransaction>('bankTransaction', BankTransaction)
@@ -1078,7 +1113,7 @@ export class AlteaDb {
         qry.and('execDate', QueryOperator.lessThanOrEqual, endNum)
 
         qry.take = 1000
-        
+
         if (ArrayHelper.NotEmpty(types))
             qry.and('type', QueryOperator.in, types)
 
@@ -1316,6 +1351,9 @@ export class AlteaDb {
 
     }
 
+
+
+
     async getPaymentsBetween(branchId: string, start: number | Date, end: number | Date, types: PaymentType[], notLinkedToBankTx = false, includes?: string[]): Promise<Payments> {
 
         let startNum: number
@@ -1346,7 +1384,7 @@ export class AlteaDb {
         if (notLinkedToBankTx)
             qry.and('bankTxId', QueryOperator.equals, null)
 
-        qry.take = 1000
+        qry.take = 2000
 
         qry.orderBy('date')
 

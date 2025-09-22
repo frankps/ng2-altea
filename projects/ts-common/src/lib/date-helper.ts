@@ -14,7 +14,7 @@ export class YearMonth {
         this.m = month
     }
 
-    static fromDateNumber(dateNum: number) : YearMonth {
+    static fromDateNumber(dateNum: number): YearMonth {
 
         if (!dateNum)
             return null
@@ -27,7 +27,7 @@ export class YearMonth {
         return ym
     }
 
-    static fromDate(date: Date) : YearMonth {
+    static fromDate(date: Date): YearMonth {
 
         if (!date)
             return null
@@ -35,6 +35,34 @@ export class YearMonth {
         let ym = new YearMonth(dateFns.getYear(date), dateFns.getMonth(date) + 1)
 
         return ym
+    }
+
+    /**
+     * Parses a YearMonth from a number or string in the format 'yyyyMM' or 'yyMM'
+     * - Accepts '202509' or 202509 (6 digits)
+     * - Accepts '2509' or 2509 (4 digits, assumed to be 2025-09)
+     */
+    static parse(value: string | number): YearMonth {
+        const str = typeof value === 'number' ? value.toString().padStart(4, '0') : value.trim();
+
+        let year: number;
+        let month: number;
+
+        if (/^\d{6}$/.test(str)) {
+            year = parseInt(str.slice(0, 4), 10);
+            month = parseInt(str.slice(4, 6), 10);
+        } else if (/^\d{4}$/.test(str)) {
+            year = 2000 + parseInt(str.slice(0, 2), 10);
+            month = parseInt(str.slice(2, 4), 10);
+        } else {
+            throw new Error(`Invalid YearMonth format: ${value}`);
+        }
+
+        if (month < 1 || month > 12) {
+            throw new Error(`Invalid month in YearMonth: ${month}`);
+        }
+
+        return new YearMonth(year, month);
     }
 
     next(): YearMonth {
@@ -63,12 +91,12 @@ export class YearMonth {
         return YearMonth.fromDate(startPreviousMonth)
     }
 
-    startDate() : Date {
+    startDate(): Date {
         let date = new Date(this.y, this.m - 1, 1)
         return date
     }
 
-    endDate() : Date {
+    endDate(): Date {
         let date = this.startDate()
         date = dateFns.addMonths(date, 1)
         return date
@@ -81,8 +109,14 @@ export class YearMonth {
     /**
      * returns yearmonth in format yymm as number
      */
-    toNumber() : number {
-        let num = (this.y - 2000) * 100 + this.m
+    toNumber(shortForm: boolean = true): number {
+
+        let y = this.y
+
+        if (shortForm)
+            y = y - 2000
+
+        let num = y * 100 + this.m
         return num
     }
 
@@ -100,6 +134,18 @@ export class YearMonth {
 
         return toNum
     }
+
+    lastDayOfMonth(): Date {
+        let date = new Date(this.y, this.m - 1, 1)
+        date = dateFns.addMonths(date, 1)
+        date = dateFns.subDays(date, 1)
+        return date
+    }
+
+    firstDayOfMonth(): Date {
+        let date = new Date(this.y, this.m - 1, 1)
+        return date
+    }
 }
 
 export class DateHelper {
@@ -112,7 +158,7 @@ export class DateHelper {
 
     static get maxDate() {
         return new Date(2100, 0, 1)
-    }   
+    }
 
     static isDate(input: any) {
         return input instanceof Date
@@ -130,24 +176,24 @@ export class DateHelper {
         date: Date,
         startTime: string, // format: 'HH:mm'
         endTime: string     // format: 'HH:mm'
-      ): boolean {
+    ): boolean {
         const [startHour, startMinute] = startTime.split(':').map(Number);
         const [endHour, endMinute] = endTime.split(':').map(Number);
-      
+
         const timeInMinutes = date.getHours() * 60 + date.getMinutes();
         const startInMinutes = startHour * 60 + startMinute;
         const endInMinutes = endHour * 60 + endMinute;
-      
+
         return timeInMinutes >= startInMinutes && timeInMinutes <= endInMinutes;
-      }
-    
+    }
+
 
     /**
      * 
      * @param time time in format HH:mm
      * @param date 
      */
-    static getDateAtTime(time: string, date = new Date()) : Date {
+    static getDateAtTime(time: string, date = new Date()): Date {
 
         if (!time || time.indexOf(':') == -1)
             return null
@@ -176,7 +222,7 @@ export class DateHelper {
             yearMonths.push(yearMonth)
         }
 
-        return yearMonths   
+        return yearMonths
     }
 
     /**
@@ -214,7 +260,7 @@ export class DateHelper {
         if (!days || days.length == 0)
             return []
 
-        const res : string[] = []
+        const res: string[] = []
 
         days.forEach(day => {
             res.push(DateHelper.getDayName(day))

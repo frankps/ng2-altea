@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { BankTransactionService, BranchService, ObjectService, PaymentService, SessionService } from 'ng-altea-common';
-import { ApiListResult, ApiStatus, ArrayHelper, DateHelper, DbQuery, ObjectHelper, QueryOperator, Translation } from 'ts-common';
+import { ApiListResult, ApiStatus, ArrayHelper, DateHelper, DbQuery, ObjectHelper, QueryOperator, Translation, YearMonth } from 'ts-common';
 import * as dateFns from 'date-fns'
 import { BankTransaction, BankTxType, Payment, Payments, PaymentType, StripeGetPayouts, StripePayout } from 'ts-altea-model';
 import { AlteaDb, BankTransactionLinking, FortisBankImport } from 'ts-altea-logic';
@@ -365,6 +365,8 @@ export class BankTransactionsComponent implements OnInit {
     }
 
   }
+
+
 
   /*
   "OVERSCHRIJVING IN EURO VAN REKENING NL41CITI2032304805 BIC CITINL2X STRIPE CO A L GOODBODY IFSC NORTH WALL QUA REFERTE OPDRACHTGEVER 
@@ -951,8 +953,54 @@ export class BankTransactionsComponent implements OnInit {
   }
 
   async nextWingsMonth() {
-    await this.saveWingsSettings()
+    let me = this
+    let wingsSettings = me.sessionSvc.branch.acc.wings
+
+    let yearMonth = me.wingsExport.yearMonth
+
+    let ym = YearMonth.parse(yearMonth)
+    ym = ym.next()
+
+    me.wingsExport.yearMonth = ym.toNumber(false)
+    me.wingsExport.from = me.wingsExport.to + 1
+
+    let tx = await this.alteaDb.getLatestBankTransactionInMonth(ym)
+
+    if (tx) {
+      me.wingsExport.to = tx.numInt
+    }
+
+   
+
+   // await this.saveWingsSettings()
   }
+
+
+  async previousWingsMonth() {
+    let me = this
+    let wingsSettings = me.sessionSvc.branch.acc.wings
+
+    let yearMonth = me.wingsExport.yearMonth
+
+    let ym = YearMonth.parse(yearMonth)
+    ym = ym.previous()
+
+    me.wingsExport.yearMonth = ym.toNumber(false)
+    me.wingsExport.to = me.wingsExport.from - 1
+
+    let tx = await this.alteaDb.getFirstBankTransactionInMonth(ym)
+
+    if (tx) {
+      me.wingsExport.from = tx.numInt
+    }
+
+   
+
+   // await this.saveWingsSettings()
+  }
+
+  
+
 
   async saveWingsSettings() {
     let me = this

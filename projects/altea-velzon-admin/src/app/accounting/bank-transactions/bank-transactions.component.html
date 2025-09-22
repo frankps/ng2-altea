@@ -2,7 +2,8 @@
 
 <div class="row my-3">
     <div class="col-2">
-        <input type="text" placeholder="Datepicker" class="form-control" bsDatepicker [(ngModel)]="bank.from" (bsValueChange)="fromChanged($event)">
+        <input type="text" placeholder="Datepicker" class="form-control" bsDatepicker [(ngModel)]="bank.from"
+            (bsValueChange)="fromChanged($event)">
     </div>
     <div class="col-2">
         <input type="text" placeholder="Datepicker" class="form-control" bsDatepicker [(ngModel)]="bank.to">
@@ -35,8 +36,10 @@
             <input type="checkbox" class="btn-check" id="btnUpload" autocomplete="off" [(ngModel)]="showUpload">
             <label class="btn btn-outline-primary my-0" for="btnUpload"><i class="fa-solid fa-upload"></i></label>
 
-            <input type="checkbox" class="btn-check" id="btnShowWingsDownload" autocomplete="off" [(ngModel)]="showWingsDownload" (click)="initDownloadInterval()">
-            <label class="btn btn-outline-primary my-0" for="btnShowWingsDownload"><i class="fa-solid fa-download"></i></label>
+            <input type="checkbox" class="btn-check" id="btnShowWingsDownload" autocomplete="off"
+                [(ngModel)]="showWingsDownload" (click)="initDownloadInterval()">
+            <label class="btn btn-outline-primary my-0" for="btnShowWingsDownload"><i
+                    class="fa-solid fa-download"></i></label>
         </div>
 
         <button type="button" class="btn btn-primary ms-2" (click)="getTransactions()"><i
@@ -54,7 +57,8 @@
 <div class="row my-3" *ngIf="showWingsDownload">
     <div class="col-2">
         <label class="form-label" for="wingsYearMonth">Wings maand</label>
-        <input type="number" id="wingsYearMonth" name="wingsYearMonth" class="form-control" [(ngModel)]="wingsExport.yearMonth" />
+        <input type="number" id="wingsYearMonth" name="wingsYearMonth" class="form-control"
+            [(ngModel)]="wingsExport.yearMonth" />
     </div>
     <div class="col-2">
         <label class="form-label" for="wingsFrom">Eerste transactie</label>
@@ -64,12 +68,21 @@
         <label class="form-label" for="wingsTo">Laatste transactie</label>
         <input type="number" id="wingsTo" name="wingsTo" class="form-control" [(ngModel)]="wingsExport.to" />
     </div>
-    <div class="col-2">
+    <div class="col-2 d-flex align-items-end">
         <input type="button" class="btn-check" id="btnDownload" autocomplete="off" (click)="downloadWings()">
         <label class="btn btn-outline-primary my-0" for="btnDownload"><i class="fa-solid fa-download"></i></label>
+        
+        &nbsp;
+        <input type="button" class="ms-3 btn-check" id="btnPreviousWingsMonth" autocomplete="off"
+            (click)="previousWingsMonth()">
+        <label class="btn btn-outline-primary my-0" for="btnPreviousWingsMonth"><i class="fa-solid fa-left"></i></label>
 
-        <input type="button" class="ms-3 btn-check" id="btnNextWingsMonth" autocomplete="off" (click)="nextWingsMonth()">
+        &nbsp;
+        <input type="button" class="ms-3 btn-check" id="btnNextWingsMonth" autocomplete="off"
+            (click)="nextWingsMonth()">
         <label class="btn btn-outline-primary my-0" for="btnNextWingsMonth"><i class="fa-solid fa-right"></i></label>
+
+
     </div>
 </div>
 
@@ -139,8 +152,9 @@
                                     <div class="col-2">{{stripeTx.amount/100}}</div>
                                     <div class="col-2">{{stripeTx.fee/100}}</div>
                                     <div class="col-3">{{stripeTx?.source?.payment_intent}}</div>
-                                    <div class="col">{{stripeTx?.link}}</div>  <!--  link is set to 'ok' when link with payment is established -->
-                                 
+                                    <div class="col">{{stripeTx?.link}}</div>
+                                    <!--  link is set to 'ok' when link with payment is established -->
+
                                 </div>
 
                             </li>
@@ -182,9 +196,11 @@
                         <button type="button" class="btn btn-primary btn-sm ms-2"
                             (click)="getStripePayout(tx)">Payout</button>
 
-                        <button type="button" class="btn btn-primary btn-sm ms-2" (click)="linkStripe(tx)">Link intents</button>
+                        <button type="button" class="btn btn-primary btn-sm ms-2" (click)="linkStripe(tx)">Link
+                            intents</button>
 
-                        <button type="button" class="btn btn-primary btn-sm ms-2" (click)="fallBackStripeLinking(tx)">Link amounts</button>
+                        <button type="button" class="btn btn-primary btn-sm ms-2"
+                            (click)="fallBackStripeLinking(tx)">Link amounts</button>
                     </ng-container>
 
 
