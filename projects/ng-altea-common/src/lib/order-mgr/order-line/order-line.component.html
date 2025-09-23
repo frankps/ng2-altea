@@ -38,10 +38,6 @@
 
                     <i class="fas fa-pen ms-2" *ngIf="sessionSvc.isPosAdmin()" (click)="toggleShowMoreInternal()"></i>
 
-
-
-
-
                 </div>
             </div>
 
@@ -65,7 +61,7 @@
             <!-- Typically for promotions     orderMgrSvc.isPos && -->
             <ng-container *ngIf="product?.hasSpecialPrices()">
 
-                <div class="row mt-2" style="font-size: small;" *ngFor="let price of product.getSpecialPrices()">
+                <div class="row mt-2" style="font-size: small;" *ngFor="let price of product.getSpecialPrices(orderMgrSvc.isPos)">
                     <div class="col">
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" id="price_{{price.id}}"
@@ -168,7 +164,9 @@
                             class="fa-solid fa-backward-step"></i> &nbsp; {{ 'dic.back' | translate }} </button>
                 </div>
                 <div class="col-7 d-grid">
-                    <button type="button" class="btn btn-outline-primary" (click)="addOrderLine(orderLine)"><i
+
+                    <small *ngIf="!orderMgrSvc.isPos && product.online != OnlineMode.reserve">Dit product kan enkel in de winkel gekocht worden</small>
+                    <button type="button" class="btn btn-outline-primary" *ngIf="orderMgrSvc.isPos || product.online == OnlineMode.reserve" (click)="addOrderLine(orderLine)"><i
                             class="fa-solid fa-circle-plus fa-lg"></i> &nbsp; {{ 'dic.add'
                         | translate }} </button>
                 </div>

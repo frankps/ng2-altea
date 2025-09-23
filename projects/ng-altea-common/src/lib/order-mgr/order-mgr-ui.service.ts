@@ -110,6 +110,7 @@ export class OrderMgrUiService {   // implements OnInit
   modeChanges: BehaviorSubject<string> = new BehaviorSubject<string>(null)
 
 
+  /** Is POS (Point Of Sales) => In shop  */
   isPos: boolean = false
 
   /**  */
@@ -1686,9 +1687,15 @@ export class OrderMgrUiService {   // implements OnInit
 
     if (hasSpecialPrices) {
 
-      let prices = product.getSpecialPrices()
+      let prices = product.getSpecialPrices(this.isPos)
 
       for (let price of prices) {
+
+        if (this.isPos && price.posOnly)
+          continue
+
+        if (!price.auto)  // we only auto-apply prices that are marked as auto
+          continue
 
         /** if there are price conditions, then we will not pre-select automatically */
         if (price.hasConditions())

@@ -117,6 +117,7 @@ export class AccountingConfig {
     
     wings = {
         yearMonth: 202410,     // the month accounting is currently processing 
+        runningNumber: 1,  // the running number for the month
         txFromNum: 202401051,  // the first transaction number to process (in that month)
         txToNum: 202401076     // the last transaction number to process (in that month)
     }

@@ -989,7 +989,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
 
   hasVoucher(voucher: string): boolean {
-  
+
     let vouchers: string[] = this.info?.vouchers
 
     if (ArrayHelper.IsEmpty(vouchers))
@@ -1007,7 +1007,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     this.markAsUpdated('info')
   }
 
-  removeVoucher(voucher: string) : boolean {
+  removeVoucher(voucher: string): boolean {
     if (ArrayHelper.IsEmpty(this.info?.vouchers))
       return false
 

@@ -1239,6 +1239,8 @@
       "to": "Tot (hh:mm)",
       "giftOpt": "Cadeaubon optie",
       "hasPeriods": "Prijs geldig gedurende specifieke periodes",
+      "auto": "Automatisch toepassen",
+      "posOnly": "Enkel in winkel",
       "help": {
         "price": "Prijs per behandeling"
       }

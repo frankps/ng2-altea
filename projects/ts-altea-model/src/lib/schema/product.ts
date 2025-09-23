@@ -529,7 +529,7 @@ export class Product extends ObjectWithIdPlus {
     return idx >= 0
   }
 
-  getSpecialPrices(): Price[] {
+  getSpecialPrices(isPos: boolean = false): Price[] {
 
     if (ArrayHelper.IsEmpty(this.prices))
       return []
@@ -539,6 +539,8 @@ export class Product extends ObjectWithIdPlus {
 
     let prices = this.prices.filter(p => p.act && p.isPromo && !p.giftOpt && (!p.hasDates || (p.startDate <= now && now <= p.endDate)))
 
+    if (!isPos)
+      prices = prices.filter(p => !p.posOnly)
 
     return prices
   }
@@ -1236,6 +1238,12 @@ export class Price extends ObjectWithIdPlus {
 
   /** Rule is active */
   on = true
+
+  /** price can only be applied on POS (Point Of Sale) => only in shop */
+  posOnly = false
+
+  /** automatically apply price to order line */
+  auto = true
 
   constructor(productId?: string, title?: string) {
     super()

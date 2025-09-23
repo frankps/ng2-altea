@@ -88,24 +88,24 @@ export class TaxLines {
         return new TaxLines(lines)
     }
 
-/*
-  hasVatLines(atLeast: number = 1): boolean {
-
-    if (!Array.isArray(this.vatLines))
-      return false
-
-    let length = this.vatLines.length
-
-    return length >= 1
-  }
-
-  totalVatIncl() {
-    if (!this.vatLines)
-      return 0
+    /*
+      hasVatLines(atLeast: number = 1): boolean {
     
-    return _.sumBy(this.vatLines, 'incl')
-  }
-    */
+        if (!Array.isArray(this.vatLines))
+          return false
+    
+        let length = this.vatLines.length
+    
+        return length >= 1
+      }
+    
+      totalVatIncl() {
+        if (!this.vatLines)
+          return 0
+        
+        return _.sumBy(this.vatLines, 'incl')
+      }
+        */
 
     hasLines(atLeast: number = 1): boolean {
         if (ArrayHelper.IsEmpty(this.lines))
@@ -119,10 +119,25 @@ export class TaxLines {
 
     totalIncl() {
         if (!this.lines)
-          return 0
-        
+            return 0
+
         return _.sumBy(this.lines, 'incl')
-      }
+    }
+
+    totalYearMonthIncl(yearMonth: YearMonth) {
+        if (!this.lines)
+            return 0
+
+        let yearMonthNum = yearMonth.toNumber()
+
+        let scope = this.lines.filter(t => t.per == yearMonthNum)
+
+
+        if (ArrayHelper.IsEmpty(scope))
+            return 0
+
+        return _.sumBy(scope, 'incl')
+    }
 
     getLines(yearMonth: YearMonth) {
         if (!this.hasLines())

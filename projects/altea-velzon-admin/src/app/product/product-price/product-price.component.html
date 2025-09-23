@@ -343,6 +343,27 @@
 
   </div>
 
+  <div class="row">
+    <div class="col-12">
+
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" id="auto" [(ngModel)]="object.auto" />
+        <label class="form-check-label" for="auto" translate="objects.price.auto"></label>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" id="posOnly" [(ngModel)]="object.posOnly" />
+        <label class="form-check-label" for="posOnly" translate="objects.price.posOnly"></label>
+      </div>
+
+    </div>
+  </div>
 
   <ng-container *ngIf="product.hasOptions()">
 

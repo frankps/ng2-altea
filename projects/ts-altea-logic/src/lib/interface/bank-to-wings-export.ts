@@ -1,7 +1,7 @@
 import { BankTransaction, BankTxInfo, BankTxType } from "ts-altea-model"
 import { CsvImport, ImportColumn, ImportDefinition } from "./csv-import"
 import * as dateFns from 'date-fns'
-import { ApiListResult, ArrayHelper, DateHelper, DbObjectMulti, ObjectHelper } from "ts-common"
+import { ApiListResult, ArrayHelper, DateHelper, DbObjectMulti, ObjectHelper, YearMonth } from "ts-common"
 import { AlteaDb } from "../general/altea-db"
 import { IDb } from "../interfaces/i-db"
 import { instanceToPlain, plainToInstance } from "class-transformer"
@@ -25,7 +25,7 @@ export class BankToWingsExportRequest {
     /*     opDate: Date
         runningNumber: string */
     dagBoek: string = 'BANK'
-    runningNumber: string = null
+    runningNumber: number = null
     dossierId: string = '0001'
     rekening: string = '550000'
     defaultWingsSupplierId: string = '00000534'
@@ -71,11 +71,16 @@ export class BankToWingsExport {
 
         // DateHelper.yyyyMMdd(new Date())
 
-        const yearMonth = `${request.yearMonth}`
+        const yearMonthString = `${request.yearMonth}`
 
-        const runningNumber = ("00" + yearMonth.slice(-2)).slice(-3)
+        let yearMonth = YearMonth.parse(yearMonthString)
+
+        const runningNumber = ("000" + request.runningNumber).slice(-3)
         
-        var xmlBookings = this.createXmlHeader(request.dagBoek, runningNumber, new Date(), request.accountId, totalAmount)
+        let opDate = yearMonth.lastDayOfMonth()
+        opDate = dateFns.setHours(opDate, 12)
+
+        var xmlBookings = this.createXmlHeader(request.dagBoek, runningNumber, opDate, request.accountId, totalAmount)
 
         var bookingTag = xmlBookings.first()
 

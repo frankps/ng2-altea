@@ -403,6 +403,9 @@ export class PriceChange {
   /** is a promotion */
   promo: boolean = false
 
+  /** if true, then val is an absolute value */
+  abs: boolean = false
+
   static new(id: string, val: number, promo: boolean = false, info: string = '') : PriceChange {
     let pc = new PriceChange()
     pc.id = id

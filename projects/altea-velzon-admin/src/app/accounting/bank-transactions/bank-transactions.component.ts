@@ -9,6 +9,7 @@ import { StripeService } from 'projects/ng-altea-common/src/lib/stripe.service';
 import { DashboardService, ToastType, TranslationService } from 'ng-common'
 import { BankToWingsExport, BankToWingsExportRequest } from 'ts-altea-logic';
 import { saveAs } from 'file-saver'
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
   selector: 'app-bank-transactions',
@@ -83,7 +84,7 @@ export class BankTransactionsComponent implements OnInit {
   wingsExport = new BankToWingsExportRequest()
 
   constructor(protected sessionSvc: SessionService, protected txSvc: BankTransactionService, protected paySvc: PaymentService, protected objSvc: ObjectService,
-    protected stripeSvc: StripeService, protected objectSvc: ObjectService, private translationSvc: TranslationService, public dashboardSvc: DashboardService, protected branchSvc: BranchService) {
+    protected stripeSvc: StripeService, protected objectSvc: ObjectService, private translationSvc: TranslationService, public dashboardSvc: DashboardService, protected branchSvc: BranchService, protected spinner: NgxSpinnerService) {
 
   }
 
@@ -519,7 +520,7 @@ export class BankTransactionsComponent implements OnInit {
       }
 
     }
-  
+
     console.warn(this.pays)
   }
 
@@ -568,7 +569,7 @@ export class BankTransactionsComponent implements OnInit {
     const qry = new DbQuery()
     qry.include('order')
 
-  
+
 
 
     if (tx.type == BankTxType.terminalCredit) {
@@ -587,7 +588,7 @@ export class BankTransactionsComponent implements OnInit {
       qry.and('bankTxId', QueryOperator.equals, null)
     }
 
-    
+
 
 
     let sameAmountPays = await me.paySvc.query$(qry)
@@ -847,7 +848,7 @@ export class BankTransactionsComponent implements OnInit {
 
 
 
-  
+
 
 
     console.error(`${minDate} - ${maxDate}`)
@@ -923,6 +924,11 @@ export class BankTransactionsComponent implements OnInit {
 
     this.wingsExport.yearMonth = wingsSettings.yearMonth
 
+    if (wingsSettings.runningNumber)
+      this.wingsExport.runningNumber = wingsSettings.runningNumber
+    else
+      this.wingsExport.runningNumber = 1
+
     this.wingsExport.from = wingsSettings.txFromNum
     this.wingsExport.to = wingsSettings.txToNum
 
@@ -941,6 +947,9 @@ export class BankTransactionsComponent implements OnInit {
 
     var bankToWingsExport = new BankToWingsExport(me.alteaDb)
 
+
+
+
     let response = await bankToWingsExport.export(this.wingsExport)
 
     console.error(response)
@@ -953,53 +962,83 @@ export class BankTransactionsComponent implements OnInit {
   }
 
   async nextWingsMonth() {
-    let me = this
-    let wingsSettings = me.sessionSvc.branch.acc.wings
 
-    let yearMonth = me.wingsExport.yearMonth
+    this.spinner.show()
 
-    let ym = YearMonth.parse(yearMonth)
-    ym = ym.next()
+    try {
+      let me = this
+      let wingsSettings = me.sessionSvc.branch.acc.wings
 
-    me.wingsExport.yearMonth = ym.toNumber(false)
-    me.wingsExport.from = me.wingsExport.to + 1
+      let yearMonth = me.wingsExport.yearMonth
 
-    let tx = await this.alteaDb.getLatestBankTransactionInMonth(ym)
+      let ym = YearMonth.parse(yearMonth)
+      ym = ym.next()
 
-    if (tx) {
-      me.wingsExport.to = tx.numInt
+      me.wingsExport.yearMonth = ym.toNumber(false)
+      me.wingsExport.from = me.wingsExport.to + 1
+
+      me.wingsExport.runningNumber++
+
+      let tx = await this.alteaDb.getLatestBankTransactionInMonth(ym)
+
+      if (tx) {
+        me.wingsExport.to = tx.numInt
+      }
+
+      await this.saveWingsSettings()
+
+    } catch (err) {
+      console.error(err)
+
+    } finally {
+      this.spinner.hide()
     }
 
-   
 
-   // await this.saveWingsSettings()
+
+
+    // await this.saveWingsSettings()
   }
 
 
   async previousWingsMonth() {
-    let me = this
-    let wingsSettings = me.sessionSvc.branch.acc.wings
 
-    let yearMonth = me.wingsExport.yearMonth
 
-    let ym = YearMonth.parse(yearMonth)
-    ym = ym.previous()
+    this.spinner.show()
 
-    me.wingsExport.yearMonth = ym.toNumber(false)
-    me.wingsExport.to = me.wingsExport.from - 1
+    try {
 
-    let tx = await this.alteaDb.getFirstBankTransactionInMonth(ym)
+      let me = this
+      let wingsSettings = me.sessionSvc.branch.acc.wings
 
-    if (tx) {
-      me.wingsExport.from = tx.numInt
+      let yearMonth = me.wingsExport.yearMonth
+
+      let ym = YearMonth.parse(yearMonth)
+      ym = ym.previous()
+
+      me.wingsExport.yearMonth = ym.toNumber(false)
+      me.wingsExport.to = me.wingsExport.from - 1
+
+      me.wingsExport.runningNumber--
+
+      let tx = await this.alteaDb.getFirstBankTransactionInMonth(ym)
+
+      if (tx) {
+        me.wingsExport.from = tx.numInt
+      }
+
+      await this.saveWingsSettings()
+
+
+    } catch (err) {
+      console.error(err)
+
+    } finally {
+      this.spinner.hide()
     }
-
-   
-
-   // await this.saveWingsSettings()
   }
 
-  
+
 
 
   async saveWingsSettings() {
@@ -1010,6 +1049,7 @@ export class BankTransactionsComponent implements OnInit {
     wingsSettings.yearMonth = me.wingsExport.yearMonth
     wingsSettings.txFromNum = me.wingsExport.from
     wingsSettings.txToNum = me.wingsExport.to
+    wingsSettings.runningNumber = me.wingsExport.runningNumber
 
     let update = {
       id: branch.id,

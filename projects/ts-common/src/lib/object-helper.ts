@@ -26,6 +26,14 @@ export class StringHelper {
         return StringHelper.isDefined(mobile) && mobile.length >= 8
     }
 
+    static toUrlSafe(str: string): string {
+        return str
+            .toLowerCase()
+            .trim()
+            .replace(/\s+/g, '_')       // spaces → underscores
+            .replace(/[^a-z0-9_-]/g, ''); // remove unsafe chars
+    }
+
 }
 
 

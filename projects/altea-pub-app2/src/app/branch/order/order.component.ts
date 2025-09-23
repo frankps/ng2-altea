@@ -3,7 +3,7 @@ import { ContactService, OrderMgrUiService, OrderUiMode, SessionService } from '
 import { Contact, OrderLine } from 'ts-altea-model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
-
+import { StringHelper } from 'ts-common';
 /*
 
 http://localhost:4350/branch/aqua/order/01e28ce2-0014-4dfe-8e81-d4f77460ee09/contact-edit
@@ -190,7 +190,26 @@ export class OrderComponent implements OnInit {
   }
 
   async gotoMode(mode: string) {
-    this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'orderMode', mode])
+
+    let extras = {}
+
+    if (mode == 'order-finished') {
+
+      let queryParams = {}
+      extras['queryParams'] = queryParams
+
+      let order = this.orderMgrSvc.order
+      let productName = order?.lines[0]?.product?.name
+
+      StringHelper.isEmail
+      if (productName)
+        queryParams['prod0'] = StringHelper.toUrlSafe(productName)
+
+
+    }
+
+
+    this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'orderMode', mode], extras)
   }
 
 
@@ -334,7 +353,7 @@ export class OrderComponent implements OnInit {
 
   posShowContact() {
 
-   // this.mode = 'contact-edit'
+    // this.mode = 'contact-edit'
 
     this.gotoMode('contact-edit')
 

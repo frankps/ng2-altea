@@ -61,6 +61,11 @@
             [(ngModel)]="wingsExport.yearMonth" />
     </div>
     <div class="col-2">
+        <label class="form-label" for="wingsRunningNumber">Running number</label>
+        <input type="number" id="wingsRunningNumber" name="wingsRunningNumber" class="form-control"
+            [(ngModel)]="wingsExport.runningNumber" />
+    </div>
+    <div class="col-2">
         <label class="form-label" for="wingsFrom">Eerste transactie</label>
         <input type="number" id="wingsFrom" name="wingsFrom" class="form-control" [(ngModel)]="wingsExport.from" />
     </div>

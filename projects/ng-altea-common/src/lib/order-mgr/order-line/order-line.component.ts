@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { OrderMgrUiService } from '../order-mgr-ui.service';
 import { ProductService, SessionService } from 'ng-altea-common'
-import { OrderLine, OrderLineOption, OrderLineOptionValue, Price, PriceChange, PriceChangeType, Product, ProductType } from 'ts-altea-model';
+import { OnlineMode, OrderLine, OrderLineOption, OrderLineOptionValue, Price, PriceChange, PriceChangeType, Product, ProductType } from 'ts-altea-model';
 import { ArrayHelper } from 'ts-common';
 
 
@@ -64,6 +64,8 @@ export class OrderLineComponent implements OnInit {
 
     this.qtyArray = [...Array(21 - minQty).keys()].map(i => i + minQty)
   }
+
+  OnlineMode = OnlineMode
 
   @Input() set product(product: Product) {
     this.setQtyArray(product)
