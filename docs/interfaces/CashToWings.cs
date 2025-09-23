@@ -10,6 +10,29 @@ using Dvit.OpenBiz.Database;
 using Dvit.OpenBiz.Pcl;
 using Sandlight.Data2;
 
+// Calling code:
+
+        private void ctrlExport_Click(object sender, EventArgs e)
+        {
+            CashBookReport rep = new CashBookReport();
+
+            // int year, int month, string rootPath, string dossierId, string runningNumber, string directory = @"C:\Temp\"
+
+            int year = (int)ctrlYear.Value;
+            int month = (int)ctrlMonth.Value;
+            string rootPath = @"C:\Program Files\Wings";
+            string dossierId = ctrlDossierId.Text;
+            string runningNumber = ctrlRunningNumber.Text;
+            string exportDir = ctrlDir.Text;
+
+            var response = rep.CreateWingsInterfaceToFile(year, month, rootPath, dossierId, runningNumber, exportDir);
+            
+            ctrlOutput.Text += response.Message;
+        }
+
+
+
+
 namespace Sukosan.Services.Interfaces
 {
 
@@ -191,6 +214,8 @@ namespace Sukosan.Services.Interfaces
             return xml;
         }
 
+
+// DONE: createXmlHeader
         private XElement CreateBookingXml(string bookCode, string runningNumber, DateTime opDate, string accountID, decimal totalAmount)
         {
             var booking = new XElement("Booking",
@@ -212,6 +237,7 @@ namespace Sukosan.Services.Interfaces
             return booking;
         }
 
+// DONE: createDetail
         private XElement CreateBookingDetailXml(string accountType, string accountId, decimal lineAmountDC, string comment)
         {
             return new XElement("Detail",

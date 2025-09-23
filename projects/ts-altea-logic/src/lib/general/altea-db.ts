@@ -1352,6 +1352,14 @@ export class AlteaDb {
     }
 
 
+    async getPaymentsInYearMonth(branchId: string, yearMonth: YearMonth, types: PaymentType[], includes?: string[]): Promise<Payments> {
+
+        let start = yearMonth.startDate()
+        let end = yearMonth.endDate()
+
+        return await this.getPaymentsBetween(branchId, start, end, types, false, includes)
+
+    }
 
 
     async getPaymentsBetween(branchId: string, start: number | Date, end: number | Date, types: PaymentType[], notLinkedToBankTx = false, includes?: string[]): Promise<Payments> {
@@ -1375,7 +1383,7 @@ export class AlteaDb {
         qry.and('order.branchId', QueryOperator.equals, branchId)
 
         qry.and('date', QueryOperator.greaterThanOrEqual, startNum)
-        qry.and('date', QueryOperator.lessThanOrEqual, endNum)
+        qry.and('date', QueryOperator.lessThan, endNum)
 
         if (ArrayHelper.NotEmpty(types))
             qry.and('type', QueryOperator.in, types)
