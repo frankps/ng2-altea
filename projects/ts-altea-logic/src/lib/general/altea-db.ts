@@ -197,11 +197,11 @@ export class AlteaDb {
         qry.include('invoice.orders')
 
         qry.and('branchId', QueryOperator.equals, branchId)
-       // qry.and('invoiced', QueryOperator.equals, true)
-       
+        // qry.and('invoiced', QueryOperator.equals, true)
+
         qry.and('toInvoice', QueryOperator.equals, true)
 
-        qry.or('invoiced', QueryOperator.equals, false) 
+        qry.or('invoiced', QueryOperator.equals, false)
 
         qry.or('invoiceId', QueryOperator.equals, null)
         qry.or('invoiceNum', QueryOperator.equals, null)
@@ -259,7 +259,7 @@ export class AlteaDb {
         } else {
             let startNum = DateHelper.yyyyMMddhhmmss(start)
             let endNum = DateHelper.yyyyMMddhhmmss(end)
-            
+
             qry.and('start', QueryOperator.greaterThanOrEqual, startNum)
             qry.and('start', QueryOperator.lessThanOrEqual, endNum)
             qry.orderBy('start')
@@ -272,7 +272,7 @@ export class AlteaDb {
 
         qry.and('lines', QueryOperator.some, orderLineFilter)
 
-        
+
 
         if (options) {
 
@@ -898,34 +898,34 @@ export class AlteaDb {
 
 
     /** Subscriptions */
-/*
-    async getLoyaltyCards(contactId?: string, includes?: string[]): Promise<LoyaltyCard[]> {
+    /*
+        async getLoyaltyCards(contactId?: string, includes?: string[]): Promise<LoyaltyCard[]> {
+    
+            if (!contactId)
+                contactId = this.branchId
+    
+            const qry = new DbQueryTyped<LoyaltyCard>('loyaltyCard', LoyaltyCard)
+    
+            if (includes)
+                qry.include(...includes)
+    
+            qry.and('contactId', QueryOperator.equals, contactId)
+    
+            const cards = await this.db.query$<LoyaltyCard>(qry)
+    
+            return cards
+        }*/
 
-        if (!contactId)
-            contactId = this.branchId
+    async getSubscriptionsForContact(contactId: string): Promise<Subscription[]> {
 
-        const qry = new DbQueryTyped<LoyaltyCard>('loyaltyCard', LoyaltyCard)
-
-        if (includes)
-            qry.include(...includes)
-
+        const qry = new DbQueryTyped<Subscription>('subscription', Subscription)
         qry.and('contactId', QueryOperator.equals, contactId)
 
-        const cards = await this.db.query$<LoyaltyCard>(qry)
 
-        return cards
-    }*/
+        let objects = await this.db.query$<Subscription>(qry)
 
-        async getSubscriptionsForContact(contactId: string): Promise<Subscription[]> {
-
-            const qry = new DbQueryTyped<Subscription>('subscription', Subscription)
-            qry.and('contactId', QueryOperator.equals, contactId)
-
-    
-            let objects = await this.db.query$<Subscription>(qry)
-    
-            return objects
-        }
+        return objects
+    }
 
 
     async getSubscriptionsByOrderId(orderId: string): Promise<Subscription[]> {
@@ -1043,7 +1043,7 @@ export class AlteaDb {
         const lastDayOfMonth = yearMonth.lastDayOfMonth()
         const maxExecDate = DateHelper.yyyyMMdd(lastDayOfMonth)
         qry.and('execDate', QueryOperator.lessThanOrEqual, maxExecDate)
-      
+
 
         qry.orderBy('execDate', SortOrder.desc)
         qry.orderBy('numInt', SortOrder.desc)
@@ -1060,7 +1060,7 @@ export class AlteaDb {
         const firstDayOfMonth = yearMonth.firstDayOfMonth()
         const minExecDate = DateHelper.yyyyMMdd(firstDayOfMonth)
         qry.and('execDate', QueryOperator.greaterThanOrEqual, minExecDate)
-      
+
         qry.orderBy('execDate', SortOrder.asc)
         qry.orderBy('numInt', SortOrder.asc)
 
@@ -1078,7 +1078,7 @@ export class AlteaDb {
 
         qry.include(...includes)
 
-       // qry.and('accountId', QueryOperator.equals, accountId)
+        // qry.and('accountId', QueryOperator.equals, accountId)
         qry.and('numInt', QueryOperator.greaterThanOrEqual, from)
         qry.and('numInt', QueryOperator.lessThanOrEqual, to)
 
@@ -1355,7 +1355,9 @@ export class AlteaDb {
     async getPaymentsInYearMonth(branchId: string, yearMonth: YearMonth, types: PaymentType[], includes?: string[]): Promise<Payments> {
 
         let start = yearMonth.startDate()
-        let end = yearMonth.endDate()
+        //let end = yearMonth.endDate()
+        let end = dateFns.addDays(start, 5)
+        console.error('YearMonth end incorrect while debugging (just 5 days)')
 
         return await this.getPaymentsBetween(branchId, start, end, types, false, includes)
 

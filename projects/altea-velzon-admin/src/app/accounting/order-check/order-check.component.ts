@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Year } from '@syncfusion/ej2-angular-schedule';
 import { BranchService, ObjectService, OrderService, SessionService } from 'ng-altea-common';
-import { AlteaDb, CheckContactLoyalty, ConsistencyReport, ContactLoyaltyReport, MonthClosing, MonthClosingResult, MonthClosingUpdate, MonthConsistencyReportBuilder, WingsReporting } from 'ts-altea-logic';
+import { AlteaDb, CashToWingsExport, CashToWingsExportRequest, CheckContactLoyalty, ConsistencyReport, ContactLoyaltyReport, MonthClosing, MonthClosingResult, MonthClosingUpdate, MonthConsistencyReportBuilder, WingsReporting } from 'ts-altea-logic';
 import { YearMonth } from 'ts-common';
 import * as _ from "lodash";
 import { NgxSpinnerService } from "ngx-spinner"
@@ -374,5 +374,34 @@ export class OrderCheckComponent implements OnInit {
     saveAs(blob, fileName);
 
   }
+
+
+  async downloadWingsCashReport() {
+    let me = this
+  
+    let alteaDb = new AlteaDb(this.objSvc)
+
+
+    let request = new CashToWingsExportRequest()
+    request.yearMonth =  new YearMonth(2024, 10)
+    request.branchId = me.sessionSvc.branchId
+
+    let cashToWingsExport = new CashToWingsExport(alteaDb)
+
+    
+
+    let report = await cashToWingsExport.export(request)
+
+    console.error(report)
+
+    var fileName = `cash-to-wings-${request.yearMonth.y}-${request.yearMonth.m}.xml`
+
+    const blob = new Blob([report.xmlString], { type: 'application/csv;charset=utf-8' });
+    saveAs(blob, fileName);
+
+
+  }
+
+
 
 }

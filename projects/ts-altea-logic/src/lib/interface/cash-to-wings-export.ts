@@ -65,6 +65,7 @@ export class CashBookRecord {
 export class CashBookWingsInterfaceResponse {
     message: string;
     xmlResult: string;
+    dossierId: string;
 
     constructor(message: string, xmlResult: string) {
         this.message = message;
@@ -75,12 +76,37 @@ export class CashBookWingsInterfaceResponse {
 
 export class CashToWingsExportRequest {
 
-    yearMonth: number = -1  // yyyyMM
+    yearMonth: YearMonth
 
     branchId: string
 
-    getYearMonth(): YearMonth {
-        return YearMonth.parse(this.yearMonth)
+    runningNumber: number = -1
+
+    rootPath: string = 'C:\\Program Files\\Wings'
+    dossierId: string = '0001'
+
+
+    runningNumberToString(): string {
+        return ("000" + this.runningNumber).slice(-3)
+    }
+
+    opDate(): Date {
+       
+
+        let opDate = this.yearMonth.lastDayOfMonth()
+        opDate = dateFns.setHours(opDate, 12)   // otherwise with TimeZone conversion we can fall into previous/next date
+
+        return opDate
+    }
+
+    defaultRunningNumber(): string {
+
+        let month = this.yearMonth.m
+
+        const num = (month + 3) % 12;
+
+        // pad left with zeros to length 3
+        return num.toString().padStart(3, "0");
     }
 }
 
@@ -113,21 +139,21 @@ export class CashToWingsExport {
 
         console.log('CashToWingsExport started', request)
 
-        let yearMonth = request.getYearMonth()
+        // let yearMonth = request.getYearMonth()
 
+        let records = await this.createReportRecords(request)
 
+        let response = this.createXml(records, request)
 
-
-
-        return new CashToWingsExportResponse()
+        return response
     }
 
 
-    async createReportRecords(request: CashToWingsExportRequest) : Promise<CashBookRecord[]> {
 
-        let yearMonth = request.getYearMonth()
 
-        var cashPayments = await this.alteaDb.getPaymentsInYearMonth(request.branchId, yearMonth, [PaymentType.cash])
+    async createReportRecords(request: CashToWingsExportRequest): Promise<CashBookRecord[]> {
+
+        var cashPayments = await this.alteaDb.getPaymentsInYearMonth(request.branchId, request.yearMonth, [PaymentType.cash], ['order'])
 
         let cashGroups = this.groupPayments(cashPayments.list)
 
@@ -135,6 +161,69 @@ export class CashToWingsExport {
 
         return cashBookRecords
 
+    }
+
+    createXml(records: CashBookRecord[], request: CashToWingsExportRequest) : CashToWingsExportResponse {
+
+
+        let totalAmount = _.sumBy(records, 'amount')
+        let balance = totalAmount
+        var xmlBookings = this.createXmlHeader("KAS", request.defaultRunningNumber(), request.opDate(), "570000", totalAmount)
+        var bookingTag = xmlBookings.first()
+
+        let count = 0
+
+        let messages = []
+
+        for (let record of records) {
+            let accountType = ''
+            let accountId = ''
+
+            switch (record.type) {
+                case CashBookRecordType.DayTotalCashPayments:
+                    if (record.category == "Gift" || record.category == "CreditUpload") {
+                        accountType = "1";
+                        accountId = this.overTeDragenOpbrengstenId;
+                    }
+                    else {
+                        accountType = "2";
+                        accountId = this.wingsDagontvangstenCustomerId;
+                    }
+                    break;
+                case CashBookRecordType.CashToBank:
+                    accountType = "1";
+                    accountId = "580000";
+                    break;
+
+            }
+
+            let lineAmountDC = -record.amount;
+            balance += lineAmountDC;
+
+            let comment = `${dateFns.format(record.date, 'dd/MM')} ${record.info}`
+            var xmlDetail = this.createXmlDetail(accountType, accountId, lineAmountDC, record.info)
+            bookingTag.import(xmlDetail)
+            count++
+        }
+
+        messages.push(`Nr of detail records: ${count}`)
+
+        if (balance == 0)
+            messages.push("OK, balance is 0.")
+        else
+            messages.push(`niet OK: balance is ${balance} (maar zou 0 moeten zijn!)`)
+
+        let xmlDoc = this.buildWingsAccounting(request.rootPath, request.dossierId, xmlBookings)
+
+        const xmlString = xmlDoc.end({
+            prettyPrint: true,
+            headless: false,
+        });
+
+        const response = new CashToWingsExportResponse()
+        response.message = messages.join("\n")
+        response.xmlString = xmlString
+        return response
     }
 
     groupPayments(payments: Payment[]): _.Dictionary<Payment[]> {
@@ -209,7 +298,7 @@ export class CashToWingsExport {
     }
 
     /** Base overload: returns a <Detail> node */
-    createDetail(
+    createXmlDetail(
         accountType: string,
         accountId: string,
         lineAmountDC: number,
@@ -226,5 +315,27 @@ export class CashToWingsExport {
             .ele('Comment').txt(comment).up()
             .up();
         return detail;
+    }
+
+
+    buildWingsAccounting(rootPath: string, dossierId: string, booking: XMLBuilder): XMLBuilder {
+
+        const ns = "http://www.w3.org/2001/XMLSchema-instance"
+        const doc = create({ version: '1.0', encoding: 'UTF-8' });
+        const root = doc.ele('WingsAccounting').att('xmlns:xsi', ns);
+
+        const session = root.ele('Session');
+        const connection = session.ele('Connection');
+        connection.ele('RootPath').txt(rootPath).up();
+        connection.ele('DossierID').txt(dossierId).up();
+
+        const bookingBatch = session.ele('BookingBatch');
+
+        // If `this.booking` is a fragment/element, import it directly.
+        // If it's a full document, import its root: `bookingBatch.import(this.booking.root())`.
+        bookingBatch.import(booking);
+
+        // move back up to the document root to return the full builder
+        return doc;
     }
 }
