@@ -61,7 +61,7 @@
             <!-- Typically for promotions     orderMgrSvc.isPos && -->
             <ng-container *ngIf="product?.hasSpecialPrices()">
 
-                <div class="row mt-2" style="font-size: small;" *ngFor="let price of product.getSpecialPrices(orderMgrSvc.isPos)">
+                <div class="row mt-2" style="font-size: small;" *ngFor="let price of orderLine.getSpecialPrices(orderMgrSvc.isPos)">
                     <div class="col">
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" id="price_{{price.id}}"

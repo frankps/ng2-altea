@@ -225,6 +225,14 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
   /** deposit is required for this order (default=true): this can be disabled manually by staff or on contact level*/
   depo = true
 
+  /** reduction %, this can be caused by a voucher  */
+  @Type(() => Number)
+  reduPct = 0
+
+  /** reduction on order */
+  @Type(() => Number)
+  redu = 0
+
   /** deposit amount in branch currency */
   @Type(() => Number)
   deposit = 0;
@@ -999,12 +1007,19 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
   }
 
-  addVoucher(voucher: string) {
+  /** add voucher to order, returns true if voucher was added (false in case of voucher already existing)*/
+  addVoucher(voucher: string) : boolean {
     if (!this.info?.vouchers)
       this.info.vouchers = []
 
+    if (this.info.vouchers.indexOf(voucher) >= 0)
+      return false
+
+
     this.info.vouchers.push(voucher)
     this.markAsUpdated('info')
+
+    return true
   }
 
   removeVoucher(voucher: string): boolean {
@@ -1367,10 +1382,23 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
       totalIncl += orderLine.incl
     }
 
+    /** user can have a reduction (caused by a voucher) */
+    let reductionFactor = 1
+
+    if (this.reduPct) 
+      reductionFactor = 1 - this.reduPct / 100
+
     let calculatedVatLines = Array.from(vatMap.values())
     calculatedVatLines = _.sortBy<VatLine>(calculatedVatLines, 'pct')
 
     for (let vatLine of calculatedVatLines) {
+
+      if (reductionFactor != 1) {
+        vatLine.vat = vatLine.vat * reductionFactor
+        vatLine.excl  = vatLine.excl  * reductionFactor
+        vatLine.incl  = vatLine.incl  * reductionFactor
+      }
+
       vatLine.vat = _.round(vatLine.vat, 2)
       vatLine.excl = _.round(vatLine.excl, 2)
       vatLine.incl = _.round(vatLine.incl, 2)
@@ -1382,9 +1410,11 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     }
 
 
-    let origVat = this.vat
-    let origExcl = this.excl
-    let origIncl = this.incl
+    if (reductionFactor != 1) {
+      totalVat = totalVat * reductionFactor
+      totalIncl = totalIncl * reductionFactor
+      totalExcl = totalExcl * reductionFactor
+    }
 
     totalVat = _.round(totalVat, 2)
     totalExcl = _.round(totalExcl, 2)
@@ -1444,9 +1474,17 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
       excl += line.excl
     }
 
+    if (this.reduPct) {
+      let reductionFactor = 1 - this.reduPct / 100
+      vat = vat * reductionFactor
+      incl = incl * reductionFactor
+      excl = excl * reductionFactor
+    }
+
     vat = NumberHelper.round(vat)
     incl = NumberHelper.round(incl)
     excl = NumberHelper.round(excl)
+      
 
     if (incl != this.incl) {
       this.incl = incl

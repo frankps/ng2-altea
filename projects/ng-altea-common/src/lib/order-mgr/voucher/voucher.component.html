@@ -6,6 +6,7 @@
     </div>
 
     <div class="col" *ngIf="orderMgrSvc.isPos">
+        <span class="badge text-bg-success ms-2 float-end" (click)="validateVoucher('DEKRIJTE')">DEKRIJTE</span>
         <span class="badge text-bg-success ms-2 float-end" (click)="validateVoucher('KADO25')">KADO25</span>
         <span class="badge text-bg-success ms-2 float-end" (click)="validateVoucher('CAVA25')">CAVA25</span>
     </div>

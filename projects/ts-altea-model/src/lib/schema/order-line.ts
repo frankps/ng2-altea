@@ -406,7 +406,7 @@ export class PriceChange {
   /** if true, then val is an absolute value */
   abs: boolean = false
 
-  static new(id: string, val: number, promo: boolean = false, info: string = '') : PriceChange {
+  static new(id: string, val: number, promo: boolean = false, info: string = ''): PriceChange {
     let pc = new PriceChange()
     pc.id = id
     pc.val = val
@@ -620,6 +620,11 @@ export class OrderLine extends ObjectWithIdPlus {
     console.error(this.incl)
   }
 
+
+
+
+
+
   createOrderLineOption(productOption: ProductOption, initOptionValues?: Map<String, String[]>): OrderLineOption {
 
     let optionValues: ProductOptionValue[]
@@ -674,6 +679,18 @@ export class OrderLine extends ObjectWithIdPlus {
 
     return line
 
+  }
+
+  hasOptionValue(optionId: string, valueId: string): boolean {
+
+    let option = this.options.find(o => o.id == optionId)
+
+    if (!option || !option.hasValues())
+      return false
+
+    let optionValue = option.values.find(v => v.id == valueId)
+
+    return optionValue ? true : false
   }
 
   hasOptions(): boolean {
@@ -820,6 +837,65 @@ export class OrderLine extends ObjectWithIdPlus {
 
   }
 
+  getSpecialPrices(isPos: boolean = false): Price[] {
+
+    console.error('getSpecialPrices')
+
+    let product = this.product
+
+    if (ArrayHelper.IsEmpty(product.prices))
+      return []
+
+    let now = new Date()
+
+    let prices = product.prices.filter(p => p.on && p.act && p.isPromo && !p.giftOpt && (!p.hasDates || (p.startDate <= now && now <= p.endDate)))
+
+    if (!isPos)
+      prices = prices.filter(p => !p.posOnly)
+
+
+    let result = []
+
+    /** some prices are only applicable for specific option values */
+
+    for (let price of prices) {
+
+      if (!price.hasOptions) {
+        result.push(price)
+        continue
+      }
+       
+
+      let hasOptionValues = true
+
+      for (let option of price.options) {
+        //let orderLineOption = this.getOptionById(option.optionId)
+
+        if (option.allValues) {
+          continue
+        } else {
+          for (let value of option.values) {
+            let orderLineOptionValue = this.hasOptionValue(option.optionId, value.id)
+
+            if (!orderLineOptionValue) {
+              hasOptionValues = false
+              break
+            } else
+              continue
+          }
+        }
+      }
+
+      if (hasOptionValues)
+        result.push(price)
+
+    }
+
+
+    return result
+  }
+
+
 
   applyPrice(price: Price) {
 
@@ -827,7 +903,51 @@ export class OrderLine extends ObjectWithIdPlus {
 
     price.isPromo
 
-    if (price.extraQty?.on) {  // if this is not a 'real' price change, but instead customer receives extra quantity
+    if (price.hasOptions) {
+
+      if (ArrayHelper.IsEmpty(price.options))
+        return
+
+      let optionValueFound = false
+
+      for (let option of price.options) {
+
+        let orderLineOption = this.getOptionById(option.optionId)
+
+        if (!orderLineOption)
+          continue
+
+        priceChange.tp = PriceChangeType.price
+
+        if (option.allValues) {
+
+          priceChange.val = option.value
+          priceChange.pct = option.isPct
+        } else {
+
+          for (let value of option.values) {
+            let orderLineOptionValue = orderLineOption.getValueById(value.id)
+
+            if (!orderLineOptionValue)
+              continue
+
+            priceChange.val = option.value
+            priceChange.pct = option.isPct
+            optionValueFound = true
+            break
+          }
+
+          if (optionValueFound)
+            break
+
+        }
+
+      }
+
+      if (!optionValueFound)
+        return
+
+    } else if (price.extraQty?.on) {  // if this is not a 'real' price change, but instead customer receives extra quantity
       priceChange.tp = PriceChangeType.subsQty
       priceChange.val = price.extraQty.val
       priceChange.pct = price.extraQty.pct
@@ -843,9 +963,9 @@ export class OrderLine extends ObjectWithIdPlus {
 
     priceChange.info = price.title
 
-
     this.addPriceChange(priceChange)
   }
+
 
 
   addPriceChange(priceChange: PriceChange, addToEnd: boolean = true) {
@@ -965,8 +1085,13 @@ export class OrderLine extends ObjectWithIdPlus {
 
     /**
      * Code introduced for when price of subscription is defined by (options of) containing products (product.items)
+     * 
+     * We assume that when salesPrice is set, then we use this price for the subscription
+     * Is product.salesPrice = 0, then we sum up the prices of the product items (and their options)
+     * 
      */
-    if (this.product.isSubscription() && this.product.hasItems()) {
+    if (!this.product.salesPrice && this.product.isSubscription() && this.product.hasItems()) {
+
 
       for (let productItem of this.product.items) {
 
@@ -979,7 +1104,7 @@ export class OrderLine extends ObjectWithIdPlus {
             qty = qtyOrderLineOption.values[0].val
         }
 
-        // unitPrice += qty
+        unitPrice += qty * productItem.product.salesPrice
 
         let optionPrices = 0
 
@@ -989,10 +1114,15 @@ export class OrderLine extends ObjectWithIdPlus {
 
             let orderLineOption = this.getOptionById(productItemOption.id)
 
-            optionPrices = _.sumBy(orderLineOption.values, 'prc')
+            if (orderLineOption) {
 
-            if (optionPrices)
-              unitPrice += qty * optionPrices
+              optionPrices = _.sumBy(orderLineOption.values, 'prc')
+
+              if (optionPrices)
+                unitPrice += qty * optionPrices
+
+            }
+
 
           }
         }
@@ -1072,7 +1202,7 @@ export class OrderLine extends ObjectWithIdPlus {
 
 
     let globalPriceLevel = optionValueSum / 4
-    globalPriceLevel = Math.min(globalPriceLevel, 3)  
+    globalPriceLevel = Math.min(globalPriceLevel, 3)
 
 
 
@@ -1095,7 +1225,7 @@ export class OrderLine extends ObjectWithIdPlus {
       totalDiscount += discount
     }
 
-    
+
 
     let priceChange = PriceChange.new('bodySculptorSubscription', -totalDiscount, true, 'BodySculptor Promo')
 

@@ -84,7 +84,7 @@ export class ProductPriceComponent implements OnInit {
 
   newOptionIsValid() {
 
-    return (this.newOptionPrice && this.newOptionPrice.optionId && this.newOptionPrice.value)
+    return (this.newOptionPrice && this.newOptionPrice.optionId)   // && this.newOptionPrice.value
 
   }
 

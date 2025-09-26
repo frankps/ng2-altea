@@ -29,7 +29,8 @@
 
         <ng-container [ngSwitch]="valueFormat">
             <ng-container *ngSwitchCase="'pre'">
-                <pre>{{value}}</pre>
+                <div class="mt-2 ms-4"><pre>{{value}}</pre></div>
+                
             </ng-container>
 
             <ng-container *ngSwitchCase="'url'">

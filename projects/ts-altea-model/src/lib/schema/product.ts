@@ -521,7 +521,7 @@ export class Product extends ObjectWithIdPlus {
 
     // console.log(this.prices)
 
-    let idx = this.prices.findIndex(p => p.act && p.isPromo && !p.giftOpt && (!p.hasDates || (p.startDate <= now && now <= p.endDate)))
+    let idx = this.prices.findIndex(p => p.on && p.act && p.isPromo && !p.giftOpt && (!p.hasDates || (p.startDate <= now && now <= p.endDate)))
 
 
     // console.log(idx)
@@ -536,8 +536,7 @@ export class Product extends ObjectWithIdPlus {
 
     let now = new Date()
 
-
-    let prices = this.prices.filter(p => p.act && p.isPromo && !p.giftOpt && (!p.hasDates || (p.startDate <= now && now <= p.endDate)))
+    let prices = this.prices.filter(p => p.on && p.act && p.isPromo && !p.giftOpt && (!p.hasDates || (p.startDate <= now && now <= p.endDate)))
 
     if (!isPos)
       prices = prices.filter(p => !p.posOnly)

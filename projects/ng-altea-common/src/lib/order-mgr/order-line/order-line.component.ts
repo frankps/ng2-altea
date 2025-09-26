@@ -79,6 +79,14 @@ export class OrderLineComponent implements OnInit {
 
     this._orderLine = line
 
+    this.initPrices()
+
+  }
+
+  initPrices() {
+
+    let line = this.orderLine
+
     this.prices = {}
 
     if (!line)
@@ -227,6 +235,15 @@ export class OrderLineComponent implements OnInit {
 
 
     this.updateOldOrders()
+
+
+
+    /** some special prices are applied only for specific option values
+     *  (introduced for for 'Peeling kuur' => 4 + 1, 3 + free product)
+     */
+    this.orderMgrSvc.preselectSpecialPrices(this.orderLine, true)
+    this.initPrices()
+
 
 
     this.orderLine.markAsUpdated("options")

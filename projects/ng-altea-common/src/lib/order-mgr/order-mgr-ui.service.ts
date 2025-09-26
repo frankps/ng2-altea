@@ -1679,7 +1679,11 @@ export class OrderMgrUiService {   // implements OnInit
   }
 
 
-  preselectSpecialPrices(orderLine: OrderLine) {
+  preselectSpecialPrices(orderLine: OrderLine, reset: boolean = false) {
+
+    if (reset) {
+      orderLine.pc = []
+    }
 
     let product = orderLine.product
 
@@ -1691,7 +1695,7 @@ export class OrderMgrUiService {   // implements OnInit
 
       for (let price of prices) {
 
-        if (this.isPos && price.posOnly)
+        if (!this.isPos && price.posOnly)
           continue
 
         if (!price.auto)  // we only auto-apply prices that are marked as auto
@@ -1977,6 +1981,23 @@ STRIPE integration
 
     voucher = voucher.trim().toUpperCase()
 
+    if (voucher == 'DEKRIJTE') {
+
+      if (!this.order.addVoucher(voucher))
+        return new AddVoucherResult(voucher, false, 'Voucher al toegepast')
+
+      this.order.reduPct = 10
+      
+      this.order.calculateAll()
+
+
+      this.orderDirty = true
+      return new AddVoucherResult(voucher, true, `Voucher ${voucher} toegepast!`)
+
+    }
+
+
+
     if (voucher == 'CAVA25' || voucher == 'KADO25') {
 
       if (voucher == 'CAVA25') {
@@ -1988,7 +2009,7 @@ STRIPE integration
       if (voucher == 'KADO25') {
         if (this.order.hasVoucher('CAVA25'))
           this.order.removeVoucher('CAVA25')
-         
+
       }
 
       let startDate = this.order.startDate

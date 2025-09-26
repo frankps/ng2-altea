@@ -60,25 +60,15 @@
                 <div class="col-6"><ngx-altea-label-value label="objects.contact.email"
                         [value]="object.email"></ngx-altea-label-value></div>
 
-            </div>
-
-            <div class="row">
-
                 <div class="col-6">
 
                     <ngx-altea-label-value label="objects.contact.mobile"
                         [value]="object.mobile"></ngx-altea-label-value>
 
-
-
-
-
                 </div>
 
-
-
-
             </div>
+
 
             <div class="row" *ngIf="object.depositPct">
                 <div class="col-6"><ngx-altea-label-value label="ui.deposit.request"
@@ -88,13 +78,20 @@
 
 
 
+
+
+            <div class="row">
+                <div class="col-6"><ngx-altea-label-value label="objects.contact.remark" [value]="object.remark"
+                        valueFormat="pre"></ngx-altea-label-value></div>
+
+            </div>
+
             <div class="row">
                 <div class="col-6"> <ngx-altea-label-value label="dic.created" [value]="object.cre"
                         valueFormat="date"></ngx-altea-label-value> </div>
                 <div class="col-6"> <ngx-altea-label-value label="dic.updated" [value]="object.upd"
                         valueFormat="date"></ngx-altea-label-value> </div>
             </div>
-
 
             <!-- 
         <ngx-altea-label-value label="objects.product.salesPrice" [value]="object.salesPrice"></ngx-altea-label-value>
@@ -126,7 +123,7 @@
                     <div class="col-6">
                         <ngx-altea-label-control label="objects.contact.first" for="first">
                             <input type="text" id="first" name="first" required class="form-control"
-                                [(ngModel)]="object.first" (change)="nameChanged()"/>
+                                [(ngModel)]="object.first" (change)="nameChanged()" />
                         </ngx-altea-label-control>
                     </div>
                     <div class="col-6">
@@ -169,11 +166,24 @@
                         </ngx-altea-label-control>
                     </div>
 
+
+
+                    <int-phone-edit [css]="mobilePhoneCss" [(phone)]="object.mobile"
+                        (phoneChange)="formChanged('general')"></int-phone-edit>
+
+
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col">
+                        <ngx-altea-label-control label="objects.contact.remark" for="remark">
+                            <textarea rows="3" class="form-control" id="remark" name="remark" style="height: 120px"
+                                [(ngModel)]="object.remark"></textarea>
+                        </ngx-altea-label-control>
+                    </div>
                 </div>
 
 
-                <int-phone-edit [css]="mobilePhoneCss" [(phone)]="object.mobile"
-                    (phoneChange)="formChanged('general')"></int-phone-edit>
 
                 <!--
                 
@@ -217,43 +227,6 @@
                             </ng-select>
                         </ngx-altea-label-control>
 
-
-
-
-                        <!--                         <ngx-altea-label-control layout="list" for="online" label="ui.deposit.request">
-
-                            <div class="form-check mt-2">
-
-                                <input class="form-check-input" type="radio" name="depositMode" id="depositMode"
-                                    value="default" (click)="depositModeChanged(false)" [(ngModel)]="depositMode">
-                                <label class="form-check-label" translate>ui.deposit.default
-                                </label>
-                            </div>
-
-                            <div class="form-check">
-
-                                <div class="row">
-                                    <div class="col">
-                                        <input class="form-check-input" type="radio" name="depositMode" id="depositMode"
-                                            value="custom" (click)="depositModeChanged(true)" [(ngModel)]="depositMode">
-                                        <label class="form-check-label" translate>ui.deposit.custom
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="row" *ngIf="object.depositPct">
-                                    <div class="col ps-5 mt-2">
-                                        <ng-select id="qty" name="qty" style="width: 80px; height: 0.5%;"
-                                            [items]="depositPctgs" bindLabel="label" bindValue="pct" [clearable]="false"
-                                            [multiple]="false" [(ngModel)]="object.depositPct">
-                                        </ng-select>
-                                    </div>
-
-                                </div>
-
-                            </div>
-                        </ngx-altea-label-control> -->
-
-
                     </div>
                 </div>
 
@@ -269,6 +242,80 @@
 
 
             </form>
+
+
+
+
+        </ng-container>
+
+    </ngx-altea-form-card-section>
+
+    <ngx-altea-form-card-section sectionName="ui.contact.edit.sections.order.title" sectionId="order"
+        [editSectionId]="editSectionId" [showButtons]="false">
+
+        <ng-container always>
+
+            <ng-container *ngIf="orders">
+
+
+                <ng-container *ngFor="let uiOrder of orders">
+                    <!-- 
+                (click)="openOrder(uiOrder)"
+-->
+                    <div class="row mb-1">
+                        <div class="col-4" (click)="openOrder(uiOrder)">
+
+                            <i *ngIf="uiOrder.stateIcon()" placement="top" [ngbTooltip]="uiOrder.state"
+                                [style.color]="uiOrder.stateColor()" [class]="uiOrder.stateIcon()"></i>
+                            &nbsp;
+
+                            {{uiOrder.start| intdate}}
+
+                            <span *ngIf="uiOrder.gift">{{uiOrder.giftCode}}</span>
+
+                            <i *ngIf="uiOrder.attn" class="ms-2 fa-sharp fa-solid fa-circle-exclamation"
+                                style="color: red"></i>
+
+                            <i *ngIf="uiOrder.src == 'ngApp'" style="color: gray; vertical-align: middle;"
+                                class="fa-solid fa-mobile float-end"></i>
+                            <i *ngIf="uiOrder.gift" class="fa-duotone fa-solid fa-gift float-end"></i>
+
+
+                        </div>
+
+                        <div class="col-3" [style.color]="uiOrder.pay.color">{{uiOrder.pay.info}}
+
+
+
+                            <!--                             <i class="fa-sharp fa-solid float-end fa-grip-dots" (click)="toggleSelected(uiOrder)"></i>
+                        <i class="fa-solid fa-trash float-end  me-2" *ngIf="sessionSvc.isAdmin() && isSelected(uiOrder)"
+                            (click)="startDeleteOrder(uiOrder)"></i> -->
+
+                        </div>
+
+                        <div class="col">
+                            {{uiOrder.summary}}
+                        </div>
+                    </div>
+                    <div class="row mb-1" *ngIf="uiOrder.privNote">
+                        <div class="col-4"></div>
+                        <div class="col-8">
+                            <pre>{{uiOrder.privNote}}</pre>
+                        </div>
+                    </div>
+
+                </ng-container>
+
+
+
+
+            </ng-container>
+
+            <div class="row my-2" *ngIf="ordersCreateBefore">
+                <div class="col-12 d-flex justify-content-center">
+                    <i class="fa-duotone fa-solid fa-arrows-rotate fa-lg" (click)="getOrders()"></i>
+                </div>
+            </div>
 
 
 
@@ -313,7 +360,8 @@
                             <div class="row mb-2">
                                 <div class="col-4 d-flex justify-content-end">{{ option.name }}</div>
                                 <div class="col">
-                                    <span class="badge text-bg-secondary me-2" *ngFor="let value of option.values">{{value.name}}</span>
+                                    <span class="badge text-bg-secondary me-2"
+                                        *ngFor="let value of option.values">{{value.name}}</span>
 
 
                                 </div>
@@ -457,7 +505,7 @@
                             <div class="col">
                                 <i class="fa-solid fa-trash" (click)="deleteCardChange(change, card)"></i>
                             </div>
-                            
+
 
                         </div>
 
@@ -481,73 +529,6 @@
 
 
 
-    <ngx-altea-form-card-section sectionName="ui.contact.edit.sections.order.title" sectionId="order"
-        [editSectionId]="editSectionId" [showButtons]="false">
-
-        <ng-container always>
-
-            <ng-container *ngIf="orders">
-
-
-                <ng-container *ngFor="let uiOrder of orders">
-                    <!-- 
-                    (click)="openOrder(uiOrder)"
- -->
-                    <div class="row mb-1">
-                        <div class="col-4" (click)="openOrder(uiOrder)">
-
-                            <i *ngIf="uiOrder.stateIcon()" placement="top" [ngbTooltip]="uiOrder.state"
-                                [style.color]="uiOrder.stateColor()" [class]="uiOrder.stateIcon()"></i>
-                            &nbsp;
-
-                            {{uiOrder.start| intdate}}
-
-                            <span *ngIf="uiOrder.gift">{{uiOrder.giftCode}}</span>
-
-                            <i *ngIf="uiOrder.attn" class="ms-2 fa-sharp fa-solid fa-circle-exclamation"
-                                style="color: red"></i>
-
-                            <i *ngIf="uiOrder.src == 'ngApp'" style="color: gray; vertical-align: middle;"
-                                class="fa-solid fa-mobile float-end"></i>
-                            <i *ngIf="uiOrder.gift" class="fa-duotone fa-solid fa-gift float-end"></i>
-
-
-                        </div>
-
-                        <div class="col-3" [style.color]="uiOrder.pay.color">{{uiOrder.pay.info}}
-
-
-
-                            <!--                             <i class="fa-sharp fa-solid float-end fa-grip-dots" (click)="toggleSelected(uiOrder)"></i>
-                            <i class="fa-solid fa-trash float-end  me-2" *ngIf="sessionSvc.isAdmin() && isSelected(uiOrder)"
-                                (click)="startDeleteOrder(uiOrder)"></i> -->
-
-                        </div>
-
-                        <div class="col">
-                            {{uiOrder.summary}}
-                        </div>
-                    </div>
-
-                </ng-container>
-
-
-
-
-            </ng-container>
-
-            <div class="row my-2" *ngIf="ordersCreateBefore">
-                <div class="col-12 d-flex justify-content-center">
-                    <i class="fa-duotone fa-solid fa-arrows-rotate fa-lg" (click)="getOrders()"></i>
-                </div>
-            </div>
-
-
-
-
-        </ng-container>
-
-    </ngx-altea-form-card-section>
 
 
     <ngx-altea-form-card-section sectionName="ui.contact.edit.sections.comm.title" sectionId="comm"
