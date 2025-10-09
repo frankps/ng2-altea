@@ -48,7 +48,7 @@ export class CreateAvailabilityContext {
         resourceIds.push(ctx.branchId)
 
         ctx.configResources = await this.alteaDb.getResources(resourceIds)
-     //   ctx.configResources = await this.alteaDb.getResourcesActive(resourceIds, availabilityRequest.from, availabilityRequest.to)
+        //   ctx.configResources = await this.alteaDb.getResourcesActive(resourceIds, availabilityRequest.from, availabilityRequest.to)
 
 
         ctx.resourceGroups = await this.loadResourceGroupsWithChildren(ctx.configResources, availabilityRequest.from, availabilityRequest.to)
@@ -72,7 +72,7 @@ export class CreateAvailabilityContext {
         /** We don't want the current order to block itself => exclude previous made plannings for this order */
         let excludeOrderId = ctx.order.id
 
-        
+
         let clientId = ctx.order.lock
 
         let includeGroupPlannings = true
@@ -80,9 +80,9 @@ export class CreateAvailabilityContext {
 
 
         // to debug
-/*         let planId = 'b9f96be6-fda5-476f-9169-74514be783f6'
-        let planning = ctx.resourcePlannings.getById(planId)
-        console.warn('planning', planning) */
+        /*         let planId = 'b9f96be6-fda5-476f-9169-74514be783f6'
+                let planning = ctx.resourcePlannings.getById(planId)
+                console.warn('planning', planning) */
         // END debug
 
         /* get resource groups not previously loaded 
@@ -246,7 +246,12 @@ export class CreateAvailabilityContext {
             const resourceSchedules = schedules.filter(s => s.resourceId == resourceId)
 
             const defaultSchedule = resourceSchedules.find(s => s.default)
-            let dateRanges = defaultSchedule.toDateRangeSet(from, to, 'START', 'END')
+
+            let dateRanges = new DateRangeSet()
+
+            /** some resources have no default schedule  */
+            if (defaultSchedule)   
+                dateRanges = defaultSchedule.toDateRangeSet(from, to, 'START', 'END')
 
             const otherSchedules = resourceSchedules.filter(s => !s.default)
 
@@ -386,7 +391,7 @@ export class CreateAvailabilityContext {
     }
 
 
-    filterNonActiveChildResources(resources: Resource[], from?: number, to?: number) : Resource[] {
+    filterNonActiveChildResources(resources: Resource[], from?: number, to?: number): Resource[] {
 
         if (ArrayHelper.IsEmpty(resources))
             return resources
@@ -396,7 +401,7 @@ export class CreateAvailabilityContext {
         for (let resource of resources) {
 
             /** clone, otherwise we are changing the master cache (the filters below were changing cache) */
-            let clone : Resource = ObjectHelper.clone(resource, Resource)
+            let clone: Resource = ObjectHelper.clone(resource, Resource)
 
             if (ArrayHelper.IsEmpty(clone.children))
                 continue
@@ -537,7 +542,7 @@ export class CreateAvailabilityContext {
      * @param plannings 
      * @returns 
      */
-    removeMasksAlreadyPlanned(plannings: ResourcePlannings) : ResourcePlannings {
+    removeMasksAlreadyPlanned(plannings: ResourcePlannings): ResourcePlannings {
 
         if (!plannings)
             return plannings

@@ -1,4 +1,4 @@
-import { EventType, OrderUi, PlanningType, Resource, ResourcePlanning, ResourcePlanningUi, ResourcePlannings, Schedule } from "ts-altea-model"
+import { DateRangeSet, EventType, OrderUi, PlanningType, Resource, ResourcePlanning, ResourcePlanningUi, ResourcePlannings, Schedule } from "ts-altea-model"
 import * as dateFns from 'date-fns'
 import { Unsubscribe } from 'firebase/firestore';
 import { OrderFireFilters, OrderFirestoreService, ResourcePlanningService, ResourceService, SessionService } from "ng-altea-common";
@@ -292,7 +292,13 @@ export abstract class CalendarBase {
         let branchId = this.sessionSvc.branchId
 
         var humanResources = await this.resourceSvc.getHumanResourcesInclGroups()
-        humanResources = humanResources.filter(hr => !hr.isGroup && hr.online && (!hr.hasEnd || hr.endDate > start) && (!hr.hasStart || hr.startDate < end))
+
+        let now = new Date()
+
+        let fleur = humanResources.find(hr => hr.id == '9ee276b9-41f5-46fa-8bc2-534218325711')
+        console.warn('fleur', fleur)
+
+        humanResources = humanResources.filter(hr => !hr.isGroup && hr.online && (!hr.hasEnd || hr.endDate > start) && (!hr.hasStart || hr.startDate < end || hr.startDate > now))
 
         var humanResourceIds = humanResources.map(hr => hr.id)
 
@@ -348,13 +354,13 @@ export abstract class CalendarBase {
 
             var defaultSchedule = humanResource.schedules?.find(schedule => schedule.default)
 
-            if (!defaultSchedule)
-                continue
+            var dateRangeSet = new DateRangeSet()
 
-            var dateRangeSet = defaultSchedule.toDateRangeSet(start, end)
+            if (defaultSchedule)
+                dateRangeSet = defaultSchedule.toDateRangeSet(start, end)
 
             // check if there are other overruling schedules
-            let overrulingSchedules = humanResource.schedules.filter(schedule => schedule.id != defaultSchedule.id 
+            let overrulingSchedules = humanResource.schedules.filter(schedule => schedule.id != defaultSchedule?.id 
                 && schedule.hasPlanningsBetween(start, end) )
 
 

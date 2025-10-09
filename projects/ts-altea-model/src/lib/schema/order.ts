@@ -1571,7 +1571,9 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     if (!this.hasLines())
       return []
 
-    const products = this.lines.map(l => l.product).filter(p => p)
+    let lines = _.orderBy(this.lines, ['incl'], ['desc'])
+
+    const products = lines.map(l => l.product).filter(p => p)
 
     return products
   }

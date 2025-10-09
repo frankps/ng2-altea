@@ -807,7 +807,7 @@ export class OrderMgmtService {
         if (specialDates.indexOf(dateNum) >= 0)
             return true
 
-        let specialRanges = [[20241224, 20250101], [20250212, 20250214]]
+        let specialRanges = [[20251027, 20251102], [20251111, 20251111], [20251222, 20260104], [20260216, 20260222], [20260216, 20260222], [20260406, 20260419], [20260501, 20260501], [20260514, 20260515], [20260525, 20260525]]
 
         for (let range of specialRanges) {
               if (dateNum >= range[0] && dateNum <= range[1])

@@ -74,6 +74,29 @@
                             <div class="col-5">
 
                                 <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="productPrice" name="productPrice"
+                                        [(ngModel)]="item.productPrice" />
+                                    <label class="form-check-label" for="productPrice"
+                                        translate="objects.productItem.productPrice"></label>
+                                </div>
+                            </div>
+
+                            <div class="col-5">
+
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="optionPrice" name="optionPrice"
+                                        [(ngModel)]="item.optionPrice" />
+                                    <label class="form-check-label" for="optionPrice"
+                                        translate="objects.productItem.optionPrice"></label>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-5">
+
+                                <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" id="optionQty" name="optionQty"
                                         [(ngModel)]="item.optionQty" />
                                     <label class="form-check-label" for="optionQty"

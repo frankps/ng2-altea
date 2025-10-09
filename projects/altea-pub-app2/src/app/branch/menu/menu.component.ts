@@ -76,13 +76,13 @@ export class MenuComponent implements OnInit {
 
       case 'demo-orders':
 
-        this.router.navigate(['/branch', 'aqua' , 'pay-finished'],
+/*         this.router.navigate(['/branch', 'aqua' , 'pay-finished'],
           { queryParams: { orderId: '1fc92e80-81e0-404f-9dd3-6dbc8c543f30', sessionId: 'cs_test_a1mBsBKED9JEbO9PanUx34TTwJb5ZUInTtBH2vQ4yb3xdhQa7eou0rbyMw' }})
+ */
 
-/*
         this.orderMgrSvc.newOrder(OrderUiMode.newOrder)
         this.orderMgrSvc.changeUiState(OrderUiState.demoOrders)
-        this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'order']) */
+        this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'order'])
         break
 
       default:

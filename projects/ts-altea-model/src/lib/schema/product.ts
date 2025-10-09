@@ -990,6 +990,12 @@ export class ProductItem extends ObjectWithIdPlus {
   name?: string;
   qty?: number = 1
 
+  /** automatically calculate price: qty * product.salesPrice  (where qty is this.qty or coming in via option, see optionQty)  */
+  productPrice: boolean = true
+
+  /** automatically include prices of options */
+  optionPrice: boolean = true
+
   /** instead of specifying an explicit qty, it can come from a product option (value): specified by optionId */
   optionQty: boolean = false
 
@@ -997,7 +1003,7 @@ export class ProductItem extends ObjectWithIdPlus {
   optionId?: string;
 
   @Type(() => ProductItemOption)
-  options?: ProductItemOption[] = []
+  options?: ProductItemOption[] = []  
 
   hasOptions(): boolean {
 

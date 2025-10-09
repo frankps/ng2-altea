@@ -25,4 +25,15 @@ export class NumberHelper {
     return typeof value === 'number' && !isNaN(value);
   }
 
+  static intl = new Intl.NumberFormat("nl-BE", {   //"nl-BE"
+    useGrouping: false,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })
+
+  // Formats numbers for CSV with , as decimal and no thousands separator
+  static toCsvNumber(value: number, decimals = 2): string {
+    return NumberHelper.intl.format(value);
+  }
+
 }

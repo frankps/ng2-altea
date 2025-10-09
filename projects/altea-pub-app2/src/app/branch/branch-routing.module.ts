@@ -15,6 +15,7 @@ import { MyOrdersComponent } from './my-orders/my-orders.component';
 import { ProfileComponent } from './profile/profile.component';
 import { OpenComponent } from './open/open.component';
 import { LastMinutesComponent } from './last-minutes/last-minutes.component';
+import { ReviewComponent } from './review/review.component';
 
 const routes: Routes = [{
   path: ':branch', component: BranchComponent,
@@ -35,6 +36,7 @@ const routes: Routes = [{
     { path: "profile", component: ProfileComponent },
     { path: "user-contact", component: UserContactMatchComponent },
     { path: "last-minutes", component: LastMinutesComponent },
+    { path: "review/:orderId", component: ReviewComponent },
   ]
 }]  
 

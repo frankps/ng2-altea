@@ -442,6 +442,7 @@ export class ReportMonth extends ObjectWithIdPlus {
 
         this.year = year
         this.month = month
+        this.yearMonth = year * 100 + month
     }
 
     latest: boolean = true
@@ -450,6 +451,7 @@ export class ReportMonth extends ObjectWithIdPlus {
     orgId?: string
     branchId?: string
 
+    yearMonth: number
     year: number
     month: number
 
@@ -478,10 +480,8 @@ export class ReportMonth extends ObjectWithIdPlus {
 
     subtract(other: ReportMonth): ReportMonth {
 
-        let result = new ReportMonth()
+        let result = new ReportMonth(this.orgId, this.branchId, this.year, this.month)
 
-        result.year = this.year
-        result.month = this.month
 
         result.noDecl = this.noDecl - other.noDecl
 

@@ -1468,13 +1468,30 @@ export class AlteaDb {
 
         qry.and('branchId', QueryOperator.equals, branchId)
 
+        let fromYearMonth = from.toNumber(false)
+        let toYearMonth = toInclusive.toNumber(false)
 
+        qry.and('yearMonth', QueryOperator.greaterThanOrEqual, fromYearMonth)
+        qry.and('yearMonth', QueryOperator.lessThanOrEqual, toYearMonth)
+
+        /*
+         let fromYear = qry.or()
+        fromYear.and('year', QueryOperator.equals, from.y)
+        fromYear.and('month', QueryOperator.greaterThanOrEqual, from.m)
+
+        let toYear = qry.or()
+        toYear.and('year', QueryOperator.equals, toInclusive.y)
+        toYear.and('month', QueryOperator.lessThanOrEqual, toInclusive.m)
+*/
+
+
+     /*
         qry.and('year', QueryOperator.greaterThanOrEqual, from.y)
         qry.and('month', QueryOperator.greaterThanOrEqual, from.m)
 
         qry.and('year', QueryOperator.lessThanOrEqual, toInclusive.y)
         qry.and('month', QueryOperator.lessThanOrEqual, toInclusive.m)
-
+*/
         if (latestOnly)
             qry.and('latest', QueryOperator.equals, true)
 

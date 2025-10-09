@@ -205,6 +205,9 @@ ng generate component info/user-data-deletion --project altea-pub-app2
 ng generate component auth/contact --project altea-pub-app2
 
 
+ng generate component branch/review --project altea-pub-app2
+
+
 ng generate component branch/userContactMatch --project altea-pub-app2
 ng generate component branch/my-orders --project altea-pub-app2
 

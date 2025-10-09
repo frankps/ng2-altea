@@ -67,7 +67,7 @@ export class YearMonth {
 
     next(): YearMonth {
 
-        return this.add(1)
+        return this.addMonths(1)
         /*
         let start = this.startDate()
         let startNextMonth = dateFns.addMonths(start, 1)
@@ -75,7 +75,7 @@ export class YearMonth {
         return YearMonth.fromDate(startNextMonth) */
     }
 
-    add(months: number): YearMonth {
+    addMonths(months: number): YearMonth {
 
         let start = this.startDate()
         let startNextMonth = dateFns.addMonths(start, months)

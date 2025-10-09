@@ -1159,6 +1159,8 @@
     },
     "productItem": {
       "optionQty": "Aantal via product optie",
+      "productPrice": "qty x salesPrice",
+      "optionPrice": "Product optie prijzen",
       "option": {
         "mode": "Selectie mode"
       }

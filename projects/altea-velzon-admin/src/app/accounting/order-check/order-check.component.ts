@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Year } from '@syncfusion/ej2-angular-schedule';
 import { BranchService, ObjectService, OrderService, SessionService } from 'ng-altea-common';
-import { AlteaDb, CashToWingsExport, CashToWingsExportRequest, CheckContactLoyalty, ConsistencyReport, ContactLoyaltyReport, MonthClosing, MonthClosingResult, MonthClosingUpdate, MonthConsistencyReportBuilder, WingsReporting } from 'ts-altea-logic';
+import { AlteaDb, CashToWingsExport, CashToWingsExportRequest, CheckContactLoyalty, ConsistencyReport, ContactLoyaltyReport, MonthClosing, MonthClosingResult, MonthClosingUpdate, MonthConsistencyReportBuilder, WingsReporting, WingsYearReport, WingsYearReporting } from 'ts-altea-logic';
 import { YearMonth } from 'ts-common';
 import * as _ from "lodash";
 import { NgxSpinnerService } from "ngx-spinner"
@@ -285,8 +285,8 @@ export class OrderCheckComponent implements OnInit {
 
     let branchId = me.sessionSvc.branchId
 
-    let from = new YearMonth(2025, 1)
-    let to = new YearMonth(2025, 3) // (2025, 1)
+    let from = new YearMonth(2024, 10)
+    let to = new YearMonth(2025, 9) // (2025, 1)
 
     let reportMonths = await alteaDb.getReportMonthsPeriod(branchId, from, to, true)
 
@@ -362,7 +362,7 @@ export class OrderCheckComponent implements OnInit {
 
     let yearMonth = new YearMonth(2024, 10)
 
-    let report = await wingsReporting.create(yearMonth, me.sessionSvc.branchId)
+    let report = await wingsReporting.createYearMonth(yearMonth, me.sessionSvc.branchId)
 
 
     var fileName = `wings-checks-${yearMonth.y}-${yearMonth.m}.csv`
@@ -402,6 +402,26 @@ export class OrderCheckComponent implements OnInit {
 
   }
 
+
+
+  async downloadYearReport() {
+    let me = this
+
+    let alteaDb = new AlteaDb(this.objSvc)
+
+    let wingsReporting = new WingsYearReporting(alteaDb)
+
+    let yearMonth = new YearMonth(2024, 10)
+
+    let report = await wingsReporting.createYear(yearMonth, me.sessionSvc.branchId)
+
+
+
+    var fileName = `year-report-${yearMonth.y}-${yearMonth.m}.csv`
+
+    const blob = new Blob([report.toCsv()], { type: 'application/csv;charset=utf-8' });
+    saveAs(blob, fileName);
+  }
 
 
 }

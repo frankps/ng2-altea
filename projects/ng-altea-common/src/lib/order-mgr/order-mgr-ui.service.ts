@@ -391,6 +391,15 @@ export class OrderMgrUiService {   // implements OnInit
     this.clearData()
     this.order = new Order(branch.unique, true)
 
+    /*
+      If the user is logged in, we use the contact info from the session service
+    */
+    if (this.sessionSvc.contact) {
+      this.order.contact = this.sessionSvc.contact
+      this.order.contactId = this.sessionSvc.contact.id
+      this.order.for = this.sessionSvc.contact.name
+    }
+      
 
     this.order.branchId = branch.id
     this.order.branch = branch
@@ -1987,7 +1996,7 @@ STRIPE integration
         return new AddVoucherResult(voucher, false, 'Voucher al toegepast')
 
       this.order.reduPct = 10
-      
+
       this.order.calculateAll()
 
 

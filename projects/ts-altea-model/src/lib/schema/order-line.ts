@@ -810,7 +810,7 @@ export class OrderLine extends ObjectWithIdPlus {
 
 
   /**
-   * Product.Prices can contain promotions or prive increases/decreases during certain days, periods.
+   * Product.Prices can contain promotions or increases/decreases during certain days, periods.
    * These prices are reflected on the orderLine via priceChanges (orderline.pc[])
    * 
    */
@@ -839,7 +839,7 @@ export class OrderLine extends ObjectWithIdPlus {
 
   getSpecialPrices(isPos: boolean = false): Price[] {
 
-    console.error('getSpecialPrices')
+    //console.error('getSpecialPrices')
 
     let product = this.product
 
@@ -864,7 +864,7 @@ export class OrderLine extends ObjectWithIdPlus {
         result.push(price)
         continue
       }
-       
+
 
       let hasOptionValues = true
 
@@ -1097,37 +1097,37 @@ export class OrderLine extends ObjectWithIdPlus {
 
         let qty = productItem.qty
 
-        if (productItem.optionQty && productItem.optionId) {
-          let qtyOrderLineOption = this.getOptionById(productItem.optionId)
+        if (productItem.productPrice) {
+          if (productItem.optionQty && productItem.optionId) {
+            let qtyOrderLineOption = this.getOptionById(productItem.optionId)
 
-          if (qtyOrderLineOption.hasValues())
-            qty = qtyOrderLineOption.values[0].val
+            if (qtyOrderLineOption.hasValues())
+              qty = qtyOrderLineOption.values[0].val
+          }
+
+          unitPrice += qty * productItem.product.salesPrice
         }
 
-        unitPrice += qty * productItem.product.salesPrice
+        if (productItem.optionPrice) {
+          let optionPrices = 0
 
-        let optionPrices = 0
+          if (productItem.hasOptions()) {
 
-        if (productItem.hasOptions()) {
+            for (let productItemOption of productItem.options) {
 
-          for (let productItemOption of productItem.options) {
+              let orderLineOption = this.getOptionById(productItemOption.id)
 
-            let orderLineOption = this.getOptionById(productItemOption.id)
+              if (orderLineOption) {
 
-            if (orderLineOption) {
+                optionPrices = _.sumBy(orderLineOption.values, 'prc')
 
-              optionPrices = _.sumBy(orderLineOption.values, 'prc')
+                if (optionPrices)
+                  unitPrice += qty * optionPrices
 
-              if (optionPrices)
-                unitPrice += qty * optionPrices
-
+              }
             }
-
-
           }
         }
-
-
       }
     }
 
@@ -1163,7 +1163,7 @@ export class OrderLine extends ObjectWithIdPlus {
     for (const option of this.options) {
       if (!option.values)
         continue
-
+ 
       for (const orderLineOptionValue of option.values) {
         unitPrice += orderLineOptionValue.getPrice(option.formula, this.options)
         // totalDuration += value.duration

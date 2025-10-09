@@ -273,12 +273,18 @@
 
                             <span *ngIf="uiOrder.gift">{{uiOrder.giftCode}}</span>
 
+
+                            
+
+                            <i *ngIf="uiOrder.toInvoice" [style.color]="uiOrder.invoiced ? 'green' : 'orange'" class="fa-solid fa-file-invoice float-end mx-1"></i>
+
+
                             <i *ngIf="uiOrder.attn" class="ms-2 fa-sharp fa-solid fa-circle-exclamation"
                                 style="color: red"></i>
 
                             <i *ngIf="uiOrder.src == 'ngApp'" style="color: gray; vertical-align: middle;"
-                                class="fa-solid fa-mobile float-end"></i>
-                            <i *ngIf="uiOrder.gift" class="fa-duotone fa-solid fa-gift float-end"></i>
+                                class="fa-solid fa-mobile float-end  mx-1"></i>
+                            <i *ngIf="uiOrder.gift" class="fa-duotone fa-solid fa-gift float-end  mx-1"></i>
 
 
                         </div>

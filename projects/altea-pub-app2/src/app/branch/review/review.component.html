@@ -1,0 +1,52 @@
+<ng-container *ngIf="review">
+
+    <div class="row mt-5">
+        <div class="col">
+            <h4>Hoe was je ervaring bij Aquasense?</h4>
+            <p>Geef een score van 0 tot 5 voor elk onderdeel. <small>(0 = slecht, 5 = uitstekend)</small>
+            </p>
+
+        </div>
+    </div>
+
+    <div class="row mt-1" *ngFor="let param of reviewParams">
+        <div class="col-4 col-lg-3">
+            {{param.label}}
+
+        </div>
+        <div class="col">
+            <!--             <ngb-rating [(rate)]="review.params[param.code]" [max]="5" [readonly]="false"></ngb-rating>
+ -->
+            <ngb-rating [(rate)]="review.params[param.code]" [max]="5" [readonly]="false">
+                <ng-template let-fill="fill" let-index="index">
+                    <i class="bi-star{{ fill === 100 ? '-fill' : '' }}" [class.filled]="fill === 100"
+                        [class.low]="index < 3"></i>
+                </ng-template>
+            </ngb-rating>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col">
+
+            <textarea rows="3" class="form-control" id="feedback" name="feedback" style="height: 80px"
+                [(ngModel)]="review.feedback"
+                placeholder="Wat vond je het leukste aan je bezoek (of wat kon beter)?"></textarea>
+
+        </div>
+    </div>
+
+    <small style="font-style: italic;">Je antwoord wordt enkel intern gebruikt en helpt ons om elke ervaring nóg aangenamer te maken.</small>
+    <div class="row mt-4">
+        <div class="col">
+
+            <button class="btn btn-primary float-end" type="button" style="width: 250px;"
+                (click)="submit()">Verstuur feedback</button>
+
+        </div>
+    </div>
+
+
+
+
+</ng-container>

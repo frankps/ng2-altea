@@ -43,7 +43,7 @@ export class ProductItemsComponent implements OnInit {
         value.items = []
 
       this.itemChanges = new CollectionChangeTracker<ProductItem>(value.items, ProductItem, {
-        propsToUpdate: ['idx', 'name', 'qty', 'options', 'optionQty', 'optionId']
+        propsToUpdate: ['idx', 'name', 'qty', 'options', 'optionQty', 'optionId', 'productPrice', 'optionPrice']
         //   propsToRemove: ['values']
       })
     }

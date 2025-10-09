@@ -27,7 +27,8 @@ function toCsvDate(value: number): string {
 }
 
 
-export class WingsReport {
+
+export class WingsMonthReport {
 
     reportMonth: ReportMonth
 
@@ -237,9 +238,10 @@ export class WingsReporting {
     }
 
 
-    async create(yearMonth: YearMonth, branchId: string): Promise<WingsReport> {
 
-        let report = new WingsReport()
+    async createYearMonth(yearMonth: YearMonth, branchId: string): Promise<WingsMonthReport> {
+
+        let report = new WingsMonthReport()
 
         console.error(`Start creating report`)
 

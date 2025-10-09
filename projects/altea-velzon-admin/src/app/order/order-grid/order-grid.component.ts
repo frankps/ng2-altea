@@ -345,7 +345,7 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
     let branchId = this.sessionSvc.branchId
 
     this.spinner.show()
-  
+
     this.objects$ = null
     const query = new DbQuery()
 
@@ -374,9 +374,9 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
       cancelFilter.or('state', QueryOperator.not, OrderState.cancelled)
       cancelFilter.or('paid', QueryOperator.not, 0)
 
-/*       let cancelWithPayment = cancelFilter.or()
-      cancelWithPayment.and('state', QueryOperator.equals, OrderState.cancelled)
-      cancelWithPayment.and('paid', QueryOperator.greaterThan, 0) */
+      /*       let cancelWithPayment = cancelFilter.or()
+            cancelWithPayment.and('state', QueryOperator.equals, OrderState.cancelled)
+            cancelWithPayment.and('paid', QueryOperator.greaterThan, 0) */
     }
 
 
@@ -401,16 +401,18 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
 
     }
 
-
+    query.take = 50
 
     switch (orderSearch.typeSelect) {
       case SearchTypeSelect.toInvoice:
         query.and('toInvoice', QueryOperator.equals, true)
-       // query.and('invoiced', QueryOperator.equals, false)
+        query.take = 100
+        // query.and('invoiced', QueryOperator.equals, false)
         break
 
       case SearchTypeSelect.invoiced:
         query.and('invoiced', QueryOperator.equals, true)
+        query.take = 100
         break
 
       case SearchTypeSelect.gifts:
@@ -428,9 +430,19 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
     }
 
 
-    query.take = 50
+
     query.include('lines.planning.resource', 'contact')
-    query.orderBy('start', SortOrder.desc)
+
+    switch (orderSearch.typeSelect) {
+      case SearchTypeSelect.invoiced:
+        query.orderBy('invoiceNum', SortOrder.desc)
+        break
+      default:
+        query.orderBy('start', SortOrder.desc)
+        query.orderBy('cre', SortOrder.desc)
+    }
+
+
 
     console.log(query)
 
@@ -440,10 +452,11 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
 
     orders.forEach(order => {
       if (!order.start)
-        order.startDate = order.cre  
+        order.startDate = order.cre
     })
-    
-    orders = _.orderBy(orders, ['start'], ['desc'])
+
+    if (orderSearch.typeSelect != SearchTypeSelect.invoiced)
+      orders = _.orderBy(orders, ['start'], ['desc'])
 
 
     this.objects = orders

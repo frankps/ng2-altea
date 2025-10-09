@@ -24,6 +24,8 @@ import { OrderFinishedComponent } from './order-finished/order-finished.componen
 import { OpenComponent } from './open/open.component';
 import { LastMinutesComponent } from './last-minutes/last-minutes.component';
 import { Bootstrap5Module } from 'ng-common';
+import { ReviewComponent } from './review/review.component';
+import { NgbRatingModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [
@@ -42,7 +44,8 @@ import { Bootstrap5Module } from 'ng-common';
      ProfileComponent,
      OrderFinishedComponent,
      OpenComponent,
-     LastMinutesComponent
+     LastMinutesComponent,
+     ReviewComponent
   ],
   imports: [
     CommonModule,
@@ -52,7 +55,8 @@ import { Bootstrap5Module } from 'ng-common';
     TranslateModule,
     AuthModule,
     FormsModule,
-    Bootstrap5Module
+    Bootstrap5Module,
+    NgbRatingModule
   ]
 })
 export class BranchModule { }

@@ -9,7 +9,7 @@ import { AuthService } from '../../auth/auth.service';
 import { environment } from '../../../environments/environment';
 import { NgxSpinnerService } from "ngx-spinner"
 import { ArrayHelper } from 'ts-common';
-import { Subscription } from 'rxjs';
+import * as sc from 'stringcase'
 /*
 
 https://stripe.com/docs/payments/accept-a-payment?platform=web&ui=embedded-checkout
@@ -368,8 +368,25 @@ this.timerSubscription = this.orderMgrSvc.timerChanged.subscribe(seconds => {
 
     console.log(me.orderMgrSvc.order)
 
+
+
     let returnUrl = `${environment.app}/branch/${branch.unique}/pay-finished?orderId=${order.id}&sessionId={CHECKOUT_SESSION_ID}`
 
+    /** the marketing company requested to add product info */
+    let products = order.getProducts()
+
+    if (ArrayHelper.NotEmpty(products)) {
+      let numOfProducts = products.length
+      
+      if (numOfProducts > 0 && products[0].slug) {
+        let slug = sc.snakecase(products[0].slug)
+        returnUrl += `&prod0=${slug}`
+      }
+    }
+
+    /*
+    prod0
+    */
 
     let stripeShowText = 'Aquasense'
 
