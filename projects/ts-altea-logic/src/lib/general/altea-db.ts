@@ -1,5 +1,5 @@
 import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbObject, DbObjectCreate, DbObjectMulti, DbObjectMultiCreate, DbQuery, DbQueryBaseTyped, DbQueryTyped, DbUpdateManyWhere, ObjectHelper, ObjectWithId, QueryCondition, QueryOperator, SortOrder, StringHelper, TypeHelper, YearMonth } from 'ts-common'
-import { Branch, Gift, Subscription, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template, OrderLine, BankTransaction, Message, LoyaltyProgram, LoyaltyCard, PlanningType, ResourcePlannings, TemplateCode, MsgType, LoyaltyCardChange, Payment, PaymentType, BankTxType, Payments, ReportMonth, ReportMonths, Contact, ReportPeriod, ReportType, ReportLine } from 'ts-altea-model'
+import { Branch, Gift, Subscription, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template, OrderLine, BankTransaction, Message, LoyaltyProgram, LoyaltyCard, PlanningType, ResourcePlannings, TemplateCode, MsgType, LoyaltyCardChange, Payment, PaymentType, BankTxType, Payments, ReportMonth, ReportMonths, Contact, ReportPeriod, ReportType, ReportLine, ReviewStatus } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { IDb } from '../interfaces/i-db'
 import { AlteaPlanningQueries } from './altea-queries'
@@ -134,6 +134,35 @@ export class AlteaDb {
         const dateNum = DateHelper.yyyyMMddhhmmss(date)
 
         qry.and('depoBy', QueryOperator.lessThanOrEqual, dateNum)
+
+        const orders = await this.db.query$<Order>(qry)
+
+        return orders
+    }
+
+    async getOrdersForReview(branchId: string, startOffset: number, endOffset: number, includes: string[] = ['contact']) {
+
+        let now = new Date()
+        let from = dateFns.addHours(now, startOffset)
+        let to = dateFns.addHours(now, endOffset)
+
+        let fromNum = DateHelper.yyyyMMddhhmmss(from)
+        let toNum = DateHelper.yyyyMMddhhmmss(to)
+
+        const qry = new DbQueryTyped<Order>('order', Order)
+        qry.and('id', QueryOperator.equals, '1f715908-c60a-4a84-9667-c963f02f20be')
+
+        /*
+        qry.and('branchId', QueryOperator.equals, branchId)
+        qry.and('start', QueryOperator.greaterThanOrEqual, fromNum)
+        qry.and('start', QueryOperator.lessThanOrEqual, toNum)
+        qry.and('rev', QueryOperator.equals, null)   // review status is not yet set
+        qry.and('state', QueryOperator.notIn, [OrderState.cancelled, OrderState.creation])
+        qry.and('paid', QueryOperator.greaterThan, 0)
+        */
+
+        if (ArrayHelper.NotEmpty(includes))
+            qry.include(...includes)
 
         const orders = await this.db.query$<Order>(qry)
 
@@ -966,6 +995,15 @@ export class AlteaDb {
         return updateResult
 
     }
+
+    /** Contact */
+
+    async updateContact(contact: Contact, propertiesToUpdate: string[]): Promise<ApiResult<Contact>> {
+
+        let updateResult = await this.updateObject('contact', Contact, contact, propertiesToUpdate)
+        return updateResult
+    }
+
 
     /** Order */
 

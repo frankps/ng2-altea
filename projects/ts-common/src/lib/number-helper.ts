@@ -12,12 +12,12 @@ import * as _ from "lodash";
 
 export class NumberHelper {
 
-  static round(num: number): number {
+  static round(num: number, decimals = 2): number {
     //  return +(Math.round(number + "e+2") + "e-2");
 
     // let rounded = currency(num).value
 
-    return _.round(num, 2)
+    return _.round(num, decimals)
 
   }
 

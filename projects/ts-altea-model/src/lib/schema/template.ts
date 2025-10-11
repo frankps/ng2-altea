@@ -86,6 +86,23 @@ export class Template extends ObjectWithParameters {
     return this.channels[0] as MsgType
   }
 
+  private toMsgType(value: string): MsgType | undefined {
+    if (Object.values(MsgType).includes(value as MsgType)) {
+      return value as MsgType;
+    }
+    return undefined; // or return MsgType.unknown if you re-enable it
+  }
+
+  msgTypes(): MsgType[] {
+
+    if (ArrayHelper.IsEmpty(this.channels))
+      return []
+
+    let msgTypes = this.channels.map(channel => this.toMsgType(channel)).filter(type => type !== undefined)
+
+    return msgTypes
+  }
+
   generateHash(text: string): string {
     return CryptoJS.SHA256(text).toString(CryptoJS.enc.Hex)
   }
@@ -449,12 +466,14 @@ export class Template extends ObjectWithParameters {
 
 
     const payLinkPath = `branch/aqua/order/${order.id}/pay-online`
+    const appUrl = `https://book.birdy.life`
     const payLink = `https://book.birdy.life/${payLinkPath}`
 
     const headerImage = `<img width='600' class='max-width' style='display:block;color:#000000;text-decoration:none;font-family:Helvetica, arial, sans-serif;font-size:16px;max-width:100% !important;width:100%;height:auto !important;' alt='' src='https://marketing-image-production.s3.amazonaws.com/uploads/17ae7951ff4ef38519fa1a715981599a402f7e4d4b05f8508a5bdf2ff5f738656a4b382fde86d71f28e68b0f9b2124d322ce2b1afdd6028244e8ce986823557f.jpg' border='0'>
 <div>&nbsp;</div>`
 
     const replacements = {
+      'app-url': appUrl,
       'header-image': headerImage,
       'branch': branch.name,
       'branch-unique': branch.unique,

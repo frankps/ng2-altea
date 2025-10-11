@@ -102,6 +102,41 @@ export class OrderMessagingBase {
     }
 
 
+    /**
+     * Send all given templates to the given contact, for all allowed message types for that contact (channels, ex. email, whatsapp, ...)
+     * Returns a list of messages that were sent
+     * 
+     * @param templates 
+     * @param contact 
+     * @param order 
+     * @param branch 
+     * @param send 
+     * @returns 
+     */
+    async sendPossibleTemplates(templates: Template[], contact: Contact, order: Order, branch: Branch, send: boolean = true): Promise<ApiResult<Message>[]> {
+
+        let result: ApiResult<Message>[] = []
+
+        for (let template of templates) {
+
+            let channels = template.msgTypes()
+
+            for (let channel of channels) {
+
+                if (!contact.msgTypeSelected(channel))
+                    continue
+
+                let res = await this.sendTemplate(channel, template, order, branch, send)
+
+                result.push(res)
+
+            }
+        }
+
+        return result
+    }
+
+
     async sendTemplate(type: MsgType, template: Template, order: Order, branch: Branch, send: boolean = true): Promise<ApiResult<Message>> {
 
         if (!order.msg) // messaging disabled for order
@@ -121,11 +156,11 @@ export class OrderMessagingBase {
     }
 
     async sendMessage(msg: Message, order: Order, contact: Contact, branch: Branch, send: boolean = true): Promise<ApiResult<Message>> {
-    
+
         if (!order.msg) // messaging disabled for order
             return ApiResult.warning('Messaging disabled for order!')
 
-        
+
         if (!msg.conIds)
             msg.conIds = []
 
@@ -151,7 +186,7 @@ export class OrderMessagingBase {
                 msg.from = new MessageAddress(branch.emailFrom, branch.name)
 
                 msg.addTo(contact?.email, contact.name, contact.id)
-        
+
                 if (branch.emailBcc)
                     msg.addBcc(branch.emailBcc)
         }
@@ -168,7 +203,7 @@ export class OrderMessagingBase {
         }
 
         return new ApiResult(msg)
-        
+
     }
 
     async sendWhatsAppTemplate(template: Template, order: Order, branch: Branch, send: boolean = true): Promise<ApiResult<Message>> {
@@ -183,7 +218,7 @@ export class OrderMessagingBase {
 
         const msg = template.mergeWithOrder(order, branch, true)
 
-       // return new ApiResult(msg)
+        // return new ApiResult(msg)
 
         console.warn(msg)
 

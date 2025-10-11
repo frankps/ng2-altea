@@ -163,11 +163,62 @@ export class User extends UserBase {
     return contact
 
   }
-
-
-
 }
 
+export enum ReviewPlatform {
+  google = 'google',
+  facebook = 'facebook',
+  internal = 'internal'
+}
+
+export class ContactReview {
+
+  platform: ReviewPlatform
+
+  last: Date
+}
+
+/** Summary of reviews by platform */
+export class ContactReviews {
+
+  @Type(() => ContactReview)
+  reviews: ContactReview[] = []
+
+  /** returns -1 if no review was done for platform */
+  nrOfDaysSinceLastReview(platform: ReviewPlatform): number {
+    if (!this.reviews)
+      return -1
+
+    let review = this.reviews.find(r => r.platform === platform)
+
+    if (!review)
+      return -1
+
+    let diffDays = dateFns.differenceInDays(new Date(), review.last)
+
+    return diffDays
+  }
+
+  newReview(platform: ReviewPlatform, reviewDate: Date = new Date()): ContactReview {
+
+    if (!this.reviews)
+      this.reviews = []
+
+    let review = this.reviews.find(r => r.platform === platform)
+
+    if (review)
+      review.last = reviewDate
+    else {
+
+      review = new ContactReview()
+      review.platform = platform
+      review.last = reviewDate
+      this.reviews.push(review)
+    }
+
+    return review
+  }
+}
 
 export class Contact extends UserBase {
 
@@ -252,6 +303,15 @@ export class Contact extends UserBase {
   @Type(() => LoyaltyCard)
   cards?: LoyaltyCard[]
 
+
+  /** date of last review: used in check for new review request (min x days between reviews) */
+  revDate?: Date
+
+  /** Summary of reviews by platform: used to check if we ask for reviews (both internally & on external platforms) */
+  @Type(() => ContactReviews)
+  rev?: ContactReviews
+  
+
   constructor() {
     super()
 
@@ -310,6 +370,16 @@ export class Contact extends UserBase {
     this.m.setDirty('name')
   }
 
+
+  nrOfDaysSinceLastReview(): number {
+
+    if (!this.revDate)
+      return -1
+
+    let diffDays = dateFns.differenceInDays(new Date(), this.revDate)
+
+    return diffDays
+  }
 
 
 }

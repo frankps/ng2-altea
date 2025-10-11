@@ -1,5 +1,6 @@
+import { ArrayHelper } from "../lib"
 import { ApiStatus } from "./api-status"
-
+import * as _ from "lodash"
 
 export class DeleteManyResult {
   count: number
@@ -89,6 +90,27 @@ export class ApiResult<T = null> extends ApiResultBase {
     
     return res
 
+  }
+
+  static countOk<T>(results: ApiResult<T>[]) : number {
+
+    if (ArrayHelper.IsEmpty(results))
+      return 0
+
+    let oks = results.filter(result => result?.status == ApiStatus.ok)
+
+    return oks.length
+
+  }
+
+  static atLeastOneOk<T>(results: ApiResult<T>[]) : boolean {
+
+    if (ArrayHelper.IsEmpty(results))
+      return false
+
+    let okResult = results.find(result => result?.status == ApiStatus.ok)
+
+    return okResult ? true : false
   }
 
 }

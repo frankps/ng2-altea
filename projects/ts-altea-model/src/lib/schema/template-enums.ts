@@ -30,6 +30,7 @@ export enum TemplateCode {
   resv_footer = 'resv_footer',
   resv_door_info = 'resv_door_info',
   resv_door_info2 = 'resv_door_info2',
+  order_review = 'order_review',
   
   gift_online = 'gift_online',
 

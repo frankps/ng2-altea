@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbObject, DbQuery, DbQueryTyped, HtmlTable, ObjectHelper, QueryOperator } from 'ts-common'
-import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, TemplateCode, CustomerCancelReasons, MessageAddress, MessageDirection, TemplateFormat, Contact } from 'ts-altea-model'
+import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, TemplateCode, CustomerCancelReasons, MessageAddress, MessageDirection, TemplateFormat, Contact, ReviewStatus, ReviewPlatform } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import * as dateFns from 'date-fns'
 import * as Handlebars from "handlebars"
@@ -603,7 +603,7 @@ export class OrderMessaging extends OrderMessagingBase {
                         if (ArrayHelper.NotEmpty(order.tags)
                             && order.tags.indexOf(orderTag) >= 0)
                             continue  // then this message was already sent
-                     
+
 
 
                         let template = templatesByType.get(msgType)
@@ -625,7 +625,7 @@ export class OrderMessaging extends OrderMessagingBase {
                             let message = template.merge(branch, replacements, order.id, true)
                             message.type = msgType
 
-                             let res = await this.sendMessage(message, order, contact, branch, true)
+                            let res = await this.sendMessage(message, order, contact, branch, true)
 
                             if (!res.isOk) {
                                 errorCount++
@@ -635,7 +635,7 @@ export class OrderMessaging extends OrderMessagingBase {
                                 cols.push('OK')
                                 reminderCount++
                                 newOrderTags.push(orderTag)
-                            } 
+                            }
 
                         } catch (error) {
 
@@ -683,12 +683,112 @@ export class OrderMessaging extends OrderMessagingBase {
 
         }
 
+    }
 
+
+    /**
+     * Send messages to customers to make a review of their finished order (all ok?)
+     * 
+     * @returns 
+     */
+    async reviewRequestMessaging(): Promise<any> {
+
+        const templateCode = TemplateCode.order_review
+
+        let branchId = '66e77bdb-a5f5-4d3d-99e0-4391bded4c6c'
+
+        const templates = await this.alteaDb.getTemplates(branchId, templateCode)
+
+        let emailTemplate = templates.find(t => t.channels?.indexOf(MsgType.email) >= 0)
+
+        const ordersToReview = await this.alteaDb.getOrdersForReview(branchId, -6, -3, ['contact'])
+
+        if (ArrayHelper.IsEmpty(ordersToReview)) {
+            return 'No orders to review'
+        }
+
+        let branches = await this.branchesForOrders(ordersToReview)
+
+        let table = new HtmlTable()
+
+        table.headerRow = true
+        let header: string[] = []
+        table.addRow(header)
+
+        header.push('Klant', 'Aanvang', 'Status', 'Totaal', 'Betaald', 'Verstuurd', 'Vorige review (dagen)')
+
+
+
+        for (let branch of branches) {
+
+            let branchOrders = ordersToReview.filter(o => o.branchId == branch.id)
+
+            for (let order of branchOrders) {
+
+                if (!order.contact)
+                    continue
+    
+                const cols = []
+                table.addRow(cols)
+    
+                cols.push(order.for)
+                cols.push(DateHelper.dateToString_DM_HHmm(order.startDate))
+                cols.push(order.state)
+                cols.push(order.incl)
+                cols.push(order.paid)
+    
+                let contact = order.contact
+
+                let nrOfDaysSinceLastReview = contact.nrOfDaysSinceLastReview()
+
+                cols.push(nrOfDaysSinceLastReview)
+
+                if (nrOfDaysSinceLastReview >= 0 && nrOfDaysSinceLastReview < 30) {
+                    cols.push('=> No review request')
+                    continue
+                }
+
+                try {
+    
+                    // we try to send template for different message types (email, whatsapp, ...) that are allowed for the contact
+                    let res = await this.sendPossibleTemplates(templates, order.contact, order, branch, true)
+    
+                    let okCount = ApiResult.countOk(res)
+    
+                    if (okCount > 0) {
+    
+                        cols.push(okCount)
+    
+                        let orderUpdate = new DbObject<Order>('order', Order, { id: order.id, rev: ReviewStatus.requested })
+                        const updatedResult = await this.alteaDb.db.update$<Order>(orderUpdate)
+                    } else {
+                        cols.push('0')
+                    }
+    
+    
+    
+                } catch (error) {
+    
+                    cols.push(`exception: ${error}`)
+                }
+    
+                
+            }
+        }
+
+        let subject = `Review request messaging: ${ordersToReview.length} orders`
+        await this.sendAdminMessage(subject, table.toHtmlString())
 
 
     }
 
+    async branchesForOrders(orders: Order[]): Promise<Branch[]> {
+        let branchIds = orders.map(o => o.branchId)
+        branchIds = _.uniq(branchIds)
+        const branches = this.alteaDb.getBranches(branchIds)
 
+        return branches
+    }
 
     async reminderMessaging2(dayMin: number = 2, msgType: MsgType = MsgType.email): Promise<string> {
 

@@ -1,52 +1,232 @@
-<ng-container *ngIf="review">
-
-    <div class="row mt-5">
-        <div class="col">
-            <h4>Hoe was je ervaring bij Aquasense?</h4>
-            <p>Geef een score van 0 tot 5 voor elk onderdeel. <small>(0 = slecht, 5 = uitstekend)</small>
-            </p>
-
+<ng-container [ngSwitch]="mode">
+    <ng-container *ngSwitchCase="ReviewMode.init">
+        <div class="row mt-5">
+            <div class="col">
+                Initialisatie ...
+            </div>
         </div>
-    </div>
 
-    <div class="row mt-1" *ngFor="let param of reviewParams">
-        <div class="col-4 col-lg-3">
-            {{param.label}}
+    </ng-container>
 
+    <ng-container *ngSwitchCase="ReviewMode.orderNotExisting">
+        <div class="row mt-5">
+            <div class="col">
+                Order niet gevonden ...
+            </div>
         </div>
-        <div class="col">
-            <!--             <ngb-rating [(rate)]="review.params[param.code]" [max]="5" [readonly]="false"></ngb-rating>
+
+    </ng-container>
+
+    <ng-container *ngSwitchCase="ReviewMode.alreadyReviewed">
+        <div class="row mt-5">
+            <div class="col">
+                Order al eerder beoordeeld ...
+            </div>
+        </div>
+    </ng-container>
+
+
+    <ng-container *ngSwitchCase="ReviewMode.finaliseReview">
+        <div class="row mt-5">
+            <div class="col">
+
+                <ng-container *ngIf="review.rating >= 4.5">
+                    <h4>Dank voor uw top-score! 🌟</h4>
+                    <p>We hopen u snel terug te kunnen verwelkomen!</p>
+                </ng-container>
+
+                <ng-container *ngIf="review.rating >= 4.0 && review.rating < 4.5">
+                    <h4>Bijna top-score! 🌟</h4>
+                    <p>We hopen het devolgende perfect te maken!</p>
+                </ng-container>
+
+                <ng-container *ngIf="review.rating >= 3.0 && review.rating < 4">
+                    <h4>Dankjewel voor je eerlijke feedback 💚</h4>
+                    <p>We willen hier echt uit leren...</p>
+                </ng-container>
+
+                <ng-container *ngIf="review.rating < 3">
+                    <h4>Het spijt ons dat we je niet 100% konden overtuigen 💧</h4>
+                    <p>We willen hier echt uit leren...</p>
+                </ng-container>
+
+            </div>
+        </div>
+
+        <ng-container *ngIf="feedbackSaved && review.rating < 4.5">
+
+            <div class="row mt-3">
+                <div class="col">
+
+                    <p>Wij gaan aan de slag met uw feedback!</p>
+
+                </div>
+            </div>
+
+
+        </ng-container>
+
+        <ng-container *ngIf="!feedbackSaved && review.rating < 4.5">
+
+            <div class="row mt-3">
+                <div class="col">
+
+                    <p>Wil je 1 concreet punt meegeven dat we kunnen aanpakken? 1 zinnetje is genoeg... </p>
+
+                    <textarea rows="3" class="form-control" id="feedback" name="feedback" style="height: 80px"
+                        [(ngModel)]="review.feedback" placeholder="Wil je (optioneel) 1 detail toelichten?"></textarea>
+
+                    <small>Wij gaan er dan mee aan de slag!</small>
+
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col">
+    
+                    <button class="btn btn-primary float-end" type="button" style="width: 250px;"
+                        [disabled]="!allFilledIn()" (click)="updateReview()">Verstuur feedback</button>
+    
+                </div>
+            </div>
+
+        </ng-container>
+
+
+    </ng-container>
+
+
+
+    <ng-container *ngSwitchCase="ReviewMode.requestGoogleReview">
+
+        <ng-container *ngIf="review.hasCustomFeedback()">
+
+            <div class="row mt-5">
+                <div class="col">
+
+                    <h4>Veel dank! Wil je je ervaring ook delen op Google?</h4>
+
+                    <p>Je helpt anderen ons te vinden en ondersteunt ons als lokale zaak enorm. Dankjewel! 🙏</p>
+
+                </div>
+            </div>
+
+
+            <div class="row mt-4 mb-5">
+                <div class="col d-flex justify-content-center">
+
+                    <button class="btn btn-outline-primary" (click)="openGoogleAndCopyIfPresent(review)">
+                        <img src="assets/google_g_icon_download.png" alt="Google logo" width="20" height="20"
+                            style="margin-right: 5px;"> Delen op Google</button>
+
+                </div>
+            </div>
+
+
+            <div class="row mb-5">
+                <div class="col d-flex justify-content-center" style="text-align: center;">
+
+                    Tip: je tekst staat al op je klembord. Plak in het Google-vak met ⌘V (Mac) of Ctrl+V (Windows). Op
+                    je telefoon: lang drukken → Plakken.
+
+                </div>
+            </div>
+
+        </ng-container>
+
+
+        <ng-container *ngIf="!review.hasCustomFeedback()">
+
+            <div class="row mt-5">
+                <div class="col">
+
+                    <h4>Nog één klein stapje: geef je sterren ook op Google ✨</h4>
+
+                    <p>Met één tik op de sterren help je ons enorm. 🙏 Tekst toevoegen mag, maar hoeft niet. </p>
+
+                </div>
+            </div>
+
+
+            <div class="row mt-4 mb-5">
+                <div class="col d-flex justify-content-center">
+
+                    <button class="btn btn-outline-primary" (click)="openGoogleAndCopyIfPresent(review)">
+                        <img src="assets/google_g_icon_download.png" alt="Google logo" width="20" height="20"
+                            style="margin-right: 5px;"> Delen op Google</button>
+
+                </div>
+            </div>
+
+
+        </ng-container>
+
+
+
+
+    </ng-container>
+
+    <ng-container *ngSwitchCase="ReviewMode.review">
+
+
+
+        <div class="row mt-5">
+            <div class="col">
+                <h4>Hoe was je ervaring bij Aquasense?</h4>
+                <p>Geef een score van 1 tot 5 voor elk onderdeel. <small>(1 = slecht, 5 = uitstekend)</small>
+                </p>
+
+            </div>
+        </div>
+
+        <div class="row mt-1" *ngFor="let param of reviewParams">
+            <div class="col-4 col-lg-3">
+                {{param.label}}
+
+            </div>
+            <div class="col">
+                <!--             <ngb-rating [(rate)]="review.params[param.code]" [max]="5" [readonly]="false"></ngb-rating>
  -->
-            <ngb-rating [(rate)]="review.params[param.code]" [max]="5" [readonly]="false">
-                <ng-template let-fill="fill" let-index="index">
-                    <i class="bi-star{{ fill === 100 ? '-fill' : '' }}" [class.filled]="fill === 100"
-                        [class.low]="index < 3"></i>
-                </ng-template>
-            </ngb-rating>
+                <ngb-rating [(rate)]="review.params[param.code]" [max]="5" [readonly]="false">
+                    <ng-template let-fill="fill" let-index="index">
+                        <i class="bi-star{{ fill === 100 ? '-fill' : '' }}" [class.filled]="fill === 100"
+                            [class.low]="index < 3"></i>
+                    </ng-template>
+                </ngb-rating>
+            </div>
         </div>
-    </div>
 
-    <div class="row mt-4">
-        <div class="col">
+        <div class="row mt-4">
+            <div class="col">
 
-            <textarea rows="3" class="form-control" id="feedback" name="feedback" style="height: 80px"
-                [(ngModel)]="review.feedback"
-                placeholder="Wat vond je het leukste aan je bezoek (of wat kon beter)?"></textarea>
+                <textarea rows="3" class="form-control" id="feedback" name="feedback" style="height: 80px"
+                    [(ngModel)]="review.feedback"
+                    placeholder="Wat vond je het leukste aan je bezoek (of wat kon beter)?"></textarea>
 
+            </div>
         </div>
-    </div>
 
-    <small style="font-style: italic;">Je antwoord wordt enkel intern gebruikt en helpt ons om elke ervaring nóg aangenamer te maken.</small>
-    <div class="row mt-4">
-        <div class="col">
+        <small style="font-style: italic;">Je antwoord wordt enkel intern gebruikt en helpt ons om elke ervaring nóg
+            aangenamer te maken.</small>
+        <div class="row mt-4">
+            <div class="col">
 
-            <button class="btn btn-primary float-end" type="button" style="width: 250px;"
-                (click)="submit()">Verstuur feedback</button>
+                <button class="btn btn-primary float-end" type="button" style="width: 250px;"
+                    [disabled]="!allFilledIn()" (click)="submit()">Verstuur feedback</button>
 
+            </div>
         </div>
-    </div>
+        <div class="row mt-1">
+            <div class="col">
+                <small class="text-muted float-end" *ngIf="!allFilledIn()">Versturen mogelijk van zodra alle items een
+                    score
+                    hebben (1-5)</small>
+            </div>
+        </div>
 
 
 
-
+    </ng-container>
+    <ng-container *ngSwitchDefault>
+    </ng-container>
 </ng-container>

@@ -10,7 +10,7 @@ import * as Handlebars from "handlebars"
 import * as sc from 'stringcase'
 import { OrderPersonMgr } from "../order-person-mgr";
 import { CancelOrderMessage } from "ts-altea-logic";
-import { TaxLines, TaxLine, VatLine, Branch, Contact, Currency, DepositMode, Invoice, InvoiceTotals, OrderLine, OrderLineSummary, OrderType, Organisation, Payment, PaymentType, PlanningMode, Product, ProductSubType, ProductType, Resource, ResourcePlanning, Subscription, OrderDeclare, OrderLineOption, LoyaltyCardChange } from "ts-altea-model";
+import { TaxLines, TaxLine, VatLine, Branch, Contact, Currency, DepositMode, Invoice, InvoiceTotals, OrderLine, OrderLineSummary, OrderType, Organisation, Payment, PaymentType, PlanningMode, Product, ProductSubType, ProductType, Resource, ResourcePlanning, Subscription, OrderDeclare, OrderLineOption, LoyaltyCardChange, Review } from "ts-altea-model";
 
 
 //import { numberAttribute } from "@angular/core";
@@ -127,6 +127,11 @@ export enum OrderSource {
   ngApp = "ngApp"
 }
 
+export enum ReviewStatus {
+  requested = "requested",
+  completed = "completed"
+}
+
 export class OrderCancel {
   by?: OrderCancelBy
   reason?: string
@@ -176,6 +181,9 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
   /** name of contact (to reduce external joins with contact table) */
   for?: string
 
+  /** name(s) of staff */
+  staff?: string
+
   @Type(() => Invoice)
   invoice?: Invoice;
   invoiceId?: string;
@@ -186,6 +194,9 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
   /** short summary of orderlines, stored as json (to reduce external joins with contact table) */
   @Type(() => OrderLineSummary)
   sum?: OrderLineSummary[] = []
+
+  @Type(() => Review)
+  reviews?: Review[] = []
 
   @Type(() => Payment)
   payments?: Payment[] = []
@@ -295,6 +306,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
   @Type(() => LoyaltyCardChange)
   loyalty?: LoyaltyCardChange[]
 
+  
 
   /** Order needs special attention (use privNote for more details) */
   attn: boolean = false
@@ -304,6 +316,9 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
    * we use a client generated guid that is stored in local client storage
    */
   lock?: string = ''
+
+  /** review status: requested, completed */
+  rev?: ReviewStatus
 
   /** external ids for this order (for instance: used for Stripe payment intends) */
   //extIds?: string[] = []
@@ -743,6 +758,10 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     const firstSvc = this.lines.findIndex(l => l.product?.type == ProductType.svc)
 
     return firstSvc >= 0
+  }
+
+  hasReviews(): boolean {
+    return (Array.isArray(this.reviews) && this.reviews.length > 0)
   }
 
   hasPersons(): boolean {
