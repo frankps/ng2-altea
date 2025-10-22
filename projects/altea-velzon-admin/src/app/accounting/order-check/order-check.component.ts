@@ -401,6 +401,7 @@ export class OrderCheckComponent implements OnInit {
 
   wingsExportYearMonth = 202410
   WingsExportType = WingsExportType
+  wingsExportMessages: SafeHtml = null
 
   async downloadWingsExport(type: WingsExportType, yearMonth: number = this.wingsExportYearMonth) {
     let me = this
@@ -434,6 +435,10 @@ export class OrderCheckComponent implements OnInit {
 
     let report = await wingsExport.export(request)
 
+    let messages = report.messages.join("<br>\n")
+    me.wingsExportMessages = this.sanitizer.bypassSecurityTrustHtml(messages)
+
+
     console.error(report)
 
     var fileName = `${type}-to-wings-${request.yearMonth.y}-${request.yearMonth.m}.xml`
@@ -441,6 +446,8 @@ export class OrderCheckComponent implements OnInit {
     const blob = new Blob([report.xmlString], { type: 'application/csv;charset=utf-8' });
     saveAs(blob, fileName);
 
+
+    
 
   }
 

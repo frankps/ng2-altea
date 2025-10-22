@@ -27,7 +27,7 @@ export class GiftToWingsExport extends WingsExportBase {
 
         let giftPayments = await this.getGiftPayments(request)
 
-        let response = this.createXml(giftPayments, request)
+        let response = await this.createXml(giftPayments, request)
 
         return response
     }
@@ -46,27 +46,71 @@ export class GiftToWingsExport extends WingsExportBase {
         return giftPayments
     }
 
-    createXml(giftPayments: Payments, request: WingsExportRequest): WingsExportResponse {
+
+    async removeInvoicedPayments(giftPayments: Payments, messages: string[]): Promise<Payments> {
+        
+        let orderIds = giftPayments.getGiftOrderIds()
+        let orders = await this.alteaDb.getOrdersByIds(orderIds)
+
+        let result = new Payments()
+
+        for (let giftPayment of giftPayments.list) {
+
+            let gift = giftPayment.gift
+
+            let orderIdOfGift = giftPayment.gift.orderId
+            let orderOfGift = orders.find(o => o.id == orderIdOfGift)
+
+            let dateStr = dateFns.format(giftPayment.dateTyped, 'dd/MM HH:mm')
+
+            let giftWasInvoiced = false
+            if (orderOfGift) {
+                if (orderOfGift.invoiced)
+                    giftWasInvoiced = true
+            } else {    // we don't have the original order anymore (legacy) => we trust the flag gift.invoice
+                if (gift.invoice)
+                    giftWasInvoiced = true
+            }
+
+            
+            if (giftWasInvoiced) {
+                let giftCreationDate = dateFns.format(gift.cre, 'dd/MM/yy HH:mm')
+
+                messages.push(`Skipping gift payment ${gift.code} on ${dateStr}: order is invoiced ${orderOfGift?.invoiceNum ?? '<old system>'} (gift created on ${giftCreationDate})`)
+                continue
+            } else {
+                result.add(giftPayment)
+            }
+        }
+
+        return result
+
+    }
+
+    async createXml(giftPayments: Payments, request: WingsExportRequest): Promise<WingsExportResponse> {
+
+        let messages = []
+        let giftPaymentsNotInvoiced = await this.removeInvoicedPayments(giftPayments, messages)
 
 
-        let totalAmount = giftPayments.totalAmount()
+
+        let totalAmount = giftPaymentsNotInvoiced.totalAmount()
         let balance = totalAmount
         var xmlBookings = this.createXmlHeader("D01", null, request.opDate(), this.overTeDragenOpbrengstenId, totalAmount)
         var bookingTag = xmlBookings.first()
 
         let count = 0
-        let messages = []
 
-        for (let giftPayment of giftPayments.list) {
 
-            let order = giftPayment.order
+        for (let giftPayment of giftPaymentsNotInvoiced.list) {
+
+
             let gift = giftPayment.gift
 
-            let dateStr = dateFns.format(giftPayment.dateTyped, 'dd/MM')
+            let dateStr = dateFns.format(giftPayment.dateTyped, 'dd/MM HH:mm')
 
-            let comment = `${dateStr} cadeaubon ${gift.code ?? 'null'}`  // $"{pay.Date.ToString("dd/MM")} cadeaubon '{pay.Gift.GiftCode}'"
+            let comment = `${dateStr} cadeaubon ${gift.code ?? 'null'}`  
 
-            // "2", wingsDagontvangstenCustomerId
             let lineAmountDC = -giftPayment.amount;
             balance += lineAmountDC;
 
@@ -82,7 +126,7 @@ export class GiftToWingsExport extends WingsExportBase {
         if (balance == 0)
             messages.push("OK, balance is 0.")
         else
-            messages.push(`niet OK: balance is ${balance} (maar zou 0 moeten zijn!)`)
+            messages.push(`Not OK: balance is ${balance} (maar zou 0 moeten zijn!)`)
 
         let xmlDoc = this.buildWingsAccounting(request.rootPath, request.dossierId, xmlBookings)
 
@@ -92,7 +136,7 @@ export class GiftToWingsExport extends WingsExportBase {
         });
 
         const response = new WingsExportResponse()
-        response.message = messages.join("\n")
+        response.messages = messages
         response.xmlString = xmlString
         return response
 

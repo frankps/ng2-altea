@@ -1397,8 +1397,8 @@ export class AlteaDb {
     async getPaymentsInYearMonth(branchId: string, yearMonth: YearMonth, types: PaymentType[], includes?: string[], and?: QueryCondition[]): Promise<Payments> {
 
         let start = yearMonth.startDate()
-        //let end = yearMonth.endDate()
-        let end = dateFns.addDays(start, 5)
+        let end = yearMonth.endDate()
+       // let end = dateFns.addDays(start, 5)
         console.error('YearMonth end incorrect while debugging (just 5 days)')
 
         return await this.getPaymentsBetween(branchId, start, end, types, false, includes, and)

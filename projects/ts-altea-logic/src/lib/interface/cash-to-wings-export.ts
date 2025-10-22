@@ -1,7 +1,7 @@
-import { BankTransaction, BankTxInfo, BankTxType, Payment, PaymentType } from "ts-altea-model"
+import { BankTransaction, BankTxInfo, BankTxType, Payment, Payments, PaymentType } from "ts-altea-model"
 import { CsvImport, ImportColumn, ImportDefinition } from "./csv-import"
 import * as dateFns from 'date-fns'
-import { ApiListResult, ArrayHelper, DateHelper, DbObjectMulti, ObjectHelper, YearMonth } from "ts-common"
+import { ApiListResult, ArrayHelper, DateHelper, DbObjectMulti, NumberHelper, ObjectHelper, YearMonth } from "ts-common"
 import { AlteaDb } from "../general/altea-db"
 import { IDb } from "../interfaces/i-db"
 import { instanceToPlain, plainToInstance } from "class-transformer"
@@ -53,7 +53,7 @@ export class CashBookRecord {
         this.type = type;
         this.category = category;
         this.info = info;
-        this.amount = amount;
+        this.amount = NumberHelper.round(amount, 2)
         this.cashDate = cashDate;
     }
 
@@ -97,24 +97,40 @@ export class CashToWingsExport extends WingsExportBase {
     }
 
 
+    applyNoDecl(cashPayments: Payments) {
+
+        let result = new Payments()
+
+        for (let pay of cashPayments.list) {
+            pay.amount = NumberHelper.round(pay.amount - pay.noDecl, 2)
+
+            if (pay.amount != 0)
+                result.add(pay)
+        }
+
+        return result
+
+    }
 
 
     async createReportRecords(request: WingsExportRequest): Promise<CashBookRecord[]> {
 
         var cashPayments = await this.alteaDb.getPaymentsInYearMonth(request.branchId, request.yearMonth, [PaymentType.cash], ['order'])
 
+        cashPayments = this.applyNoDecl(cashPayments)
+
         let cashGroups = this.groupPayments(cashPayments.list)
 
         let cashBookRecords = this.groupsToRecords(cashGroups)
 
         return cashBookRecords
-
     }
 
-    createXml(records: CashBookRecord[], request: WingsExportRequest) : WingsExportResponse {
+    createXml(records: CashBookRecord[], request: WingsExportRequest): WingsExportResponse {
 
 
         let totalAmount = _.sumBy(records, 'amount')
+        totalAmount = NumberHelper.round(totalAmount, 2)
         let balance = totalAmount
         var xmlBookings = this.createXmlHeader("KAS", request.defaultRunningNumber(), request.opDate(), "570000", totalAmount)
         var bookingTag = xmlBookings.first()
@@ -145,8 +161,8 @@ export class CashToWingsExport extends WingsExportBase {
 
             }
 
-            let lineAmountDC = -record.amount;
-            balance += lineAmountDC;
+            let lineAmountDC = - NumberHelper.round(record.amount, 2)
+            balance = NumberHelper.round(balance + lineAmountDC, 2);
 
             let comment = `${dateFns.format(record.date, 'dd/MM')} ${record.info}`
             var xmlDetail = this.createXmlDetail(accountType, accountId, lineAmountDC, comment)
@@ -169,7 +185,7 @@ export class CashToWingsExport extends WingsExportBase {
         });
 
         const response = new WingsExportResponse()
-        response.message = messages.join("\n")
+        response.messages = messages
         response.xmlString = xmlString
         return response
     }

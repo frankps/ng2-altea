@@ -54,7 +54,8 @@ export class WingsExportRequest {
 
 export class WingsExportResponse {
 
-    message: string
+    /** messages about the export */
+    messages: string[]
     xmlString: string
 
 }

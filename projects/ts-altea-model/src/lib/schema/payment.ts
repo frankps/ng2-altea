@@ -180,6 +180,8 @@ export class Payments {
 
     let orderIds = giftPays.map(p => p.gift.orderId)
 
+    orderIds = _.uniq(orderIds)
+
     return orderIds
 
   }
