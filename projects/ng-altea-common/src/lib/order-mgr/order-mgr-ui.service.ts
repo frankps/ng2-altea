@@ -846,6 +846,7 @@ export class OrderMgrUiService {   // implements OnInit
 
     let order = this.order
 
+    this.alteaSvc.availabilityService.fixOrder(order)
 
     if (order.start)  // if order was already planned, then we will work on a copy 
       order = order.clone()
@@ -1690,15 +1691,17 @@ export class OrderMgrUiService {   // implements OnInit
 
   preselectSpecialPrices(orderLine: OrderLine, reset: boolean = false) {
 
-    if (reset) {
-      orderLine.pc = []
-    }
+
 
     let product = orderLine.product
 
     let hasSpecialPrices = product.hasSpecialPrices()
 
     if (hasSpecialPrices) {
+
+      if (reset) {
+        orderLine.pc = []
+      }
 
       let prices = product.getSpecialPrices(this.isPos)
 

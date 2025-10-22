@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ReviewParameter, Review, Order, Contact, ContactReviews, ReviewPlatform } from 'ts-altea-model';
+import { ReviewParameter, Review, Order, Contact, ContactReviews, ReviewPlatform, ReviewStatus } from 'ts-altea-model';
 import { NgbRatingModule } from '@ng-bootstrap/ng-bootstrap';
 import { ContactService, ObjectService, OrderService, ReviewService, SessionService } from 'ng-altea-common';
 import { NgxSpinnerService } from "ngx-spinner"
@@ -65,7 +65,7 @@ export class ReviewComponent {
   /** true: the user entered feedback & it is saved */
   feedbackSaved = false
 
-  debug = true
+  debug = false
 
   constructor(protected route: ActivatedRoute, protected orderSvc: OrderService, protected reviewSvc: ReviewService, protected contactSvc: ContactService,
     protected spinner: NgxSpinnerService, protected sessionSvc: SessionService, protected clipboard: Clipboard, protected objSvc: ObjectService) {
@@ -127,7 +127,7 @@ export class ReviewComponent {
     let order: Order = null
 
     if (orderId) {
-      order = await this.orderSvc.get$(orderId, ['lines', 'reviews', 'contact'])
+      order = await this.orderSvc.get$(orderId, ['lines', 'contact'])   // 'reviews',
 
       console.error(order)
     }
@@ -210,6 +210,9 @@ export class ReviewComponent {
       if (res.isOk) {
 
         await this.registerReviewOnContact(ReviewPlatform.internal)
+
+        this.order.rev = ReviewStatus.completed
+        await this.alteaDb.updateOrder(this.order, ['rev'])
 
         if (this.review.rating > 4.5)
           this.mode = ReviewMode.requestGoogleReview

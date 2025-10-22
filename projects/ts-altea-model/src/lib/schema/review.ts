@@ -7,12 +7,12 @@ export class ReviewParameter {
 
     static getAll(): ReviewParameter[] {
         return [
-            new ReviewParameter('advice', 'Advies'),
-            new ReviewParameter('polite', 'Vriendelijkheid'),
-            new ReviewParameter('clean', 'Netheid ruimtes'),
-            new ReviewParameter('quality', 'Kwaliteit behandeling'),
             new ReviewParameter('reception', 'Onthaal'),
-            new ReviewParameter('online', 'Online reserveren'),
+            new ReviewParameter('polite', 'Vriendelijkheid'),
+            new ReviewParameter('advice', 'Advies'),
+            new ReviewParameter('quality', 'Kwaliteit behandeling'),
+            new ReviewParameter('clean', 'Netheid ruimtes'),
+            new ReviewParameter('online', 'Online reserveren')
         ]
     }
 

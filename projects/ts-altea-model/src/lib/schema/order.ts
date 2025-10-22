@@ -761,7 +761,8 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
   }
 
   hasReviews(): boolean {
-    return (Array.isArray(this.reviews) && this.reviews.length > 0)
+    return this.rev == ReviewStatus.completed
+    // return (Array.isArray(this.reviews) && this.reviews.length > 0)
   }
 
   hasPersons(): boolean {
@@ -1775,12 +1776,37 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     if (this.gift || !this.hasLines())
       return false
 
-    const personSelectLines = this.lines?.filter(ol => ol.product?.type == ProductType.svc && ol.product?.personSelect)
+    const personSelectLines = this.personSelectLines()
 
     // ol.qty
     const total = _.sumBy(personSelectLines, 'qty')
 
     return (total > 1)
+  }
+
+  personSelectLines(): OrderLine[] {
+    if (this.gift || !this.hasLines())
+      return []
+
+    const personSelectLines = this.lines?.filter(ol => ol.product?.type == ProductType.svc && ol.product?.personSelect)
+
+    return personSelectLines
+  }
+
+  getPersonIdNotSelected(alreadySelected: string[]): string {
+    
+    if (ArrayHelper.IsEmpty(alreadySelected))
+      alreadySelected = []
+
+    let personIds = this.persons.map(p => p.id)
+    
+    let notSelected = personIds.filter(id => !alreadySelected.includes(id))
+
+    if (ArrayHelper.NotEmpty(notSelected))
+      return notSelected[0]
+
+    return null
+
   }
 
   needsStaffSelect(): boolean {

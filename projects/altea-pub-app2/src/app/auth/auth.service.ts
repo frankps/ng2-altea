@@ -211,7 +211,7 @@ export class AuthService {
             if (newUser || !me.user.first)
               me.router.navigate(['/auth', 'profile'])
             else
-              me.router.navigate(['branch', 'aqua', 'menu'])
+              me.router.navigate(['/branch', 'aqua', 'menu'])
           }
 
           // this.router.navigate(['staff', 'dashboard'])

@@ -236,7 +236,7 @@ export class BankTransactionLinking {
       return []
     }
 
-    stripeTransactions = stripeTransactions.filter(tx => tx.type != 'payout')
+    stripeTransactions = stripeTransactions.filter(tx => tx.type == 'payment' || tx.type == 'charge')   // "payment"    before:  tx.type != 'payout'
     let paymentIntentIds: string[] = stripeTransactions.map(tx => tx.source?.payment_intent).filter(id => id != null && id != undefined)
     // for (let stripeTx of tx.prov.transactions)
 

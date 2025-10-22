@@ -15,38 +15,38 @@
 <button type="button" class="btn btn-primary btn-sm me-2" (click)="doChecks(2025,8)">Aug</button>
 <button type="button" class="btn btn-primary btn-sm me-2" (click)="doChecks(2025,9)">Sep</button>
 
-<div class="row mt-3">  
+<div class="row mt-3">
 
 
-        <div class="col-3">
+    <div class="col-3">
 
-            <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="calculateNoDecl" name="calculateNoDecl"
-                    [(ngModel)]="calculateNoDecl" />
-                <label class="form-check-label" for="calculateNoDecl">Calc No Decl</label>
-            </div>
-
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="calculateNoDecl" name="calculateNoDecl"
+                [(ngModel)]="calculateNoDecl" />
+            <label class="form-check-label" for="calculateNoDecl">Calc No Decl</label>
         </div>
 
-        <div class="col-3">
+    </div>
 
-            <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="resetNoDecl" name="resetNoDecl"
-                    [(ngModel)]="resetNoDecl" />
-                <label class="form-check-label" for="resetNoDecl">Reset No Decl</label>
-            </div>
+    <div class="col-3">
 
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="resetNoDecl" name="resetNoDecl"
+                [(ngModel)]="resetNoDecl" />
+            <label class="form-check-label" for="resetNoDecl">Reset No Decl</label>
         </div>
 
-        <div class="col-3">
+    </div>
 
-            <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="fixToInvoice" name="fixToInvoice"
-                    [(ngModel)]="fixToInvoice" />
-                <label class="form-check-label" for="resetNoDecl">toInvoice=false</label>
-            </div>
+    <div class="col-3">
 
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="fixToInvoice" name="fixToInvoice"
+                [(ngModel)]="fixToInvoice" />
+            <label class="form-check-label" for="resetNoDecl">toInvoice=false</label>
         </div>
+
+    </div>
 
 </div>
 
@@ -76,7 +76,8 @@
         <h5>No declares</h5>
 
         <div class="row ms-3" *ngFor="let result of report.cash.results">
-            <div class="col">{{result.msg}} <a *ngIf="result.order" [routerLink]="['/aqua/orders/manage',result.order.id]">Open {{result.order.for}}</a> </div>
+            <div class="col">{{result.msg}} <a *ngIf="result.order"
+                    [routerLink]="['/aqua/orders/manage',result.order.id]">Open {{result.order.for}}</a> </div>
         </div>
     </ng-container>
 
@@ -128,9 +129,11 @@
 
 <ng-container *ngIf="branch">Laatst afgesloten maand: {{branch.acc.closed.year}}.{{branch.acc.closed.month}}
 
-    <button type="button" class="btn btn-primary btn-sm mx-2" (click)="calcNextMonth()">Bereken {{getNextMonth()}}</button>
+    <button type="button" class="btn btn-primary btn-sm mx-2" (click)="calcNextMonth()">Bereken
+        {{getNextMonth()}}</button>
 
-    <button type="button" class="btn btn-primary btn-sm mx-2" (click)="closeNextMonth()">Sluit {{getNextMonth()}}</button>
+    <button type="button" class="btn btn-primary btn-sm mx-2" (click)="closeNextMonth()">Sluit
+        {{getNextMonth()}}</button>
 
     <button type="button" class="btn btn-primary btn-sm mx-2" (click)="calculateCustomMonth()">Bereken</button>
 
@@ -187,13 +190,31 @@
 <button type="button" class="btn btn-primary btn-sm me-2" (click)="checkContactLoyalty()">Check loyalty</button>
 
 
-<button type="button" *ngIf="loyaltyReport" class="btn btn-primary btn-sm me-2" (click)="fixContactLoyalty()">Fix loyalty</button>
+<button type="button" *ngIf="loyaltyReport" class="btn btn-primary btn-sm me-2" (click)="fixContactLoyalty()">Fix
+    loyalty</button>
 
 
 <h4>Wings checks</h4>
 
-<button type="button" class="btn btn-primary btn-sm me-2" (click)="downloadWingsReport()">Download wings checks</button>
+<div class="row">
+    <div class="col-2">
+        <label class="form-label" for="wingsYearMonth">Export maand</label>
+        <input type="number" id="wingsYearMonth" name="wingsYearMonth" class="form-control"
+            [(ngModel)]="wingsExportYearMonth" />
+    </div>
+    <div class="col d-flex align-items-end">
+        <button type="button" class="btn btn-primary btn-sm me-2"
+            (click)="downloadWingsExport(WingsExportType.cash)">Cash to wings</button>
+        <button type="button" class="btn btn-primary btn-sm me-2"
+            (click)="downloadWingsExport(WingsExportType.gift)">Gift to wings</button>
+    </div>
+</div>
 
-<button type="button" class="btn btn-primary btn-sm me-2" (click)="downloadWingsCashReport()">Cash to wings</button>
+<div class="row mt-2">
+    <div class="col">
+        <button type="button" class="btn btn-primary btn-sm me-2" (click)="downloadWingsReport()">Download wings
+            checks</button>
 
-<button type="button" class="btn btn-primary btn-sm me-2" (click)="downloadYearReport()">Year report</button>
+        <button type="button" class="btn btn-primary btn-sm me-2" (click)="downloadYearReport()">Year report</button>
+    </div>
+</div>

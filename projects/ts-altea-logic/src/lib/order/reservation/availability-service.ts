@@ -12,6 +12,7 @@ import { SolutionPicker } from './solution-picker'
 import { DetermineReservationOptions } from './determine-reservation-options'
 import * as dateFns from 'date-fns'
 import { OrderMgmtService } from 'ts-altea-logic'
+import * as _ from "lodash";
 
 export class AvailabilityService {
 
@@ -129,7 +130,7 @@ export class AvailabilityService {
                 if (lessThanADay)
                     periodStr = `Op ${dateFns.format(period.from, 'dd/MM')}`
                 else {
-                    periodStr = `Tijdens de periode ${period.toString('dd/MM')}`    
+                    periodStr = `Tijdens de periode ${period.toString('dd/MM')}`
                 }
 
                 response.informCustomer(`${periodStr} kan de wellness enkel geboekt worden voor max 4 personen (huidige selectie = ${remark}). Kies ofwel een andere datum, of pas het aantal personen aan. Dank voor uw begrip!`)
@@ -187,6 +188,63 @@ export class AvailabilityService {
         return ExcludedProducts.empty
     }
 
+
+    /** Fix order if needed (such as adding persons to order) */
+    fixOrder(order: Order) {
+
+        if (!order)
+            return
+
+        /** there was the issue with an orderline: 2 x Massage => only 1 person was selected
+         *  => we need to configure correct nr of persons
+         */
+        let personSelectLines = order.personSelectLines()
+
+        if (ArrayHelper.IsEmpty(personSelectLines))
+            return
+
+        const maxQtyOrderLine = _.maxBy(personSelectLines, 'qty')
+
+        if (order.nrOfPersons < maxQtyOrderLine.qty) {
+            order.nrOfPersons = maxQtyOrderLine.qty
+            order.markAsUpdated('nrOfPersons')
+            order.markAsUpdated('persons')
+            order.updatePersons()
+        }
+
+        
+
+        for (let line of personSelectLines) {
+            line.nrPers = line.qty
+
+            if (ArrayHelper.IsEmpty(line.persons))
+                line.persons = []
+
+            let personsSelected = line.persons.length
+
+            if (personsSelected == line.nrPers)  // then all ok
+                continue
+
+            if (personsSelected < line.nrPers) {
+                // then we need to add persons
+                for (let i = personsSelected; i < line.nrPers; i++) {
+                    let personIdNotSelectedYet = order.getPersonIdNotSelected(line.persons)
+
+                    if (personIdNotSelectedYet) {
+                        line.persons.push(personIdNotSelectedYet)
+                        line.markAsUpdated('persons')
+                    }
+                }
+            } else {
+                // then we need to remove persons
+                line.persons.splice(line.nrPers)
+                line.markAsUpdated('persons')
+            }
+        }
+
+    }
+
+
     async process(availabilityRequest: AvailabilityRequest): Promise<AvailabilityResponse> {
 
         //        availabilityRequest.to
@@ -199,6 +257,7 @@ export class AvailabilityService {
 
         console.error('OrderGetPossibleDates.process()', availabilityRequest)
 
+        //this.fixOrder(availabilityRequest.order)
 
         const order = availabilityRequest.order! //.clone()
 

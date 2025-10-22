@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Year } from '@syncfusion/ej2-angular-schedule';
 import { BranchService, ObjectService, OrderService, SessionService } from 'ng-altea-common';
-import { AlteaDb, CashToWingsExport, CashToWingsExportRequest, CheckContactLoyalty, ConsistencyReport, ContactLoyaltyReport, MonthClosing, MonthClosingResult, MonthClosingUpdate, MonthConsistencyReportBuilder, WingsReporting, WingsYearReport, WingsYearReporting } from 'ts-altea-logic';
+import { AlteaDb, CashToWingsExport, WingsExportRequest, WingsExportType, CheckContactLoyalty, ConsistencyReport, ContactLoyaltyReport, MonthClosing, MonthClosingResult, MonthClosingUpdate, MonthConsistencyReportBuilder, WingsReporting, WingsYearReport, WingsYearReporting, WingsExportBase, GiftToWingsExport } from 'ts-altea-logic';
 import { YearMonth } from 'ts-common';
 import * as _ from "lodash";
 import { NgxSpinnerService } from "ngx-spinner"
@@ -67,7 +67,7 @@ export class OrderCheckComponent implements OnInit {
 
       console.log('No decl', me.calculateNoDecl, me.resetNoDecl)
 
-      
+
       me.report = await report.checkAll(me.branch, yearMonth, me.calculateNoDecl, me.resetNoDecl, me.fixToInvoice)
 
       console.log(me.report)
@@ -84,7 +84,7 @@ export class OrderCheckComponent implements OnInit {
       if (error)
         me.dashboardSvc.showErrorToast(error)
       else
-      me.dashboardSvc.showSuccessToast('Checks finished')
+        me.dashboardSvc.showSuccessToast('Checks finished')
 
     }
 
@@ -375,26 +375,68 @@ export class OrderCheckComponent implements OnInit {
 
   }
 
-
-  async downloadWingsCashReport() {
-    let me = this
+  /*
+    async downloadWingsCashReport() {
+      let me = this
+    
+      let alteaDb = new AlteaDb(this.objSvc)
   
+      let request = new WingsExportRequest()
+      request.yearMonth =  new YearMonth(2024, 10)
+      request.branchId = me.sessionSvc.branchId
+  
+      let cashToWingsExport = new CashToWingsExport(alteaDb)
+  
+      let report = await cashToWingsExport.export(request)
+  
+      console.error(report)
+  
+      var fileName = `cash-to-wings-${request.yearMonth.y}-${request.yearMonth.m}.xml`
+  
+      const blob = new Blob([report.xmlString], { type: 'application/csv;charset=utf-8' });
+      saveAs(blob, fileName);
+  
+    }
+      */
+
+  wingsExportYearMonth = 202410
+  WingsExportType = WingsExportType
+
+  async downloadWingsExport(type: WingsExportType, yearMonth: number = this.wingsExportYearMonth) {
+    let me = this
+
+ 
+
     let alteaDb = new AlteaDb(this.objSvc)
 
-
-    let request = new CashToWingsExportRequest()
-    request.yearMonth =  new YearMonth(2024, 10)
+    let request = new WingsExportRequest()
+    request.yearMonth = YearMonth.parse(yearMonth)  // new YearMonth(year, month)
     request.branchId = me.sessionSvc.branchId
 
-    let cashToWingsExport = new CashToWingsExport(alteaDb)
 
-    
+    console.error('downloadWingsExport', type, request.yearMonth.toString())
 
-    let report = await cashToWingsExport.export(request)
+    let wingsExport: WingsExportBase
+
+    switch (type) {
+      case WingsExportType.cash:
+        wingsExport = new CashToWingsExport(alteaDb)
+        break
+      case WingsExportType.gift:
+        wingsExport = new GiftToWingsExport(alteaDb)
+        break
+    }
+
+    if (!wingsExport) {
+      console.error(`Invalid wings export type: ${type}`)
+      return
+    }
+
+    let report = await wingsExport.export(request)
 
     console.error(report)
 
-    var fileName = `cash-to-wings-${request.yearMonth.y}-${request.yearMonth.m}.xml`
+    var fileName = `${type}-to-wings-${request.yearMonth.y}-${request.yearMonth.m}.xml`
 
     const blob = new Blob([report.xmlString], { type: 'application/csv;charset=utf-8' });
     saveAs(blob, fileName);

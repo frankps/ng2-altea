@@ -296,7 +296,7 @@ export const MENU: MenuItem[] = [
     label: 'menu.staff.label',
     icon: 'user',
     link: '/%branch%/staff',
-    roles: ['admin', 'staff']
+    roles: []
   }
   /*,
   {

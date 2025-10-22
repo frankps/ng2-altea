@@ -30,16 +30,28 @@ export class OpenComponent implements OnInit {
 
   ngOnInit() {
     
+    let me = this
 
     combineLatest({
       params: this.route.paramMap,
       queryParams: this.route.queryParams
     }).subscribe(async ({ params, queryParams }) => {
-      this.productSlug = params.get('slug');
-      console.error('Route params:', this.productSlug);
+
+
+      me.productSlug = params.get('slug');
+
+      /** Facebook ads where adding %3F (encoded version of '?') to the slug => we just remove it here */
+      me.productSlug = me.productSlug.split('?')[0].split('%3F')[0]
+
+      /*
+      if (!me.productSlug)
+        me.productSlug = params['slug']
+*/
+
+      console.error('Route params:', me.productSlug);
       console.error('Query params:', queryParams);
 
-      await this.createOrder(this.productSlug, queryParams)
+      await me.createOrder(me.productSlug, queryParams)
       // Now you can proc
       // eed with both params and queryParams available
       // await this.createOrder(this.slug);

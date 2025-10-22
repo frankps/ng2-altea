@@ -701,7 +701,7 @@ export class OrderMessaging extends OrderMessagingBase {
 
         let emailTemplate = templates.find(t => t.channels?.indexOf(MsgType.email) >= 0)
 
-        const ordersToReview = await this.alteaDb.getOrdersForReview(branchId, -6, -3, ['contact'])
+        const ordersToReview = await this.alteaDb.getOrdersForReview(branchId, -4, -2, ['contact'])
 
         if (ArrayHelper.IsEmpty(ordersToReview)) {
             return 'No orders to review'

@@ -150,16 +150,20 @@ export class AlteaDb {
         let toNum = DateHelper.yyyyMMddhhmmss(to)
 
         const qry = new DbQueryTyped<Order>('order', Order)
-        qry.and('id', QueryOperator.equals, '1f715908-c60a-4a84-9667-c963f02f20be')
+        //qry.and('id', QueryOperator.equals, '1f715908-c60a-4a84-9667-c963f02f20be')
 
-        /*
+        qry.or('contact.revDate', QueryOperator.equals, null)
+        let previousMaxReviewDate = dateFns.addDays(new Date(), -30)
+        qry.or('contact.revDate', QueryOperator.lessThan, previousMaxReviewDate)
+
+
         qry.and('branchId', QueryOperator.equals, branchId)
         qry.and('start', QueryOperator.greaterThanOrEqual, fromNum)
         qry.and('start', QueryOperator.lessThanOrEqual, toNum)
-        qry.and('rev', QueryOperator.equals, null)   // review status is not yet set
+        qry.and('rev', QueryOperator.equals, null)   // review status is not yet set  (not yet requested)
         qry.and('state', QueryOperator.notIn, [OrderState.cancelled, OrderState.creation])
         qry.and('paid', QueryOperator.greaterThan, 0)
-        */
+
 
         if (ArrayHelper.NotEmpty(includes))
             qry.include(...includes)
@@ -1390,19 +1394,59 @@ export class AlteaDb {
     }
 
 
-    async getPaymentsInYearMonth(branchId: string, yearMonth: YearMonth, types: PaymentType[], includes?: string[]): Promise<Payments> {
+    async getPaymentsInYearMonth(branchId: string, yearMonth: YearMonth, types: PaymentType[], includes?: string[], and?: QueryCondition[]): Promise<Payments> {
 
         let start = yearMonth.startDate()
         //let end = yearMonth.endDate()
         let end = dateFns.addDays(start, 5)
         console.error('YearMonth end incorrect while debugging (just 5 days)')
 
-        return await this.getPaymentsBetween(branchId, start, end, types, false, includes)
+        return await this.getPaymentsBetween(branchId, start, end, types, false, includes, and)
 
     }
+    /*
+        async getGiftPaymentsBetween(branchId: string, start: number | Date, end: number | Date, includes?: string[], and?: QueryCondition[]): Promise<Payments> {
+            let startNum: number
+            let endNum: number
+    
+            if (TypeHelper.isDate(start))
+                startNum = DateHelper.yyyyMMddhhmmss(start as Date)
+            else
+                startNum = start as number
+    
+            if (TypeHelper.isDate(end))
+                endNum = DateHelper.yyyyMMddhhmmss(end as Date)
+            else
+                endNum = end as number
+    
+    
+            const qry = new DbQueryTyped<Payment>('payment', Payment)
+    
+            qry.and('order.branchId', QueryOperator.equals, branchId)
+            //qry.and('order.isGift', QueryOperator.equals, true)
+    
+            qry.and('date', QueryOperator.greaterThanOrEqual, startNum)
+            qry.and('date', QueryOperator.lessThan, endNum)
+    
+            qry.and('type', QueryOperator.equals, PaymentType.gift)
+    
+            qry.take = 2000
+    
+            qry.orderBy('date')
+    
+            if (ArrayHelper.NotEmpty(includes)) {
+                qry.include(...includes)
+            }
+            //qry.include()
+    
+            const payments = await this.db.query$<Payment>(qry)
+    
+            return new Payments(payments)
+    
+        }
+    */
 
-
-    async getPaymentsBetween(branchId: string, start: number | Date, end: number | Date, types: PaymentType[], notLinkedToBankTx = false, includes?: string[]): Promise<Payments> {
+    async getPaymentsBetween(branchId: string, start: number | Date, end: number | Date, types: PaymentType[], notLinkedToBankTx = false, includes?: string[], and?: QueryCondition[]): Promise<Payments> {
 
         let startNum: number
         let endNum: number
@@ -1431,6 +1475,9 @@ export class AlteaDb {
 
         if (notLinkedToBankTx)
             qry.and('bankTxId', QueryOperator.equals, null)
+
+        if (ArrayHelper.NotEmpty(and))
+            qry.where.and.push(...and)
 
         qry.take = 2000
 
@@ -1523,13 +1570,13 @@ export class AlteaDb {
 */
 
 
-     /*
-        qry.and('year', QueryOperator.greaterThanOrEqual, from.y)
-        qry.and('month', QueryOperator.greaterThanOrEqual, from.m)
-
-        qry.and('year', QueryOperator.lessThanOrEqual, toInclusive.y)
-        qry.and('month', QueryOperator.lessThanOrEqual, toInclusive.m)
-*/
+        /*
+           qry.and('year', QueryOperator.greaterThanOrEqual, from.y)
+           qry.and('month', QueryOperator.greaterThanOrEqual, from.m)
+   
+           qry.and('year', QueryOperator.lessThanOrEqual, toInclusive.y)
+           qry.and('month', QueryOperator.lessThanOrEqual, toInclusive.m)
+   */
         if (latestOnly)
             qry.and('latest', QueryOperator.equals, true)
 
