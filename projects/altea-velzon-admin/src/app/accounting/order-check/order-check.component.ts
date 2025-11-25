@@ -285,7 +285,7 @@ export class OrderCheckComponent implements OnInit {
 
     let branchId = me.sessionSvc.branchId
 
-    let from = new YearMonth(2024, 10)
+    let from = new YearMonth(2025, 7)
     let to = new YearMonth(2025, 9) // (2025, 1)
 
     let reportMonths = await alteaDb.getReportMonthsPeriod(branchId, from, to, true)
@@ -353,27 +353,7 @@ export class OrderCheckComponent implements OnInit {
 
   }
 
-  async downloadWingsReport() {
-    let me = this
 
-    let alteaDb = new AlteaDb(this.objSvc)
-
-    let wingsReporting = new WingsReporting(alteaDb)
-
-    let yearMonth = new YearMonth(2024, 10)
-
-    let report = await wingsReporting.createYearMonth(yearMonth, me.sessionSvc.branchId)
-
-
-    var fileName = `wings-checks-${yearMonth.y}-${yearMonth.m}.csv`
-
-    let csvString = report.toCsv()
-    console.error(csvString)
-
-    const blob = new Blob([csvString], { type: 'application/csv;charset=utf-8' });
-    saveAs(blob, fileName);
-
-  }
 
   /*
     async downloadWingsCashReport() {
@@ -451,20 +431,38 @@ export class OrderCheckComponent implements OnInit {
 
   }
 
+  async downloadWingsReport(yearMonthNumber: number = this.wingsExportYearMonth) {
+    let me = this
+
+    let alteaDb = new AlteaDb(this.objSvc)
+
+    let wingsReporting = new WingsReporting(alteaDb)
+
+    let yearMonth = YearMonth.parse(yearMonthNumber)
+
+    let report = await wingsReporting.createYearMonth(yearMonth, me.sessionSvc.branchId)
+
+    var fileName = `month-details-${yearMonth.y}-${yearMonth.m}.csv`
+
+    let csvString = report.toCsv()
+    console.error(csvString)
+
+    const blob = new Blob([csvString], { type: 'application/csv;charset=utf-8' });
+    saveAs(blob, fileName);
+
+  }
 
 
-  async downloadYearReport() {
+  async downloadYearReport(yearMonthNumber: number = this.wingsExportYearMonth) {
     let me = this
 
     let alteaDb = new AlteaDb(this.objSvc)
 
     let wingsReporting = new WingsYearReporting(alteaDb)
 
-    let yearMonth = new YearMonth(2024, 10)
+    let yearMonth = YearMonth.parse(yearMonthNumber)
 
     let report = await wingsReporting.createYear(yearMonth, me.sessionSvc.branchId)
-
-
 
     var fileName = `year-report-${yearMonth.y}-${yearMonth.m}.csv`
 

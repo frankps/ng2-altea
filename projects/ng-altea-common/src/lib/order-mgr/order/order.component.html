@@ -4,9 +4,10 @@
         <div class="row header">
             <div class="col-6 px-3 d-flex align-items-center">
 
-                <i *ngIf="order.src == 'ngApp'" class="fa-solid fa-mobile"></i>
-                <span *ngIf="order.contact"> &nbsp;<a [routerLink]="['/aqua/contacts/',order.contact.id]"
+                <i *ngIf="order.src == 'ngApp'" class="fa-solid fa-mobile me-2"></i>
+                <span *ngIf="order.contact"><a [routerLink]="['/aqua/contacts/',order.contact.id]"
                         style="text-decoration: none; color: inherit;">{{order.contact.name}}</a></span>
+                <span *ngIf="!order.contact">{{order.for}} <i class="fa-solid fa-user-slash ms-1"></i></span>
 
             </div>
             <div class="col-6 px-3 d-flex justify-content-end align-items-center">
@@ -43,14 +44,25 @@
         <div class="row">
             <div class="col-8">
 
-                <ng-container *ngIf="show.contact && order.contact">
+                <ng-container *ngIf="show.contact">
 
-                    <div class="row" *ngIf="order.contact.mobile">
-                        <div class="col">{{order.contact.mobile}}</div>
-                    </div>
-                    <div class="row">
-                        <div class="col" *ngIf="order.contact.email"><small>{{order.contact.email}}</small></div>
-                    </div>
+                    <ng-container *ngIf="order.contact">
+                        <div class="row" *ngIf="order.contact.mobile">
+                            <div class="col">{{order.contact.mobile}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col" *ngIf="order.contact.email"><small>{{order.contact.email}}</small></div>
+                        </div>
+                    </ng-container>
+
+                    <ng-container *ngIf="!order.contact">
+                        <div class="row" *ngIf="order.mobile">
+                            <div class="col">{{order.mobile}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col" *ngIf="order.email"><small>{{order.email}}</small></div>
+                        </div>
+                    </ng-container>
 
                 </ng-container>
 
@@ -203,7 +215,7 @@
             </div>
 
 
-<!--             <div class="row">
+            <!--             <div class="row">
                 <div class="col">{{line.product?.isSubscription()}}</div>
                 <div class="col">{{line.subscriptionsCreated()}}</div>
             </div> -->

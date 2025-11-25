@@ -232,6 +232,11 @@ export class DateRange<T = any> {
         this.to = dateFns.addSeconds(this.to, seconds)
     }
 
+    shiftWithSeconds(seconds: number) {
+        this.from = dateFns.addSeconds(this.from, seconds)
+        this.to = dateFns.addSeconds(this.to, seconds)
+    }
+
     
     getBorders(): DateBorder[] {
 

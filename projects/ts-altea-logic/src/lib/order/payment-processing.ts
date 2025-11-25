@@ -3,7 +3,7 @@
 //import { PrismaClient, Organisation as OrganisationModel, Prisma } from '@prisma/client'
 import { ApiBatchItemResult, ApiBatchProcess, ApiBatchResult, ApiListResult, ApiResult, ApiStatus, ArrayHelper, DbObjectCreate, DbObjectMulti, DbQueryTyped, ManagedObject, ObjectHelper, ObjectWithId, QueryOperator } from 'ts-common';
 import { plainToClass, instanceToPlain, plainToInstance } from "class-transformer"
-import { CanUseGift, Gift, LoyaltyCardChange, LoyaltyRewardType, Message, MsgType, Order, OrderLine, Payment, PaymentType, Subscription } from 'ts-altea-model';
+import { CanUseGift, Gift, LoyaltyCardChange, LoyaltyRewardType, Message, MsgType, Order, OrderLine, Payment, PaymentType, PaymentJson, Subscription } from 'ts-altea-model';
 import { AlteaDb } from '../general/altea-db';
 import { IDb } from '../interfaces/i-db';
 
@@ -202,6 +202,9 @@ export class PaymentProcessing {
                 if (subscription.usedQty >= subscription.totalQty) {
                     subscription.act = false
                 }
+
+                // keep track of subscription quantities in payment
+                subsPayment.json = PaymentJson.subscriptionInfo(subscription.usedQty, subscription.totalQty)
 
                 subscriptionsToUpdate.push(subscription)
 

@@ -12,7 +12,7 @@ import { DetermineReservationOptions } from './reservation/determine-reservation
 import * as dateFns from 'date-fns'
 import * as Handlebars from "handlebars"
 import * as _ from "lodash"
-import { ArrayHelper, HtmlTable } from 'ts-common'
+import { ArrayHelper, HtmlTable, StringHelper } from 'ts-common'
 
 
 
@@ -160,9 +160,17 @@ export class OrderCronJobs {
 
 
             let appOrders = await me.alteaDb.getAppOrdersToCleanup()
-            await this.doOrderCleanup(appOrders, html, cleanup)
 
-            let allOrders = [...posOrders, ...appOrders]
+
+            /** free orders (free test sessions BodySculptor...): we need at least some contact info */
+            let appOrdersFree = appOrders.filter(o => o.paid == 0 && o.incl == 0 && StringHelper.isEmptyOrSpaces(o.for) && StringHelper.isEmptyOrSpaces(o.contactId));
+            await this.doOrderCleanup(appOrdersFree, html, cleanup)
+
+            /** paying orders: we need a payment! */
+            let appOrdersNonFree = appOrders.filter(o => o.paid == 0 && o.incl > 0);
+            await this.doOrderCleanup(appOrdersNonFree, html, cleanup)
+
+            let allOrders = [...posOrders, ...appOrdersFree, ...appOrdersNonFree]
 
             if (ArrayHelper.IsEmpty(allOrders)) {
                 html.addRow(['<h3>Geen orders om te cleanen!</h3>'])

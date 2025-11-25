@@ -120,6 +120,10 @@ export class SessionService implements OnInit {
   init(environment: any) {
     this.backend = environment.backend
     this.localServer = environment.localServer
+
+
+    if (this.backend.includes('localhost'))
+      this.stripEnvironment = 'test'
   }
 
   get stripeTest(): boolean {

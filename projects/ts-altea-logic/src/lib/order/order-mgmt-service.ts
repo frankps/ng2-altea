@@ -661,7 +661,7 @@ export class OrderMgmtService {
                 console.error(`Resource not found for requestItem ${requestItem}`)
                 continue
             }
-                
+
 
             const resPlan = new ResourcePlanning()
 
@@ -810,7 +810,7 @@ export class OrderMgmtService {
         let specialRanges = [[20251027, 20251102], [20251111, 20251111], [20251222, 20260104], [20260216, 20260222], [20260216, 20260222], [20260406, 20260419], [20260501, 20260501], [20260514, 20260515], [20260525, 20260525]]
 
         for (let range of specialRanges) {
-              if (dateNum >= range[0] && dateNum <= range[1])
+            if (dateNum >= range[0] && dateNum <= range[1])
                 return true
         }
 
@@ -852,7 +852,7 @@ export class OrderMgmtService {
 
         for (let price of product.prices) {
 
-            
+
             if (!price.on)
                 continue
 
@@ -864,6 +864,11 @@ export class OrderMgmtService {
 
             if (price.start) {
                 if (creationDate < price.startDate)
+                    continue
+            }
+
+            if (price.end) {
+                if (creationDate > price.endDate)
                     continue
             }
 
@@ -902,25 +907,47 @@ export class OrderMgmtService {
 
                 const skipAfter = dateFns.subHours(startDate, price.skipLast)
 
-                if (skipAfter <= now )  // && now < startDate
+                if (skipAfter <= now)  // && now < startDate
                     continue
 
 
             }
 
+
+
             switch (price.mode) {
                 case PriceMode.add:
 
-                    let priceChange = new PriceChange()
-                    priceChange.tp = PriceChangeType.price
-                    priceChange.val = price.value
-                    priceChange.info = price.title
-                    priceChange.id = price.id
-                    priceChange.pct = false
+                    
+                    {
+                        let priceChange = new PriceChange()
+                        priceChange.tp = PriceChangeType.price
+                        priceChange.val = price.value
+                        priceChange.info = price.title
+                        priceChange.id = price.id
+                        priceChange.promo = price.isPromo
+                        priceChange.pct = false
 
-                    orderLine.pc.push(priceChange)
+                        orderLine.pc.push(priceChange)
 
+                        
+                    }
                     break
+
+                case PriceMode.pct:
+                    {
+                        let priceChange = new PriceChange()
+                        priceChange.tp = PriceChangeType.price
+                        priceChange.val = price.value
+                        priceChange.info = price.title
+                        priceChange.id = price.id
+                        priceChange.promo = price.isPromo
+                        priceChange.pct = true
+
+                        orderLine.pc.push(priceChange)
+                    }
+                    break
+
             }
 
             if (price.skip)

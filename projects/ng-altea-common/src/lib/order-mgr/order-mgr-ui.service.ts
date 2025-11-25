@@ -20,7 +20,8 @@ import { Router } from '@angular/router';
 export enum OrderUiState {
   demoOrders = 'demo-orders',
   browseCatalog = 'browse-catalog',
-  requestInvoice = 'request-invoice'
+  requestInvoice = 'request-invoice',
+  selectDate = 'select-date'
 }
 
 export enum OrderUiMode {
@@ -121,6 +122,11 @@ export class OrderMgrUiService {   // implements OnInit
 
 
   slugProduct: Product
+
+  /** true if we should show the product info during planning: date & time selections
+   * 
+   */
+  showOrderSummaryPlanning: boolean = false
 
   constructor(private productSvc: ProductService, private orderSvc: OrderService, private orderMgrSvc: OrderMgrService
     , protected spinner: NgxSpinnerService, public dbSvc: ObjectService, public alteaSvc: AlteaService, protected sessionSvc: SessionService,
@@ -374,6 +380,8 @@ export class OrderMgrUiService {   // implements OnInit
     this.giftNotFound = false
 
     this.canForce = false
+
+    this.showOrderSummaryPlanning = false
 
     if (this.interval)
       clearInterval(this.interval)
@@ -835,6 +843,7 @@ export class OrderMgrUiService {   // implements OnInit
 
   async getAvailabilities() {
 
+
     // just for debugging
     /*     this.options = ReservationOptionSet.createDummy().options
         console.error(this.options)
@@ -867,7 +876,9 @@ export class OrderMgrUiService {   // implements OnInit
     this.availabilityResponse = null
     this.optionSet = null
 
+
     this.availabilityResponse = await this.alteaSvc.availabilityService.process(request)
+
 
 
     if (this.availabilityResponse?.optionSet?.options) {

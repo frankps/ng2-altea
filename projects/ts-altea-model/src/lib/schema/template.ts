@@ -472,6 +472,22 @@ export class Template extends ObjectWithParameters {
     const headerImage = `<img width='600' class='max-width' style='display:block;color:#000000;text-decoration:none;font-family:Helvetica, arial, sans-serif;font-size:16px;max-width:100% !important;width:100%;height:auto !important;' alt='' src='https://marketing-image-production.s3.amazonaws.com/uploads/17ae7951ff4ef38519fa1a715981599a402f7e4d4b05f8508a5bdf2ff5f738656a4b382fde86d71f28e68b0f9b2124d322ce2b1afdd6028244e8ce986823557f.jpg' border='0'>
 <div>&nbsp;</div>`
 
+    let contactFullName = ''
+    let contactFirstName = ''
+
+    if (order.contact) {
+      contactFullName = order.contact.name
+      contactFirstName = order.contact.first
+    } else {
+      contactFullName = order.for
+
+      if (order.for) {
+        contactFirstName = order.for.split(' ')[0]
+      }
+
+      
+    }
+
     const replacements = {
       'app-url': appUrl,
       'header-image': headerImage,
@@ -483,8 +499,8 @@ export class Template extends ObjectWithParameters {
       'deposit-time': order.depositTime(),
       'deposit-date': order.depositDate(),
       // term: this.getTerm_old(order),
-      'first': order?.contact?.first,
-      'name': order?.contact?.name,
+      'first': contactFirstName,
+      'name': contactFullName,
       'order-id': order?.id,
       'start-date': order.startDateFormat(),
       'order-lines-html': order.sumToString(),

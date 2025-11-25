@@ -33,6 +33,7 @@
     "move": "Verplaatsen",
     "months": "maanden",
     "name": "Naam",
+    "full-name": "Naam: voornaam + achternaam",
     "gender": "Geslacht",
     "duration": "Duurtijd",
     "durationMin": "Duurtijd in minuten",

@@ -33,6 +33,7 @@
     "move": "Verplaatsen",
     "months": "maanden",
     "name": "Naam",
+    "full-name": "Naam: voornaam achternaam",
     "gender": "Geslacht",
     "duration": "Duurtijd",
     "durationMin": "Duurtijd in minuten",
@@ -178,9 +179,9 @@
     },
     "task-priority": {
       "0": "Niet dringend",
-      "10": "Normaal",
-      "20": "Zo snel mogelijk",
-      "30": "Dringend"
+      "100": "Normaal",
+      "200": "Zo snel mogelijk",
+      "300": "Dringend"
     },
     "task-schedule": {
       "once": "Eénmalig",
@@ -1159,6 +1160,8 @@
     },
     "productItem": {
       "optionQty": "Aantal via product optie",
+      "productPrice": "qty x salesPrice",
+      "optionPrice": "Product optie prijzen",
       "option": {
         "mode": "Selectie mode"
       }
@@ -1239,6 +1242,8 @@
       "to": "Tot (hh:mm)",
       "giftOpt": "Cadeaubon optie",
       "hasPeriods": "Prijs geldig gedurende specifieke periodes",
+      "auto": "Automatisch toepassen",
+      "posOnly": "Enkel in winkel",
       "help": {
         "price": "Prijs per behandeling"
       }

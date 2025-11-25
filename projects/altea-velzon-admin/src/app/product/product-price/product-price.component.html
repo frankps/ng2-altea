@@ -575,7 +575,7 @@
   </div>
 
   <ng-container *ngIf="object.hasConditions()">
-    <ng-container *ngFor="let condition of object.cond">
+    <ng-container *ngFor="let condition of object.cond; let idx = index">
 
       <div class="row mt-2">
         <div class="col-4">
@@ -589,6 +589,8 @@
         </div>
         <div class="col-2">
           <i class="fa-solid fa-pen-circle" (click)="editCondition(condition)"></i>
+
+          <i class="fas fa-trash float-end me-3" (click)="deleteCondition(condition, idx)"></i>
         </div>
       </div>
 

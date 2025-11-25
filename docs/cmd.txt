@@ -155,6 +155,7 @@ ng generate component order-mgr/debug-plannings --project ng-altea-common
 ng generate component order-mgr/cancel-order --project ng-altea-common
 ng generate component order-mgr/debug-messaging --project ng-altea-common
 
+ng generate component order-mgr/order-inline-contact --project ng-altea-common
 
 ng generate component order-mgr/voucher --project ng-altea-common
 

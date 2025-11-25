@@ -4,7 +4,7 @@
     Maak eerst een order met een klant.
 </p>
 
-<div class="card" *ngIf="orderMgrUiSvc.order?.contact">
+<div class="card" *ngIf="orderMgrUiSvc.order?.contact || orderMgrUiSvc.order?.mobile || orderMgrUiSvc.order?.email">
     <div class="card-body">
 
         <div class="row">
@@ -24,11 +24,11 @@
             </div>
 
             <div class="col-3">
-                <button type="button" class="btn btn-primary btn-sm" (click)="sendEmail(code)">Email</button>
+                <button type="button" class="btn btn-primary btn-sm" *ngIf="orderMgrUiSvc.order?.contact || orderMgrUiSvc.order?.email" (click)="sendEmail(code)">Email</button>
             </div>
 
             <div class="col-3">
-                <button type="button" class="btn btn-primary btn-sm" (click)="sendWhatsApp(code)">WhatsApp</button>
+                <button type="button" class="btn btn-primary btn-sm" *ngIf="orderMgrUiSvc.order?.contact || orderMgrUiSvc.order?.mobile" (click)="sendWhatsApp(code)">WhatsApp</button>
 
                 <!-- testWhatsAppTemplate_old() -->
 

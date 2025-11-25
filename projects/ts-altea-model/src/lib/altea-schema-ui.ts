@@ -10,7 +10,7 @@
 import { Type } from "class-transformer"
 import { ArrayHelper, DateHelper, ObjectWithId } from "ts-common"
 import * as _ from "lodash";
-import { OrderLineOptionValue, PlanningType, Resource, ResourcePlanning, ResourceType, OrderLineOption, OrderLine, OrderState, Contact, Order, Task } from "ts-altea-model";
+import { OrderLineOptionValue, PlanningType, Resource, ResourcePlanning, ResourceType, OrderLineOption, OrderLine, OrderState, Contact, Order, Task, PaymentType, PaymentJson, Payment } from "ts-altea-model";
 
 export class ObjectUi {
     id: string
@@ -211,17 +211,45 @@ export class OrderLineUi extends ObjectUi {
     }
 }
 
+export class PaymentUi extends ObjectUi {
+
+    amount: number
+
+    type: PaymentType
+
+    /** extra data about payment (introduced for subscriptions) */
+    @Type(() => PaymentJson)
+    json?: PaymentJson
+
+    static fromPayment(payment: Payment): PaymentUi {
+        if (!payment)
+            return null
+
+        const paymentUi = new PaymentUi()
+        paymentUi.id = payment.id
+        paymentUi.amount = payment.amount
+        paymentUi.type = payment.type
+        paymentUi.json = payment.json
+
+        return paymentUi
+    }
+}
+
 /**
  * OrderUi was initially created to show Orders in the calendar,
  * but later on it is "abused" to show also tasks & breaks, ...
  */
 export class OrderUi extends ObjectUi {
 
+
     @Type(() => ContactUi)
     contact: ContactUi
 
     @Type(() => OrderLineUi)
     lines: OrderLineUi[] = []
+
+    @Type(() => PaymentUi)
+    payments: PaymentUi[] = []
 
     @Type(() => ResourcePlanningUi)
     planning: ResourcePlanningUi[] = []
@@ -342,13 +370,17 @@ export class OrderUi extends ObjectUi {
         if (order.info?.vouchers) {
             orderUi.vouchers = order.info.vouchers
         }
-            
 
-        if (order.contact)
-            orderUi.contact = ContactUi.fromContact(order.contact)
+        let contact = order.getContact()
+
+        if (contact)
+            orderUi.contact = ContactUi.fromContact(contact)
 
         if (ArrayHelper.NotEmpty(order.lines))
             orderUi.lines = order.lines.map(line => OrderLineUi.fromOrderLine(line))
+
+        if (ArrayHelper.NotEmpty(order.payments))
+            orderUi.payments = order.payments.map(payment => PaymentUi.fromPayment(payment))
 
         if (ArrayHelper.NotEmpty(order.planning))
             orderUi.planning = order.planning.map(plan => ResourcePlanningUi.fromResourcePlanning(plan))

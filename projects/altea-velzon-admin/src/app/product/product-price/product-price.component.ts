@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { DaysOfWeekShort, OptionPrice, Price, PriceCondition, PriceMode, Product, ProductOption } from 'ts-altea-model'
 import { TranslationService } from 'ng-common'
-import { Translation } from 'ts-common'
+import { ArrayHelper, Translation } from 'ts-common'
 import { th } from 'date-fns/locale';
 import * as _ from "lodash";
 
@@ -53,6 +53,15 @@ export class ProductPriceComponent implements OnInit {
       this.conditionInEdit = condition
     else
       this.conditionInEdit = null
+  }
+
+  deleteCondition(condition: PriceCondition, idx: number) {
+
+    if (ArrayHelper.IsEmpty(this.object.cond))
+      return
+
+    this.object.cond.splice(idx, 1)
+
   }
 
   addCondition(newCondition: PriceCondition) {

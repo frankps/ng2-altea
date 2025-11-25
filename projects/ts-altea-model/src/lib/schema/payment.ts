@@ -208,6 +208,29 @@ export class Payments {
 
 }
 
+export class PaymentSubscriptionJson {
+  turn?: number
+  total?: number
+}
+
+/** Extra information about payment, introduced for subscriptions (keep track of turns & total quantity) */
+export class PaymentJson {
+
+  @Type(() => PaymentSubscriptionJson)
+  sub?: PaymentSubscriptionJson
+
+  static subscriptionInfo(turn: number, total: number): PaymentJson {
+    let subscriptionInfo = new PaymentSubscriptionJson()
+    subscriptionInfo.turn = turn
+    subscriptionInfo.total = total
+
+    let paymentJson = new PaymentJson()
+    paymentJson.sub = subscriptionInfo
+
+    return paymentJson
+  } 
+}
+
 export class Payment extends ObjectWithIdPlus {
 
   static cash(amount: number): Payment {
@@ -281,6 +304,10 @@ export class Payment extends ObjectWithIdPlus {
 
   /** valid: used for gift payments, true if corresponding gift was processed (proc=true) & operation was successfully */
   vld: boolean = false
+
+  /** extra data about payment (introduced for subscriptions, to keep track of turns & total quantity) */
+  @Type(() => PaymentJson)
+  json?: PaymentJson
 
   constructor() {
     super()

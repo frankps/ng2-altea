@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { ApiListResult, ArrayHelper, DbQuery, DbQueryTyped, ObjectHelper, QueryOperator } from 'ts-common'
-import { AvailabilityRequest, Order, AvailabilityContext, Resource, ResourcePlanning, ResourceType, Schedule, SchedulingType, DateRangeSet, ResourcePlannings, BranchModeRange, DateRange, PlanningType } from 'ts-altea-model'
+import { ApiListResult, ArrayHelper, DateHelper, DbQuery, DbQueryTyped, ObjectHelper, QueryOperator } from 'ts-common'
+import { AvailabilityRequest, Order, AvailabilityContext, Resource, ResourcePlanning, ResourceType, Schedule, SchedulingType, DateRangeSet, ResourcePlannings, BranchModeRange, DateRange, PlanningType, ScheduleRecurrence } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { AlteaDb } from '../../general/altea-db'
 import { IDb } from '../../interfaces/i-db'
 import * as _ from "lodash";
+import * as dateFns from 'date-fns'
 
 export class CreateAvailabilityContext {
     alteaDb: AlteaDb
@@ -126,7 +127,7 @@ export class CreateAvailabilityContext {
 
         const resourceIdsWithCustomSchedules = resourcesWithCustomSchedules.map(r => r.id!)
         //resourceIdsWithCustomSchedules.push(ctx.branchId)
-        ctx.schedules = await this.loadSchedules(resourceIdsWithCustomSchedules, ctx.allResources)    // this.alteaDb.schedules(ctx.allResourceIds)
+        ctx.schedules = await this.loadSchedules(resourceIdsWithCustomSchedules, ctx.allResources, ctx.resourcePlannings, availabilityRequest)    // this.alteaDb.schedules(ctx.allResourceIds)
 
         ctx.scheduleDateRanges = this.createScheduleDateRanges(resourceIdsWithCustomSchedules, ctx.schedules, availabilityRequest.from, availabilityRequest.to, ctx.resourcePlannings)
 
@@ -207,15 +208,96 @@ export class CreateAvailabilityContext {
      * @param resources 
      * @returns 
      */
-    async loadSchedules(resourceIds: string[], resources: Resource[]): Promise<Schedule[]> {
+    async loadSchedules(resourceIds: string[], resources: Resource[], resourcePlannings: ResourcePlannings, availabilityRequest: AvailabilityRequest): Promise<Schedule[]> {
 
         const schedules = await this.alteaDb.schedules(resourceIds)
+
+        this.processRecurrences(schedules, resourcePlannings, availabilityRequest)
 
         this.attachResourcesToSchedules(schedules, resources)
 
         return schedules
     }
 
+    /**
+     * A schedule can be:
+     * - active by default
+     * - active during certain periods (defined via resource plannings)
+     * - active during certain recurrence patters (defined via schedule recurrence) -> new since Nov 2025
+     * 
+     * @param schedules 
+     * @param resourcePlannings 
+     * @param availabilityRequest 
+     */
+    processRecurrences(schedules: Schedule[], resourcePlannings: ResourcePlannings, availabilityRequest: AvailabilityRequest) {
+
+        if (ArrayHelper.NotEmpty(schedules)) {
+            for (const schedule of schedules) {
+
+                // should be configured in UI
+                let hifrDagAfwezig = '6bbe99b0-5c47-4823-924f-2c865cd180d8'
+                if (schedule.id == hifrDagAfwezig) {
+                    schedule.rec = ScheduleRecurrence.getHifrDagAfwezig()
+                }
+
+                this.scheduleRecurrenceToResourcePlannings(schedule, resourcePlannings, availabilityRequest)
+            }
+        }
+
+    }
+
+    /**
+     * Convert schedule recurrence to resource plannings
+     * @param schedule 
+     * @param resourcePlannings 
+     * @param availabilityRequest 
+     */
+
+    scheduleRecurrenceToResourcePlannings(schedule: Schedule, resourcePlannings: ResourcePlannings, availabilityRequest: AvailabilityRequest) {
+
+        if (!schedule?.rec)
+            return
+
+        let from = availabilityRequest.fromDate()
+        let to = availabilityRequest.toDate()
+
+        let weekStarts: Date[]
+
+        for (const recurrence of schedule.rec) {
+            if (!recurrence.act)
+                continue
+
+            if (ArrayHelper.NotEmpty(recurrence.dow)) {
+
+                if (!weekStarts)
+                    weekStarts = DateHelper.getWeekStarts(from, to)
+
+                for (const dow of recurrence.dow) {
+
+                    for (const weekStart of weekStarts) {
+
+                        let planningFrom = dateFns.addDays(weekStart, dow)
+                        let planningTo = dateFns.addDays(planningFrom, 1)
+
+                        let resourcePlanning = new ResourcePlanning()
+                        resourcePlanning.resourceId = schedule.resourceId
+                        resourcePlanning.scheduleId = schedule.id
+                        resourcePlanning.startDate = planningFrom
+                        resourcePlanning.endDate = planningTo
+                        resourcePlanning.type = PlanningType.sch
+                        resourcePlanning.act = true
+                        resourcePlanning.del = false
+
+                        resourcePlannings.plannings.push(resourcePlanning)
+                    }
+
+                }
+
+            }
+
+            // resourcePlannings.add(dateRangeSet)
+        }
+    }
 
 
 
@@ -245,12 +327,13 @@ export class CreateAvailabilityContext {
 
             const resourceSchedules = schedules.filter(s => s.resourceId == resourceId)
 
+            // the default schedule for the resource
             const defaultSchedule = resourceSchedules.find(s => s.default)
 
             let dateRanges = new DateRangeSet()
 
             /** some resources have no default schedule  */
-            if (defaultSchedule)   
+            if (defaultSchedule)
                 dateRanges = defaultSchedule.toDateRangeSet(from, to, 'START', 'END')
 
             const otherSchedules = resourceSchedules.filter(s => !s.default)
@@ -297,21 +380,17 @@ export class CreateAvailabilityContext {
 
     attachResourcesToSchedules(schedules: Schedule[], resources: Resource[]) {
 
-        if (!Array.isArray(resources) || resources.length == 0)
+        if (ArrayHelper.IsEmpty(resources) || ArrayHelper.IsEmpty(schedules))
             return
 
+        for (const schedule of schedules) {
 
-        if (Array.isArray(schedules) && schedules.length > 0) {
-
-            for (const schedule of schedules) {
-
-                if (schedule.resourceId) {
-                    const resource = resources.find(r => r.id == schedule.resourceId)
-                    schedule.resource = resource
-                }
+            if (schedule.resourceId) {
+                const resource = resources.find(r => r.id == schedule.resourceId)
+                schedule.resource = resource
             }
-
         }
+
     }
 
 

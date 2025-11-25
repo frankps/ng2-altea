@@ -1260,6 +1260,9 @@ export class Price extends ObjectWithIdPlus {
     this.initDays()
     // this.start = new Date()
     // this.end = new Date()
+
+    this.startDate = new Date()
+    this.endDate = dateFns.addMonths(this.startDate, 1) 
   }
 
 
@@ -1311,7 +1314,7 @@ export class Price extends ObjectWithIdPlus {
 
     if (value) {
       this.start = DateHelper.yyyyMMdd(value) * 1000000  // * 1000000 because we don't care about hhmmss
-      this._startDate = null
+      this._startDate = value
     }
     else {
       this.start = null
@@ -1361,7 +1364,7 @@ export class Price extends ObjectWithIdPlus {
 
     if (value) {
       this.end = DateHelper.yyyyMMdd(value) * 1000000
-      this._endDate = null
+      this._endDate = value
     }
     else
       this.end = null

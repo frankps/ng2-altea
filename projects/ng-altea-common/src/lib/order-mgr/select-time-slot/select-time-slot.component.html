@@ -4,7 +4,7 @@
     <div class="card">
         <div class="card-header"><span translate>ui.order-mgr.select-time-slot.title</span>
             {{orderMgrSvc.availabilityRequestFromDate() | date:"dd/MM/yy" }}:</div>
-        <!--  {{}} -->
+       
         <div class="card-body">
 
             <span *ngIf="!orderMgrSvc.hasOptions()" translate>ui.order-mgr.select-time-slot.no-slots</span>

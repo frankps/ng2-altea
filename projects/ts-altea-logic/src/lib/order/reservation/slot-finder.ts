@@ -167,7 +167,8 @@ export class SlotFinder {
 
                 let possibleDateRanges = DateRangeSet.empty
 
-                let duration = firstRequestItem.durationInSeconds()
+
+                let duration = firstRequestItem.durationInSeconds() 
 
                 /** Marie is faster then other employees for certain services => we need to take this into account.
                  *  We need to make this code more general (setting coming from DB)
@@ -211,6 +212,13 @@ export class SlotFinder {
 
                 // we reduce by the duration because we want interval with possible start dates
                 availableRange.increaseToWithSeconds(-duration)
+
+                /*
+                let offsetSeconds = firstRequestItem.offsetInSeconds()
+
+                if (offsetSeconds != 0)
+                    availableRange.shiftWithSeconds(-offsetSeconds)
+                */
 
                 if (availableRange.to < availableRange.from)
                     continue

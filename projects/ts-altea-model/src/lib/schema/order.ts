@@ -181,6 +181,10 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
   /** name of contact (to reduce external joins with contact table) */
   for?: string
 
+  /** in case user did not login */
+  email?: string
+  mobile?: string
+
   /** name(s) of staff */
   staff?: string
 
@@ -306,7 +310,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
   @Type(() => LoyaltyCardChange)
   loyalty?: LoyaltyCardChange[]
 
-  
+
 
   /** Order needs special attention (use privNote for more details) */
   attn: boolean = false
@@ -1028,7 +1032,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
   }
 
   /** add voucher to order, returns true if voucher was added (false in case of voucher already existing)*/
-  addVoucher(voucher: string) : boolean {
+  addVoucher(voucher: string): boolean {
     if (!this.info?.vouchers)
       this.info.vouchers = []
 
@@ -1108,6 +1112,34 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
   nextOrderLineIdx() {
     return ObjectHelper.nextIdx(this.lines)
+  }
+
+  /** returns the contact for this order (can be linked contact or inline contact => temp contact created on the fly) */
+  getContact() : Contact {
+
+    if (this.contact)
+      return this.contact
+    else {
+      let inlineContact = this.inlineContact()
+      return inlineContact
+    }
+
+  }
+
+  /** when a user was not logged in, contact info can be in order (inline contact) */
+  inlineContact(): Contact {
+
+    if (!this.for)
+      return undefined
+
+    let contact = new Contact()
+
+    contact.id = sc['spinalcase'](this.for)
+    contact.name = this.for
+    contact.email = this.email
+    contact.mobile = this.mobile
+
+    return contact
   }
 
   addLine(orderLine: OrderLine, setUnitPrice = true) {
@@ -1405,7 +1437,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     /** user can have a reduction (caused by a voucher) */
     let reductionFactor = 1
 
-    if (this.reduPct) 
+    if (this.reduPct)
       reductionFactor = 1 - this.reduPct / 100
 
     let calculatedVatLines = Array.from(vatMap.values())
@@ -1415,8 +1447,8 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
       if (reductionFactor != 1) {
         vatLine.vat = vatLine.vat * reductionFactor
-        vatLine.excl  = vatLine.excl  * reductionFactor
-        vatLine.incl  = vatLine.incl  * reductionFactor
+        vatLine.excl = vatLine.excl * reductionFactor
+        vatLine.incl = vatLine.incl * reductionFactor
       }
 
       vatLine.vat = _.round(vatLine.vat, 2)
@@ -1504,7 +1536,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     vat = NumberHelper.round(vat)
     incl = NumberHelper.round(incl)
     excl = NumberHelper.round(excl)
-      
+
 
     if (incl != this.incl) {
       this.incl = incl
@@ -1778,8 +1810,15 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
     const personSelectLines = this.personSelectLines()
 
+    if (ArrayHelper.IsEmpty(personSelectLines))
+      return false
+
+
+    const total = personSelectLines.reduce((sum, line) => sum + line.qty * line.nrPers, 0)
+
+
     // ol.qty
-    const total = _.sumBy(personSelectLines, 'qty')
+   // const total = _.sumBy(personSelectLines, 'qty')
 
     return (total > 1)
   }
@@ -1788,18 +1827,18 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     if (this.gift || !this.hasLines())
       return []
 
-    const personSelectLines = this.lines?.filter(ol => ol.product?.type == ProductType.svc && ol.product?.personSelect)
+    const personSelectLines = this.lines?.filter(ol => ol.product?.type == ProductType.svc && (ol.product?.personSelect || ol.product?.customers > 1))
 
     return personSelectLines
   }
 
   getPersonIdNotSelected(alreadySelected: string[]): string {
-    
+
     if (ArrayHelper.IsEmpty(alreadySelected))
       alreadySelected = []
 
     let personIds = this.persons.map(p => p.id)
-    
+
     let notSelected = personIds.filter(id => !alreadySelected.includes(id))
 
     if (ArrayHelper.NotEmpty(notSelected))

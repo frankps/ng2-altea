@@ -2,8 +2,16 @@
  -->
 
 <div class="card">
-    <div class="card-header" translate>
-        ui.order-mgr.select-date.title
+    <div class="card-header">
+
+        <b translate>ui.order-mgr.select-date.title</b>
+
+        <div class="row mt-2" *ngIf="orderSummary">
+            <div class="col d-flex justify-content-center">
+                {{orderSummary}}
+            </div>
+        </div>
+
     </div>
     <div class="card-body">
 
@@ -11,12 +19,13 @@
             <div class="col d-flex justify-content-center">
 
                 <bs-datepicker-inline [bsValue]="bsInlineValue" [minDate]="minDate"
-                    (bsValueChange)="dateChanged($event)" [dateCustomClasses]="dateCustomClasses"></bs-datepicker-inline>
+                    (bsValueChange)="dateChanged($event)"
+                    [dateCustomClasses]="dateCustomClasses"></bs-datepicker-inline>
 
             </div>
         </div>
 
-  
+
 
 
     </div>

@@ -571,25 +571,30 @@ export class OrderMessaging extends OrderMessagingBase {
                         continue
                     }
 
-                    let contact = order.contact
+                    let contact = await order.getContact()
 
                     if (!contact.entry) {
 
                         contact.entry = ObjectHelper.createRandomNumberString(4)
-                        let contactId = contact.id
-                        let dbObj = new DbObject<Contact>('contact', Contact, { id: contactId, entry: contact.entry })
 
-                        const updatedResult = await this.alteaDb.db.update$<Contact>(dbObj)
+                        if (order.contact) {
+                            let contactId = contact.id
+                            let dbObj = new DbObject<Contact>('contact', Contact, { id: contactId, entry: contact.entry })
 
-                        if (updatedResult.status != ApiStatus.ok) {
-                            let msg = `Could not set entry code '${contact.entry}' for contact ${contact.name}`
-                            cols.push(msg)
-                            continue
+                            const updatedResult = await this.alteaDb.db.update$<Contact>(dbObj)
+
+                            if (updatedResult.status != ApiStatus.ok) {
+                                let msg = `Could not set entry code '${contact.entry}' for contact ${contact.name}`
+                                cols.push(msg)
+                                continue
+                            }
+
+                            console.log(updatedResult)
                         }
+
 
                         //contact.entry = updatedResult.object
 
-                        console.log(updatedResult)
                     }
 
                     let newOrderTags = []
@@ -608,7 +613,10 @@ export class OrderMessaging extends OrderMessagingBase {
 
                         let template = templatesByType.get(msgType)
 
-                        let canSend = contact.canSendMessageType(msgType)   //canSendMsg(msgType)
+                        let canSend = true
+
+                        if (order.contact)
+                            contact.canSendMessageType(msgType)   //canSendMsg(msgType)
 
                         if (!canSend) {
                             cols.push(`Cannot send ${msgType}`)
@@ -727,16 +735,16 @@ export class OrderMessaging extends OrderMessagingBase {
 
                 if (!order.contact)
                     continue
-    
+
                 const cols = []
                 table.addRow(cols)
-    
+
                 cols.push(order.for)
                 cols.push(DateHelper.dateToString_DM_HHmm(order.startDate))
                 cols.push(order.state)
                 cols.push(order.incl)
                 cols.push(order.paid)
-    
+
                 let contact = order.contact
 
                 let nrOfDaysSinceLastReview = contact.nrOfDaysSinceLastReview()
@@ -749,30 +757,30 @@ export class OrderMessaging extends OrderMessagingBase {
                 }
 
                 try {
-    
+
                     // we try to send template for different message types (email, whatsapp, ...) that are allowed for the contact
                     let res = await this.sendPossibleTemplates(templates, order.contact, order, branch, true)
-    
+
                     let okCount = ApiResult.countOk(res)
-    
+
                     if (okCount > 0) {
-    
+
                         cols.push(okCount)
-    
+
                         let orderUpdate = new DbObject<Order>('order', Order, { id: order.id, rev: ReviewStatus.requested })
                         const updatedResult = await this.alteaDb.db.update$<Order>(orderUpdate)
                     } else {
                         cols.push('0')
                     }
-    
-    
-    
+
+
+
                 } catch (error) {
-    
+
                     cols.push(`exception: ${error}`)
                 }
-    
-                
+
+
             }
         }
 

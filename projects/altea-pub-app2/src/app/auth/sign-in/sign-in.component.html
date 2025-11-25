@@ -16,16 +16,14 @@
     </ng-container>
     <ng-container *ngSwitchDefault>
 
-
-
-        <div class="row mt-2">
+<!--         <div class="row mt-2">
             <div class="col mx-5 d-flex justify-content-center">
                 <small>Door nu aan te loggen, kan u later uw reservatie verder beheren.</small>
             </div>
 
-        </div>
+        </div> -->
 
-        <div class="row mt-5">
+<!--         <div class="row mt-3">
 
             <div class="col mx-5 d-grid">
                 <button type="button" *ngIf="dashboardLink" class="btn btn-primary" translate (click)="toDashboard()">Dashboard</button>
@@ -38,12 +36,34 @@
 
                 <button type="button" class="btn btn-outline-primary mt-2" [routerLink]="['/', 'auth','email-passwd']">Email</button>
 
-<!--             (click)="signIn('email')"
-                 <button type="button" class="btn btn-outline-primary mt-2" (click)="clearCache()">Clear cache</button> -->
+            </div>
+
+        </div> -->
+
+        <div class="row mt-3">
+
+            <div class="col mx-4 d-grid">
+               
+                <div class="row">
+
+                    <div class="col d-grid px-1">
+                        <button type="button" class="btn btn-outline-primary"
+                        (click)="signIn('facebook')">Facebook</button>
+                    </div>
+
+
+                    <div class="col d-grid px-1">
+                        <button type="button" class="btn btn-outline-primary" (click)="signIn('google')">Google</button>
+                    </div>
+
+
+                    <div class="col d-grid px-1">
+                        <button type="button" class="btn btn-outline-primary" [routerLink]="['/', 'auth','email-passwd']">Email</button>
+                    </div>
+                </div>
             </div>
 
         </div>
-
 
     </ng-container>
 </ng-container>

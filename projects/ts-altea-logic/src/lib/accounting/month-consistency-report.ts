@@ -4,7 +4,7 @@ import * as dateFns from 'date-fns'
 import * as Handlebars from "handlebars"
 import * as _ from "lodash"
 import { BankTransaction, BankTxType, Branch, Invoice, Order, Payment, PaymentInfo, Payments, PaymentType, StripePayout } from 'ts-altea-model'
-import { ApiStatus, ArrayHelper, DateHelper, YearMonth } from 'ts-common'
+import { ApiStatus, ArrayHelper, DateHelper, TypeHelper, YearMonth } from 'ts-common'
 
 
 export class BankTransactionCheckResult {
@@ -102,7 +102,7 @@ export class MonthConsistencyReportBuilder {
   async checkAll(branch: Branch, yearMonth: YearMonth, calculateNoDecl: boolean, resetNoDecl: boolean, fixToInvoice: boolean): Promise<ConsistencyReport> {
 
 
-    let me = this 
+    let me = this
     let report = new ConsistencyReport()
 
     console.warn('checkAll')
@@ -167,7 +167,7 @@ export class MonthConsistencyReportBuilder {
 
     let max = totalsInclCashReturns / 2
 
-    
+
 
     //return result.addMsg(`Max cash payments (/2)= ${max}`)
     if (resetNoDecl) {
@@ -250,6 +250,32 @@ export class MonthConsistencyReportBuilder {
   }
 
 
+  filterOrdersWithPaymentsBetween(orders: Order[], start: number | Date, end: number | Date) : Order[] {
+
+    if (ArrayHelper.IsEmpty(orders))
+      return []
+
+    let startNum: number
+    let endNum: number
+
+    if (TypeHelper.isDate(start))
+        startNum = DateHelper.yyyyMMddhhmmss(start as Date)
+    else
+        startNum = start as number
+
+    if (TypeHelper.isDate(end))
+        endNum = DateHelper.yyyyMMddhhmmss(end as Date)
+    else
+        endNum = end as number
+
+
+
+    let filteredOrders = orders.filter(o => o.payments && o.payments.some(p => p.date >= startNum && p.date < endNum))
+
+    return filteredOrders
+
+  }
+
   /**
    * 
    * @param yearMonth 
@@ -270,7 +296,8 @@ export class MonthConsistencyReportBuilder {
 
     /** all orders invoiced? */
 
-    let ordersInvoiceProblem = await this.alteaDb.getOrdersMissingInvoice(this.branchId)
+    let ordersInvoiceProblem = await this.alteaDb.getOrdersMissingInvoice(this.branchId, start)
+    ordersInvoiceProblem = this.filterOrdersWithPaymentsBetween(ordersInvoiceProblem, start, end)
 
     if (ArrayHelper.NotEmpty(ordersInvoiceProblem)) {
 
@@ -325,13 +352,13 @@ export class MonthConsistencyReportBuilder {
             order.toInvoice = false
             ordersToUpdate.push(order)
           }
-            
+
         }
 
         if (!orderInvoiceOk) {
 
           let createdAt = dateFns.format(order.cre, 'dd/MM/yy')
-          result.addMsg(`${order.for} created at ${createdAt} has ${extraInfo}... (${order.id})`)
+          result.addMsg(`${order.for} created at ${createdAt} has ${extraInfo}...`, order)
 
         }
 
@@ -371,7 +398,7 @@ export class MonthConsistencyReportBuilder {
       }
 
       if (!order.toInvoice || !order.invoiced) {
-        result.addMsg(`corresponding order for '${gift.code}' invoiced? toInvoice=${order.toInvoice} invoiced=${order.invoiced} invoiceNum=${order.invoiceNum} id=${order.id}`)
+        result.addMsg(`corresponding order for '${gift.code}' invoiced? toInvoice=${order.toInvoice} invoiced=${order.invoiced} invoiceNum=${order.invoiceNum}`, order)
       }
 
     }

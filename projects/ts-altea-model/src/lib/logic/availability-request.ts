@@ -28,6 +28,10 @@ export class AvailabilityRequest {
         return DateHelper.parse(this.from)
     }
 
+    toDate() {
+        return DateHelper.parse(this.to)
+    }
+
     constructor(order?: Order) {
         this.order = order
 

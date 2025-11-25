@@ -41,9 +41,7 @@ export class UserSelectComponent implements OnInit {
   async selectUser(humanResource: Resource, modal: any) {
 
 
-    
-
-    if (humanResource?.id && !this.sessionSvc.hasRole('admin')) {
+    if (humanResource?.id && humanResource?.short != 'Hilde' && !this.sessionSvc.hasRole('admin')) {
       var staffCheckedIn = await this.planningSvc.staffCheckedIn(humanResource.id)
 
       if (!staffCheckedIn) {

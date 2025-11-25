@@ -76,7 +76,15 @@ export class ProductReporting {
         let bodySculptorReveal30MinAbo = '4154961f-1cf0-4d77-a266-b2b3476f8662'
         let bodySculptorReveal45MinAbo = '4bfccc8b-aae8-469c-965c-e7e6afde932e'
 
-        let productIds = [revealTestBeurt, revealLightTestBeurt, bodySculptorAbo, bodySculptorReveal30MinAbo, bodySculptorReveal45MinAbo]
+        let laserTestBeurt = 'c513fabd-b5d2-47b5-80a8-e31e9d9a10f0'
+        let laserMan = '8c88aaab-35b8-4268-a6bc-1905fe961a05'
+        let laserVrouw = '1f382a5e-fd24-445a-859f-381d403fbea7'
+        let peelingKuur = 'a6e41432-fcc5-419c-b284-61fc55fd71e7'
+        let huidAnalyse = 'db4ab338-0fc2-4c76-910a-78da721de37e'
+        let bodyslimmingTest ='4116c908-91bc-4f6e-9df0-a2021f08145c'
+        let bodyslimmingAbo = 'b0f9ecb6-d9b7-4e81-ad65-4e078683a5ab'
+
+        let productIds = [revealTestBeurt, revealLightTestBeurt, bodySculptorAbo, bodySculptorReveal30MinAbo, bodySculptorReveal45MinAbo,laserTestBeurt,laserMan,laserVrouw,peelingKuur,huidAnalyse,bodyslimmingTest,bodyslimmingAbo]
 
         let orders = await this.getProductReport(branchId, startDate, endDate, productIds)
 

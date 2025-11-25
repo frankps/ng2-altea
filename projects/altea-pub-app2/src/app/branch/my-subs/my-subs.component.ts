@@ -64,6 +64,7 @@ export class MySubsComponent implements OnInit {
       const payment = await this.orderMgrSvc.addPayment(this.orderMgrSvc.order.incl, PaymentType.subs, 'app')
       payment.subsId = subscription.id
       payment.info = `Beurt ${turn} van ${subscription.totalQty}`
+
     }
 
     await this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'orderMode', 'select-date'])

@@ -124,6 +124,8 @@ export class IntPhoneEditComponent {
 
     if (this.checkPhone())
       this.phoneChange.emit(fullNum)
+    else
+      this.phoneChange.emit(null)
 
     return fullNum
   }

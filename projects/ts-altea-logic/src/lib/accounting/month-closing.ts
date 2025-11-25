@@ -270,7 +270,7 @@ export class MonthClosing {
                 }
 
                 if (shouldDeclareTax && [6, 12, 21].indexOf(line.vatPct) == -1) {
-                    orderCheck.add(OrderCheckItemType.lineVatError, `correct vat%: ${line.vatPct} ?`)
+                    orderCheck.add(OrderCheckItemType.lineVatError, `correct vat%: ${line.descr || line.product?.name} ${line.vatPct} ?`)
                 }
 
                 orderIncl += line.incl

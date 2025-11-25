@@ -45,7 +45,7 @@ export class OrderMessagingBase {
         /** if types (email, sms, wa=WhatsApp) are not specified explicitly, then we use preferred contact message types */
         if (ArrayHelper.IsEmpty(types)) {
 
-            types = order.contact.msg
+            types = order?.contact?.msg
 
             // SMS not supported yet!
             this.removeSms(types)
@@ -55,7 +55,7 @@ export class OrderMessagingBase {
         if (ArrayHelper.IsEmpty(types)) {
 
             console.warn(`Contact has no preffered types specified: fall-back to email`)
-            types = [MsgType.email]
+            types = [MsgType.email, MsgType.wa]
         }
 
         // this can return different templates for email, sms, whatsapp
@@ -211,7 +211,7 @@ export class OrderMessagingBase {
         if (!order.msg) // messaging disabled for order
             return ApiResult.warning('Messaging disabled for order!')
 
-        const contact = order.contact
+        const contact = order.getContact()
 
         if (!contact?.mobile)
             return ApiResult.error(`Can't send Whatsapp: contact has no mobile number`)
@@ -252,7 +252,7 @@ export class OrderMessagingBase {
         if (!branch.emailFrom)
             return ApiResult.error(`Branch 'emailFrom' missing`)
 
-        const contact = order.contact
+        let contact = order.getContact()
 
         if (!contact?.email)
             return ApiResult.error(`Can't send email: contact has no email address`)
@@ -291,14 +291,15 @@ export class OrderMessagingBase {
         if (!order.msg) // messaging disabled for order
             return ApiResult.warning('Messaging disabled for order!')
 
-        const contact = order.contact
+        const contact = order.getContact()
 
         if (!contact?.mobile)
             return ApiResult.error(`Can't send Whatsapp: contact has no mobile number`)
 
         const msg = template.mergeWithOrder(order, branch)
 
-        msg.addTo(order.contact.mobile, order.contact.getName(), order.contact.id)
+
+        msg.addTo(contact.mobile, contact.getName(), contact.id)
         msg.type = MsgType.sms
         msg.orderId = order?.id
 

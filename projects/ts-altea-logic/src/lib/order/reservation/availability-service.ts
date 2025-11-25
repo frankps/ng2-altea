@@ -33,6 +33,119 @@ export class AvailabilityService {
 
     }
 
+
+    async process(availabilityRequest: AvailabilityRequest): Promise<AvailabilityResponse> {
+
+        //        availabilityRequest.to
+
+
+        /*         let nowNum = DateHelper.yyyyMMddhhmmss()
+        
+                if (availabilityRequest.from < nowNum)
+                    availabilityRequest.from = nowNum */
+
+        console.error('OrderGetPossibleDates.process()', availabilityRequest)
+
+        //this.fixOrder(availabilityRequest.order)
+
+        const order = availabilityRequest.order! //.clone()
+
+        const response = new AvailabilityResponse()
+
+
+        const requestDate = new Date()
+
+        //const schedule = await this.alteaDb.scheduleGetDefault(order.branchId!)
+
+        /** Create Order Context
+         *  ____________________
+         *  
+         *  Fetch all necessary data (productResources, resourcess, ...) in order to query availability  
+         */
+
+        //to do: check that resourceRoles are fetched => create an order with resource roles inside
+
+        const createAvailabilityContext = new CreateAvailabilityContext(this.alteaDb)
+        const availabilityCtx = await createAvailabilityContext.create(availabilityRequest)
+        if (availabilityRequest.debug) response.debug.ctx = availabilityCtx
+
+
+        const preChecksOk = this.checkScheduleLimitations(availabilityRequest, availabilityCtx, response)
+
+
+
+        /*
+                const excludedProducts = this.checkExcludedProducts(availabilityRequest, availabilityCtx)
+        
+                if (excludedProducts.hasProducts()) {
+                    console.error('Excluded products found', excludedProducts)
+                    response.informCustomer('products_not_available', {
+                        products: excludedProducts.getProductNames(),
+                        period: excludedProducts.dateRange.toString('dd/MM')
+                    })
+                    return response
+                }
+        */
+        /**
+         *  Calculate the final availability of all the resources based on all the data previously fetched (availability context)
+         */
+
+        /*         const availability = new ResourceAvailability(availabilityCtx)
+                if (availabilityRequest.debug) response.debug.availability = availability */
+
+        const availability2 = new ResourceAvailability2(availabilityCtx)
+        if (availabilityRequest.debug) response.debug.availability = availability2
+
+        /** Create Resource Request
+         *  _______________________
+         *  
+         *  Translate an order (with orderlines & products) into a resource request (which resources & when needed)  
+         */
+
+        const createResourceRequest = new CreateResourceRequest(this.alteaDb)
+        const initialResourceRequests = createResourceRequest.create(availabilityCtx)
+        if (availabilityRequest.debug) response.debug.resourceRequests.push(...initialResourceRequests)
+
+
+            
+        if (!preChecksOk)
+            return response
+
+
+        // const noGroupsResourceRequests = ResourceRequestOptimizer.I.replaceResourceGroupsByChildren(...initialResourceRequests)
+        // if (availabilityRequest.debug) response.debug.resourceRequests.push(...noGroupsResourceRequests)
+
+
+        /** If an order contains multiple treatments for the same customer, then we will try to allocate same resources (staff & room) for this customer.  */
+        /*
+                const optimizedRequests = ResourceRequestOptimizer.I.optimize(...initialResourceRequests)
+                if (availabilityRequest.debug) response.debug.resourceRequests.push(...optimizedRequests)
+        */
+
+
+        /** Look for possibilities: first we try to find solutions for the optimized resource request,
+         *  if no solutions found, we try the original resourceRequest
+         * 
+         */
+
+
+        response.solutionSet = SlotFinder.I.findSlots(availability2, availabilityCtx, ...initialResourceRequests)
+
+        // response.solutionSet = SlotFinder.I.findSlots(availability, availabilityCtx, ...optimizedRequests)
+
+
+        response.optionSet = DetermineReservationOptions.I.getAllReservationOptions(response.solutionSet)
+
+        console.error(response.optionSet)
+
+        this.doPricing(availabilityRequest, response.optionSet)
+
+        return response
+    }
+
+
+
+    /** For some schedules, we might not provide requested products or services */
     checkScheduleLimitations(availabilityRequest: AvailabilityRequest, ctx: AvailabilityContext, response: AvailabilityResponse): boolean {
 
         const branchModeRanges = ctx.getBranchModeRanges(ctx.request.getDateRange())
@@ -203,19 +316,25 @@ export class AvailabilityService {
         if (ArrayHelper.IsEmpty(personSelectLines))
             return
 
-        const maxQtyOrderLine = _.maxBy(personSelectLines, 'qty')
+        const maxPersons = Math.max(...personSelectLines.map(line => line.qty * (line.nrPers ?? 1)));
 
-        if (order.nrOfPersons < maxQtyOrderLine.qty) {
-            order.nrOfPersons = maxQtyOrderLine.qty
+        //    const maxQtyOrderLine = _.maxBy(personSelectLines, 'qty')
+
+        if (order.nrOfPersons < maxPersons) {
+            order.nrOfPersons = maxPersons
             order.markAsUpdated('nrOfPersons')
             order.markAsUpdated('persons')
             order.updatePersons()
         }
 
-        
+
 
         for (let line of personSelectLines) {
-            line.nrPers = line.qty
+
+            // line.nrPers = line.qty
+
+            //if (line.product)
+            line.nrPers = line.qty * (line?.product?.customers ?? 1)
 
             if (ArrayHelper.IsEmpty(line.persons))
                 line.persons = []
@@ -242,111 +361,6 @@ export class AvailabilityService {
             }
         }
 
-    }
-
-
-    async process(availabilityRequest: AvailabilityRequest): Promise<AvailabilityResponse> {
-
-        //        availabilityRequest.to
-
-
-        /*         let nowNum = DateHelper.yyyyMMddhhmmss()
-        
-                if (availabilityRequest.from < nowNum)
-                    availabilityRequest.from = nowNum */
-
-        console.error('OrderGetPossibleDates.process()', availabilityRequest)
-
-        //this.fixOrder(availabilityRequest.order)
-
-        const order = availabilityRequest.order! //.clone()
-
-        const response = new AvailabilityResponse()
-
-
-        const requestDate = new Date()
-
-        //const schedule = await this.alteaDb.scheduleGetDefault(order.branchId!)
-
-        /** Create Order Context
-         *  ____________________
-         *  
-         *  Fetch all necessary data (productResources, resourcess, ...) in order to query availability  
-         */
-
-        //to do: check that resourceRoles are fetched => create an order with resource roles inside
-
-        const createAvailabilityContext = new CreateAvailabilityContext(this.alteaDb)
-        const availabilityCtx = await createAvailabilityContext.create(availabilityRequest)
-        if (availabilityRequest.debug) response.debug.ctx = availabilityCtx
-
-
-        const preChecksOk = this.checkScheduleLimitations(availabilityRequest, availabilityCtx, response)
-
-        if (!preChecksOk)
-            return response
-
-        /*
-                const excludedProducts = this.checkExcludedProducts(availabilityRequest, availabilityCtx)
-        
-                if (excludedProducts.hasProducts()) {
-                    console.error('Excluded products found', excludedProducts)
-                    response.informCustomer('products_not_available', {
-                        products: excludedProducts.getProductNames(),
-                        period: excludedProducts.dateRange.toString('dd/MM')
-                    })
-                    return response
-                }
-        */
-        /**
-         *  Calculate the final availability of all the resources based on all the data previously fetched (availability context)
-         */
-
-        /*         const availability = new ResourceAvailability(availabilityCtx)
-                if (availabilityRequest.debug) response.debug.availability = availability */
-
-        const availability2 = new ResourceAvailability2(availabilityCtx)
-        if (availabilityRequest.debug) response.debug.availability = availability2
-
-        /** Create Resource Request
-         *  _______________________
-         *  
-         *  Translate an order (with orderlines & products) into a resource request (which resources & when needed)  
-         */
-
-        const createResourceRequest = new CreateResourceRequest(this.alteaDb)
-        const initialResourceRequests = createResourceRequest.create(availabilityCtx)
-        if (availabilityRequest.debug) response.debug.resourceRequests.push(...initialResourceRequests)
-
-        // const noGroupsResourceRequests = ResourceRequestOptimizer.I.replaceResourceGroupsByChildren(...initialResourceRequests)
-        // if (availabilityRequest.debug) response.debug.resourceRequests.push(...noGroupsResourceRequests)
-
-
-        /** If an order contains multiple treatments for the same customer, then we will try to allocate same resources (staff & room) for this customer.  */
-        /*
-                const optimizedRequests = ResourceRequestOptimizer.I.optimize(...initialResourceRequests)
-                if (availabilityRequest.debug) response.debug.resourceRequests.push(...optimizedRequests)
-        */
-
-
-        /** Look for possibilities: first we try to find solutions for the optimized resource request,
-         *  if no solutions found, we try the original resourceRequest
-         * 
-         */
-
-
-        response.solutionSet = SlotFinder.I.findSlots(availability2, availabilityCtx, ...initialResourceRequests)
-
-        // response.solutionSet = SlotFinder.I.findSlots(availability, availabilityCtx, ...optimizedRequests)
-
-
-        response.optionSet = DetermineReservationOptions.I.getAllReservationOptions(response.solutionSet)
-
-        console.error(response.optionSet)
-
-        this.doPricing(availabilityRequest, response.optionSet)
-
-        return response
     }
 
 

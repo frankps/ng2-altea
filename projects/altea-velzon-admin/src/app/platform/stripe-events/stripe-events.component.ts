@@ -60,7 +60,7 @@ export class StripeEventsComponent implements OnInit, OnDestroy {
 
     const stripeEventsCol = collection(this.firestore, "operations", "stripe", "events")
 
-    const qry = query(stripeEventsCol, orderBy('date', 'desc'), limit(10))
+    const qry = query(stripeEventsCol, orderBy('date', 'desc'), limit(30))
 
     this.stripeEventsSubscription = collectionData(qry).subscribe(dataSet => {
 

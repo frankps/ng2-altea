@@ -172,6 +172,25 @@ export class DateHelper {
         return utcDate
     }
 
+    /**
+     * 
+     * @param from 
+     * @param to 
+     * @param weekStartsOn 0=sunday 1=monday ... 6=saturday
+     * @returns 
+     */
+    static getWeekStarts(from: Date, to: Date, weekStartsOn: 0 | 1 | 2 | 3 | 4 | 5 | 6 = 0): Date[] {
+        const result: Date[] = [];
+        let current = dateFns.startOfWeek(from, { weekStartsOn: weekStartsOn }); 
+      
+        while (dateFns.isBefore(current, to) || current.getTime() === to.getTime()) {
+          result.push(current);
+          current = dateFns.addWeeks(current, 1);
+        }
+      
+        return result;
+      }
+
     static isTimeBetween(
         date: Date,
         startTime: string, // format: 'HH:mm'

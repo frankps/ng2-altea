@@ -89,9 +89,11 @@ export class UserBase extends ObjectWithIdPlus {
       components.push(this.last)
     }
 
-    const name = components.join(' ')
-
-    return name
+    if (ArrayHelper.NotEmpty(components)) {
+      const name = components.join(' ')
+      return name
+    } else
+      return null
 
   }
 
@@ -310,7 +312,7 @@ export class Contact extends UserBase {
   /** Summary of reviews by platform: used to check if we ask for reviews (both internally & on external platforms) */
   @Type(() => ContactReviews)
   rev?: ContactReviews
-  
+
 
   constructor() {
     super()

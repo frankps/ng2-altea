@@ -223,11 +223,11 @@ export class AlteaDb {
 
     }
 
-    async getOrdersMissingInvoice(branchId: string): Promise<Order[]> {
+    async getOrdersMissingInvoice(branchId: string, minCreationDate?: Date): Promise<Order[]> {
 
         const qry = new DbQueryTyped<Order>('order', Order)
 
-        qry.include('invoice.orders')
+        qry.include('invoice.orders', 'payments')
 
         qry.and('branchId', QueryOperator.equals, branchId)
         // qry.and('invoiced', QueryOperator.equals, true)
@@ -238,6 +238,10 @@ export class AlteaDb {
 
         qry.or('invoiceId', QueryOperator.equals, null)
         qry.or('invoiceNum', QueryOperator.equals, null)
+
+        if (minCreationDate)
+            qry.and('cre', QueryOperator.greaterThanOrEqual, minCreationDate)
+
         qry.take = 500
 
         const orders = await this.db.query$<Order>(qry)
@@ -407,12 +411,16 @@ export class AlteaDb {
         qry.and('src', QueryOperator.equals, 'ngApp')
         // qry.include('contact')
 
-        qry.or('paid', QueryOperator.equals, 0)
-        qry.or('contactId', QueryOperator.equals, null)
+        //qry.and('incl', QueryOperator.greaterThan, 0)
+        
+        qry.and('paid', QueryOperator.equals, 0)
+        // qry.or('contactId', QueryOperator.equals, null)
+        //qry.and('contactId', QueryOperator.equals, null)
+        //qry.and('for', QueryOperator.equals, null)  // inline contact
 
         let now = new Date()
         let maxCreationDate = dateFns.subMinutes(now, 20)
-        let minCreationDate = dateFns.subDays(now, 2)
+        let minCreationDate = dateFns.subDays(now, 4)
 
         qry.and('cre', QueryOperator.lessThan, maxCreationDate)
         qry.and('cre', QueryOperator.greaterThanOrEqual, minCreationDate)

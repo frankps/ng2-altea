@@ -388,7 +388,10 @@
 
           <div class="row mt-2">
             <div class="col">
-              {{price.title}}
+              <ng-container *ngIf="price.act">{{price.title}}</ng-container>
+              <ng-container *ngIf="!price.act"><s>{{price.title}}</s> <small> &nbsp; (niet actief)</small></ng-container>
+              
+
             </div>
           </div>
           <div class="row">
@@ -409,6 +412,7 @@
             <div class="col" *ngIf="editSectionId === 'pricing'">
               <i class="fas fa-trash float-end" (click)="deletePrice(price)"></i>
               <i class="fas fa-pen float-end me-3" (click)="editPrice(price)"></i>
+              <i class="fas fa-copy float-end me-3" (click)="copyPrice(price)"></i>
               <i *ngIf="idx > 0" class="fa-solid fa-up float-end me-3" (click)="movePriceUp(price, idx)"></i>
             </div>
           </div>

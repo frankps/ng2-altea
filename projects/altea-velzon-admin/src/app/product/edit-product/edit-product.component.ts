@@ -12,7 +12,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import * as sc from 'stringcase'
 import { ConnectTo } from 'ts-common'
-
+import * as dateFns from 'date-fns'
 
 /*
 
@@ -539,6 +539,28 @@ if (this.editSection == 'pricing') {
 
   }
 
+  copyPrice(price: Price) {
+    if (!price)
+      return
+
+    // const newPrice = new Price(price.productId, price.title)
+    let clonedPrice = ObjectHelper.clone(price, Price)
+    clonedPrice.newId()
+    clonedPrice.startDate = new Date()
+    clonedPrice.endDate = dateFns.addMonths(clonedPrice.startDate, 1)
+
+    this.priceChanges?.add(clonedPrice)  // createId(price.id)
+
+    this.price = clonedPrice
+
+    this.priceModal?.show()
+
+    /*
+    newPrice.value = price.value
+    newPrice.startDate = price.startDate
+    newPrice.endDate = price.endDate
+    */
+  }
 
   editPrice(price: Price) {
 

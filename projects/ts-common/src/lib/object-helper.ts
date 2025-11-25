@@ -19,10 +19,18 @@ export class StringHelper {
     }
 
     static isEmail(email: string): boolean {
+
+        if (!email)
+            return false
+
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     }
 
     static isMobileNumber(mobile: string): boolean {
+
+        if (!mobile)
+            return false
+
         return StringHelper.isDefined(mobile) && mobile.length >= 8
     }
 

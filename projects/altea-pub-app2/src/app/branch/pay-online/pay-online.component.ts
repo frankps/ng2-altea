@@ -396,6 +396,8 @@ this.timerSubscription = this.orderMgrSvc.timerChanged.subscribe(seconds => {
 
     if (this.authSvc?.user?.email)
       createCheckout.email = this.authSvc.user.email
+    else if (order.email)
+      createCheckout.email = order.email
 
     console.error(createCheckout)
 

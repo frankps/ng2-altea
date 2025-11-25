@@ -70,9 +70,24 @@ export class OpenComponent implements OnInit {
     console.error('createOrder')
     await this.orderMgrSvc.newOrder(OrderUiMode.newOrder)
     //  await this.orderMgrSvc.loadProductBySlug(productSlug)
-    await this.orderMgrSvc.openProductBySlug(productSlug, params)
-    this.orderMgrSvc.changeUiState(OrderUiState.browseCatalog)
-    this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'orderMode', 'order-line'])
+    let orderLine = await this.orderMgrSvc.openProductBySlug(productSlug, params)
+
+    /* for testing certain services, the slug is typical 'revealight-testbeurt'
+    => then we immediatly want to select the date
+    */
+    if (productSlug.includes('test') || productSlug.includes('huidanalyse')) { 
+      await this.orderMgrSvc.addOrderLine(orderLine, 1, true)
+      this.orderMgrSvc.showOrderSummaryPlanning = true
+      this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'orderMode', 'select-date'])
+    } else {
+      this.orderMgrSvc.changeUiState(OrderUiState.browseCatalog)
+      this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'orderMode', 'order-line'])
+    }
+    
+    
+
+
+    
   }
 
 }

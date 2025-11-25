@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ContactService, OrderMgrUiService, OrderUiMode, SessionService } from 'ng-altea-common';
-import { Contact, OrderLine } from 'ts-altea-model';
+import { Contact, Order, OrderLine } from 'ts-altea-model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
 import { StringHelper } from 'ts-common';
@@ -236,6 +236,8 @@ export class OrderComponent implements OnInit {
 
   async orderFinished() {
 
+    console.error('orderFinished() triggered, current mode:', this.orderMgrSvc.uiMode)
+
     switch (this.orderMgrSvc.uiMode) {
 
       /** for a new gift, we will pay */
@@ -357,6 +359,12 @@ export class OrderComponent implements OnInit {
 
     this.gotoMode('contact-edit')
 
+  }
+
+
+  inlineContactSaved(order: Order) {
+    this.mode = 'contact-edit'
+    this.gotoNextMode()
   }
 
 }
