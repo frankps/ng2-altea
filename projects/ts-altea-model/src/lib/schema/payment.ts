@@ -217,7 +217,7 @@ export class PaymentSubscriptionJson {
 export class PaymentJson {
 
   @Type(() => PaymentSubscriptionJson)
-  sub?: PaymentSubscriptionJson
+  subs?: PaymentSubscriptionJson
 
   static subscriptionInfo(turn: number, total: number): PaymentJson {
     let subscriptionInfo = new PaymentSubscriptionJson()
@@ -225,7 +225,7 @@ export class PaymentJson {
     subscriptionInfo.total = total
 
     let paymentJson = new PaymentJson()
-    paymentJson.sub = subscriptionInfo
+    paymentJson.subs = subscriptionInfo
 
     return paymentJson
   } 

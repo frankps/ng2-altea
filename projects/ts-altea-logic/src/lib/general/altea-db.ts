@@ -1517,6 +1517,7 @@ export class AlteaDb {
         qry.and('branchId', QueryOperator.equals, branchId)
         qry.and('year', QueryOperator.equals, year)
         qry.and('month', QueryOperator.equals, month)
+        qry.and('act', QueryOperator.equals, true)
 
         const report = await this.db.queryFirst$<ReportMonth>(qry)
 

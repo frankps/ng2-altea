@@ -340,8 +340,28 @@ export class OrderUi extends ObjectUi {
             info += ` ${lineInfo}`
         }
 
-        if (this.isOrder() && pay)
+
+        // in case of subscription (payments): we show the current turn & total turns
+        if (ArrayHelper.NotEmpty(this.payments)) {
+
+            /*
+            For a subscription payment, we store the total number of turns & the current turn in the payment.json.subs
+            pay.json = {"subs": {"total": 20, "turn": 17}}
+            */
+
+            let pay = this.payments[0]
+
+            if (pay.json?.subs) {
+                info += ` ${pay.json.subs.turn}/${pay.json.subs.total} `
+            }
+
+        }
+
+        if ( this.paid != this.incl && this.incl > 0) {   // this.isOrder()  && pay
             info += ` €${this.paid}/${this.incl}`
+        }
+
+       
 
 
         if (ArrayHelper.NotEmpty(this.vouchers)) {
