@@ -32,27 +32,27 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
   // html editor 
   editor: Editor;
   toolbar: Toolbar = [
-  // default value
-  ['bold', 'italic'],
-  ['underline', 'strike'],
-  ['code', 'blockquote'],
-  ['ordered_list', 'bullet_list'],
-  [{ heading: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] }],
-  ['link', 'image'],
-  // or, set options for link:
-  //[{ link: { showOpenInNewTab: false } }, 'image'],
-  ['text_color', 'background_color'],
-  ['align_left', 'align_center', 'align_right', 'align_justify'],
-  ['horizontal_rule', 'format_clear'],
+    // default value
+    ['bold', 'italic'],
+    ['underline', 'strike'],
+    ['code', 'blockquote'],
+    ['ordered_list', 'bullet_list'],
+    [{ heading: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] }],
+    ['link', 'image'],
+    // or, set options for link:
+    //[{ link: { showOpenInNewTab: false } }, 'image'],
+    ['text_color', 'background_color'],
+    ['align_left', 'align_center', 'align_right', 'align_justify'],
+    ['horizontal_rule', 'format_clear'],
 
-];
+  ];
 
-/*
-   ['horizontal_rule', 'format_clear', 'indent', 'outdent'],
-  ['superscript', 'subscript'],
-  ['undo', 'redo'],
-
-  */
+  /*
+     ['horizontal_rule', 'format_clear', 'indent', 'outdent'],
+    ['superscript', 'subscript'],
+    ['undo', 'redo'],
+  
+    */
 
 
   html = '';
@@ -95,14 +95,13 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
   changes: CollectionChangeTracker<Template>
 
 
+  /** Basic templates: templates that are not related to an order */
+  basicTemplates: Template[]
+
   constructor(protected spinner: NgxSpinnerService, protected sessionSvc: SessionService, protected templateSvc: TemplateService
     , protected dashboardSvc: DashboardService, public translationSvc: TranslationService, public toastService: ToastService,
     private messagingSvc: MessagingService) {
     super()
-
-
-
-    // 
   }
 
   async ngOnInit() {
@@ -113,7 +112,7 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
 
     this.initSelections()
 
-    this.getTemplates()
+    let templates = await this.initTemplates()
 
     this.initialized = true
 
@@ -172,31 +171,37 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
 
 
 
-  getTemplates() {
+  async initTemplates(): Promise<Template[]> {
 
     this.spinner.show()
 
     const query = new DbQuery()
     query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
-    query.and('code', QueryOperator.in, orderTemplates)
+    //query.and('code', QueryOperator.in, orderTemplates)
     query.and('act', QueryOperator.equals, true)
 
+    query.include('products')
     query.orderBy('idx')
 
-    this.templateSvc.query(query).subscribe(templates => {
+    this.templates = await this.templateSvc.query$(query)
 
-      if (templates?.data) {
-        this.templates = templates?.data
-        this.makeSelections(this.templates)
-      }
 
-      console.warn(this.templates)
 
-      this.changes = new CollectionChangeTracker<Template>(this.templates, Template)
+    this.basicTemplates = this.templates.filter(t => t.cat != 'order')
 
-      this.selectionsAvailable = true
-      this.spinner.hide()
-    })
+    console.error('Basic templates!', this.basicTemplates)
+
+
+    this.makeSelections(this.templates)
+
+    console.warn(this.templates)
+
+    this.changes = new CollectionChangeTracker<Template>(this.templates, Template)
+
+    this.selectionsAvailable = true
+    this.spinner.hide()
+
+    return this.templates
 
   }
 
@@ -311,7 +316,7 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
             return
       */
 
-           // return
+      // return
 
       const whatsAppResult = await this.messagingSvc.updateWhatsAppTemplate$(whatsAppTpl)
 
@@ -323,6 +328,9 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
         console.log('Hash: ', this.template.hash)
 
         this.template.updateHash()
+
+        let updateCopy = _.cloneDeep(this.template)
+        delete updateCopy.products
 
         const tplUpdateResult = await this.templateSvc.update$(this.template, this.sessionSvc.humanResource?.id)
 
@@ -466,6 +474,16 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
 
     const batch = this.changes.getApiBatch()
 
+    if (batch.hasUpdates()) {
+
+      for (let template of batch.update) {
+         delete template['products']  // backend doesn't work with this field
+      }
+
+    }
+
+
+
     console.error(batch)
 
     const res = await this.templateSvc.batchProcess$(batch, this.dashboardSvc.resourceId)
@@ -480,6 +498,13 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
       this.changes.reset()
     }
 
+  }
+
+
+  editBasicTemplate(template: Template) {
+    this.template = template
+
+    this.canExport = template.hashChanged()
   }
 
 }

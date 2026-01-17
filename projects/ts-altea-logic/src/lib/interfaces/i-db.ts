@@ -1,4 +1,4 @@
-import { ApiListResult, ApiResult, DbObject, DbObjectCreate, DbObjectMulti, DbObjectMultiCreate, DbQuery, DbQueryBase, DbQueryBaseTyped, DbQueryTyped, DbUpdateManyWhere, ObjectWithId, QueryOperator } from 'ts-common'
+import { ApiListResult, ApiResult, DbObject, DbObjectCreate, DbObjectMulti, DbObjectMultiCreate, DbQuery, DbQueryBase, DbQueryBaseTyped, DbQueryTyped, DbUpdateManyWhere, ObjectWithId, PrismaNativeQuery, QueryOperator } from 'ts-common'
 import { Message, Order, Schedule, SchedulingType } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 
@@ -14,13 +14,14 @@ export interface IDb {
     create$<T>(dbObject: DbObjectCreate<T>): Promise<ApiResult<T>>
     createMany$<T>(dbObject: DbObjectMultiCreate<T>): Promise<ApiListResult<T>>
 
-    query$<T  extends ObjectWithId>(query: DbQueryTyped<T>): Promise<T[]>
+    query$<T  extends ObjectWithId>(query: DbQueryTyped<T>, useCache?: boolean): Promise<T[]>
     queryFirst$<T  extends ObjectWithId>(query: DbQueryTyped<T>): Promise<T | null>
+
+    // support for native prisma queries
+    findMany$<T>(prismaQuery: PrismaNativeQuery<T>): Promise<T[]>
 
     deleteMany$<T extends ObjectWithId>(query: DbQueryBaseTyped<T>): Promise<any> 
    
-
-
     //  async deleteMany$<T extends ObjectWithId>(query DbQueryBaseTyped<T>): Promise<any> 
 
 

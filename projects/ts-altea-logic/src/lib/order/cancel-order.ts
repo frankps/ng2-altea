@@ -403,7 +403,11 @@ export class CancelOrder {
         else if (origOrder.contact)
             order.for = origOrder.contact.name
 
+        // for orders without contact, we use the email and mobile from the order
+        order.email = origOrder.email
+        order.mobile = origOrder.mobile
 
+        
         let line = new OrderLine()
         line.unit = amount
         //  line.orderId = order.id

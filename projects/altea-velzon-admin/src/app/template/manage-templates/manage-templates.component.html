@@ -10,9 +10,28 @@
   </ng-container>
   <ng-container edit>
 
-  </ng-container> -->
+  </ng-container> 
+  
+   mb-3  d-flex justify-content-center
+  -->
 
     <ng-container always>
+
+
+        <div class="row" *ngFor="let template of basicTemplates">
+
+            <div class="col-4">
+                {{template.code}}
+            </div>
+            <div class="col-4">
+                <i class="fas fa-pen ms-2"
+               
+                (click)="editBasicTemplate(template)"></i>
+            </div>
+        </div>
+
+
+
 
         <div class="row mb-3  d-flex justify-content-center">
             <div class="col-4">
@@ -121,7 +140,7 @@
 
                                 <ngx-altea-label-control label="objects.template.subject" for="subject">
                                     <input type="text" id="subject" name="subject" class="form-control"
-                                        [(ngModel)]="template.subject" (change)="updateTemplate(template)"/>
+                                        [(ngModel)]="template.subject" (change)="updateTemplate(template)" />
                                 </ngx-altea-label-control>
 
                             </div>
@@ -163,7 +182,8 @@
                                 <div class="NgxEditor__Wrapper">
                                     <ngx-editor-menu [editor]="editor" [toolbar]="toolbar"> </ngx-editor-menu>
                                     <ngx-editor [editor]="editor" [(ngModel)]="template.body" [disabled]="false"
-                                        [placeholder]="'Maak template'" (ngModelChange)="updateTemplate(template)"></ngx-editor>
+                                        [placeholder]="'Maak template'"
+                                        (ngModelChange)="updateTemplate(template)"></ngx-editor>
                                 </div>
 
                             </ng-container>
@@ -190,14 +210,14 @@
                                         <ngx-altea-label-control label="objects.template.action.label"
                                             for="actionLabel">
                                             <input type="text" id="actionLabel" name="actionLabel" class="form-control"
-                                                [(ngModel)]="action.label" (change)="updateTemplate(template)"/>
+                                                [(ngModel)]="action.label" (change)="updateTemplate(template)" />
                                         </ngx-altea-label-control>
                                     </div>
                                     <div class="col-6">
 
                                         <ngx-altea-label-control label="objects.template.action.url" for="actionUrl">
                                             <input type="text" id="actionUrl" name="actionUrl" class="form-control"
-                                                [(ngModel)]="action.url" (change)="updateTemplate(template)"/>
+                                                [(ngModel)]="action.url" (change)="updateTemplate(template)" />
                                         </ngx-altea-label-control>
 
                                     </div>

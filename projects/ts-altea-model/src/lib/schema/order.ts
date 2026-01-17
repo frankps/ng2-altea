@@ -847,6 +847,14 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     return this.lines?.find(l => l.productId == productId)
   }
 
+  getLinesByProducts(productIds: string[]): OrderLine[] | undefined {
+
+    if (ArrayHelper.IsEmpty(productIds))
+      return []
+
+    return this.lines?.filter(l => productIds.includes(l.productId))
+  }
+
   getLineOption(productId: string, optionId: string): OrderLineOption | undefined {
 
     const line = this.getLineByProduct(productId)
@@ -1115,7 +1123,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
   }
 
   /** returns the contact for this order (can be linked contact or inline contact => temp contact created on the fly) */
-  getContact() : Contact {
+  getContact(): Contact {
 
     if (this.contact)
       return this.contact
@@ -1608,6 +1616,15 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     return productIds
   }
 
+  hasProductIds(...productIds: string[]): boolean {
+    if (!this.hasLines())
+      return false
+
+    const lineProductIds = this.lines!.filter(l => l.productId).map(l => l.productId!)
+
+    return productIds.every(id => lineProductIds.includes(id))
+  }
+
   getNotLoadedProductIds(): string[] {
 
     if (!this.hasLines())
@@ -1818,7 +1835,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
 
     // ol.qty
-   // const total = _.sumBy(personSelectLines, 'qty')
+    // const total = _.sumBy(personSelectLines, 'qty')
 
     return (total > 1)
   }

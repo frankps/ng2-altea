@@ -1,10 +1,11 @@
 import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbObject, DbObjectCreate, DbObjectMulti, DbObjectMultiCreate, DbQuery, DbQueryBaseTyped, DbQueryTyped, DbUpdateManyWhere, ObjectHelper, ObjectWithId, QueryCondition, QueryOperator, SortOrder, StringHelper, TypeHelper, YearMonth } from 'ts-common'
-import { Branch, Gift, Subscription, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template, OrderLine, BankTransaction, Message, LoyaltyProgram, LoyaltyCard, PlanningType, ResourcePlannings, TemplateCode, MsgType, LoyaltyCardChange, Payment, PaymentType, BankTxType, Payments, ReportMonth, ReportMonths, Contact, ReportPeriod, ReportType, ReportLine, ReviewStatus } from 'ts-altea-model'
+import { Branch, Gift, Subscription, Order, OrderState, Organisation, Product, Resource, ResourcePlanning, Schedule, SchedulingType, Task, TaskSchedule, TaskStatus, Template, OrderLine, BankTransaction, Message, LoyaltyProgram, LoyaltyCard, PlanningType, ResourcePlannings, TemplateCode, MsgType, LoyaltyCardChange, Payment, PaymentType, BankTxType, Payments, ReportMonth, ReportMonths, Contact, ReportPeriod, ReportType, ReportLine, ReviewStatus, TemplateMessage } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import { IDb } from '../interfaces/i-db'
 import { AlteaPlanningQueries } from './altea-queries'
 import * as dateFns from 'date-fns'
 import { orderBy } from 'lodash'
+import { PrismaNativeQuery } from 'ts-common'
 
 export class AlteaDb {
 
@@ -91,9 +92,17 @@ export class AlteaDb {
         return branches
     }
 
-    async getContactById(id: string): Promise<Contact> {
-        const object = await this.getObjectById$('contact', Contact, id)
+    async getContactById(id: string, includes?: string[]): Promise<Contact> {
+        const object = await this.getObjectById$('contact', Contact, id, includes)
         return object
+    }
+
+    async getContactsByEmails(emails: string[]): Promise<Contact[]> {
+        const qry = new DbQueryTyped<Contact>('contact', Contact)
+        qry.and('email', QueryOperator.in, emails)
+        qry.take = emails.length + 1
+        const contacts = await this.db.query$<Contact>(qry)
+        return contacts
     }
 
 
@@ -112,6 +121,181 @@ export class AlteaDb {
         return expiredDepositOrders
     }
 
+    /**
+     * Get contacts that have not ordered given products in the period [fromDaysAgo, toDaysAgo] and have not yet received a reminder message for that period.
+     * 
+     * @param branchId 
+     * @param fromDaysAgo 
+     * @param toDaysAgo 
+     * @param productIds 
+     * @param templateCode 
+     * @param remind 
+     * @returns 
+     */
+    async getSleepingContacts(branchId: string, fromDaysAgo: number, toDaysAgo: number, productIds: string[], templateCode: string, remind: number): Promise<Contact[]> {
+
+        const today = new Date()
+        const fromDate = dateFns.subDays(today, fromDaysAgo)
+
+        const toDate = dateFns.subDays(today, toDaysAgo)
+
+        const todayNum = DateHelper.yyyyMMddhhmmss(today)
+        const fromNum = DateHelper.yyyyMMddhhmmss(fromDate)
+        const toNum = DateHelper.yyyyMMddhhmmss(toDate)
+
+
+        /* PRISMA query 
+        */
+        const qry = {
+            where: {
+                branchId,
+                del: false,
+                act: true,
+                // Has at least one finished order
+                orders: {
+                    some: {
+                        start: { gt: fromNum, lte: toNum },
+                        paid: { gt: 0 },
+                        state: { in: ['confirmed', 'waitDeposit', 'finished'] },
+                        del: false,
+                        lines: {
+                            some: { productId: { in: productIds } }
+                        },
+                    }
+                },
+                // No future appointments
+                NOT: {
+                    orders: {
+                        some: {
+                            start: { gte: toNum },
+                            state: { in: ['confirmed', 'waitDeposit', 'finished'] },
+                            del: false,
+                            lines: {
+                                some: { productId: { in: productIds } }
+                            }
+                        }
+                    },
+                    messages: {
+                        some: {
+                            cat: { in: ['reactivation'] },
+                            code: { equals: templateCode },
+                            remind: { equals: remind }
+                        }
+                    },
+                }
+            },
+            take: 10,
+            orderBy: { id: "desc" },
+            include: {
+                orders: {
+                    where: {
+                        lines: { some: { productId: { in: productIds } } },
+                        state: { in: ['confirmed', 'waitDeposit', 'finished'] },
+                        del: false,
+                    },
+                    orderBy: { start: 'desc' },
+                    take: 1, // latest order containing any of the productIds
+                    select: {
+                        id: true,
+                        start: true,
+                        paid: true,
+                        state: true,
+                        lines: {
+                            select: { id: true, productId: true, qty: true, start: true },
+                        },
+                    },
+                },
+                messages: {
+                    where: {
+                        cat: { in: ['reactivation'] }
+                    },
+                    orderBy: { cre: 'desc' },
+                    // take: 1, // latest order containing any of the productIds
+                    /*                 select: {
+                                      id: true,
+                                      start: true,
+                                      paid: true,
+                                      state: true,
+                                      lines: {
+                                        select: { id: true, productId: true, qty: true, start: true },
+                                      },
+                                    }, */
+                },
+            }
+        }
+
+        let prismaQry = new PrismaNativeQuery<Contact>('contact', Contact, qry)
+        const contacts = await this.db.findMany$<Contact>(prismaQry)
+
+        return contacts
+    }
+
+
+    async getSleepingContactsDebug(contactId: string, templateCode: string, remind: number): Promise<Contact[]> {
+
+        const today = new Date()
+
+
+
+        /* PRISMA query 
+        */
+        const qry = {
+            where: {
+                id: contactId,
+
+                // No future appointments
+                NOT: {
+  
+                    messages: {
+                        some: {
+                            cat: { in: ['reactivation'] },
+                            code: { equals: templateCode },
+                            remind: { equals: remind }
+                        }
+                    },
+                }
+            },
+            take: 10,
+            orderBy: { id: "desc" },
+            include: {
+                orders: {
+
+                    orderBy: { start: 'desc' },
+                    take: 1, // latest order containing any of the productIds
+                    select: {
+                        id: true,
+                        start: true,
+                        paid: true,
+                        state: true,
+                        lines: {
+                            select: { id: true, productId: true, qty: true, start: true },
+                        },
+                    },
+                },
+                messages: {
+                    where: {
+                        cat: { in: ['reactivation'] }
+                    },
+                    orderBy: { cre: 'desc' },
+                    // take: 1, // latest order containing any of the productIds
+                    /*                 select: {
+                                      id: true,
+                                      start: true,
+                                      paid: true,
+                                      state: true,
+                                      lines: {
+                                        select: { id: true, productId: true, qty: true, start: true },
+                                      },
+                                    }, */
+                },
+            }
+        }
+
+        let prismaQry = new PrismaNativeQuery<Contact>('contact', Contact, qry)
+        const contacts = await this.db.findMany$<Contact>(prismaQry)
+
+        return contacts
+    }
 
     async getOrder(orderId: string, ...includes: string[]): Promise<Order> {
 
@@ -286,7 +470,6 @@ export class AlteaDb {
         qry.include('lines.product')
 
 
-
         qry.and('branchId', QueryOperator.equals, branchId)
 
         if (options?.useCreationDate) {
@@ -412,7 +595,7 @@ export class AlteaDb {
         // qry.include('contact')
 
         //qry.and('incl', QueryOperator.greaterThan, 0)
-        
+
         qry.and('paid', QueryOperator.equals, 0)
         // qry.or('contactId', QueryOperator.equals, null)
         //qry.and('contactId', QueryOperator.equals, null)
@@ -460,6 +643,21 @@ export class AlteaDb {
         qry.and('code', QueryOperator.equals, code)
 
         const templates = await this.db.query$<Template>(qry)
+
+        return templates
+    }
+
+    async getTemplatesByCategory(branchId: string, cat: string, ...includes: string[]): Promise<Template[]> {
+
+        const qry = new DbQueryTyped<Template>('template', Template)
+        qry.and('branchId', QueryOperator.equals, branchId)
+        qry.and('cat', QueryOperator.contains, cat)
+        qry.and('act', QueryOperator.equals, true)
+
+        if (ArrayHelper.NotEmpty(includes))
+            qry.include(...includes)
+
+        const templates = await this.db.query$<Template>(qry, false)
 
         return templates
     }
@@ -773,10 +971,13 @@ export class AlteaDb {
         }
 
     */
-    async getObjectById$<T extends ObjectWithId>(typeName: string, type: { new(): T; }, id: string): Promise<T> {
+    async getObjectById$<T extends ObjectWithId>(typeName: string, type: { new(): T; }, id: string, includes?: string[]): Promise<T> {
 
         const qry = new DbQueryTyped<T>(typeName, type)
         qry.and('id', QueryOperator.equals, id)
+
+        if (includes)
+            qry.include(...includes)
 
         let object = await this.db.queryFirst$<T>(qry)
 
@@ -1015,6 +1216,13 @@ export class AlteaDb {
         let updateResult = await this.updateObject('contact', Contact, contact, propertiesToUpdate)
         return updateResult
     }
+
+
+    async updateContacts(contacts: Contact[], propertiesToUpdate: string[]): Promise<ApiListResult<Contact>> {
+        let updateResult = await this.updateObjects('contact', Contact, contacts, propertiesToUpdate)
+        return updateResult
+    }
+
 
 
     /** Order */
@@ -1406,7 +1614,7 @@ export class AlteaDb {
 
         let start = yearMonth.startDate()
         let end = yearMonth.endDate()
-       // let end = dateFns.addDays(start, 5)
+        // let end = dateFns.addDays(start, 5)
         console.error('YearMonth end incorrect while debugging (just 5 days)')
 
         return await this.getPaymentsBetween(branchId, start, end, types, false, includes, and)
@@ -1753,6 +1961,31 @@ export class AlteaDb {
     async deleteTasks(ids: string[]): Promise<any> {
         let deleteResult = await this.deleteObjectsByIds('task', Task, ids)
         return deleteResult
+    }
+
+
+    /** Templates */
+
+    async createTemplate(template: Template): Promise<ApiResult<Template>> {
+        let createResult = await this.createObject('template', Template, template)
+        return createResult
+    }
+
+    async createTemplates(templates: Template[]): Promise<ApiListResult<Template>> {
+        let createResult = await this.createObjects('template', Template, templates)
+        return createResult
+    }
+
+    /** Templates */
+
+    async createTemplateMessage(templateMessage: TemplateMessage): Promise<ApiResult<TemplateMessage>> {
+        let createResult = await this.createObject('templateMessage', TemplateMessage, templateMessage)
+        return createResult
+    }
+
+    async createTemplateMessages(templateMessages: TemplateMessage[]): Promise<ApiListResult<TemplateMessage>> {
+        let createResult = await this.createObjects('templateMessage', TemplateMessage, templateMessages)
+        return createResult
     }
 
 }

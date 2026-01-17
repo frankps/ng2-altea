@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { ObjectWithId, BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, ApiBatchResult, DbQuery, ObjectHelper, ApiStatus, ConnectTo, DbQueryTyped, DbObjectCreate, DbObjectMulti, DbObject, DbObjectMultiCreate, DbQueryBaseTyped, DbUpdateManyWhere, DeleteManyResult } from 'ts-common'
+import { ObjectWithId, BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, ApiBatchResult, DbQuery, ObjectHelper, ApiStatus, ConnectTo, DbQueryTyped, DbObjectCreate, DbObjectMulti, DbObject, DbObjectMultiCreate, DbQueryBaseTyped, DbUpdateManyWhere, DeleteManyResult, PrismaNativeQuery, ArrayHelper } from 'ts-common'
 import { plainToInstance } from "class-transformer";
 import { Observable, map, Subject, take } from "rxjs";
 import { SessionService } from './session.service';
@@ -19,7 +19,7 @@ export class ObjectService implements IDb {
   typeCaches = new Map<any, BackendHttpServiceBase<any>>()
 
 
-  constructor(protected http: HttpClient, protected sessionSvc: SessionService, protected prodResSvc: ProductResourceService ) { }
+  constructor(protected http: HttpClient, protected sessionSvc: SessionService, protected prodResSvc: ProductResourceService) { }
 
 
   async post$<T>(httpServer: string, pageUrl: string, body: any): Promise<T> {
@@ -330,15 +330,34 @@ export class ObjectService implements IDb {
   }
 
 
+  //     async findMany$<T>(typeName: string, prismaQuery: any): Promise<T[]> {
 
-  async query$<T extends ObjectWithId>(query: DbQueryTyped<T>): Promise<T[]> {
+  /*
+      let res = await this.post$(this.sessionSvc.backend, `${this.sessionSvc.branchUnique}/objects/deleteMany`, query)
+
+    let typedRes: ApiResult<any> = plainToInstance(ApiResult<any>, res)
+  */
+  async findMany$<T>(prismaQuery: PrismaNativeQuery<T>): Promise<T[]> {
+
+    let res = await this.post$(this.sessionSvc.backend, `${this.sessionSvc.branchUnique}/objects/findMany`, prismaQuery)
+
+    if (Array.isArray(res)) {
+      let typedRes = res.map(obj => plainToInstance(prismaQuery.type, obj))
+      return typedRes
+    }
+  
+    return []
+
+  }
+
+  async query$<T extends ObjectWithId>(query: DbQueryTyped<T>, useCache: boolean = true): Promise<T[]> {
 
     const me = this
 
     console.warn('============== query$ ')
 
     // if there is a cache available for the requested type => use cache
-    if (me.typeCaches.has(query.type)) {
+    if (me.typeCaches.has(query.type) && useCache) {
 
       const cacheSvc = me.typeCaches.get(query.type) as BackendHttpServiceBase<T>
       const objects = cacheSvc.queryFromCache(query)
@@ -357,10 +376,10 @@ export class ObjectService implements IDb {
 
       return objects
     }
-  
+
 
     return new Promise<T[]>(function (resolve, reject) {
-  
+
       me.query<T>(query).pipe(take(1)).subscribe(res => {
 
         if (res.data)

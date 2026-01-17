@@ -27,6 +27,7 @@ export class OrderComponent implements OnInit {
 
     console.error(this.orderMgrSvc.order)
 
+    
     this.mode = 'browse-catalog'
   }
 
@@ -96,8 +97,8 @@ export class OrderComponent implements OnInit {
 
   }
 
-  browseCatalog() {
-    this.gotoMode('browse-catalog')
+  async browseCatalog() {
+    await this.gotoMode('browse-catalog')
     //this.mode = 'browse-catalog'
   }
 
@@ -106,51 +107,51 @@ export class OrderComponent implements OnInit {
     var order = await this.orderMgrSvc.saveOrder()
 
     console.log(order)
-    this.gotoMode('pay-online')
+    await this.gotoMode('pay-online')
     //this.mode = 'pay-online'
   }
 
-  productSelected() {
-    this.gotoMode('order-line')
+  async productSelected() {
+    await this.gotoMode('order-line')
     //this.mode = 'order-line'
   }
 
-  newOrderLine() {
-    this.gotoMode('order')
+  async newOrderLine() {
+    await this.gotoMode('order')
     //this.mode = 'order'
   }
 
-  deleteOrderLine() {
+  async deleteOrderLine() {
 
     if (this.orderMgrSvc.nrOfOrderLines() == 0)
-      this.gotoMode('browse-catalog')
+      await this.gotoMode('browse-catalog')
     else
-      this.gotoMode('order')
+      await this.gotoMode('order')
   }
 
-  showCatalog() {
-    this.gotoMode('browse-catalog')
+  async showCatalog() {
+    await this.gotoMode('browse-catalog')
     //this.mode = 'browse-catalog'
   }
 
-  orderLineSelected(line: OrderLine) {
-    this.gotoMode('order-line')
+  async orderLineSelected(line: OrderLine) {
+    await this.gotoMode('order-line')
     //this.mode = 'order-line'
   }
 
-  closeOrderLine() {
-    this.gotoMode('order')
+  async closeOrderLine() {
+    await this.gotoMode('order')
     //this.mode = 'order'
   }
 
 
-  selectDate() {
-    this.gotoMode("select-date")
+  async selectDate() {
+    await this.gotoMode("select-date")
     //this.mode = "select-date"
   }
 
-  dateSelected(date: Date) {
-    this.gotoMode("select-time-slot")
+  async dateSelected(date: Date) {
+    await this.gotoMode("select-time-slot")
     //this.mode = "select-time-slot"
   }
 
@@ -175,7 +176,7 @@ export class OrderComponent implements OnInit {
 
     console.warn('Current contact', this.contact)
 
-    this.gotoMode("contact-select")
+    await this.gotoMode("contact-select")
     //this.mode = 'contact-select'
   }
 
@@ -190,6 +191,11 @@ export class OrderComponent implements OnInit {
   }
 
   async gotoMode(mode: string) {
+
+    if (!mode)
+      return
+
+    let me = this
 
     let extras = {}
 
@@ -208,8 +214,9 @@ export class OrderComponent implements OnInit {
 
     }
 
+    let branchUnique = me.sessionSvc.branchUnique
 
-    this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'orderMode', mode], extras)
+    await this.router.navigate(['/branch', branchUnique, 'orderMode', mode], extras)
   }
 
 
@@ -220,7 +227,7 @@ export class OrderComponent implements OnInit {
       this.authSvc.redirect = ['branch', 'aqua', 'orderMode', 'continue-after-sign-in']
 
       //this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'orderMode', 'sign-in'])
-      this.gotoMode('sign-in')
+      await this.gotoMode('sign-in')
       //this.mode = 'sign-in'
     }
     else {
@@ -250,21 +257,21 @@ export class OrderComponent implements OnInit {
 
       default:
 
-        this.gotoNextMode()
+        await this.gotoNextMode()
 
         break
 
     }
   }
 
-  payOnline() {
+  async payOnline() {
     //  this.mode = 'pay-online'
     //this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'orderMode', 'pay-online'])
 
-    this.gotoMode('pay-online')
+    await this.gotoMode('pay-online')
   }
 
-  nextMode(currentMode: string) {
+  async nextMode(currentMode: string) {
 
     console.error('nextMode() triggered, current mode:', currentMode)
 
@@ -309,35 +316,40 @@ export class OrderComponent implements OnInit {
         nextMode = 'select-date'
       }
     }
+    else if (currentMode == 'order' && !hasServices && !this.authSvc.loggedOn()) {
+      // extMode = 'sign-in'
+      nextMode = null 
+      await this.collectUserInfo()
+    }
 
     console.warn(`Current mode = ${currentMode} -> nex mode = ${nextMode} `)
 
     return nextMode
   }
 
-  gotoNextMode() {
+  async gotoNextMode() {
 
-    let nextMode = this.nextMode(this.mode)
+    let nextMode = await this.nextMode(this.mode)
     // this.mode = nextMode
 
-    this.gotoMode(nextMode)
+    await this.gotoMode(nextMode)
 
     //this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'orderMode', nextMode])
 
   }
 
-  staffSelected(staff: string[]) {
+  async staffSelected(staff: string[]) {
 
 
     console.log(this.orderMgrSvc.order)
 
-    this.gotoNextMode()
+    await this.gotoNextMode()
 
     //this.mode = 'select-time-slot'
   }
 
-  personsSelected() {
-    this.gotoNextMode()
+  async personsSelected() {
+    await this.gotoNextMode()
 
     //this.mode = 'select-date'
   }
@@ -349,22 +361,25 @@ export class OrderComponent implements OnInit {
 
     await this.orderMgrSvc.saveOrder(true)
 
-    this.gotoNextMode()
+    await this.gotoNextMode()
   }
 
 
-  posShowContact() {
+  async posShowContact() {
 
     // this.mode = 'contact-edit'
 
-    this.gotoMode('contact-edit')
+    await this.gotoMode('contact-edit')
 
   }
 
 
-  inlineContactSaved(order: Order) {
+  async inlineContactSaved(order: Order) {
     this.mode = 'contact-edit'
-    this.gotoNextMode()
+
+    await this.orderMgrSvc.saveOrder(true)
+
+    await this.gotoNextMode()
   }
 
 }

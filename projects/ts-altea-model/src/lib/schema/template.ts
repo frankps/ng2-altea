@@ -1,7 +1,7 @@
 
 
 
-import { Branch, Message, MessageDirection, MsgType, Order, TemplateAction, TemplateFormat, TextComponent, TextParameter, WhatsAppBodyComponent, WhatsAppButtonComponent, WhatsAppButtonsComponent, WhatsAppHeaderComponent, WhatsAppTemplateComponent, WhatsAppUrlButtonComponent } from "ts-altea-model";
+import { Branch, Contact, Message, MessageDirection, MsgType, Order, TemplateAction, TemplateFormat, TextComponent, TextParameter, WhatsAppBodyComponent, WhatsAppButtonComponent, WhatsAppButtonsComponent, WhatsAppHeaderComponent, WhatsAppTemplateComponent, WhatsAppUrlButtonComponent } from "ts-altea-model";
 import 'reflect-metadata';
 import { ArrayHelper, DateHelper, ObjectWithIdPlus, StringHelper } from 'ts-common'
 import * as _ from "lodash";
@@ -10,6 +10,9 @@ import * as dateFns from 'date-fns'
 import * as Handlebars from "handlebars"
 import { ObjectWithParameters } from "./object-with-parameters";
 import * as CryptoJS from 'crypto-js'
+import { ProductTemplate } from "./product-template";
+import { Type } from "class-transformer";
+import { TemplateMessage } from "./template-message";
 
 /*
 export enum OrderTemplate {
@@ -38,10 +41,15 @@ export class Template extends ObjectWithParameters {
   cat?: string
 
   code?: string | null
+
+  /** a suffix added to the code */
+  suffix?: string | null
+
   name?: string | null
   lang?: string | null
   subject?: string | null
   body?: string | null
+  info?: string | null
   short?: string | null
   remind = 60
 
@@ -55,6 +63,61 @@ export class Template extends ObjectWithParameters {
 
   hash: string
 
+
+  @Type(() => ProductTemplate)
+  products?: ProductTemplate[]
+
+  @Type(() => TemplateMessage)
+  messages?: TemplateMessage[]
+
+
+  addProduct(productId: string) {
+
+    if (!this.products)
+      this.products = []
+
+    const productTemplate = new ProductTemplate()
+    productTemplate.productId = productId
+    this.products.push(productTemplate)
+    //this.markAsUpdated('products')
+  }
+
+  productIds() {
+
+    if (ArrayHelper.IsEmpty(this.products))
+      return []
+
+    return this.products.map(p => p.productId)
+  }
+
+  productNames() {
+
+    if (ArrayHelper.IsEmpty(this.products))
+      return []
+
+    return this.products.map(p => p.product.name)
+  }
+
+  productNamesAsString(separator = ', '): string {
+
+    if (ArrayHelper.IsEmpty(this.products))
+      return ''
+
+    return this.productNames().join(separator)
+  }
+
+  firstProductSlug() {
+    if (ArrayHelper.IsEmpty(this.products))
+      return null
+
+    let templateProduct = this.products.find(p => p.product?.slug)
+
+    if (!templateProduct)
+      return null
+
+    return templateProduct.product.slug
+
+  }
 
   channelsToString(): string {
 
@@ -376,7 +439,7 @@ export class Template extends ObjectWithParameters {
   }
 
 
-  merge(branch: Branch, replacements: any, orderId: string, addParamsForRemoteTemplating: boolean = false): Message {
+  merge(branch: Branch, replacements: any, orderId: string = null, addParamsForRemoteTemplating: boolean = false): Message {
 
     const message = new Message()
 
@@ -432,9 +495,15 @@ export class Template extends ObjectWithParameters {
             const valueMap = this.createValueMap(paramNames, replacements)
             url = this.replaceParamNamesWithValues(url, valueMap)
 
-            var urlPath = new URL(url).pathname
+
+            let urlObj = new URL(url)
+
+            var urlPath = urlObj.pathname
             urlPath = urlPath.substring(1)
 
+            if (urlObj.search)
+              urlPath += urlObj.search
+          
             message.addTextParameter('url-path', urlPath, TextComponent.actions, actionIdx)
 
           }
@@ -454,6 +523,32 @@ export class Template extends ObjectWithParameters {
 
   }
 
+  mergeWithContact(contact: Contact, branch: Branch, addParamsForRemoteTemplating: boolean = false, replacements: any = {}, message: Message = null): Message {
+
+
+    if (!message)
+      message = new Message()
+
+    message.branchId = branch.id
+    //message.conta = contact.id
+    message.code = this.code
+    message.dir = MessageDirection.out
+    message.auto = true   //this is automatic message
+    message.fmt = this.format
+
+    /*     const replacements = {
+          'first': contact.first,
+          'name': contact.name,
+        } */
+    replacements['first'] = contact.first
+    replacements['name'] = contact.name
+
+    let msg = this.merge(branch, replacements, null, addParamsForRemoteTemplating)
+
+
+
+    return msg
+  }
 
   /**
    * 
@@ -485,7 +580,7 @@ export class Template extends ObjectWithParameters {
         contactFirstName = order.for.split(' ')[0]
       }
 
-      
+
     }
 
     const replacements = {
@@ -545,3 +640,4 @@ export class Template extends ObjectWithParameters {
   }
 
 }
+

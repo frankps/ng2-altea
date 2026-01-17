@@ -300,6 +300,11 @@ export class DbQueryTyped<T> extends DbQuery {
 
 }
 
+export class PrismaNativeQuery<T> {
+  constructor(public typeName: string, public type?: { new(): T; }, public prismaQuery?: any) {
+  }
+}
+
 /**
  *  Typically used for updating object:
  *  Inp: partial object having an id and only those properties to update {id: 'abc', propToUpodate: 'update' }

@@ -96,7 +96,17 @@ export class Subscription extends ObjectWithIdPlus {
 
     let valueIds = option.values.filter(v => ObjectHelper.notNullOrUndefined(v)).map(v => v.id)
 
-    return valueIds 
+    return valueIds
+  }
+
+  /** In case of a product bundle, return the product ids of the items, otherwise just the unit product id */
+  getUnitProductIds(): string[] {
+  
+
+    if (this.unitProduct?.hasItems())
+      return this.unitProduct.items.flatMap(item => item.productId)
+
+    return [this.unitProductId]
   }
 
   /** created at */

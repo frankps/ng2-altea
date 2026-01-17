@@ -8,6 +8,19 @@
 
 
 
+<div class="row mt-4">
+    <div class="col">
+
+        <textarea rows="3" class="form-control" id="input" name="input" style="height: 80px"
+            [(ngModel)]="input"
+            ></textarea>
+
+    </div>
+</div>
+
+<button type="button" class="btn btn-primary btn-sm mx-3 my-3" (click)="optOut(input)">Opt out emails</button>
+
+
 <ng-container *ngIf="stripeEvents">
 
     <ul class="list-group" *ngFor="let event of stripeEvents">
@@ -69,6 +82,10 @@
     </ng-select> -->
 
 
+    <button type="button" class="btn btn-primary btn-sm mx-3 my-3" (click)="sleepingContacts()">Sleeping contacts</button>
+
+
+
     <button type="button" class="btn btn-primary btn-sm mx-3 my-3" (click)="getSubscriptions()">Subscriptions</button>
 
 
@@ -85,6 +102,8 @@
     <button type="button" class="btn btn-primary btn-sm mx-3 my-3" (click)="prepareProductTasks()">Prepare product tasks</button>
 
     <button type="button" class="btn btn-primary btn-sm mx-3 my-3" (click)="bodySculptorReporting()">BodySculptor report</button>
+
+    <button type="button" class="btn btn-primary btn-sm mx-3 my-3" (click)="queryBodySculptorCustomers()">BodySculptor customers</button>
 
 </ng-container>
 

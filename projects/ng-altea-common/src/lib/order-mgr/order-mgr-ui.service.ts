@@ -518,6 +518,10 @@ export class OrderMgrUiService {   // implements OnInit
 
     let product = await me.productSvc.queryFirst$(query)
 
+    // very important to have resources ordered by idx
+    if (ArrayHelper.NotEmpty(product.resources))
+      product.resources = _.orderBy(product.resources, 'idx')
+
     this.slugProduct = product
 
     me.spinner.hide()
@@ -1692,15 +1696,15 @@ export class OrderMgrUiService {   // implements OnInit
     if (qty > 0 && qty < product.minQty)
       qty = product.minQty
 
-    me.orderLine = new OrderLine(product, qty, initOptionValues)
+    me.orderLine = new OrderLine(product, qty, initOptionValues, this.isPos)
 
-    me.preselectSpecialPrices(me.orderLine)
+    // me.preselectSpecialPrices(me.orderLine)
 
     return me.orderLine
   }
 
 
-  preselectSpecialPrices(orderLine: OrderLine, reset: boolean = false) {
+   preselectSpecialPrices(orderLine: OrderLine, reset: boolean = false) {
 
 
 
@@ -1724,7 +1728,7 @@ export class OrderMgrUiService {   // implements OnInit
         if (!price.auto)  // we only auto-apply prices that are marked as auto
           continue
 
-        /** if there are price conditions, then we will not pre-select automatically */
+        // if there are price conditions, then we will not pre-select automatically 
         if (price.hasConditions())
           continue
 
@@ -1740,7 +1744,7 @@ export class OrderMgrUiService {   // implements OnInit
 
 
 
-  }
+  } 
 
 
 

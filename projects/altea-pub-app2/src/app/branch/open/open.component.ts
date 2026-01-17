@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { OrderMgrUiService, OrderUiMode, OrderUiState, SessionService } from 'ng-altea-common';
+import { ObjectService, OrderMgrUiService, OrderUiMode, OrderUiState, SessionService, TemplateMessageService } from 'ng-altea-common';
 import { combineLatest } from 'rxjs';
+import { AlteaDb } from 'ts-altea-logic';
 
 
 // http://localhost:4350/branch/aqua/open/cerelift-pro/option
@@ -26,7 +27,7 @@ import { combineLatest } from 'rxjs';
 export class OpenComponent implements OnInit {
   productSlug: string | null = null;
 
-  constructor(private route: ActivatedRoute, protected sessionSvc: SessionService, protected router: Router, protected orderMgrSvc: OrderMgrUiService) { }
+  constructor(private route: ActivatedRoute, protected sessionSvc: SessionService, protected router: Router, protected orderMgrSvc: OrderMgrUiService, protected dbSvc: ObjectService, protected templateMessageSvc: TemplateMessageService) { }
 
   ngOnInit() {
     
@@ -51,7 +52,21 @@ export class OpenComponent implements OnInit {
       console.error('Route params:', me.productSlug);
       console.error('Query params:', queryParams);
 
+
+      let messageId = queryParams['message-id']
+
+      if (messageId) {
+        await me.registerMessageClick(messageId)
+
+        delete queryParams['message-id']
+      }
+      
       await me.createOrder(me.productSlug, queryParams)
+
+
+
+
+
       // Now you can proc
       // eed with both params and queryParams available
       // await this.createOrder(this.slug);
@@ -63,6 +78,25 @@ export class OpenComponent implements OnInit {
   }
 
 
+  async registerMessageClick(messageId: string) {
+
+
+    let update = {
+      id: messageId,
+      clicked: new Date()
+    }
+
+    let result = await this.templateMessageSvc.update$(update)
+
+
+    if (result.isOk) {
+      console.log('Message clicked')
+    } else {
+      console.error('Problem clicking message', result.error)
+    }
+
+
+  }
 
 
   async createOrder(productSlug: string, params?: any) {
@@ -80,7 +114,7 @@ export class OpenComponent implements OnInit {
       this.orderMgrSvc.showOrderSummaryPlanning = true
       this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'orderMode', 'select-date'])
     } else {
-      this.orderMgrSvc.changeUiState(OrderUiState.browseCatalog)
+      // this.orderMgrSvc.changeUiState(OrderUiState.browseCatalog)
       this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'orderMode', 'order-line'])
     }
     

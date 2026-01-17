@@ -2,9 +2,15 @@
 
 <ng-container *ngFor="let plan of plannings">
 
+<!--     <div class="row mt-1">
+        <div class="col-1" (click)="debugPlanning(plan)">{{plan.id}}
 
+        </div>
+    </div> -->
     <div class="row mt-1">
-        <div class="col-1">{{plan.startDate | date:"dd/MM"}}
+        <div class="col-2">{{plan.startDate | date:"dd/MM"}}
+
+            <span class="badge rounded-pill text-bg-info" *ngIf="plan.prep">prep</span>
 
         </div>
         <div class="col-2">
@@ -12,8 +18,15 @@
             <input *ngIf="edit" type="time" id="start" name="start" required class="form-control form-control-sm"
                 [value]="plan.startHour" (change)="changeStartHour(plan, $event)" />
         </div>
-        <div class="col-1">{{plan.endDate | date:"HH:mm"}}</div>
-        <div class="col-1">{{plan.act}}</div>
+        <div class="col-2">
+
+            <span *ngIf="!edit">{{plan.endDate | date:"HH:mm"}}</span>
+            <input *ngIf="edit" type="time" id="end" name="end" required class="form-control form-control-sm"
+                [value]="plan.endHour" (change)="changeEndHour(plan, $event)" />
+
+
+        </div>
+        <!-- <div class="col-1">{{plan.act}}</div> -->
         <div class="col-3">
             <!--   <span *ngIf="!edit && plan.resourceGroup">{{plan.resourceGroup.shortOrName()}}</span>
  -->
@@ -25,10 +38,11 @@
 
         </div>
 
-        <div class="col-3">
+        <div class="col-2">
             <!-- 
         <span *ngIf="!edit && plan.resource">{{plan.resource.shortOrName()}}</span> -->
 
+            
             <ng-select *ngIf="resources" id="resourceId_{{plan.id}}" name="resourceId_{{plan.id}}" [disabled]="!edit"
                 [items]="resources" bindLabel="name" bindValue="id" [clearable]="false" [multiple]="false"
                 [(ngModel)]="plan.resourceId" (change)="resourceChanged(plan, 'resourceId', $event)">

@@ -1,8 +1,8 @@
 import { Component, ViewChild, inject } from '@angular/core';
-import { Contact, DateRangeTests, Message, MsgType, Order, PaymentType, PriceCondition, PriceConditionType, Product, SmsMessage, Subscription, TemplateChannel, User, ValueComparator } from 'ts-altea-model';
+import { Contact, DateRangeTests, Message, MsgType, Order, OrderLine, PaymentType, PriceCondition, PriceConditionType, Product, SmsMessage, Subscription, TemplateChannel, User, ValueComparator } from 'ts-altea-model';
 import { SearchContactComponent } from '../../contact/search-contact/search-contact.component';
 import { AlteaService, BranchService, ObjectService, OrderService, ProductService, ResourceService, ScheduleService, SessionService, TemplateService, UserService } from 'ng-altea-common';
-import { AlteaDb, CheckDeposists, CreateReportingData, OrderCronJobs, OrderMessaging, OrderMgmtService, ProductReporting, TaskSchedulingService } from 'ts-altea-logic';
+import { AlteaDb, CheckDeposists, ContactReactivation, CreateReportingData, OptOutContacts, OrderCronJobs, OrderMessaging, OrderMgmtService, ProductReporting, TaskSchedulingService } from 'ts-altea-logic';
 import { TranslationService } from 'ng-common'
 import { Country } from 'ts-altea-model'
 import { DbQuery, DbQueryTyped, HtmlTable, ObjectHelper, QueryOperator, Translation } from 'ts-common';
@@ -51,6 +51,13 @@ export class DemoComponent {
 
   initialized = false
 
+  input: string = `Email
+eric.ysewyn@telenet.be
+alma-tronconi@gmail.com
+luypaertellen@gmail.com
+lgermonpre@deloitte.com
+masidelautaro@yahoo.com`
+
   constructor(private http: HttpClient, public dbSvc: ObjectService, protected translationSvc: TranslationService, protected backEndSvc: ObjectService
     , protected userSvc: UserService, protected resourceSvc: ResourceService, protected anySvc: ScheduleService, protected productSvc: ProductService, protected orderSvc: OrderService,
     protected messagingSvc: MessagingService, protected stripeSvc: StripeService, protected sessionSvc: SessionService,
@@ -68,7 +75,7 @@ export class DemoComponent {
 
     console.error(this.subscriptionUnitProducts)
 
-    this.initialized = true
+    this.initialized = true  
     //   this.read()
     /* 
         await this.translationSvc.translateEnum(Country, 'enums.country.', this.countries)
@@ -76,6 +83,59 @@ export class DemoComponent {
     
         console.warn(this.country) */
   }
+
+
+  async optOut(input: string) {
+
+    console.error(input)
+
+    if (!input)
+      return
+
+    let emails = input.split('\n').map(email => email.trim())
+
+    let optOutContacts = new OptOutContacts(this.dbSvc)
+
+    let contacts = await optOutContacts.optOut(emails)
+
+    console.error(contacts)
+  }
+
+  async sleepingContacts() {
+
+    let alteaDb = new AlteaDb(this.dbSvc)
+
+    let contactReactivation = new ContactReactivation(alteaDb)  
+
+    console.error('sleepingContacts')
+
+    let res = await contactReactivation.reactivateContacts()
+    console.log(res)
+
+
+    /*
+    let templates = await contactReactivation.getTemplates()
+    console.log(templates)
+
+
+    let res = await alteaDb.createTemplate(templates[0])
+
+    //let res = await this.templateSvc.create$(templates[0])
+    console.log(res)
+    */
+
+
+    /*
+    console.error(templates)
+
+    let alteaDb = new AlteaDb(this.dbSvc)
+
+    let contacts = await alteaDb.getSleepingContacts(this.sessionSvc.branchId, 60)
+
+    console.error(contacts)
+    */
+  }
+
 
   async aggregateReportData() {
     let alteaDb = new AlteaDb(this.dbSvc)
@@ -116,6 +176,51 @@ export class DemoComponent {
 
     this.downloadCSV(csvString, 'body-sculptor-report.csv')
   }
+
+  /*
+  Isabel <pieters.isabel@scarlet.be>; Mieke <mieke.beeckman@gmail.com>; Ilse <ilse.van.loo@hotmail.be>; Pascale <pascale.dhaenens@telenet.be>; Sonja <sonja.lauwers2@telenet.be>; Viviane <vivianedevalez@hotmail.com>; Linda <lindaknockaert6@gmail.com>; Kader <kader.capa@hotmail.com>; Annelie <annelie.bettens@gmail.com>; Elke <elkero@hotmail.com>; Nele <nele.van.vreckem@telenet.be>; els <elsenfree@hotmail.com>; Aurelie <aurelie.capiau@hotmail.com>; Jenny  <jenny.de.clercq@hotmail.com>; Carine <delmottecarine63@gmail.com>; Hilde <info@aquasense.be>; Nel <nel.vanherreweghe@gmail.com>; Nathalie <natje.decock@telenet.be>; Hilde <deswarte.hilde@gmail.com>; Karla <karla.colaes@gmail.com>; Elke <elke@signedelke.be>; Amine <emine.ekinci482@gmail.com>; Lies <lieslyppens@gmail.com>; Lina Maria  <lina.jooris@yahoo.com>; Marijke <Marijkemesselis@icloud.com>; Linda <linda.deschoenmacker@gmail.com>; Inge <martens_inge@hotmail.com>; Soumia  <soumia.ouali@telenet.be>; Saskia <saskia.baetens@telenet.be>
+*/
+
+  async queryBodySculptorCustomers() {
+
+    let alteaDb = new AlteaDb(this.dbSvc)
+
+    console.error('queryBodySculptorCustomers')
+
+
+
+    let subsQry = new DbQueryTyped<OrderLine>('orderLine', OrderLine)
+    subsQry.include('order.contact')
+    subsQry.and('productId', QueryOperator.equals, '3a52a26d-6cf7-4f56-bfcc-049d44fd9402')  // '83c7a2b4-83b8-49af-adbb-cc107649f0c2'
+    // subsQry.and('order.start', QueryOperator.greaterThan, 20250829000000)
+
+    console.error(subsQry)
+
+    let orderLines = await this.dbSvc.query$<OrderLine>(subsQry)
+
+    let contacts = orderLines.map(l => {
+      let contact = l.order?.contact
+
+      if (!contact) return null
+
+      //return `${contact.first} <${contact.email}>`
+
+      return `${contact.email};${contact.first};${contact.last};V`
+    }).filter(c => c != null)
+
+    contacts = _.uniq(contacts)
+
+    // let contactList = contacts.join('; ')
+
+    contacts.splice(0, 0, 'Email;Naam;Achternaam;Geslacht')
+
+    let contactList = contacts.join('\n')
+
+    console.error(contacts)
+    console.error(contactList)
+  }
+
+
 
   async prepareProductTasks() {
     let alteaDb = new AlteaDb(this.dbSvc)
@@ -407,7 +512,7 @@ export class DemoComponent {
       let contactOrders = orders.filter(o => o.contactId === sub.contactId)
 
       for (let order of contactOrders) {
-        table.addRow(['',order.startDateFormat(), order.lines.map(l => l.product.name).join(', ')])
+        table.addRow(['', order.startDateFormat(), order.lines.map(l => l.product.name).join(', ')])
       }
 
 

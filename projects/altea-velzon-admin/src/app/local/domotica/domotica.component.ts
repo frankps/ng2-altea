@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { plainToInstance } from 'class-transformer';
 import { LocalService } from 'ng-altea-common';
 import { Action, ActionType, Event, LuxomAddress, LuxomState, LuxomGetState } from 'ts-altea-model';
+import { ApiListResult } from 'ts-common';
 
 @Component({
   selector: 'app-domotica',
@@ -27,10 +28,14 @@ export class DomoticaComponent implements OnInit {
     //await this.getLuxomState()
   }
 
+  test() {
+    console.error('test')
+  }
+
   async getSaunaState() {
 
-    
-    const luxomState = new LuxomGetState([LuxomAddress.saunaStoombad ])
+
+    const luxomState = new LuxomGetState([LuxomAddress.saunaStoombad])
 
     const action = new Action(ActionType.luxomState, luxomState)
 
@@ -47,7 +52,14 @@ export class DomoticaComponent implements OnInit {
 
     const action = new Action(ActionType.luxomState, luxomState)
 
-    const res = await this.localSvc.executeAction$(action)
+    let res: ApiListResult<any>
+
+    try {
+      res = await this.localSvc.executeAction$(action)
+    } catch (error) {
+      console.error(error)
+    }
+     
 
     console.warn(res)
 

@@ -149,12 +149,13 @@ export class SlotFinder {
 
         let firstItemAvailabilities = availability.getAvailabilities(firstRequestItem.resources)
 
-
+  
         // if there are group level reservations, then we need to subtract them from the availabilities
+        
         let possibleResources = firstRequestItem.resources
-
+        
         firstItemAvailabilities = this.subtractGroupLevelReservations(possibleResources, firstItemAvailabilities, ctx, availability)
-
+        
 
         let i = 0
 

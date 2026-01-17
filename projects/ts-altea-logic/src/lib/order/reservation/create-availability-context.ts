@@ -231,6 +231,11 @@ export class CreateAvailabilityContext {
      */
     processRecurrences(schedules: Schedule[], resourcePlannings: ResourcePlannings, availabilityRequest: AvailabilityRequest) {
 
+        let from = availabilityRequest.fromDate()
+
+        if (from.getFullYear() <= 2026)
+            return
+
         if (ArrayHelper.NotEmpty(schedules)) {
             for (const schedule of schedules) {
 
@@ -238,6 +243,7 @@ export class CreateAvailabilityContext {
                 let hifrDagAfwezig = '6bbe99b0-5c47-4823-924f-2c865cd180d8'
                 if (schedule.id == hifrDagAfwezig) {
                     schedule.rec = ScheduleRecurrence.getHifrDagAfwezig()
+                    
                 }
 
                 this.scheduleRecurrenceToResourcePlannings(schedule, resourcePlannings, availabilityRequest)
@@ -255,7 +261,7 @@ export class CreateAvailabilityContext {
 
     scheduleRecurrenceToResourcePlannings(schedule: Schedule, resourcePlannings: ResourcePlannings, availabilityRequest: AvailabilityRequest) {
 
-        if (!schedule?.rec)
+        if (ArrayHelper.IsEmpty(schedule?.rec))
             return
 
         let from = availabilityRequest.fromDate()

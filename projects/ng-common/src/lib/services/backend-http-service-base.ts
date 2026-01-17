@@ -319,6 +319,7 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
     if (resourceId)
       url = this.appendQueryParams(url, `resId=${resourceId}`)
 
+
     const observ = this.http.put<any>(url, object).pipe(map(res => {
 
       res = this.makeApiResultTyped(res)
@@ -336,6 +337,9 @@ export class BackendHttpServiceBase<T extends ObjectWithId> extends BackendServi
 
       return res
     }))
+
+
+
 
     return observ
   }

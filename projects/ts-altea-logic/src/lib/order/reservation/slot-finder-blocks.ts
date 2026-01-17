@@ -114,9 +114,10 @@ export class SlotFinderBlocks {
     preconfiguredBlocksOnly(schedule: Schedule, product: Product) : boolean {
 
         let hifrAfwezig = 'd507d664-3d8f-4ebe-bb3b-86dcd7df6fc8'
+        let hifrDagAfwezig = '6bbe99b0-5c47-4823-924f-2c865cd180d8'
         let wellness = '31eaebbc-af39-4411-a997-f2f286c58a9d'
 
-        if (schedule.id == hifrAfwezig && product.id == wellness)
+        if ((schedule.id == hifrAfwezig || schedule.id == hifrDagAfwezig) && product.id == wellness)
             return true
 
         return false

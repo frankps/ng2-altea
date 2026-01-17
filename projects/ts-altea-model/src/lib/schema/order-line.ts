@@ -542,7 +542,7 @@ export class OrderLine extends ObjectWithIdPlus {
 
 
 
-  constructor(product?: Product, qty = 1, initOptionValues?: Map<String, String[]>) {
+  constructor(product?: Product, qty = 1, initOptionValues?: Map<String, String[]>, isPos: boolean = false) {
     super()
 
 
@@ -616,12 +616,53 @@ export class OrderLine extends ObjectWithIdPlus {
 
     }
 
+    this.preselectSpecialPrices(product, isPos)
     this.calculateAll()
     console.error(this.incl)
   }
 
 
+  preselectSpecialPrices(product: Product, isPos: boolean = false, reset: boolean = false) {
 
+
+
+    //let product = this.product
+
+    let hasSpecialPrices = product.hasSpecialPrices()
+
+    if (hasSpecialPrices) {
+
+      if (reset) {
+        this.pc = []
+      }
+
+      let prices = product.getSpecialPrices(isPos)
+
+      for (let price of prices) {
+
+        if (!isPos && price.posOnly)
+          continue
+
+        if (!price.auto)  // we only auto-apply prices that are marked as auto
+          continue
+
+        // if there are price conditions, then we will not pre-select automatically 
+        if (price.hasConditions())
+          continue
+
+        if (this.hasPriceChange(price.id))
+          continue
+
+        this.applyPrice(price)
+
+      }
+
+
+    }
+
+
+
+  }
 
 
 
@@ -1078,6 +1119,10 @@ export class OrderLine extends ObjectWithIdPlus {
   calculateUnitPrice(startDate?: Date, creationDate?: Date): number {
 
     let unitPrice = this.base
+
+    /*     if (this.product?.salesPrice) 
+          unitPrice = this.product.salesPrice */
+
 
     if (!this.hasOptions()) {
       return unitPrice

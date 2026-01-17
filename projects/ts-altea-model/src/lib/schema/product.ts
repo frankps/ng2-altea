@@ -11,6 +11,7 @@ import * as Handlebars from "handlebars"
 import * as sc from 'stringcase'
 import { OrderPersonMgr } from "../order-person-mgr";
 import { CancelOrderMessage } from "ts-altea-logic";
+import { ProductTemplate } from "./product-template";
 
 
 export enum ProductType {
@@ -385,6 +386,9 @@ export class Product extends ObjectWithIdPlus {
   @Type(() => ProductResource)
   resources?: ProductResource[]
 
+  @Type(() => ProductTemplate)
+  templates?: ProductTemplate[]
+
   lines?: OrderLine[]
 
   /** certain tasks are related to a product (make a dish, clean-up) */
@@ -568,6 +572,10 @@ export class Product extends ObjectWithIdPlus {
 
   salesPricing(onDate: Date = new Date()): number {
 
+    return this.salesPrice
+
+
+
     if (ArrayHelper.IsEmpty(this.prices))
       return this.salesPrice
 
@@ -590,7 +598,7 @@ export class Product extends ObjectWithIdPlus {
         return specialPrice.value
 
       case PriceMode.pct: {
-        var newPrice = this.salesPrice * (1 - specialPrice.value / 100)
+        var newPrice = this.salesPrice * (1 + specialPrice.value / 100)
         return newPrice
       }
     }

@@ -845,6 +845,12 @@ export class ResourcePlanning extends ObjectWithIdPlus implements IAsDbObject<Re
     this.end = DateHelper.yyyyMMddhhmmss(value)
   }
 
+  get endHour(): string {
+    let hour = dateFns.format(this.endDate, 'HH:mm')    //DateHelper.parse(this.start)
+
+    return hour
+  }
+
   get endDate() {
     return DateHelper.parse(this.end)
   }
@@ -931,6 +937,31 @@ export class ResourcePlanning extends ObjectWithIdPlus implements IAsDbObject<Re
     return newStart
   }
 
+  changeEndHour(newEndHour: string): Date {
+    if (!newEndHour)
+      return null
+
+    let items = newEndHour.split(':')
+
+    if (items.length != 2)
+      return null
+
+    let hour = + items[0]
+    let min = + items[1]
+
+    let endDate = this.endDate
+
+    let newEnd = dateFns.startOfDay(endDate)
+
+    newEnd = dateFns.addHours(newEnd, hour)
+    newEnd = dateFns.addMinutes(newEnd, min)
+
+    this.endDate = newEnd
+
+
+
+    return newEnd
+  }
 
 
   toDateRange(): DateRange {

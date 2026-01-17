@@ -11,6 +11,7 @@ import * as Handlebars from "handlebars"
 import * as sc from 'stringcase'
 import { OrderPersonMgr } from "../order-person-mgr";
 import { CancelOrderMessage } from "ts-altea-logic";
+import { TemplateMessage } from "./template-message";
 
 /**
  * implements shared logic for Contact & User
@@ -120,6 +121,8 @@ export class User extends UserBase {
 
   /** to be used when block=true, show this message */
   alert?: string
+
+
 
   email?: string
   mobile?: string
@@ -257,7 +260,8 @@ export class Contact extends UserBase {
   /** Mobile number confirmed */
   mobileConf = false
 
-
+  optOut: boolean = false
+  
   /** Allowed messaging for communication (valid strings: see enum MsgTyp) */
   //msg: string[] = ['email', 'wa']
 
@@ -305,6 +309,8 @@ export class Contact extends UserBase {
   @Type(() => LoyaltyCard)
   cards?: LoyaltyCard[]
 
+  @Type(() => TemplateMessage)
+  messages?: TemplateMessage[];
 
   /** date of last review: used in check for new review request (min x days between reviews) */
   revDate?: Date

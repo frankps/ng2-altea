@@ -41,6 +41,10 @@ export class DebugPlanningsComponent implements OnInit {
 
   }
 
+  debugPlanning(plan: ResourcePlanning) {
+    console.log(plan)
+  }
+
 
   async ngOnInit() {
 
@@ -61,6 +65,18 @@ export class DebugPlanningsComponent implements OnInit {
     console.log(startHour)
 
     plan.changeStartHour(startHour)
+
+    this.planningChanges.update(plan)
+
+  }
+
+
+  changeEndHour(plan: ResourcePlanning, event) {
+
+    let endHour = event.srcElement.value
+    console.log(endHour)
+
+    plan.changeEndHour(endHour)
 
     this.planningChanges.update(plan)
 

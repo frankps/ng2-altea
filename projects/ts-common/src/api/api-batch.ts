@@ -1,3 +1,4 @@
+import { ArrayHelper } from "../lib/array-helper"
 import { ApiResultBase } from "./api-result"
 import { ApiStatus } from "./api-status"
 
@@ -14,6 +15,10 @@ export class ApiBatchProcess<ObjectType> {
         if (this.delete && this.delete.length > 0) return true
 
         return false
+    }
+
+    hasUpdates(): boolean {
+        return ArrayHelper.NotEmpty(this.update)
     }
 }
 

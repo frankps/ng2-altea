@@ -76,12 +76,12 @@ export class ProductPlanningComponent implements OnInit {
       return "not found"
 
   }
-
+  
 
   async doPlanPrepTimes() {
-
-    let from = new Date(2025, 8 , 1)
-    let to = new Date(2025, 8, 15)
+  
+    let from = new Date(2025, 11 , 13)
+    let to = new Date(2025, 11, 16 )
     let scheduleId = 'd507d664-3d8f-4ebe-bb3b-86dcd7df6fc8'
 
     // Wellness supervisor - from:start-30  duration:+35 min

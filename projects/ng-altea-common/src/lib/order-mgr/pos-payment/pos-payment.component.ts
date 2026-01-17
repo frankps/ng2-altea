@@ -1,12 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { OrderMgrUiService } from '../order-mgr-ui.service';
-import { CompensationGiftReason, Gift, LoyaltyReward, OrderLine, Payment, PaymentType, ProductItemOptionMode, Subscription, TemplateCode } from 'ts-altea-model';
+import { CompensationGiftReason, Gift, LoyaltyReward, Order, OrderLine, Payment, PaymentType, ProductItemOptionMode, Subscription, TemplateCode } from 'ts-altea-model';
 import { GiftService } from '../../data-services/sql/gift.service';
 import { SessionService } from '../../session.service';
 import { SubscriptionService } from '../../data-services/sql/subscription.service';
-import { ArrayHelper, DbQuery, QueryOperator } from 'ts-common';
+import { ArrayHelper, DbQuery, PrismaNativeQuery, QueryOperator } from 'ts-common';
 import { AlteaService } from '../../altea.service';
 import * as _ from "lodash";
+import { ObjectService } from '../../object.service';
+
+
+/** 
+ * 
+ * 
+ */
+
 
 export enum PosPaymentMessage {
   none = 'none',
@@ -39,7 +47,7 @@ export class PosPaymentComponent implements OnInit {
   message: PosPaymentMessage = PosPaymentMessage.none
 
   constructor(protected mgrUiSvc: OrderMgrUiService, protected giftSvc: GiftService, protected sessionSvc: SessionService,
-    protected subSvc: SubscriptionService, protected alteaSvc: AlteaService) {
+    protected subSvc: SubscriptionService, protected alteaSvc: AlteaService, protected objSvc: ObjectService) {
   }
 
   async ngOnInit() {
@@ -104,7 +112,82 @@ export class PosPaymentComponent implements OnInit {
     return (this.mgrUiSvc.order?.contactId && ArrayHelper.AtLeastOneItem(productIds))
   }
 
+
+  async getActiveSubscriptions(branchId: string, contactId: string): Promise<Subscription[]> {
+
+    /* PRISMA query 
+    */
+    const qry = {
+      where: {
+        branchId,
+        del: false,
+        act: true,
+        contactId: contactId
+        //  unitProductId: { in: productIds }
+      },
+      take: 1000,
+      orderBy: { id: "desc" },
+      include: {
+        subscriptionProduct: { include: { items: true } },
+        //  { include: { items: { include: { product: { include: { items: true } } } } } },
+        unitProduct: { include: { items: true } }
+
+      }
+    }
+
+    let prismaQry = new PrismaNativeQuery<Subscription>('subscription', Subscription, qry)
+    let subscriptions = await this.objSvc.findMany$<Subscription>(prismaQry)
+
+    if (ArrayHelper.IsEmpty(subscriptions))
+      return []
+
+    /** Only return subscriptions that are not fully used */
+    subscriptions = subscriptions.filter(s => s.usedQty < s.totalQty)
+
+    return subscriptions
+
+  }
+
+  possibleSubscriptionsForOrder(subscriptions: Subscription[], order: Order): Subscription[] {
+
+    let productIds = order.getProductIds()
+
+    if (ArrayHelper.IsEmpty(productIds))
+      return []
+
+    let possibleSubscriptions = []
+
+    for (let subscription of subscriptions) {
+
+      if (order.hasProductIds(subscription.unitProductId)) {
+        possibleSubscriptions.push(subscription)
+        continue
+      }
+
+
+      /** in case the unit product is a bundle => contains multiple products (items)
+       *  then we need to check if all items are present in the order
+       */
+
+      if (ArrayHelper.IsEmpty(subscription.unitProduct?.items))
+        continue
+
+      let subscriptionProductIds = subscription.unitProduct?.items.flatMap(item => item.productId)
+
+      let orderHasAllSubscriptionProductIds = order.hasProductIds(...subscriptionProductIds)
+
+      if (orderHasAllSubscriptionProductIds) {
+        possibleSubscriptions.push(subscription)
+      }
+
+    }
+
+    return possibleSubscriptions
+  }
+
   async startSubscription(): Promise<PosPaymentMessage> {
+
+    let me = this
 
     let contactId = this.mgrUiSvc.order.contactId
 
@@ -118,18 +201,25 @@ export class PosPaymentComponent implements OnInit {
       return PosPaymentMessage.noContact
 
 
+    let subscriptions = await this.getActiveSubscriptions(me.sessionSvc.branchId, contactId)
+
+
+    me.subscriptions = me.possibleSubscriptionsForOrder(subscriptions, me.mgrUiSvc.order)
+
+    console.error(me.subscriptions)
+
+    /*
     let query = new DbQuery()
     query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
     query.and('unitProductId', QueryOperator.in, productIds)
     query.and('act', QueryOperator.equals, true)
     query.and('contactId', QueryOperator.equals, contactId)
 
-    // subscriptionProduct
     query.include('subscriptionProduct.items')
     //    query.include('unitProduct.items')
 
     this.subscriptions = await this.subSvc.query$(query)
-
+*/
     if (ArrayHelper.AtLeastOneItem(this.subscriptions)) {
       this.showSubscriptions = true
 
@@ -187,7 +277,89 @@ export class PosPaymentComponent implements OnInit {
   }
 
 
-  canUseSubscription(orderLine: OrderLine, subs: Subscription): boolean {
+  canUseSubscriptionForBundles(orderLines: OrderLine[], subs: Subscription): boolean {
+
+    let openQty = subs.openQty()
+
+    if (openQty <= 0)
+      return false
+
+    /*     if (orderLine.productId != subs.unitProductId)
+          return false */
+
+    let orderLine = orderLines[0]
+
+    /* Most subscriptions just have 1 item */
+    for (let prodItem of subs.unitProduct?.items) {
+
+      if (!prodItem.hasOptions())
+        continue
+
+      for (let option of prodItem.options) {
+
+        switch (option.mode) {
+          case ProductItemOptionMode.cust:
+
+            /** Custom subscription. The customer can choose option values themselves: the selected option values are stored in Subscription.options
+               *  => the orderline needs to have at least these options selected. (if other options with price are selected in orderline)
+                */
+            let subscriptionValueIds = subs.getOptionValueIds(option.id)
+            let orderLineValueIds = orderLine.getOptionValueIds(option.id)
+
+            let commonValueIds = _.intersection(subscriptionValueIds, orderLineValueIds)
+
+            if (commonValueIds.length < subscriptionValueIds.length) {
+
+              let msg = `Not all values from subscription are selected in orderline!`
+              console.warn(msg)
+              return false
+
+            }
+
+            break
+
+
+          default:
+
+            /** the options are preconfigured in the subscription-product, orderLine needs to have them */
+
+
+
+            let orderLineOption = orderLine.getOptionById(option.id)
+
+            if (!orderLineOption) {
+              let msg = `Orderline is missing option ${option.name}`
+              console.warn(msg)
+              return false
+            }
+
+            let valueIds = option.valueIds()
+
+            if (valueIds.length > 0 && !orderLineOption.hasAtLeastOne(valueIds)) {
+
+              let possibleValues = option.valueNames()
+              let msg = `Orderline option '${option.name}' is missing specific value: ${possibleValues.join(',')}`
+              console.warn(msg)
+              return false
+            }
+
+
+        }
+
+
+
+
+
+      }
+
+    }
+
+
+    return true
+
+  }
+
+  canUseSubscriptionForSingleProduct(orderLine: OrderLine, subs: Subscription): boolean {
 
     let openQty = subs.openQty()
 
@@ -268,36 +440,41 @@ export class PosPaymentComponent implements OnInit {
   }
 
 
-  async useSubscription(subs: Subscription) {
+  async useSubscription(subscription: Subscription) {
 
-    // whatever the current price, we need to pay the product (identified by unitProductId)
-    // let product = this.mgrUiSvc.getProduct(subs.unitProductId)  //order.getLineByProduct(subs.unitProductId)
+    let me = this
 
-    /*
+    let unitProductIds = subscription.getUnitProductIds()
 
-    */
+    if (ArrayHelper.IsEmpty(unitProductIds))
+      return
+
+    let orderLines = this.mgrUiSvc.order.getLinesByProducts(unitProductIds)
+
+    if (ArrayHelper.IsEmpty(orderLines))
+      return
+
+    if (unitProductIds.length != orderLines.length) {
+      console.error('Number of products in subscription does not match number of (matching) order lines')
+      return
+    }
+
+    let canUseSubscription = true
+    
+    if (unitProductIds.length == 1)
+      canUseSubscription = this.canUseSubscriptionForSingleProduct(orderLines[0], subscription)
 
 
+    let unitPrice = _.sumBy(orderLines, 'unit')
 
-    console.warn('useSubscription', subs)
 
+    if (canUseSubscription) {
 
-    let orderLine = this.mgrUiSvc.order.getLineByProduct(subs.unitProductId)
+      /** The back-end will update the subscription when saving the order */
+      const payment = await this.mgrUiSvc.addPayment(unitPrice, PaymentType.subs, 'pos')
 
-    if (orderLine) {
-
-      let canUseSubscription = this.canUseSubscription(orderLine, subs)
-
-      if (canUseSubscription) {
-
-        /** The back-end will update the subscription when saving the order */
-        const payment = await this.mgrUiSvc.addPayment(orderLine.unit, PaymentType.subs, 'pos')
-
-        payment.subsId = subs.id
-        subs.usedQty++
-
-      }
-
+      payment.subsId = subscription.id
+      subscription.usedQty++
 
     }
 

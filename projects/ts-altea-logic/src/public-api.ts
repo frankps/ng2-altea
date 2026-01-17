@@ -18,4 +18,4 @@ export * from './lib/order/messaging/order-messaging'
 export * from './lib/task/task-scheduling-service'
 export * from './lib/order'
 export * from './lib/reporting'
-
+export * from './lib/messaging'

@@ -1,7 +1,7 @@
 import { ArrayHelper } from "../array-helper"
+import { IHtmlItem } from "./html"
 
-
-export class HtmlTable {
+export class HtmlTable implements IHtmlItem {
 
     rows: any[] = []
 
