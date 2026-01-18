@@ -46,13 +46,10 @@ export class HtmlTable implements IHtmlItem {
         const htmlLines: string[] = []
 
 
-        let tableClass = ''
-
-        if (this.class)
-            tableClass = ` class="${this.class}"`
+        const tableClass = this.class ?? 'altea-table'
 
 
-        htmlLines.push(`<table${tableClass}>`)
+        htmlLines.push(`<table class="${tableClass}">`)
 
         let rowIdx = 0
 
