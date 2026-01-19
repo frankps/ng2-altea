@@ -58,7 +58,7 @@ export class OpenComponent implements OnInit {
       if (messageId) {
         await me.registerMessageClick(messageId)
 
-        delete queryParams['message-id']
+        //delete queryParams['message-id']
       }
       
       await me.createOrder(me.productSlug, queryParams)
@@ -74,17 +74,21 @@ export class OpenComponent implements OnInit {
 
 
 
-    //await this.createOrder(slug)
+    //await this.createOrder(slug)  
   }
 
 
   async registerMessageClick(messageId: string) {
 
+    
 
     let update = {
       id: messageId,
       clicked: new Date()
     }
+
+    console.warn('registerMessageClick:', messageId, update)
+
 
     let result = await this.templateMessageSvc.update$(update)
 

@@ -15,7 +15,7 @@ export class HtmlDoc {
         const styles = this.defaultStyles()
         const body = this.items.map(item => item.toHtmlString()).join('<br>\n')
 
-        return `${styles}\n${body}`
+        return `<html><head>${styles}</head><body>${body}</body></html>`
 
     }
 

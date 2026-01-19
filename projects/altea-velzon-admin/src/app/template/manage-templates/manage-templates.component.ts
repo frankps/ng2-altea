@@ -1,7 +1,7 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Template, TemplateAction, TemplateChannel, TemplateFormat, TemplateRecipient, TemplateType, WhatsAppTemplate, WhatsAppTemplateUpdate, orderTemplates } from 'ts-altea-model' //'../../../../../../libs/ts-altea-common/src';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ProductTemplate, Template, TemplateAction, TemplateChannel, TemplateFormat, TemplateRecipient, TemplateType, WhatsAppTemplate, WhatsAppTemplateUpdate, orderTemplates } from 'ts-altea-model' //'../../../../../../libs/ts-altea-common/src';
 import { DashboardService, NgSectionsComponent, ToastType } from 'ng-common';
-import { ApiStatus, CollectionChangeTracker, DbQuery, QueryOperator } from 'ts-common'
+import { ApiStatus, ArrayHelper, CollectionChangeTracker, DbQuery, ObjectHelper, QueryOperator } from 'ts-common'
 import { MessagingService, SessionService, TemplateService } from 'ng-altea-common'
 import * as _ from "lodash";
 import { NgxSpinnerService } from "ngx-spinner"
@@ -9,7 +9,7 @@ import { ToastService } from '../../velzon/dashboard/dashboard/toast-service';
 import { Editor, Toolbar } from 'ngx-editor'
 import { TranslationService } from 'ng-common'
 import { Translation } from 'ts-common'
-
+import { SearchProductComponent } from '../../product/search-product/search-product.component';
 
 export class TemplateTypeSelections {
   email_provider = false
@@ -28,6 +28,8 @@ export class TemplateVariant {
   styleUrls: ['./manage-templates.component.scss'],
 })
 export class ManageTemplatesComponent extends NgSectionsComponent implements OnInit, OnDestroy {
+
+  @ViewChild('searchProductModal') public searchProductModal: SearchProductComponent;
 
   // html editor 
   editor: Editor;
@@ -94,6 +96,8 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
 
   changes: CollectionChangeTracker<Template>
 
+  productTemplateChanges: CollectionChangeTracker<ProductTemplate>
+
 
   /** Basic templates: templates that are not related to an order */
   basicTemplates: Template[]
@@ -122,6 +126,41 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
   ngOnDestroy(): void {
     this.editor.destroy();
   }
+
+  async initTemplates(): Promise<Template[]> {
+
+    this.spinner.show()
+
+    const query = new DbQuery()
+    query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
+    //query.and('code', QueryOperator.in, orderTemplates)
+    //query.and('act', QueryOperator.equals, true)
+
+    query.include('products.product')
+    query.orderBy('idx')
+
+    this.templates = await this.templateSvc.query$(query)
+
+
+
+    this.basicTemplates = this.templates.filter(t => t.cat != 'order')
+
+    console.error('Basic templates!', this.basicTemplates)
+
+
+    this.makeSelections(this.templates)
+
+    console.warn(this.templates)
+
+    this.changes = new CollectionChangeTracker<Template>(this.templates, Template)
+
+    this.selectionsAvailable = true
+    this.spinner.hide()
+
+    return this.templates
+
+  }
+
 
   override cancel() {
     super.cancel()
@@ -171,39 +210,7 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
 
 
 
-  async initTemplates(): Promise<Template[]> {
 
-    this.spinner.show()
-
-    const query = new DbQuery()
-    query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
-    //query.and('code', QueryOperator.in, orderTemplates)
-    query.and('act', QueryOperator.equals, true)
-
-    query.include('products')
-    query.orderBy('idx')
-
-    this.templates = await this.templateSvc.query$(query)
-
-
-
-    this.basicTemplates = this.templates.filter(t => t.cat != 'order')
-
-    console.error('Basic templates!', this.basicTemplates)
-
-
-    this.makeSelections(this.templates)
-
-    console.warn(this.templates)
-
-    this.changes = new CollectionChangeTracker<Template>(this.templates, Template)
-
-    this.selectionsAvailable = true
-    this.spinner.hide()
-
-    return this.templates
-
-  }
 
 
 
@@ -332,7 +339,7 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
         let updateCopy = _.cloneDeep(this.template)
         delete updateCopy.products
 
-        const tplUpdateResult = await this.templateSvc.update$(this.template, this.sessionSvc.humanResource?.id)
+        const tplUpdateResult = await this.templateSvc.update$(updateCopy, this.sessionSvc.humanResource?.id)
 
         console.log('Hash: ', this.template.hash)
         this.canExport = false
@@ -393,7 +400,10 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
 
         this.template.updateHash()
 
-        const tplUpdateResult = await this.templateSvc.update$(this.template, this.sessionSvc.humanResource?.id)
+        let updateCopy = _.cloneDeep(this.template)
+        delete updateCopy.products
+
+        const tplUpdateResult = await this.templateSvc.update$(updateCopy, this.sessionSvc.humanResource?.id)
 
         console.log('Hash: ', this.template.hash)
 
@@ -469,34 +479,33 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
 
 
 
-    if (!this.changes.hasChanges())
-      return
+    if (this.changes.hasChanges()) {
+      const batch = this.changes.getApiBatch()
 
-    const batch = this.changes.getApiBatch()
-
-    if (batch.hasUpdates()) {
-
-      for (let template of batch.update) {
-         delete template['products']  // backend doesn't work with this field
+/*       if (batch.hasUpdates()) {
+  
+        for (let template of batch.update) {
+          delete template['products']  // backend doesn't work with this field
+        }
+  
+      } */
+  
+      console.error(batch)
+  
+      const res = await this.templateSvc.batchProcess$(batch, this.dashboardSvc.resourceId)
+  
+      console.warn(res)
+  
+  
+      if (res.status == ApiStatus.error) {
+        this.dashboardSvc.showToastType(ToastType.saveError)
+      } else {
+        this.dashboardSvc.showToastType(ToastType.saveSuccess)
+        this.changes.reset()
       }
-
+  
     }
 
-
-
-    console.error(batch)
-
-    const res = await this.templateSvc.batchProcess$(batch, this.dashboardSvc.resourceId)
-
-    console.warn(res)
-
-
-    if (res.status == ApiStatus.error) {
-      this.dashboardSvc.showToastType(ToastType.saveError)
-    } else {
-      this.dashboardSvc.showToastType(ToastType.saveSuccess)
-      this.changes.reset()
-    }
 
   }
 
@@ -507,4 +516,74 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
     this.canExport = template.hashChanged()
   }
 
+  deleteTemplate(template: Template) {
+    this.changes.delete(template)
+    this.basicTemplates = this.basicTemplates.filter(t => t.id != template.id)
+  }
+
+
+  copyTemplate(template: Template) {
+
+
+    let newTemplate = ObjectHelper.clone(template, Template)
+    newTemplate.newId()
+
+    newTemplate.extId = null
+    newTemplate.hash = null
+
+    if (!newTemplate.suffix)
+      newTemplate.suffix = ''
+
+    newTemplate.suffix += '1'
+
+    if (ArrayHelper.NotEmpty(newTemplate.products)) {
+      newTemplate.products.forEach(p => p.id = ObjectHelper.newGuid())
+    }
+
+
+    this.changes.add(newTemplate)
+
+    this.basicTemplates.push(newTemplate)
+
+  }
+
+  searchProduct() {
+    this.searchProductModal.show()
+  }
+
+  addProduct(product) {
+
+    let productTemplate = new ProductTemplate()
+    productTemplate.markAsNew()
+    productTemplate.productId = product.id
+    productTemplate.templateId = this.template.id
+    productTemplate.product = product
+
+    if (!this.template.products)
+      this.template.products = []
+
+    this.template.products.push(productTemplate)
+    
+
+    this.changes.update(this.template)
+
+    //this.changes.update(this.template)
+
+    console.warn(product)
+  }
+
+
+  deleteProduct(template: Template, productTemplate: ProductTemplate) {
+
+    if (!template || !productTemplate)
+      return
+
+    template.markAsRemoved('products', productTemplate.id)
+
+
+    this.template.products = template.products.filter(p => p.id != productTemplate.id)
+    //this.productTemplateChanges.delete(productTemplate)
+
+    this.changes.update(this.template)
+  }
 }

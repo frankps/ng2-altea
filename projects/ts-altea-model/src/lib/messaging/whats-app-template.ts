@@ -78,19 +78,21 @@ export class WhatsAppUrlButtonComponent extends WhatsAppButtonComponent {
 export class WhatsAppTemplateBase {
 
 
+    components: WhatsAppTemplateComponent[] = []
+
 
 }
 
 
-export class WhatsAppTemplateUpdate {
+export class WhatsAppTemplateUpdate extends WhatsAppTemplateBase {
 
     params: any
 
     constructor(public id: string) {
-
+        super()
     }
 
-    components: WhatsAppTemplateComponent[] = []
+
 
     static fromTemplate(tpl: Template): WhatsAppTemplateUpdate {
 
@@ -107,21 +109,20 @@ export class WhatsAppTemplateUpdate {
  * https://developers.facebook.com/docs/whatsapp/business-management-api/message-templates/components
  * 
  */
-export class WhatsAppTemplate {
+export class WhatsAppTemplate extends WhatsAppTemplateBase {
 
 
     allow_category_change = true
 
 
-    components: WhatsAppTemplateComponent[] = []
 
     constructor(public name: string, public category: 'AUTHENTICATION' | 'MARKETING' | 'UTILITY' = 'UTILITY', public language: string = 'nl') {
-
+        super()
     }
 
     static fromTemplate(tpl: Template): WhatsAppTemplate {
 
-        const waTpl = new WhatsAppTemplate(tpl.code)
+        const waTpl = new WhatsAppTemplate(tpl.fullCode())
         waTpl.components.push(...tpl.getWhatsAppComponents())
 
         return waTpl

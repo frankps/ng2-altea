@@ -70,6 +70,9 @@ export class Template extends ObjectWithParameters {
   @Type(() => TemplateMessage)
   messages?: TemplateMessage[]
 
+  fullCode(): string {
+    return `${this.code}${this.suffix ? `_${this.suffix}` : ''}`
+  }
 
   addProduct(productId: string) {
 
@@ -256,6 +259,21 @@ export class Template extends ObjectWithParameters {
 
   }
 
+  replaceParamNamesWithNumbersExample(text: string, paramNames: string[], startAt = 1) {
+
+    if (ArrayHelper.IsEmpty(paramNames))
+      return text
+
+    for (let param of paramNames) {
+      text = text.replaceAll(`{{${param}}}`, `${startAt++}`)
+    }
+
+    return text
+
+  }
+
+
+
   replaceParamNamesWithValues(text: string, values: Map<string, string>) {
 
     if (!values)
@@ -346,11 +364,17 @@ export class Template extends ObjectWithParameters {
 
           let exampleUrl = null
 
+          exampleUrl = this.replaceParamNamesWithNumbersExample(action.url, paramNames)
+
+          /* 
           if (paramNames.length == 1) {
             exampleUrl = this.removeParamBrackets(action.url, paramNames)
-          }
+          } */
 
-          const button = new WhatsAppUrlButtonComponent(action.label, url, exampleUrl)
+          let urlObj = new URL(url)
+          const urlBase = urlObj.origin + "/{{1}}"
+
+          const button = new WhatsAppUrlButtonComponent(action.label, urlBase, exampleUrl)
           whatsappButtons.buttons.push(button)
         }
 
@@ -439,9 +463,10 @@ export class Template extends ObjectWithParameters {
   }
 
 
-  merge(branch: Branch, replacements: any, orderId: string = null, addParamsForRemoteTemplating: boolean = false): Message {
+  merge(branch: Branch, replacements: any, orderId: string = null, addParamsForRemoteTemplating: boolean = false, message: Message = null): Message {
 
-    const message = new Message()
+    if (!message)
+      message = new Message()
 
     message.branchId = branch.id
     message.orderId = orderId
@@ -543,7 +568,7 @@ export class Template extends ObjectWithParameters {
     replacements['first'] = contact.first
     replacements['name'] = contact.name
 
-    let msg = this.merge(branch, replacements, null, addParamsForRemoteTemplating)
+    let msg = this.merge(branch, replacements, null, addParamsForRemoteTemplating, message)
 
 
 

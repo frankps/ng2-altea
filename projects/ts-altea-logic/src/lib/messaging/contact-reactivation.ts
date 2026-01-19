@@ -1,5 +1,5 @@
 
-import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbObject, DbQuery, DbQueryTyped, HtmlDoc, HtmlTable, ObjectHelper, QueryOperator } from 'ts-common'
+import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbObject, DbQuery, DbQueryTyped, HtmlDoc, HtmlTable, HtmlText, HtmlTextType, ObjectHelper, QueryOperator } from 'ts-common'
 import { Order, AvailabilityContext, AvailabilityRequest, AvailabilityResponse, Schedule, SchedulingType, ResourceType, ResourceRequest, TimeSpan, SlotInfo, PossibleSlots, ReservationOption, Solution, ResourcePlanning, PlanningInfo, PlanningProductInfo, PlanningContactInfo, PlanningResourceInfo, OrderState, Template, Message, MsgType, Branch, MsgInfo, TemplateCode, CustomerCancelReasons, MessageAddress, MessageDirection, TemplateFormat, Contact, ReviewStatus, ReviewPlatform, TemplateMessage } from 'ts-altea-model'
 import { Observable } from 'rxjs'
 import * as dateFns from 'date-fns'
@@ -10,6 +10,25 @@ import { IDb } from '../interfaces/i-db'
 import { MessagingBase } from './messaging-base'
 
 
+export class ContactReactivationError {
+
+    contact: Contact
+    template: Template
+    message: Message
+
+    result: ApiResult<Message>
+
+    constructor(contact: Contact, template: Template, message: Message, result: ApiResult<Message>) {
+        this.contact = contact
+        this.template = template
+        this.message = message
+        this.result = result
+    }
+
+
+
+}
+
 export class ContactReactivation extends MessagingBase {
 
 
@@ -17,12 +36,32 @@ export class ContactReactivation extends MessagingBase {
         super(db)
     }
 
+    delay = (ms: number) => new Promise(res => setTimeout(res, ms))
+
+
+    daysAgo(order: Order): number {
+
+        if (!order)
+            return 0
+
+        let daysAgo = dateFns.differenceInDays(new Date(), order.startDate)
+
+        return daysAgo
+
+    }
 
     async reactivateContacts() {
 
+        let me = this
+
+        let batchSize = 2
+        let maxBatches = 1
+
         let aquasenseId = '66e77bdb-a5f5-4d3d-99e0-4391bded4c6c'
 
-        let debug = true
+        let debug = true   // then an individual contact is processed: to check if message is merged & sent correctly
+
+        let sendWhatsApp = true  // also for debugging
 
         let branch = await this.alteaDb.getBranch(aquasenseId)
 
@@ -35,20 +74,22 @@ export class ContactReactivation extends MessagingBase {
 
         const htmlDoc = new HtmlDoc()
 
-
+        let messageCount = 0
 
         /*         console.log(testContact)
                 return */
 
         for (let code of codes) {
-            const htmlTable = new HtmlTable()
-            htmlDoc.add(htmlTable)
+
+            htmlDoc.add(new HtmlText(`${code} reactivation`, HtmlTextType.h1))
+
 
             let specificTemplates = allReactivationTemplates.filter(t => t.code == code)
 
             let productIds = this.getAllProductIds(specificTemplates)
 
-            let productNames = this.getAllProductNames(specificTemplates)
+            // let productNames = this.getAllProductNames(specificTemplates)
+
 
             /**  there can exist different templates for same template code. For instance [90,60]
              => after 60 days we sent a soft message, but after 90 days we sent a stronger message
@@ -61,51 +102,144 @@ export class ContactReactivation extends MessagingBase {
                 let fromDaysAgo = distinctReminds[idx]
                 let toDaysAgo = distinctReminds[idx + 1]
 
+
+
+                const htmlTable = new HtmlTable()
+
+                let errors: ContactReactivationError[] = []
+
+
+
+                let remindCount = 0
+
+
+
                 let contacts: Contact[]
                 // let contacts = await this.alteaDb.getSleepingContacts(aquasenseId, fromDaysAgo, toDaysAgo, productIds)
 
-                if (debug)
-                    contacts = await this.alteaDb.getSleepingContactsDebug('a13baec9-e21a-4fbb-ac2e-a716dea361b6', code, toDaysAgo)
-                else
-                    contacts = await this.alteaDb.getSleepingContacts(aquasenseId, fromDaysAgo, toDaysAgo, productIds, code, toDaysAgo)
+
+
 
                 let templatesForPeriod = specificTemplates.filter(t => t.remind == toDaysAgo)
 
-                let messages: TemplateMessage[] = []
+                let contactBatch = 0
 
-                for (let contact of contacts) {
+                while (true) {
 
-                    let template = this.takeRandomTemplate(templatesForPeriod)
+                    if (debug) {
+                        let debugContactId = 'a13baec9-e21a-4fbb-ac2e-a716dea361b6'  // Frank Paepens
 
-                    if (!template)  // should NOT happen
-                        continue
+                        let deleteResult = await this.alteaDb.deleteTemplateMessagesForContact(debugContactId)
+                        console.log(deleteResult)
+                        
+                        contacts = await this.alteaDb.getSleepingContactsDebug(debugContactId, code, toDaysAgo)
+                    }
+                    else {
 
-                    let message = new Message()
+                        let cursorId = null
 
-                    let replacements = {
-                        'product-slug': template.firstProductSlug(),
-                        'message-id': message.id
+
+                        if (ArrayHelper.NotEmpty(contacts))   // continue from last contact (as from second loop onwards)
+                            cursorId = contacts[contacts.length - 1].id
+
+                        contacts = await this.alteaDb.getSleepingContacts(aquasenseId, fromDaysAgo, toDaysAgo, productIds, code, toDaysAgo, cursorId, batchSize)
+
+                        if (ArrayHelper.IsEmpty(contacts))  // no more contacts to process
+                            break
+
                     }
 
-                    message = template.mergeWithContact(contact, branch, true, replacements, message)
-                    console.log(message)
+                    contactBatch++  // we start processing the next contact batch
 
-                    var sendResult = await this.sendWhatsApp(message, contact)
-                    console.log(sendResult)
+                    let messages: TemplateMessage[] = []
 
-                    //Add & save a TemplateMessage object
-                    let templateMessage = TemplateMessage.create(template.id, contact.id, templateCategory, code, template.suffix, toDaysAgo)
-                    templateMessage.id = message.id
-                    messages.push(templateMessage)
+                    for (let contact of contacts) {
 
-                    const cols: string[] = [contact.name, `${-fromDaysAgo}`, `${-toDaysAgo}`, template.name, template.code, template.productNamesAsString(), sendResult.status]
-                    htmlTable.addRow(cols)
+                        let template = this.takeRandomTemplate(templatesForPeriod)
+
+                        if (!template)  // should NOT happen
+                            continue
+
+                        let message = new Message()
+
+                        let replacements = {
+                            'product-slug': template.firstProductSlug(),
+                            'message-id': message.id
+                        }
+
+                        message = template.mergeWithContact(contact, branch, true, replacements, message)
+                        //console.log(message)
+
+
+                        //Add & save a TemplateMessage object
+                        let templateMessage = TemplateMessage.create(template.id, contact.id, templateCategory, code, template.suffix, toDaysAgo)
+                        templateMessage.id = message.id
+                        messages.push(templateMessage)
+
+
+                        var sendResult: ApiResult<Message>
+
+                        if (sendWhatsApp) {
+                            try {
+                                sendResult = await this.sendWhatsApp(message, contact)
+                                console.log(sendResult)
+                            } catch (error) {
+                                console.error(error)
+                                sendResult = ApiResult.error(error.message)
+
+                            } finally {
+                                if (sendResult.status != ApiStatus.ok) {
+                                    errors.push(new ContactReactivationError(contact, template, message, sendResult))
+                                    templateMessage.success = false
+                                    templateMessage.result = sendResult
+                                } else {
+                                    templateMessage.success = true
+                                }
+                            }
+                        }
+
+                        let daysAgo = null
+
+                        if (ArrayHelper.NotEmpty(contact?.orders))
+                            daysAgo = me.daysAgo(contact.orders[0])
+
+                        const cols: string[] = [`${messageCount}`, `${remindCount}`, contact.name, `${daysAgo}`, template.code, template.productNamesAsString(), sendResult?.status]
+                        htmlTable.addRow(cols)
+
+                        if (sendWhatsApp)
+                            await me.delay(100);
+
+                        messageCount++
+                        remindCount++
+                    }
+
+
+                    var msgSave = await this.alteaDb.createTemplateMessages(messages)
+                    console.log(msgSave)
+
+
+
+                    if (debug)
+                        break  // we just process 1 contact (already done)
+
+
+                    if (sendWhatsApp)
+                        await me.delay(1500); // inter-batch pause
+
+
+                    if (contactBatch >= maxBatches)
+                        break
 
                 }
 
-                var msgSave = await this.alteaDb.createTemplateMessages(messages)
 
-                console.log(msgSave)
+                htmlDoc.add(new HtmlText(`${code} reactivation for interval [${fromDaysAgo} - ${toDaysAgo}]`, HtmlTextType.h2))
+
+                htmlDoc.add(new HtmlText(`Nr of messages: ${remindCount}`, HtmlTextType.p))
+                htmlDoc.add(htmlTable)
+
+
+
 
             }
 

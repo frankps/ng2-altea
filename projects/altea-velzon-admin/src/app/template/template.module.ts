@@ -16,6 +16,7 @@ import { TimepickerModule } from 'ngx-bootstrap/timepicker';
 import { NgbModule, NgbToastModule  } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { NgxEditorModule } from 'ngx-editor'
+import { ProductModule } from '../product/product.module';
 
 
 @NgModule({
@@ -32,7 +33,8 @@ import { NgxEditorModule } from 'ngx-editor'
     BsDatepickerModule,
     TimepickerModule,
     NgxSpinnerModule,
-    NgxEditorModule
+    NgxEditorModule,
+    ProductModule
   ]
 })
 export class TemplateModule {}

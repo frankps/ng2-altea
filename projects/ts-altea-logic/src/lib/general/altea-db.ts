@@ -132,7 +132,7 @@ export class AlteaDb {
      * @param remind 
      * @returns 
      */
-    async getSleepingContacts(branchId: string, fromDaysAgo: number, toDaysAgo: number, productIds: string[], templateCode: string, remind: number): Promise<Contact[]> {
+    async getSleepingContacts(branchId: string, fromDaysAgo: number, toDaysAgo: number, productIds: string[], templateCode: string, remind: number, cursorId?: string, batchSize: number = 100): Promise<Contact[]> {
 
         const today = new Date()
         const fromDate = dateFns.subDays(today, fromDaysAgo)
@@ -142,6 +142,11 @@ export class AlteaDb {
         const todayNum = DateHelper.yyyyMMddhhmmss(today)
         const fromNum = DateHelper.yyyyMMddhhmmss(fromDate)
         const toNum = DateHelper.yyyyMMddhhmmss(toDate)
+
+        let cursor = undefined
+
+        if (cursorId)
+            cursor = { id: cursorId }
 
 
         /* PRISMA query 
@@ -163,28 +168,38 @@ export class AlteaDb {
                         },
                     }
                 },
-                // No future appointments
-                NOT: {
-                    orders: {
-                        some: {
-                            start: { gte: toNum },
-                            state: { in: ['confirmed', 'waitDeposit', 'finished'] },
-                            del: false,
-                            lines: {
-                                some: { productId: { in: productIds } }
+                // No future appointments AND no prior messages for this code/remind
+                AND: [
+                    {
+                        NOT: {
+                            orders: {
+                                some: {
+                                    start: { gte: toNum },
+                                    state: { in: ['confirmed', 'waitDeposit', 'finished'] },
+                                    del: false,
+                                    lines: {
+                                        some: { productId: { in: productIds } }
+                                    }
+                                }
                             }
                         }
                     },
-                    messages: {
-                        some: {
-                            cat: { in: ['reactivation'] },
-                            code: { equals: templateCode },
-                            remind: { equals: remind }
+                    {
+                        NOT: {
+                            messages: {
+                                some: {
+                                    cat: { in: ['reactivation'] },
+                                    code: { equals: templateCode },
+                                    remind: { equals: remind }
+                                }
+                            }
                         }
-                    },
-                }
+                    }
+                ]
             },
-            take: 10,
+            take: batchSize,
+            cursor,
+            skip: cursor ? 1 : 0,
             orderBy: { id: "desc" },
             include: {
                 orders: {
@@ -1976,7 +1991,7 @@ export class AlteaDb {
         return createResult
     }
 
-    /** Templates */
+    /** TemplateMessages */
 
     async createTemplateMessage(templateMessage: TemplateMessage): Promise<ApiResult<TemplateMessage>> {
         let createResult = await this.createObject('templateMessage', TemplateMessage, templateMessage)
@@ -1986,6 +2001,18 @@ export class AlteaDb {
     async createTemplateMessages(templateMessages: TemplateMessage[]): Promise<ApiListResult<TemplateMessage>> {
         let createResult = await this.createObjects('templateMessage', TemplateMessage, templateMessages)
         return createResult
+    }
+
+    async deleteTemplateMessagesForContact(contactId: string): Promise<any> {
+        if (!contactId)
+            return null
+
+        const qry = new DbQueryBaseTyped<TemplateMessage>('templateMessage', TemplateMessage)
+        qry.and('contactId', QueryOperator.equals, contactId)
+
+        const res = await this.db.deleteMany$(qry)
+
+        return res
     }
 
 }

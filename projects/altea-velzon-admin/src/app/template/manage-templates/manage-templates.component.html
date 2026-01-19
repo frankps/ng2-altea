@@ -1,3 +1,6 @@
+<ngx-altea-search-product #searchProductModal (select)="addProduct($event)"></ngx-altea-search-product>
+
+
 <ngx-altea-form-card-section sectionName="ui.template.edit.sections.config.title" sectionId="config"
     [editSectionId]="editSectionId" icon="fa-duotone fa-mail" (editModeChanged)="editModeChanged($event)"
     (cancel)="cancel()" (save)="save()">
@@ -17,18 +20,53 @@
 
     <ng-container always>
 
+        <ng-container *ngFor="let template of basicTemplates">
 
-        <div class="row" *ngFor="let template of basicTemplates">
+            <div class="row">
+                <div class="col-2">
+                    {{template.cat}}
+                </div>
+                <div class="col-2">
+                    {{template.code}}
+                </div>
+                <div class="col-2">
+                    {{template.suffix}}
+                </div>
+                <div class="col-2">
+                    {{template.remind}}
+                </div>
+                <div class="col-2">
+                    {{template.act}}
+                </div>
+                <div class="col-2">
+                    <i class="fas fa-pen " (click)="editBasicTemplate(template)"></i>
 
-            <div class="col-4">
-                {{template.code}}
+                    <i class="fa-solid fa-copy ms-2" (click)="copyTemplate(template)"></i>
+
+
+                    <i class="fa-solid fa-trash ms-2" (click)="deleteTemplate(template)"></i>
+                </div>
             </div>
-            <div class="col-4">
-                <i class="fas fa-pen ms-2"
-               
-                (click)="editBasicTemplate(template)"></i>
+
+            <div class="row">
+                <div class="col-2">
+                    
+                </div>
+                <div class="col-10">
+                    <ng-container >
+                        
+
+
+                        <span *ngFor="let productTemplate of template.products" 
+                        class="badge rounded-pill text-bg-info ms-2">{{productTemplate.product?.name}}</span>
+
+                    </ng-container>
+                </div>
             </div>
-        </div>
+
+
+        </ng-container>
+
 
 
 
@@ -162,6 +200,45 @@
                             </div>
                         </div>
 
+                        <div class="row mt-2">
+                            <div class="col-3">
+
+                                <ngx-altea-label-control label="objects.template.cat" for="cat">
+                                    <input type="text" id="cat" name="cat" class="form-control"
+                                        [(ngModel)]="template.cat" (change)="updateTemplate(template)" />
+                                </ngx-altea-label-control>
+
+                            </div>
+                            <div class="col-3">
+
+                                <ngx-altea-label-control label="objects.template.code" for="code">
+                                    <input type="text" id="code" name="code" class="form-control"
+                                        [(ngModel)]="template.code" (change)="updateTemplate(template)" />
+                                </ngx-altea-label-control>
+
+                            </div>
+                            <div class="col-2">
+
+                                <ngx-altea-label-control label="objects.template.suffix" for="suffix">
+                                    <input type="text" id="suffix" name="suffix" class="form-control"
+                                        [(ngModel)]="template.suffix" (change)="updateTemplate(template)" />
+                                </ngx-altea-label-control>
+                            </div>
+                            <div class="col-2">
+
+                                <ngx-altea-label-control label="objects.template.remind" for="remind">
+                                    <input type="number" id="remind" name="remind" class="form-control"
+                                        [(ngModel)]="template.remind" (change)="updateTemplate(template)" />
+                                </ngx-altea-label-control>
+                            </div>
+                            <div class="col-2">
+                                <div class="form-check form-switch">
+                                    <input type="checkbox" class="form-check-input" id="act" name="act"
+                                        [(ngModel)]="template.act" (change)="updateTemplate(template)">
+                                    <label class="form-check-label" for="act" translate="dic.act"></label>
+                                </div>
+                            </div>
+                        </div>
 
 
                     </div>
@@ -227,7 +304,24 @@
                             </ng-container>
                         </ng-container>
 
+
+                        <h5>Products &nbsp; <i class="fa-solid fa-circle-plus" (click)="searchProduct()"></i>
+                        </h5>
+                        
+
+                        <ng-container *ngIf="template.products">
+                        
+                            <span *ngFor="let productTemplate of template.products" 
+                            class="badge rounded-pill text-bg-info ms-2">{{productTemplate.product?.name}} &nbsp; <i class="fa-solid fa-xmark" (click)="deleteProduct(template, productTemplate)"></i></span>
+    
+                        </ng-container>
+
+
                     </div>
+
+
+
+
 
 
 

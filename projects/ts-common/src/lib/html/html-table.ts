@@ -48,10 +48,13 @@ export class HtmlTable implements IHtmlItem {
 
         const tableClass = this.class ?? 'altea-table'
 
-
+        // Keep markup lean; rely on global styles injected by HtmlDoc
         htmlLines.push(`<table class="${tableClass}">`)
 
         let rowIdx = 0
+
+        const thStyle = this.styles.th ? this.styleString(this.styles.th) : ''
+        const tdStyle = this.styles.td ? this.styleString(this.styles.td) : ''
 
         for (let row of this.rows) {
 
@@ -66,8 +69,8 @@ export class HtmlTable implements IHtmlItem {
             if (rowIdx == 0 && this.headerRow) {
                 colTag = 'th'
 
-                if (this.styles.th)
-                    style = ` style="${this.styleString(this.styles.th)}"`   // padding:20px
+                if (thStyle)
+                    style = ` style="${thStyle}"`
             }
 
 
@@ -75,8 +78,8 @@ export class HtmlTable implements IHtmlItem {
 
                 let colString = col ? col : ''
 
-                if ((rowIdx > 0 || !this.headerRow) && this.styles.td)
-                    style = ` style="${this.styleString(this.styles.td)}"` 
+                if ((rowIdx > 0 || !this.headerRow) && tdStyle)
+                    style = ` style="${tdStyle}"` 
 
                 htmlLines.push(`<${colTag}${style}>${colString}</${colTag}>`)   //  style="padding:20px"
 

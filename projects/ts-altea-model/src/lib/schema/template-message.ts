@@ -60,5 +60,7 @@ export class TemplateMessage extends ObjectWithIdPlus {
     body?: string;
     short?: string; // for SMS or other messaging
 
+    success: boolean = false
+    result?: any
   }
   

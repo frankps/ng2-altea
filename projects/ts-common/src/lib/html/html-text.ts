@@ -2,6 +2,7 @@ import { IHtmlItem } from "./html";
 
 export enum HtmlTextType {
     plain = 'plain',
+    p = 'p',
     h1 = 'h1',
     h2 = 'h2',
     h3 = 'h3',
@@ -26,6 +27,8 @@ export class HtmlText implements IHtmlItem {
         switch (this.type) {
             case HtmlTextType.plain:
                 return this.text
+            case HtmlTextType.p:
+                return `<p>${this.text}</p>`
             case HtmlTextType.h1:
                 return `<h1>${this.text}</h1>`
             case HtmlTextType.h2:

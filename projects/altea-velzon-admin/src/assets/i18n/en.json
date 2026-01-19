@@ -1062,6 +1062,10 @@
       "_name": "Template",
       "subject": "Onderwerp",
       "format": "Formaat",
+      "cat": "Categorie",
+      "remind": "Herinnering",
+      "suffix": "Suffix",
+      "code": "Code",
       "body": {
         "email": "E-mail",
         "sms": "SMS",
