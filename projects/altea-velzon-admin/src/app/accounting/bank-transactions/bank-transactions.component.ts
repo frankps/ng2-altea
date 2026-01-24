@@ -338,8 +338,8 @@ export class BankTransactionsComponent implements OnInit {
 
   initFilters() {
 
-    this.bank.from = new Date(2024, 9, 1)
-    this.bank.to = new Date(2024, 11, 31)
+    this.bank.from = new Date(2025, 9, 1)
+    this.bank.to = new Date(2025, 11, 31)
 
     //this.bank.from = dateFns.addMonths(this.bank.to, -2)
 
@@ -451,6 +451,43 @@ export class BankTransactionsComponent implements OnInit {
     let payments = await me.paySvc.query$(qry)
 
     return new Payments(payments)
+  }
+
+
+  async updateTx(tx: BankTransaction) {
+    let me = this
+
+    const fortis = new FortisBankImport(this.objSvc)
+
+    const txInfo = fortis.getBankTransactionInfo(tx)
+
+
+    console.log(txInfo)
+
+    tx.setInfo(txInfo)
+
+
+    let update = {
+      id: tx.id,
+      type: tx.type,
+      refDate: tx.refDate,
+      orig: tx.orig,
+      cost: tx.cost
+    }
+
+    /*
+
+        this.type = info.type
+        this.refDate = info.forDate
+        this.orig = info.orig
+        this.cost = info.cost
+
+    */
+
+    var res = await this.txSvc.update$(update)
+
+    console.log(res)
+
   }
 
 

@@ -278,9 +278,10 @@ export class ObjectService implements IDb {
 
         const object = res.object
 
+        res.object = null
         apiResult = plainToInstance(ApiResult<Message>, res)
 
-        if (apiResult.isOk)
+        if (object)
           apiResult.object = plainToInstance(Message, object)
       }
 

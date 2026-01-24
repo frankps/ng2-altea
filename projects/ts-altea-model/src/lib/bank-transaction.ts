@@ -221,4 +221,17 @@ export class BankTransaction extends ObjectWithId {
 
         return info1
     }
+
+
+
+
+    setInfo(info: BankTxInfo) {
+        if (!info)
+            return
+
+        this.type = info.type
+        this.refDate = info.forDate
+        this.orig = info.orig
+        this.cost = info.cost
+    }
 }

@@ -34,6 +34,8 @@ export class OrderCheckComponent implements OnInit {
   resetNoDecl = false
   fixToInvoice = false
 
+  year = 2025
+
   constructor(protected orderSvc: OrderService, protected objSvc: ObjectService, protected spinner: NgxSpinnerService, public dashboardSvc: DashboardService,
     public sessionSvc: SessionService, private sanitizer: DomSanitizer, public branchSvc: BranchService, private ngZone: NgZone
   ) {

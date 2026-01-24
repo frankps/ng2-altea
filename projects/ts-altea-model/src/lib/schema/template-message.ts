@@ -56,6 +56,16 @@ export class TemplateMessage extends ObjectWithIdPlus {
     remind?: number;
     suffix?: string;
 
+    /** the recipient address: email, mobile
+     *  example: info@aquasense.be, 32478336034
+     */
+    to?: string;
+
+    /** the parameters used in the template message
+     *  example: { name: 'John Doe', age: 30 }
+     */
+    params?: any;
+
     subject?: string;
     body?: string;
     short?: string; // for SMS or other messaging

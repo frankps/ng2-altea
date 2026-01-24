@@ -30,35 +30,39 @@ export class MessagingBase {
         msg.addTo(contact.mobile, contact.name, contact.id)  // contact.email
 
         msg.type = MsgType.wa
-       
+
         if (send) {
 
             const sendRes = await this.alteaDb.db.sendMessage$(msg)
             //const sendRes = new ApiResult(msg)
             console.warn(sendRes)
 
+            return sendRes
+
         }
 
-        return new ApiResult(msg)
+        let res = new ApiResult(msg)
+        res.status = ApiStatus.notProcessed
+        return res
     }
 
-        // get non active orders: state=creation, older then 15min,
-        async sendAdminMessage(subject: string, body: string) {
+    // get non active orders: state=creation, older then 15min,
+    async sendAdminMessage(subject: string, body: string) {
 
-            const msg = new Message()
-    
-            msg.subj = subject
-            msg.body = body
-    
-            msg.from = new MessageAddress('info@aquasense.be', 'Aquasense')
-            msg.addTo('frank.newsly@gmail.com', 'Frank')
-           // msg.addTo('hilde@aquasense.be', 'Hilde')
-            msg.type = MsgType.email
-            msg.auto = true
-            msg.dir = MessageDirection.out
-            msg.fmt = TemplateFormat.html
-    
-            await this.alteaDb.db.sendMessage$(msg)
-        }
+        const msg = new Message()
+
+        msg.subj = subject
+        msg.body = body
+
+        msg.from = new MessageAddress('info@aquasense.be', 'Aquasense')
+        msg.addTo('frank.newsly@gmail.com', 'Frank')
+        // msg.addTo('hilde@aquasense.be', 'Hilde')
+        msg.type = MsgType.email
+        msg.auto = true
+        msg.dir = MessageDirection.out
+        msg.fmt = TemplateFormat.html
+
+        await this.alteaDb.db.sendMessage$(msg)
+    }
 
 }

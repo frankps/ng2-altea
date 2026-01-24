@@ -470,7 +470,7 @@ export class Template extends ObjectWithParameters {
 
     message.branchId = branch.id
     message.orderId = orderId
-    message.code = this.code
+    message.code = this.fullCode()
     message.dir = MessageDirection.out
     message.auto = true   //this is automatic message
     message.fmt = this.format
@@ -556,7 +556,8 @@ export class Template extends ObjectWithParameters {
 
     message.branchId = branch.id
     //message.conta = contact.id
-    message.code = this.code
+    //message.code = this.code
+    message.code = this.fullCode()
     message.dir = MessageDirection.out
     message.auto = true   //this is automatic message
     message.fmt = this.format
@@ -570,7 +571,7 @@ export class Template extends ObjectWithParameters {
 
     let msg = this.merge(branch, replacements, null, addParamsForRemoteTemplating, message)
 
-
+  
 
     return msg
   }

@@ -121,6 +121,35 @@ export class AlteaDb {
         return expiredDepositOrders
     }
 
+
+    async getMobileNumbersAlreadyTargeted(branchId: string, category: string, templateCode: string, remind: number): Promise<string[]> {
+
+        /* PRISMA query 
+                */
+        const qry = {
+            where: {
+               /*  branchId: { eq: branchId }, */
+                cat: category,
+                code: templateCode,
+                remind: remind 
+            },
+            select: { to: true },
+            distinct: ['to']
+        }
+
+        let prismaQry = new PrismaNativeQuery<TemplateMessage>('templateMessage', TemplateMessage, qry)
+        const templateMessages = await this.db.findMany$<TemplateMessage>(prismaQry)
+
+        if (ArrayHelper.IsEmpty(templateMessages))
+            return []
+
+        let addresses = templateMessages.map(m => m.to)
+
+        addresses = addresses.filter(a => typeof a === "string" && a.trim().length >= 7)
+
+        return addresses
+
+    }
     /**
      * Get contacts that have not ordered given products in the period [fromDaysAgo, toDaysAgo] and have not yet received a reminder message for that period.
      * 
@@ -170,6 +199,12 @@ export class AlteaDb {
                 },
                 // No future appointments AND no prior messages for this code/remind
                 AND: [
+                    {
+                        NOT: [
+                            { mobile: null },
+                            { mobile: "" },
+                        ]
+                    },
                     {
                         NOT: {
                             orders: {
@@ -260,7 +295,7 @@ export class AlteaDb {
 
                 // No future appointments
                 NOT: {
-  
+
                     messages: {
                         some: {
                             cat: { in: ['reactivation'] },

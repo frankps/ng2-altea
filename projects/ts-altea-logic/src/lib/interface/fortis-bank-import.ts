@@ -123,13 +123,7 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
 
         const info = this.getBankTransactionInfo(tx)
 
-        if (info) {
-            tx.type = info.type
-            tx.refDate = info.forDate
-
-            tx.orig = info.orig
-            tx.cost = info.cost
-        }
+        tx.setInfo(info)
 
         return tx
     }
@@ -193,6 +187,8 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
         }
 
 
+        /** As from 30/10/2025, the format of the details changed */
+
         const regexAtos = /6660.?0000.?0483/
         const atosMatches = tx.details.match(regexAtos)
 
@@ -221,7 +217,7 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
                       example: 2025-0003 is for payments in 30/12/2024   => we need to decrease the year from the transaction number
                     */
                     let sequenceNumber = tx.getSequenceNumberFromNum()
-    
+
                     let dayMonthItems = dayMonth.split('/')
                     let month = Number(dayMonthItems[1])
                     let day = Number(dayMonthItems[0])
@@ -244,6 +240,39 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
                 return txInfo
 
             }
+
+
+        }
+
+
+        /** New logic since 31/10/2025 for credit cards  */
+
+        if (tx.remoteAccount == 'LU224080000000024952') {
+
+            // the info field is for instance:  202510280040088,81986244/MC/926/18217596/0000755/,0000985 00/EUR/00010 94/28.10.2025/
+
+            let infoItems = tx.info.split(',')  // 0000985 00/EUR/00010 94/28.10.2025/
+
+            let amountString = infoItems[2]
+            let amounts = amountString.split('/')
+
+            let origString = amounts[0]
+            origString = origString.replace(' ', '.')
+            let costString = amounts[2]
+            costString = costString.replace(' ', '.')
+            let dateString = amounts[3]
+            let date = dateFns.parse(dateString, 'dd.MM.yyyy', new Date())
+
+
+            let txInfo = new BankTxInfo(BankTxType.terminalCredit)
+            // txInfo.forDate = tx.execDate
+            txInfo.forDate = DateHelper.yyyyMMdd(date)
+            txInfo.orig = parseFloat(origString)
+            txInfo.cost = parseFloat(costString)
+            return txInfo
+
+
+
 
 
         }

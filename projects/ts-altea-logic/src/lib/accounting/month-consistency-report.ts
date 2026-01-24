@@ -514,18 +514,6 @@ export class MonthConsistencyReportBuilder {
 
     let cashPays = order.getPaymentsBetween(startNum, endNum, [PaymentType.cash])
 
-    /*
-    let cashPaysNoDecl = cashPays.filter(p => p.noDecl > 0)
-
-    if (ArrayHelper.NotEmpty(cashPaysNoDecl)) {
-
-      for (let pay of cashPaysNoDecl) {
-        pay.noDecl = 0
-
-        if (paysToUpdate.findIndex(p => p.id == pay.id) == -1) // if not yet in the list
-          paysToUpdate.push(pay)
-      }
-    }*/
 
 
     if (ArrayHelper.IsEmpty(cashPays))

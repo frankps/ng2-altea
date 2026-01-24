@@ -54,12 +54,12 @@ export class ContactReactivation extends MessagingBase {
 
         let me = this
 
-        let batchSize = 2
-        let maxBatches = 1
+        let batchSize = 20
+        let maxBatches = 2
 
         let aquasenseId = '66e77bdb-a5f5-4d3d-99e0-4391bded4c6c'
 
-        let debug = true   // then an individual contact is processed: to check if message is merged & sent correctly
+        let debug = false   // then an individual contact is processed: to check if message is merged & sent correctly
 
         let sendWhatsApp = true  // also for debugging
 
@@ -118,11 +118,15 @@ export class ContactReactivation extends MessagingBase {
                 // let contacts = await this.alteaDb.getSleepingContacts(aquasenseId, fromDaysAgo, toDaysAgo, productIds)
 
 
+                let alreadyReceivedMobileNumbers = await this.alteaDb.getMobileNumbersAlreadyTargeted(aquasenseId, templateCategory, code, toDaysAgo)
+
+
 
 
                 let templatesForPeriod = specificTemplates.filter(t => t.remind == toDaysAgo)
 
                 let contactBatch = 0
+                let nextCursorId = null
 
                 while (true) {
 
@@ -131,29 +135,38 @@ export class ContactReactivation extends MessagingBase {
 
                         let deleteResult = await this.alteaDb.deleteTemplateMessagesForContact(debugContactId)
                         console.log(deleteResult)
-                        
+
                         contacts = await this.alteaDb.getSleepingContactsDebug(debugContactId, code, toDaysAgo)
                     }
                     else {
 
-                        let cursorId = null
-
-
-                        if (ArrayHelper.NotEmpty(contacts))   // continue from last contact (as from second loop onwards)
-                            cursorId = contacts[contacts.length - 1].id
+                        let cursorId = nextCursorId  // continue from last contact (as from second loop onwards)
 
                         contacts = await this.alteaDb.getSleepingContacts(aquasenseId, fromDaysAgo, toDaysAgo, productIds, code, toDaysAgo, cursorId, batchSize)
 
                         if (ArrayHelper.IsEmpty(contacts))  // no more contacts to process
                             break
 
+                        nextCursorId = contacts[contacts.length - 1].id
+
                     }
+
+                    //contacts = this.removeContactsAlreadySent(contacts, alreadyReceivedMobileNumbers)
+
+                    if (ArrayHelper.IsEmpty(contacts))
+                        continue
 
                     contactBatch++  // we start processing the next contact batch
 
                     let messages: TemplateMessage[] = []
 
                     for (let contact of contacts) {
+
+                        if (!contact.mobile)
+                            continue
+
+                        if (this.alreadyReceived(contact.mobile, alreadyReceivedMobileNumbers))
+                            continue
 
                         let template = this.takeRandomTemplate(templatesForPeriod)
 
@@ -174,6 +187,7 @@ export class ContactReactivation extends MessagingBase {
                         //Add & save a TemplateMessage object
                         let templateMessage = TemplateMessage.create(template.id, contact.id, templateCategory, code, template.suffix, toDaysAgo)
                         templateMessage.id = message.id
+                        templateMessage.to = contact.mobile  // because we send Whatsapp to mobile number
                         messages.push(templateMessage)
 
 
@@ -182,6 +196,7 @@ export class ContactReactivation extends MessagingBase {
                         if (sendWhatsApp) {
                             try {
                                 sendResult = await this.sendWhatsApp(message, contact)
+                                alreadyReceivedMobileNumbers.push(contact.mobile)
                                 console.log(sendResult)
                             } catch (error) {
                                 console.error(error)
@@ -250,6 +265,44 @@ export class ContactReactivation extends MessagingBase {
 
         await this.sendAdminMessage(subject, body)
 
+    }
+
+    cleanMobile(raw?: string | null): string | null {
+        if (!raw) return null;
+        const digits = raw.replace(/\D+/g, "");      // drop non-numeric
+        if (!digits) return null;
+        const last9 = digits.slice(-9);              // keep rightmost 9
+        return last9;
+    }
+
+
+    alreadyReceived(address: string, alreadyReceivedMobileNumbers: string[]): boolean {
+        if (!address)
+            return false
+
+        let cleanedAddress = this.cleanMobile(address)
+
+        return alreadyReceivedMobileNumbers.some(item => item.indexOf(cleanedAddress) >= 0)
+    }
+
+
+    removeContactsAlreadySent(contacts: Contact[], alreadyReceivedMobileNumbers: string[]): Contact[] {
+        if (ArrayHelper.IsEmpty(contacts))
+            return []
+
+        if (ArrayHelper.IsEmpty(alreadyReceivedMobileNumbers))
+            return contacts
+
+        let validContactsNotYetSent = contacts.filter(c => {
+            let cleanedMobile = this.cleanMobile(c.mobile)
+
+            if (!cleanedMobile)
+                return false
+
+            return !alreadyReceivedMobileNumbers.includes(cleanedMobile)
+        })
+
+        return validContactsNotYetSent
     }
 
 
