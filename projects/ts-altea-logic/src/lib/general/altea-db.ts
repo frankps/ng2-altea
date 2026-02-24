@@ -121,17 +121,80 @@ export class AlteaDb {
         return expiredDepositOrders
     }
 
+    async getTemplateCodes(branchId: string, category: string): Promise<string[]> {
 
-    async getMobileNumbersAlreadyTargeted(branchId: string, category: string, templateCode: string, remind: number): Promise<string[]> {
+
+        /* PRISMA query 
+        */
+        const qry = {
+            where: {
+                /*  branchId: { eq: branchId }, */
+                branchId: branchId,
+                cat: category,
+            },
+            select: { code: true },
+            distinct: ['code']
+        }
+
+
+        let prismaQry = new PrismaNativeQuery<Template>('template', Template, qry)
+        const templates = await this.db.findMany$<Template>(prismaQry)
+
+        if (ArrayHelper.IsEmpty(templates))
+            return []
+
+        let codes = templates.map(t => t.code)
+
+        return codes
+    }
+
+
+    async getMobileNumbersAlreadyTargetedForCategory(branchId: string, category: string, sinceDaysAgo: number): Promise<string[]> {
+
+
+        const today = new Date()
+
+        const asFromDate = dateFns.subDays(today, sinceDaysAgo)
 
         /* PRISMA query 
                 */
         const qry = {
             where: {
-               /*  branchId: { eq: branchId }, */
+                /*  branchId: { eq: branchId }, */
+                cat: category,
+                cre: { gt: asFromDate },
+                template: { branchId: branchId },
+            },
+            select: { to: true },
+            distinct: ['to']
+        }
+
+        let prismaQry = new PrismaNativeQuery<TemplateMessage>('templateMessage', TemplateMessage, qry)
+        const templateMessages = await this.db.findMany$<TemplateMessage>(prismaQry)
+
+        if (ArrayHelper.IsEmpty(templateMessages))
+            return []
+
+        let addresses = templateMessages.map(m => m.to)
+
+        addresses = addresses.filter(a => typeof a === "string" && a.trim().length >= 7)
+
+        return addresses
+
+    }
+
+    /** Get all mobile numbers that have already received a message for a given template (category, code and remind) */
+    async getMobileNumbersAlreadyTargetedForTemplate(branchId: string, category: string, templateCode: string, remind: number): Promise<string[]> {
+
+        /* PRISMA query 
+                */
+        const qry = {
+            where: {
+                /*  branchId: { eq: branchId }, */
                 cat: category,
                 code: templateCode,
-                remind: remind 
+                remind: remind,
+                template: { branchId: branchId },
             },
             select: { to: true },
             distinct: ['to']
@@ -178,6 +241,7 @@ export class AlteaDb {
             cursor = { id: cursorId }
 
 
+
         /* PRISMA query 
         */
         const qry = {
@@ -185,6 +249,7 @@ export class AlteaDb {
                 branchId,
                 del: false,
                 act: true,
+                optOut: false, // optOut = no communication
                 // Has at least one finished order
                 orders: {
                     some: {
@@ -214,7 +279,7 @@ export class AlteaDb {
                                     del: false,
                                     lines: {
                                         some: { productId: { in: productIds } }
-                                    }
+                                    } 
                                 }
                             }
                         }
@@ -389,6 +454,7 @@ export class AlteaDb {
         qry.or('contact.revDate', QueryOperator.equals, null)
         let previousMaxReviewDate = dateFns.addDays(new Date(), -30)
         qry.or('contact.revDate', QueryOperator.lessThan, previousMaxReviewDate)
+        qry.or('contactId', QueryOperator.equals, null)
 
 
         qry.and('branchId', QueryOperator.equals, branchId)
@@ -697,12 +763,16 @@ export class AlteaDb {
         return templates
     }
 
-    async getTemplatesByCategory(branchId: string, cat: string, ...includes: string[]): Promise<Template[]> {
+    async getTemplatesByCategory(branchId: string, cat: string, code: string = null, ...includes: string[]): Promise<Template[]> {
 
         const qry = new DbQueryTyped<Template>('template', Template)
         qry.and('branchId', QueryOperator.equals, branchId)
         qry.and('cat', QueryOperator.contains, cat)
-        qry.and('act', QueryOperator.equals, true)
+        
+        if (code)
+            qry.and('code', QueryOperator.equals, code)
+        else
+            qry.and('act', QueryOperator.equals, true)
 
         if (ArrayHelper.NotEmpty(includes))
             qry.include(...includes)

@@ -82,7 +82,33 @@
     </ng-select> -->
 
 
-    <button type="button" class="btn btn-primary btn-sm mx-3 my-3" (click)="sleepingContacts()">Sleeping contacts</button>
+    <div class="row">
+        <div class="col">
+            <ngx-altea-label-control label="Codes" for="templateCodes">
+                <ng-select id="templateCodes" name="templateCodes" *ngIf="templateCodes" [items]="templateCodes" [clearable]="true" [multiple]="false"
+                    [(ngModel)]="selectedTemplateCode"></ng-select>
+            </ngx-altea-label-control>
+        </div>
+        <div class="col-2">
+
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="testOnly" name="testOnly"
+                    [(ngModel)]="testOnly" />
+                <label class="form-check-label" for="testOnly">Test only</label>
+            </div>
+
+
+        </div>
+        <div class="col">
+            <button type="button" class="btn btn-primary btn-sm mx-3 my-3" (click)="sleepingContacts(selectedTemplateCode, testOnly)">Sleeping contacts</button>
+        </div>
+    </div>
+
+
+
+
+
+
 
 
 
@@ -104,6 +130,10 @@
     <button type="button" class="btn btn-primary btn-sm mx-3 my-3" (click)="bodySculptorReporting()">BodySculptor report</button>
 
     <button type="button" class="btn btn-primary btn-sm mx-3 my-3" (click)="queryBodySculptorCustomers()">BodySculptor customers</button>
+
+    <button type="button" class="btn btn-primary btn-sm mx-3 my-3" (click)="reviewRequestMessaging()">Reviews</button>
+
+    <button type="button" class="btn btn-primary btn-sm mx-3 my-3" (click)="fixGifts()">Fix gifts</button>
 
 </ng-container>
 

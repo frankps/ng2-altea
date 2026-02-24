@@ -132,6 +132,11 @@ export class CreateResourceRequest {
 
             const product = orderLine.product!
 
+            /** skip bundles/arrangements: this orderline is just a container for child lines -> planning done by child lines*/
+            if (product.isBundle())
+                continue
+
+
             //product.preTime
 
             let productResources: ProductResource[]

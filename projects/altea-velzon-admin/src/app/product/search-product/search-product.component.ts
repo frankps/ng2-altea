@@ -65,7 +65,7 @@ export class SearchProductComponent extends NgBaseComponent implements OnDestroy
 
       if (product)
         selectedProducts.push(product)
-      
+
     })
 
     this.selectMulti.emit(selectedProducts)
@@ -81,11 +81,16 @@ export class SearchProductComponent extends NgBaseComponent implements OnDestroy
     this.select.emit(product)
     modal.close()
   }
-
+  // dfc76cad-8957-4ed5-9782-7a4e2044bd9b
   getSearchDbQuery(searchFor: string): DbQuery | null {
 
     const query = new DbQuery()
-    query.and('name', QueryOperator.contains, searchFor)
+
+    if (searchFor.length == 36)
+      query.and('id', QueryOperator.equals, searchFor)
+    else
+      query.and('name', QueryOperator.contains, searchFor)
+
     query.and('del', QueryOperator.equals, false)
 
     /*     query.or('type', QueryOperator.equals, ProductType.prod)

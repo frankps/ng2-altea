@@ -3,6 +3,7 @@
  */
 export * from './lib/accounting'
 export * from './lib/contact'
+export * from './lib/gift'
 export * from './lib/ts-altea-logic'
 export * from './lib/general/altea-db'
 export * from './lib/general/altea-queries'

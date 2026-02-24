@@ -1516,6 +1516,9 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     return _.isEqual(vatLinesA, vatLinesB)
   }
 
+  getChildLines(parentId: string): OrderLine[] {
+    return this.lines?.filter(l => l.pId == parentId) ?? []
+  }
 
 
   makeLineTotals(): number {

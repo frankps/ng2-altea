@@ -454,15 +454,30 @@ export class PosPaymentComponent implements OnInit {
     if (ArrayHelper.IsEmpty(orderLines))
       return
 
-    if (unitProductIds.length != orderLines.length) {
-      console.error('Number of products in subscription does not match number of (matching) order lines')
-      return
-    }
+
 
     let canUseSubscription = true
-    
-    if (unitProductIds.length == 1)
-      canUseSubscription = this.canUseSubscriptionForSingleProduct(orderLines[0], subscription)
+
+    if (unitProductIds.length == 1) {
+
+      for (let orderLine of orderLines) {
+        canUseSubscription = this.canUseSubscriptionForSingleProduct(orderLine, subscription)
+
+        if (canUseSubscription) {
+          orderLines = [orderLine]
+          break
+        }
+
+      }
+    }
+    else {
+
+      if (unitProductIds.length != orderLines.length) {
+        console.error('Number of products in subscription does not match number of (matching) order lines')
+        return
+      }
+
+    }
 
 
     let unitPrice = _.sumBy(orderLines, 'unit')

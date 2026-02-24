@@ -61,6 +61,8 @@ export class ReportMonths {
 
     incomeAddColumns(line: ReportMonth, payTypes: PaymentType[], totals: any, cols: string[]) {
 
+        let total = 0
+
         for (let bankType of payTypes) {
 
             if (!totals.payType[bankType])
@@ -72,10 +74,21 @@ export class ReportMonths {
             if (value) {
                 totals.payType[bankType] += value
                 strVal = `${value}`
+
+
+                if (bankType != PaymentType.gift && bankType != PaymentType.loyal && bankType != PaymentType.subs)
+                    total += value
+
             }
 
             cols.push(strVal)
+
         }
+
+        total = _.round(total, 0)
+
+        cols.push(`${total}`)
+        totals.total += total
 
     }
 
@@ -105,16 +118,21 @@ export class ReportMonths {
             header.push(payType)
         }
 
+        header.push('Total')
+
         header.push('nodecl', 'cash%')
 
         let totals = {
             payType: {},
-            noDecl: 0
+            noDecl: 0,
+            total: 0
         }
 
         for (let line of this.lines) {
             let cols: string[] = []
             table.addRow(cols)
+
+            //   let total = _.round(line.inc[PaymentType.cash], 2)
 
             cols.push(`${line.year}`, `${line.month}`, `${line.version}`)
 
@@ -152,7 +170,7 @@ export class ReportMonths {
 
             let isBank = bankTypes.indexOf(payType) >= 0
 
-            let payTypeTotal = totals.payType[payType]
+            let payTypeTotal = _.round(totals.payType[payType], decimals)
             let strTotal = ''
 
             if (payTypeTotal) {
@@ -169,7 +187,7 @@ export class ReportMonths {
 
         let totalNoDecl = _.round(totals.noDecl, decimals)
         let pctgNoDecl = _.round(100 * totals.noDecl / totals.payType[PaymentType.cash], decimals)
-        footer.push(`<b>${totalNoDecl}</b>`, `<i>${pctgNoDecl}%</i>`)
+        footer.push(`<b>${totals.total}</b>`, `<b>${totalNoDecl}</b>`, `<i>${pctgNoDecl}%</i>`)
 
         let footer2: string[] = []
         table.addRow(footer2)
@@ -245,9 +263,9 @@ export class ReportMonths {
                 let excl = _.round(incl / (1 + pctg / 100), 2)
                 let vat = _.round(incl - excl, 2)
 
-                let inclStr = `${incl}`.replace('.',decimalSeparator)
-                let exclStr = `${excl}`.replace('.',decimalSeparator)
-                let vatStr = `${vat}`.replace('.',decimalSeparator)
+                let inclStr = `${incl}`.replace('.', decimalSeparator)
+                let exclStr = `${excl}`.replace('.', decimalSeparator)
+                let vatStr = `${vat}`.replace('.', decimalSeparator)
 
                 cols.push(inclStr, exclStr, vatStr)
 
@@ -263,7 +281,7 @@ export class ReportMonths {
             }
 
             lineTotalIncl = _.round(lineTotalIncl, 2)
-            let lineTotalInclStr = `${lineTotalIncl}`.replace('.',decimalSeparator)
+            let lineTotalInclStr = `${lineTotalIncl}`.replace('.', decimalSeparator)
             cols.push(`<b>${lineTotalInclStr}</b>`)
         }
 

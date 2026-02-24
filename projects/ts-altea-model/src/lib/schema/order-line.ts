@@ -11,7 +11,7 @@ import * as Handlebars from "handlebars"
 import * as sc from 'stringcase'
 import { OrderPersonMgr } from "../order-person-mgr";
 import { CancelOrderMessage } from "ts-altea-logic";
-import { Branch, Contact, DepositMode, FormulaTerm, Invoice, Order, OrderType, Organisation, Payment, PaymentType, PlanningMode, Price, PriceMode, Product, ProductItemOption, ProductItemOptionMode, ProductOption, ProductOptionValue, ProductType, Resource, ResourcePlanning, Subscription } from "ts-altea-model";
+import { Branch, Contact, DepositMode, FormulaTerm, Invoice, Order, OrderType, Organisation, Payment, PaymentType, PlanningMode, Price, PriceMode, Product, ProductItemOption, ProductItemOptionMode, ProductOption, ProductOptionValue, ProductSubType, ProductType, Resource, ResourcePlanning, Subscription } from "ts-altea-model";
 
 export class OrderLineOptionSummary {
   /** option name */
@@ -434,6 +434,9 @@ export class OrderLine extends ObjectWithIdPlus {
   product?: Product;
   productId?: string
 
+  /** parent orderline id: used for bundles/arrangements (1 parent order line and sub lines for the containing products) */
+  pId?: string
+
   @Type(() => ResourcePlanning)
   planning?: ResourcePlanning[]
 
@@ -617,7 +620,7 @@ export class OrderLine extends ObjectWithIdPlus {
     }
 
     this.preselectSpecialPrices(product, isPos)
-    this.calculateAll()
+    this.calculateInclThenExcl()
     console.error(this.incl)
   }
 
@@ -938,7 +941,7 @@ export class OrderLine extends ObjectWithIdPlus {
 
 
 
-  applyPrice(price: Price) {
+  applyPrice(price: Price) : PriceChange {
 
     let priceChange = new PriceChange()
 
@@ -947,7 +950,7 @@ export class OrderLine extends ObjectWithIdPlus {
     if (price.hasOptions) {
 
       if (ArrayHelper.IsEmpty(price.options))
-        return
+        return null
 
       let optionValueFound = false
 
@@ -986,7 +989,7 @@ export class OrderLine extends ObjectWithIdPlus {
       }
 
       if (!optionValueFound)
-        return
+        return null
 
     } else if (price.extraQty?.on) {  // if this is not a 'real' price change, but instead customer receives extra quantity
       priceChange.tp = PriceChangeType.subsQty
@@ -1005,6 +1008,8 @@ export class OrderLine extends ObjectWithIdPlus {
     priceChange.info = price.title
 
     this.addPriceChange(priceChange)
+
+    return priceChange
   }
 
 
@@ -1031,7 +1036,17 @@ export class OrderLine extends ObjectWithIdPlus {
   }
 
   hasPersons(): boolean {
-    return (Array.isArray(this.persons) && this.persons.length > 0)
+    let product = this.product
+
+    if (product) {
+      if (product.type == ProductType.prod)
+        return false
+
+      if (product.sub == ProductSubType.bundle)
+        return false
+    }
+    
+    return ( Array.isArray(this.persons) && this.persons.length > 0)   // !this.pId &&
   }
 
 
@@ -1080,7 +1095,7 @@ export class OrderLine extends ObjectWithIdPlus {
     const previousVat = this.vat
 
     /** a gift orderline can have for instance no product attached */
-    if (recalculateUnitPrice && this.product && !this.cust)
+    if (recalculateUnitPrice && this.product)
       this.setUnitPrice()
 
     this.incl = this.unit * this.qty
@@ -1102,8 +1117,6 @@ export class OrderLine extends ObjectWithIdPlus {
 
   setUnitPrice() {
 
-    if (this.cust)
-      return
 
     console.warn('setUnitPrice')
 
@@ -1119,13 +1132,33 @@ export class OrderLine extends ObjectWithIdPlus {
   calculateUnitPrice(startDate?: Date, creationDate?: Date): number {
 
     let unitPrice = this.base
+    let unitPriceSet = false
 
     /*     if (this.product?.salesPrice) 
           unitPrice = this.product.salesPrice */
 
+    if (this.cust) {
+      unitPrice = this.unit
+      unitPriceSet = true
+    }
+      
 
     if (!this.hasOptions()) {
-      return unitPrice
+      unitPriceSet = true
+    }
+
+    let isBundle = this.product?.isBundle()
+    let childLines = []
+    let hasChildLines = false
+
+    if (isBundle) {
+      childLines = this.order?.getChildLines(this.id)
+      hasChildLines = ArrayHelper.NotEmpty(childLines)
+
+      if (hasChildLines || unitPrice < 0) {   // unit price < 0 happens when last child line was deleted (so currently no child lines anymore)
+        unitPrice = 0
+        unitPriceSet = true
+      }
     }
 
     /**
@@ -1135,7 +1168,7 @@ export class OrderLine extends ObjectWithIdPlus {
      * Is product.salesPrice = 0, then we sum up the prices of the product items (and their options)
      * 
      */
-    if (!this.product.salesPrice && this.product.isSubscription() && this.product.hasItems()) {
+    if (!unitPriceSet && !this.product.salesPrice && this.product.isSubscription() && this.product.hasItems()) {
 
 
       for (let productItem of this.product.items) {
@@ -1179,29 +1212,34 @@ export class OrderLine extends ObjectWithIdPlus {
     // Handle 
 
 
-    let optionsWithPrice = this.product.getOptionsHavingPrices()
-    for (let option of optionsWithPrice) {
+    if (!unitPriceSet) {
 
-      let orderLineOption = this.getOptionById(option.id)
-
-      if (!orderLineOption)
-        continue
-
-      for (const orderLineOptionValue of orderLineOption.values) {
-
-        if (option.hasFormula)
-          unitPrice += orderLineOptionValue.getPrice(option.formula, this.options)
-        else if (option.hasPrice)
-          unitPrice += orderLineOptionValue.prc
-
-        // unitPrice += orderLineOptionValue.getPrice(formula, this.options)
-        // totalDuration += value.duration
+      let optionsWithPrice = this.product.getOptionsHavingPrices()
+      for (let option of optionsWithPrice) {
+  
+        let orderLineOption = this.getOptionById(option.id)
+  
+        if (!orderLineOption)
+          continue
+  
+        for (const orderLineOptionValue of orderLineOption.values) {
+  
+          if (option.hasFormula)
+            unitPrice += orderLineOptionValue.getPrice(option.formula, this.options)
+          else if (option.hasPrice)
+            unitPrice += orderLineOptionValue.prc
+  
+          // unitPrice += orderLineOptionValue.getPrice(formula, this.options)
+          // totalDuration += value.duration
+        }
       }
+
     }
+
 
     let bodySculptorAboId = '3a52a26d-6cf7-4f56-bfcc-049d44fd9402'
 
-    if (this.productId == bodySculptorAboId)
+    if (!unitPriceSet && this.productId == bodySculptorAboId)
       this.doBodySculptorSubscriptionPricing()
 
     /*
@@ -1216,7 +1254,17 @@ export class OrderLine extends ObjectWithIdPlus {
     }
       */
 
-    let priceChange = this.calculatePriceChanges(unitPrice)
+    let unitPriceForPriceChanges = unitPrice
+
+
+    if (isBundle && hasChildLines) {
+
+        unitPriceForPriceChanges = _.sumBy(childLines, 'unit')   //childLines.reduce((acc, line) => acc + line.unit, 0)
+      
+    }
+
+
+    let priceChange = this.calculatePriceChanges(unitPriceForPriceChanges)
 
     if (priceChange)
       unitPrice += priceChange
@@ -1329,6 +1377,9 @@ export class OrderLine extends ObjectWithIdPlus {
 
       if (priceChange.pct) {
         let pct = priceChange.val / 100
+
+        
+
         delta += _.round(unitPrice * pct, 2)
       } else {
         delta += _.round(priceChange.val, 2)

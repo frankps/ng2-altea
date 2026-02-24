@@ -731,10 +731,14 @@ export class OrderMessaging extends OrderMessagingBase {
 
             let branchOrders = ordersToReview.filter(o => o.branchId == branch.id)
 
+            let contactsToUpdate: Contact[] = []
+
             for (let order of branchOrders) {
 
-                if (!order.contact)
-                    continue
+                let contact = order.getContact()   // order can have NO contact!  (quick orders => contact info embedded in order)
+
+                // let contact = order.getContact()
+
 
                 const cols = []
                 table.addRow(cols)
@@ -745,13 +749,16 @@ export class OrderMessaging extends OrderMessagingBase {
                 cols.push(order.incl)
                 cols.push(order.paid)
 
-                let contact = order.contact
 
-                let nrOfDaysSinceLastReview = contact.nrOfDaysSinceLastReview()
+
+                let nrOfDaysSinceLastReview = -1
+
+                if (order.contact)
+                    contact.nrOfDaysSinceLastReview()
 
                 cols.push(nrOfDaysSinceLastReview)
 
-                if (nrOfDaysSinceLastReview >= 0 && nrOfDaysSinceLastReview < 30) {
+                if (nrOfDaysSinceLastReview >= 0 && nrOfDaysSinceLastReview < 60) {
                     cols.push('=> No review request')
                     continue
                 }
@@ -759,7 +766,7 @@ export class OrderMessaging extends OrderMessagingBase {
                 try {
 
                     // we try to send template for different message types (email, whatsapp, ...) that are allowed for the contact
-                    let res = await this.sendPossibleTemplates(templates, order.contact, order, branch, true)
+                    let res = await this.sendPossibleTemplates(templates, contact, order, branch, true)
 
                     let okCount = ApiResult.countOk(res)
 
@@ -769,6 +776,12 @@ export class OrderMessaging extends OrderMessagingBase {
 
                         let orderUpdate = new DbObject<Order>('order', Order, { id: order.id, rev: ReviewStatus.requested })
                         const updatedResult = await this.alteaDb.db.update$<Order>(orderUpdate)
+
+   /*                      if (order.contact) {
+                            contact.revDate = new Date()
+                            contactsToUpdate.push(contact)
+                        } */
+
                     } else {
                         cols.push('0')
                     }
@@ -782,6 +795,10 @@ export class OrderMessaging extends OrderMessagingBase {
 
 
             }
+
+
+/*             if (ArrayHelper.NotEmpty(contactsToUpdate))
+                await this.alteaDb.updateContacts(contactsToUpdate, ['revDate']) */
         }
 
         let subject = `Review request messaging: ${ordersToReview.length} orders`

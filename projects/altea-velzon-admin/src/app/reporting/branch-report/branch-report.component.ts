@@ -49,7 +49,7 @@ export class BranchReportComponent implements OnInit {
   options: ReportOptions = new ReportOptions()
   ReportPeriod = ReportPeriod
 
-  startDate = new Date(2025, 3, 1)
+  startDate = new Date(2024, 9, 1)
   endDate = new Date()
 
   constructor(public dbSvc: ObjectService, public sessionSvc: SessionService) {

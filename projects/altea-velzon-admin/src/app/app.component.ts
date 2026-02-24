@@ -193,13 +193,13 @@ export class AppComponent implements OnInit {
     await this.loyaltyProgramSvc.initCache(typeInfos)
     this.objectSvc.typeCaches.set(LoyaltyProgram, this.loyaltyProgramSvc)
 
-    const templateQry = new DbQuery()
+/*     const templateQry = new DbQuery()
     templateQry.and('branchId', QueryOperator.equals, branchId)
     templateQry.take = 1000
     this.templateSvc.cacheQuery = templateQry
     await this.templateSvc.initCache(typeInfos)
     this.objectSvc.typeCaches.set(Template, this.templateSvc)
-
+ */
 
     /* 
     const scheduleQry = new DbQuery()

@@ -29,6 +29,12 @@ export class ContactReactivationError {
 
 }
 
+export class ContactReactivationInput {
+
+    codes: string[]
+
+}
+
 export class ContactReactivation extends MessagingBase {
 
 
@@ -50,23 +56,23 @@ export class ContactReactivation extends MessagingBase {
 
     }
 
-    async reactivateContacts() {
+    async reactivateContacts(templateCode: string = null, testOnly: boolean = true) {   // 
 
         let me = this
 
-        let batchSize = 20
+        let batchSize = 5
         let maxBatches = 2
 
         let aquasenseId = '66e77bdb-a5f5-4d3d-99e0-4391bded4c6c'
 
-        let debug = false   // then an individual contact is processed: to check if message is merged & sent correctly
+       // let testOnly = false   // then an individual contact is processed: to check if message is merged & sent correctly
 
         let sendWhatsApp = true  // also for debugging
 
         let branch = await this.alteaDb.getBranch(aquasenseId)
 
         let templateCategory = 'reactivation'
-        let allReactivationTemplates = await this.alteaDb.getTemplatesByCategory(aquasenseId, templateCategory, 'products.product')  // .product
+        let allReactivationTemplates = await this.alteaDb.getTemplatesByCategory(aquasenseId, templateCategory, templateCode, 'products.product')  // .product
 
         /** we can have different versions/variations of a template with the same code, the suffix is used to distinguish them */
         let codes = this.getCodes(allReactivationTemplates)
@@ -75,6 +81,19 @@ export class ContactReactivation extends MessagingBase {
         const htmlDoc = new HtmlDoc()
 
         let messageCount = 0
+
+
+        /** Get all mobile numbers that have already received a message for the last 14 days (any template of the reactivation category):
+ * we don't want to spam people (across all templates)
+ */
+        let alreadyReceivedReactivationMobileNumbers = []
+
+        if (!testOnly)
+            alreadyReceivedReactivationMobileNumbers = await this.alteaDb.getMobileNumbersAlreadyTargetedForCategory(aquasenseId, templateCategory, 5)
+
+        if (ArrayHelper.IsEmpty(alreadyReceivedReactivationMobileNumbers))
+            alreadyReceivedReactivationMobileNumbers = []
+
 
         /*         console.log(testContact)
                 return */
@@ -114,14 +133,21 @@ export class ContactReactivation extends MessagingBase {
 
 
 
+
                 let contacts: Contact[]
                 // let contacts = await this.alteaDb.getSleepingContacts(aquasenseId, fromDaysAgo, toDaysAgo, productIds)
 
 
-                let alreadyReceivedMobileNumbers = await this.alteaDb.getMobileNumbersAlreadyTargeted(aquasenseId, templateCategory, code, toDaysAgo)
+                /** Sometimes we have different contacts with same mobile number (duplicate contacts, husband/wife, etc.) 
+                 *  We don't want to send same message twice.
+                */
+                let alreadyReceivedTemplateMobileNumbers = []
 
+                if (!testOnly)
+                    alreadyReceivedTemplateMobileNumbers = await this.alteaDb.getMobileNumbersAlreadyTargetedForTemplate(aquasenseId, templateCategory, code, toDaysAgo)
 
-
+                if (ArrayHelper.IsEmpty(alreadyReceivedTemplateMobileNumbers))
+                    alreadyReceivedTemplateMobileNumbers = []
 
                 let templatesForPeriod = specificTemplates.filter(t => t.remind == toDaysAgo)
 
@@ -130,7 +156,7 @@ export class ContactReactivation extends MessagingBase {
 
                 while (true) {
 
-                    if (debug) {
+                    if (testOnly) {
                         let debugContactId = 'a13baec9-e21a-4fbb-ac2e-a716dea361b6'  // Frank Paepens
 
                         let deleteResult = await this.alteaDb.deleteTemplateMessagesForContact(debugContactId)
@@ -151,6 +177,9 @@ export class ContactReactivation extends MessagingBase {
 
                     }
 
+                    let contactInBatch = 0
+
+                    const alreadyReceivedMobileNumbers = _.union(alreadyReceivedReactivationMobileNumbers, alreadyReceivedTemplateMobileNumbers)
                     //contacts = this.removeContactsAlreadySent(contacts, alreadyReceivedMobileNumbers)
 
                     if (ArrayHelper.IsEmpty(contacts))
@@ -184,19 +213,21 @@ export class ContactReactivation extends MessagingBase {
                         //console.log(message)
 
 
-                        //Add & save a TemplateMessage object
+                        // Add & save a TemplateMessage object
                         let templateMessage = TemplateMessage.create(template.id, contact.id, templateCategory, code, template.suffix, toDaysAgo)
                         templateMessage.id = message.id
                         templateMessage.to = contact.mobile  // because we send Whatsapp to mobile number
                         messages.push(templateMessage)
-
 
                         var sendResult: ApiResult<Message>
 
                         if (sendWhatsApp) {
                             try {
                                 sendResult = await this.sendWhatsApp(message, contact)
-                                alreadyReceivedMobileNumbers.push(contact.mobile)
+
+                                if (sendResult.status == ApiStatus.ok)
+                                    me.addMobileNumberToAlreadyReceived(contact.mobile, alreadyReceivedReactivationMobileNumbers, alreadyReceivedTemplateMobileNumbers)
+
                                 console.log(sendResult)
                             } catch (error) {
                                 console.error(error)
@@ -218,7 +249,7 @@ export class ContactReactivation extends MessagingBase {
                         if (ArrayHelper.NotEmpty(contact?.orders))
                             daysAgo = me.daysAgo(contact.orders[0])
 
-                        const cols: string[] = [`${messageCount}`, `${remindCount}`, contact.name, `${daysAgo}`, template.code, template.productNamesAsString(), sendResult?.status]
+                        const cols: string[] = [`${messageCount}`, `${contactInBatch}`, contact.name, `${daysAgo}`, template.code, template.productNamesAsString(), sendResult?.status]
                         htmlTable.addRow(cols)
 
                         if (sendWhatsApp)
@@ -226,6 +257,7 @@ export class ContactReactivation extends MessagingBase {
 
                         messageCount++
                         remindCount++
+                        contactInBatch++
                     }
 
 
@@ -234,7 +266,7 @@ export class ContactReactivation extends MessagingBase {
 
 
 
-                    if (debug)
+                    if (testOnly)
                         break  // we just process 1 contact (already done)
 
 
@@ -267,6 +299,25 @@ export class ContactReactivation extends MessagingBase {
 
     }
 
+
+    addMobileNumberToAlreadyReceived(mobileNumber: string, ...alreadyReceivedMobileLists: string[][]) {
+        if (!mobileNumber)
+            return
+
+        for (let alreadyReceivedMobileList of alreadyReceivedMobileLists) {
+            if (ArrayHelper.IsEmpty(alreadyReceivedMobileList))
+                continue
+
+            if (this.alreadyReceived(mobileNumber, alreadyReceivedMobileList))
+                continue
+
+            const cleanedMobileNumber = mobileNumber.replace(/\D+/g, "");
+
+            alreadyReceivedMobileList.push(cleanedMobileNumber)
+        }
+    }
+
+
     cleanMobile(raw?: string | null): string | null {
         if (!raw) return null;
         const digits = raw.replace(/\D+/g, "");      // drop non-numeric
@@ -277,12 +328,12 @@ export class ContactReactivation extends MessagingBase {
 
 
     alreadyReceived(address: string, alreadyReceivedMobileNumbers: string[]): boolean {
-        if (!address)
+        if (!address || ArrayHelper.IsEmpty(alreadyReceivedMobileNumbers))
             return false
 
         let cleanedAddress = this.cleanMobile(address)
 
-        return alreadyReceivedMobileNumbers.some(item => item.indexOf(cleanedAddress) >= 0)
+        return alreadyReceivedMobileNumbers.some(item => item?.indexOf(cleanedAddress) >= 0)
     }
 
 

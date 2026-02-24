@@ -30,10 +30,17 @@
                         (change)="unitPriceChanged()" />
 
                     <ng-template #showPrice>
-                        <span *ngIf="product?.priceFrom" style="font-size: small;">{{'objects.product.priceFrom-app' |
-                            translate}}&nbsp;&nbsp;</span>
-                        € {{orderLine.incl}}
-                        <sup *ngIf="product?.priceInfo">&nbsp;*</sup>
+
+                        <ng-container *ngIf="orderLine.incl">
+                            
+                            <span *ngIf="product?.priceFrom" style="font-size: small;">{{'objects.product.priceFrom-app' |
+                                translate}}&nbsp;&nbsp;</span>
+                            € {{orderLine.incl}}
+                            <sup *ngIf="product?.priceInfo">&nbsp;*</sup>
+
+                        </ng-container>
+
+
                     </ng-template>
 
                     <i class="fas fa-pen ms-2" *ngIf="sessionSvc.isPosAdmin()" (click)="toggleShowMoreInternal()"></i>

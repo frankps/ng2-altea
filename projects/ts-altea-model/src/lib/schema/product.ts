@@ -514,6 +514,10 @@ export class Product extends ObjectWithIdPlus {
   @Type(() => Number)
   minQty = 1;
 
+  /** Maximum quantity to order in 1 order */
+  @Type(() => Number)
+  maxQty = 100;
+
 
   hasSpecialPrices() {
 

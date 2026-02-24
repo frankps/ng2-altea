@@ -45,6 +45,16 @@ export class CreateReportingData {
         let day = date.getDate()
 
         await this.createForDay(branchId, year, month, day)
+
+
+
+        let endDate = new Date()
+        let startDate = dateFns.subDays(endDate, 10)
+        endDate = dateFns.addDays(endDate, 1)
+
+        await this.aggregateAll(branchId, startDate, endDate) 
+
+        //await this.aggregateAll(branchId, date)
     }
 
     async createForDays(branchId: string, startDate: Date, endDate: Date) {

@@ -177,6 +177,9 @@ export class ReviewComponent {
     /** keep track of reviews (by platform) on contact level  */
     let contact = this.contact
 
+    if (!contact)   // not all orders have a contact
+      return
+
     if (!contact.rev)
       contact.rev = new ContactReviews()
 

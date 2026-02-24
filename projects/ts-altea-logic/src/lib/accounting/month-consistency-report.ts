@@ -132,6 +132,8 @@ export class MonthConsistencyReportBuilder {
 
 
 
+
+
   async cashPayments(yearMonth: YearMonth, calculateNoDecl: boolean, resetNoDecl: boolean): Promise<CheckResults> {
 
     let me = this
@@ -165,7 +167,7 @@ export class MonthConsistencyReportBuilder {
 
     let paysToUpdate = []
 
-    let max = totalsInclCashReturns / 2
+    let max = _.round(totalsInclCashReturns * 0.45, 2)
 
 
 
@@ -201,6 +203,10 @@ export class MonthConsistencyReportBuilder {
 
       }
 
+      totalPositivePays = _.round(totalPositivePays, 2)
+      totalsInclCashReturns = _.round(totalsInclCashReturns, 2)
+      totals.noDeclare = _.round(totals.noDeclare, 2)
+
       result.addMsg(`Total cash positive pays: ${totalPositivePays}, total incl negative pays=${totalsInclCashReturns}`)
       result.addMsg(`No declare: ${totals.noDeclare}, max noDecl=${max} (stop when noDeclare > max)`)
 
@@ -216,6 +222,55 @@ export class MonthConsistencyReportBuilder {
 
 
     return result
+  }
+
+  doOrderCash(order: Order, startNum: number, endNum: number, paysToUpdate: Payment[], result: CheckResults, mode: { fullCashOnly: boolean, min: number }, totals: { noDeclare: number, ids: string[] }) {
+    if (order.toInvoice || order.invoiced || order.gift || order.giftCode)
+      return
+
+    let cashPays = order.getPaymentsBetween(startNum, endNum, [PaymentType.cash])
+
+
+
+    if (ArrayHelper.IsEmpty(cashPays))
+      return
+
+    /* We might call this method 2 times, once to try all cash, second a partial try
+    */
+    if (!totals.ids.includes(order.id)) {
+      let noDeclTotal = _.sumBy(cashPays, 'noDecl')  // already done before
+      totals.noDeclare += noDeclTotal
+      totals.ids.push(order.id)
+    } else {
+      console.log(`already added order ${order.id}`)
+    }
+
+    cashPays = cashPays.filter(p => p.amount > mode.min && p.noDecl == 0)
+
+    if (ArrayHelper.IsEmpty(cashPays))
+      return
+
+    let totalPays = order.nrOfPayments()
+    let numOfCashPays = cashPays.length
+    let totalCashPays = _.sumBy(cashPays, 'amount')
+
+    let startDateNum = order.start
+
+    /** Only cash used and order serviced with period  */
+    if ((!mode.fullCashOnly || numOfCashPays == totalPays) && startDateNum && startDateNum >= startNum && startDateNum < endNum) {
+      let paysToReduce = cashPays
+      for (let pay of paysToReduce) {
+        pay.noDecl = pay.amount
+
+        if (paysToUpdate.findIndex(p => p.id == pay.id) == -1) // if not yet in the list
+          paysToUpdate.push(pay)
+
+
+        totals.noDeclare += pay.noDecl
+
+        result.addMsg(`noDecl ${pay.noDecl} @ ${pay.date} for ${order.for} (${totals.noDeclare})`, order)
+      }
+    }
   }
 
 
@@ -250,7 +305,7 @@ export class MonthConsistencyReportBuilder {
   }
 
 
-  filterOrdersWithPaymentsBetween(orders: Order[], start: number | Date, end: number | Date) : Order[] {
+  filterOrdersWithPaymentsBetween(orders: Order[], start: number | Date, end: number | Date): Order[] {
 
     if (ArrayHelper.IsEmpty(orders))
       return []
@@ -259,14 +314,14 @@ export class MonthConsistencyReportBuilder {
     let endNum: number
 
     if (TypeHelper.isDate(start))
-        startNum = DateHelper.yyyyMMddhhmmss(start as Date)
+      startNum = DateHelper.yyyyMMddhhmmss(start as Date)
     else
-        startNum = start as number
+      startNum = start as number
 
     if (TypeHelper.isDate(end))
-        endNum = DateHelper.yyyyMMddhhmmss(end as Date)
+      endNum = DateHelper.yyyyMMddhhmmss(end as Date)
     else
-        endNum = end as number
+      endNum = end as number
 
 
 
@@ -508,54 +563,6 @@ export class MonthConsistencyReportBuilder {
   }
 
 
-  doOrderCash(order: Order, startNum: number, endNum: number, paysToUpdate: Payment[], result: CheckResults, mode: { fullCashOnly: boolean, min: number }, totals: { noDeclare: number, ids: string[] }) {
-    if (order.toInvoice || order.invoiced || order.gift || order.giftCode)
-      return
-
-    let cashPays = order.getPaymentsBetween(startNum, endNum, [PaymentType.cash])
-
-
-
-    if (ArrayHelper.IsEmpty(cashPays))
-      return
-
-    /* We might call this method 2 times, once to try all cash, second a partial try
-    */
-    if (!totals.ids.includes(order.id)) {
-      let noDeclTotal = _.sumBy(cashPays, 'noDecl')  // already done before
-      totals.noDeclare += noDeclTotal
-      totals.ids.push(order.id)
-    } else {
-      console.log(`already added order ${order.id}`)
-    }
-
-    cashPays = cashPays.filter(p => p.amount > mode.min && p.noDecl == 0)
-
-    if (ArrayHelper.IsEmpty(cashPays))
-      return
-
-    let totalPays = order.nrOfPayments()
-    let numOfCashPays = cashPays.length
-    let totalCashPays = _.sumBy(cashPays, 'amount')
-
-    let startDateNum = order.start
-
-    /** Only cash used and order serviced with period  */
-    if ((!mode.fullCashOnly || numOfCashPays == totalPays) && startDateNum && startDateNum >= startNum && startDateNum < endNum) {
-      let paysToReduce = cashPays
-      for (let pay of paysToReduce) {
-        pay.noDecl = pay.amount
-
-        if (paysToUpdate.findIndex(p => p.id == pay.id) == -1) // if not yet in the list
-          paysToUpdate.push(pay)
-
-
-        totals.noDeclare += pay.noDecl
-
-        result.addMsg(`noDecl ${pay.noDecl} @ ${pay.date} for ${order.for} (${totals.noDeclare})`, order)
-      }
-    }
-  }
 
 
   getTotal(orders: Order[], payType: PaymentType, startNum: number, endNum: number, minValue): number {

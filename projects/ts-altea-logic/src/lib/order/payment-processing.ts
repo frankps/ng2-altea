@@ -104,7 +104,7 @@ export class PaymentProcessing {
         // newPayments = payments.filter(pay => pay?.m?.n === true)
 
         // non processed gift payments
-        const newGiftPayments = payments.filter(pay => pay.type == PaymentType.gift && !pay.proc && pay.date > 20250429000000)
+        const newGiftPayments = payments.filter(pay => pay?.m?.n === true && pay.type == PaymentType.gift && !pay.proc)
 
         if (ArrayHelper.IsEmpty(newGiftPayments))
             return new ApiListResult([], ApiStatus.ok, 'No gift payments to process!')
@@ -143,18 +143,23 @@ export class PaymentProcessing {
                     result.message += canUse.msg + " "
                 }
 
-                giftPayment.proc = true
+                if (!giftPayment.m.f)
+                    giftPayment.m.f = []
+
+                if (!giftPayment.proc) {
+                    giftPayment.proc = true
+                    giftPayment.m.f.push('proc')
+                }
 
                 if (!giftPayment.m.n)  // if not new (new will be saved anyway), then update
                 {
                     giftPayment.m.u = true
 
-                    if (!giftPayment.m.f)
-                        giftPayment.m.f = []
+                    
 
                     giftPayment.m.f.push('vld', 'proc')
                 }
-                    
+
 
             }
         }

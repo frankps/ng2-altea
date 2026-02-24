@@ -58,11 +58,16 @@ export class OrderLineComponent implements OnInit {
 
   setQtyArray(product: Product) {
     let minQty = 1
+    let maxQty = 21
 
-    if (product)
+    if (product) {
       minQty = product.minQty
 
-    this.qtyArray = [...Array(21 - minQty).keys()].map(i => i + minQty)
+      if (product.maxQty < 21)
+        maxQty = product.maxQty + 1
+    }
+
+    this.qtyArray = [...Array(maxQty - minQty).keys()].map(i => i + minQty)
   }
 
   OnlineMode = OnlineMode
@@ -205,7 +210,7 @@ export class OrderLineComponent implements OnInit {
 
     return true
   }
-  
+
 
   deleteOrderLine() {
     const orderLine = this.orderMgrSvc.orderLine

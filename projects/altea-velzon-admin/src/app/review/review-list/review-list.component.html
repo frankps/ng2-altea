@@ -1,0 +1,42 @@
+
+
+
+<ng-container *ngIf="reviews">
+
+
+    <div class="card mt-2" *ngFor="let review of reviews">
+        <div class="card-header">
+
+            <div class="row">
+                <div class="col">{{ review.customer }}</div>
+                <div class="col">  <ngb-rating style="color: rgb(66, 196, 37);" [rate]="review.customTotal(0)" [max]="5" [readonly]="true" /> &nbsp; <b>{{ review.customTotal() }}</b>  </div>
+                <div class="col">
+                    <a class="float-end" [routerLink]="['/aqua/orders/manage/',review.orderId]"
+                    style="text-decoration: underline; color: inherit;">{{ review.order?.start | intdate }}</a>
+                </div>
+            </div>
+         
+
+
+        </div>
+        <div class="card-body">
+          <figure *ngIf="review.feedback">
+            <blockquote class="blockquote">
+              <p>{{ review.feedback }}</p>
+            </blockquote>
+          </figure>
+
+          <div class="row">
+           
+            <div class="col-2" *ngIf="review.params['advice'] < 5">Advies: {{ review.params['advice'] }}</div>
+            <div class="col-2" *ngIf="review.params['clean'] < 5">Netheid: {{ review.params['clean'] }}</div>
+            <div class="col-2" *ngIf="review.params['polite'] < 5">Vriendelijkheid: {{ review.params['polite'] }}</div>
+            <div class="col-2" *ngIf="review.params['quality'] < 5">Kwaliteit: {{ review.params['quality'] }}</div>
+            <div class="col-2" *ngIf="review.params['reception'] < 5">Onthaal: {{ review.params['reception'] }}</div>
+          </div>
+         
+        </div>
+      </div>
+
+
+</ng-container>

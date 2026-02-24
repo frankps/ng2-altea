@@ -73,10 +73,16 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
   MsgStateIcon = MsgStateIcon
 
 
+  /*   mobilePhoneCss = {
+      row: 'row mt-3',
+      colPrefix: 'col-2',
+      colLocalNum: 'col-4'
+    } */
+
   mobilePhoneCss = {
-    row: 'row mt-3',
-    colPrefix: 'col-2',
-    colLocalNum: 'col-4'
+    row: 'row',
+    colPrefix: 'col-4',
+    colLocalNum: 'col-8'
   }
 
   orders: UIOrder[] = []
@@ -105,7 +111,7 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
       , contactSvc
       , router, route, spinner, dashboardSvc)
 
-    this.sectionProps.set('general', ['name', 'first', 'last', 'gender', 'birth', 'email', 'emailRemind', 'mobile', 'smsRemind', 'language', 'deposit', 'depositPct', 'act'])
+    this.sectionProps.set('general', ['name', 'first', 'last', 'gender', 'birth', 'email', 'emailRemind', 'mobile', 'optOut', 'smsRemind', 'language', 'deposit', 'depositPct', 'act'])
     this.translationSvc.translateEnum(Gender, 'enums.gender.', this.gender)
     this.translationSvc.translateEnum(Language, 'enums.language.', this.language)
     this.translationSvc.translateEnum(DepositMode, 'enums.deposit-mode.', this.depositMode)

@@ -2,7 +2,7 @@ import { Component, ViewChild, OnInit, Injectable } from '@angular/core';
 //import { Gender, OnlineMode, Product, ProductType, Price, DaysOfWeekShort, ProductTypeIcons, ProductOption, ProductResource, ResourceType, ResourceTypeIcons, Resource, Schedule } from 'ts-altea-model'
 //import { BackendHttpServiceBase, DashboardService, FormCardSectionEventData, ToastType } from 'ng-common'
 import { ActivatedRoute, Router } from '@angular/router';
-import { BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, Translation, ObjectHelper, ObjectWithId, CollectionChangeTracker, ApiStatus, DateHelper } from 'ts-common'
+import { BackendServiceBase, ApiListResult, ApiResult, ApiBatchProcess, Translation, ObjectHelper, ObjectWithId, CollectionChangeTracker, ApiStatus, DateHelper, DbQuery, QueryOperator } from 'ts-common'
 import * as _ from "lodash";
 import { NgxSpinnerService } from "ngx-spinner"
 import { NgTemplateOutlet } from '@angular/common';
@@ -147,8 +147,22 @@ export abstract class NgEditBaseComponent<T extends ObjectWithId> extends NgSect
 
         this.spinner.show()
 
-        let res = await me.objectSvc.get$(id, this.includes)
-       
+
+        let res: T
+
+        if (id.length == 36)
+            res = await me.objectSvc.get$(id, this.includes)
+        else {
+
+            let includes = []
+
+            if (this.includes)
+                includes = this.includes.split(',')
+
+            let qry = me.getQuery('code', id, includes)
+            res = await me.objectSvc.queryFirst$(qry)
+        }
+
         this.object = res as T
 
         this.resetOrigObject()
@@ -168,6 +182,19 @@ export abstract class NgEditBaseComponent<T extends ObjectWithId> extends NgSect
 
     }
 
+
+    getQuery(property: string, value: any, includes: string[]) {
+        const query = new DbQuery()
+    
+        query.and(property, QueryOperator.equals, value)
+        if (includes)
+            query.include(...includes)
+        query.take = 1
+    
+
+    
+        return query
+      }
 
 
     saveSection(sectionProps: Map<string, string[]>, editSection: string) {

@@ -63,6 +63,11 @@ export class Template extends ObjectWithParameters {
 
   hash: string
 
+  /**
+   * 'noVisit': true if the template is for a contact that has not been visited for a given period
+   */
+  options: any = {}
+
 
   @Type(() => ProductTemplate)
   products?: ProductTemplate[]

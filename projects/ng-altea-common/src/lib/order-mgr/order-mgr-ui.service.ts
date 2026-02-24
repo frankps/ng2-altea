@@ -407,7 +407,7 @@ export class OrderMgrUiService {   // implements OnInit
       this.order.contactId = this.sessionSvc.contact.id
       this.order.for = this.sessionSvc.contact.name
     }
-      
+
 
     this.order.branchId = branch.id
     this.order.branch = branch
@@ -1595,6 +1595,7 @@ export class OrderMgrUiService {   // implements OnInit
 
   /** method used to add products (used in demo orders). When product is a bundle, then it will result in multiple orderLines */
   async addProduct(product: Product, qty = 1, initOptionValues?: Map<String, String[]>): Promise<OrderLine[]> {
+    let me = this
 
     if (product.sub == ProductSubType.bundle) {
 
@@ -1604,23 +1605,29 @@ export class OrderMgrUiService {   // implements OnInit
 
       const orderLines = []
 
+      let bundleOrderLine = await this.newOrderLine(product, qty, initOptionValues)
+      bundleOrderLine.unit = 0
+      bundleOrderLine.cust = true
+      bundleOrderLine.incl = 0
+      bundleOrderLine.excl = 0
+      bundleOrderLine.vat = 0
+     // orderLinesal
+      me.order.addLine(bundleOrderLine, false)
+      orderLines.push(bundleOrderLine)
+
+
       for (let item of product.items) {
 
-        /*
-            query.include('options:orderBy=idx.values:orderBy=idx', 'items:orderBy=idx')
-   // query.include('options:orderBy=idx.values:orderBy=idx', 'resources:orderBy=idx.resource', 'items:orderBy=idx', 'prices')
-   */
+        const containingProduct = await this.productSvc.get$(item.productId, ['options:orderBy=idx.values:orderBy=idx', 'resources:orderBy=idx', 'prices'])
 
-
-        const product = await this.productSvc.get$(item.productId, ['options:orderBy=idx.values:orderBy=idx', 'resources:orderBy=idx', 'prices'])
-
-        if (!product) {
+        if (!containingProduct) {
           console.warn(`Product not found!`)
           continue
         }
 
         let optionValues = item.getOptionValuesAsMap()
-        let orderLine = await this.newOrderLine(product, item.qty, optionValues)
+        let orderLine = await this.newOrderLine(containingProduct, item.qty, optionValues)
+        orderLine.pId = bundleOrderLine.id
         await this.addOrderLine(orderLine)
         orderLines.push(orderLine)
 
@@ -1704,7 +1711,7 @@ export class OrderMgrUiService {   // implements OnInit
   }
 
 
-   preselectSpecialPrices(orderLine: OrderLine, reset: boolean = false) {
+  preselectSpecialPrices(orderLine: OrderLine, reset: boolean = false) {
 
 
 
@@ -1744,7 +1751,7 @@ export class OrderMgrUiService {   // implements OnInit
 
 
 
-  } 
+  }
 
 
 
@@ -1845,6 +1852,14 @@ export class OrderMgrUiService {   // implements OnInit
   deleteCurrentOrderLine() {
     if (!this.orderLine)
       return
+
+    // first check if there are child lines (in case of bundle)
+    let childLines = this.order.getChildLines(this.orderLine.id)
+    if (ArrayHelper.NotEmpty(childLines)) {
+      for (let childLine of childLines) {
+        this.order.deleteLine(childLine)
+      }
+    }
 
     if (this.order.deleteLine(this.orderLine))
       this.orderDirty = true

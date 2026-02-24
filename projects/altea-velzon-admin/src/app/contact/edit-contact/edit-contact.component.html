@@ -84,6 +84,9 @@
                 <div class="col-6"><ngx-altea-label-value label="objects.contact.remark" [value]="object.remark"
                         valueFormat="pre"></ngx-altea-label-value></div>
 
+                <div class="col-6"> <ngx-altea-label-value label="objects.contact.optOut" [value]="object.optOut"
+                    valueFormat="yesNo"></ngx-altea-label-value> </div>
+
             </div>
 
             <div class="row">
@@ -168,9 +171,28 @@
 
 
 
-                    <int-phone-edit [css]="mobilePhoneCss" [(phone)]="object.mobile"
-                        (phoneChange)="formChanged('general')"></int-phone-edit>
 
+
+                </div>
+
+                <div class="row mt-3">
+
+                    <div class="col">
+                        <int-phone-edit [css]="mobilePhoneCss" [(phone)]="object.mobile"
+                            (phoneChange)="formChanged('general')"></int-phone-edit>
+                    </div>
+
+
+                    <div class="col">
+
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="optOut" name="optOut"
+                                [(ngModel)]="object.optOut" />
+                            <label class="form-check-label" for="optOut" translate="objects.contact.optOut"></label>
+                        </div>
+
+
+                    </div>
 
                 </div>
 
@@ -181,6 +203,10 @@
                                 [(ngModel)]="object.remark"></textarea>
                         </ngx-altea-label-control>
                     </div>
+
+
+
+
                 </div>
 
 
@@ -274,9 +300,10 @@
                             <span *ngIf="uiOrder.gift">{{uiOrder.giftCode}}</span>
 
 
-                            
 
-                            <i *ngIf="uiOrder.toInvoice" [style.color]="uiOrder.invoiced ? 'green' : 'orange'" class="fa-solid fa-file-invoice float-end mx-1"></i>
+
+                            <i *ngIf="uiOrder.toInvoice" [style.color]="uiOrder.invoiced ? 'green' : 'orange'"
+                                class="fa-solid fa-file-invoice float-end mx-1"></i>
 
 
                             <i *ngIf="uiOrder.attn" class="ms-2 fa-sharp fa-solid fa-circle-exclamation"

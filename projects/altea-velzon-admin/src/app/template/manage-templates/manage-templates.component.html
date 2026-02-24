@@ -50,15 +50,15 @@
 
             <div class="row">
                 <div class="col-2">
-                    
+
                 </div>
                 <div class="col-10">
-                    <ng-container >
-                        
+                    <ng-container>
 
 
-                        <span *ngFor="let productTemplate of template.products" 
-                        class="badge rounded-pill text-bg-info ms-2">{{productTemplate.product?.name}}</span>
+
+                        <span *ngFor="let productTemplate of template.products"
+                            class="badge rounded-pill text-bg-info ms-2">{{productTemplate.product?.name}}</span>
 
                     </ng-container>
                 </div>
@@ -240,6 +240,15 @@
                             </div>
                         </div>
 
+                        <div class="row mt-2">
+                            <div class="col">
+                                <div class="form-check form-switch">
+                                    <input type="checkbox" class="form-check-input" id="noVisit" name="noVisit"
+                                        [(ngModel)]="template.options.noVisit" (change)="updateTemplate(template)">
+                                    <label class="form-check-label" for="act">Klant niet meer geweest sindsdien (voor geen enkele dienst).</label>
+                                </div>
+                            </div>
+                        </div>
 
                     </div>
                     <div class="col-10 mt-2">
@@ -307,13 +316,15 @@
 
                         <h5>Products &nbsp; <i class="fa-solid fa-circle-plus" (click)="searchProduct()"></i>
                         </h5>
-                        
+
 
                         <ng-container *ngIf="template.products">
-                        
-                            <span *ngFor="let productTemplate of template.products" 
-                            class="badge rounded-pill text-bg-info ms-2">{{productTemplate.product?.name}} &nbsp; <i class="fa-solid fa-xmark" (click)="deleteProduct(template, productTemplate)"></i></span>
-    
+
+                            <span *ngFor="let productTemplate of template.products"
+                                class="badge rounded-pill text-bg-info ms-2">{{productTemplate.product?.name}} &nbsp; <i
+                                    class="fa-solid fa-xmark"
+                                    (click)="deleteProduct(template, productTemplate)"></i></span>
+
                         </ng-container>
 
 

@@ -155,6 +155,7 @@ export class OrderCheckComponent implements OnInit {
 
   async calculateCustomMonth() {
 
+    return
     console.log('calculateCustomMonth')
 
     let yearMonth = new YearMonth(2024, 10)
@@ -287,8 +288,8 @@ export class OrderCheckComponent implements OnInit {
 
     let branchId = me.sessionSvc.branchId
 
-    let from = new YearMonth(2025, 7)
-    let to = new YearMonth(2025, 9) // (2025, 1)
+    let from = new YearMonth(2025, 10)
+    let to = new YearMonth(2025, 12) // (2025, 1)
 
     let reportMonths = await alteaDb.getReportMonthsPeriod(branchId, from, to, true)
 
@@ -433,7 +434,7 @@ export class OrderCheckComponent implements OnInit {
 
   }
 
-  async downloadWingsReport(yearMonthNumber: number = this.wingsExportYearMonth) {
+  async downloadWingsReportAsCsv(yearMonthNumber: number = this.wingsExportYearMonth) {
     let me = this
 
     let alteaDb = new AlteaDb(this.objSvc)
@@ -454,6 +455,25 @@ export class OrderCheckComponent implements OnInit {
 
   }
 
+  async downloadWingsReportAsExcel(yearMonthNumber: number = this.wingsExportYearMonth) {
+    let me = this
+
+    let alteaDb = new AlteaDb(this.objSvc)
+
+    let wingsReporting = new WingsReporting(alteaDb)
+
+    let yearMonth = YearMonth.parse(yearMonthNumber)
+
+    let report = await wingsReporting.createYearMonth(yearMonth, me.sessionSvc.branchId)
+
+    var fileName = `month-details-${yearMonth.y}-${yearMonth.m}.xlsx`
+
+    let workbook = report.toExcel()
+    const buffer = await workbook.xlsx.writeBuffer();
+
+    const blob = new Blob([buffer]);
+    saveAs(blob, fileName);
+  }
 
   async downloadYearReport(yearMonthNumber: number = this.wingsExportYearMonth) {
     let me = this

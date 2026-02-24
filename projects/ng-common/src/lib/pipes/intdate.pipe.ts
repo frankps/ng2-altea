@@ -11,7 +11,7 @@ export class IntdatePipe implements PipeTransform {
     if (!value)
       return ''
     const date = DateHelper.parse(value)
-    return date ? dateFns.format(date, 'dd/MM HH:mm') : ''
+    return date ? dateFns.format(date, 'dd/MM/yy HH:mm') : ''
   }
 
 }

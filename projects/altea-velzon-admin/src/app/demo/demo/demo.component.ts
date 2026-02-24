@@ -2,7 +2,7 @@ import { Component, ViewChild, inject } from '@angular/core';
 import { Contact, DateRangeTests, Message, MsgType, Order, OrderLine, PaymentType, PriceCondition, PriceConditionType, Product, SmsMessage, Subscription, TemplateChannel, User, ValueComparator } from 'ts-altea-model';
 import { SearchContactComponent } from '../../contact/search-contact/search-contact.component';
 import { AlteaService, BranchService, ObjectService, OrderService, ProductService, ResourceService, ScheduleService, SessionService, TemplateService, UserService } from 'ng-altea-common';
-import { AlteaDb, CheckDeposists, ContactReactivation, CreateReportingData, OptOutContacts, OrderCronJobs, OrderMessaging, OrderMgmtService, ProductReporting, TaskSchedulingService } from 'ts-altea-logic';
+import { AlteaDb, CheckDeposists, ContactReactivation, CreateReportingData, FixGifts, OptOutContacts, OrderCronJobs, OrderMessaging, OrderMgmtService, ProductReporting, TaskSchedulingService } from 'ts-altea-logic';
 import { TranslationService } from 'ng-common'
 import { Country } from 'ts-altea-model'
 import { DbQuery, DbQueryTyped, HtmlTable, ObjectHelper, QueryOperator, Translation } from 'ts-common';
@@ -66,16 +66,21 @@ masidelautaro@yahoo.com`
   }
 
 
+  templateCodes: string[] = []
+  testOnly = false
+  selectedTemplateCode: string = 'facials_25pct_reactivatie'
+
   async ngOnInit() {
 
     await this.translationSvc.translateEnum(PriceConditionType, 'enums.price-condition-type.', this.priceConditionTypes)
     await this.translationSvc.translateEnum(ValueComparator, 'enums.value-comparator.', this.valueComparators)
 
-    this.subscriptionUnitProducts = await this.productSvc.subscriptionUnitProducts()
+    await this.getTemplateCodes()
+    // this.subscriptionUnitProducts = await this.productSvc.subscriptionUnitProducts()
 
     console.error(this.subscriptionUnitProducts)
 
-    this.initialized = true  
+    this.initialized = true
     //   this.read()
     /* 
         await this.translationSvc.translateEnum(Country, 'enums.country.', this.countries)
@@ -101,15 +106,21 @@ masidelautaro@yahoo.com`
     console.error(contacts)
   }
 
-  async sleepingContacts() {
+  async getTemplateCodes() {
+    let alteaDb = new AlteaDb(this.dbSvc)
+    this.templateCodes = await alteaDb.getTemplateCodes(this.sessionSvc.branchId, 'reactivation')
+    console.error(this.templateCodes)
+  }
+
+  async sleepingContacts(templateCode: string, testOnly: boolean) {
 
     let alteaDb = new AlteaDb(this.dbSvc)
 
-    let contactReactivation = new ContactReactivation(alteaDb)  
+    let contactReactivation = new ContactReactivation(alteaDb)
 
     console.error('sleepingContacts')
 
-    let res = await contactReactivation.reactivateContacts()
+    let res = await contactReactivation.reactivateContacts(templateCode, testOnly)
     console.log(res)
 
 
@@ -144,8 +155,13 @@ masidelautaro@yahoo.com`
     /*      console.error('aggregateReportData')
         return  */
 
+    await this.spinner.show()
+    //await createReportingData.createForDays(this.sessionSvc.branchId, new Date(2024, 9, 1), new Date(2025, 2, 1))
+    
+    await createReportingData.aggregateAll(this.sessionSvc.branchId, new Date(2024, 9, 1), new Date(2025, 3, 1))   // , new Date()
 
-    await createReportingData.aggregateAll(this.sessionSvc.branchId, new Date(2024, 9, 1), new Date())
+    await this.spinner.hide()
+   
   }
 
 
@@ -580,6 +596,12 @@ Datum: 1 april 2024 om 19h00
 
   }
 
+  async fixGifts() {
+    let alteaDb = new AlteaDb(this.dbSvc)
+    let fixGifts = new FixGifts(alteaDb)
+    await fixGifts.fixGifts()
+  }
+
   createGiftCode() {
 
     this.giftCode = ObjectHelper.createRandomString(6, "ABCDEFGHJKLMNPQRSTUVWXYZ23456789")
@@ -659,6 +681,19 @@ Datum: 1 april 2024 om 19h00
     link.click();
     URL.revokeObjectURL(link.href);
 
+  }
+
+
+
+  async reviewRequestMessaging() {
+
+    console.error('reviewRequestMessaging')
+   // return
+
+    let alteaDb = new AlteaDb(this.dbSvc)
+    let orderMessaging = new OrderMessaging(alteaDb)
+    let res = await orderMessaging.reviewRequestMessaging()
+    console.error(res)
   }
 
 }

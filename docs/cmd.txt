@@ -84,6 +84,10 @@ http://localhost:4200/auth2/test
 New component:
 
 
+ng generate module review --project=altea-velzon-admin --routing
+ng generate component review/review-list --project=altea-velzon-admin
+
+
 ng generate module reporting --project=altea-velzon-admin --routing
 ng generate component reporting/branchReport --project=altea-velzon-admin
 

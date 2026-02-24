@@ -33,7 +33,7 @@ export const appRoutes: Route[] = [
       { path: "reporting", loadChildren: () => import(`./reporting/reporting.module`).then(m => m.ReportingModule) },
       { path: "local", loadChildren: () => import(`./local/local.module`).then(m => m.LocalModule) },
       { path: "staff", loadChildren: () => import(`./staff/staff.module`).then(m => m.StaffModule) },
-      
+      { path: "reviews", loadChildren: () => import(`./review/review.module`).then(m => m.ReviewModule) },
       // { path: "order", loadChildren: () => import(`./order-mgr/order-mgr.module`).then(m => m.OrderMgrModule) },
       { path: "demo", component: DemoComponent },
       { path: "", component: DemoComponent },

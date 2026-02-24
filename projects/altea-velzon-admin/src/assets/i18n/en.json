@@ -1056,7 +1056,8 @@
       "postal": "Postcode",
       "city": "Stad",
       "remark": "Opmerking",
-      "news": "Ik ontvang graag de {{company}} nieuwsbrief"
+      "news": "Ik ontvang graag de {{company}} nieuwsbrief",
+      "optOut": "Opt out = geen communicatie"
     },
     "template": {
       "_name": "Template",
@@ -1133,6 +1134,7 @@
       "type": "Type",
       "sub": "Sub type",
       "minQty": "Minimum te bestellen",
+      "maxQty": "Maximum",
       "minQty-app": "Minimaal {{min}} te bestellen",
       "types": {
         "product": {
@@ -1350,6 +1352,9 @@
     },
     "orders": {
       "label": "Orders"
+    },
+    "reviews": {
+      "label": "Reviews"
     },
     "calendar": {
       "label": "Kalender",

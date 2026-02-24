@@ -57,6 +57,13 @@ export const MENU: MenuItem[] = [
     roles: []
   },
   {
+    id: 101,
+    label: 'menu.reviews.label',
+    icon: 'star',
+    link: '/%branch%/reviews/list',
+    roles: []
+  },
+  {
     id: 2,
     label: 'menu.resources.label',
     icon: 'globe',

@@ -292,8 +292,21 @@
                 <div class="row mb-1">
 
                     <div class="col-2">
+                        Betaald op
+                    </div>
+                    <div class="col-2">
+                        Afspraak
+                    </div>
+                </div>
+                <div class="row mb-1">
+
+                    <div class="col-2">
                         <a [routerLink]="['/', 'aqua','orders','manage',pay.orderId]">{{pay.date |
                             intdate}}</a>
+                    </div>
+
+                    <div class="col-2">
+                        {{pay.order?.start | intdate}}
                     </div>
 
                     <div class="col-1">€{{pay.amountRounded()}}
@@ -302,7 +315,7 @@
 
 
                     <ng-container *ngIf="pay.order">
-                        <div class="col-3">{{pay.order.for}}
+                        <div class="col-2">{{pay.order.for}}
                         </div>
 
 

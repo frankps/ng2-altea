@@ -12,7 +12,14 @@
             </div>
             <div class="col-6 px-3 d-flex justify-content-end align-items-center">
                 <span *ngIf="order.giftCode"><span *ngIf="order.isNew(); else showGiftCode">.....</span>
-                    <ng-template #showGiftCode>{{order.giftCode}}</ng-template>
+                    <ng-template #showGiftCode>
+
+                        <!-- {{order.giftCode}} -->
+
+                        <a [routerLink]="['/aqua/gifts/',order.giftCode]"
+                            style="text-decoration: none; color: inherit;">{{order.giftCode}}</a>
+
+                    </ng-template>
                 </span>
                 &nbsp;<i *ngIf="order.gift" class="fa-duotone fa-solid fa-gift"></i>
                 <span class="ms-2">{{order.start | intdate}}</span>
@@ -112,7 +119,11 @@
         <ng-container *ngFor="let line of order.lines; let idx = index">
             <div>
                 <div class="row mt-2">
-                    <div class="col-8" (click)="selectOrderLine(line)">{{line.qty}} x <small>{{line.descr}}</small>
+                    <div class="col-8" (click)="selectOrderLine(line)">
+                        <ng-container *ngIf="line.pId"><i class="fa-solid fa-caret-right"></i>&nbsp;</ng-container>
+                        <!-- if line has a parent line (for bundles/arrangements) -->
+
+                        <ng-container *ngIf="line.qty != 1">{{line.qty}} x </ng-container><small>{{line.descr}}</small>
 
                         <small>
 
@@ -146,12 +157,18 @@
 
 
 
+                        <ng-container *ngIf="line.incl">
 
-                        <span class="float-end">€ {{line.incl}}</span>
+                            <span class="float-end">€ {{line.incl}}</span>
 
-                        <span class="float-end me-1" *ngIf="!order.start && !order.gift && line?.product?.priceFrom "
-                            style="font-size: smaller; text-align: right;"><sup>*</sup> <span
-                                translate>objects.product.priceFrom-app</span> &nbsp; </span>
+                            <span class="float-end me-1"
+                                *ngIf="!order.start && !order.gift && line?.product?.priceFrom "
+                                style="font-size: smaller; text-align: right;"><sup>*</sup> <span
+                                    translate>objects.product.priceFrom-app</span> &nbsp; </span>
+
+
+                        </ng-container>
+
 
 
 
@@ -238,7 +255,7 @@
 
 
 
-            <div class="row mt-2 mb-3" *ngIf="order.nrOfPersons > 1 && appMode == AppMode.pos">
+            <div class="row mt-2 mb-3" *ngIf="line.hasPersons() && order.nrOfPersons > 1 && appMode == AppMode.pos">
                 <div class="col">
                     <div class="btn-group btn-group-sm float-end" role="group" aria-label="Basic example">
 
@@ -339,8 +356,22 @@
 
                     </div>
 
-                    <div class="col"><span *ngIf="!show.extra">{{pay.info}}</span> <span
-                            class="float-end">€{{pay.amount}}</span></div>
+                    <!--                     <a [routerLink]="['/aqua/gifts/',order.giftCode]"
+                        style="text-decoration: none; color: inherit;">{{order.giftCode}}</a> -->
+
+
+                    <div class="col">
+
+                        <ng-container *ngIf="!show.extra; else elsePayInfo">
+                            <a *ngIf="pay.giftId" [routerLink]="['/aqua/gifts/',pay.giftId]"
+                                style="text-decoration: none; color: blue;">{{pay.info}}</a>
+                        </ng-container>
+                        <ng-template #elsePayInfo>
+                            {{pay.info}}
+                        </ng-template>
+
+                        <span class="float-end">€{{pay.amount}}</span>
+                    </div>
 
                 </ng-container>
 

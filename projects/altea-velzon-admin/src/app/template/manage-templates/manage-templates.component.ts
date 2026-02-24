@@ -133,9 +133,9 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
 
     const query = new DbQuery()
     query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
-    //query.and('code', QueryOperator.in, orderTemplates)
+    //query.and('code', QueryOperator.equals, 'revealight_reactivatie')
     //query.and('act', QueryOperator.equals, true)
-
+    query.take = 1000
     query.include('products.product')
     query.orderBy('idx')
 
@@ -144,6 +144,12 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
 
 
     this.basicTemplates = this.templates.filter(t => t.cat != 'order')
+
+    this.basicTemplates.forEach(t => {
+
+      if (!t.options)
+        t.options = {}
+    })
 
     console.error('Basic templates!', this.basicTemplates)
 
@@ -482,28 +488,28 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
     if (this.changes.hasChanges()) {
       const batch = this.changes.getApiBatch()
 
-/*       if (batch.hasUpdates()) {
-  
-        for (let template of batch.update) {
-          delete template['products']  // backend doesn't work with this field
-        }
-  
-      } */
-  
+      /*       if (batch.hasUpdates()) {
+        
+              for (let template of batch.update) {
+                delete template['products']  // backend doesn't work with this field
+              }
+        
+            } */
+
       console.error(batch)
-  
+
       const res = await this.templateSvc.batchProcess$(batch, this.dashboardSvc.resourceId)
-  
+
       console.warn(res)
-  
-  
+
+
       if (res.status == ApiStatus.error) {
         this.dashboardSvc.showToastType(ToastType.saveError)
       } else {
         this.dashboardSvc.showToastType(ToastType.saveSuccess)
         this.changes.reset()
       }
-  
+
     }
 
 
@@ -513,6 +519,7 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
   editBasicTemplate(template: Template) {
     this.template = template
 
+    console.error(template)
     this.canExport = template.hashChanged()
   }
 
@@ -526,6 +533,9 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
 
 
     let newTemplate = ObjectHelper.clone(template, Template)
+    newTemplate.cre = new Date()
+    newTemplate.upd = newTemplate.cre
+
     newTemplate.newId()
 
     newTemplate.extId = null
@@ -563,7 +573,7 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
       this.template.products = []
 
     this.template.products.push(productTemplate)
-    
+
 
     this.changes.update(this.template)
 
