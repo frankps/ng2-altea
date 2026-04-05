@@ -346,6 +346,71 @@ export class AlteaDb {
     }
 
 
+    /**
+     * Get contacts that have not ordered given products in the period [fromDaysAgo, toDaysAgo] and have not yet received a reminder message for that period.
+     * 
+     * @param branchId 
+     * @param fromDaysAgo 
+     * @param toDaysAgo 
+     * @param productIds 
+     * @param templateCode 
+     * @param remind 
+     * @returns 
+     */
+    async getContactsForProducts(branchId: string, productIds: string[], cursorId?: string, batchSize: number = 100): Promise<Contact[]> {
+
+
+        let cursor = undefined
+
+        if (cursorId)
+            cursor = { id: cursorId }
+
+
+
+        /* PRISMA query 
+        */
+        const qry = {
+            where: {
+                branchId,
+                del: false,
+                act: true,
+                optOut: false, // optOut = no communication
+                // Has at least one finished order
+                orders: {
+                    some: {
+                        //paid: { gt: 0 },
+                        state: { in: ['confirmed', 'waitDeposit', 'finished'] },
+                        del: false,
+                        lines: {
+                            some: { productId: { in: productIds } }
+                        },
+                    }
+                },
+                // No future appointments AND no prior messages for this code/remind
+                AND: [
+                    {
+                        NOT: [
+                            { mobile: null },
+                            { mobile: "" },
+                        ]
+                    }
+                ]
+            },
+            take: batchSize,
+            cursor,
+            skip: cursor ? 1 : 0,
+            orderBy: { id: "desc" },
+            include: {
+            }
+        }
+
+        let prismaQry = new PrismaNativeQuery<Contact>('contact', Contact, qry)
+        const contacts = await this.db.findMany$<Contact>(prismaQry)
+
+        return contacts
+    }
+
+
     async getSleepingContactsDebug(contactId: string, templateCode: string, remind: number): Promise<Contact[]> {
 
         const today = new Date()

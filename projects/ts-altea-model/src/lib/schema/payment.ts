@@ -30,7 +30,7 @@ export class LoyaltyPayInfo {
 
 
 
-  constructor(public cardId: string, public rewardId: string) {
+  constructor(public programId: string, public cardId: string, public rewardId: string) {
 
   }
 

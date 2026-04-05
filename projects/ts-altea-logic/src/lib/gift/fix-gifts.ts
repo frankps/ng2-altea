@@ -80,15 +80,15 @@ export class FixGifts {
 
                 let availableAmount = gift.availableAmount()
 
-                if (gift.used == 0) {
+                problem.fix = `new used ${totalOfPayments}`
+                gift.used = totalOfPayments
+                giftsToUpdate.push(gift)
 
+
+/*                 if (gift.used == 0) {
                     if (totalOfPayments <= availableAmount) {
-                        problem.fix = `new used ${totalOfPayments}`
-                        gift.used = totalOfPayments
-                        giftsToUpdate.push(gift)
-    
                     }
-                }
+                } */
 
 
 

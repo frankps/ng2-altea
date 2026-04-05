@@ -187,7 +187,7 @@ export class OrderComponent implements OnInit {
       this.order.resPrefs = new ResourcePreferences()
 
     if (!this.humanResources)
-      this.humanResources = await this.resourceSvc.getByType$(ResourceType.human)
+      this.humanResources = await this.resourceSvc.getByType$(ResourceType.human, false, { pos: true })
 
     this.showHumanResources = !this.showHumanResources
   }

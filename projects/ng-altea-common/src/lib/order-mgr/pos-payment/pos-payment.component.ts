@@ -361,6 +361,13 @@ export class PosPaymentComponent implements OnInit {
 
   canUseSubscriptionForSingleProduct(orderLine: OrderLine, subs: Subscription): boolean {
 
+
+    if (orderLine.json?.['subsPaid']) {  // orderline already fully paid by subscription
+      return false
+    }
+
+
+
     let openQty = subs.openQty()
 
     if (openQty <= 0)
@@ -439,6 +446,91 @@ export class PosPaymentComponent implements OnInit {
 
   }
 
+  calculateSubscriptionValue2(subscription: Subscription, orderLines: OrderLine[]): number {
+
+    let totalValue = 0
+
+    let unitProduct = subscription.unitProduct
+
+    let orderLinesForProduct = orderLines.filter(l => l.productId == unitProduct.id)
+
+    if (ArrayHelper.IsEmpty(orderLinesForProduct))
+      return 0
+
+    for (let orderLine of orderLinesForProduct) {
+
+      if (!this.canUseSubscriptionForSingleProduct(orderLine, subscription))
+        continue
+
+
+      if (unitProduct.hasOptions()) {
+
+        for (let option of unitProduct.options) {
+
+          let subscriptionOptionValueIds = subscription.getOptionValueIds(option.id)
+          let orderLineOptionValues = orderLine.getOptionValues(subscriptionOptionValueIds)
+
+          let totalOptionValue = _.sumBy(orderLineOptionValues, 'prc')
+          totalValue += totalOptionValue
+
+        }
+
+      } else {
+        totalValue += orderLine.unit
+      }
+
+    }
+
+
+
+    return totalValue
+
+  }
+
+
+
+  calculateSubscriptionValue(subscription: Subscription, orderLines: OrderLine[]): number {
+
+
+
+    let totalValue = 0
+
+    for (let productItem of subscription.subscriptionProduct.items) {
+
+      let orderLinesForProduct = orderLines.filter(l => l.productId == productItem.productId)
+
+      if (ArrayHelper.IsEmpty(orderLinesForProduct))
+        return 0
+
+      for (let orderLine of orderLinesForProduct) {
+
+        if (!this.canUseSubscriptionForSingleProduct(orderLine, subscription))
+          continue
+
+
+        if (productItem.hasOptions()) {
+
+          for (let option of productItem.options) {
+
+            let subscriptionOptionValueIds = subscription.getOptionValueIds(option.id)
+            let orderLineOptionValues = orderLine.getOptionValues(subscriptionOptionValueIds)
+
+            let totalOptionValue = _.sumBy(orderLineOptionValues, 'prc')
+            totalValue += totalOptionValue
+
+          }
+
+        } else {
+          totalValue += orderLine.unit
+        }
+
+      }
+
+    }
+
+    return totalValue
+
+  }
 
   async useSubscription(subscription: Subscription) {
 
@@ -451,12 +543,17 @@ export class PosPaymentComponent implements OnInit {
 
     let orderLines = this.mgrUiSvc.order.getLinesByProducts(unitProductIds)
 
+    // filter out orderlines that are already fully paid by subscription
+    orderLines = orderLines.filter(l => !l.json?.['subsPaid'])
+
     if (ArrayHelper.IsEmpty(orderLines))
       return
 
 
 
     let canUseSubscription = true
+
+    let subscriptionValue = 0
 
     if (unitProductIds.length == 1) {
 
@@ -465,6 +562,12 @@ export class PosPaymentComponent implements OnInit {
 
         if (canUseSubscription) {
           orderLines = [orderLine]
+
+
+
+          subscriptionValue = this.calculateSubscriptionValue2(subscription, orderLines)
+
+
           break
         }
 
@@ -476,20 +579,39 @@ export class PosPaymentComponent implements OnInit {
         console.error('Number of products in subscription does not match number of (matching) order lines')
         return
       }
+      subscriptionValue = _.sumBy(orderLines, 'unit')
 
     }
 
 
-    let unitPrice = _.sumBy(orderLines, 'unit')
 
 
     if (canUseSubscription) {
 
       /** The back-end will update the subscription when saving the order */
-      const payment = await this.mgrUiSvc.addPayment(unitPrice, PaymentType.subs, 'pos')
+      const payment = await this.mgrUiSvc.addPayment(subscriptionValue, PaymentType.subs, 'pos')
 
       payment.subsId = subscription.id
       subscription.usedQty++
+
+      for (let orderLine of orderLines) {
+        if (!orderLine.json)
+          orderLine.json = {}
+
+        // we keep track of subscriptions that paid for orderline
+        if (!orderLine.json['subsIds'])
+          orderLine.json['subsIds'] = []
+
+        orderLine.json['subsIds'].push(subscription.id)
+
+        if (subscriptionValue == orderLine.incl) {   // will not work for bundles (multi product subscriptions)
+          orderLine.json['subsPaid'] = true   // the subscription fully paid for this orderline
+        }
+
+        orderLine.markAsUpdated('json')
+
+
+      }
 
     }
 

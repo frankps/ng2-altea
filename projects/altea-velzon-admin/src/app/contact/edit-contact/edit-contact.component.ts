@@ -27,7 +27,8 @@ import { LoyaltyCardChangeService } from 'ng-altea-common';
 import { UIOrder } from '../../order/order-grid/order-grid.component';
 import { plainToInstance } from 'class-transformer';
 import { SearchContactComponent } from '../search-contact/search-contact.component';
-import { MoveContactData } from 'ts-altea-logic';
+import { AlteaDb, ContactLoyaltyReport, MoveContactData } from 'ts-altea-logic';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 
 
@@ -86,7 +87,8 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
   }
 
   orders: UIOrder[] = []
-  ordersCreateBefore: Date = new Date(2050, 0, 1)
+  // ordersCreateBefore: Date = new Date(2050, 0, 1)
+  ordersCreateBefore: number = 20990820093000 //Date = new Date(2050, 0, 1)
 
   test = "31478336034"
 
@@ -99,19 +101,19 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
   subscriptions: Subscription[]
 
 
-
+  htmlLoyaltyReport: SafeHtml
 
   public saveScheduling$: Rx.Subject<any> = new Rx.Subject<any>()
 
   constructor(protected contactSvc: ContactService, protected translationSvc: TranslationService, route: ActivatedRoute, router: Router,
     spinner: NgxSpinnerService, private modalService: NgbModal, dashboardSvc: DashboardService,
     protected scheduleSvc: ScheduleService, protected sessionSvc: SessionService, protected loyaltyCardSvc: LoyaltyCardService, protected loyaltyCardChangeSvc: LoyaltyCardChangeService,
-    protected orderSvc: OrderService, protected backendSvc: ObjectService) {
+    protected orderSvc: OrderService, protected backendSvc: ObjectService, protected objSvc: ObjectService, private sanitizer: DomSanitizer) {
     super('contact', Contact, 'subscriptions,giftsIn,giftsOut,cards'
       , contactSvc
       , router, route, spinner, dashboardSvc)
 
-    this.sectionProps.set('general', ['name', 'first', 'last', 'gender', 'birth', 'email', 'emailRemind', 'mobile', 'optOut', 'smsRemind', 'language', 'deposit', 'depositPct', 'act'])
+    this.sectionProps.set('general', ['name', 'first', 'last', 'gender', 'birth', 'email', 'emailRemind', 'mobile', 'optOut', 'smsRemind', 'language', 'deposit', 'depositPct', 'act', 'debt', 'debtInfo'])
     this.translationSvc.translateEnum(Gender, 'enums.gender.', this.gender)
     this.translationSvc.translateEnum(Language, 'enums.language.', this.language)
     this.translationSvc.translateEnum(DepositMode, 'enums.deposit-mode.', this.depositMode)
@@ -201,7 +203,7 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
         } */
 
     this.orders = []
-    this.ordersCreateBefore = new Date(2050, 0, 1)
+    this.ordersCreateBefore = 20990820093000
     await this.getOrders()
 
   }
@@ -397,15 +399,15 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
 
     const query = new DbQuery()
     query.and('contactId', QueryOperator.equals, contact.id)
-    query.and('cre', QueryOperator.lessThan, this.ordersCreateBefore)
-    query.orderByDesc('cre')
+    query.and('start', QueryOperator.lessThan, this.ordersCreateBefore)
+    query.orderByDesc('start')
     query.include('lines')
     query.take = take
 
     let orders = await this.orderSvc.query$(query)
 
     if (ArrayHelper.NotEmpty(orders)) {
-      this.ordersCreateBefore = orders[orders.length - 1].cre
+      this.ordersCreateBefore = orders[orders.length - 1].start
       this.orders.push(...orders.map(order => UIOrder.fromOrder(order)))
     }
 
@@ -426,6 +428,24 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
 
 
 
+
+
+  }
+
+  async checkContactLoyalty() {
+
+    let me = this
+
+    let alteaDb = new AlteaDb(this.objSvc)
+
+    let loyaltyReport = new ContactLoyaltyReport(alteaDb)
+
+
+    await loyaltyReport.loadContactData(this.object.id)  //checkContact('f3c4cbdd-8ad9-4327-ba08-ce282271ac64')
+
+    let html = loyaltyReport.toHtml()
+
+    me.htmlLoyaltyReport = this.sanitizer.bypassSecurityTrustHtml(html)
 
 
   }

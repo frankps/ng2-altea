@@ -68,11 +68,22 @@ export class ContactListComponent extends NgBaseListComponent<Contact> implement
     query.and('del', QueryOperator.equals, false)
     query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
 
-    let filters = query.and()
 
-    filters.or('name', QueryOperator.contains, searchFor)
-    filters.or('mobile', QueryOperator.contains, searchFor)
-    filters.or('email', QueryOperator.contains, searchFor)
+    switch (searchFor) {
+
+      case 'debt':
+        query.and('debt', QueryOperator.not, 0)
+        break
+      default:
+        let filters = query.and()
+
+        filters.or('name', QueryOperator.contains, searchFor)
+        filters.or('mobile', QueryOperator.contains, searchFor)
+        filters.or('email', QueryOperator.contains, searchFor)
+
+
+    }
+
 
 
 

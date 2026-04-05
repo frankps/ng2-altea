@@ -14,8 +14,8 @@
         <ul class="list-group" style="width: 100%;" *ngIf="objects">
             <li class="list-group-item" *ngFor="let resource of objects" (click)="select(resource)">
 
-                <i class="{{getIcon(resource)}}"></i> &nbsp; {{ resource.name }}
-
+                <i class="{{getIcon(resource)}}"></i> &nbsp;
+                    <span [style]="resource.act?'':'text-decoration: line-through;'">{{resource.name}}</span>
                 <i class="fa-solid fa-circle float-end" [style.color]="resource.color"></i>
 
             </li>

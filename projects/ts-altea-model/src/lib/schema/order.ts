@@ -556,7 +556,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
   }
 
-  startOrCreationDateFormat(format: string = 'd/M HH:mm'): string {
+  startOrCreationDateFormat(format: string = 'dd/MM/yy HH:mm'): string {
 
     let date = this.startOrCreationDate()
 
@@ -897,10 +897,31 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     return types.indexOf(type) >= 0
   }
 
+  /** Check if giftId is already used as payment (to protect against double use of gift) */
+  giftAlreadyUsed(giftId: string): boolean {
+    if (ArrayHelper.IsEmpty(this.payments))
+      return false
+
+    let payments = this.payments.filter(p => p.type == PaymentType.gift && p.giftId == giftId)
+
+    return payments.length > 0
+  }
+
   hasOnlyPaymentType(type: PaymentType): boolean {
     let types = this.getPaymentTypes()
 
     return types.length == 1 && types[0] == type
+  }
+
+  hasLoyaltyPaymentsForProgram(programId: string): boolean {
+
+    if (ArrayHelper.IsEmpty(this.payments))
+      return false
+
+    let payments = this.payments.filter(p => p.type == PaymentType.loyal && p.loyal?.programId == programId)
+
+    return payments.length > 0
+
   }
 
   getPaymentsByType(type: PaymentType): Payment[] {
@@ -1572,16 +1593,37 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
     if (!this.payments || !payment)
       return false
 
-    const removed = _.remove(this.payments, l => l.id == payment.id)
+    const removedPays = _.remove(this.payments, l => l.id == payment.id)
 
-    if (Array.isArray(removed) && removed.length > 0 && !payment.m.n)  // orderLine.m.n = it was a new line not yet saved in backend
-    {
-      this.markAsRemoved('payments', payment.id)
+    if (Array.isArray(removedPays) && removedPays.length > 0) {
+
+      if (payment.subsId) {  // payment coming from subscription
+
+        let subscriptionId = payment.subsId
+
+        let lines = this.lines.filter(l => l.json?.['subsIds']?.indexOf(subscriptionId) >= 0)
+
+        let totalUndo = 0
+        for (let line of lines) {
+          line.json['subsIds'] = line.json['subsIds'].filter(id => id != subscriptionId)
+          line.json['subsPaid'] = false
+          line.markAsUpdated('json')
+          totalUndo += line.incl
+
+          if (totalUndo >= payment.amount)
+            break
+        }
+
+      }
+
+
+      if (!payment.m.n)   // orderLine.m.n = it was a new line not yet saved in backend
+        this.markAsRemoved('payments', payment.id)
     }
 
     this.makePayTotals()
 
-    return (Array.isArray(removed) && removed.length > 0)
+    return (Array.isArray(removedPays) && removedPays.length > 0)
   }
 
   deleteAllPlannings() {

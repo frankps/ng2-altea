@@ -55,7 +55,11 @@ export class UIOrder extends Order {
 
     } else {
       uiOrder.pay.info = `€${order.paid} / €${order.incl}`
-      uiOrder.pay.color = 'green'
+
+      if (order.paid == order.incl)
+        uiOrder.pay.color = 'green'
+      else
+        uiOrder.pay.color = 'red'
     }
 
 

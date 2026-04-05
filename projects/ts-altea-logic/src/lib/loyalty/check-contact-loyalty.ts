@@ -3,6 +3,7 @@ import { IDb } from '../interfaces/i-db'
 import * as dateFns from 'date-fns'
 import * as Handlebars from "handlebars"
 import * as _ from "lodash"
+
 import { LoyaltyByProgram, LoyaltyMgmtService } from 'ts-altea-logic'
 import { BankTransaction, BankTxType, Invoice, LoyaltyCard, LoyaltyCardChange, LoyaltyProgram, Order, Payment, PaymentInfo, Payments, PaymentType, StripePayout } from 'ts-altea-model'
 import { ApiStatus, ArrayHelper, DateHelper, HtmlTable, SortOrder, YearMonth } from 'ts-common'
@@ -372,13 +373,13 @@ export class ContactLoyaltyReport {
         let orderHeaderCols: string[] = []
         reportTable.addRow(orderHeaderCols)
 
-        orderHeaderCols.push('Afspraak', 'Totaal', 'Status', 'Betalingen', 'Info')
+        orderHeaderCols.push('Afspraak', 'Totaal', 'Betaald', 'Status', 'Betalingen', 'Info')
 
         for (let card of this.cards)
             orderHeaderCols.push(card.name)
 
 
-        let commonEmpty = ['', '', '', '', '']
+        let commonEmpty = ['', '', '', '', '', '']
 
         for (let line of this.lines) {
 
@@ -412,8 +413,10 @@ export class ContactLoyaltyReport {
 
                     if (order) {
 
-
-                        lineCols.push(order.startOrCreationDateFormat(), `${order.incl}`, `${order.state}`)
+                        // https://pos.birdy.life/aqua/orders/manage/f2792e77-3c08-4b79-ac12-5b80539b68c4
+                        let dateUrl = `<a href="https://pos.birdy.life/aqua/orders/manage/${order.id}">${order.startOrCreationDateFormat()}</a>`
+             
+                        lineCols.push(dateUrl, `${order.incl}`, `${order.paid}`, `${order.state}`)
 
                         lineCols.push(order.sumToString(false))
 

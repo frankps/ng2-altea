@@ -251,7 +251,27 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
 
             // the info field is for instance:  202510280040088,81986244/MC/926/18217596/0000755/,0000985 00/EUR/00010 94/28.10.2025/
 
-            let infoItems = tx.info.split(',')  // 0000985 00/EUR/00010 94/28.10.2025/
+            /*Previous:
+            
+            ;202601130042852,81986244/MC/994/18217596/0000811/,0000184 70/EUR/00000 00/13.01.2026/;
+
+            Since 20250405 (replaced decimal separator from ' ' to ','):
+            ;202602230039795,81986244/MC/028/18217596/0000840/,0000028,00/EUR/00000,01/23.02.2026/;
+                202602230039795
+                81986244/MC/028/18217596/0000840/
+                0000028
+                00/EUR/00000
+                01/23.02.2026/
+            */
+
+            let info = tx.info
+
+            let infoItems = info.split(',')  // 0000985 00/EUR/00010 94/28.10.2025/
+
+            // since 20250405, the decimal separator is replaced from ' ' to ',' => need to go back to old format
+            info = `${infoItems[0]},${infoItems[1]},${infoItems[2]} ${infoItems[3]} ${infoItems[4]}`
+            infoItems = info.split(',')
+
 
             let amountString = infoItems[2]
             let amounts = amountString.split('/')
@@ -259,6 +279,9 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
             let origString = amounts[0]
             origString = origString.replace(' ', '.')
             let costString = amounts[2]
+
+
+
             costString = costString.replace(' ', '.')
             let dateString = amounts[3]
             let date = dateFns.parse(dateString, 'dd.MM.yyyy', new Date())

@@ -53,6 +53,7 @@ export class LoyaltyComponent implements OnInit {
 
     console.log(this.loyalty)
 
+    let me = this
 
     let loyaltyCard: LoyaltyCard = cardUi.card
     let loyaltyProgram: LoyaltyProgram = cardUi.program
@@ -91,17 +92,22 @@ export class LoyaltyComponent implements OnInit {
     let pay = await this.orderMgrSvc.addPayment(rewardAmound, PaymentType.loyal, this.sessionSvc.loc)
 
     //    pay.loyalId = loyaltyProgram.id
-    pay.loyal = new LoyaltyPayInfo(loyaltyCard.id, reward.id)
+    pay.loyal = new LoyaltyPayInfo(loyaltyProgram?.id, loyaltyCard.id, reward.id)
 
-    cardUi.current -= reward.amount
+    cardUi.current -= reward.amount 
+    
+    this.loyalty = this.orderMgrSvc.loyalty
+    this.loyalty.cards = this.loyalty.cards.filter(c => c.program.id != cardUi.program.id)
 
-    console.log(cardUi)
+
+
 
     console.log(this.loyalty)
 
+
   }
 
-  canAddLoyalty() : boolean {
+  canAddLoyalty(): boolean {
 
     let order = this.order
     let now = new Date()

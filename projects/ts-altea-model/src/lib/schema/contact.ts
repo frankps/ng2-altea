@@ -319,6 +319,12 @@ export class Contact extends UserBase {
   @Type(() => ContactReviews)
   rev?: ContactReviews
 
+  /** outstanding debt: introduced for gifts that were used multiple times (software error) */
+  @Type(() => Number)
+  debt = 0;
+
+  /** extra info about outstanding debt */
+  debtInfo?: string
 
   constructor() {
     super()

@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { OrderService, ResourcePlanningService, ResourceService, SessionService } from 'ng-altea-common';
 import { DashboardService, ToastType } from 'ng-common';
-import { Resource, ResourcePlanning, ResourceSet } from 'ts-altea-model';
+import { Resource, ResourcePlanning, ResourceSet, ResourceType } from 'ts-altea-model';
 import { ApiStatus, ArrayHelper, CollectionChangeTracker } from 'ts-common';
 import * as _ from "lodash";
 import { NgxSpinnerService } from "ngx-spinner"
@@ -50,7 +50,7 @@ export class DebugPlanningsComponent implements OnInit {
 
     let branch = await this.sessionSvc.branch$()
 
-    let resources = await this.resSvc.getAllForBranch$()
+    let resources = await this.resSvc.getAllForBranch$() //await this.resSvc.getAllForBranch$()
     this.resources = _.sortBy(resources, 'name')
 
     this.resourceGroups = this.resources.filter(r => r.isGroup)

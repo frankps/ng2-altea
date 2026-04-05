@@ -1,6 +1,6 @@
 import { LoyaltyCard, LoyaltyCardChange, LoyaltyLine, LoyaltyProgram, LoyaltyReward, LoyaltyUnit, Order, OrderLine, Payment, PaymentType, Product, ProductSubType, ProductType, RegisterLoyalty } from "ts-altea-model";
 import { AlteaDb } from "../general/altea-db";
-import { ArrayHelper } from "ts-common";
+import { ArrayHelper, ObjectWithId } from "ts-common";
 import { IDb } from "../interfaces/i-db";
 import * as _ from "lodash";
 
@@ -66,7 +66,7 @@ export class LoyaltyUi {
 }
 
 /** to show loyalty card info in the UI */
-export class LoyaltyUiCard {
+export class LoyaltyUiCard extends ObjectWithId {
 
     program: LoyaltyProgram
     card: LoyaltyCard
@@ -80,6 +80,8 @@ export class LoyaltyUiCard {
     openRewards: LoyaltyReward[]
 
     constructor(program: LoyaltyProgram, card: LoyaltyCard) {
+        super()
+        
         this.program = program
         this.card = card
     }
@@ -258,6 +260,9 @@ export class LoyaltyMgmtService {
 
         for (let loyaltyProgram of newLoyaltyThisOrder.programs) {
 
+            let orderHasLoyaltyPaymentsForProgram = order.hasLoyaltyPaymentsForProgram(loyaltyProgram.id)
+               
+
             const existingCard = cards.find(c => c.programId == loyaltyProgram.id)
 
             const uiCard = new LoyaltyUiCard(loyaltyProgram, existingCard)
@@ -266,14 +271,14 @@ export class LoyaltyMgmtService {
             // the extra amount that can be added coming from this order
             uiCard.extra = newLoyaltyThisOrder.getValue(loyaltyProgram.id)
 
-            if (uiCard.extra > 0)
+            if (!orderHasLoyaltyPaymentsForProgram && uiCard.extra > 0)
                 loyalty.newLoyalty = true
 
             if (existingCard) {
 
                 uiCard.current = existingCard.value
 
-                if (existingCard.value > 0 && loyaltyProgram.hasRewards()) {
+                if (!orderHasLoyaltyPaymentsForProgram && existingCard.value > 0 && loyaltyProgram.hasRewards()) {
                     uiCard.openRewards = loyaltyProgram.rewards.filter(r => r.amount <= existingCard.value)
                 }
 
@@ -347,6 +352,9 @@ export class LoyaltyMgmtService {
                 continue
 
             for (let loyaltyProgram of loyaltyPrograms) {
+
+                if (order.hasLoyaltyPaymentsForProgram(loyaltyProgram.id))
+                    continue
 
                 if (loyaltyProgram.hasProduct(line.product)) {
 

@@ -85,7 +85,7 @@
                         valueFormat="pre"></ngx-altea-label-value></div>
 
                 <div class="col-6"> <ngx-altea-label-value label="objects.contact.optOut" [value]="object.optOut"
-                    valueFormat="yesNo"></ngx-altea-label-value> </div>
+                        valueFormat="yesNo"></ngx-altea-label-value> </div>
 
             </div>
 
@@ -94,6 +94,16 @@
                         valueFormat="date"></ngx-altea-label-value> </div>
                 <div class="col-6"> <ngx-altea-label-value label="dic.updated" [value]="object.upd"
                         valueFormat="date"></ngx-altea-label-value> </div>
+            </div>
+
+            <div class="row mt-2" *ngIf="object.debt != 0">
+
+                <div class="col-12" style="color: red;">
+                    Openstaande schuld van <b>€{{object.debt}}</b> <br>
+                    <small>{{object.debtInfo}}</small>
+                    
+                </div>
+
             </div>
 
             <!-- 
@@ -255,7 +265,7 @@
 
                     </div>
                 </div>
-
+  
 
                 <altea-search-contact #searchContactModal [modal]="true"
                     (contactSelected)="exportToContactSelected($event)"></altea-search-contact>
@@ -263,6 +273,27 @@
                 <div class="row mt-3">
                     <div class="col"><button type="button" class="btn btn-primary btn-sm float-end"
                             (click)="searchContact()">Exporteer gegevens naar andere klant</button></div>
+
+                </div>
+
+
+                <div class="row mt-3">
+                    <div class="col-3">
+                        <ngx-altea-label-control label="objects.contact.debt" for="debt">
+                            <input type="number" id="debt" name="debt" required class="form-control"
+                                [(ngModel)]="object.debt" />
+                        </ngx-altea-label-control>
+                    </div>
+
+                    <div class="col-9">
+                        <ngx-altea-label-control label="objects.contact.debtInfo" for="debtInfo">
+                            <textarea rows="3" class="form-control" id="debtInfo" name="debtInfo" style="height: 120px"
+                                [(ngModel)]="object.debtInfo"></textarea>
+                        </ngx-altea-label-control>
+                    </div>
+
+
+
 
                 </div>
 
@@ -502,6 +533,12 @@
         [editSectionId]="editSectionId" [showButtons]="false">
 
         <ng-container always>
+
+
+            <button type="button" class="btn btn-primary btn-sm me-2" (click)="checkContactLoyalty()">Check
+                loyalty</button>
+
+            <div *ngIf="htmlLoyaltyReport" [innerHTML]="htmlLoyaltyReport"></div>
 
             <ng-container *ngIf="object.cards">
 

@@ -1057,7 +1057,9 @@
       "city": "Stad",
       "remark": "Opmerking",
       "news": "Ik ontvang graag de {{company}} nieuwsbrief",
-      "optOut": "Opt out = geen communicatie"
+      "optOut": "Opt out = geen communicatie",
+      "debt": "Openstaand",
+      "debtInfo": "Extra info schuld"
     },
     "template": {
       "_name": "Template",

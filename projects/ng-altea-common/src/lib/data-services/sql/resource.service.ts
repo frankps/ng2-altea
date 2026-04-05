@@ -25,18 +25,30 @@ export class ResourceService extends BackendHttpServiceBase<Resource> {
 
     const query = new DbQuery()
     query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
+    query.and('act', QueryOperator.equals, true)
     query.take = 1000
     return await this.query$(query)
 
   }
 
-  async getByType$(type: ResourceType, isGroup: boolean = false): Promise<Resource[]> {
+  async getByType$(type: ResourceType, isGroup: boolean = false, options?: any): Promise<Resource[]> {
 
     const query = new DbQuery()
 
     query.and('type', QueryOperator.equals, type)
     query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
     query.and('act', QueryOperator.equals, true)
+
+    if (options) {
+
+      if (options.online) 
+        query.and('online', QueryOperator.equals, true)
+      
+      if (options.pos) 
+        query.and('pos', QueryOperator.equals, true)
+
+    }
+
 
     query.and('isGroup', QueryOperator.equals, isGroup)
 

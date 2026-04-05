@@ -65,6 +65,19 @@
 
       <form #resourceGeneralForm="ngForm">
 
+        <div class="row">
+          <div class="col d-flex justify-content-end">
+
+              <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="act" name="act"
+                      [(ngModel)]="object.act" />
+                  <label class="form-check-label" for="act" translate="objects.act"></label>
+              </div>
+
+
+          </div>
+      </div>
+
         <!-- help="objects.resource.help.{{object.type}}-name" -->
         <ngx-altea-label-control label="dic.name" for="name">
           <input type="text" id="name" name="name" required class="form-control" [(ngModel)]="object.name" />

@@ -60,7 +60,7 @@ export class ContactReactivation extends MessagingBase {
 
         let me = this
 
-        let batchSize = 5
+        let batchSize = 10
         let maxBatches = 2
 
         let aquasenseId = '66e77bdb-a5f5-4d3d-99e0-4391bded4c6c'

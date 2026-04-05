@@ -150,6 +150,8 @@ this.timerSubscription = this.orderMgrSvc.timerChanged.subscribe(seconds => {
 
     this.giftMessage = ''
 
+    
+
     const gifts = await this.giftSvc.searchGift(giftCode)
 
     if (ArrayHelper.IsEmpty(gifts)) {
@@ -159,6 +161,11 @@ this.timerSubscription = this.orderMgrSvc.timerChanged.subscribe(seconds => {
     } else {
 
       const gift = gifts[0]
+
+      if (this.orderMgrSvc.order?.giftAlreadyUsed(gift.id)) {
+        this.giftMessage = `Cadeaubon '${giftCode}' reeds gebruikt!`
+        return
+      }
       
 
       const available = gift.availableAmount()

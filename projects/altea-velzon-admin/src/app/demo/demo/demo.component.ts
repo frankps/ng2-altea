@@ -157,11 +157,11 @@ masidelautaro@yahoo.com`
 
     await this.spinner.show()
     //await createReportingData.createForDays(this.sessionSvc.branchId, new Date(2024, 9, 1), new Date(2025, 2, 1))
-    
+
     await createReportingData.aggregateAll(this.sessionSvc.branchId, new Date(2024, 9, 1), new Date(2025, 3, 1))   // , new Date()
 
     await this.spinner.hide()
-   
+
   }
 
 
@@ -236,6 +236,41 @@ masidelautaro@yahoo.com`
     console.error(contactList)
   }
 
+
+  facebookBodysculptorDoelgroepen() {
+    let bodysculptorIds = ['3a52a26d-6cf7-4f56-bfcc-049d44fd9402', 'd2758de4-255f-416b-b62e-dbc3bbe6291a', 'ebdfbfc2-e483-4919-b0ff-c69d0275b39e', 'd7381fc3-a3f8-429d-8dab-4099a1c8c94d']
+
+    this.facebookDoelgroepen('BodySculptor', bodysculptorIds)
+  }
+
+  async facebookDoelgroepen(name: string, productIds: string[]) {
+    let alteaDb = new AlteaDb(this.dbSvc)
+
+    let contacts = await alteaDb.getContactsForProducts(this.sessionSvc.branchId, productIds, undefined, 1000)
+
+    let csvContent = this.createFacebookCsv(contacts)
+
+    this.downloadFile(csvContent, `${name}-doelgroepen.csv`, 'text/csv')
+  }
+
+  downloadFile(content: string, filename: string, mimeType: string = 'text/plain') {
+    const blob = new Blob([content], { type: mimeType })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  createFacebookCsv(contacts: Contact[], sep: string = ','): string {
+    let csv = ''
+    csv += `email${sep}phone${sep}fn${sep}ln${sep}country\n`
+    for (let contact of contacts) {
+      csv += `${contact.email}${sep}${contact.mobile}${sep}${contact.first}${sep}${contact.last}${sep}BE\n`
+    }
+    return csv
+  }
 
 
   async prepareProductTasks() {
@@ -688,7 +723,7 @@ Datum: 1 april 2024 om 19h00
   async reviewRequestMessaging() {
 
     console.error('reviewRequestMessaging')
-   // return
+    // return
 
     let alteaDb = new AlteaDb(this.dbSvc)
     let orderMessaging = new OrderMessaging(alteaDb)

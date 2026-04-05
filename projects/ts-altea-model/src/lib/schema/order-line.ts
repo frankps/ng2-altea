@@ -267,6 +267,7 @@ export class OrderLineOptionValue extends ObjectWithId {
   @Type(() => Number)
   dur = 0
 
+  /** price */
   @Type(() => Number)
   prc = 0
 
@@ -479,7 +480,10 @@ export class OrderLine extends ObjectWithIdPlus {
   /** preferred location resource ids for this line */
   lrIds?: string[]
 
-  /** custom info: json.subs: contains array of subscriptionIds */
+  /** custom info: json.subs: contains
+   * - subsIds: array of subscription ids
+   * - subsPaid: true if the orderline is fully paid by subscription
+   */
   json: any
 
   /** Number of customers for this orderline   */
@@ -741,13 +745,18 @@ export class OrderLine extends ObjectWithIdPlus {
     return (ArrayHelper.NotEmpty(this.options))
   }
 
-  getOptionValues(): OrderLineOptionValue[] {
+  getOptionValues(filterValueIds?: string[]): OrderLineOptionValue[] {
 
     if (!this.hasOptions())
       return []
 
-    return this.options.flatMap(o => o.values)
+    let optionValues = this.options.flatMap(o => o.values)
 
+    if (ArrayHelper.NotEmpty(filterValueIds)) {
+      optionValues = optionValues.filter(v => filterValueIds.indexOf(v.id) >= 0)
+    }
+
+    return optionValues
   }
 
   getOptionValueIds(optionId: string): string[] {
