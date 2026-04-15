@@ -55,6 +55,7 @@
     "exceljs": "^4.4.0",
     "file-saver": "^2.0.5",
     "firebase": "^10.7.1",
+    "flatpickr": "^4.6.13",
     "handlebars": "^4.7.8",
     "indent-string": "^5.0.0",
     "leaflet": "^1.9.4",
@@ -78,11 +79,13 @@
     "stringcase": "^4.3.1",
     "swiper": "^11.0.5",
     "tslib": "^2.3.0",
+    "ubl-builder": "^1.4.5",
     "underscore": "^1.13.6",
     "xmlbuilder2": "^3.1.1",
     "zone.js": "~0.13.0"
   },
   "devDependencies": {
+    "@angular-builders/custom-webpack": "^16.0.1",
     "@angular-devkit/build-angular": "^16.2.10",
     "@angular/cli": "^16.2.10",
     "@angular/compiler-cli": "^16.2.0",

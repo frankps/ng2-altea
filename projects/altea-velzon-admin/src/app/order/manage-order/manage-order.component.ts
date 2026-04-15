@@ -5,6 +5,7 @@ import { DashboardService, NgBaseComponent } from 'ng-common';
 import { ContactSelect2Component } from 'projects/ng-altea-common/src/lib/order-mgr/contact-select2/contact-select2.component';
 import { BehaviorSubject, Observable, take, takeUntil } from 'rxjs';
 import { Contact, Gift, MenuItem, Order, OrderLine, OrderState } from 'ts-altea-model';
+import { buildInvoiceUbl } from 'ts-altea-logic';
 
 
 
@@ -204,6 +205,34 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
 
   }
 
+
+  async exportUbl(): Promise<void> {
+    const invoice = this.orderMgrSvc.invoice
+    const branch = this.orderMgrSvc.branch
+
+    if (!invoice || !branch) {
+      console.error('Cannot export UBL: invoice or branch missing')
+      return
+    }
+
+    // Dynamically import ubl-builder to keep it out of the initial bundle
+    const [ublMain, ublCac] = await Promise.all([
+      import('ubl-builder'),
+      import('ubl-builder/lib/ubl21/CommonAggregateComponents') as any
+    ])
+
+    const xml = buildInvoiceUbl(invoice, branch, ublMain, ublCac)
+
+    const customerName = (invoice.company || invoice.to?.name || '').replace(/\s+/g, '_')
+    const fileName = `invoice-${invoice.num || 'export'}${customerName ? '-' + customerName : ''}.xml`
+    const blob = new Blob([xml], { type: 'application/xml' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = fileName
+    a.click()
+    URL.revokeObjectURL(url)
+  }
 
   printInvoice(): void {
     const printContent = document.getElementById('invoice');

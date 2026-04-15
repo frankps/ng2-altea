@@ -147,13 +147,14 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular-builders/custom-webpack:browser",
           "options": {
             "outputPath": "dist/altea-velzon-admin",
             "index": "projects/altea-velzon-admin/src/index.html",
             "main": "projects/altea-velzon-admin/src/main.ts",
             "polyfills": [
-              "zone.js", "projects/altea-velzon-admin/src/polyfills.ts"
+              "zone.js",
+              "projects/altea-velzon-admin/src/polyfills.ts"
             ],
             "tsConfig": "projects/altea-velzon-admin/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
@@ -161,15 +162,16 @@
               "projects/altea-velzon-admin/src/favicon.ico",
               "projects/altea-velzon-admin/src/assets"
             ],
-            "styles": ["projects/altea-velzon-admin/src/styles.scss",
-            "node_modules/shepherd.js/dist/css/shepherd.css",
-              "node_modules/flatpickr/dist/flatpickr.css",          
+            "styles": [
+              "projects/altea-velzon-admin/src/styles.scss",
+              "node_modules/shepherd.js/dist/css/shepherd.css",
+              "node_modules/flatpickr/dist/flatpickr.css",
               "node_modules/@ctrl/ngx-emoji-mart/picker.css",
               "node_modules/swiper/swiper-bundle.css",
               "projects/altea-velzon-admin/src/assets/scss/config/minimal/bootstrap.scss",
               "projects/altea-velzon-admin/src/assets/scss/config/minimal/app.scss",
               "projects/altea-velzon-admin/src/assets/scss/icons.scss",
-              "node_modules/ngx-bootstrap/datepicker/bs-datepicker.css", 
+              "node_modules/ngx-bootstrap/datepicker/bs-datepicker.css",
               "node_modules/ngx-spinner/animations/ball-scale-multiple.css",
               "node_modules/@ng-select/ng-select/themes/default.theme.css",
               "node_modules/@syncfusion/ej2-base/styles/material.css",
@@ -182,7 +184,10 @@
               "node_modules/@syncfusion/ej2-navigations/styles/material.css",
               "node_modules/@syncfusion/ej2-angular-schedule/styles/material.css"
             ],
-            "scripts": []
+            "scripts": [],
+            "customWebpackConfig": {
+              "path": "projects/altea-velzon-admin/webpack.config.js"
+            }
           },
           "configurations": {
             "production": {
@@ -218,7 +223,7 @@
           "defaultConfiguration": "production"
         },
         "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
+          "builder": "@angular-builders/custom-webpack:dev-server",
           "configurations": {
             "production": {
               "browserTarget": "altea-velzon-admin:build:production"
@@ -319,15 +324,15 @@
             "styles": [
               "projects/altea-pub-app/src/styles.scss",
               "node_modules/shepherd.js/dist/css/shepherd.css",
-              "node_modules/flatpickr/dist/flatpickr.css",          
+              "node_modules/flatpickr/dist/flatpickr.css",
               "node_modules/@ctrl/ngx-emoji-mart/picker.css",
               "node_modules/swiper/swiper-bundle.css",
               "projects/altea-velzon-admin/src/assets/scss/config/minimal/bootstrap.scss",
               "projects/altea-velzon-admin/src/assets/scss/config/minimal/app.scss",
               "projects/altea-velzon-admin/src/assets/scss/icons.scss",
-              "node_modules/ngx-bootstrap/datepicker/bs-datepicker.css", 
+              "node_modules/ngx-bootstrap/datepicker/bs-datepicker.css",
               "node_modules/ngx-spinner/animations/ball-scale-multiple.css",
-              "node_modules/@ng-select/ng-select/themes/default.theme.css"  
+              "node_modules/@ng-select/ng-select/themes/default.theme.css"
             ],
             "scripts": [],
             "serviceWorker": true,
@@ -429,15 +434,15 @@
             "styles": [
               "projects/dvit-gen/src/styles.scss",
               "node_modules/shepherd.js/dist/css/shepherd.css",
-              "node_modules/flatpickr/dist/flatpickr.css",          
+              "node_modules/flatpickr/dist/flatpickr.css",
               "node_modules/@ctrl/ngx-emoji-mart/picker.css",
               "node_modules/swiper/swiper-bundle.css",
               "projects/altea-velzon-admin/src/assets/scss/config/minimal/bootstrap.scss",
               "projects/altea-velzon-admin/src/assets/scss/config/minimal/app.scss",
               "projects/altea-velzon-admin/src/assets/scss/icons.scss",
-              "node_modules/ngx-bootstrap/datepicker/bs-datepicker.css", 
+              "node_modules/ngx-bootstrap/datepicker/bs-datepicker.css",
               "node_modules/ngx-spinner/animations/ball-scale-multiple.css",
-              "node_modules/@ng-select/ng-select/themes/default.theme.css" 
+              "node_modules/@ng-select/ng-select/themes/default.theme.css"
             ],
             "scripts": []
           },
@@ -569,15 +574,15 @@
             "styles": [
               "projects/altea-pub-app2/src/styles.scss",
               "node_modules/shepherd.js/dist/css/shepherd.css",
-              "node_modules/flatpickr/dist/flatpickr.css",          
+              "node_modules/flatpickr/dist/flatpickr.css",
               "node_modules/@ctrl/ngx-emoji-mart/picker.css",
               "node_modules/swiper/swiper-bundle.css",
               "projects/altea-velzon-admin/src/assets/scss/config/minimal/bootstrap.scss",
               "projects/altea-velzon-admin/src/assets/scss/config/minimal/app.scss",
               "projects/altea-velzon-admin/src/assets/scss/icons.scss",
-              "node_modules/ngx-bootstrap/datepicker/bs-datepicker.css", 
+              "node_modules/ngx-bootstrap/datepicker/bs-datepicker.css",
               "node_modules/ngx-spinner/animations/ball-scale-multiple.css",
-              "node_modules/@ng-select/ng-select/themes/default.theme.css"  
+              "node_modules/@ng-select/ng-select/themes/default.theme.css"
             ],
             "scripts": []
           },
@@ -603,7 +608,7 @@
               "vendorChunk": true,
               "extractLicenses": false,
               "sourceMap": true,
-              "namedChunks": true,  
+              "namedChunks": true,
               "fileReplacements": [
                 {
                   "replace": "projects/altea-pub-app2/src/environments/environment.ts",
