@@ -90,12 +90,20 @@ export function buildInvoiceUbl(
 
   ublInvoice.setUBLVersionID('2.1')
   ublInvoice.setCustomizationID('urn:cen.eu:en16931:2017#compliant#urn:fdc:peppol.eu:2017:poacc:billing:3.0')
-  ublInvoice.setProfileID('urn:fdc:peppol.eu:2017:poacc:billing:30:1.0')
+  ublInvoice.setProfileID('urn:fdc:peppol.eu:2017:poacc:billing:01:1.0')
   // ID must be set explicitly (constructor has this commented out) and before IssueDate
   ublInvoice.setID(invoice.num || 'UNKNOWN')
   ublInvoice.setIssueDate(invoiceDate)
   ublInvoice.setInvoiceTypeCode('380')  // Commercial invoice
   ublInvoice.setDocumentCurrencyCode(currency)
+  // PEPPOL-EN16931-R003 (fatal): buyer reference or order reference MUST be provided
+  ublInvoice.setBuyerReference(invoice.num || 'N/A')
+  // BR-CO-25 (fatal): when PayableAmount > 0, Payment due date (BT-9) or Payment terms (BT-20) MUST be present
+  // addPaymentTerm() is not implemented in ubl-builder — use setDueDate (BT-9) instead
+  const dueDateObj = new Date(invoiceDate)
+  dueDateObj.setDate(dueDateObj.getDate() + 30)
+  const dueDate = dueDateObj.toISOString().split('T')[0]
+  ublInvoice.setDueDate(dueDate)
 
   // --- Supplier party (branch) ---
   // PEPPOL BIS 3.0 (BR-62): EndpointID MUST have schemeID.
@@ -172,7 +180,6 @@ export function buildInvoiceUbl(
       new TaxSubtotal({
         taxableAmount: amt(vl.excl.toFixed(2), currency),
         taxAmount: amt(vl.vat.toFixed(2), currency),
-        percent: String(vl.pct),
         taxCategory: new TaxCategory({
           id: vl.pct > 0 ? 'S' : 'Z',
           percent: String(vl.pct),
@@ -210,33 +217,21 @@ export function buildInvoiceUbl(
 
       for (const line of order.lines) {
         const vatPct = line.vatPct ?? 0
+        const qty = line.qty ?? 1
         const lineExcl = (line.excl ?? 0).toFixed(2)
-        const lineVat = (line.vat ?? 0).toFixed(2)
-        const unitPrice = (line.unit ?? 0).toFixed(2)
+        // BR-CO-10: PriceAmount MUST be the net unit price (excl. VAT) so that
+        // LineExtensionAmount = InvoicedQuantity × PriceAmount holds.
+        // line.unit is the gross price incl. VAT; use excl / qty instead.
+        const netUnitPrice = ((line.excl ?? 0) / qty).toFixed(2)
 
         const descr = invoice.useAlter ? (invoice.alter || '') : (line.descr || '')
 
         ublInvoice.addInvoiceLine(new InvoiceLine({
           id: String(lineIdx++),
-          invoicedQuantity: String(line.qty ?? 1),
+          // BR-CL-23 (fatal): unitCode is mandatory on InvoicedQuantity; C62 = piece/unit
+          invoicedQuantity: { content: String(qty), attributes: { unitCode: 'C62' } },
           lineExtensionAmount: amt(lineExcl, currency),
-          taxTotals: [
-            new TaxTotal({
-              taxAmount: amt(lineVat, currency),
-              taxSubtotals: [
-                new TaxSubtotal({
-                  taxableAmount: amt(lineExcl, currency),
-                  taxAmount: amt(lineVat, currency),
-                  percent: String(vatPct),
-                  taxCategory: new TaxCategory({
-                    id: vatPct > 0 ? 'S' : 'Z',
-                    percent: String(vatPct),
-                    taxScheme: new TaxScheme({ id: 'VAT' })
-                  })
-                })
-              ]
-            })
-          ],
+          // cac:TaxTotal is NOT part of PEPPOL BIS 3.0 InvoiceLine — tax info goes in Item/ClassifiedTaxCategory
           item: new Item({
             name: descr,
             classifiedTaxCategory: new ClassifiedTaxCategory({
@@ -246,7 +241,7 @@ export function buildInvoiceUbl(
             })
           }),
           price: new Price({
-            priceAmount: amt(unitPrice, currency)
+            priceAmount: amt(netUnitPrice, currency)
           })
         }))
       }
