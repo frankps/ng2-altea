@@ -268,6 +268,7 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
 
             let infoItems = info.split(',')  // 0000985 00/EUR/00010 94/28.10.2025/
 
+            
             // since 20250405, the decimal separator is replaced from ' ' to ',' => need to go back to old format
             info = `${infoItems[0]},${infoItems[1]},${infoItems[2]} ${infoItems[3]} ${infoItems[4]}`
             infoItems = info.split(',')

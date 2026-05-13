@@ -78,7 +78,7 @@ export class Resource extends ObjectWithIdPlus {
   label?: string;
   prio?: number;
   isGroup = false
-  //isRole?: boolean;
+  //isRole?: boolean;  
   tel?: string;
   email?: string;
 
@@ -99,6 +99,9 @@ export class Resource extends ObjectWithIdPlus {
 
   /** Most resources use the schedule (opening hours) of the branch, but a custom schedule can be specified per resource  */
   customSchedule = false
+
+  /** even if custom schedule, we can still apply special branch plannings (filter out public holidays defined on branch resource, etc) */
+  branchPlanning = true
 
   @Exclude()
   _startDate: Date | null = null

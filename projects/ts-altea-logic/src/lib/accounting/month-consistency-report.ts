@@ -167,7 +167,7 @@ export class MonthConsistencyReportBuilder {
 
     let paysToUpdate = []
 
-    let max = _.round(totalsInclCashReturns * 0.45, 2)
+    let max = _.round(totalsInclCashReturns * 0.40, 2)
 
 
 

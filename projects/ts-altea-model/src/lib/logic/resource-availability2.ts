@@ -12,6 +12,7 @@ import * as dateFns from 'date-fns'
 import { ResourceRequestItem } from "./resource-request";
 import { ResultWithSolutionNotes } from "./resource-availability";
 import { StaffBreaks } from "./staff-breaks";
+import { AlteaPlanningQueries } from "ts-altea-logic";
 
 
 export class ResourceAvailability2 {
@@ -52,6 +53,10 @@ export class ResourceAvailability2 {
 
         let branchAvailability: DateRangeSet // = new DateRangeSet()
 
+        var branchPlannings = ctx.resourcePlannings.filterByResource(ctx.branchId)
+        branchPlannings = branchPlannings.filterByType(...AlteaPlanningQueries.absenceTypes())
+        var branchClosed = branchPlannings.toDateRangeSet()
+       
 
         for (const resource of resources) {
 
@@ -163,6 +168,10 @@ export class ResourceAvailability2 {
 
 
 
+            if (resource.type == ResourceType.human && resource.branchPlanning) 
+                resourceStillAvailable = resourceStillAvailable.subtract(branchClosed)
+            
+
             resourceStillAvailable.resource = resource
             resourceOccupation.overlapAllowed.resource = resource
             workingHours.resource = resource
@@ -178,6 +187,8 @@ export class ResourceAvailability2 {
                 branchAvailability = resourceStillAvailable
 
             }
+
+
 
         }
 
