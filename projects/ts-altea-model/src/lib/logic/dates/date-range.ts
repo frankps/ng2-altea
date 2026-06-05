@@ -342,6 +342,25 @@ export class DateRange<T = any> {
         return !notIntersect
     }
 
+
+    intersectionWith(range: DateRange) : DateRange {
+
+        if (!range)
+            return null
+
+        const ourFromTime = this.from.getTime();
+        const ourToTime = this.to.getTime();
+        const theirFromTime = range.from.getTime();
+        const theirToTime = range.to.getTime();
+
+        const from = Math.max(ourFromTime,theirFromTime)
+        const to = Math.min(ourToTime,theirToTime)
+
+        let result = new DateRange(new Date(from), new Date(to))
+
+        return result
+    }
+
     protected takeDates(
         countExtractor: () => number,
         dateTaker: (n: number) => Date,
@@ -559,6 +578,23 @@ export class DateRange<T = any> {
         return diff < timeSpan.seconds
     }
 
+      shiftTime(timeSpan: TimeSpan) : DateRange {
+    
+        this.from = dateFns.addSeconds(this.from, timeSpan.seconds)
+        this.to = dateFns.addSeconds(this.to, timeSpan.seconds)
+
+        return this
+    
+      }
+
+
+      timeSpan() : TimeSpan {
+
+        const seconds = Math.abs(this.to.getTime() - this.from.getTime()) / 1000
+
+        return TimeSpan.seconds(seconds)
+        
+      }
 
     // subtractMany(others: DateRange[]) : DateRange[] {
 

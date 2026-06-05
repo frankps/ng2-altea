@@ -80,8 +80,8 @@ export class ProductPlanningComponent implements OnInit {
 
   async doPlanPrepTimes() {
   
-    let from = new Date(2026, 2 , 27)
-    let to = new Date(2026, 2, 28 )
+    let from = new Date(2026, 5 , 21)
+    let to = new Date(2026, 6, 2 )
     let scheduleId = 'd507d664-3d8f-4ebe-bb3b-86dcd7df6fc8'
 
     // Wellness supervisor - from:start-30  duration:+35 min
@@ -127,6 +127,10 @@ export class ProductPlanningComponent implements OnInit {
    * @returns 
    */
   async planPrepTimes(branchId: string, resType: ResourceType, product: Product, from: Date, to: Date, scheduleId: string, prodResId: string): Promise<ResourcePlannings> {
+
+    console.error('planPrepTimes')
+/*     
+    return new ResourcePlannings() */
 
     // let prodRes = product.resources.filter(prodRes => prodRes.act && prodRes.prep && prodRes.resource?.type == resType && prodRes.scheduleIds.includes(scheduleId))
 
@@ -205,9 +209,9 @@ export class ProductPlanningComponent implements OnInit {
     let apiBatchProcess = new ApiBatchProcess<ResourcePlanning>()
     apiBatchProcess.create = newResourcePlannings.plannings
 
-    let res = await this.planningSvc.batchProcess$(apiBatchProcess, this.sessionSvc.branchId)
+/*     let res = await this.planningSvc.batchProcess$(apiBatchProcess, this.sessionSvc.branchId)
 
-    console.warn('res', res)
+    console.warn('res', res) */
 
     return newResourcePlannings
 

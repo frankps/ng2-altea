@@ -42,6 +42,11 @@ export class AvailabilityContext {
     /** current planning of all the resources (during interval [request.from, request.to] ) */
     resourcePlannings: ResourcePlannings = new ResourcePlannings() // empty set
 
+
+    /** masks are used to reserve someone when we're on holidays (cleaning wellness) */
+    masks: ResourcePlannings = new ResourcePlannings()
+
+
     /** every resource can have 0, 1 or more schedules: a schedule defines when a resource is available for specific days of the week (for instance on mondays from 9:00 till 17:00, ...),
      * these schedules are Date independent (monday, tuesday, ... are OK, but not 04/12/2022)
      */

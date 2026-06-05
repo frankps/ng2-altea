@@ -173,14 +173,31 @@ export class ResourcePlanningComponent implements OnInit {
 
   }
 
-  async addPlanning() {
+  edit(planning: ResourcePlanning) {
+    this.objNew = planning
 
+    this.start = planning.startDate
+    this.end = planning.endDate
+
+    this.mode = ListSectionMode.edit
+
+  }
+
+
+  cancelPlanning() {
+    this.prepareNew()
+  }
+
+  updatePlanning() {
     let planning = this.objNew
+    this.uiToObject(planning)
 
-    console.error('Add planning ... ')
+    this.planningChanges.update(planning)
 
-    this.objNew.branchId = this.sessionSvc.branchId
-    this.objNew.resourceId = this._resource.id
+    this.prepareNew()
+  }
+
+  uiToObject(planning: ResourcePlanning) {
 
     if (this.start instanceof Date) {
 
@@ -199,6 +216,19 @@ export class ResourcePlanningComponent implements OnInit {
         this.objNew.endDate = this.end
 
     }
+  }
+
+  async addPlanning() {
+
+    let planning = this.objNew
+
+    console.error('Add planning ... ')
+
+    this.objNew.branchId = this.sessionSvc.branchId
+    this.objNew.resourceId = this._resource.id
+
+
+    this.uiToObject(planning)
 
 
     this.planningChanges.add(this.objNew)
@@ -227,6 +257,8 @@ export class ResourcePlanningComponent implements OnInit {
     const res = await this.planningSvc.batchProcess$(batch, this.dashboardSvc.resourceId)
 
     if (res.status == ApiStatus.ok) {
+
+      this.planningChanges.reset()
 
       this.dashboardSvc.showToastType(ToastType.saveSuccess)
       await this.resourceSvc.refreshCachedObjectFromBackend(this.resource.id)

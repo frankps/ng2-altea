@@ -11,6 +11,7 @@
     "actions": "Acties",
     "act": "Actief",
     "add": "Toevoegen",
+    "update": "Aanpassen",
     "back": "Terug",
     "cancel": "Annuleren",
     "confirm": "Bevestig",
@@ -1259,7 +1260,8 @@
     },
     "resourcePlanning": {
       "fullDays": "Volledige dag(en)",
-      "ors": "Overrule dagplanning"
+      "ors": "Overrule dagplanning",
+      "dailyTime": "Herhaal tijdsinterval dagelijks"
     },
     "optionPrice": {
       "allValues": "Geldig voor alle optie waarden",

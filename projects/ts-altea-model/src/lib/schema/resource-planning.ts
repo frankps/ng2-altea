@@ -635,6 +635,75 @@ export class ResourcePlannings {
     return map
 
   }
+
+  hasPlanninsOfType(type: PlanningType, dateRange?: DateRange): boolean {
+
+    if (this.isEmpty())
+      return false
+
+    let planning = this.plannings.find(p => p.type == type && (!dateRange || (p.endDate >= dateRange.from && p.startDate <= dateRange.to)))
+
+    return planning !== undefined
+  }
+
+
+  getPlanninsOfType(type: PlanningType, dateRange?: DateRange): ResourcePlannings {
+
+    if (this.isEmpty())
+      return new ResourcePlannings()
+
+    let plannings = this.plannings.filter(p => p.type == type && (!dateRange || (p.endDate >= dateRange.from && p.startDate <= dateRange.to)))
+
+
+
+    return new ResourcePlannings(plannings)
+  }
+
+  orderByStart() {
+
+    if (this.isEmpty())
+      return
+
+    this.plannings = _.orderBy(this.plannings, ['start'], ['asc'])
+  }
+
+
+  getLast(): ResourcePlanning {
+
+    if (this.isEmpty())
+      return null
+
+    return this.plannings[this.plannings.length - 1]
+
+  }
+
+  /** if the flag ResourcePlanning.dailyTime is set, then we have to duplicate this record for 
+   *  time intervals [start:hhmmss, end:hhmmss] for all dates between [start:yyyyMMdd, end:yyyyMMdd]
+   */
+  unpack(inRange: DateRange): ResourcePlannings {
+
+    const toUnpack = this.plannings.filter(p => p.dailyTime)
+
+    if (!toUnpack || toUnpack.length == 0)
+      return this
+
+    const notToUnpack = this.plannings.filter(p => !p.dailyTime)
+    let result = new ResourcePlannings(notToUnpack)
+
+
+    for (let planning of toUnpack) {
+
+      let unpacked = planning.unpack(inRange)
+      result.add(unpacked)
+
+
+    }
+
+    return result
+
+
+  }
+
 }
 
 
@@ -773,6 +842,9 @@ export class ResourcePlanning extends ObjectWithIdPlus implements IAsDbObject<Re
   /** format: yyyyMMddhhmmss */
   end?: number = DateHelper.yyyyMMddhhmmss(new Date())
 
+
+
+
   /** date format: 
    *  's': second format, start & end have format yyyyMMddhhmmss
    *  'd': hour format, UI just works with dates (not hours), start has format yyyyMMdd000000, end has format yyyyMMdd235959
@@ -792,6 +864,9 @@ export class ResourcePlanning extends ObjectWithIdPlus implements IAsDbObject<Re
    *     (2) if task (taskId is set): if true, then new bookings can overlap with this task
    * */
   overlap: boolean = false
+
+  /** when true, then repeat time intervals [start:hhmmss, end:hhmmss] for all dates between [start:yyyyMMdd, end:yyyyMMdd] */
+  dailyTime: boolean = false
 
   // service?: string;
   // customer?: string;
@@ -903,6 +978,12 @@ export class ResourcePlanning extends ObjectWithIdPlus implements IAsDbObject<Re
   }
 
 
+  shiftTime(timeSpan: TimeSpan) {
+
+    this.startDate = dateFns.addSeconds(this.startDate, timeSpan.seconds)
+    this.endDate = dateFns.addSeconds(this.endDate, timeSpan.seconds)
+
+  }
   /**
    * 
    * @param newStartHour format HH:mm
@@ -988,12 +1069,56 @@ export class ResourcePlanning extends ObjectWithIdPlus implements IAsDbObject<Re
 
   }
 
+
+
   override toString(dateFormat: string = 'HH:mm'): string {   //  'dd/MM HH:mm'
 
     let full = this.ors ? ' FULL-DAY' : ''
 
     return `[${this.type}: ${dateFns.format(this.startDate, dateFormat)}-${dateFns.format(this.endDate, dateFormat)}${full}]`
 
+  }
+
+
+  /** if the flag ResourcePlanning.dailyTime is set, then we have to duplicate this record for 
+   *  time intervals [start:hhmmss, end:hhmmss] for all dates between [start:yyyyMMdd, end:yyyyMMdd]
+   */
+  unpack(inRange: DateRange): ResourcePlannings {
+
+    let plannings = new ResourcePlannings()
+
+    let planningRange = this.toDateRange()
+    let inScoop = planningRange.intersectsWith(inRange)
+
+    if (!this.dailyTime || !inScoop) {
+      // plannings.push(this)  // then we keep the original, no work
+      return plannings
+    }
+
+    let scoopDateRange = planningRange.intersectionWith(inRange)
+
+    let fromHours = planningRange.from.getHours()
+    let fromMinutes = planningRange.from.getMinutes()
+
+    let toHours = planningRange.to.getHours()
+    let toMinutes = planningRange.to.getMinutes()
+
+    const days = dateFns.eachDayOfInterval({ start: scoopDateRange.from, end: scoopDateRange.to })
+
+    for (const day of days) {
+
+      let unpacked = this.clone()
+      unpacked.newId()
+
+      unpacked.startDate = dateFns.set(day, { hours: fromHours, minutes: fromMinutes })
+      unpacked.endDate = dateFns.set(day, { hours: toHours, minutes: toMinutes })
+
+      unpacked.dailyTime = false
+
+      plannings.push(unpacked)
+    }
+
+    return plannings
   }
 
 }

@@ -13,15 +13,16 @@
             <li class="list-group-item" *ngFor="let planning of plannings; let idx = index">
                 <div class="row">
                     <div class="col-2"><span translate>enums.planning-type.{{planning.type}}</span>
-                    
+
                         <i class="fa-sharp-duotone fa-solid fa-calendar-day float-end" *ngIf="planning.ors"
-                        [ngbTooltip]="'objects.resourcePlanning.ors' | translate"></i>
+                            [ngbTooltip]="'objects.resourcePlanning.ors' | translate"></i>
                     </div>
                     <div class="col-2">{{planning.startDate | date:planning.dateFormat()}}</div>
                     <div class="col-2">{{planning.endDate | date:planning.dateFormat()}}</div>
                     <div class="col-4">{{planning?.rem}}</div>
                     <div class="col-2" *ngIf="parent.sectionInEditIs(thisSection)">
                         <i class="fas fa-trash float-end" (click)="delete(planning)"></i>
+                        <i class="fas fa-pen float-end me-2" (click)="edit(planning)"></i>
                     </div>
                 </div>
 
@@ -67,8 +68,18 @@
 
                     </div>
                     <div class="col-3">
-                        <button type="button" class="btn btn-primary btn-sm  float-end" (click)="addPlanning()"
-                            translate>dic.add</button>
+                        <button *ngIf="mode==ListSectionMode.createNew" type="button"
+                            class="btn btn-primary btn-sm  float-end" (click)="addPlanning()" translate>dic.add</button>
+
+
+
+                        <button *ngIf="mode==ListSectionMode.edit" type="button"
+                            class="btn btn-primary btn-sm  float-end" (click)="updatePlanning()"
+                            translate>dic.update</button>
+
+                        <button *ngIf="mode==ListSectionMode.edit" type="button"
+                            class="btn btn-primary btn-sm  float-end me-2" (click)="cancelPlanning()"
+                            translate>dic.cancel</button>
 
                     </div>
                 </div>
@@ -86,6 +97,13 @@
                             <input class="form-check-input" type="checkbox" id="ors" name="ors"
                                 [(ngModel)]="objNew.ors" />
                             <label class="form-check-label" for="ors" translate="objects.resourcePlanning.ors"></label>
+                        </div>
+
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="dailyTime" name="dailyTime"
+                                [(ngModel)]="objNew.dailyTime" />
+                            <label class="form-check-label" for="dailyTime"
+                                translate="objects.resourcePlanning.dailyTime"></label>
                         </div>
 
                     </div>
@@ -112,7 +130,7 @@
 
 
 
-                
+
 
 
             </li>

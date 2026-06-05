@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { AvailabilityContext, BranchSchedules, DateRange, DateRangeSet, PlanningBlockSeries, PlanningMode, PossibleSlots, Product, Resource, ResourceAvailability2, ResourceRequest, ResourceRequestItem, ResourceType, Schedule, SlotInfo, Solution, SolutionItem, SolutionNoteLevel, SolutionSet, TimeSpan } from "ts-altea-model";
+import { AvailabilityContext, BranchSchedules, DateRange, DateRangeSet, PlanningBlockSeries, PlanningMode, PlanningType, PossibleSlots, Product, Resource, ResourceAvailability2, ResourceRequest, ResourceRequestItem, ResourceType, Schedule, SlotInfo, Solution, SolutionItem, SolutionNoteLevel, SolutionSet, TimeSpan } from "ts-altea-model";
 import * as _ from "lodash"
 import { ResourceRequestOptimizer } from "./resource-request-optimizer";
 import { scheduled } from "rxjs";
@@ -71,7 +71,7 @@ export class SlotFinderBlocks {
                 /** if planning blocks are configured, then a customer might still change the duration via a product option. But, for a certain product & schedule we might disable this (example: wellness during holiday) */
                 const durationFixed = this.preconfiguredBlocksOnly(firstSchedule, product)
 
-                // if the range has no occupations yet
+                // if the range has no occupations yet or fixed duration
                 if (scheduleIsEmpty || durationFixed) {
                     possibleDateRanges = this.getFullDayStartDates(product, availableRange, ctx, schedules)
 
@@ -500,6 +500,34 @@ export class SlotFinderBlocks {
 
     getFullDayStartDates(product: Product, dateRange: DateRange, ctx: AvailabilityContext, schedules: BranchSchedules): DateRangeSet {
 
+
+        if (ctx.resourcePlannings.hasPlanninsOfType(PlanningType.mask, dateRange)) {
+            
+            let planningMasks = ctx.masks //.filterByDateRange(dateRange) // resourcePlannings.getPlanninsOfType(PlanningType.mask, dateRange)
+
+            if (!planningMasks || planningMasks.isEmpty())
+                return new DateRangeSet() 
+
+
+            planningMasks.orderByStart()
+
+            // the masks are typically the cleaning blocks
+            let maskDateRanges = planningMasks.toDateRangeSet()
+
+            // the final cleaning block mask is always missing (after 2 hours) => we add
+            let last = maskDateRanges.getLast()
+            last = last.clone()
+            last.shiftTime(last.timeSpan()).shiftTime(TimeSpan.hours(2))
+            maskDateRanges.addRanges(last)
+
+
+            // between the cleaning blocks we have the actual wellness sessions
+            let options = maskDateRanges.invert()
+
+
+            return options
+
+        }
 
 
         let resultBlocks = new DateRangeSet()

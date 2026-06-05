@@ -224,7 +224,7 @@ export class DateRangeSets extends SolutionNotes {
 
 
 
-  
+
             resultSets.reduced++
 
 
@@ -297,14 +297,14 @@ export class DateRangeSets extends SolutionNotes {
                     //  solution.addNote(`Break not possible for ${resource.name} if we allocate ${dateRange.toString()}  (break remaining: ${breakStillPossible.remaining?.toString()})`)
                 }
             }
-        
+
             let reducedSet = set
-            
+
 
             /** typically used for group level reservations: Wellness supervisor needed for certain time */
-            if (setContainsRange) 
+            if (setContainsRange)
                 reducedSet = set.subtractRange(range)
-            
+
             resultSets.sets.push(reducedSet)
 
             if (!perfectMatch) {
@@ -391,7 +391,7 @@ export class DateRangeSet {
 
     constructor(public ranges: DateRange[] = [], public resource?: Resource) {
 
-        if (ArrayHelper.NotEmpty(ranges)) 
+        if (ArrayHelper.NotEmpty(ranges))
             ranges = ranges.filter(r => r?.isValid())
 
     }
@@ -429,6 +429,21 @@ export class DateRangeSet {
 
         this.ranges = _.sortBy(this.ranges, 'from')
 
+    }
+
+    invert(): DateRangeSet {
+
+        let result = new DateRangeSet()
+
+        for (let i = 0; i < this.ranges.length - 1; i++) {
+            let r1 = this.ranges[i]
+            let r2 = this.ranges[i + 1]
+
+            let range = new DateRange(r1.to, r2.from)
+            result.addRanges(range)
+        }
+
+        return result
     }
 
     /**
@@ -552,7 +567,7 @@ export class DateRangeSet {
 
         return _.minBy(this.ranges, 'from').from
     }
-    
+
 
     outerRange(): DateRange {
 
@@ -1068,7 +1083,7 @@ export class DateRangeSet {
 
             }
 
-            
+
         }
 
         return subtractFrom
@@ -1121,7 +1136,7 @@ export class DateRangeSet {
 
             }
 
-            
+
         }
 
         return subtractFrom
@@ -1143,7 +1158,7 @@ export class DateRangeSet {
         }
 
         return result
-            
+
     }
 
 
@@ -1236,6 +1251,14 @@ export class DateRangeSet {
 
     }
 
+    getLast(): DateRange {
+
+        if (this.isEmpty())
+            return null
+
+        return this.ranges[this.ranges.length - 1]
+
+    }
 
     /**
  *  Creates for each date range in this.ranges a solution

@@ -77,7 +77,18 @@ export class CreateAvailabilityContext {
         let clientId = ctx.order.lock
 
         let includeGroupPlannings = true
-        ctx.resourcePlannings = await this.loadResourcePlannings(ctx.allResourceIds, availabilityRequest, includeGroupPlannings, excludeOrderId, clientId)
+        let resourcePlannings = await this.loadResourcePlannings(ctx.allResourceIds, availabilityRequest, includeGroupPlannings, excludeOrderId, clientId)
+
+        ctx.masks = resourcePlannings.filterByType(PlanningType.mask)
+
+
+        let requestRange = new DateRange(availabilityRequest.fromDate(), availabilityRequest.toDate())
+        // availabilityRequest.fro
+        resourcePlannings = resourcePlannings.unpack(requestRange)
+
+
+        ctx.resourcePlannings = this.removeMasksAlreadyPlanned(resourcePlannings)
+
 
 
         // to debug
@@ -243,7 +254,7 @@ export class CreateAvailabilityContext {
                 let hifrDagAfwezig = '6bbe99b0-5c47-4823-924f-2c865cd180d8'
                 if (schedule.id == hifrDagAfwezig) {
                     schedule.rec = ScheduleRecurrence.getHifrDagAfwezig()
-                    
+
                 }
 
                 this.scheduleRecurrenceToResourcePlannings(schedule, resourcePlannings, availabilityRequest)
@@ -614,11 +625,13 @@ export class CreateAvailabilityContext {
 
         let plannings = new ResourcePlannings(resourcePlannings)
 
-        plannings = this.removeMasksAlreadyPlanned(plannings)
+        // plannings = this.removeMasksAlreadyPlanned(plannings)
 
         return plannings
 
     }
+
+
 
 
 
