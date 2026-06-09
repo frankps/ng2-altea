@@ -10,6 +10,8 @@ import { NgxSpinnerService } from "ngx-spinner"
 import { Observable } from 'rxjs';
 import { EditProductComponent } from '../edit-product/edit-product.component';
 import { ScheduleService, SessionService, ResourcePlanningService } from 'ng-altea-common';
+import { addWeeks, isBefore, isEqual } from "date-fns";
+import * as dateFns from 'date-fns'
 
 @Component({
   selector: 'ngx-altea-product-planning',
@@ -75,20 +77,55 @@ export class ProductPlanningComponent implements OnInit {
     else
       return "not found"
 
-  } 
-  
+  }
+
 
   async doPlanPrepTimes() {
-  
-    let from = new Date(2026, 5 , 21)
-    let to = new Date(2026, 6, 2 )
+
+    let mode = 'weekly'   // default: 'continuous'
+    // weekly -> to implement our day of !
+
+    console.log(mode)
+   // return
+
+
+    let from = new Date(2026, 7, 4)
+    let to = new Date(2026, 8, 29)
     let scheduleId = 'd507d664-3d8f-4ebe-bb3b-86dcd7df6fc8'
 
     // Wellness supervisor - from:start-30  duration:+35 min
     let prodResId = '7b9d4162-ee61-42f2-84f8-a474b3a92d4d'
     let branchId = this.sessionSvc.branchId
 
-    let res = await this.planPrepTimes(branchId, ResourceType.human, this.product, from, to, scheduleId, prodResId)
+
+
+    let res: ResourcePlannings
+
+    switch (mode) {
+
+      case 'continuous':
+        res = await this.planPrepTimes(branchId, ResourceType.human, this.product, from, to, scheduleId, prodResId)
+        break
+
+      case 'weekly':
+
+        for (
+          let current = from;
+          isBefore(current, to) || isEqual(current, to);
+          current = addWeeks(current, 1)
+        ) {
+          res = new ResourcePlannings()
+          let nextDay = dateFns.addDays(current, 1)
+          let subRes = await this.planPrepTimes(branchId, ResourceType.human, this.product, current, nextDay, scheduleId, prodResId)
+          res.add(subRes)
+          console.log(current);
+        }
+
+
+
+    }
+
+
 
     console.warn('res', res)
 
@@ -129,8 +166,8 @@ export class ProductPlanningComponent implements OnInit {
   async planPrepTimes(branchId: string, resType: ResourceType, product: Product, from: Date, to: Date, scheduleId: string, prodResId: string): Promise<ResourcePlannings> {
 
     console.error('planPrepTimes')
-/*     
-    return new ResourcePlannings() */
+    /*     
+        return new ResourcePlannings() */
 
     // let prodRes = product.resources.filter(prodRes => prodRes.act && prodRes.prep && prodRes.resource?.type == resType && prodRes.scheduleIds.includes(scheduleId))
 
@@ -209,9 +246,9 @@ export class ProductPlanningComponent implements OnInit {
     let apiBatchProcess = new ApiBatchProcess<ResourcePlanning>()
     apiBatchProcess.create = newResourcePlannings.plannings
 
-/*     let res = await this.planningSvc.batchProcess$(apiBatchProcess, this.sessionSvc.branchId)
-
-    console.warn('res', res) */
+    let res = await this.planningSvc.batchProcess$(apiBatchProcess, this.sessionSvc.branchId)
+    
+        console.warn('res', res)
 
     return newResourcePlannings
 

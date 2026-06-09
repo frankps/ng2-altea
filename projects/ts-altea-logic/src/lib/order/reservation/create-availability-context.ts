@@ -82,14 +82,17 @@ export class CreateAvailabilityContext {
         ctx.masks = resourcePlannings.filterByType(PlanningType.mask)
 
 
-        let requestRange = new DateRange(availabilityRequest.fromDate(), availabilityRequest.toDate())
-        // availabilityRequest.fro
-        resourcePlannings = resourcePlannings.unpack(requestRange)
+        let debug1 = resourcePlannings.plannings.filter(rp => rp.resourceId == 'a24c4fac-69ca-49c4-9864-175da528b7fe')
+        console.error(debug1)
+
+
 
 
         ctx.resourcePlannings = this.removeMasksAlreadyPlanned(resourcePlannings)
 
 
+        let debug2 = resourcePlannings.plannings.filter(rp => rp.resourceId == 'a24c4fac-69ca-49c4-9864-175da528b7fe')
+        console.error(debug2)
 
         // to debug
         /*         let planId = 'b9f96be6-fda5-476f-9169-74514be783f6'
@@ -621,11 +624,14 @@ export class CreateAvailabilityContext {
 
 
         const resourcePlannings = await this.alteaDb.resourcePlannings(availabilityRequest.from, availabilityRequest.to, resourceIds, includeGroupPlannings, excludeOrderId, clientId)
-
-
         let plannings = new ResourcePlannings(resourcePlannings)
 
-        // plannings = this.removeMasksAlreadyPlanned(plannings)
+        /** if the flag ResourcePlanning.dailyTime is set, then we have to duplicate this record for 
+         *  time intervals [start:hhmmss, end:hhmmss] for all dates between [start:yyyyMMdd, end:yyyyMMdd]
+         */
+        let requestRange = new DateRange(availabilityRequest.fromDate(), availabilityRequest.toDate())
+        plannings = plannings.unpack(requestRange)
+
 
         return plannings
 

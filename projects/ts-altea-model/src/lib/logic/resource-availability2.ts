@@ -56,7 +56,7 @@ export class ResourceAvailability2 {
         var branchPlannings = ctx.resourcePlannings.filterByResource(ctx.branchId)
         branchPlannings = branchPlannings.filterByType(...AlteaPlanningQueries.absenceTypes())
         var branchClosed = branchPlannings.toDateRangeSet()
-       
+
 
         for (const resource of resources) {
 
@@ -153,10 +153,10 @@ export class ResourceAvailability2 {
 
 
             /*  New solution: with problems!!  Does not work when qty > 1   !!! > investigate !!!            */
-/*             let resourceStillAvailable = extendedSchedule.subtract(unavailable, false)
-            resourceStillAvailable = resourceStillAvailable.subtract(resourceOccupation.overlapAllowed, true)
-  
- */
+            /*             let resourceStillAvailable = extendedSchedule.subtract(unavailable, false)
+                        resourceStillAvailable = resourceStillAvailable.subtract(resourceOccupation.overlapAllowed, true)
+              
+             */
             /*
             Old solution
             Issue 30/7/25: subtractMany was not working correctly for multiple ranges, only first range was subtracted   
@@ -168,9 +168,9 @@ export class ResourceAvailability2 {
 
 
 
-            if (resource.type == ResourceType.human && resource.branchPlanning) 
+            if (resource.type == ResourceType.human && resource.branchPlanning)
                 resourceStillAvailable = resourceStillAvailable.subtract(branchClosed)
-            
+
 
             resourceStillAvailable.resource = resource
             resourceOccupation.overlapAllowed.resource = resource
@@ -192,15 +192,15 @@ export class ResourceAvailability2 {
 
         }
 
-    
 
-/*         let wellnessId = '31eaebbc-af39-4411-a997-f2f286c58a9d'
+
+        let wellnessId = '31eaebbc-af39-4411-a997-f2f286c58a9d'
         let orderHasWellness = this.ctx.hasProduct(wellnessId)
 
         if (!orderHasWellness)
             this.allocateGroupPlannings()
- */
-        
+
+
 
 
     }
@@ -558,7 +558,7 @@ export class ResourceAvailability2 {
         let me = this
         let ctx = this.ctx
 
-        let groupPlannings = ctx.resourcePlannings.filterByResourceGroupsOnly()  // PlanningType.mask
+        let groupPlannings = ctx.resourcePlannings.filterByUnallocatedResourceGroupsOnly()  // PlanningType.mask
 
         if (!groupPlannings || groupPlannings.isEmpty())
             return
@@ -615,14 +615,14 @@ export class ResourceAvailability2 {
      * @param range 
      * @returns 
      */
-    bestCandidate(resources: Resource[], range: DateRange) : Resource | null {
+    bestCandidate(resources: Resource[], range: DateRange): Resource | null {
 
         if (ArrayHelper.IsEmpty(resources))
             return null
 
         let frankId = 'cc682b80-6243-4ac5-92a9-5ceed36111a4'
         let hildeId = 'e738d496-a66d-414e-a098-d5ca84403e9d'
-        let hulpId = 'a24c4fac-69ca-49c4-9864-175da528b7fe' 
+        let hulpId = 'a24c4fac-69ca-49c4-9864-175da528b7fe'
 
         let prefferedResources = [frankId, hildeId, hulpId]
         let prefferedResource = resources.find(r => prefferedResources.includes(r.id))
@@ -646,7 +646,7 @@ export class ResourceAvailability2 {
 
             let resource = availability.resource
             let duration = availability.duration
-           
+
             if (duration.seconds < bestDuration.seconds) {
                 bestDuration = duration
                 bestResource = resource

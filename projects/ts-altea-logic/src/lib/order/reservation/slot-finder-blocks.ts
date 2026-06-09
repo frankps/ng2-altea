@@ -501,9 +501,12 @@ export class SlotFinderBlocks {
     getFullDayStartDates(product: Product, dateRange: DateRange, ctx: AvailabilityContext, schedules: BranchSchedules): DateRangeSet {
 
 
+
+        /** if masks are existing, then these masks determine the starts of the blocks !! */
+
         if (ctx.resourcePlannings.hasPlanninsOfType(PlanningType.mask, dateRange)) {
             
-            let planningMasks = ctx.masks //.filterByDateRange(dateRange) // resourcePlannings.getPlanninsOfType(PlanningType.mask, dateRange)
+            let planningMasks = ctx.masks 
 
             if (!planningMasks || planningMasks.isEmpty())
                 return new DateRangeSet() 

@@ -419,7 +419,7 @@ export class ResourcePlannings {
     return new ResourcePlannings(planningsForResource)
   }
 
-  filterByResourceGroupsOnly(type?: PlanningType) {
+  filterByUnallocatedResourceGroupsOnly(type?: PlanningType) {
 
     const planningsForResource = this.plannings.filter(rp => rp.resourceGroupId && !rp.resourceId && (!type || rp.type == type))
 
@@ -684,7 +684,7 @@ export class ResourcePlannings {
 
     const toUnpack = this.plannings.filter(p => p.dailyTime)
 
-    if (!toUnpack || toUnpack.length == 0)
+    if (!toUnpack || toUnpack?.length == 0) 
       return this
 
     const notToUnpack = this.plannings.filter(p => !p.dailyTime)
@@ -695,13 +695,30 @@ export class ResourcePlannings {
 
       let unpacked = planning.unpack(inRange)
       result.add(unpacked)
+    }
 
+    return result
+  }
+
+
+
+
+  applyRepeatFlag(inRange: DateRange): ResourcePlannings {
+
+
+    const planningsWithRepeat = this.plannings.filter(p => p.repeat)
+
+    if (!planningsWithRepeat || planningsWithRepeat?.length == 0) 
+      return this
+
+    const planningsWithoutRepeat = this.plannings.filter(p => !p.repeat)
+    let result = new ResourcePlannings(planningsWithoutRepeat)
+
+    for (let planning of planningsWithRepeat) {
 
     }
 
     return result
-
-
   }
 
 }
@@ -843,8 +860,6 @@ export class ResourcePlanning extends ObjectWithIdPlus implements IAsDbObject<Re
   end?: number = DateHelper.yyyyMMddhhmmss(new Date())
 
 
-
-
   /** date format: 
    *  's': second format, start & end have format yyyyMMddhhmmss
    *  'd': hour format, UI just works with dates (not hours), start has format yyyyMMdd000000, end has format yyyyMMdd235959
@@ -867,6 +882,8 @@ export class ResourcePlanning extends ObjectWithIdPlus implements IAsDbObject<Re
 
   /** when true, then repeat time intervals [start:hhmmss, end:hhmmss] for all dates between [start:yyyyMMdd, end:yyyyMMdd] */
   dailyTime: boolean = false
+
+  repeat?: string
 
   // service?: string;
   // customer?: string;
@@ -1091,8 +1108,8 @@ export class ResourcePlanning extends ObjectWithIdPlus implements IAsDbObject<Re
     let inScoop = planningRange.intersectsWith(inRange)
 
     if (!this.dailyTime || !inScoop) {
-      // plannings.push(this)  // then we keep the original, no work
-      return plannings
+     
+      return plannings   // return EMPTY plannings: 
     }
 
     let scoopDateRange = planningRange.intersectionWith(inRange)
@@ -1119,6 +1136,25 @@ export class ResourcePlanning extends ObjectWithIdPlus implements IAsDbObject<Re
     }
 
     return plannings
+  }
+
+
+
+  applyRepeatFlag(inRange: DateRange): ResourcePlannings {
+    let plannings = new ResourcePlannings()
+
+    let planningRange = this.toDateRange()
+
+    switch (this.repeat) {
+     
+      case 'weekly':
+
+      
+        break
+    
+    }
+
+    return plannings    
   }
 
 }

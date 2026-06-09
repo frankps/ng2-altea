@@ -17,7 +17,7 @@ Serve:
         https://altea-pub-app2.web.app/
 
     ng serve dvit-gen --port 4400
-
+    
 Deploy:
 
     ng build --aot --project altea-velzon-admin
