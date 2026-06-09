@@ -684,7 +684,7 @@ export class ResourcePlannings {
 
     const toUnpack = this.plannings.filter(p => p.dailyTime)
 
-    if (!toUnpack || toUnpack?.length == 0) 
+    if (!toUnpack || toUnpack?.length == 0)
       return this
 
     const notToUnpack = this.plannings.filter(p => !p.dailyTime)
@@ -701,20 +701,23 @@ export class ResourcePlannings {
   }
 
 
-
+  
 
   applyRepeatFlag(inRange: DateRange): ResourcePlannings {
 
 
     const planningsWithRepeat = this.plannings.filter(p => p.repeat)
 
-    if (!planningsWithRepeat || planningsWithRepeat?.length == 0) 
+    if (!planningsWithRepeat || planningsWithRepeat?.length == 0)
       return this
 
     const planningsWithoutRepeat = this.plannings.filter(p => !p.repeat)
     let result = new ResourcePlannings(planningsWithoutRepeat)
 
     for (let planning of planningsWithRepeat) {
+
+      let unpacked = planning.applyRepeatFlag(inRange)
+      result.add(unpacked)
 
     }
 
@@ -883,7 +886,7 @@ export class ResourcePlanning extends ObjectWithIdPlus implements IAsDbObject<Re
   /** when true, then repeat time intervals [start:hhmmss, end:hhmmss] for all dates between [start:yyyyMMdd, end:yyyyMMdd] */
   dailyTime: boolean = false
 
-  repeat?: string
+  repeat?: any
 
   // service?: string;
   // customer?: string;
@@ -1108,7 +1111,7 @@ export class ResourcePlanning extends ObjectWithIdPlus implements IAsDbObject<Re
     let inScoop = planningRange.intersectsWith(inRange)
 
     if (!this.dailyTime || !inScoop) {
-     
+
       return plannings   // return EMPTY plannings: 
     }
 
@@ -1143,18 +1146,71 @@ export class ResourcePlanning extends ObjectWithIdPlus implements IAsDbObject<Re
   applyRepeatFlag(inRange: DateRange): ResourcePlannings {
     let plannings = new ResourcePlannings()
 
+    if (!this.repeat)
+      return plannings
+
     let planningRange = this.toDateRange()
 
     switch (this.repeat) {
-     
-      case 'weekly':
 
-      
+      case 'weekly': {
+
+        /*
+
+        Core efficiency trick — skip to the first relevant week in O(1):
+
+minN = max(0, ceil( (inRange.from − planningRange.to) / WEEK_MS ))
+This single division tells us the minimum number of whole weeks we need to advance planningRange before it can possibly reach inRange. For a planning from 2016 with inRange in 2026, that's ~520 weeks — skipped instantly, no loop.
+
+Then iterate only over the weeks that matter:
+
+Starting at minN, each iteration shifts the range by n × WEEK_MS. The loop exits as soon as shiftedFrom >= inRange.to, so it runs only over the weeks that actually overlap the window (typically just a handful).
+
+For each candidate week, the intersection check is a simple arithmetic comparison (overlapFrom < overlapTo) — no Date object construction until we know there's a real overlap.
+
+Each matching occurrence is a clone() of the original planning with adjusted startDate/endDate and repeat cleared so it won't be re-expanded downstream.
+        */
+
+        const WEEK_MS = 7 * 24 * 60 * 60 * 1000
+
+        const planFromMs = planningRange.from.getTime()
+        const planToMs = planningRange.to.getTime()
+        const durationMs = planToMs - planFromMs
+
+        // Jump directly to the first week-offset where the shifted range can reach inRange.from.
+        // We need: planToMs + n * WEEK_MS > inRange.from  =>  n > (inRange.from - planToMs) / WEEK_MS
+        const minN = Math.max(0, Math.ceil((inRange.from.getTime() - planToMs) / WEEK_MS))
+
+        for (let n = minN; ; n++) {
+
+          const shiftedFromMs = planFromMs + n * WEEK_MS
+
+          // Stop as soon as the shifted range starts after inRange ends
+          if (shiftedFromMs >= inRange.to.getTime())
+            break
+
+          const shiftedToMs = shiftedFromMs + durationMs
+
+          // Intersection: max(froms) < min(tos)
+          const overlapFrom = Math.max(shiftedFromMs, inRange.from.getTime())
+          const overlapTo = Math.min(shiftedToMs, inRange.to.getTime())
+
+          if (overlapFrom < overlapTo) {
+            const occurrence = this.clone()
+            occurrence.newId()
+            occurrence.startDate = new Date(shiftedFromMs)
+            occurrence.endDate = new Date(shiftedToMs)
+            occurrence.repeat = undefined
+            plannings.push(occurrence)
+          }
+        }
+
         break
-    
+      }
+
     }
 
-    return plannings    
+    return plannings
   }
 
 }

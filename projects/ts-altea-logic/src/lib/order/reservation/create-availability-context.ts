@@ -632,6 +632,7 @@ export class CreateAvailabilityContext {
         let requestRange = new DateRange(availabilityRequest.fromDate(), availabilityRequest.toDate())
         plannings = plannings.unpack(requestRange)
 
+        plannings = plannings.applyRepeatFlag(requestRange)
 
         return plannings
 

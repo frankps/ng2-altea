@@ -279,7 +279,7 @@ export class AlteaDb {
                                     del: false,
                                     lines: {
                                         some: { productId: { in: productIds } }
-                                    } 
+                                    }
                                 }
                             }
                         }
@@ -833,7 +833,7 @@ export class AlteaDb {
         const qry = new DbQueryTyped<Template>('template', Template)
         qry.and('branchId', QueryOperator.equals, branchId)
         qry.and('cat', QueryOperator.contains, cat)
-        
+
         if (code)
             qry.and('code', QueryOperator.equals, code)
         else
@@ -1009,9 +1009,18 @@ export class AlteaDb {
 
         const qry = new DbQueryTyped<ResourcePlanning>('resourcePlanning', ResourcePlanning)
 
-        qry.and('end', QueryOperator.greaterThanOrEqual, from)
-        qry.and('start', QueryOperator.lessThanOrEqual, to)
+        //qry.and('end', QueryOperator.greaterThanOrEqual, from)
+        qry.and('start', QueryOperator.lessThanOrEqual, to)   // original here
+
+        // also get the plannings to repeat 
+        let andOrRepeat = qry.and()
+        andOrRepeat.or('end', QueryOperator.greaterThanOrEqual, from)
+        andOrRepeat.or('repeat', QueryOperator.not, null)
+
+
         qry.and('act', QueryOperator.equals, true)
+
+
 
         // we don't need to see staff presence & holiday requests
         qry.and('type', QueryOperator.notIn, ['pres', 'holReq'])
