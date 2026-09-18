@@ -312,7 +312,7 @@ export class OrderMgmtService {
         if ([OrderState.creation, OrderState.created, OrderState.waitDeposit].indexOf(order.state) >= 0) {
 
 
-            if (order.paid >= order.deposit) {
+            if (order.paid >= order.incl ||  order.paid >= order.deposit) {
 
                 return OrderState.confirmed
             }

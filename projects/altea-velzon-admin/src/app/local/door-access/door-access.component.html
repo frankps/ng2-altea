@@ -3,6 +3,10 @@
 
         <h4>Door users</h4>
 
+         <button type="button" class="btn btn-primary btn-sm" (click)="loadUsers()">Codes tonen</button>
+
+        <button type="button" class="btn btn-primary btn-sm" (click)="selectUsersWithCode()">Selecteer codes</button>
+
         <button type="button" class="btn btn-primary btn-sm" (click)="deleteUsers()" translate>dic.delete</button>
 
 
@@ -19,7 +23,7 @@
                                 {{user.name}}
 
                                 <span class="badge text-bg-secondary ms-2" *ngIf="user.device">{{user.device}}</span>
-                                <span class="badge text-bg-info ms-2" *ngIf="user.device">{{user.code}}</span>
+                                <span class="badge text-bg-info ms-2" *ngIf="user.code">{{user.code}}</span>
 
                             </label>
                         </div>
@@ -29,6 +33,9 @@
                     </div>
 
                     <div class="col-6">
+
+
+                       
 
                         <button type="button" class="btn btn-primary btn-sm" (click)="openDoor(user.uuid)"><i class="fa-solid fa-door-open"></i></button>
                     </div>

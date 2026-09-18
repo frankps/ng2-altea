@@ -207,6 +207,7 @@ export class Schedule extends ObjectWithIdPlus {
   //scheduling?: Scheduling[];
 
   // the start of the week schedules (if weeks.length > 1), format: yyyymmdd
+  @Type(() => Number)
   start?: number;
 
   @Type(() => WeekSchedule)
@@ -218,6 +219,9 @@ export class Schedule extends ObjectWithIdPlus {
   prepIncl: boolean = true
 
 
+  /** for staff: contracted hours per week. null = geen contract vastgelegd */
+  @Type(() => Number)
+  hoursWeek?: Number
 
   /*
   set startDate(value: Date) {

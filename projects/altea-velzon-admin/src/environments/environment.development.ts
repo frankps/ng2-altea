@@ -16,7 +16,7 @@ export const environment = {
     },
    // backend: 'https://dvit-477c9.uc.r.appspot.com',
     backend: 'http://localhost:8080',
-    localServer:  'http://localhost:3005', // 'https://altea.dvit.local', //'http://localhost:3005',   // 'https://localhost', //
+    localServer: 'http://localhost:3005', //'https://altea.dvit.local', // 'http://localhost:3005', // 'https://altea.dvit.local', //'http://localhost:3005',   // 'https://localhost', //
     idleTime: {
       userSelect: 5,
       showTaks: 3
@@ -32,4 +32,31 @@ export const environment = {
    * on performance if an error is thrown.
    */
   // import 'zone.js/plugins/zone-error';  // Included with Angular CLI.
+
+
+  /*
+
+https://altea.dvit.local
+https://192.168.3.50
+door-access/users
+
+
+http://localhost:3005/actions/test
+https://192.168.3.50/actions/test
+
+
+
+https://192.168.3.50/door-access/users
+
+
+https://192.168.3.50/actions/test
+Working
+
+
+https://192.168.3.50/door-access/users
+
+
+
+
+  */
   

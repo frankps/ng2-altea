@@ -89,7 +89,7 @@ export class LoyaltyProgramListComponent extends NgBaseListComponent<LoyaltyProg
 
     let branchId = this.sessionSvc.branchId
 
-    prog.orgId = branchId
+    //prog.orgId = branchId
     prog.branchId = branchId
 
     prog.name = 'Nieuw'

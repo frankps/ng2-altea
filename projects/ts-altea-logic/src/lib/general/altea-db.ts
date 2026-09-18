@@ -614,6 +614,34 @@ export class AlteaDb {
 
     }
 
+    /** orders that are invoiced, but invoiced still false */
+    async getOrdersMissingInvoicedFlag(branchId: string, minCreationDate?: Date): Promise<Order[]> {
+
+        const qry = new DbQueryTyped<Order>('order', Order)
+
+        qry.include('invoice.orders', 'payments', 'contact')
+
+        qry.and('branchId', QueryOperator.equals, branchId)
+        // qry.and('invoiced', QueryOperator.equals, true)
+
+        qry.and('invoiceId', QueryOperator.not, null)
+        qry.or('invoiced', QueryOperator.equals, false)
+
+        /*
+        qry.or('invoiceId', QueryOperator.not, null)
+        qry.or('invoiceNum', QueryOperator.equals, null)
+*/
+
+        if (minCreationDate)
+            qry.and('cre', QueryOperator.greaterThanOrEqual, minCreationDate)
+
+        qry.take = 500
+
+        const orders = await this.db.query$<Order>(qry)
+        return orders
+
+    }
+
     async getOrdersNeedingCommunication(date: Date = new Date()) {
 
         const qry = new DbQueryTyped<Order>('order', Order)
@@ -860,20 +888,10 @@ export class AlteaDb {
     }
 
 
-    async getMessages(branchId: string, orderId: string, code: TemplateCode, fields?: string[]): Promise<Message[]> {
-
-        const qry = new DbQueryTyped<Message>('message', Message)
-
-        if (fields)
-            qry.select(...fields)
-
-        qry.and('branchId', QueryOperator.equals, branchId)
-        qry.and('orderId', QueryOperator.equals, orderId)
-        qry.and('code', QueryOperator.equals, code)
-
-        const messages = await this.db.query$<Message>(qry)
-
-        return messages
+    async getMessages(_branchId: string, _orderId: string, _code: TemplateCode, _fields?: string[]): Promise<Message[]> {
+        // SQL Message was dropped for Phuket Step 0 (COM-18). Reminder de-dup
+        // never worked (nothing wrote the table). Do not query a gone table.
+        return []
     }
 
 

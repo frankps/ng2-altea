@@ -23,8 +23,8 @@ export class Subscription extends ObjectWithIdPlus {
 
   static jsonProps = ['options']
 
-  orgId?: string;
-  branchId?: string;
+  //orgId?: string;
+  branchId: string;
 
   @Type(() => Contact)
   contact?: Contact;
@@ -32,6 +32,7 @@ export class Subscription extends ObjectWithIdPlus {
 
   // @Type(() => Order)
   order?: Order;
+  orderLineId?: string;
 
   /** the purchase order id */
   orderId?: string;
@@ -63,6 +64,27 @@ export class Subscription extends ObjectWithIdPlus {
   totalQty = 0;
   usedQty = 0;
 
+  ref?: string;
+
+  @Type(() => Number)
+  idx?: number;
+
+  validFrom?: Date;
+  validUntil?: Date;
+  expiredAt?: Date;
+  blocked: boolean = false;
+  voidedAt?: Date;
+
+  @Type(() => Number)
+  value?: number;
+
+  @Type(() => Number)
+  vatPct?: number;
+
+  estimated: boolean = false;
+
+  @Type(() => Number)
+  openTurns?: number;
 
   /**
    * The available quantity
@@ -101,7 +123,7 @@ export class Subscription extends ObjectWithIdPlus {
 
   /** In case of a product bundle, return the product ids of the items, otherwise just the unit product id */
   getUnitProductIds(): string[] {
-  
+
 
     if (this.unitProduct?.hasItems())
       return this.unitProduct.items.flatMap(item => item.productId)

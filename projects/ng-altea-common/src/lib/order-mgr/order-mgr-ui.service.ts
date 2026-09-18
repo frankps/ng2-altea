@@ -560,7 +560,7 @@ export class OrderMgrUiService {   // implements OnInit
 
       for (let line of gift.lines) {
 
-        const product = products.find(p => p.id == line.pId.toLowerCase())
+        const product = products.find(p => line?.pId && p.id == line.pId.toLowerCase())
 
         if (product) {
           const optionValues = line.getOptionValuesAsMap()

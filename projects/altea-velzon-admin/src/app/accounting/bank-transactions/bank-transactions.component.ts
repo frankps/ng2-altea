@@ -580,6 +580,10 @@ export class BankTransactionsComponent implements OnInit {
   async findMissingPaysInDb(tx: BankTransaction, refDate: Date, missing: number[]): Promise<Payment[]> {
     let me = this
 
+
+
+
+
     let candidates = await me.getMissingPaysFromDb(tx, refDate, missing)
 
     if (ArrayHelper.NotEmpty(candidates)) {
@@ -610,7 +614,18 @@ export class BankTransactionsComponent implements OnInit {
 
 
     if (tx.type == BankTxType.terminalCredit) {
+ /*
+      // On 28/5/2026 we had a special Visa payout of more then 1 month:
 
+      let refDate2 = new Date(2026, 4, 28)  // dateFns.addDays(refDate, -1)
+      let fromDate2 = dateFns.subMonths(refDate2, 2)
+      let toDate2 = refDate2
+      qry.and('type', QueryOperator.in, [PaymentType.credit, PaymentType.debit])
+      qry.and('bankTxId', QueryOperator.equals, null)
+      qry.and('date', QueryOperator.greaterThanOrEqual, DateHelper.yyyyMMddhhmmss(fromDate2))
+      qry.and('date', QueryOperator.lessThanOrEqual, DateHelper.yyyyMMddhhmmss(toDate2))
+*/
+     
       let fromDate2 = dateFns.subDays(refDate, 2)
       let toDate2 = dateFns.addDays(refDate, 2)
 

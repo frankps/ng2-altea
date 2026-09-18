@@ -38,8 +38,8 @@ export class Invoice extends ObjectWithIdPlus {
 
   state: InvoiceState = InvoiceState.toInvoice
 
-  orgId?: string
-  branchId?: string
+ // orgId?: string
+  branchId: string
 
   @Type(() => Contact)
   to?: Contact;

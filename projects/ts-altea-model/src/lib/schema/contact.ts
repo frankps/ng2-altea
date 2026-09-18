@@ -260,7 +260,7 @@ export class Contact extends UserBase {
   /** Mobile number confirmed */
   mobileConf = false
 
-  optOut: boolean = false
+  
   
   /** Allowed messaging for communication (valid strings: see enum MsgTyp) */
   //msg: string[] = ['email', 'wa']
@@ -283,7 +283,9 @@ export class Contact extends UserBase {
   deposit: DepositMode = DepositMode.default
   depositPct?: number
 
+  mute: boolean = false
   news: boolean = false
+  optOut: boolean = false
   rules: boolean = false
 
   /*   active = true
@@ -325,6 +327,8 @@ export class Contact extends UserBase {
 
   /** extra info about outstanding debt */
   debtInfo?: string
+
+  supplier: boolean = false
 
   constructor() {
     super()

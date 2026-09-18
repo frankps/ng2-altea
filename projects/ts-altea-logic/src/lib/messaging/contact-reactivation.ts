@@ -365,7 +365,7 @@ export class ContactReactivation extends MessagingBase {
         let aquasenseId = '66e77bdb-a5f5-4d3d-99e0-4391bded4c6c'
 
         let template = new Template()
-        template.orgId = aquasenseId
+        //template.orgId = aquasenseId
         template.branchId = aquasenseId
         template.cat = 'reactivatie'
         template.name = 'Suiker ontharing reactivatie'

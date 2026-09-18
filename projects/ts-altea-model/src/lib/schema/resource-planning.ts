@@ -703,6 +703,11 @@ export class ResourcePlannings {
 
   
 
+  /** 
+   * 
+   * @param inRange 
+   * @returns 
+   */
   applyRepeatFlag(inRange: DateRange): ResourcePlannings {
 
 
@@ -886,6 +891,9 @@ export class ResourcePlanning extends ObjectWithIdPlus implements IAsDbObject<Re
   /** when true, then repeat time intervals [start:hhmmss, end:hhmmss] for all dates between [start:yyyyMMdd, end:yyyyMMdd] */
   dailyTime: boolean = false
 
+  /** currently only 'weekly' supported, but future proof
+   *  for use case: weekly day off (every thursday) -> planning linked to schedule
+   */
   repeat?: any
 
   // service?: string;

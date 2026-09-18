@@ -293,6 +293,14 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
   }
 
 
+  editBasicTemplate(template: Template) {
+    this.template = template
+
+    console.error(template)
+    this.canExport = template.hashChanged()
+  }
+
+
   /**
    *  Templates:
    *     https://business.facebook.com/wa/manage/message-templates/?business_id=1868859750078498&waba_id=317260764808883 
@@ -469,7 +477,7 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
         template = new Template()
         template.cat = 'order'
         template.code = templateCode
-        template.orgId = this.sessionSvc.orgId
+        //template.orgId = this.sessionSvc.orgId
         template.branchId = this.sessionSvc.branchId
         template.to.push(variant.recipient)
         template.channels.push(variant.channel)
@@ -516,12 +524,7 @@ export class ManageTemplatesComponent extends NgSectionsComponent implements OnI
   }
 
 
-  editBasicTemplate(template: Template) {
-    this.template = template
 
-    console.error(template)
-    this.canExport = template.hashChanged()
-  }
 
   deleteTemplate(template: Template) {
     this.changes.delete(template)

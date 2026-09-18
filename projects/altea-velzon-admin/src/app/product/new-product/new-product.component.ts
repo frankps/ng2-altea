@@ -71,7 +71,8 @@ export class NewProductComponent implements OnInit {
     //this.newProduct.organisation = new ConnectTo("66e77bdb-a5f5-4d3d-99e0-4391bded4c6c")
     // this.newProduct.branch = new ConnectTo("66e77bdb-a5f5-4d3d-99e0-4391bded4c6c")
 
-    this.newProduct.orgId = this.sessionSvc.orgId
+   //  this.newProduct.orgId = this.sessionSvc.orgId
+    
     this.newProduct.branchId = this.sessionSvc.branchId
     this.newProduct.catId = this.categoryId
 

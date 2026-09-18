@@ -192,7 +192,7 @@ export class EditProductComponent extends NgEditBaseComponent<Product> implement
         this.object.type = type
         //  this.object.orgId = "66e77bdb-a5f5-4d3d-99e0-4391bded4c6c"
 
-        this.object.organisation = new ConnectTo("66e77bdb-a5f5-4d3d-99e0-4391bded4c6c")
+      //  this.object.organisation = new ConnectTo("66e77bdb-a5f5-4d3d-99e0-4391bded4c6c")
         this.object.branch = new ConnectTo("66e77bdb-a5f5-4d3d-99e0-4391bded4c6c")
 
       }

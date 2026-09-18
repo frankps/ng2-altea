@@ -21,7 +21,7 @@ export class DoorAccessComponent implements OnInit {
   async ngOnInit(): Promise<void> {
 
     console.error('loadUsers')
-    await this.loadUsers()
+   // await this.loadUsers()
 
   }
 
@@ -42,6 +42,20 @@ export class DoorAccessComponent implements OnInit {
   getSelectedUsers() {
 
     return Object.keys(this.selected).filter(key => this.selected[key])
+  }
+
+  selectUsersWithCode() {
+
+    if (ArrayHelper.IsEmpty(this.users)) {
+      return
+    }
+
+    for (const user of this.users) {
+      if (user.code) {
+        this.selected[user.uuid] = true
+      }
+    }
+
   }
 
   async deleteUsers() {

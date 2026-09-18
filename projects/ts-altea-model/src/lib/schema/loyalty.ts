@@ -141,10 +141,30 @@ export enum LoyaltyUnit {
   qty = 'qty'
 }
 
+enum LoyaltyUnitLabel {
+  point = 'point', // punt / punten          <- default for track = priceIncl
+  stamp = 'stamp', // stempel / stempels     <- default for track = qty
+  seal = 'seal', // zegel / zegels          <- "spaarzegel", idiomatic BE/NL
+  star = 'star', // ster / sterren          <- irregular plural: proves the point
+  credit = 'credit', // credit / credits
+  visit = 'visit' // bezoek / bezoeken      <- for the per-visit track, if it ever ships
+}
+
+enum LoyaltyExpireMode {
+  none = 'none', // default — nothing expires
+  inactivity = 'inactivity', // whole balance expires after expireMonths without a movement
+}
+
+enum LoyaltyChangeKind {
+  earn = 'earn', // posted by the earn service against an order
+  redeem = 'redeem', // points spent on a reward
+  adjust = 'adjust', // manual correction, goodwill, migration reconciliation, reversal
+  expire = 'expire', // posted by the inactivity job
+}
 export class LoyaltyProgram extends ObjectWithIdPlus {
 
-  orgId?: string
-  branchId?: string
+  //orgId?: string
+  branchId: string
 
   @Type(() => LoyaltyCard)
   cards?: LoyaltyCard[]
@@ -182,6 +202,25 @@ export class LoyaltyProgram extends ObjectWithIdPlus {
   rewards: LoyaltyReward[] = []
 
   idx = 0
+
+  // new Phuket v2
+  setId?: string
+
+  unitLabel?: LoyaltyUnitLabel
+
+  earnOnGiftSale = false
+
+  expireMode?:   LoyaltyExpireMode 
+
+  @Type(() => Number)
+  expireMonths = 24
+
+  @Type(() => Number)
+  // --- reporting (LOY-97) ---------------------------------------------------
+  // Estimated € value of ONE unit, for the liability report only.
+  // NEVER used to redeem (LOY-98). Aquasense ≈ 0.043.
+  unitLiability = 0
+
 
   getRewardById(id: string): LoyaltyReward {
 
@@ -366,8 +405,10 @@ export class LoyaltyCardChange extends ObjectWithId {
   card?: LoyaltyCard
   cardId?: string
 
+  @Type(() => Number)
   value: number = 0
 
+  @Type(() => Number)
   total: number = 0
 
   isReward: boolean = false
@@ -384,6 +425,16 @@ export class LoyaltyCardChange extends ObjectWithId {
 
   @Type(() => Date)
   public date: Date = new Date()
+
+  kind?: LoyaltyCardChange
+
+  usrId?: string
+  branchId?: string
+  reason?: string
+
+  refId?: string
+  
+
 }
 
 export class LoyaltyCard extends ObjectWithIdPlus {
@@ -411,7 +462,12 @@ export class LoyaltyCard extends ObjectWithIdPlus {
   changes?: LoyaltyCardChange[]
 
   name?: string
+
+  @Type(() => Number)
   value: number = 0
+
+  @Type(() => Number)
+  lifetime: number = 0
 
   hasChanges() {
     return ArrayHelper.NotEmpty(this.changes)

@@ -97,15 +97,15 @@ export class ProductOption extends ObjectWithIdPlus {
   slug?: string
   descr?: string
   public = true
-  required = true
-  multiSelect = false
+  required = true   // at least 1 value should be selected (if not required, then customer can skip this option)
+  multiSelect = false  // user can select multiple values (if false, then only 1 value can be selected)
 
   /** this option(.value) has effect on order.nrOfPersons */
   persons = false
 
   hasDuration = false
 
-  /* only evaluated is hasDuration=true, then if addDur=true, the duration (of selected product option) is 
+  /* only evaluated is hasDuration=true, then the addDur=true, the duration (of selected product option) is 
   automatically added to the total service duration.
   */
   addDur: boolean = true
@@ -280,6 +280,37 @@ export enum PlanningMode {
   block = 'block'
 }
 
+
+export class PlanningRhythm {
+  scheduleIds: string[] = []
+
+  custDur: boolean = false // customer can pick another length (requires a duration option)
+  staffForce: boolean = true // staff may force a start on another time
+
+
+  dayFromFirst: boolean = false   // the first booking re-bases the rest of the day
+
+  series: PlanningRhythmSeries[] = []
+}
+
+export class PlanningRhythmSeries {
+  /** start time of first block */
+  start = "09:00"
+
+  /** default duration of 1 block */
+  @Type(() => Number)
+  dur = 60
+
+  /** time between 2 blocks */
+  @Type(() => Number)
+  post = 0
+
+  /** number of blocks in series: not defined = unlimited within schedule */
+  @Type(() => Number)
+  count?: number
+}
+
+
 export class PlanningBlockSeries {
   start = "09:00"
 
@@ -366,8 +397,13 @@ export class Product extends ObjectWithIdPlus {
   gender?: Gender
   online?: OnlineMode
 
+  pos?: any
+
+  /*
+  removed in V2
   organisation?: Organisation | ConnectTo;
   orgId?: string;
+  */
 
   branch?: Branch | ConnectTo
   branchId?: string
@@ -445,6 +481,9 @@ export class Product extends ObjectWithIdPlus {
   @Type(() => ProductRule)
   rules?: ProductRule[]
 
+
+  rhythm?: any
+  
   /** min number of hours before reservation for free cancel (undefined/null = take setting from Branch, 0 = always free cancel, 24 = 1 day upfront for free cancel, ...) */
 
   @Type(() => Number)
@@ -473,13 +512,28 @@ export class Product extends ObjectWithIdPlus {
   @Type(() => Number)
   postMaxGap = 0   // max gap between actual treatment and cleanup
 
+  codes: string[] = []  // used to identify product in POS (ex. scan barcode)
+
+  trackStock: boolean = false
 
   @Type(() => Number)
   stock = 0
 
   @Type(() => Number)
   minStock = 0
+
+  @Type(() => Number)
+  maxStock = 0
+
+  @Type(() => Number)
+  supMinQty = 1
+
+  @Type(() => Number)
+  supBatchQty = 1
   //advance = 0
+
+  @Type(() => Number)
+  onOrder = 0
 
   @Type(() => Number)
   vatPct = 0
@@ -503,6 +557,9 @@ export class Product extends ObjectWithIdPlus {
   @Type(() => Number)
   salesPrice = 0
 
+  @Type(() => Number)
+  purchPrice = 0
+
   /** then price 'As from' will be shown, price can be higher (certain days/moments) using pricing  */
   priceFrom = false
 
@@ -517,6 +574,9 @@ export class Product extends ObjectWithIdPlus {
   /** Maximum quantity to order in 1 order */
   @Type(() => Number)
   maxQty = 100;
+
+  /** the version this product was created in */
+  ver: string;
 
 
   hasSpecialPrices() {
@@ -825,6 +885,8 @@ export class ProductResource extends ObjectWithIdPlus {
   /** if resource is group => how many resources from group do we need to reserve */
   groupQty = 1
 
+  qty = 1
+
   /** group allocation = instead of allocating a specific resource (person,...), we allocate on resource group => make sure at least 1 resource stays available */
   groupAlloc = false
 
@@ -1015,7 +1077,7 @@ export class ProductItem extends ObjectWithIdPlus {
   optionId?: string;
 
   @Type(() => ProductItemOption)
-  options?: ProductItemOption[] = []  
+  options?: ProductItemOption[] = []
 
   hasOptions(): boolean {
 
@@ -1274,7 +1336,7 @@ export class Price extends ObjectWithIdPlus {
     // this.end = new Date()
 
     this.startDate = new Date()
-    this.endDate = dateFns.addMonths(this.startDate, 1) 
+    this.endDate = dateFns.addMonths(this.startDate, 1)
   }
 
 

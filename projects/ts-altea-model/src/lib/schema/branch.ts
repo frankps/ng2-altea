@@ -206,6 +206,33 @@ export class Branch extends ObjectWithIdPlus {
     /** Accounting settings */
     acc?: AccountingConfig
 
+
+    @Type(() => Number)
+    stockLock: number = 0
+
+    @Type(() => Number)
+    fyEndMonth: number = 0
+
+    sectors: string[] = []
+    tz: string
+    placeId?: string
+
+
+    @Type(() => Number)
+    lat?: number
+
+    @Type(() => Number)
+    lng?: number
+
+    url?: string
+
+    
+    packs: string[] = []
+
+    /** rounding for duration in MINUTES */
+    @Type(() => Number)
+    durRound: number = 5
+
     get sameDayTerm(): number { return this.getDepositTerm(0) }
     set sameDayTerm(value: number) { this.setDepositTerm(0, value) }
 

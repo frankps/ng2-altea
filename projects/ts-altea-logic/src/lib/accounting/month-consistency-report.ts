@@ -167,7 +167,7 @@ export class MonthConsistencyReportBuilder {
 
     let paysToUpdate = []
 
-    let max = _.round(totalsInclCashReturns * 0.40, 2)
+    let max = _.round(totalsInclCashReturns * 0.45, 2)
 
 
 
@@ -354,6 +354,8 @@ export class MonthConsistencyReportBuilder {
     let ordersInvoiceProblem = await this.alteaDb.getOrdersMissingInvoice(this.branchId, start)
     ordersInvoiceProblem = this.filterOrdersWithPaymentsBetween(ordersInvoiceProblem, start, end)
 
+    let ordersToUpdate: Order[] = []
+
     if (ArrayHelper.NotEmpty(ordersInvoiceProblem)) {
 
       result.addMsg(`${ordersInvoiceProblem.length} orders with invoice problem, trying to solve...`)
@@ -420,13 +422,52 @@ export class MonthConsistencyReportBuilder {
 
       }
 
-      if (ArrayHelper.NotEmpty(ordersToUpdate)) {
-        let updateRes = await this.alteaDb.updateOrders(ordersToUpdate, ['toInvoice', 'invoiced', 'invoiceNum'])
 
-        if (updateRes.isOk)
-          result.addMsg(`${ordersToUpdate.length} orders updated...`)
+
+
+
+
+    }
+
+
+    let ordersInvoicedNotSet = await this.alteaDb.getOrdersMissingInvoicedFlag(this.branchId, start)
+
+    if (ordersInvoicedNotSet?.length > 0) {
+
+
+
+      for (let order of ordersInvoicedNotSet) {
+        let createdAt = dateFns.format(order.cre, 'dd/MM/yy')
+
+        let invoice = order.invoice
+
+        let extraInfo = ''
+
+        let invoiceTotal = invoice?.totals?.incl ?? 0
+
+
+        if (invoiceTotal > 0) {
+          const totalOfOrders = invoice.orders.reduce((sum, order) => sum + order.incl, 0)
+
+          if (totalOfOrders === invoiceTotal) {
+            order.invoiced = true
+            extraInfo = ', but fixed'
+          }
+
+          ordersToUpdate.push(order)
+        }
+
+        result.addMsg(`${order.for} created at ${createdAt} has 'invoiced' not set ${extraInfo} (Invoice: ${order.invoiceNum})`, order)
       }
 
+    }
+
+
+    if (ArrayHelper.NotEmpty(ordersToUpdate)) {
+      let updateRes = await this.alteaDb.updateOrders(ordersToUpdate, ['toInvoice', 'invoiced', 'invoiceNum'])
+
+      if (updateRes.isOk)
+        result.addMsg(`${ordersToUpdate.length} orders updated...`)
     }
 
 

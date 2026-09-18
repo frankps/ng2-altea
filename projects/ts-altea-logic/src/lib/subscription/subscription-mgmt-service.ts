@@ -102,7 +102,7 @@ export class SubscriptionMgmtService {
             for (let i = 0; i < orderLine.qty; i++) {
 
                 const sub = new Subscription()
-                sub.orgId = order.orgId
+                //sub.orgId = order.orgId
                 sub.branchId = order.branchId
                 sub.contactId = order.contactId
                 sub.orderId = order.id

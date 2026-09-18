@@ -1,0 +1,20 @@
+Three of the smartest people in AI.
+
+One question: "Have we reached AGI?"
+
+Three completely different answers.
+
+A thread on why nobody can agree 🧵
+
+
+
+
+
+
+required: at least 1 option value should be selected 
+multiSelect: user can select multiple option values
+
+hasDuration: option values (can) have a duration (if selected, then automatically set addDur=true)
+hasPrice: option values (can) have a price
+
+pvt: this option is private, customers can not select, only staff via POS

@@ -55,8 +55,11 @@ export class Resource extends ObjectWithIdPlus {
   @Type(() => Schedule)
   schedules?: Schedule[];
 
+
+  /* removed in V2
   organisation?: Organisation | ConnectTo;
   orgId?: string;
+  */
 
   branch?: Branch | ConnectTo;
   branchId?: string;
@@ -102,6 +105,13 @@ export class Resource extends ObjectWithIdPlus {
 
   /** even if custom schedule, we can still apply special branch plannings (filter out public holidays defined on branch resource, etc) */
   branchPlanning = true
+
+  @Type(() => Number)
+  post = 0
+
+  /** for staff: contracted hours per week. null = geen contract vastgelegd */
+  @Type(() => Number)
+  hoursWeek?: Number
 
   @Exclude()
   _startDate: Date | null = null

@@ -120,8 +120,12 @@ masidelautaro@yahoo.com`
 
     console.error('sleepingContacts')
 
+    await this.spinner.show()
+
     let res = await contactReactivation.reactivateContacts(templateCode, testOnly)
     console.log(res)
+
+    await this.spinner.hide()
 
 
     /*

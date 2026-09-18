@@ -497,6 +497,8 @@ export class OrderLine extends ObjectWithIdPlus {
   @Type(() => PriceChange)
   pc?: PriceChange[]
 
+  @Type(() => Number)
+  recv = 0;
 
   __old_constructor(product?: Product, qty = 1, initOptionValues?: Map<String, String[]>) {
     //super()

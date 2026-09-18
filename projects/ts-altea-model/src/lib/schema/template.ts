@@ -30,8 +30,8 @@ export const orderTemplates = ['resv_wait_deposito', 'resv_remind_deposit', 'res
 
 export class Template extends ObjectWithParameters {
 
-  orgId?: string
-  branchId?: string
+  // orgId?: string
+  branchId: string
   idx = 0
 
   to: string[] = []

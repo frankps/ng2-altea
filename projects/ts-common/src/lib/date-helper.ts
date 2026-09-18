@@ -161,7 +161,7 @@ export class DateHelper {
     }
 
     static isDate(input: any) {
-        return input instanceof Date
+        return input instanceof Date && !isNaN(input.getTime())
     }
 
     static getUtcDate(date = new Date()) {

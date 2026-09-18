@@ -348,6 +348,11 @@ export class GiftLine {
 
 }
 
+export enum GiftVatMode {
+  spv = 'spv', // single-purpose: VAT rate known at issue, declared at issue
+  mpv = 'mpv', // multi-purpose: VAT declared at redemption
+}
+
 export enum CanUseGiftMsg {
   notActive = 'notActive',
   alreadyConsumed = 'alreadyConsumed',
@@ -428,6 +433,11 @@ export class Gift extends ObjectWithIdPlus {
    */
   decl: boolean = false
 
+  vatMode: GiftVatMode = GiftVatMode.spv;
+
+  blocked: boolean = false;
+  expiredAt?: Date;
+  voidedAt?: Date;
 
   @Exclude()
   get name() {

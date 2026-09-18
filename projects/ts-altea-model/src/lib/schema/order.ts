@@ -168,8 +168,9 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
   static defaultInclude = ['lines:orderBy=idx', 'contact', 'payments:orderBy=idx', 'planning']   // .product.items
   static jsonProps = ['vatLines', 'persons', 'info', 'sum', 'extIds', 'tags']
 
-  organisation?: Organisation;
-  orgId?: string;
+  /* removed in V2
+     organisation?: Organisation;
+    orgId?: string; */
 
   branch?: Branch;
   branchId?: string;
@@ -304,7 +305,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
   /** The device/location where app was created (needed for deposit handling) */
   src?: OrderSource = OrderSource.pos
 
-  /** Loyalty is/is not applied for this order */
+  /** set to true when loyalty applied */
   loyal: boolean = false
 
   @Type(() => LoyaltyCardChange)
@@ -329,6 +330,11 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
   /** logic can add tags to order to know if certain actions were performed (ex. certain message was sent to customer) */
   tags?: string[] = []
+
+  @Type(() => Number)
+  expect?: number  // format: yyyyMMddHHmmss
+
+  supRef?: string
 
   constructor(codePrefix?: string, markAsNew = false, createContact: boolean = false) {
     super()
@@ -388,7 +394,7 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
   createInvoice(): Invoice {
     let invoice = new Invoice()
     invoice.branchId = this.branchId
-    invoice.orgId = this.orgId
+    //invoice.orgId = this.orgId
 
     let totals = new InvoiceTotals()
     totals.excl = this.excl
@@ -1337,7 +1343,10 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
       deposit += depositValue
     }
 
-    deposit = Math.round(deposit)
+    let roundedDeposit = Math.round(deposit)
+
+    if (roundedDeposit < this.incl)    // we had case deposit=36 for incl=35,9
+      deposit = roundedDeposit
 
     this.deposit = deposit
 
