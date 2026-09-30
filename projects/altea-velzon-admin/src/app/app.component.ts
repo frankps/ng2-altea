@@ -168,7 +168,7 @@ export class AppComponent implements OnInit {
     const productQry = new DbQuery()
     productQry.and('branchId', QueryOperator.equals, branchId)
     productQry.include('options:orderBy=idx.values:orderBy=idx', 'resources:orderBy=idx', 'items:orderBy=idx', 'prices')   // we previously also fteched the resource: 'resources:orderBy=idx.resource'
-    productQry.take = 1000
+    productQry.take = 2000
     this.productSvc.cacheQuery = productQry
     this.productSvc.linkedTypes = ['ProductItem', 'ProductResource']
     await this.productSvc.initCache(typeInfos)

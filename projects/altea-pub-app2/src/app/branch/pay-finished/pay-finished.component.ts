@@ -6,6 +6,7 @@ import { AuthService } from '../../auth/auth.service';
 import { Gift, Order, OrderInvoiceInfo, StripeSessionStatus } from 'ts-altea-model';
 import { NgxSpinnerService } from "ngx-spinner"
 import { AlteaDb } from 'ts-altea-logic';
+import { TrackingService } from '../../tracking/tracking.service';
 
 
 /**
@@ -37,7 +38,8 @@ export class PayFinishedComponent implements OnInit {
 
 
   constructor(protected orderMgrSvc: OrderMgrUiService, protected route: ActivatedRoute, protected stripeSvc: StripeService,
-    protected authSvc: AuthService, protected spinner: NgxSpinnerService, protected sessionSvc: SessionService, private objSvc: ObjectService) {
+    protected authSvc: AuthService, protected spinner: NgxSpinnerService, protected sessionSvc: SessionService, private objSvc: ObjectService,
+    protected trackingSvc: TrackingService) {
 
     console.error('PayFinishedComponent')
 
@@ -192,6 +194,11 @@ ${contact.postal} ${contact.city}`
         this.orderMgrSvc.mode = 'order-finished'
 
         this.orderMgrSvc.stopTimer()
+
+        /** marketing event for GTM -> Meta pixel & GA4 (see TrackingService).
+         *  TrackingService de-duplicates on order id, so a refresh or the
+         *  order-finished route firing as well will not count twice. */
+        this.trackingSvc.bookingConfirmed(this.orderMgrSvc.order, { paidOnline: true })
 
       }
 

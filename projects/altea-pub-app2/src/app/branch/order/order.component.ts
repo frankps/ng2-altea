@@ -3,7 +3,7 @@ import { ContactService, OrderMgrUiService, OrderUiMode, SessionService } from '
 import { Contact, Order, OrderLine } from 'ts-altea-model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
-import { StringHelper } from 'ts-common';
+import { TrackingService } from '../../tracking/tracking.service';
 /*
 
 http://localhost:4350/branch/aqua/order/01e28ce2-0014-4dfe-8e81-d4f77460ee09/contact-edit
@@ -23,7 +23,8 @@ export class OrderComponent implements OnInit {
 
   // protected sessionSvc: SessionService, protected orderMgrSvc: OrderMgrUiService, protected router: Router
   constructor(protected orderMgrSvc: OrderMgrUiService, protected route: ActivatedRoute, protected router: Router
-    , protected sessionSvc: SessionService, protected authSvc: AuthService, protected contactSvc: ContactService) {
+    , protected sessionSvc: SessionService, protected authSvc: AuthService, protected contactSvc: ContactService
+    , protected trackingSvc: TrackingService) {
 
     console.error(this.orderMgrSvc.order)
 
@@ -199,24 +200,17 @@ export class OrderComponent implements OnInit {
 
     let extras = {}
 
-    if (mode == 'order-finished') {
-
-      let queryParams = {}
-      extras['queryParams'] = queryParams
-
-      let order = this.orderMgrSvc.order
-      let productName = order?.lines[0]?.product?.name
-
-      StringHelper.isEmail
-      if (productName)
-        queryParams['prod0'] = StringHelper.toUrlSafe(productName)
-
-
-    }
+    if (mode == 'order-finished')
+      extras['queryParams'] = this.trackingSvc.trackingQueryParams(this.orderMgrSvc.order)
 
     let branchUnique = me.sessionSvc.branchUnique
 
     await this.router.navigate(['/branch', branchUnique, 'orderMode', mode], extras)
+
+    /** marketing event for GTM -> Meta pixel & GA4 (see TrackingService).
+     *  Fired AFTER the navigation, so the event carries the order-finished url. */
+    if (mode == 'order-finished')
+      this.trackingSvc.bookingConfirmed(this.orderMgrSvc.order)
   }
 
 

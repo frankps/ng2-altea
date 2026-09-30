@@ -136,7 +136,7 @@ export class ProductOptionsComponent implements OnInit {
         option.values = []
 
       let valueChanges = new CollectionChangeTracker<ProductOptionValue>(option.values, ProductOptionValue, {
-        propsToUpdate: ['name', 'duration', 'value', 'price', 'pvt', 'default']
+        propsToUpdate: ['name', 'slug', 'duration', 'value', 'price', 'pvt', 'default']
       })
 
       this.valueChangesPerOption.set(option, valueChanges)

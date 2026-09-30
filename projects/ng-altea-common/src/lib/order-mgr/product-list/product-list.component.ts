@@ -4,6 +4,7 @@ import { Order, OrderLine, OrderLineOption, Product, ProductSubType, ProductType
 import { DashboardService, NgBaseComponent } from 'ng-common';
 import { takeUntil } from 'rxjs';
 import { NgxSpinnerService } from "ngx-spinner"
+import { ProductService } from 'ng-altea-common';
 
 
 
@@ -20,7 +21,7 @@ export class ProductListComponent extends NgBaseComponent implements OnInit {
     serviceCats: Product[] */
 
 
-  constructor(protected orderMgrSvc: OrderMgrUiService, protected dashboardSvc: DashboardService, protected spinner: NgxSpinnerService) {
+  constructor(protected orderMgrSvc: OrderMgrUiService, protected dashboardSvc: DashboardService, protected spinner: NgxSpinnerService, protected productSvc: ProductService) {
     super()
 
     if (!Array.isArray(orderMgrSvc.path) || orderMgrSvc.path.length == 0)
@@ -63,6 +64,9 @@ export class ProductListComponent extends NgBaseComponent implements OnInit {
 
     if (product.isCategory())
       this.orderMgrSvc.showProductsInCategory(product)
+    else if (await this.orderMgrSvc.showVariants(product)) {
+      
+    }
     else {
       await this.orderMgrSvc.newOrderLine(product)
       this.productSelected.emit(product)

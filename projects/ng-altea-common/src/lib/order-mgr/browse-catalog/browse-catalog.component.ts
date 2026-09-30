@@ -53,9 +53,12 @@ export class BrowseCatalogComponent implements OnInit {
     this.orderMgrSvc.showRootCategories()
   }
 
-  showCategory(category) {
+  async showCategory(category) {
 
-    this.orderMgrSvc.showProductsInCategory(category)
+    var numOfProducts = await this.orderMgrSvc.showProductsInCategory(category)
+
+    if (numOfProducts == 0)
+      await this.orderMgrSvc.showVariants(category)
 
   }
 

@@ -9,7 +9,7 @@ import { AuthService } from '../../auth/auth.service';
 import { environment } from '../../../environments/environment';
 import { NgxSpinnerService } from "ngx-spinner"
 import { ArrayHelper } from 'ts-common';
-import * as sc from 'stringcase'
+import { TrackingService } from '../../tracking/tracking.service'
 /*
 
 https://stripe.com/docs/payments/accept-a-payment?platform=web&ui=embedded-checkout
@@ -89,8 +89,22 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
 
   constructor(protected orderMgrSvc: OrderMgrUiService, protected route: ActivatedRoute, protected sessionSvc: SessionService,
     protected stripeSvc: StripeService, private translationSvc: TranslationService, protected authSvc: AuthService, protected spinner: NgxSpinnerService,
-    protected giftSvc: GiftService, protected router: Router
+    protected giftSvc: GiftService, protected router: Router, protected trackingSvc: TrackingService
   ) {
+  }
+
+  /** Order is confirmed without an online payment (gift covers everything, or nothing to pay).
+   *  Adds the tracking query params (prod, options, sel, oid) for the Meta custom conversions and
+   *  fires the booking_confirmed event for GTM -> Meta pixel & GA4. */
+  protected async gotoOrderFinished() {
+
+    const order = this.orderMgrSvc.order
+    const queryParams = this.trackingSvc.trackingQueryParams(order)
+
+    await this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'orderMode', 'order-finished'], { queryParams })
+
+    /** after the navigation: the event then carries the order-finished url */
+    this.trackingSvc.bookingConfirmed(order)
   }
 
   async ngOnInit() {
@@ -102,7 +116,8 @@ export class PayOnlineComponent implements OnInit, OnDestroy {
     await this.setPaymentOptions()
 
 
-/*   
+/*   https://book.birdy.life/branch/aqua/open/wellness
+
 MOVED to order-mgr-ui.service.ts
 
 this.timerSubscription = this.orderMgrSvc.timerChanged.subscribe(seconds => {
@@ -193,7 +208,7 @@ this.timerSubscription = this.orderMgrSvc.timerChanged.subscribe(seconds => {
           const savedOrder = await this.orderMgrSvc.saveOrder(true)
           console.log(savedOrder)
 
-          this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'orderMode', 'order-finished']) //])
+          this.gotoOrderFinished()
         }
 
 
@@ -311,7 +326,7 @@ this.timerSubscription = this.orderMgrSvc.timerChanged.subscribe(seconds => {
     this.toPay = payOption.amount
 
     if (payOption.amount == 0) {
-      this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'orderMode', 'order-finished'])
+      this.gotoOrderFinished()
       return
     }
 
@@ -379,16 +394,13 @@ this.timerSubscription = this.orderMgrSvc.timerChanged.subscribe(seconds => {
 
     let returnUrl = `${environment.app}/branch/${branch.unique}/pay-finished?orderId=${order.id}&sessionId={CHECKOUT_SESSION_ID}`
 
-    /** the marketing company requested to add product info */
-    let products = order.getProducts()
+    /** same params as the free confirmation URL, so a paid booking is attributed the same way */
+    const trackingParams = this.trackingSvc.trackingQueryParams(order)
 
-    if (ArrayHelper.NotEmpty(products)) {
-      let numOfProducts = products.length
-      
-      if (numOfProducts > 0 && products[0].slug) {
-        let slug = sc.snakecase(products[0].slug)
-        returnUrl += `&prod0=${slug}`
-      }
+    for (const key of Object.keys(trackingParams)) {
+      const value = trackingParams[key]
+      if (value)
+        returnUrl += `&${key}=${value}`
     }
 
     /*

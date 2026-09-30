@@ -96,6 +96,7 @@ export class OrderLineSummary {
 
 export class OrderLineOption extends ObjectWithId {
   name?: string
+  slug?: string 
 
   @Type(() => OrderLineOptionValue)
   values: OrderLineOptionValue[] = []
@@ -113,7 +114,7 @@ export class OrderLineOption extends ObjectWithId {
 
     this.id = productOption.id
     this.name = productOption.name
-
+    this.slug = productOption.slug
 
     this.setFormula(productOption)
 
@@ -151,6 +152,7 @@ export class OrderLineOption extends ObjectWithId {
     const olOption = new OrderLineOption()
     olOption.id = prodOption.id
     olOption.name = prodOption.name
+    olOption.slug = prodOption.slug
 
     if (prodOption.hasValues()) {
       olOption.values = prodOption.values.filter(v => showPrivate || !v.pvt).map(value => OrderLineOptionValue.fromProductOptionValue(value))
@@ -263,6 +265,7 @@ export class OrderLineOption extends ObjectWithId {
 
 export class OrderLineOptionValue extends ObjectWithId {
   name?: string;
+  slug?: string
 
   @Type(() => Number)
   dur = 0
@@ -288,6 +291,7 @@ export class OrderLineOptionValue extends ObjectWithId {
 
     this.id = productOptionValue.id
     this.name = productOptionValue.name
+    this.slug = productOptionValue.slug
     this.dur = productOptionValue.duration
     this.val = productOptionValue.value
 
@@ -301,6 +305,7 @@ export class OrderLineOptionValue extends ObjectWithId {
     const olOptionValue = new OrderLineOptionValue()
     olOptionValue.id = prodOptionValue.id
     olOptionValue.name = prodOptionValue.name
+    olOptionValue.slug = prodOptionValue.slug
     olOptionValue.dur = prodOptionValue.duration
     olOptionValue.val = prodOptionValue.value
     olOptionValue.d = prodOptionValue.default
@@ -551,7 +556,7 @@ export class OrderLine extends ObjectWithIdPlus {
 
 
 
-  constructor(product?: Product, qty = 1, initOptionValues?: Map<String, String[]>, isPos: boolean = false) {
+  constructor(product?: Product, qty = 1, initOptionValues?: Map<String, String[]>, isPos: boolean = false, prefix: string = '') {
     super()
 
 
@@ -561,7 +566,7 @@ export class OrderLine extends ObjectWithIdPlus {
       return
 
 
-    this.descr = product.name
+    this.descr = prefix + product.name
     this.base = product.salesPricing()
     //this.incl = product.salesPrice
     this.vatPct = product.vatPct

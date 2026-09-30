@@ -1561,7 +1561,7 @@ export class AlteaDb {
         return transactions
     }
 
-    async getBankTransactionsBetween(start: number | Date, end: number | Date, types?: BankTxType[], extra?: any): Promise<BankTransaction[]> {
+    async getBankTransactionsBetween(start: number | Date, end: number | Date, types?: BankTxType[], extra?: any, filterProperty?: string): Promise<BankTransaction[]> {
 
         let startNum: number
         let endNum: number
@@ -1579,8 +1579,11 @@ export class AlteaDb {
 
         const qry = new DbQueryTyped<BankTransaction>('bankTransaction', BankTransaction)
 
-        qry.and('execDate', QueryOperator.greaterThanOrEqual, startNum)
-        qry.and('execDate', QueryOperator.lessThanOrEqual, endNum)
+        if (!filterProperty)
+            filterProperty = 'execDate'
+
+        qry.and(filterProperty, QueryOperator.greaterThanOrEqual, startNum)
+        qry.and(filterProperty, QueryOperator.lessThanOrEqual, endNum)
 
         qry.take = 1000
 

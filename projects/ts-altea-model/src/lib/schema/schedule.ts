@@ -159,6 +159,7 @@ export class WeekSchedule {
 
 }
 
+/** Dinsdagen afwezig */
 export class ScheduleRecurrence {
   /** is active */
   act = true
@@ -168,7 +169,7 @@ export class ScheduleRecurrence {
 
   static getHifrDagAfwezig(): ScheduleRecurrence[] {
     const recurrence = new ScheduleRecurrence()
-    recurrence.dow = [2]
+    recurrence.dow = []   // used to be [2]
     return [recurrence]
   }
 

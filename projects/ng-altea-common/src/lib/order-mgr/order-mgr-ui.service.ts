@@ -1436,8 +1436,36 @@ export class OrderMgrUiService {   // implements OnInit
    */
 
 
+  /*   productHasVariants(product: Product) {
+  
+      if (product.isCategory())
+        return false
+  
+      if (product.hasOptions())
+        return true
+  
+      return false
+  
+    } */
 
-  showProductsInCategory(category: Product) {
+  async showVariants(product: Product): Promise<boolean> {
+
+    if (!product)
+      return false
+
+    let variants = await this.productSvc.getVariants(product.id)
+
+    if (variants && variants.length > 0) {
+
+      this.path.push(product)
+      this.products = variants
+      return true
+    }
+
+    return false
+  }
+
+  async showProductsInCategory(category: Product) : Promise<number> {
 
     this.spinner.show()
 
@@ -1454,12 +1482,14 @@ export class OrderMgrUiService {   // implements OnInit
     let isConsumerOnline = this.sessionSvc.appMode != AppMode.pos
     let branchId = this.sessionSvc.branchId
 
-    this.productSvc.getProductsInCategory(branchId, category.id, isConsumerOnline).pipe(take(1)).subscribe(res => {
-      this.products = res
-      console.error(res)
+    this.products = await this.productSvc.getProductsInCategory$(branchId, category.id, isConsumerOnline)
 
-      this.spinner.hide()
-    })
+    console.error(this.products)
+
+    this.spinner.hide()
+
+    return this.products?.length ?? 0
+
   }
 
   async searchProductsOld(searchFor: string) {
@@ -1611,7 +1641,7 @@ export class OrderMgrUiService {   // implements OnInit
       bundleOrderLine.incl = 0
       bundleOrderLine.excl = 0
       bundleOrderLine.vat = 0
-     // orderLinesal
+      // orderLinesal
       me.order.addLine(bundleOrderLine, false)
       orderLines.push(bundleOrderLine)
 
@@ -1703,7 +1733,17 @@ export class OrderMgrUiService {   // implements OnInit
     if (qty > 0 && qty < product.minQty)
       qty = product.minQty
 
-    me.orderLine = new OrderLine(product, qty, initOptionValues, this.isPos)
+    let prefix = ''
+
+    if (product.variantOfId) {
+      let parentProduct = await this.productSvc.get$(product.variantOfId)
+
+      if (parentProduct) {
+        prefix = parentProduct.name + ' - '
+      }
+    }
+
+    me.orderLine = new OrderLine(product, qty, initOptionValues, this.isPos, prefix)
 
     // me.preselectSpecialPrices(me.orderLine)
 

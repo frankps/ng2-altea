@@ -127,9 +127,12 @@ options:orderBy=idx.values:orderBy=idx
   getProductsInCategoryQuery(branchId: string, categoryId: string | null = null, online: boolean): DbQuery {
     const query = new DbQuery()
 
+    query.and('act', QueryOperator.equals, true)
     query.and('del', QueryOperator.equals, false)
     query.and('catId', QueryOperator.equals, categoryId)
     query.and('branchId', QueryOperator.equals, branchId)
+
+    query.and('variantOfId', QueryOperator.equals, null) // we don't want to see variants -> first click on variant
 
     if (online)
       query.and('online', QueryOperator.not, OnlineMode.invisible)
@@ -161,6 +164,14 @@ options:orderBy=idx.values:orderBy=idx
     return this.query(query).pipe(map(obj => obj.data ? obj.data : []))
   }
 
+  async getVariants(productId: string): Promise<Product[]> {
+    const query = new DbQuery()
+    query.and('variantOfId', QueryOperator.equals, productId)
+    query.and('act', QueryOperator.equals, true)
+    query.and('del', QueryOperator.equals, false)
+
+    return this.query$(query)
+   }
 
 
   // 'prices,options:orderBy=idx.values:orderBy=idx,items:orderBy=idx,resources:orderBy=idx.resource'

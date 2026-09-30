@@ -226,10 +226,11 @@ export class CreateAvailabilityContext {
 
         const schedules = await this.alteaDb.schedules(resourceIds)
 
-        this.processRecurrences(schedules, resourcePlannings, availabilityRequest)
+        // was introduced to be "free" on tuesdays
+        // this.processRecurrences(schedules, resourcePlannings, availabilityRequest)
 
         this.attachResourcesToSchedules(schedules, resources)
-
+  
         return schedules
     }
 

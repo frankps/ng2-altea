@@ -56,7 +56,7 @@ export class BankTransaction extends ObjectWithId {
     /** original amount */
     orig?: number
 
-    cost?: number
+    cost?: number = 0
 
     check?: number
 
@@ -174,7 +174,7 @@ export class BankTransaction extends ObjectWithId {
             this._execDate = DateHelper.parse(this.execDate)
 
         return this._execDate
-    }
+    }   
 
 
     @Exclude()
@@ -226,12 +226,19 @@ export class BankTransaction extends ObjectWithId {
 
 
     setInfo(info: BankTxInfo) {
-        if (!info)
+        if (!info) {
+            
             return
+        }
+          
+        // type, refDate, orig, cost
 
         this.type = info.type
         this.refDate = info.forDate
         this.orig = info.orig
-        this.cost = info.cost
+
+        if (info.cost)
+            this.cost = info.cost
+
     }
 }

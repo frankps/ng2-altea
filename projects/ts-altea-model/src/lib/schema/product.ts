@@ -199,6 +199,7 @@ export class ProductOptionValue extends ObjectWithIdPlus {
   prices?: Price[];
   idx = 0
   name?: string;
+  slug?:  string
   descr?: string;
 
   @Type(() => Number)
@@ -578,6 +579,10 @@ export class Product extends ObjectWithIdPlus {
   /** the version this product was created in */
   ver: string;
 
+  variantOfId?: string;
+
+  variantAxis?: string;
+  variantIdx: number = 0;
 
   hasSpecialPrices() {
 

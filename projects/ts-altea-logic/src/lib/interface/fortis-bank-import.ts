@@ -5,7 +5,7 @@ import { ApiListResult, ArrayHelper, DateHelper, DbObjectMulti, ObjectHelper } f
 import { AlteaDb } from "../general/altea-db"
 import { IDb } from "../interfaces/i-db"
 import { instanceToPlain, plainToInstance } from "class-transformer"
-
+import * as _ from 'lodash'
 
 /*
 
@@ -56,7 +56,7 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
      * 
      * @param rowsOfCols 
      */
-    async import(rowsOfCols: string[][]): Promise<ApiListResult<BankTransaction>> {
+    async import(rowsOfCols: string[][], update = true): Promise<ApiListResult<BankTransaction>> {
 
         let me = this
 
@@ -76,19 +76,56 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
         // get rid of _... properties
         // me.lines = me.lines.map(tx => ObjectHelper.clone(tx, BankTransaction))
 
+        let uploadResult: ApiListResult<BankTransaction>;
 
-        // we only want new transactions
-        let lastDbTransaction = await me.alteaDb.getLatestBankTransaction()
-        lines = lines.filter(l => l.numInt > lastDbTransaction.numInt)
+        if (update) {
 
-        /*        console.error(lines)
-               return */
+            let propsToUpdate = ['type', 'refDate', 'orig', 'cost']
 
-        if (ArrayHelper.IsEmpty(lines))
-            return ApiListResult.warning('No new lines to upload')
+            let linesToUpdate = lines.filter(l => l.num?.length > 6)   // 2026-0
+
+            let min = _.minBy(linesToUpdate, l => l.numInt)
+            let max = _.maxBy(linesToUpdate, l => l.numInt)
+
+            let existing = await me.alteaDb.getBankTransactionsBetween(min.numInt, max.numInt, undefined, undefined, 'numInt')
+
+            let toUpdate = []
+
+            for (let line of linesToUpdate) {
+                let existingTx = existing.find(e => e.numInt == line.numInt)
+                if (existingTx) {
+
+                    for (let prop of propsToUpdate) {
+                        if (existingTx[prop] != line[prop]) {
+                            existingTx[prop] = line[prop]
+                        }
+                    }
+
+                    toUpdate.push(existingTx)
+                }
+            }
+
+            uploadResult = await me.alteaDb.updateBankTransactions(toUpdate, propsToUpdate)
+
+        } else {
+            // we only want new transactions
+            let lastDbTransaction = await me.alteaDb.getLatestBankTransaction()
+            lines = lines.filter(l => l.numInt > lastDbTransaction.numInt)
+
+            /*        console.error(lines)
+                   return */
+
+            if (ArrayHelper.IsEmpty(lines))
+                return ApiListResult.warning('No new lines to upload')
 
 
-        let uploadResult = await me.alteaDb.createBankTransactions(lines)
+
+            uploadResult = await me.alteaDb.createBankTransactions(lines)
+
+        }
+
+
+
 
         /*         const dbUpload = new DbObjectMulti<BankTransaction>('bankTransaction', BankTransaction, this.lines)
                 let uploadResult = await this.alteaDb.db.createMany$<BankTransaction>(dbUpload) */
@@ -123,7 +160,8 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
 
         const info = this.getBankTransactionInfo(tx)
 
-        tx.setInfo(info)
+        if (info)
+            tx.setInfo(info)
 
         return tx
     }
@@ -262,10 +300,18 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
                 0000028
                 00/EUR/00000
                 01/23.02.2026/
+            
+                
+            Since eug 2026:
+            ;202602230039795,81986244/MC/028/18217596/0000840/,0000028,00/EUR/00000,01/23.02.2026/;   (old)
+            ;202609110044854//81986244/VI/187/18217596/0000985///0000058,00/EUR/00000,01/11.09.2026/;    
             */
 
             let info = tx.info
 
+            /*
+
+            // format: ;202602230039795,81986244/MC/028/18217596/0000840/,0000028,00/EUR/00000,01/23.02.2026/; 
             let infoItems = info.split(',')  // 0000985 00/EUR/00010 94/28.10.2025/
 
             
@@ -280,20 +326,52 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
             let origString = amounts[0]
             origString = origString.replace(' ', '.')
             let costString = amounts[2]
-
-
-
             costString = costString.replace(' ', '.')
             let dateString = amounts[3]
-            let date = dateFns.parse(dateString, 'dd.MM.yyyy', new Date())
+            */
+
+            // format: ;202609110044854//81986244/VI/187/18217596/0000985///0000058,00/EUR/00000,01/11.09.2026/;    
+            //          202609140042082//81986244/MC/191/18217596/0000988///0000060,00/EUR/00000,01/14.09.2026/
+            //          202609010048917,81986244/MC/176/18217596/0000978/,0000005,50/EUR/00000,00/01.09.2026/
+            //          2026-01050 202608290037836,81986244/MC/175/18217596/0000977/,0000074,00/EUR/00000,01/29.08.2026/
+
+            try {
+                let infoItems = info.split('/')
+
+                let valueIdx = 5  // example: 202609010048917,81986244/MC/176/18217596/0000978/,0000005,50/EUR/00000,00/01.09.2026/
+
+                if (info.indexOf('//') >= 0)
+                    valueIdx = 9    // example: 202609110044854//81986244/VI/187/18217596/0000985///0000058,00/EUR/00000,01/11.09.2026/
 
 
-            let txInfo = new BankTxInfo(BankTxType.terminalCredit)
-            // txInfo.forDate = tx.execDate
-            txInfo.forDate = DateHelper.yyyyMMdd(date)
-            txInfo.orig = parseFloat(origString)
-            txInfo.cost = parseFloat(costString)
-            return txInfo
+                let origString = infoItems[valueIdx]
+
+                if (origString.startsWith(','))
+                    origString = origString.substring(1)
+
+                origString = origString.replace(',', '.')
+                let costString = infoItems[valueIdx + 2]
+                costString = costString.replace(',', '.')
+                let dateString = infoItems[valueIdx + 3]
+
+                let date = dateFns.parse(dateString, 'dd.MM.yyyy', new Date())
+
+
+                let txInfo = new BankTxInfo(BankTxType.terminalCredit)
+                // txInfo.forDate = tx.execDate
+                txInfo.forDate = DateHelper.yyyyMMdd(date)
+                txInfo.orig = parseFloat(origString)
+                txInfo.cost = parseFloat(costString)
+                return txInfo
+
+            } catch (err) {
+                console.error('Error parsing info:', tx.num, info)
+                console.error(err)
+                return null
+            }
+
+
+
 
 
 

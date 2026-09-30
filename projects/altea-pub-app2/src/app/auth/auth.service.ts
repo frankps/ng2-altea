@@ -195,9 +195,27 @@ export class AuthService {
               console.warn(`Redirecting to: ${originalUrl}`)
               if (originalUrl[0] == '/')
                 originalUrl = originalUrl.substring(1)
-              const pathItems = originalUrl.split('/')
 
-              me.router.navigate(pathItems)
+              /** repair urls that were already broken by an earlier redirect (?/= encoded inside a path segment) */
+              originalUrl = originalUrl.replace(/%253F/gi, '?').replace(/%3F/gi, '?').replace(/%253D/gi, '=').replace(/%3D/gi, '=')
+
+              /** the url can carry a query string (for example ?prod0=...&oid=...).
+               *  It must NOT end up inside a path segment, otherwise '?' and '=' get url-encoded
+               *  and the resulting route does not exist anymore (blank page after refresh). */
+              const [path, queryString] = originalUrl.split('?')
+              const pathItems = path.split('/')
+
+              const queryParams: any = {}
+
+              if (queryString) {
+                queryString.split('&').forEach(pair => {
+                  const [key, value] = pair.split('=')
+                  if (key)
+                    queryParams[decodeURIComponent(key)] = value ? decodeURIComponent(value) : ''
+                })
+              }
+
+              me.router.navigate(pathItems, { queryParams })
               redirected = true
 
             }
