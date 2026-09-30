@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Order, OrderLine } from 'ts-altea-model'
+import { storedAdParams } from './ad-params'
 
 /**
  * Marketing tracking for Meta (Facebook/Instagram) & Google Ads.
@@ -26,6 +27,10 @@ import { Order, OrderLine } from 'ts-altea-model'
  * data: prod<p>, opt<p>_<o>, val<p>_<o>, sel<p>, oid.
  *
  *   productOptions, sel, selMain
+ *
+ * Added when the visitor came from an ad (see ad-params.ts), only the keys present:
+ *
+ *   utm_source, utm_medium, utm_campaign, utm_content, utm_term, fbclid, gclid
  *
  * The same contract will be reused in Phuket, so only the emitting code changes.
  */
@@ -229,6 +234,14 @@ export class TrackingService {
         productMain: slugs[0],
         products: slugs,
         branch: order.branchId
+      }
+
+      /** ad click params of this session (utm_*, fbclid, gclid), see ad-params.ts.
+       *  Added as extra fields only: the existing fields above keep their shape. */
+      try {
+        Object.assign(event, storedAdParams())
+      } catch (err) {
+        console.warn('TrackingService ad params failed', err)
       }
 
       try {

@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ObjectService, OrderMgrUiService, OrderUiMode, OrderUiState, SessionService, TemplateMessageService } from 'ng-altea-common';
 import { combineLatest } from 'rxjs';
 import { AlteaDb } from 'ts-altea-logic';
+import { adQueryParams } from '../../tracking/ad-params';
 
 
 // http://localhost:4350/branch/aqua/open/cerelift-pro/option
@@ -110,16 +111,19 @@ export class OpenComponent implements OnInit {
     //  await this.orderMgrSvc.loadProductBySlug(productSlug)
     let orderLine = await this.orderMgrSvc.openProductBySlug(productSlug, params)
 
+    /* the redirects below keep only the ad params (utm_*, fbclid, gclid) on the url, so GA4 and the
+       Meta pixel still see them when they load after the redirect (see tracking/ad-params.ts) */
+
     /* for testing certain services, the slug is typical 'revealight-testbeurt'
     => then we immediatly want to select the date
     */
     if (productSlug.includes('test') || productSlug.includes('huidanalyse')) { 
       await this.orderMgrSvc.addOrderLine(orderLine, 1, true)
       this.orderMgrSvc.showOrderSummaryPlanning = true
-      this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'orderMode', 'select-date'])
+      this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'orderMode', 'select-date'], { queryParams: adQueryParams(params) })
     } else {
       // this.orderMgrSvc.changeUiState(OrderUiState.browseCatalog)
-      this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'orderMode', 'order-line'])
+      this.router.navigate(['/branch', this.sessionSvc.branchUnique, 'orderMode', 'order-line'], { queryParams: adQueryParams(params) })
     }
     
     
