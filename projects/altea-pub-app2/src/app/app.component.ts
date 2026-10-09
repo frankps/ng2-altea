@@ -1,4 +1,5 @@
-import { BranchService, CustomJsonService, SessionService } from 'ng-altea-common';
+import { BranchService, CustomJsonService, OrderMgrUiService, SessionService } from 'ng-altea-common';
+import { orderAttr } from './tracking/acquisition-capture';
 import { BsLocaleService } from 'ngx-bootstrap/datepicker';
 import { Firestore } from '@angular/fire/firestore';
 import { AuthService } from './auth/auth.service';
@@ -19,10 +20,14 @@ export class AppComponent implements OnInit {
 
 
   constructor(private localeService: BsLocaleService, private branchSvc: BranchService, private sessionSvc: SessionService,
-    protected authSvc: AuthService, private customJsonSvc: CustomJsonService, private router: Router) {
+    protected authSvc: AuthService, private customJsonSvc: CustomJsonService, private router: Router,
+    private orderMgrSvc: OrderMgrUiService) {
     this.localeService.use('nl-be');
 
     this.sessionSvc.appMode = AppMode.consum
+
+    /** every new online order carries how the booking was won (acquisition-capture-spec ACQ-11) */
+    this.orderMgrSvc.orderAttrProvider = () => orderAttr()
 
     this.authSvc.init()
 

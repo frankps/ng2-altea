@@ -13,7 +13,12 @@
  *
  * Everything here is best effort: every function catches its own errors and never throws,
  * so a tracking problem can never break the booking flow.
+ *
+ * Storing these on the order (Order.attr) is done by acquisition-capture.ts, which keeps the click
+ * for 90 days across tabs; this file only feeds the pixel / GA4 for the current session.
  */
+
+import { ACQ_CLICK_IDS, ACQ_PLATFORM_IDS } from 'ts-altea-model'
 
 export const AD_PARAM_KEYS = [
   'utm_source',
@@ -21,8 +26,10 @@ export const AD_PARAM_KEYS = [
   'utm_campaign',
   'utm_content',
   'utm_term',
-  'fbclid',
-  'gclid'
+  'utm_id',
+  // click ids and ad-platform ids recognised by the acquisition capture (ts-altea-model, ACQ-22)
+  ...ACQ_CLICK_IDS,
+  ...ACQ_PLATFORM_IDS
 ]
 
 export const AD_PARAMS_STORAGE_KEY = 'altea.ad.params'

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import { Injectable, OnInit } from '@angular/core';
+import { OrderAttr } from 'ts-altea-model'
 import { AddVoucherResult, AppMode, AvailabilityDebugInfo, AvailabilityRequest, AvailabilityResponse, Branch, ConfirmOrderResponse, Contact, CreateCheckoutSession, DateBorder, DepositMode, Gift, GiftLine, GiftType, Invoice, Order, OrderLine, OrderLineOption, OrderSource, OrderState, Payment, PaymentType, Price, Product, ProductItem, ProductSubType, ProductType, ProductTypeIcons, RedeemGift, ReservationOption, ReservationOptionSet, Resource, ResourcePlanning, ResourceType } from 'ts-altea-model'
 import { ApiListResult, ApiResult, ApiStatus, ArrayHelper, DateHelper, DbQuery, QueryOperator, Translation, YearMonth } from 'ts-common'
 import { AlteaService, GiftService, InvoiceService, ObjectService, OrderMgrService, OrderService, ProductService, ResourceService, SessionService } from 'ng-altea-common'
@@ -33,6 +34,10 @@ export enum OrderUiMode {
   providedIn: 'root'
 })
 export class OrderMgrUiService {   // implements OnInit
+
+  /** Set by the consumer app (altea-pub-app2): builds Order.attr from the captured ad click / visit
+   *  (acquisition-capture-spec ACQ-11). Not set in the POS, so POS orders never carry attr. */
+  orderAttrProvider?: () => OrderAttr | undefined
 
   tmp = ''
 
@@ -414,6 +419,17 @@ export class OrderMgrUiService {   // implements OnInit
 
     // register source of order (pos=point of sale or consumer app)
     this.order.src = this.sessionSvc.appMode == AppMode.pos ? OrderSource.pos : OrderSource.ngApp
+
+    // how this booking was won (ad click, visit, …): online orders only, set once before the first save (ACQ-11)
+    if (this.order.src == OrderSource.ngApp && this.orderAttrProvider) {
+      try {
+        const attr = this.orderAttrProvider()
+        if (attr)
+          this.order.attr = attr
+      } catch {
+        // tracking never breaks a booking
+      }
+    }
 
     this.order.lock = this.sessionSvc.clientId()
 

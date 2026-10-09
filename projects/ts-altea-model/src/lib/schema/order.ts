@@ -10,6 +10,7 @@ import * as Handlebars from "handlebars"
 import * as sc from 'stringcase'
 import { OrderPersonMgr } from "../order-person-mgr";
 import { CancelOrderMessage } from "ts-altea-logic";
+import { OrderAttr } from "../marketing/acquisition";
 import { TaxLines, TaxLine, VatLine, Branch, Contact, Currency, DepositMode, Invoice, InvoiceTotals, OrderLine, OrderLineSummary, OrderType, Organisation, Payment, PaymentType, PlanningMode, Product, ProductSubType, ProductType, Resource, ResourcePlanning, Subscription, OrderDeclare, OrderLineOption, LoyaltyCardChange, Review } from "ts-altea-model";
 
 
@@ -330,6 +331,11 @@ export class Order extends ObjectWithIdPlus implements IAsDbObject<Order> {  //
 
   /** logic can add tags to order to know if certain actions were performed (ex. certain message was sent to customer) */
   tags?: string[] = []
+
+  /** How this booking was won (ad click, visit, promo code, …): OrderAttr. Raw facts, never a resolved campaign.
+   *  Set once by the booking app on a new online order; the API validates it and never lets it change
+   *  afterwards (acquisition-capture-spec ACQ-05, ACQ-12, ACQ-27). */
+  attr?: OrderAttr
 
   @Type(() => Number)
   expect?: number  // format: yyyyMMddHHmmss

@@ -12,6 +12,7 @@ import * as sc from 'stringcase'
 import { OrderPersonMgr } from "../order-person-mgr";
 import { CancelOrderMessage } from "ts-altea-logic";
 import { TemplateMessage } from "./template-message";
+import { ContactAcq } from "../marketing/acquisition";
 
 /**
  * implements shared logic for Contact & User
@@ -287,6 +288,10 @@ export class Contact extends UserBase {
   news: boolean = false
   optOut: boolean = false
   rules: boolean = false
+
+  /** How this client was acquired: ContactAcq. Written by the server only (altea-api), frozen once written.
+   *  Clients never send it: the API strips it from every contact write (acquisition-capture-spec ACQ-13, ACQ-28). */
+  acq?: ContactAcq
 
   /*   active = true
     deleted = false
