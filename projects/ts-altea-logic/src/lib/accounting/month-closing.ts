@@ -103,7 +103,7 @@ export class MonthClosing {
         let take = 50
         let ordersProcessed = 0
 
-        let orders = await me.alteaDb.getOrdersWithPaymentsBetween(from, to, lastId, take)
+        let orders = await me.alteaDb.getOrdersWithPaymentsBetween(branchId, from, to, lastId, take)
         console.log(orders)
 
 
@@ -135,7 +135,7 @@ export class MonthClosing {
             await me.updateDatabase(objectsToUpdate)
 
             if (ordersInBatch == take) {
-                orders = await me.alteaDb.getOrdersWithPaymentsBetween(from, to, lastId, take)
+                orders = await me.alteaDb.getOrdersWithPaymentsBetween(branchId, from, to, lastId, take)
                 console.log(orders)
             } else {
                 let msg = `No more orders (last query retrieved less -${ordersInBatch}- then requested -${take}-)`

@@ -28,7 +28,7 @@
                 <div class="form-check mt-2" *ngFor="let employee of staff">
                     <input class="form-check-input" type="checkbox" [id]="employee.id" [(ngModel)]="selection[employee.id]"/>
                     <!-- [(ngModel)]="object.showPrice" -->
-                    <label class="form-check-label" [for]="employee.id">{{employee.name}}</label>
+                    <label class="form-check-label" [for]="employee.id">{{employee.short}}</label>
                 </div>
 
             </ngx-altea-label-control>

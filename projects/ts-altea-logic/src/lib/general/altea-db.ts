@@ -723,7 +723,82 @@ export class AlteaDb {
         return orders
 
     }
-    async getOrdersWithPaymentsBetween(start: Date, end: Date, lastId?: string, take: number = 25, types?: PaymentType[]): Promise<Order[]> {   // , types?: PaymentType[]
+
+
+
+
+    productVatCache = new Map<string, number>()
+
+
+    /**
+     * Resolves the VAT percentage for a product based on the order's country and the product's category
+     * @param order 
+     * @returns 
+     */
+    async resolveProductVat(orders: Order[]) {
+        let me = this
+
+        console.log('resolveProductVat', orders.length)
+
+        if (!orders || orders.length == 0)
+            return
+
+        let productsNoVatPctUnique = new Map<string, Product>()
+
+
+        let allProductsNoVatPct = new Array<Product>()
+
+        for (let order of orders) {
+            for (let line of order.lines) {
+                let product = line?.product
+                if (product && !product.vatPct) {
+                    product.vatPct = me.productVatCache.get(product.id)
+
+                    if (!product.vatPct) {
+                        if (!productsNoVatPctUnique.has(product.id)) {
+                            productsNoVatPctUnique.set(product.id, product)
+                        }
+                        allProductsNoVatPct.push(product)
+                    }
+                }
+            }
+        }
+
+        if (productsNoVatPctUnique.size > 0) {
+            await me.lookupVatPct(Array.from(productsNoVatPctUnique.values()))
+
+
+            for (let product of allProductsNoVatPct) {
+                product.vatPct = me.productVatCache.get(product.id)
+            }
+        }
+
+    }
+
+
+    async lookupVatPct(products: Product[]) {
+
+        let me = this
+
+        let categoryIds = products.map(p => p.catId)
+        let categories = await me.getProducts(categoryIds)
+
+        for (let product of products) {
+            let category = categories.find(c => c.id == product.catId)
+            if (category) {
+                product.vatPct = category.vatPct
+
+                if (!me.productVatCache.has(product.id))
+                    me.productVatCache.set(product.id, category.vatPct)
+            }
+        }
+
+
+    }
+
+
+
+    async getOrdersWithPaymentsBetween(branchId: string, start: Date, end: Date, lastId?: string, take: number = 25, types?: PaymentType[]): Promise<Order[]> {   // , types?: PaymentType[]
 
         let startNum = DateHelper.yyyyMMddhhmmss(start)
         let endNum = DateHelper.yyyyMMddhhmmss(end)
@@ -731,7 +806,7 @@ export class AlteaDb {
         const qry = new DbQueryTyped<Order>('order', Order)
         qry.include('lines.product')
         qry.include('payments.gift')
-
+        qry.and('branchId', QueryOperator.equals, branchId)
 
         let queryById = null  // '02fb9cf9-59ed-40ec-85fd-6ac924ca8935'   //  null  // for debugging
 
@@ -763,6 +838,8 @@ export class AlteaDb {
         qry.take = take
 
         const orders = await this.db.query$<Order>(qry)
+
+        await this.resolveProductVat(orders)
 
         return orders
     }

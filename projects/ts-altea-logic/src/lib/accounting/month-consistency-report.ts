@@ -111,7 +111,7 @@ export class MonthConsistencyReportBuilder {
     let closed = branch.acc.closed
 
     if (yearMonth.y > closed.year || (yearMonth.y == closed.year && yearMonth.m > closed.month))
-      report.cash = await me.cashPayments(yearMonth, calculateNoDecl, resetNoDecl)
+      report.cash = await me.cashPayments(branch.id, yearMonth, calculateNoDecl, resetNoDecl)
 
     report.invoices = await me.invoiceChecks(yearMonth, fixToInvoice)
 
@@ -134,7 +134,7 @@ export class MonthConsistencyReportBuilder {
 
 
 
-  async cashPayments(yearMonth: YearMonth, calculateNoDecl: boolean, resetNoDecl: boolean): Promise<CheckResults> {
+  async cashPayments(branchId: string, yearMonth: YearMonth, calculateNoDecl: boolean, resetNoDecl: boolean): Promise<CheckResults> {
 
     let me = this
 
@@ -148,7 +148,7 @@ export class MonthConsistencyReportBuilder {
     let startNum = DateHelper.yyyyMMddhhmmss(start)
     let endNum = DateHelper.yyyyMMddhhmmss(end)
 
-    let orders = await this.alteaDb.getOrdersWithPaymentsBetween(start, end, null, 1000, [PaymentType.cash])
+    let orders = await this.alteaDb.getOrdersWithPaymentsBetween(branchId, start, end, null, 1000, [PaymentType.cash])
 
     if (ArrayHelper.IsEmpty(orders))
       return result.addMsg('No cash orders found!')
@@ -283,7 +283,7 @@ export class MonthConsistencyReportBuilder {
     let take = 50
     let ordersProcessed = 0
 
-    let orders = await this.alteaDb.getOrdersWithPaymentsBetween(from, to, lastId, take)
+    let orders = await this.alteaDb.getOrdersWithPaymentsBetween(this.branchId, from, to, lastId, take)
 
     while (ArrayHelper.NotEmpty(orders)) {
       let ordersInBatch = orders.length
@@ -292,7 +292,7 @@ export class MonthConsistencyReportBuilder {
 
 
       if (ordersInBatch == take) {
-        orders = await this.alteaDb.getOrdersWithPaymentsBetween(from, to, lastId, take)
+        orders = await this.alteaDb.getOrdersWithPaymentsBetween(this.branchId, from, to, lastId, take)
         console.log(orders)
       } else {
         let msg = `No more orders (last query retrieved less -${ordersInBatch}- then requested -${take}-)`

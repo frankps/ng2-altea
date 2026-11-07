@@ -214,6 +214,9 @@ export class PaymentsComponent implements OnInit {
 
     const query = new DbQuery()
 
+    let branchId = this.sessionSvc.branchId
+
+    query.and('order.branchId', QueryOperator.equals, branchId)
     query.and('date', QueryOperator.greaterThanOrEqual, from)
     query.and('date', QueryOperator.lessThan, to)
 
@@ -249,6 +252,9 @@ export class PaymentsComponent implements OnInit {
 
     const query = new DbQuery()
 
+    let branchId = this.sessionSvc.branchId
+
+    query.and('order.branchId', QueryOperator.equals, branchId)
     query.and('date', QueryOperator.greaterThanOrEqual, from)
     query.and('date', QueryOperator.lessThan, to)
     query.and('type', QueryOperator.in, [PaymentType.credit, PaymentType.debit, PaymentType.stripe, PaymentType.transfer])

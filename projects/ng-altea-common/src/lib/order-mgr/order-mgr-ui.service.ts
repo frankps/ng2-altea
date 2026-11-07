@@ -1481,7 +1481,7 @@ export class OrderMgrUiService {   // implements OnInit
     return false
   }
 
-  async showProductsInCategory(category: Product) : Promise<number> {
+  async showProductsInCategory(category: Product): Promise<number> {
 
     this.spinner.show()
 
@@ -1509,6 +1509,10 @@ export class OrderMgrUiService {   // implements OnInit
   }
 
   async searchProductsOld(searchFor: string) {
+
+
+    console.warn('searchProductsOld', searchFor)
+    
     const query = new DbQuery()
 
     query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
@@ -1733,9 +1737,64 @@ export class OrderMgrUiService {   // implements OnInit
     }
   }
 
+  async resolveVat(product: Product) {
+    let me = this
+
+    console.warn('resolveVat', product)
+
+    if (!product)
+      return
+
+    if (product.vatPct)
+      return
+
+    let catId = product.catId
+
+    
+    while (catId) {
+
+      let category = await this.productSvc.get$(catId)
+
+      if (!category)
+        return
+
+      if (category.vatPct) {
+        product.vatPct = category.vatPct
+        return
+
+      } else {
+        catId = category.catId
+      }
+
+    }
+
+
+    if (!product.vatPct) {
+
+      let branch = me.sessionSvc.branch
+
+      product.vatPct = branch.vatPct
+    }
+      
+      
+
+    if (!product.vatPct) 
+      me.dashboardSvc.showErrorToast('VAT not found for product') 
+
+
+  }
+
+
   async newOrderLine(product: Product, qty = 1, initOptionValues?: Map<String, String[]>): Promise<OrderLine> {
 
     let me = this
+
+    await me.resolveVat(product)
+
+    if (!product.vatPct) {
+      console.error('VAT not found for product', product)
+      return null
+    }
 
     if (qty == 0) {
       console.error('qty == 0')

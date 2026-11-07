@@ -289,8 +289,8 @@ export class OrderCheckComponent implements OnInit {
 
     let branchId = me.sessionSvc.branchId
 
-    let from = new YearMonth(2025, 10)
-    let to = new YearMonth(2026, 6) // (2025, 1)
+    let from = new YearMonth(2026, 7)
+    let to = new YearMonth(2026, 9) // (2025, 1)
 
     let reportMonths = await alteaDb.getReportMonthsPeriod(branchId, from, to, true)
 

@@ -1253,10 +1253,10 @@ export class OrderLine extends ObjectWithIdPlus {
     }
 
 
-    let bodySculptorAboId = '3a52a26d-6cf7-4f56-bfcc-049d44fd9402'
+/*     let bodySculptorAboId = '3a52a26d-6cf7-4f56-bfcc-049d44fd9402'
 
     if (!unitPriceSet && this.productId == bodySculptorAboId)
-      this.doBodySculptorSubscriptionPricing()
+      this.doBodySculptorSubscriptionPricing() */
 
     /*
     for (const option of this.options) {

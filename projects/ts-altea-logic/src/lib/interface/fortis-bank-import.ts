@@ -56,7 +56,7 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
      * 
      * @param rowsOfCols 
      */
-    async import(rowsOfCols: string[][], update = true): Promise<ApiListResult<BankTransaction>> {
+    async import(rowsOfCols: string[][], update = false): Promise<ApiListResult<BankTransaction>> {
 
         let me = this
 
@@ -266,6 +266,7 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
 
                 let dateString = dayMonth + '/' + year
                 let transactionDate = dateFns.parse(dateString, 'dd/MM/yyyy', new Date())
+                
 
                 let origAmount = amountMatches[1]
                 let costAmount = amountMatches[2]
@@ -355,6 +356,7 @@ export class FortisBankImport extends CsvImport<BankTransaction> {
                 let dateString = infoItems[valueIdx + 3]
 
                 let date = dateFns.parse(dateString, 'dd.MM.yyyy', new Date())
+          //      date = dateFns.subDays(date, 1)
 
 
                 let txInfo = new BankTxInfo(BankTxType.terminalCredit)

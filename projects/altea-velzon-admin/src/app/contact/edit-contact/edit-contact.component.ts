@@ -399,8 +399,9 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
 
     const query = new DbQuery()
     query.and('contactId', QueryOperator.equals, contact.id)
-    query.and('start', QueryOperator.lessThan, this.ordersCreateBefore)
+    //query.and('start', QueryOperator.lessThan, this.ordersCreateBefore)
     query.orderByDesc('start')
+    query.orderByDesc('cre')
     query.include('lines')
     query.take = take
 

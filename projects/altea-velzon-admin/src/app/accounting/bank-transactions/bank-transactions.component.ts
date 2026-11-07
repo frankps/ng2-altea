@@ -242,6 +242,8 @@ export class BankTransactionsComponent implements OnInit {
   async linkSelectedPayments(linkWith: BankTransaction) {
     let me = this
 
+    console.log('linkSelectedPayments', linkWith)
+
     const paymentsToProcess = this.getSelectedOrUnselectedPayments()
 
     const selectedPayments = this.getSelectedOrUnselectedPayments(true)
@@ -265,12 +267,13 @@ export class BankTransactionsComponent implements OnInit {
         if (pay.bankTxId == linkWith.id && pay.lnk) // already selected
           continue
 
+          /*
         if (pay.bankTxId && pay.bankTxId != linkWith.id) {  // linked to other transaction
 
-          if (transactionIdsToInvalidate.indexOf(pay.bankTxId) == -1)
+          if (pay?.bankTxId && transactionIdsToInvalidate.indexOf(pay.bankTxId) == -1)
             transactionIdsToInvalidate.push(pay.bankTxId)
 
-        }
+        }*/
 
         if (pay.bankTxId != linkWith.id || pay.bankTxNum != linkWith.num) {
           pay.bankTxId = linkWith.id
@@ -288,7 +291,7 @@ export class BankTransactionsComponent implements OnInit {
           pay.lnk = false
           updatedPayments.push(pay)
 
-          if (transactionIdsToInvalidate.indexOf(pay.bankTxId) == -1)
+          if (pay?.bankTxId && transactionIdsToInvalidate.indexOf(pay.bankTxId) == -1)
             transactionIdsToInvalidate.push(pay.bankTxId)
         }
 
@@ -329,17 +332,17 @@ export class BankTransactionsComponent implements OnInit {
       console.log(txUpdate)
 
     }
-
-    if (ArrayHelper.NotEmpty(transactionIdsToInvalidate))
-      await me.invalidateTransactions(transactionIdsToInvalidate)
+    
+        if (ArrayHelper.NotEmpty(transactionIdsToInvalidate))
+          await me.invalidateTransactions(transactionIdsToInvalidate)
 
   }
 
 
   initFilters() {
 
-    this.bank.from = new Date(2025, 9, 1)
-    this.bank.to = new Date(2025, 11, 31)
+    this.bank.from = new Date(2026, 8, 1)
+    this.bank.to = new Date(2025, 9, 1)
 
     //this.bank.from = dateFns.addMonths(this.bank.to, -2)
 
@@ -348,7 +351,7 @@ export class BankTransactionsComponent implements OnInit {
   // specifies which payments are pre-selected for a transaction
   selectionMode: 'none' | 'auto' | 'linked' | 'not-linked' | 'all' = 'none'
 
-  toggleTx(tx: BankTransaction) {
+  async toggleTx(tx: BankTransaction) {
 
     console.log(tx)
     tx['open'] = !tx['open']
@@ -356,7 +359,7 @@ export class BankTransactionsComponent implements OnInit {
     if (tx['open']) {
 
       this.selectionMode = 'none'
-      this.findPaymentsForTx(tx)
+      await this.findPaymentsForTx(tx)
 
       /* if (!tx.ok)
         this.findPaymentsForTx(tx)
@@ -614,18 +617,18 @@ export class BankTransactionsComponent implements OnInit {
 
 
     if (tx.type == BankTxType.terminalCredit) {
- /*
-      // On 28/5/2026 we had a special Visa payout of more then 1 month:
-
-      let refDate2 = new Date(2026, 4, 28)  // dateFns.addDays(refDate, -1)
-      let fromDate2 = dateFns.subMonths(refDate2, 2)
-      let toDate2 = refDate2
-      qry.and('type', QueryOperator.in, [PaymentType.credit, PaymentType.debit])
-      qry.and('bankTxId', QueryOperator.equals, null)
-      qry.and('date', QueryOperator.greaterThanOrEqual, DateHelper.yyyyMMddhhmmss(fromDate2))
-      qry.and('date', QueryOperator.lessThanOrEqual, DateHelper.yyyyMMddhhmmss(toDate2))
-*/
+      /*
+           // On 28/5/2026 we had a special Visa payout of more then 1 month:
      
+           let refDate2 = new Date(2026, 4, 28)  // dateFns.addDays(refDate, -1)
+           let fromDate2 = dateFns.subMonths(refDate2, 2)
+           let toDate2 = refDate2
+           qry.and('type', QueryOperator.in, [PaymentType.credit, PaymentType.debit])
+           qry.and('bankTxId', QueryOperator.equals, null)
+           qry.and('date', QueryOperator.greaterThanOrEqual, DateHelper.yyyyMMddhhmmss(fromDate2))
+           qry.and('date', QueryOperator.lessThanOrEqual, DateHelper.yyyyMMddhhmmss(toDate2))
+     */
+
       let fromDate2 = dateFns.subDays(refDate, 2)
       let toDate2 = dateFns.addDays(refDate, 2)
 

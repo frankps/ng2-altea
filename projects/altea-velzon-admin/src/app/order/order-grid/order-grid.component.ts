@@ -408,18 +408,18 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
 
     }
 
-    query.take = 50
+    query.take = 75
 
     switch (orderSearch.typeSelect) {
       case SearchTypeSelect.toInvoice:
         query.and('toInvoice', QueryOperator.equals, true)
-        query.take = 100
+        query.take = 150
         // query.and('invoiced', QueryOperator.equals, false)
         break
 
       case SearchTypeSelect.invoiced:
         query.and('invoiced', QueryOperator.equals, true)
-        query.take = 100
+        query.take = 150
         break
 
       case SearchTypeSelect.gifts:
@@ -443,6 +443,9 @@ export class OrderGridComponent extends NgBaseListComponent<Order> implements On
     switch (orderSearch.typeSelect) {
       case SearchTypeSelect.invoiced:
         query.orderBy('invoiceNum', SortOrder.desc)
+        break
+      case SearchTypeSelect.toInvoice:
+        query.orderBy('cre', SortOrder.desc)
         break
       default:
         query.orderBy('start', SortOrder.desc)
