@@ -9,6 +9,7 @@ import { th } from 'date-fns/locale'
 import { CancelOrderMessage, CancelOrderChecks } from 'ts-altea-logic'
 import { DashboardService, ToastType } from 'ng-common'
 import * as _ from "lodash";
+import { NgxSpinnerService } from "ngx-spinner"
 
 @Component({
   selector: 'order-mgr-cancel-order',
@@ -35,12 +36,12 @@ export class CancelOrderComponent {
 
 
   cancelIsPossible = false
+  cancelInProgress = false
 
 
 
 
-
-  constructor(protected orderMgrSvc: OrderMgrUiService, protected translationSvc: TranslationService, protected alteaSvc: AlteaService, public dashboardSvc: DashboardService) {
+  constructor(protected orderMgrSvc: OrderMgrUiService, protected translationSvc: TranslationService, protected alteaSvc: AlteaService, public dashboardSvc: DashboardService, protected spinner: NgxSpinnerService) {
 
   }
 
@@ -107,19 +108,34 @@ export class CancelOrderComponent {
 
 
   async confirmCancel($event) {
-    console.warn("Button 'request' clicked: 'confirmCancel' method triggered!")
-    console.warn(this.orderCancel, this.order)
 
-    // return
+    this.spinner.show()
 
-    //  return
-    const result = await this.alteaSvc.cancelOrder.cancelOrder(this.order, this.orderCancel)
+    try {
+      this.cancelInProgress = true
+      
+      console.warn("Button 'request' clicked: 'confirmCancel' method triggered!")
+      console.warn(this.orderCancel, this.order)
+  
+      // return
+  
+      //  return
+      const result = await this.alteaSvc.cancelOrder.cancelOrder(this.order, this.orderCancel)
+  
+  
+      if (result.isOk)
+        this.dashboardSvc.showToastType(ToastType.saveSuccess)
+      else
+        this.dashboardSvc.showToastType(ToastType.saveError)
+      
+    } catch (error) {
 
+      console.error(error)
 
-    if (result.isOk)
-      this.dashboardSvc.showToastType(ToastType.saveSuccess)
-    else
-      this.dashboardSvc.showToastType(ToastType.saveError)
+    } finally {
+      this.spinner.hide()
+    }
+
 
 
   }

@@ -162,7 +162,7 @@
 
 
                             <button class="btn btn-primary" translate (click)="confirmCancel($event)"
-                                [disabled]="!orderCancel.by || !orderCancel.reason">ui.order-cancel.cancelBtn</button>
+                                [disabled]="cancelInProgress || !orderCancel.by || !orderCancel.reason">ui.order-cancel.cancelBtn</button>
                         </div>
                     </div>
                 </div>

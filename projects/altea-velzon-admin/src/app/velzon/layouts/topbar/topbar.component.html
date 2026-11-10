@@ -32,10 +32,11 @@
                 </button>
 
                 <!-- App Search-->
-                <form class="app-search d-none d-md-block"  *ngIf="dashboardSvc.showSearch">
+                <form class="app-search d-none d-md-block" *ngIf="dashboardSvc.showSearch" (submit)="$event.preventDefault()">
                     <div class="position-relative">
-                        <input type="text" class="form-control" placeholder="Search..." [(ngModel)]="searchString"
-                            id="search-options" name="search-options" (keydown.enter)="searchNow($event)">
+                        <input type="text" class="form-control" placeholder="Zoek of scan..." [(ngModel)]="searchString"
+                            id="search-options" name="search-options" autocomplete="off" autocorrect="off" spellcheck="false"
+                            (keydown.enter)="searchNow($event)" (keydown.tab)="searchOnBarcodeTab($event)">
 
                         <span class="mdi mdi-magnify search-widget-icon" (click)="searchNow($event)"></span>
                         <span class="mdi mdi-close-circle search-widget-icon search-widget-icon-close d-none"

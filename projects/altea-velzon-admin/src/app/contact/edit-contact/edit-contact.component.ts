@@ -399,7 +399,7 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
 
     const query = new DbQuery()
     query.and('contactId', QueryOperator.equals, contact.id)
-    //query.and('start', QueryOperator.lessThan, this.ordersCreateBefore)
+    query.and('start', QueryOperator.lessThan, this.ordersCreateBefore)
     query.orderByDesc('start')
     query.orderByDesc('cre')
     query.include('lines')
@@ -408,7 +408,8 @@ export class EditContactComponent extends NgEditBaseComponent<Contact> implement
     let orders = await this.orderSvc.query$(query)
 
     if (ArrayHelper.NotEmpty(orders)) {
-      this.ordersCreateBefore = orders[orders.length - 1].start
+      let lastOrder = orders[orders.length - 1]
+      this.ordersCreateBefore = lastOrder.start
       this.orders.push(...orders.map(order => UIOrder.fromOrder(order)))
     }
 

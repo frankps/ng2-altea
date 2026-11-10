@@ -18,7 +18,7 @@ import { cartData } from './data';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { DashboardService } from 'ng-common';
-import { ProductService, ResourceService, SessionService } from 'ng-altea-common';
+import { barcodeFromSearch, ProductService, ResourceService, SessionService } from 'ng-altea-common';
 import { AppComponent } from '../../../app.component';
 
 @Component({
@@ -344,9 +344,11 @@ export class TopbarComponent implements OnInit {
 
   searchNow(input: any) {
 
-    console.error(input)
+    input?.preventDefault?.()
 
-    switch (this.searchString) {
+    const term = (this.searchString ?? '').trim()
+
+    switch (term) {
       case 'wxc':
         this.sessionSvc.toggleRole('posAdmin')  //toggleRolePosAdmin()  posAdmin
         break
@@ -360,10 +362,19 @@ export class TopbarComponent implements OnInit {
         break
 
       default:
-        this.dashboardSvc.searchFor(this.searchString)
+        this.dashboardSvc.searchFor(term)
+        if (barcodeFromSearch(term))
+          this.searchString = ''
     }
 
 
+  }
+
+  /** A wedge configured to suffix Tab instead of Enter. A normal Tab still leaves the field. */
+  searchOnBarcodeTab(event: Event) {
+    if (!barcodeFromSearch((this.searchString ?? '').trim()))
+      return
+    this.searchNow(event)
   }
 
   createNew() {

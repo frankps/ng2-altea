@@ -14,6 +14,7 @@ import { StripeService } from '../stripe.service';
 import { er } from '@fullcalendar/core/internal-common';
 import { OrderReminders } from 'projects/ts-altea-logic/src/lib/order/messaging/order-reminders';
 import { Router } from '@angular/router';
+import { barcodeFromSearch, focusProductSearch, looksLikeBarcode, posScanAllowed, setInputValue } from './barcode-scan';
 
 
 
@@ -114,6 +115,11 @@ export class OrderMgrUiService {   // implements OnInit
   */
   mode: string
   modeChanges: BehaviorSubject<string> = new BehaviorSubject<string>(null)
+
+  /** One scan at a time. A second Enter from the same burst is ignored. */
+  private barcodeChain: Promise<void> = Promise.resolve()
+  private lastScanCode = ''
+  private lastScanAt = 0
 
 
   /** Is POS (Point Of Sales) => In shop  */
@@ -1510,14 +1516,20 @@ export class OrderMgrUiService {   // implements OnInit
 
   async searchProductsOld(searchFor: string) {
 
+    const term = (searchFor ?? '').trim()
+    console.warn('searchProductsOld', term)
 
-    console.warn('searchProductsOld', searchFor)
-    
+    const code = barcodeFromSearch(term)
+    if (code) {
+      this.scanBarcode(code)
+      return
+    }
+
     const query = new DbQuery()
 
     query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
 
-    query.and('name', QueryOperator.contains, searchFor)
+    query.and('name', QueryOperator.contains, term)
     query.and('del', QueryOperator.equals, false)
     query.and('showPos', QueryOperator.equals, true)
 
@@ -1542,6 +1554,160 @@ export class OrderMgrUiService {   // implements OnInit
           this.spinner.hide()
         }) */
 
+  }
+
+  /**
+   * Exact `codes[]` hit. One product is added (or its line quantity goes up).
+   * A product with options, variants, a bundle or a subscription is opened
+   * instead, the same as a click. Several hits stay in the list.
+   */
+  scanBarcode(raw: string): void {
+    const code = (raw ?? '').trim()
+    if (!looksLikeBarcode(code))
+      return
+
+    const now = performance.now()
+    if (code === this.lastScanCode && now - this.lastScanAt < 250)
+      return
+    this.lastScanCode = code
+    this.lastScanAt = now
+
+    this.barcodeChain = this.barcodeChain
+      .then(() => this.applyBarcode(code))
+      .catch(error => {
+        console.error(error)
+        this.spinner.hide()
+        this.dashboardSvc.showErrorToast('Barcode opzoeken mislukt')
+      })
+  }
+
+  private async applyBarcode(code: string): Promise<void> {
+    if (this.mode !== 'compose')
+      this.changeMode('compose')
+
+    this.clearSearchIfCode(code)
+
+    const query = new DbQuery()
+    query.and('branchId', QueryOperator.equals, this.sessionSvc.branchId)
+    query.and('codes', QueryOperator.has, code)
+    query.and('del', QueryOperator.equals, false)
+    query.and('act', QueryOperator.equals, true)
+    query.include('options:orderBy=idx.values:orderBy=idx', 'items:orderBy=idx', 'prices')
+    query.take = 20
+
+    this.spinner.show()
+    let products: Product[] = []
+    try {
+      products = (await this.productSvc.query$(query, false)) ?? []
+    } finally {
+      this.spinner.hide()
+    }
+
+    const needle = code.toLowerCase()
+    products = products.filter(product =>
+      posScanAllowed(product) &&
+      (product.codes ?? []).some(stored => (stored ?? '').trim().toLowerCase() === needle)
+    )
+
+    this.products = products
+    this.currentCategoryId = 'search'
+
+    if (products.length === 0) {
+      this.dashboardSvc.showErrorToast('Geen product met deze code')
+      focusProductSearch()
+      return
+    }
+
+    if (products.length > 1) {
+      focusProductSearch()
+      return
+    }
+
+    const openedChoices = await this.openScannedProduct(products[0])
+    if (!openedChoices)
+      focusProductSearch()
+  }
+
+  /** True when the scan opened a picker instead of adding the line. */
+  private async openScannedProduct(product: Product): Promise<boolean> {
+    if (product.isCategory()) {
+      await this.showProductsInCategory(product)
+      return true
+    }
+
+    if (!product.variantOfId && await this.showVariants(product))
+      return true
+
+    if (product.isBundle() || product.isSubscription() || product.hasOptions()) {
+      await this.newOrderLine(product)
+      return true
+    }
+
+    await this.addOrBumpScanned(product)
+    return false
+  }
+
+  private async addOrBumpScanned(product: Product): Promise<void> {
+    if (!this.order)
+      await this.newOrder()
+
+    const existing = this.scannedBumpLine(product.id)
+    if (existing) {
+      const next = existing.qty + 1
+      if (product.maxQty && next > product.maxQty) {
+        this.dashboardSvc.showErrorToast(`Maximum ${product.maxQty}`)
+        this.product = product
+        this.orderLine = existing
+        this.orderLineIsNew = false
+        return
+      }
+
+      existing.product = existing.product ?? product
+      existing.qty = next
+      existing.markAsUpdated('qty')
+      this.product = product
+      this.orderLine = existing
+      this.orderLineIsNew = false
+      this.orderDirty = true
+      this.updateNrOfPersons(existing)
+      await this.calculateAll()
+      this.order.refreshSummary()
+      return
+    }
+
+    const line = await this.newOrderLine(product)
+    if (!line)
+      return
+    await this.addOrderLine(line)
+  }
+
+  /** The plain line a repeat scan should raise. The latest match, so a second scan stacks. */
+  private scannedBumpLine(productId: string): OrderLine | null {
+    const lines = this.order?.lines
+    if (!lines?.length)
+      return null
+
+    for (let i = lines.length - 1; i >= 0; i--) {
+      const line = lines[i]
+      if (!line || line.productId !== productId || line.pId)
+        continue
+      if (line.options?.some(option => option?.values?.length))
+        continue
+      return line
+    }
+
+    return null
+  }
+
+  private clearSearchIfCode(code: string): void {
+    const el = document.getElementById('search-options')
+    if (!(el instanceof HTMLInputElement))
+      return
+    const value = el.value.trim()
+    if (!value)
+      return
+    if (value === code || barcodeFromSearch(value) === code)
+      setInputValue(el, '')
   }
 
   /** checks if current order contains given product */

@@ -1,6 +1,6 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { OrderMgrUiService, BrowseCatalogComponent } from 'ng-altea-common';
+import { BarcodeWedge, OrderMgrUiService, BrowseCatalogComponent } from 'ng-altea-common';
 import { DashboardService, NgBaseComponent } from 'ng-common';
 import { ContactSelect2Component } from 'projects/ng-altea-common/src/lib/order-mgr/contact-select2/contact-select2.component';
 import { BehaviorSubject, Observable, take, takeUntil } from 'rxjs';
@@ -29,7 +29,7 @@ export enum PosOrderMode {
   templateUrl: './manage-order.component.html',
   styleUrls: ['./manage-order.component.scss'],
 })
-export class ManageOrderComponent extends NgBaseComponent implements OnInit {
+export class ManageOrderComponent extends NgBaseComponent implements OnInit, OnDestroy {
 
   defaultServiceOrder = ['start', 'compose', 'plan', 'contact', 'pay']
   defaultProductOrder = ['start', 'compose', 'contact', 'pay']
@@ -52,6 +52,17 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
 
 
   showConfirm = false
+
+  /** Zebra DS2278 (and any keyboard wedge) while Samenstellen is open. */
+  private wedge: BarcodeWedge
+
+  private readonly onScanKey = (event: KeyboardEvent) => {
+    if (this.mode !== PosOrderMode.compose) {
+      this.wedge.reset()
+      return
+    }
+    this.wedge.handle(event)
+  }
 
   constructor(protected route: ActivatedRoute, protected orderMgrSvc: OrderMgrUiService, protected dashboardSvc: DashboardService) {
     super()
@@ -80,6 +91,8 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
 
     this.dashboardSvc.showSearch = true
 
+    this.wedge = new BarcodeWedge(code => this.orderMgrSvc.scanBarcode(code))
+
     this.dashboardSvc.search$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(searchString => {
       this.orderMgrSvc.searchProductsOld(searchString)
     })
@@ -87,8 +100,13 @@ export class ManageOrderComponent extends NgBaseComponent implements OnInit {
   }
 
   async ngOnInit() {
+    document.addEventListener('keydown', this.onScanKey, true)
+  }
 
-
+  override ngOnDestroy() {
+    document.removeEventListener('keydown', this.onScanKey, true)
+    this.wedge?.dispose()
+    super.ngOnDestroy()
   }
 
   get mode(): string {
